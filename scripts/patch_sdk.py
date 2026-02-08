@@ -141,6 +141,49 @@ def patch_readme(sdk_dir: Path) -> None:
         print("  README.md — already patched, skipping")
 
 
+PYPROJECT_URLS_SENTINEL = "[project.urls]"
+
+PYPROJECT_URLS = """
+[project.urls]
+Homepage = "https://github.com/DeloitteWorkiva/workiva-sdk"
+Documentation = "https://deloitteworkiva.github.io/workiva-sdk/"
+Repository = "https://github.com/DeloitteWorkiva/workiva-sdk"
+Issues = "https://github.com/DeloitteWorkiva/workiva-sdk/issues"
+Changelog = "https://github.com/DeloitteWorkiva/workiva-sdk/releases"
+"""
+
+
+def patch_pyproject(sdk_dir: Path) -> None:
+    """Add project URLs and license to pyproject.toml (idempotent)."""
+    pyproject_path = sdk_dir / "pyproject.toml"
+    if not pyproject_path.exists():
+        print(f"  SKIP pyproject.toml — not found at {pyproject_path}")
+        return
+
+    content = pyproject_path.read_text()
+    original = content
+
+    # Add license if missing
+    if 'license = ' not in content and 'requires-python' in content:
+        content = content.replace(
+            'requires-python',
+            'license = "Apache-2.0"\nrequires-python',
+        )
+
+    # Add project URLs if missing (after dependencies, before [tool.poetry])
+    if PYPROJECT_URLS_SENTINEL not in content:
+        content = content.replace(
+            "\n[tool.poetry]",
+            "\n" + PYPROJECT_URLS.strip() + "\n\n[tool.poetry]",
+        )
+
+    if content != original:
+        pyproject_path.write_text(content)
+        print("  pyproject.toml — patched (license + URLs)")
+    else:
+        print("  pyproject.toml — already patched, skipping")
+
+
 def main() -> None:
     if len(sys.argv) < 2:
         print(f"Usage: {sys.argv[0]} <sdk-dir>")
@@ -154,6 +197,7 @@ def main() -> None:
     print(f"Patching SDK in {sdk_dir} ...")
     patch_init(sdk_dir)
     patch_readme(sdk_dir)
+    patch_pyproject(sdk_dir)
     print("Done.")
 
 

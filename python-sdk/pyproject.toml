@@ -5,6 +5,7 @@ version = "0.4.0"
 description = "Workiva Python SDK - Unified client for Platform, Chains, and Wdata APIs"
 authors = [{ name = "Jorge Revenga" },]
 readme = "README.md"
+license = "Apache-2.0"
 requires-python = ">=3.10"
 dependencies = [
     "httpcore >=1.0.9",
@@ -13,6 +14,13 @@ dependencies = [
     "pydantic >=2.11.2",
     "typing-extensions >=4.11",
 ]
+
+[project.urls]
+Homepage = "https://github.com/DeloitteWorkiva/workiva-sdk"
+Documentation = "https://deloitteworkiva.github.io/workiva-sdk/"
+Repository = "https://github.com/DeloitteWorkiva/workiva-sdk"
+Issues = "https://github.com/DeloitteWorkiva/workiva-sdk/issues"
+Changelog = "https://github.com/DeloitteWorkiva/workiva-sdk/releases"
 
 [tool.poetry]
 packages = [
