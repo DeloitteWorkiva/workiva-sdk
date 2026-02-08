@@ -5,9 +5,9 @@ Cómo está construido el SDK internamente. Para contribuidores y curiosos.
 ## Pipeline: Spec → SDK
 
 ```
-platform.yaml ─┐
-chains.yaml   ─┤→ prepare_specs.py → *_processed.yaml
-wdata.yaml    ─┘         │
+oas/platform.yaml ─┐
+oas/chains.yaml   ─┤→ prepare_specs.py → *_processed.yaml
+oas/wdata.yaml    ─┘         │
                           ▼
                   speakeasy merge → merged.yaml
                           │
@@ -198,6 +198,7 @@ Si Workiva agrega un nuevo endpoint:
 
 ### Agregar una nueva API
 
-1. Agrega el spec a `prepare_specs.py` (resolución de conflictos)
-2. Agrega la línea en el `Makefile` (merge command)
-3. `make force`
+1. Agrega el spec `.yaml` a la carpeta `oas/`
+2. Agrega el procesamiento en `prepare_specs.py` (resolución de conflictos)
+3. Agrega la línea en el `Makefile` (merge command)
+4. `make force`

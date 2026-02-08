@@ -1,6 +1,6 @@
 # Specs procesados (se regeneran con make prepare)
-*_processed.yaml
-merged.yaml
+oas/*_processed.yaml
+oas/merged.yaml
 .spec_checksums
 
 # Python

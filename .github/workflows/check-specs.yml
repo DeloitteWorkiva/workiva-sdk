@@ -38,7 +38,7 @@ jobs:
       - name: Check for changes
         id: check
         run: |
-          current=$(sha256sum platform.yaml chains.yaml wdata.yaml 2>/dev/null | sort | sha256sum | cut -d' ' -f1)
+          current=$(sha256sum oas/platform.yaml oas/chains.yaml oas/wdata.yaml 2>/dev/null | sort | sha256sum | cut -d' ' -f1)
           previous=$(cat .spec_checksums 2>/dev/null || echo "none")
           if [ "$current" = "$previous" ]; then
             echo "changed=false" >> "$GITHUB_OUTPUT"
@@ -60,9 +60,9 @@ jobs:
         if: steps.check.outputs.changed == 'true'
         id: versions
         run: |
-          platform_ver=$(grep -m1 'version:' platform.yaml | awk '{print $2}' | tr -d "'\"")
-          chains_ver=$(grep -m1 'version:' chains.yaml | awk '{print $2}' | tr -d "'\"")
-          wdata_ver=$(grep -m1 'version:' wdata.yaml | awk '{print $2}' | tr -d "'\"")
+          platform_ver=$(grep -m1 'version:' oas/platform.yaml | awk '{print $2}' | tr -d "'\"")
+          chains_ver=$(grep -m1 'version:' oas/chains.yaml | awk '{print $2}' | tr -d "'\"")
+          wdata_ver=$(grep -m1 'version:' oas/wdata.yaml | awk '{print $2}' | tr -d "'\"")
           echo "summary=Platform ${platform_ver}, Chains ${chains_ver}, Wdata ${wdata_ver}" >> "$GITHUB_OUTPUT"
 
       - name: Create Pull Request

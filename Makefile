@@ -13,14 +13,15 @@ SHELL := /bin/bash
 .PHONY: all download check prepare merge generate force clean help test test-unit test-integration test-cov build publish
 
 # Directories
-SPECS_DIR := .
+SPECS_DIR := oas
 SCRIPTS_DIR := scripts
 SDK_DIR := python-sdk
 CHECKSUMS_FILE := .spec_checksums
 
 # Source specs
-SPECS := platform.yaml chains.yaml wdata.yaml
-PROCESSED := platform_processed.yaml chains_processed.yaml wdata_processed.yaml
+SPEC_NAMES := platform.yaml chains.yaml wdata.yaml
+SPECS := $(addprefix $(SPECS_DIR)/,$(SPEC_NAMES))
+PROCESSED := $(addprefix $(SPECS_DIR)/,platform_processed.yaml chains_processed.yaml wdata_processed.yaml)
 
 # Config file for download URLs
 SOURCES_CONF := spec_sources.conf

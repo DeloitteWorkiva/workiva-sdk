@@ -41,9 +41,9 @@ cd python-sdk && uv sync   # Install/sync all deps including dev
 ### Pipeline: Spec → SDK
 
 ```
-platform.yaml ─┐                                    ┌─ python-sdk/src/workiva/
-chains.yaml   ─┤→ prepare_specs.py → *_processed.yaml → speakeasy merge → merged.yaml → speakeasy generate ─┤
-wdata.yaml    ─┘                                    └─ patch_sdk.py (exports + README)
+oas/platform.yaml ─┐                                    ┌─ python-sdk/src/workiva/
+oas/chains.yaml   ─┤→ prepare_specs.py → *_processed.yaml → speakeasy merge → merged.yaml → speakeasy generate ─┤
+oas/wdata.yaml    ─┘                                    └─ patch_sdk.py (exports + README)
 ```
 
 **`scripts/prepare_specs.py`** handles what Speakeasy can't:
@@ -112,13 +112,13 @@ Tests live in `python-sdk/tests/` (outside `src/`, safe from regeneration).
 - `asyncPaginationSep2025: true` → enables async pagination generators
 - `allOfMergeStrategy: shallowMerge` → required for the merged spec
 
-**Merge order matters**: platform.yaml is LAST in the merge command because the last spec's global `servers` win. Platform's servers (US/EU/APAC) should be the global default.
+**Merge order matters**: platform.yaml is LAST in the merge command because the last spec's global `servers` win. Platform's servers (US/EU/APAC) should be the global default. All specs live in `oas/`.
 
 ## File Survival Matrix
 
 | Location | Survives `make force`? |
 |----------|----------------------|
-| `gen.yaml`, `scripts/`, `Makefile`, `tests/` | Yes |
+| `oas/`, `gen.yaml`, `scripts/`, `Makefile`, `tests/` | Yes |
 | `_hooks/client.py`, `_hooks/polling.py`, `_hooks/exceptions.py` | Yes (Speakeasy preserves) |
 | `_hooks/registration.py` | Yes (generated once) |
 | `__init__.py`, `pyproject.toml`, `README.md` | Regenerated, then patched |

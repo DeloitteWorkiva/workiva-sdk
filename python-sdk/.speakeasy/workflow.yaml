@@ -1,0 +1,19 @@
+workflowVersion: 1.0.0
+speakeasyVersion: latest
+sources:
+    Workiva API:
+        inputs:
+            - location: ../oas/merged.yaml
+        output: .speakeasy/out.openapi.yaml
+        registry:
+            location: registry.speakeasyapi.dev/jrevenga/workiva/workiva-api
+targets:
+    workiva:
+        target: python
+        source: Workiva API
+        codeSamples:
+            registry:
+                location: registry.speakeasyapi.dev/jrevenga/workiva/workiva-api-python-code-samples
+            labelOverride:
+                fixedValue: Python (SDK)
+            blocking: false
