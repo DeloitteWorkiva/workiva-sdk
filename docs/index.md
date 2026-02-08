@@ -1,4 +1,4 @@
-# Workiva Python SDK
+# Workiva SDK
 
 [![PyPI](https://img.shields.io/pypi/v/workiva)](https://pypi.org/project/workiva/)
 [![Python](https://img.shields.io/pypi/pyversions/workiva)](https://pypi.org/project/workiva/)

@@ -1,5 +1,5 @@
-site_name: Workiva Python SDK
-site_description: SDK unificado de Python para las APIs de Workiva — Platform, Chains y Wdata
+site_name: Workiva SDK
+site_description: SDK unificado para las APIs de Workiva — Platform, Chains y Wdata
 site_url: https://deloitteworkiva.github.io/workiva-sdk/
 repo_url: https://github.com/DeloitteWorkiva/workiva-sdk
 repo_name: DeloitteWorkiva/workiva-sdk

@@ -1,4 +1,6 @@
-# Workiva Python SDK
+<div align="center">
+
+# Workiva SDK
 
 [![PyPI](https://img.shields.io/pypi/v/workiva)](https://pypi.org/project/workiva/)
 [![Python 3.10+](https://img.shields.io/pypi/pyversions/workiva)](https://pypi.org/project/workiva/)
@@ -8,9 +10,13 @@
 
 SDK unificado de Python para las APIs de Workiva: **Platform**, **Chains** y **Wdata**.
 
-> **[Documentación completa](https://deloitteworkiva.github.io/workiva-sdk/)** — Guías, referencia de API, ejemplos y arquitectura.
-
 Tres OpenAPI specs, un solo paquete tipado con autenticación automática, polling de operaciones, paginación y soporte sync/async.
+
+[Documentación](https://deloitteworkiva.github.io/workiva-sdk/) · [Inicio rápido](https://deloitteworkiva.github.io/workiva-sdk/inicio-rapido/) · [Referencia de API](https://deloitteworkiva.github.io/workiva-sdk/referencia-api/)
+
+</div>
+
+---
 
 ## Instalación
 
@@ -52,8 +58,8 @@ with Workiva(client_id="tu_client_id", client_secret="tu_client_secret") as clie
 ## Características
 
 - **Autenticación automática** — OAuth2 client_credentials con token caching global y refresco ante 401
-- **Operaciones de larga duración** — `client.wait(response).result(timeout=300)` para polling automático de operaciones 202
-- **Paginación transparente** — `while response.next is not None: response = response.next()` para todos los patrones
+- **Operaciones de larga duración** — `client.wait(response).result(timeout=300)` para polling automático
+- **Paginación transparente** — `while response.next is not None: response = response.next()`
 - **Sync + Async** — Cada método tiene su variante `_async`: `client.files.get_files_async()`
 - **Multi-región** — US (default), EU, APAC con `server_idx=0|1|2`
 - **Reintentos con backoff** — `RetryConfig` global o per-operation
@@ -99,18 +105,20 @@ with Workiva(client_id="...", client_secret="...") as client:
 
 ## Documentación
 
+La documentación completa está disponible en **[GitHub Pages](https://deloitteworkiva.github.io/workiva-sdk/)**.
+
 | Guía | Descripción |
 |------|-------------|
-| [Inicio rápido](docs/inicio-rapido.md) | Instalación y primer request en 2 minutos |
-| [Autenticación](docs/autenticacion.md) | OAuth2 client_credentials, token caching |
-| [Configuración](docs/configuracion.md) | Servidores, timeouts, reintentos, logging |
-| [Operaciones de larga duración](docs/operaciones-larga-duracion.md) | Patrón 202, polling con `wait()` |
-| [Paginación](docs/paginacion.md) | 5 patrones, iteración con `.next()` |
-| [Manejo de errores](docs/manejo-errores.md) | Jerarquía de excepciones, try/except |
-| [Uso asíncrono](docs/uso-asincrono.md) | Métodos `_async`, `asyncio.gather` |
-| [Referencia de API](docs/referencia-api/index.md) | Los 17 namespaces y sus operaciones |
-| [Workiva Scripting](docs/workiva-scripting.md) | Uso en el módulo de scripting |
-| [Arquitectura](docs/arquitectura-sdk.md) | Pipeline, hooks, regeneración |
+| [Inicio rápido](https://deloitteworkiva.github.io/workiva-sdk/inicio-rapido/) | Instalación y primer request en 2 minutos |
+| [Autenticación](https://deloitteworkiva.github.io/workiva-sdk/autenticacion/) | OAuth2 client_credentials, token caching |
+| [Configuración](https://deloitteworkiva.github.io/workiva-sdk/configuracion/) | Servidores, timeouts, reintentos, logging |
+| [Operaciones de larga duración](https://deloitteworkiva.github.io/workiva-sdk/operaciones-larga-duracion/) | Patrón 202, polling con `wait()` |
+| [Paginación](https://deloitteworkiva.github.io/workiva-sdk/paginacion/) | 5 patrones, iteración con `.next()` |
+| [Manejo de errores](https://deloitteworkiva.github.io/workiva-sdk/manejo-errores/) | Jerarquía de excepciones, try/except |
+| [Uso asíncrono](https://deloitteworkiva.github.io/workiva-sdk/uso-asincrono/) | Métodos `_async`, `asyncio.gather` |
+| [Referencia de API](https://deloitteworkiva.github.io/workiva-sdk/referencia-api/) | Los 17 namespaces y sus operaciones |
+| [Workiva Scripting](https://deloitteworkiva.github.io/workiva-sdk/workiva-scripting/) | Uso en el módulo de scripting |
+| [Arquitectura](https://deloitteworkiva.github.io/workiva-sdk/arquitectura-sdk/) | Pipeline, hooks, regeneración |
 
 ## Desarrollo
 
@@ -129,16 +137,11 @@ wdata.yaml    ─┘
 ```
 
 ```bash
-# Pipeline completo (descarga → detecta cambios → genera)
-make all
-
-# Forzar regeneración
-make force
-
-# Pasos individuales
-make prepare        # Pre-procesar specs (conflictos, paginación, recursión)
-make merge          # Speakeasy merge → merged.yaml
-make generate       # Speakeasy generate + patch
+make all                # Pipeline completo (descarga → detecta cambios → genera)
+make force              # Forzar regeneración
+make prepare            # Pre-procesar specs
+make merge              # Speakeasy merge → merged.yaml
+make generate           # Speakeasy generate + patch
 ```
 
 ### Tests
@@ -148,9 +151,6 @@ make test               # 58 tests (unit + integration)
 make test-unit          # Solo unit tests
 make test-integration   # Solo integration tests
 make test-cov           # Coverage de _hooks (90%)
-
-# Un test específico
-cd python-sdk && uv run pytest tests/unit/test_polling_helpers.py -v
 ```
 
 ### Build
@@ -164,6 +164,7 @@ make build              # → python-sdk/dist/workiva-0.4.0-py3-none-any.whl
 ```
 .
 ├── Makefile                    # Build system
+├── mkdocs.yml                  # Documentación (MkDocs Material)
 ├── scripts/
 │   ├── prepare_specs.py        # Pre-procesamiento de specs
 │   └── patch_sdk.py            # Patches post-generación
@@ -171,19 +172,10 @@ make build              # → python-sdk/dist/workiva-0.4.0-py3-none-any.whl
 ├── chains.yaml                 # OpenAPI spec: Chains API
 ├── wdata.yaml                  # OpenAPI spec: Wdata API
 ├── docs/                       # Documentación en español
-│   ├── index.md
-│   ├── referencia-api/
-│   └── ...
 └── python-sdk/                 # SDK generado
     ├── src/workiva/
     │   ├── _hooks/             # Código custom (sobrevive regeneración)
-    │   │   ├── client.py       # Clase Workiva con wait()
-    │   │   ├── polling.py      # OperationPoller
-    │   │   └── exceptions.py   # OperationFailed, Cancelled, Timeout
     │   ├── sdk.py              # Clase SDK base
-    │   ├── files.py            # Namespace: archivos
-    │   ├── wdata.py            # Namespace: Wdata
-    │   ├── chains.py           # Namespace: Chains
     │   └── ...                 # 17 namespaces total
     └── tests/
         ├── unit/               # 38 unit tests
