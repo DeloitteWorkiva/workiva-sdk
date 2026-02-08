@@ -27,47 +27,70 @@ from workiva._hooks.polling import OperationPoller
 from workiva._hooks.exceptions import OperationFailed, OperationCancelled, OperationTimeout
 """
 
-INSTALL_INSTRUCTIONS = """\
-### PyPI
+PYPI_README = """\
+# Workiva SDK
+
+[![Python 3.10+](https://img.shields.io/pypi/pyversions/workiva)](https://pypi.org/project/workiva/)
+
+**3 APIs. 17 namespaces. 350+ operaciones. Un solo cliente Python.**
+
+[Documentación](https://deloitteworkiva.github.io/workiva-sdk/) · [Quick Start](https://deloitteworkiva.github.io/workiva-sdk/inicio-rapido/) · [API Reference](https://deloitteworkiva.github.io/workiva-sdk/referencia-api/) · [GitHub](https://github.com/DeloitteWorkiva/workiva-sdk)
+
+---
+
+## Instalación
 
 ```bash
 pip install workiva
 ```
 
-### uv
-
-```bash
-uv add workiva
-```
-
-### Poetry
-
-```bash
-poetry add workiva
-```"""
-
-SCRIPTING_SECTION = """
-## Workiva Scripting
-
-To use this SDK from the Workiva scripting module, add it to your `requirements.txt`:
-
-```
-workiva==0.4.0
-```
-
-Then in your script:
+## Uso
 
 ```python
 from workiva import Workiva
 
 with Workiva(client_id="...", client_secret="...") as client:
-    # List files
-    response = client.files.list_files()
+    # Platform API
+    response = client.admin.get_workspaces()
 
-    # Copy a file and wait for completion
+    # Wdata API
+    tables = client.wdata.get_tables()
+
+    # Chains API
+    chains = client.chains.list_chains()
+
+    # Operaciones de larga duración
     response = client.files.copy_file(file_id="abc", file_copy=params)
     operation = client.wait(response).result(timeout=300)
 ```
+
+## Características
+
+- **Autenticación automática** — OAuth2 client_credentials con token caching
+- **Operaciones de larga duración** — `client.wait(response).result(timeout=300)`
+- **Paginación transparente** — `while response.next is not None: response = response.next()`
+- **Sync + Async** — Cada método tiene su variante `_async`
+- **Multi-región** — US, EU, APAC con `server_idx=0|1|2`
+- **Reintentos con backoff** — `RetryConfig` global o per-operation
+- **Tipado completo** — Modelos Pydantic
+
+## APIs
+
+| API | Namespace | Operaciones |
+|-----|-----------|:-----------:|
+| **Platform** | `files`, `documents`, `spreadsheets`, `admin`, `permissions`, `tasks`, `presentations`, `milestones`, `activities`, `content`, `graph`, `sustainability`, `test_forms`, `reports`, `operations`, `iam` | 280+ |
+| **Chains** | `chains` | 20+ |
+| **Wdata** | `wdata` | 56+ |
+
+## Documentación
+
+La documentación completa está en [GitHub Pages](https://deloitteworkiva.github.io/workiva-sdk/):
+guías de autenticación, configuración, paginación, operaciones async, manejo de errores,
+referencia de los 17 namespaces y guía para Workiva Scripting.
+
+---
+
+Este software es propiedad de Deloitte. Todos los derechos reservados.
 """
 
 
@@ -88,57 +111,19 @@ def patch_init(sdk_dir: Path) -> None:
 
 
 def patch_readme(sdk_dir: Path) -> None:
-    """Clean up README.md for production use (idempotent)."""
+    """Replace generated README.md with production version (idempotent)."""
     readme_path = sdk_dir / "README.md"
     if not readme_path.exists():
         print(f"  SKIP README.md — not found at {readme_path}")
         return
 
     content = readme_path.read_text()
-    original = content
-
-    # Remove license badge line
-    content = re.sub(
-        r"^\[!\[License: MIT\].*\n",
-        "",
-        content,
-        flags=re.MULTILINE,
-    )
-
-    # Remove > [!IMPORTANT] block (multi-line, ends at blank line)
-    content = re.sub(
-        r"^<br /><br />\n> \[!IMPORTANT\].*?\n(?:>.*\n)*\n",
-        "",
-        content,
-        flags=re.MULTILINE,
-    )
-
-    # Remove > [!TIP] block about running first generation action
-    content = re.sub(
-        r"^> \[!TIP\]\n> .*?first generation action.*?\n\n+",
-        "",
-        content,
-        flags=re.MULTILINE,
-    )
-
-    # Replace the uv/pip/poetry install sections that contain git+<UNSET>.git
-    content = re.sub(
-        r"### uv\n.*?### PIP\n.*?### Poetry\n.*?```\n",
-        INSTALL_INSTRUCTIONS + "\n",
-        content,
-        flags=re.DOTALL,
-    )
-
-    # Add Workiva Scripting section if not already present
-    scripting_sentinel = "## Workiva Scripting"
-    if scripting_sentinel not in content:
-        content = content.rstrip("\n") + "\n" + SCRIPTING_SECTION
-
-    if content != original:
-        readme_path.write_text(content)
-        print("  README.md — patched for production")
-    else:
+    if content.strip() == PYPI_README.strip():
         print("  README.md — already patched, skipping")
+        return
+
+    readme_path.write_text(PYPI_README)
+    print("  README.md — replaced with production version")
 
 
 PYPROJECT_URLS_SENTINEL = "[project.urls]"
