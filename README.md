@@ -4,8 +4,11 @@
 [![Python 3.10+](https://img.shields.io/pypi/pyversions/workiva)](https://pypi.org/project/workiva/)
 [![Tests](https://img.shields.io/badge/tests-58%20passing-brightgreen)]()
 [![Coverage](https://img.shields.io/badge/hooks%20coverage-90%25-brightgreen)]()
+[![Docs](https://img.shields.io/badge/docs-GitHub%20Pages-blue)](https://deloitteworkiva.github.io/workiva-sdk/)
 
 SDK unificado de Python para las APIs de Workiva: **Platform**, **Chains** y **Wdata**.
+
+> **[Documentación completa](https://deloitteworkiva.github.io/workiva-sdk/)** — Guías, referencia de API, ejemplos y arquitectura.
 
 Tres OpenAPI specs, un solo paquete tipado con autenticación automática, polling de operaciones, paginación y soporte sync/async.
 

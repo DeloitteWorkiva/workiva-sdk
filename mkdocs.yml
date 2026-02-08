@@ -1,0 +1,79 @@
+site_name: Workiva Python SDK
+site_description: SDK unificado de Python para las APIs de Workiva — Platform, Chains y Wdata
+site_url: https://deloitteworkiva.github.io/workiva-sdk/
+repo_url: https://github.com/DeloitteWorkiva/workiva-sdk
+repo_name: DeloitteWorkiva/workiva-sdk
+
+theme:
+  name: material
+  language: es
+  palette:
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      primary: indigo
+      accent: amber
+      toggle:
+        icon: material/brightness-7
+        name: Cambiar a modo oscuro
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      primary: indigo
+      accent: amber
+      toggle:
+        icon: material/brightness-4
+        name: Cambiar a modo claro
+  features:
+    - navigation.sections
+    - navigation.expand
+    - navigation.top
+    - search.highlight
+    - content.code.copy
+  icon:
+    repo: fontawesome/brands/github
+
+markdown_extensions:
+  - admonition
+  - pymdownx.details
+  - pymdownx.superfences
+  - pymdownx.highlight:
+      anchor_linenums: true
+  - pymdownx.inlinehilite
+  - pymdownx.tabbed:
+      alternate_style: true
+  - tables
+  - toc:
+      permalink: true
+
+nav:
+  - Inicio: index.md
+  - Guías:
+      - Inicio rápido: inicio-rapido.md
+      - Autenticación: autenticacion.md
+      - Configuración: configuracion.md
+      - Operaciones de larga duración: operaciones-larga-duracion.md
+      - Paginación: paginacion.md
+      - Manejo de errores: manejo-errores.md
+      - Uso asíncrono: uso-asincrono.md
+  - Referencia de API:
+      - Índice: referencia-api/index.md
+      - Activities: referencia-api/activities.md
+      - Admin: referencia-api/admin.md
+      - Chains: referencia-api/chains.md
+      - Content: referencia-api/content.md
+      - Documents: referencia-api/documents.md
+      - Files: referencia-api/files.md
+      - Graph: referencia-api/graph.md
+      - IAM: referencia-api/iam.md
+      - Milestones: referencia-api/milestones.md
+      - Operations: referencia-api/operations.md
+      - Permissions: referencia-api/permissions.md
+      - Presentations: referencia-api/presentations.md
+      - Reports: referencia-api/reports.md
+      - Spreadsheets: referencia-api/spreadsheets.md
+      - Sustainability: referencia-api/sustainability.md
+      - Tasks: referencia-api/tasks.md
+      - Test Forms: referencia-api/test-forms.md
+      - Wdata: referencia-api/wdata.md
+  - Avanzado:
+      - Workiva Scripting: workiva-scripting.md
+      - Arquitectura del SDK: arquitectura-sdk.md
