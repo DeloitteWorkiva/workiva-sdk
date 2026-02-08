@@ -25,9 +25,7 @@ jobs:
           python-version: "3.12"
 
       - name: Install Speakeasy CLI
-        uses: speakeasy-api/speakeasy-action/setup@v1
-        with:
-          version: latest
+        run: curl -fsSL https://go.speakeasy.com/cli-install.sh | sh
 
       - name: Install SDK dependencies
         run: cd python-sdk && uv sync
@@ -50,6 +48,8 @@ jobs:
 
       - name: Regenerate SDK
         if: steps.check.outputs.changed == 'true'
+        env:
+          SPEAKEASY_API_KEY: ${{ secrets.SPEAKEASY_API_KEY }}
         run: make prepare merge generate
 
       - name: Run tests
