@@ -1,0 +1,12 @@
+# TaskApprovalStepInput
+
+An approval step in the approval process for a task. Each step defines how completion is determined and who participates.
+
+
+## Fields
+
+| Field                                                                                  | Type                                                                                   | Required                                                                               | Description                                                                            | Example                                                                                |
+| -------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------- |
+| `completion_mode`                                                                      | [models.CompletionMode](../models/completionmode.md)                                   | :heavy_check_mark:                                                                     | N/A                                                                                    | ONE                                                                                    |
+| `due_date`                                                                             | [date](https://docs.python.org/3/library/datetime.html#date-objects)                   | :heavy_minus_sign:                                                                     | An ISO 8601 datetime indicating a deadline for this approval step, or null if not set. | 2023-06-11T13:00:00+00:00                                                              |
+| `participants`                                                                         | List[[models.TaskUser](../models/taskuser.md)]                                         | :heavy_check_mark:                                                                     | The participants in this approval step.                                                |                                                                                        |

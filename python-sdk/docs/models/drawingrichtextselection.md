@@ -1,0 +1,12 @@
+# DrawingRichTextSelection
+
+Describes a selection within a drawing element's text
+
+
+## Fields
+
+| Field                                                                                 | Type                                                                                  | Required                                                                              | Description                                                                           | Example                                                                               |
+| ------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------- |
+| `drawing_element`                                                                     | *str*                                                                                 | :heavy_check_mark:                                                                    | Identifier of the drawing element                                                     | WW91IGZvdW5kIG1lIQ                                                                    |
+| `start`                                                                               | [models.Caret](../models/caret.md)                                                    | :heavy_check_mark:                                                                    | A caret (as in Caret Navigation) is a location between two characters in a paragraph. |                                                                                       |
+| `stop`                                                                                | [models.Caret](../models/caret.md)                                                    | :heavy_check_mark:                                                                    | A caret (as in Caret Navigation) is a location between two characters in a paragraph. |                                                                                       |

@@ -1,0 +1,2670 @@
+openapi: 3.0.0
+info:
+  description: This API is used to manage the execution of OneCloud chains and fetch metadata about your OneCloud workspaces.
+  license:
+    name: Apache 2.0
+    url: 'http://www.apache.org/licenses/LICENSE-2.0.html'
+  title: OneCloud API
+  version: v1
+  x-logo:
+    altText: OneCloud logo
+    backgroundColor: transparent
+    url: 'https://statics-onecloud-io.s3.amazonaws.com/OneCloudLogo_Color.png'
+  contact:
+    name: Workiva Inc
+    url: 'https://www.workiva.com'
+    email: platformsupport@workiva.com
+  termsOfService: 'https://developers.workiva.com'
+servers:
+  - url: 'https://h.app.wdesk.com/s/wdata/oc/api'
+    description: US
+  - url: 'https://h.eu.wdesk.com/s/wdata/oc/api'
+    description: EU
+  - url: 'https://h.apac.wdesk.com/s/wdata/oc/api'
+    description: APAC
+externalDocs:
+  description: Developer documentation for Workiva Inc.
+  url: 'https://developers.workiva.com'
+tags:
+  - description: The Chain API endpoints provide an interface for getting information about chains and their commands.
+    name: chain
+  - description: The Workspace API endpoints provide an interface for getting information about Chain workspaces.
+    name: workspace
+  - description: The Environment API endpoints provide an interface for getting information about Chain environments.
+    name: environment
+  - description: 'The Execution API endpoints provide an interface for getting information about a chain''s execution, such as when it starts and stops, its status, and run history.'
+    name: execution
+  - description: The Security API endpoints provide an interface for interacting with security-related objects and actions.
+    name: security
+  - description: The Data Prep API endpoints provide an interface to update and publish mapping groups.
+    name: dataprep
+components:
+  parameters:
+    page:
+      description: Page number to retrieve in the paginated results (0-based index).
+      example: 3
+      in: query
+      name: page
+      required: false
+      schema:
+        type: integer
+    pageSize:
+      description: Limit number of results returned (Max 100).
+      example: 10
+      in: query
+      name: pageSize
+      required: false
+      schema:
+        type: integer
+  schemas:
+    Activity:
+      description: An object representing an event within chains.
+      type: object
+      properties:
+        created_at:
+          type: string
+        id:
+          $ref: '#/components/schemas/ID'
+        key:
+          type: string
+        owner_id:
+          $ref: '#/components/schemas/ID'
+        owner_type:
+          type: string
+        parameters:
+          properties:
+            id:
+              $ref: '#/components/schemas/ID'
+          type: object
+        recipient_id:
+          $ref: '#/components/schemas/ID'
+        recipient_type:
+          type: string
+        trackable_id:
+          $ref: '#/components/schemas/ID'
+        trackable_type:
+          type: string
+        updated_at:
+          type: string
+    ActivityResponse:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/Activity'
+    Chain:
+      type: object
+      properties:
+        concurrency_enabled:
+          description: Whether or not the chain will execute commands in parallel.
+          type: boolean
+          example: true
+          default: false
+        created_at:
+          description: A timestamp representing the original creation time of the chain.
+          type: string
+          example: '2018-03-14 20:10:39.520585'
+        description:
+          description: A brief summary of what the chain does.
+          type: string
+          example: Sends an email when new changes are made to a Workiva spreadsheet.
+        disabled:
+          description: Whether or not the chain is disabled.
+          type: boolean
+          example: false
+        id:
+          $ref: '#/components/schemas/ID'
+        internal_id:
+          description: The unique identifier of the chain resource in the Chains environment.
+          type: integer
+          example: 74
+        name:
+          description: The name of the chain.
+          type: string
+          example: Monitoring Chain
+        runtime_inputs:
+          description: Variables available for user input for each execution.
+          type: array
+          items:
+            properties:
+              data_type:
+                description: The data type of the variable.
+                type: string
+                example: file
+              vuid:
+                description: The unique identifier of the variable.
+                type: string
+                example: 45072337-72ee-4c52-9428-0b2ae21ac73c
+            type: object
+        schedules:
+          description: An array describing the automated schedule for a chain run.
+          type: array
+          items:
+            $ref: '#/components/schemas/ChainSchedule'
+        updated_at:
+          description: A timestamp representing the last updated time of the chain.
+          type: string
+          example: '2018-03-14 20:10:39.520585'
+    ChainResponse:
+      type: object
+      properties:
+        data:
+          type: object
+          $ref: '#/components/schemas/Chain'
+    ChainRun:
+      type: object
+      properties:
+        chainId:
+          $ref: '#/components/schemas/ID'
+        endAt:
+          description: The timestamp at which the chain run completed.
+          type: string
+        envId:
+          $ref: '#/components/schemas/ID'
+        id:
+          $ref: '#/components/schemas/ID'
+        launchType:
+          description: The type of event that triggered the chain run.
+          type: string
+          enum:
+            - manual
+            - api
+            - schedule
+            - trigger
+            - slack
+            - trigger_event
+        pausedAt:
+          description: The timestamp at which the chain run was paused.
+          type: string
+        resultText:
+          description: The result of the chain run.
+          type: string
+        resumedAt:
+          description: The timestamp at which the chain run was resumed.
+          type: string
+        startAt:
+          description: The timestamp at which the chain run started.
+          type: string
+        state:
+          description: The state of the chain run.
+          type: string
+          enum:
+            - sleeping
+            - enqueueing
+            - paused
+            - errored
+            - warned
+            - all_succeeded
+            - stopped
+        userId:
+          $ref: '#/components/schemas/ID'
+        userName:
+          description: The user that triggered the chain run.
+          type: string
+    ChainRunNode:
+      type: object
+      properties:
+        endAt:
+          type: string
+        id:
+          $ref: '#/components/schemas/ID'
+        iterable:
+          type: boolean
+        name:
+          type: string
+        nodeId:
+          $ref: '#/components/schemas/ID'
+        nodeType:
+          type: string
+          enum:
+            - command
+            - event
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/ChainRunNodeResult'
+        startAt:
+          type: string
+        state:
+          type: string
+          enum:
+            - sleeping
+            - paused
+            - skipped
+            - errored
+            - warned
+            - succeeded
+    ChainRunNodeResult:
+      type: object
+      properties:
+        id:
+          $ref: '#/components/schemas/ID'
+        iteratorValue:
+          type: string
+        outputLogUrl:
+          type: string
+        outputVariables:
+          type: object
+          properties:
+            data:
+              type: string
+            path:
+              type: string
+        state:
+          type: string
+          enum:
+            - active
+            - errored
+            - skipped
+            - warned
+            - succeeded
+            - stopped
+    ChainRunPage:
+      type: object
+      properties:
+        chainExecutors:
+          description: An array of the chain runs.
+          type: array
+          items:
+            $ref: '#/components/schemas/ChainRun'
+        cursor:
+          description: Cursor value indicating page information for the data to retrieve.
+          type: string
+    ChainRunPageResponse:
+      type: object
+      properties:
+        data:
+          type: object
+          $ref: '#/components/schemas/ChainRunPage'
+    ChainRunResponse:
+      type: object
+      properties:
+        data:
+          type: object
+          $ref: '#/components/schemas/ChainRun'
+    ChainRunWithNodes:
+      description: A chain run object with details about all of the command nodes used in that run.
+      allOf:
+        - $ref: '#/components/schemas/ChainRun'
+        - properties:
+            nodes:
+              type: array
+              items:
+                $ref: '#/components/schemas/ChainRunNode'
+          required:
+            - rootCause
+          type: object
+    ChainRunWithNodesResponse:
+      type: object
+      properties:
+        data:
+          type: object
+          $ref: '#/components/schemas/ChainRunWithNodes'
+    ChainSchedule:
+      type: object
+      properties:
+        enabled:
+          type: boolean
+        end_at:
+          type: string
+        properties:
+          type: object
+          properties:
+            days_of_month:
+              items:
+                type: string
+              type: array
+            days_of_week:
+              items:
+                type: string
+              type: array
+            recurring_interval:
+              type: integer
+            recurring_type:
+              type: string
+            run_at_hours:
+              type: integer
+            run_at_minutes:
+              type: integer
+            run_at_seconds:
+              type: integer
+            stop_at_hours:
+              type: integer
+            stop_at_minutes:
+              type: integer
+            zone:
+              type: string
+        start_at:
+          type: string
+    ChainsEnvironmentResponse:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/EnvironmentChain'
+    ChainsResponse:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/Chain'
+    Combinator:
+      type: string
+      enum:
+        - AND
+        - OR
+    Command:
+      type: object
+      properties:
+        description:
+          description: A brief summary of what the command does.
+          type: string
+        id:
+          $ref: '#/components/schemas/ID'
+        link_id:
+          description: The link ID associated with the command.
+          type: string
+        name:
+          description: The name of the command.
+          type: string
+    CommandsResponse:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/Command'
+    Condition:
+      type: object
+      properties:
+        field:
+          type: string
+        operator:
+          $ref: '#/components/schemas/ConditionalOperator'
+        value:
+          type: array
+          items:
+            type: string
+    ConditionGroup:
+      type: object
+      properties:
+        combinator:
+          $ref: '#/components/schemas/Combinator'
+        rules:
+          type: array
+          items:
+            $ref: '#/components/schemas/Condition'
+    ConditionalOperator:
+      type: string
+      enum:
+        - 'NULL'
+        - NOT_NULL
+        - EQUALS
+        - NOT_EQUALS
+        - CONTAINS
+        - BEGINS_WITH
+        - ENDS_WITH
+        - DOES_NOT_CONTAIN
+        - DOES_NOT_BEGIN_WITH
+        - DOES_NOT_END_WITH
+        - LESS_THAN
+        - GREATER_THAN
+        - LESS_THAN_OR_EQUAL_TO
+        - GREATER_THAN_OR_EQUAL_TO
+    Conditions:
+      type: object
+      properties:
+        combinator:
+          $ref: '#/components/schemas/Combinator'
+        rules:
+          type: array
+          items:
+            $ref: '#/components/schemas/ConditionGroup'
+    Environment:
+      description: An object containing information about a particular workspace environment.
+      type: object
+      properties:
+        chains_count:
+          type: integer
+          format: int64
+        color:
+          type: string
+        created_at:
+          type: string
+        description:
+          type: string
+        id:
+          $ref: '#/components/schemas/ID'
+        name:
+          type: string
+        position:
+          type: integer
+          format: int64
+        settings:
+          type: object
+          properties:
+            color:
+              type: string
+        updated_at:
+          type: string
+        variables:
+          type: array
+          items:
+            $ref: '#/components/schemas/Variable'
+    EnvironmentChain:
+      type: object
+      properties:
+        created_at:
+          description: A timestamp representing the original creation time of the chain.
+          type: string
+          example: '2018-03-14 20:10:39.520585'
+        description:
+          description: A brief summary of what the chain does.
+          type: string
+          example: Sends an email when new changes are made to a Workiva spreadsheet.
+        id:
+          $ref: '#/components/schemas/ID'
+        internal_id:
+          description: The unique identifier of the chain resource in the Chains environment.
+          type: integer
+          example: 74
+        name:
+          description: The name of the chain.
+          type: string
+          example: Monitoring Chain
+        updated_at:
+          description: A timestamp representing the last updated time of the chain.
+          type: string
+          example: '2018-03-14 20:10:39.520585'
+    EnvironmentResponse:
+      type: object
+      properties:
+        data:
+          type: object
+          $ref: '#/components/schemas/Environment'
+    EnvironmentsResponse:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/Environment'
+    ErrorWithLineNumber:
+      type: object
+      properties:
+        error:
+          type: string
+        lineNumber:
+          type: integer
+    ErrorWithoutLineNumber:
+      type: object
+      properties:
+        error:
+          type: string
+    ID:
+      description: The unique identifier of a resource (can be a GUID).
+      type: string
+      example: '74'
+    LoginActivity:
+      description: Information about a particular login event.
+      type: object
+      properties:
+        city:
+          type: string
+        context:
+          type: string
+        country:
+          type: string
+        created_at:
+          type: string
+        failure_reason:
+          type: string
+        id:
+          $ref: '#/components/schemas/ID'
+        identity:
+          type: string
+        ip:
+          type: string
+        region:
+          type: string
+        success:
+          type: boolean
+        user_id:
+          $ref: '#/components/schemas/ID'
+    LoginActivityResponse:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/LoginActivity'
+    MappingRule:
+      description: An object containing information about a mapping rule.
+      type: object
+      properties:
+        conditions:
+          $ref: '#/components/schemas/Conditions'
+        id:
+          type: integer
+        mappingGroupGuid:
+          $ref: '#/components/schemas/ID'
+        position:
+          type: integer
+        source:
+          type: string
+        target:
+          type: string
+        type:
+          type: string
+          enum:
+            - LIKE
+            - EXACT
+            - REGEX
+    MappingRuleUploadResult:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/ErrorWithLineNumber'
+        mappingRules:
+          type: array
+          items:
+            $ref: '#/components/schemas/MappingRule'
+    Permission:
+      description: An object containing information about access permission to particular chains resources.
+      type: object
+      properties:
+        id:
+          $ref: '#/components/schemas/ID'
+        name:
+          type: string
+          enum:
+            - read
+            - execute
+            - write
+            - create
+            - admin
+        object_id:
+          $ref: '#/components/schemas/ID'
+        object_name:
+          type: string
+        object_type:
+          type: string
+        user_groups:
+          type: array
+          items:
+            $ref: '#/components/schemas/UserGroup'
+    PermissionsResponse:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/Permission'
+    RuntimeVariables:
+      type: object
+      additionalProperties: {}
+    SingleError:
+      type: object
+      properties:
+        error:
+          type: string
+        error_description:
+          type: string
+    User:
+      description: An object containing information about a particular user in Chains.
+      type: object
+      properties:
+        created_at:
+          type: string
+        email:
+          type: string
+        first_name:
+          type: string
+          nullable: true
+        id:
+          $ref: '#/components/schemas/ID'
+        last_name:
+          type: string
+          nullable: true
+        last_sign_in_at:
+          type: string
+          nullable: true
+        sso_enabled:
+          type: boolean
+    UserGroup:
+      description: An object containing information about a particular group in Chains.
+      type: object
+      properties:
+        created_at:
+          type: string
+        default:
+          type: boolean
+        id:
+          $ref: '#/components/schemas/ID'
+        name:
+          type: string
+    UserGroupResponse:
+      type: object
+      properties:
+        data:
+          type: object
+          $ref: '#/components/schemas/UserGroup'
+    UserGroupsResponse:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/UserGroup'
+    UserResponse:
+      type: object
+      properties:
+        data:
+          type: object
+          $ref: '#/components/schemas/User'
+    UsersResponse:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/User'
+    Variable:
+      type: object
+      properties:
+        defaultValue:
+          type: string
+        encrypted:
+          type: boolean
+        key:
+          type: string
+        label:
+          type: string
+        value:
+          type: string
+    Workspace:
+      type: object
+      properties:
+        company_id:
+          $ref: '#/components/schemas/ID'
+        description:
+          description: A description of the workspace.
+          type: string
+        external_id:
+          $ref: '#/components/schemas/ID'
+        id:
+          $ref: '#/components/schemas/ID'
+        name:
+          description: The name of the workspace.
+          type: string
+        variables:
+          description: A list of the workspace's variables.
+          type: array
+          items:
+            $ref: '#/components/schemas/Variable'
+    WorkspaceResponse:
+      type: object
+      properties:
+        data:
+          type: object
+          $ref: '#/components/schemas/Workspace'
+    WorkspacesResponse:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/Workspace'
+  callbacks: {}
+  links: {}
+  securitySchemes:
+    oauth2:
+      flows:
+        clientCredentials:
+          scopes: {}
+          tokenUrl: 'https://api.onecloud.io/oauth/token'
+      type: oauth2
+paths:
+  '/v1/chains/{chain_id}/export':
+    post:
+      operationId: exportChain
+      summary: Export a chain
+      description: |
+        Returns an encoded string to be stored in a file with a `.chain` extension. The `.chain` file can then be used later during an import chain call.
+        > **Note:** The exported chain will automatically expire and become unusable after 14 days. This has no bearing on the original chain or any imported copies.
+      tags:
+        - chain
+      security:
+        - oauth2: []
+      parameters:
+        - name: chain_id
+          description: The ID of the Chain.
+          in: path
+          required: true
+          schema:
+            type: string
+          example: '54865'
+        - name: wk-target-workspace
+          description: |
+            The `wk-target-workspace` header is only required for requests made by a service provider application. This does not apply to the majority of Workiva Chains API users. This header specifies the ID of the target workspace on which the service provider application wishes to take action. This workspace must be managed by the service provider.
+          in: header
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+          headers:
+            content-disposition:
+              description: |
+                content-disposition header following [MDN guidelines for content-disposition as a response header for the main body] (https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Content-Disposition#as_a_response_header_for_the_main_body). This header contains the filename of the exported chain e.g. `attachment; filename="export_file_name.chain"`.
+              schema:
+                type: string
+          content:
+            application/octet-stream:
+              schema:
+                type: string
+                format: binary
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SingleError'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SingleError'
+        '404':
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SingleError'
+  '/v1/chains/{chain_id}/publish':
+    post:
+      operationId: publishChain
+      summary: Publish a chain
+      description: Publishes the chain specified by the chain_id.
+      tags:
+        - chain
+      security:
+        - oauth2: []
+      parameters:
+        - name: chain_id
+          description: The ID of the Chain.
+          in: path
+          required: true
+          schema:
+            type: string
+          example: '54865'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                publish_comment:
+                  description: Optional publish comment
+                  type: string
+        required: false
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              example: |
+                {
+
+                  "data": {
+                    "id": "1",
+                    "internal_id": 0,
+                    "name": "List File Content",
+                    "description": "",
+                    "created_at": "2018-03-14 20:10:39.520585",
+                    "updated_at": "2018-03-14 20:10:39.520585",
+                    "disabled": true,
+                    "concurrency_enabled": false,
+                    "runtime_inputs": [
+                      {
+                        "vuid": "data.chain.45072337-72ee-4c52-9428-0b2ae21ac73c",
+                        "data_type": "string"
+                      }
+                    ],
+                    "schedules": [
+                      {
+                        "enabled": true,
+                        "start_at": "2019-02-08 06:25:00",
+                        "end_at": "2019-02-08 06:25:00",
+                        "properties": {
+                          "days_of_month": [
+                            "15", "30"
+                          ],
+                          "days_of_week": [],
+                          "recurring_interval": 1,
+                          "recurring_type": "monthly",
+                          "run_at_hours": 10,
+                          "run_at_minutes": 1,
+                          "run_at_seconds": 0,
+                          "stop_at_hours": null,
+                          "stop_at_minutes": null,
+                          "zone": "America/New_York"
+                        }
+                      }
+                    ]
+                  }
+                }
+              schema:
+                $ref: '#/components/schemas/ChainResponse'
+        '201':
+          description: |
+            Created. The chain was successfully published, but the underlying service failed to get the chain metadata.
+          headers:
+            Location:
+              description: The URL of the newly published chain.
+              schema:
+                type: string
+          content:
+            application/json:
+              example: |
+                {
+
+                  "data": {
+                    "message": "Operation succeeded, but an additional request failed. A location header with the resource URL is provided.",
+                    "id": "1",
+                    "url": "https://{appspot}/v1/metadata/environment/{environment_id}/chain/{chain_id}"
+                  }
+                }
+              schema:
+                $ref: '#/components/schemas/ChainResponse'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SingleError'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SingleError'
+        '403':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SingleError'
+  '/v1/dataprep/mapping_groups/{mappingGroupGuid}/publish':
+    post:
+      operationId: publish
+      summary: Publish draft version of a mapping group
+      description: 'Publish a draft version of a mapping group, specified by the mapping group GUID.'
+      tags:
+        - dataprep
+      parameters:
+        - name: mappingGroupGuid
+          description: The GUID of the Mapping Group.
+          in: path
+          required: true
+          schema:
+            type: string
+          example: 4ef64a1e-55da-4071-8168-d3387d99035d
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              example: |
+                {}
+              schema:
+                type: object
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorWithoutLineNumber'
+        '401':
+          description: Unauthorized
+          content:
+            text/plain:
+              schema:
+                type: string
+  '/v1/dataprep/mapping_groups/{mappingGroupGuid}/update_rules':
+    post:
+      operationId: updateRules
+      summary: Update mapping group rules
+      description: 'Update a mapping group ruleset, specified by the mapping group GUID.'
+      tags:
+        - dataprep
+      parameters:
+        - name: mappingGroupGuid
+          description: The GUID of the Mapping Group.
+          in: path
+          required: true
+          schema:
+            type: string
+          example: 4ef64a1e-55da-4071-8168-d3387d99035d
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                file:
+                  type: string
+                  format: binary
+                mode:
+                  type: string
+                  enum:
+                    - published
+                    - draft
+                    - both
+                  nullable: false
+        required: true
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              example: |
+                {
+
+                  "mappingRules": [
+                    {
+                      "id": 0,
+                      "mappingGroupGuid": "4ef64a1e-55da-4071-8168-d3387d99035d",
+                      "type": "LIKE",
+                      "source": "",
+                      "target": "",
+                      "position": 0,
+                      "conditions": {
+                        "combinator": "AND",
+                        "rules": [
+                          {
+                            "combinator": "AND",
+                            "rules": [
+                              {
+                                "field": "name",
+                                "operator": "NULL",
+                                "value": [
+                                  "Monthly Audit"
+                                ]
+                              }
+                            ]
+                          }
+                        ]
+                      }
+                    }
+                  ],
+                  "errors": [
+                    {
+                      "error": "",
+                      "lineNumber": null
+                    }
+                  ]
+                }
+              schema:
+                $ref: '#/components/schemas/MappingRuleUploadResult'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MappingRuleUploadResult'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                type: object
+  '/v1/environments/{environment_id}/import_chain':
+    post:
+      operationId: importChain
+      summary: Import a chain
+      description: |
+        Takes a .chain file and imports it into the provided environment. Returns chain metadata for the imported chain.
+        > **Note:** .chain export files will automatically expire and become unusable after 14 days.  Expired .chain files remain on the exported system until removed manually.
+      tags:
+        - chain
+      security:
+        - oauth2: []
+      parameters:
+        - name: environment_id
+          description: The ID of the Environment.
+          in: path
+          required: true
+          schema:
+            $ref: '#/components/schemas/ID'
+          example: '139'
+        - name: wk-target-workspace
+          description: |
+            The `wk-target-workspace` header is only required for requests made by a service provider application. This does not apply to the majority of Workiva Chains API users. This header specifies the ID of the target workspace on which the service provider application wishes to take action. This workspace must be managed by the service provider.
+          in: header
+          schema:
+            type: string
+      requestBody:
+        description: The .chain file to import.
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                file:
+                  description: Must be a .chain file.
+                  type: string
+                  format: binary
+        required: true
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              example: |
+                {
+
+                  "data": {
+                    "id": "1",
+                    "internal_id": 0,
+                    "name": "List File Content -- Import",
+                    "description": "",
+                    "created_at": "2018-03-14 20:10:39.520585",
+                    "updated_at": "2018-03-14 20:10:39.520585",
+                    "disabled": true,
+                    "concurrency_enabled": false,
+                    "runtime_inputs": [
+                      {
+                        "vuid": "data.chain.45072337-72ee-4c52-9428-0b2ae21ac73c",
+                        "data_type": "string"
+                      }
+                    ],
+                    "schedules": [
+                      {
+                        "enabled": true,
+                        "start_at": "2019-02-08 06:25:00",
+                        "end_at": "2019-02-08 06:25:00",
+                        "properties": {
+                          "days_of_month": [
+                            "15", "30"
+                          ],
+                          "days_of_week": [],
+                          "recurring_interval": 1,
+                          "recurring_type": "monthly",
+                          "run_at_hours": 10,
+                          "run_at_minutes": 1,
+                          "run_at_seconds": 0,
+                          "stop_at_hours": null,
+                          "stop_at_minutes": null,
+                          "zone": "America/New_York"
+                        }
+                      }
+                    ]
+                  }
+                }
+              schema:
+                $ref: '#/components/schemas/ChainResponse'
+        '201':
+          description: |
+            Created. The chain was successfully imported into the environment, but the underlying service failed to get the chain metadata.
+          headers:
+            Location:
+              description: The URL of the newly created chain.
+              schema:
+                type: string
+          content:
+            application/json:
+              example: |
+                {
+
+                  "data": {
+                    "message": "Operation succeeded, but an additional request failed. A location header with the resource URL is provided.",
+                    "id": "1",
+                    "url": "https://{api-root}/v1/metadata/environment/{environment_id}/chain/{chain_id}"
+                  }
+                }
+              schema:
+                $ref: '#/components/schemas/ChainResponse'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SingleError'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SingleError'
+        '403':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SingleError'
+  /v1/execute/chain_run/search:
+    get:
+      operationId: chainFilterSearch
+      summary: Search previous chain runs
+      description: |
+        Returns a list of all previous chain runs that match the provided criteria. The environment IDs specify which environments should be searched for the chain run. The chain IDs specify which specific chains should be returned. The state specified returns only those chains that are in that state (e.g. "completed"). If a cursor is provided, the corresponding page will be returned.
+      tags:
+        - execution
+      security:
+        - oauth2: []
+      parameters:
+        - name: environment_id
+          description: The ID(s) of the Environments to search. Not required for superusers or company admins.
+          in: query
+          required: false
+          schema:
+            type: array
+            items:
+              $ref: '#/components/schemas/ID'
+          example:
+            - '139'
+            - '140'
+            - '141'
+          explode: false
+          style: form
+        - name: chain_id
+          description: The ID(s) of the Chains to return.
+          in: query
+          required: false
+          schema:
+            type: array
+            items:
+              $ref: '#/components/schemas/ID'
+          example:
+            - '574'
+          explode: false
+          style: form
+        - name: start_date
+          description: Start Date (Unix timestamp).
+          in: query
+          required: false
+          schema:
+            $ref: '#/components/schemas/ID'
+          example: '1616143293'
+        - name: end_date
+          description: End Date (Unix timestamp).
+          in: query
+          required: false
+          schema:
+            $ref: '#/components/schemas/ID'
+          example: '1616143293'
+        - name: state
+          description: The state of the Chain Run.
+          in: query
+          required: false
+          schema:
+            type: string
+            enum:
+              - running
+              - succeeded
+              - failed
+              - paused
+              - warned
+              - completed
+          example: completed
+        - name: sort
+          description: Sort direction (by date).
+          in: query
+          schema:
+            type: string
+            enum:
+              - desc
+              - asc
+          example: desc
+        - name: cursor
+          description: 'Cursor value returned from the API, indicating page information.'
+          in: query
+          required: false
+          schema:
+            type: string
+          example: ''
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              example: |
+                {
+
+                  "data": {
+                    "cursor": "string",
+                    "chainExecutors": [
+                      {
+                        "id": "1",
+                        "chainId": "37",
+                        "envId": "1154",
+                        "userId": "5",
+                        "userName": "dev23",
+                        "startAt": "2019-02-08 06:25:00",
+                        "endAt": "2019-02-12 06:25:00",
+                        "pausedAt": "2019-02-12 06:25:00",
+                        "resumedAt": "2019-02-12 06:25:00",
+                        "state": "sleeping",
+                        "launchType": "manual",
+                        "resultText": "success"
+                      }
+                    ]
+                  }
+                }
+              schema:
+                $ref: '#/components/schemas/ChainRunPageResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SingleError'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SingleError'
+        '422':
+          description: Unable to Start Chain
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SingleError'
+  '/v1/execute/chain_run/{chain_run_id}':
+    get:
+      operationId: getChainRun
+      summary: Return chain run properties
+      description: 'Returns properties for a chain run with the provided ID, or a 404 if no such chain run is found.'
+      tags:
+        - execution
+      security:
+        - oauth2: []
+      parameters:
+        - name: chain_run_id
+          description: The ID of the Chain Run.
+          in: path
+          required: true
+          schema:
+            $ref: '#/components/schemas/ID'
+          example: '94532'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              example: |
+                {
+
+                  "data": {
+                    "id": "1",
+                    "chainId": "37",
+                    "envId": "1154",
+                    "userId": "5",
+                    "userName": "dev23",
+                    "startAt": "2019-02-08 06:25:00",
+                    "endAt": "2019-02-12 06:25:00",
+                    "pausedAt": "2019-02-12 06:25:00",
+                    "resumedAt": "2019-02-12 06:25:00",
+                    "state": "sleeping",
+                    "launchType": "manual",
+                    "resultText": "success"
+                  }
+                }
+              schema:
+                $ref: '#/components/schemas/ChainRunResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SingleError'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SingleError'
+  '/v1/execute/chain_run/{chain_run_id}/nodes':
+    get:
+      operationId: getChainRunNodes
+      summary: Return chain run properties with nodes
+      description: 'Returns properties and nodes for a chain run with the provided ID, or a 404 if no such chain run is found.'
+      tags:
+        - execution
+      security:
+        - oauth2: []
+      parameters:
+        - name: chain_run_id
+          description: The ID of the Chain Run.
+          in: path
+          required: true
+          schema:
+            $ref: '#/components/schemas/ID'
+          example: '54309'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              example: |
+                {
+
+                  "data": {
+                    "id": "1",
+                    "chainId": "37",
+                    "envId": "1154",
+                    "userId": "5",
+                    "userName": "dev23",
+                    "startAt": "2019-02-08 06:25:00",
+                    "endAt": "2019-02-12 06:25:00",
+                    "pausedAt": "2019-02-12 06:25:00",
+                    "resumedAt": "2019-02-12 06:25:00",
+                    "state": "sleeping",
+                    "launchType": "manual",
+                    "resultText": "success",
+                    "nodes": [
+                      {
+                        "id": "1",
+                        "name": "List File Content",
+                        "nodeType": "command",
+                        "state": "sleeping",
+                        "iterable": true,
+                        "nodeId": "dcaa856a-d1cc-4eca-8d79-4773ab1b58b9",
+                        "startAt": "2019-02-08 06:25:00",
+                        "endAt": "2019-02-12 06:25:00",
+                        "results": [
+                          {
+                            "id": "1",
+                            "iteratorValue": "Account",
+                            "outputVariables": {
+                              "data": null,
+                              "path": ""
+                            },
+                            "state": "active",
+                            "outputLogUrl": "dev.onecloud.io"
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                }
+              schema:
+                $ref: '#/components/schemas/ChainRunWithNodesResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SingleError'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SingleError'
+  '/v1/execute/chain_run/{chain_run_id}/stop':
+    post:
+      operationId: stopChain
+      summary: Stop a running chain
+      description: Stop a chain run with the specified ID.
+      tags:
+        - execution
+      security:
+        - oauth2: []
+      parameters:
+        - name: chain_run_id
+          description: The ID of the Chain Run.
+          in: path
+          required: true
+          schema:
+            $ref: '#/components/schemas/ID'
+          example: '543459'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              example: |
+                {
+
+                  "data": {
+                    "id": "1",
+                    "chainId": "37",
+                    "envId": "1154",
+                    "userId": "5",
+                    "userName": "dev23",
+                    "startAt": "2019-02-08 06:25:00",
+                    "endAt": "2019-02-12 06:25:00",
+                    "pausedAt": "2019-02-12 06:25:00",
+                    "resumedAt": "2019-02-12 06:25:00",
+                    "state": "sleeping",
+                    "launchType": "manual",
+                    "resultText": "success"
+                  }
+                }
+              schema:
+                $ref: '#/components/schemas/ChainRunResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SingleError'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SingleError'
+        '422':
+          description: Unable to Stop Chain
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SingleError'
+  '/v1/execute/environment/{environment_id}/chain/inputs_search':
+    get:
+      operationId: chainInputsSearch
+      summary: Search previous chain runs for an input value
+      description: |
+        Returns a list of all chain runs whose inputs match the provided search criteria. The search text is fuzzy matched; it matches any input value that contains the provided string. For example, a command that takes a File ID of "my_file_id" as an input can be searched using "my_file_id" as the search text input. The environment ID specifies which environment should be searched for chain run input parameters. The limit and cursor help determine the page size and which page to return.
+      tags:
+        - execution
+      security:
+        - oauth2: []
+      parameters:
+        - name: environment_id
+          description: The ID of the environment to search for chains run inputs.
+          in: path
+          required: true
+          schema:
+            $ref: '#/components/schemas/ID'
+          example: '130'
+        - name: search_text
+          description: The fuzzy input value to search for.
+          in: query
+          required: true
+          schema:
+            type: string
+          example: List File
+        - name: limit
+          description: Limit number of chainExecutors returned (Max 50).
+          in: query
+          required: false
+          schema:
+            $ref: '#/components/schemas/ID'
+          example: 10
+        - name: cursor
+          description: 'Cursor value returned from the API, indicating page information.'
+          in: query
+          required: false
+          schema:
+            type: string
+          example: ''
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              example: |
+                {
+
+                  "data": {
+                    "cursor": "string",
+                    "chainExecutors": [
+                      {
+                        "id": "1",
+                        "chainId": "37",
+                        "envId": "1154",
+                        "userId": "5",
+                        "userName": "dev23",
+                        "startAt": "2019-02-08 06:25:00",
+                        "endAt": "2019-02-12 06:25:00",
+                        "pausedAt": "2019-02-12 06:25:00",
+                        "resumedAt": "2019-02-12 06:25:00",
+                        "state": "sleeping",
+                        "launchType": "manual",
+                        "resultText": ""
+                      }
+                    ]
+                  }
+                }
+              schema:
+                $ref: '#/components/schemas/ChainRunPageResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SingleError'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SingleError'
+        '422':
+          description: Unable to Start Chain
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SingleError'
+  '/v1/execute/environment/{environment_id}/chain/{chain_id}/history':
+    get:
+      operationId: chainRunHistory
+      summary: Return run history for a chain
+      description: Retrieves a list of run history for a chain.
+      tags:
+        - execution
+      security:
+        - oauth2: []
+      parameters:
+        - name: environment_id
+          description: The ID of the Environment.
+          in: path
+          required: true
+          schema:
+            $ref: '#/components/schemas/ID'
+          example: '139'
+        - name: chain_id
+          description: The ID of the Chain.
+          in: path
+          required: true
+          schema:
+            type: string
+          example: '54865'
+        - name: limit
+          description: Limit number of chainRuns returned (max 50).
+          in: query
+          required: false
+          schema:
+            $ref: '#/components/schemas/ID'
+          example: 10
+        - name: cursor
+          description: 'Cursor value returned from the API, indicating page information.'
+          in: query
+          required: false
+          schema:
+            type: string
+        - name: start_date
+          description: Start Date (Unix timestamp).
+          in: query
+          required: false
+          schema:
+            $ref: '#/components/schemas/ID'
+          example: '1616143293'
+        - name: end_date
+          description: End Date (Unix timestamp).
+          in: query
+          required: false
+          schema:
+            $ref: '#/components/schemas/ID'
+          example: '1616143293'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              example: |
+                {
+
+                  "data": {
+                    "cursor": "string",
+                    "chainExecutors": [
+                      {
+                        "id": "1",
+                        "chainId": "37",
+                        "envId": "1154",
+                        "userId": "5",
+                        "userName": "dev23",
+                        "startAt": "2019-02-08 06:25:00",
+                        "endAt": "2019-02-12 06:25:00",
+                        "pausedAt": "2019-02-12 06:25:00",
+                        "resumedAt": "2019-02-12 06:25:00",
+                        "state": "sleeping",
+                        "launchType": "manual",
+                        "resultText": ""
+                      }
+                    ]
+                  }
+                }
+              schema:
+                $ref: '#/components/schemas/ChainRunPageResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SingleError'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SingleError'
+  '/v1/execute/environment/{environment_id}/chain/{chain_id}/start':
+    post:
+      operationId: startChain
+      summary: Execute a chain
+      description: 'Starts a chain run for a specific chain in an environment, specified by the Chain and Environment ID.'
+      tags:
+        - execution
+      security:
+        - oauth2: []
+      parameters:
+        - name: environment_id
+          description: The ID of the Environment.
+          in: path
+          required: true
+          schema:
+            $ref: '#/components/schemas/ID'
+          example: '139'
+        - name: chain_id
+          description: The ID of the Chain.
+          in: path
+          required: true
+          schema:
+            type: string
+          example: '34090'
+      requestBody:
+        description: The runtime variables that have been pre-defined for a Chain.
+        content:
+          application/json:
+            examples:
+              any:
+                summary: Runtime Variables
+                value:
+                  runtimeVariables:
+                    variableName: variableValue
+            schema:
+              type: object
+              properties:
+                runtimeVariables:
+                  $ref: '#/components/schemas/RuntimeVariables'
+        required: true
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              example: |
+                {
+
+                  "data": {
+                    "id": "1",
+                    "chainId": "37010",
+                    "envId": "1154",
+                    "userId": "5",
+                    "userName": "dev23",
+                    "startAt": "2019-02-08 06:25:00",
+                    "endAt": "2019-02-12 06:25:00",
+                    "pausedAt": "2019-02-12 06:25:00",
+                    "resumedAt": "2019-02-12 06:25:00",
+                    "state": "sleeping",
+                    "launchType": "manual",
+                    "resultText": "success"
+                  }
+                }
+              schema:
+                $ref: '#/components/schemas/ChainRunResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SingleError'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SingleError'
+        '422':
+          description: Unable to Start Chain
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SingleError'
+  /v1/metadata/chains/search:
+    get:
+      operationId: searchChains
+      summary: Search chains
+      description: |
+        Returns a list of all chains that match the provided criteria. The name of the change is fuzzy matched; it matches any chain name that contains the provided string. The workspace, external workspace, and environment IDs all help filter down the results to a particular setting. Setting the parallel execution enabled flag will only return chains whose commands run in parallel.
+      tags:
+        - chain
+      security:
+        - oauth2: []
+      parameters:
+        - name: workspace_id
+          description: The ID of the workspace to search for chains.
+          in: query
+          required: false
+          schema:
+            type: integer
+          example: 66
+        - name: external_workspace_id
+          description: The ID of the associated Workiva workspace to search for chains.
+          in: query
+          required: false
+          schema:
+            type: string
+          example: '201'
+        - name: environment_id
+          description: The ID of the environment to search for chains.
+          in: query
+          required: false
+          schema:
+            type: integer
+          example: 193
+        - name: name
+          description: The fuzzy name of the chain to search for.
+          in: query
+          required: false
+          schema:
+            type: string
+          example: Monthly Reports
+        - name: parallel_execution_enabled
+          description: Whether or not to return only chains that run in parallel or serially.
+          in: query
+          required: false
+          schema:
+            type: boolean
+          example: false
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              example: |
+                {
+
+                  "data": [
+                    {
+                      "id": "1",
+                      "internal_id": 0,
+                      "name": "File Utils Chain",
+                      "description": "Test a directory",
+                      "created_at": "2018-03-14 20:10:39.520585",
+                      "updated_at": "2018-03-14 20:10:39.520585",
+                      "disabled": true,
+                      "concurrency_enabled": false,
+                      "runtime_inputs": [
+                        {
+                          "vuid": "45072337-72ee-4c52-9428-0b2ae21ac73c",
+                          "data_type": "file"
+                        }
+                      ],
+                      "schedules": [
+                        {
+                          "enabled": true,
+                          "start_at": "2019-02-08 06:25:00",
+                          "end_at": "2019-02-08 06:25:00",
+                          "properties": {
+                            "days_of_month": [
+                              "1", "2", "10"
+                            ],
+                            "days_of_week": null,
+                            "recurring_interval": 1,
+                            "recurring_type": "monthly",
+                            "run_at_hours": 14,
+                            "run_at_minutes": 0,
+                            "run_at_seconds": 0,
+                            "stop_at_hours": null,
+                            "stop_at_minutes": null,
+                            "zone": "America/New_York"
+                          }
+                        }
+                      ]
+                    }
+                  ]
+                }
+              schema:
+                $ref: '#/components/schemas/ChainsResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SingleError'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SingleError'
+  '/v1/metadata/environment/{environment_id}/chain':
+    get:
+      operationId: getChains
+      summary: Return a list of chains for an environment
+      description: Retrieves a list of chains for an environment.
+      tags:
+        - chain
+      security:
+        - oauth2: []
+      parameters:
+        - name: environment_id
+          description: The ID of the Environment.
+          in: path
+          required: true
+          schema:
+            $ref: '#/components/schemas/ID'
+          example: '139'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              example: |
+                {
+
+                  "data": [
+                    {
+                      "id": "1",
+                      "internal_id": 0,
+                      "name": "string",
+                      "description": "string",
+                      "created_at": "2018-03-14 20:10:39.520585",
+                      "updated_at": "2018-03-14 20:10:39.520585"
+                    }
+                  ]
+                }
+              schema:
+                $ref: '#/components/schemas/ChainsEnvironmentResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SingleError'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SingleError'
+  '/v1/metadata/environment/{environment_id}/chain/{chain_id}':
+    get:
+      operationId: getChain
+      summary: Return chain properties
+      description: 'Returns properties for a chain with the provided ID, or a 404 if no such chain is found.'
+      tags:
+        - chain
+      security:
+        - oauth2: []
+      parameters:
+        - name: environment_id
+          description: The ID of the Environment.
+          in: path
+          required: true
+          schema:
+            type: string
+          example: '139'
+        - name: chain_id
+          description: The ID of the Chain.
+          in: path
+          required: true
+          schema:
+            type: string
+          example: '61549'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              example: |
+                {
+
+                  "data": {
+                    "id": "1",
+                    "internal_id": 0,
+                    "name": "List File Content",
+                    "description": "",
+                    "created_at": "2018-03-14 20:10:39.520585",
+                    "updated_at": "2018-03-14 20:10:39.520585",
+                    "disabled": true,
+                    "concurrency_enabled": false,
+                    "runtime_inputs": [
+                      {
+                        "vuid": "data.chain.45072337-72ee-4c52-9428-0b2ae21ac73c",
+                        "data_type": "string"
+                      }
+                    ],
+                    "schedules": [
+                      {
+                        "enabled": true,
+                        "start_at": "2019-02-08 06:25:00",
+                        "end_at": "2019-02-08 06:25:00",
+                        "properties": {
+                          "days_of_month": [
+                            "15", "30"
+                          ],
+                          "days_of_week": [],
+                          "recurring_interval": 1,
+                          "recurring_type": "monthly",
+                          "run_at_hours": 10,
+                          "run_at_minutes": 1,
+                          "run_at_seconds": 0,
+                          "stop_at_hours": null,
+                          "stop_at_minutes": null,
+                          "zone": "America/New_York"
+                        }
+                      }
+                    ]
+                  }
+                }
+              schema:
+                $ref: '#/components/schemas/ChainResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SingleError'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SingleError'
+  '/v1/metadata/environment/{environment_id}/chain/{chain_id}/command':
+    get:
+      operationId: getCommands
+      summary: Return command properties
+      description: 'Returns properties for a command with the provided ID, or a 404 if no such command is found.'
+      tags:
+        - chain
+      security:
+        - oauth2: []
+      parameters:
+        - name: environment_id
+          description: The ID of the Environment.
+          in: path
+          required: true
+          schema:
+            type: string
+          example: '139'
+        - name: chain_id
+          description: The ID of the Chain.
+          in: path
+          required: true
+          schema:
+            type: string
+          example: '2339'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              example: |
+                {
+
+                  "data": [
+                    {
+                      "id": "1",
+                      "link_id": "12",
+                      "name": "Chain command",
+                      "description": "Default command for this chain"
+                    }
+                  ]
+                }
+              schema:
+                $ref: '#/components/schemas/CommandsResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SingleError'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SingleError'
+  /v1/metadata/workspace:
+    get:
+      operationId: getWorkspaces
+      summary: Return a list of workspaces
+      description: Retrieves a list of workspaces for a company.
+      tags:
+        - workspace
+      security:
+        - oauth2: []
+      parameters: []
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              example: |
+                {
+
+                  "data": [
+                    {
+                      "id": "1",
+                      "company_id": "140",
+                      "external_id": "2",
+                      "name": "Workspace A",
+                      "description": "Primary workspace for operations",
+                      "variables": [
+                        {
+                          "key": "workspaces",
+                          "label": "Workspaces",
+                          "defaultValue": "",
+                          "value": null,
+                          "encrypted": true
+                        }
+                      ]
+                    }
+                  ]
+                }
+              schema:
+                $ref: '#/components/schemas/WorkspacesResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SingleError'
+  '/v1/metadata/workspace/{workspace_id}':
+    get:
+      operationId: getWorkspace
+      summary: Return workspace properties
+      description: 'Returns properties for a workspace with the provided ID, or a 404 if no such workspace is found.'
+      tags:
+        - workspace
+      security:
+        - oauth2: []
+      parameters:
+        - name: workspace_id
+          description: The ID of the Workspace.
+          in: path
+          required: true
+          schema:
+            $ref: '#/components/schemas/ID'
+          example: '12'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              example: |
+                {
+
+                  "data": {
+                    "id": "1",
+                    "company_id": "140",
+                    "external_id": "2",
+                    "name": "Workspace A",
+                    "description": "Primary workspace for operations",
+                    "variables": [
+                      {
+                        "key": "workspace1",
+                        "label": "Workspace1",
+                        "defaultValue": "",
+                        "value": null,
+                        "encrypted": true
+                      }
+                    ]
+                  }
+                }
+              schema:
+                $ref: '#/components/schemas/WorkspaceResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SingleError'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SingleError'
+  '/v1/metadata/workspace/{workspace_id}/environment':
+    get:
+      operationId: getEnvironments
+      summary: Return a list of environments for a workspace
+      description: Return a list of environments for a workspace.
+      tags:
+        - environment
+      security:
+        - oauth2: []
+      parameters:
+        - name: workspace_id
+          description: The ID of the Workspace.
+          in: path
+          required: true
+          schema:
+            $ref: '#/components/schemas/ID'
+          example: '12'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              example: |
+                {
+
+                  "data": [
+                    {
+                      "id": "1",
+                      "name": "Staging Environment",
+                      "description": "Environment to test changes",
+                      "position": 0,
+                      "color": "#3CB702",
+                      "chains_count": 15,
+                      "variables": [
+                        {
+                          "key": "environment",
+                          "label": "Environment",
+                          "defaultValue": "",
+                          "value": "Testing",
+                          "encrypted": true
+                        }
+                      ],
+                      "settings": {
+                        "color": "#3CB702"
+                      },
+                      "created_at": "2018-03-14 20:10:39.520585",
+                      "updated_at": "2018-03-14 20:10:39.520585"
+                    }
+                  ]
+                }
+              schema:
+                $ref: '#/components/schemas/EnvironmentsResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SingleError'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SingleError'
+  '/v1/metadata/workspace/{workspace_id}/environment/{environment_id}':
+    get:
+      operationId: getEnvironment
+      summary: Return environment properties
+      description: 'Return properties for an environment in a workspace with the provided IDs, or a 404 if no such workspace is found.'
+      tags:
+        - environment
+      security:
+        - oauth2: []
+      parameters:
+        - name: workspace_id
+          description: The ID of the Workspace.
+          in: path
+          required: true
+          schema:
+            $ref: '#/components/schemas/ID'
+          example: '12'
+        - name: environment_id
+          description: The ID of the Environment.
+          in: path
+          required: true
+          schema:
+            $ref: '#/components/schemas/ID'
+          example: '139'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              example: |
+                {
+
+                  "data": {
+                    "id": "1",
+                    "name": "string",
+                    "description": "string",
+                    "position": 0,
+                    "color": "#3CB702",
+                    "chains_count": 0,
+                    "variables": [
+                      {
+                        "key": "environment",
+                        "label": "Environment",
+                        "defaultValue": "",
+                        "value": "Testing",
+                        "encrypted": true
+                      }
+                    ],
+                    "settings": {
+                      "color": "#3CB702"
+                    },
+                    "created_at": "2018-03-14 20:10:39.520585",
+                    "updated_at": "2018-03-14 20:10:39.520585"
+                  }
+                }
+              schema:
+                $ref: '#/components/schemas/EnvironmentResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SingleError'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SingleError'
+  /v1/security/authorizations_activity:
+    get:
+      operationId: getAuthorizationsActivity
+      summary: Return a list of authorization activities
+      description: Returns a list of recent authorization activity events.
+      tags:
+        - security
+      security:
+        - oauth2: []
+      parameters:
+        - $ref: '#/components/parameters/pageSize'
+        - $ref: '#/components/parameters/page'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              example: |
+                {
+
+                  "data": [
+                    {
+                      "id": "1",
+                      "trackable_type": "UserGroupUser",
+                      "trackable_id": "1",
+                      "owner_type": "User",
+                      "owner_id": "2",
+                      "key": "user_group_user.destroy",
+                      "parameters": {
+                        "id": "1"
+                      },
+                      "recipient_type": "UserGroup",
+                      "recipient_id": "1",
+                      "created_at": "2018-03-14 20:10:39.520585",
+                      "updated_at": "2018-03-14 20:10:39.520585"
+                    }
+                  ]
+                }
+              schema:
+                $ref: '#/components/schemas/ActivityResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SingleError'
+  /v1/security/login_activity:
+    get:
+      operationId: getLoginActivity
+      summary: Return a list of login activity events
+      description: Returns a list of recent login activity events.
+      tags:
+        - security
+      security:
+        - oauth2: []
+      parameters:
+        - $ref: '#/components/parameters/pageSize'
+        - $ref: '#/components/parameters/page'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              example: |
+                {
+
+                  "data": [
+                    {
+                      "id": "1",
+                      "identity": "dev@onecloud.io",
+                      "context": "sessions#create",
+                      "success": true,
+                      "failure_reason": "Invalid login credentials. Please try again.",
+                      "user_id": "1",
+                      "ip": "1.1.1.1",
+                      "city": "New York",
+                      "region": "Midwest",
+                      "country": "United States",
+                      "created_at": "2018-03-14 20:10:39.520585"
+                    }
+                  ]
+                }
+              schema:
+                $ref: '#/components/schemas/LoginActivityResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SingleError'
+  /v1/security/permissions:
+    get:
+      operationId: getPermissions
+      summary: Return a list of all permissions for a company
+      description: Returns a list of all permissions for a company.
+      tags:
+        - security
+      security:
+        - oauth2: []
+      parameters:
+        - $ref: '#/components/parameters/pageSize'
+        - $ref: '#/components/parameters/page'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              example: |
+                {
+
+                  "data": [
+                    {
+                      "id": "1",
+                      "object_id": "12",
+                      "object_type": "Chain",
+                      "object_name": "Regression Test",
+                      "name": "read",
+                      "user_groups": [
+                        {
+                          "id": "1",
+                          "name": "Admins",
+                          "default": true,
+                          "created_at": "2018-03-14 20:10:39.520585"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              schema:
+                $ref: '#/components/schemas/PermissionsResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SingleError'
+  /v1/security/user_groups:
+    get:
+      operationId: getUserGroups
+      summary: Return a list of all user groups
+      description: Returns a list of all user groups in a company.
+      tags:
+        - security
+      security:
+        - oauth2: []
+      parameters:
+        - $ref: '#/components/parameters/pageSize'
+        - $ref: '#/components/parameters/page'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              example: |
+                {
+
+                  "data": [
+                    {
+                      "id": "1",
+                      "name": "Admins",
+                      "default": true,
+                      "created_at": "2018-03-14 20:10:39.520585"
+                    }
+                  ]
+                }
+              schema:
+                $ref: '#/components/schemas/UserGroupsResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SingleError'
+  '/v1/security/user_groups/{userGroupId}':
+    get:
+      operationId: getUserGroup
+      summary: Return user group properties
+      description: 'Return properties for a user group with the provided ID, or a 404 if no such user group is found.'
+      tags:
+        - security
+      security:
+        - oauth2: []
+      parameters:
+        - name: userGroupId
+          description: The ID of the User Group.
+          in: path
+          required: true
+          schema:
+            type: string
+          example: '21'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              example: |
+                {
+
+                  "data": {
+                    "id": "1",
+                    "name": "Admins",
+                    "default": true,
+                    "created_at": "2018-03-14 20:10:39.520585"
+                  }
+                }
+              schema:
+                $ref: '#/components/schemas/UserGroupResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SingleError'
+  '/v1/security/user_groups/{userGroupId}/permissions':
+    get:
+      operationId: getUserGroupPermissions
+      summary: Return a list of permissions for a user group
+      description: 'Returns properties for a user group with the provided ID, or a 404 if no such user group is found.'
+      tags:
+        - security
+      security:
+        - oauth2: []
+      parameters:
+        - name: userGroupId
+          description: The ID of the User Group.
+          in: path
+          required: true
+          schema:
+            type: string
+            example: '1'
+        - $ref: '#/components/parameters/pageSize'
+        - $ref: '#/components/parameters/page'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              example: |
+                {
+
+                  "data": [
+                    {
+                      "id": "1",
+                      "object_id": "12",
+                      "object_type": "Chain",
+                      "object_name": "Regression Test",
+                      "name": "read",
+                      "user_groups": [
+                        {
+                          "id": "1",
+                          "name": "Admins",
+                          "default": true,
+                          "created_at": "2018-03-14 20:10:39.520585"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              schema:
+                $ref: '#/components/schemas/PermissionsResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SingleError'
+  /v1/security/users:
+    get:
+      operationId: getUsers
+      summary: Return a list of users
+      description: Returns a list of all users in a particular company.
+      tags:
+        - security
+      security:
+        - oauth2: []
+      parameters:
+        - $ref: '#/components/parameters/pageSize'
+        - $ref: '#/components/parameters/page'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              example: |
+                {
+
+                  "data": [
+                    {
+                      "id": "1",
+                      "email": "dev@onecloud.io",
+                      "first_name": "Dev",
+                      "last_name": "Gomez",
+                      "sso_enabled": true,
+                      "last_sign_in_at": "2018-03-14 20:10:39.520585",
+                      "created_at": "2018-03-14 20:10:39.520585"
+                    }
+                  ]
+                }
+              schema:
+                $ref: '#/components/schemas/UsersResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SingleError'
+  '/v1/security/users/{userId}':
+    get:
+      operationId: getUser
+      summary: Return user properties
+      description: 'Returns properties for a user with the provided ID, or a 404 if no such user is found.'
+      tags:
+        - security
+      security:
+        - oauth2: []
+      parameters:
+        - name: userId
+          description: The ID of the User.
+          in: path
+          required: true
+          schema:
+            type: string
+          example: '1'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              example: |
+                {
+
+                  "data": {
+                    "id": "1",
+                    "email": "dev@onecloud.io",
+                    "first_name": "Dev",
+                    "last_name": "Gomez",
+                    "sso_enabled": true,
+                    "last_sign_in_at": "2018-03-14 20:10:39.520585",
+                    "created_at": "2018-03-14 20:10:39.520585"
+                  }
+                }
+              schema:
+                $ref: '#/components/schemas/UserResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SingleError'
+  '/v1/security/users/{userId}/groups':
+    get:
+      operationId: getUserUserGroups
+      summary: Return a list of user groups
+      description: Returns a list of all groups that a user is a part of in a particular company.
+      tags:
+        - security
+      security:
+        - oauth2: []
+      parameters:
+        - name: userId
+          description: The ID of the User.
+          in: path
+          required: true
+          schema:
+            type: string
+          example: '1'
+        - $ref: '#/components/parameters/pageSize'
+        - $ref: '#/components/parameters/page'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              example: |
+                {
+
+                  "data": [
+                    {
+                      "id": "1",
+                      "name": "Admins",
+                      "default": true,
+                      "created_at": "2018-03-14 20:10:39.520585"
+                    }
+                  ]
+                }
+              schema:
+                $ref: '#/components/schemas/UserGroupsResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SingleError'
+security: []
+x-explorer-enabled: true
+x-proxy-enabled: true
+x-samples-enabled: true
+x-samples-languages:
+  - curl
+  - node
+  - ruby
+  - javascript
+  - python
+

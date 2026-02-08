@@ -1,0 +1,13 @@
+# DimensionValue
+
+Data model for a dimension value
+
+
+
+## Fields
+
+| Field                                                                                                  | Type                                                                                                   | Required                                                                                               | Description                                                                                            | Example                                                                                                |
+| ------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------ |
+| `active`                                                                                               | *Optional[bool]*                                                                                       | :heavy_minus_sign:                                                                                     | Indicates whether the dimension value is available for use in new metrics.                             | true                                                                                                   |
+| `id`                                                                                                   | *Optional[str]*                                                                                        | :heavy_minus_sign:                                                                                     | A user-entered, unique identifier for the dimension value, up to 20 characters.                        | Ames, IA                                                                                               |
+| `name`                                                                                                 | *OptionalNullable[str]*                                                                                | :heavy_minus_sign:                                                                                     | The name of the dimension value, up to 300 characters. If not provided, defaults to the value of 'id'. | Ames, Iowa                                                                                             |

@@ -1,0 +1,83 @@
+configVersion: 2.0.0
+generation:
+  sdkClassName: SDK
+  usageSnippets:
+    optionalPropertyRendering: withExample
+    sdkInitStyle: constructor
+  fixes:
+    nameResolutionFeb2025: false
+    parameterOrderingFeb2024: false
+    requestResponseComponentNamesFeb2024: false
+    securityFeb2025: false
+    sharedErrorComponentsApr2025: false
+    sharedNestedComponentsJan2026: false
+  auth:
+    oAuth2ClientCredentialsEnabled: true
+    oAuth2PasswordEnabled: false
+    hoistGlobalSecurity: true
+  schemas:
+    allOfMergeStrategy: shallowMerge
+  requestBodyFieldName: ""
+  versioningStrategy: automatic
+  persistentEdits: {}
+  tests:
+    generateTests: true
+    generateNewTests: false
+    skipResponseBodyAssertions: false
+generate:
+  version: ""
+python:
+  version: 0.4.0
+  additionalDependencies:
+    dev:
+      pytest: ">=8.0"
+      pytest-asyncio: ">=0.24"
+      pytest-cov: ">=6.0"
+      respx: ">=0.22"
+    main:
+      typing-extensions: ">=4.11"
+  allowedRedefinedBuiltins:
+    - id
+    - object
+  asyncMode: both
+  author: Workiva
+  authors:
+    - Jorge Revenga
+  baseErrorName: SDKBaseError
+  clientServerStatusCodesAsErrors: true
+  constFieldCasing: upper
+  defaultErrorName: SDKError
+  description: Workiva Python SDK - Unified client for Platform, Chains, and Wdata APIs
+  enableCustomCodeRegions: false
+  enumFormat: enum
+  fixFlags:
+    asyncPaginationSep2025: true
+    responseRequiredSep2024: false
+  flattenGlobalSecurity: true
+  flattenRequests: false
+  flatteningOrder: parameters-first
+  imports:
+    option: openapi
+    paths:
+      callbacks: ""
+      errors: errors
+      operations: ""
+      shared: ""
+      webhooks: ""
+  inferUnionDiscriminators: true
+  inputModelSuffix: input
+  license: ""
+  maxMethodParams: 4
+  methodArguments: infer-optional-args
+  moduleName: ""
+  multipartArrayFormat: legacy
+  outputModelSuffix: output
+  packageManager: poetry
+  packageName: workiva
+  preApplyUnionDiscriminators: false
+  pytestFilterWarnings: []
+  pytestTimeout: 0
+  responseFormat: flat
+  sseFlatResponse: false
+  templateVersion: v2
+  useAsyncHooks: false

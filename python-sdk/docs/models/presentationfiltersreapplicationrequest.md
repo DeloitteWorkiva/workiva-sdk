@@ -1,0 +1,9 @@
+# PresentationFiltersReapplicationRequest
+
+
+## Fields
+
+| Field                                                                                    | Type                                                                                     | Required                                                                                 | Description                                                                              | Example                                                                                  |
+| ---------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------- |
+| `presentation_filters_reapplication`                                                     | [models.PresentationFiltersReapplication](../models/presentationfiltersreapplication.md) | :heavy_check_mark:                                                                       | The filter reapplication request to apply                                                | {<br/>"ignoreNonEditableFilters": true<br/>}                                             |
+| `presentation_id`                                                                        | *str*                                                                                    | :heavy_check_mark:                                                                       | The unique identifier of the presentation                                                |                                                                                          |

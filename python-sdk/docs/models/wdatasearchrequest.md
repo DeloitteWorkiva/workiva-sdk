@@ -1,0 +1,13 @@
+# WdataSearchRequest
+
+
+## Fields
+
+| Field                                                                         | Type                                                                          | Required                                                                      | Description                                                                   |
+| ----------------------------------------------------------------------------- | ----------------------------------------------------------------------------- | ----------------------------------------------------------------------------- | ----------------------------------------------------------------------------- |
+| `cursor`                                                                      | *Optional[str]*                                                               | :heavy_minus_sign:                                                            | A paging cursor; if included, `limit` is ignored                              |
+| `description`                                                                 | *Optional[str]*                                                               | :heavy_minus_sign:                                                            | The description to use when fuzzy-matching entities                           |
+| `limit`                                                                       | *Optional[int]*                                                               | :heavy_minus_sign:                                                            | The number of folders to return, from 1 to 1000; by default, 1000             |
+| `name`                                                                        | *Optional[str]*                                                               | :heavy_minus_sign:                                                            | The name to use when fuzzy-matching entities                                  |
+| `offset`                                                                      | *Optional[int]*                                                               | :heavy_minus_sign:                                                            | The item to start with on the page, greater than or equal to 0; by default, 0 |
+| `type`                                                                        | List[*int*]                                                                   | :heavy_minus_sign:                                                            | To limit the scope, the type of entity to return in the results               |

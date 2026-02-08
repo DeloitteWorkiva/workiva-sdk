@@ -1,0 +1,9 @@
+# PartiallyUpdateTablePropertiesRequest
+
+
+## Fields
+
+| Field                                                                        | Type                                                                         | Required                                                                     | Description                                                                  | Example                                                                      |
+| ---------------------------------------------------------------------------- | ---------------------------------------------------------------------------- | ---------------------------------------------------------------------------- | ---------------------------------------------------------------------------- | ---------------------------------------------------------------------------- |
+| `request_body`                                                               | List[[models.JSONPatchOperation](../models/jsonpatchoperation.md)]           | :heavy_check_mark:                                                           | Patch document representing the changes to be made to the table's properties |                                                                              |
+| `table_id`                                                                   | *str*                                                                        | :heavy_check_mark:                                                           | The unique identifier for the table                                          | WW91IGZvdW5kfIG1lIQ                                                          |

@@ -1,0 +1,9 @@
+# SpreadsheetFiltersReapplicationRequest
+
+
+## Fields
+
+| Field                                                                                  | Type                                                                                   | Required                                                                               | Description                                                                            | Example                                                                                |
+| -------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------- |
+| `spreadsheet_filters_reapplication`                                                    | [models.SpreadsheetFiltersReapplication](../models/spreadsheetfiltersreapplication.md) | :heavy_check_mark:                                                                     | The filter reapplication request to apply                                              | {<br/>"ignoreNonEditableFilters": true<br/>}                                           |
+| `spreadsheet_id`                                                                       | *str*                                                                                  | :heavy_check_mark:                                                                     | The unique identifier of the spreadsheet                                               |                                                                                        |

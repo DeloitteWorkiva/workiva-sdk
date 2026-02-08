@@ -1,0 +1,13 @@
+# ChainsChainRunHistoryRequest
+
+
+## Fields
+
+| Field                                                            | Type                                                             | Required                                                         | Description                                                      | Example                                                          |
+| ---------------------------------------------------------------- | ---------------------------------------------------------------- | ---------------------------------------------------------------- | ---------------------------------------------------------------- | ---------------------------------------------------------------- |
+| `chain_id`                                                       | *str*                                                            | :heavy_check_mark:                                               | The ID of the Chain.                                             | 54865                                                            |
+| `cursor`                                                         | *Optional[str]*                                                  | :heavy_minus_sign:                                               | Cursor value returned from the API, indicating page information. |                                                                  |
+| `end_date`                                                       | *Optional[str]*                                                  | :heavy_minus_sign:                                               | End Date (Unix timestamp).                                       | 74                                                               |
+| `environment_id`                                                 | *str*                                                            | :heavy_check_mark:                                               | The ID of the Environment.                                       | 74                                                               |
+| `limit`                                                          | *Optional[str]*                                                  | :heavy_minus_sign:                                               | Limit number of chainRuns returned (max 50).                     | 74                                                               |
+| `start_date`                                                     | *Optional[str]*                                                  | :heavy_minus_sign:                                               | Start Date (Unix timestamp).                                     | 74                                                               |

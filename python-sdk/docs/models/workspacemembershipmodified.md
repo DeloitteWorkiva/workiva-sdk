@@ -1,0 +1,12 @@
+# WorkspaceMembershipModified
+
+When the action was performed, and details about the user who did it
+
+
+
+## Fields
+
+| Field                                                                                                  | Type                                                                                                   | Required                                                                                               | Description                                                                                            | Example                                                                                                |
+| ------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------ |
+| `date_time`                                                                                            | [date](https://docs.python.org/3/library/datetime.html#date-objects)                                   | :heavy_minus_sign:                                                                                     | When the action was performed                                                                          | 2019-10-30T15:03:27Z                                                                                   |
+| `user`                                                                                                 | [OptionalNullable[models.WorkspaceMembershipSchemasUser]](../models/workspacemembershipschemasuser.md) | :heavy_minus_sign:                                                                                     | N/A                                                                                                    |                                                                                                        |

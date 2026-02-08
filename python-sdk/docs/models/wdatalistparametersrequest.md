@@ -1,0 +1,10 @@
+# WdataListParametersRequest
+
+
+## Fields
+
+| Field                                                                                     | Type                                                                                      | Required                                                                                  | Description                                                                               |
+| ----------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------- |
+| `cursor`                                                                                  | *Optional[str]*                                                                           | :heavy_minus_sign:                                                                        | A paging cursor; if included the limit is ignored                                         |
+| `limit`                                                                                   | *Optional[int]*                                                                           | :heavy_minus_sign:                                                                        | The number of parameters to return, must be between 1 and 1000, will default<br/>to 1000  |
+| `offset`                                                                                  | *Optional[int]*                                                                           | :heavy_minus_sign:                                                                        | The item to start with on the page, must be greater than or equal to 0, will default to 0 |

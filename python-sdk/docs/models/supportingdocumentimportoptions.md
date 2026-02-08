@@ -1,0 +1,11 @@
+# SupportingDocumentImportOptions
+
+Additional import options used for Native files. Should only be provided when kind is "Supporting Document".
+
+
+
+## Fields
+
+| Field                                                                                                                              | Type                                                                                                                               | Required                                                                                                                           | Description                                                                                                                        | Example                                                                                                                            |
+| ---------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------- |
+| `container_id`                                                                                                                     | *Optional[str]*                                                                                                                    | :heavy_minus_sign:                                                                                                                 | The ID of the folder in which to place the newly imported files. Set this to the empty string (`""`) to import to the root folder. | V0ZEYXRhRW5zVkNmU2Zi1mZjcE4EzNzk0ZmUwZjk                                                                                           |

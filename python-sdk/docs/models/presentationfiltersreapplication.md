@@ -1,0 +1,10 @@
+# PresentationFiltersReapplication
+
+A presentation filter reapply operation, which can reapply filters to a presentation and optionally ignore read-only filters.
+
+
+## Fields
+
+| Field                                                                                                                        | Type                                                                                                                         | Required                                                                                                                     | Description                                                                                                                  | Example                                                                                                                      |
+| ---------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------- |
+| `ignore_non_editable_filters`                                                                                                | *Optional[bool]*                                                                                                             | :heavy_minus_sign:                                                                                                           | Skip filters that cannot be reapplied (due to not having edit permissions or locked sections) instead of returning an error. | true                                                                                                                         |

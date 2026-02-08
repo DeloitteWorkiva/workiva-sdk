@@ -1,0 +1,14 @@
+# WdataGetFilesRequest
+
+
+## Fields
+
+| Field                                                                         | Type                                                                          | Required                                                                      | Description                                                                   |
+| ----------------------------------------------------------------------------- | ----------------------------------------------------------------------------- | ----------------------------------------------------------------------------- | ----------------------------------------------------------------------------- |
+| `cursor`                                                                      | *Optional[str]*                                                               | :heavy_minus_sign:                                                            | A paging cursor; if included, `limit` is ignored                              |
+| `limit`                                                                       | *Optional[int]*                                                               | :heavy_minus_sign:                                                            | The number of files to return, from 1 to 1000; by default, 1000               |
+| `offset`                                                                      | *Optional[int]*                                                               | :heavy_minus_sign:                                                            | The item to start with on the page, greater than or equal to 0; by default, 0 |
+| `search_text`                                                                 | *Optional[str]*                                                               | :heavy_minus_sign:                                                            | The text to filter the results upon; matching the file name                   |
+| `sort_by`                                                                     | [Optional[models.SortBy]](../models/sortby.md)                                | :heavy_minus_sign:                                                            | The column to use the sort order on                                           |
+| `sort_order`                                                                  | [Optional[models.SortOrder]](../models/sortorder.md)                          | :heavy_minus_sign:                                                            | The sort order for the files being returned                                   |
+| `table_id`                                                                    | *str*                                                                         | :heavy_check_mark:                                                            | The unique table identifier associated with this file                         |

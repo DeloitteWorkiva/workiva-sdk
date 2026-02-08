@@ -1,0 +1,14 @@
+# LineTerminator
+
+Defines the shape, size, and location of a line''s head and tail
+(the starting point and stop point of a line segment or connector).
+
+
+
+## Fields
+
+| Field                                                                                         | Type                                                                                          | Required                                                                                      | Description                                                                                   | Example                                                                                       |
+| --------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------- |
+| `cap`                                                                                         | [Optional[models.LineCap]](../models/linecap.md)                                              | :heavy_minus_sign:                                                                            | The way the terminator of a line looks.                                                       |                                                                                               |
+| `position`                                                                                    | [models.LineRelativePosition](../models/linerelativeposition.md)                              | :heavy_check_mark:                                                                            | The relative position for the head and tail of a line drawing element.                        | {<br/>"paragraphRelative": {<br/>"paragraphIndex": 3,<br/>"x": 0,<br/>"y": 0<br/>},<br/>"type": "paragraphRelative"<br/>} |
+| `size`                                                                                        | [Optional[models.LineCapSize]](../models/linecapsize.md)                                      | :heavy_minus_sign:                                                                            | The size of a cap at a line terminator.                                                       |                                                                                               |

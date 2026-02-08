@@ -1,0 +1,20 @@
+# Specs procesados (se regeneran con make prepare)
+*_processed.yaml
+merged.yaml
+.spec_checksums
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+.venv/
+dist/
+*.egg-info/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+
+# Speakeasy
+.speakeasy/

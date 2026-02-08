@@ -1,0 +1,12 @@
+# StyleText
+
+Applies a text/table style to a range of text. Table styles can only be applied to cells. Likewise, the "Normal" text style can only be applied to non-table text and the "Table (Normal)" style can only be applied to table text.
+
+
+
+## Fields
+
+| Field                                                                                            | Type                                                                                             | Required                                                                                         | Description                                                                                      | Example                                                                                          |
+| ------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------ |
+| `selection`                                                                                      | [models.RichTextSelection](../models/richtextselection.md)                                       | :heavy_check_mark:                                                                               | Describes a selection within piece of rich text                                                  | {<br/>"start": {<br/>"offset": 0,<br/>"paragraphIndex": 0<br/>},<br/>"stop": {<br/>"offset": 10,<br/>"paragraphIndex": 2<br/>}<br/>} |
+| `style`                                                                                          | *str*                                                                                            | :heavy_check_mark:                                                                               | The unique identifier of a style.                                                                | c3R5bGUta2V5Ol90Ymw                                                                              |

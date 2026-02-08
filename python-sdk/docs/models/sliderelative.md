@@ -1,0 +1,11 @@
+# SlideRelative
+
+Represents the position of a drawing relative to the top-left corner a slide.
+
+
+## Fields
+
+| Field                                                                                            | Type                                                                                             | Required                                                                                         | Description                                                                                      | Example                                                                                          |
+| ------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------ |
+| `x`                                                                                              | *float*                                                                                          | :heavy_check_mark:                                                                               | The horizontal offset in points typically from the left edge.                                    | 0                                                                                                |
+| `y`                                                                                              | *float*                                                                                          | :heavy_check_mark:                                                                               | The vertical offset in points typically from the top edge where larger numbers are further down/ | 0                                                                                                |

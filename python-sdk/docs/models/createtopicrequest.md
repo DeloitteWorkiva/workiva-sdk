@@ -1,0 +1,9 @@
+# CreateTopicRequest
+
+
+## Fields
+
+| Field                                                                               | Type                                                                                | Required                                                                            | Description                                                                         | Example                                                                             |
+| ----------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------- |
+| `topic`                                                                             | [models.TopicInput](../models/topicinput.md)                                        | :heavy_check_mark:                                                                  | The properties of the topic to create                                               | {<br/>"index": 0,<br/>"name": "Climate",<br/>"parent": "82bae647-8e43-44c3-a4e7-2aa3294c87ac"<br/>} |
+| `program_id`                                                                        | *str*                                                                               | :heavy_check_mark:                                                                  | The unique identifier of the program                                                |                                                                                     |

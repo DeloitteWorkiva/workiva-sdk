@@ -1,0 +1,12 @@
+# TableAnchorCreationResultCollection
+
+A collection of created results from a table anchor creation. When there are no additional results before the current collection, the previous property will be null. When there are no additional results after the current collection, the next property will be null.
+
+
+## Fields
+
+| Field                                                                            | Type                                                                             | Required                                                                         | Description                                                                      | Example                                                                          |
+| -------------------------------------------------------------------------------- | -------------------------------------------------------------------------------- | -------------------------------------------------------------------------------- | -------------------------------------------------------------------------------- | -------------------------------------------------------------------------------- |
+| `at_next_link`                                                                   | *OptionalNullable[str]*                                                          | :heavy_minus_sign:                                                               | Pagination link for next set of results                                          | <opaque_url>                                                                     |
+| `data`                                                                           | List[[models.TableAnchorCreationResult](../models/tableanchorcreationresult.md)] | :heavy_minus_sign:                                                               | The current page of data.                                                        |                                                                                  |
+| `revision`                                                                       | *Optional[str]*                                                                  | :heavy_minus_sign:                                                               | Identifies a unique revision of content.                                         | 24601abc                                                                         |

@@ -1,0 +1,75 @@
+
+[project]
+name = "workiva"
+version = "0.4.0"
+description = "Workiva Python SDK - Unified client for Platform, Chains, and Wdata APIs"
+authors = [{ name = "Jorge Revenga" },]
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+    "httpcore >=1.0.9",
+    "httpx >=0.28.1",
+    "jsonpath-python >=1.0.6",
+    "pydantic >=2.11.2",
+    "typing-extensions >=4.11",
+]
+
+[tool.poetry]
+packages = [
+    { include = "workiva", from = "src" }
+]
+include = ["py.typed", "src/workiva/py.typed"]
+
+[tool.setuptools.package-data]
+"*" = ["py.typed", "src/workiva/py.typed"]
+
+[virtualenvs]
+in-project = true
+
+[tool.poetry.group.dev.dependencies]
+mypy = "==1.15.0"
+pylint = "==3.2.3"
+pyright = "==1.1.398"
+pytest = ">=8.0"
+pytest-asyncio = ">=0.24"
+pytest-cov = ">=6.0"
+respx = ">=0.22"
+
+[dependency-groups]
+dev = [
+    "mypy==1.15.0",
+    "pylint==3.2.3",
+    "pyright==1.1.398",
+    "pytest>=8.0",
+    "pytest-asyncio>=0.24",
+    "pytest-cov>=6.0",
+    "respx>=0.22",
+    "twine>=6.0",
+]
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.pytest.ini_options]
+asyncio_default_fixture_loop_scope = "function"
+pythonpath = ["src"]
+
+[tool.mypy]
+disable_error_code = "misc"
+explicit_package_bases = true
+mypy_path = "src"
+
+[[tool.mypy.overrides]]
+module = "typing_inspect"
+ignore_missing_imports = true
+
+[[tool.mypy.overrides]]
+module = "jsonpath"
+ignore_missing_imports = true
+
+[tool.pyright]
+venvPath = "."
+venv = ".venv"
+
+
