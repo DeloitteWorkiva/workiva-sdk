@@ -57,6 +57,8 @@ oas/wdata.yaml    ─┘                                    └─ patch_sdk.py 
 **`scripts/patch_sdk.py`** runs after generation (idempotent):
 - Appends custom exports to `__init__.py` (Workiva, OperationPoller, exceptions)
 - Cleans README.md (removes Speakeasy scaffolding, adds real install instructions)
+- Injects `X-Version: 2026-01-01` header into `clientcredentials.py` token request
+- Adds proprietary license, classifiers, and project URLs to `pyproject.toml`
 
 ### Generated vs Custom Code
 
@@ -66,6 +68,7 @@ Custom code (survives regeneration):
 - `_hooks/client.py` — `Workiva(SDK)` convenience wrapper with `.wait()` for 202 responses
 - `_hooks/polling.py` — `OperationPoller` with sync/async polling, retry-after, timeout
 - `_hooks/exceptions.py` — `OperationFailed`, `OperationCancelled`, `OperationTimeout`
+- `_hooks/version_header.py` — `VersionHeaderHook` injects `X-Version: 2026-01-01` on all API calls
 - `_hooks/registration.py` — Hook extension point (generated once, then free to modify)
 
 Generated hooks (overwritten on regeneration):
@@ -75,7 +78,7 @@ Generated hooks (overwritten on regeneration):
 
 ### Auth
 
-All 3 APIs share the same bearer token from `/iam/v1/oauth2/token`. The `ClientCredentialsHook` handles this automatically — it caches tokens in a **class-level dict** (`ClassVar`), meaning the cache is global across all SDK instances in a process. The hook always uses a **sync** HTTP client for token requests, even in async flows (runs in a thread via `asyncio.to_thread`).
+All 3 APIs share the same bearer token from `/oauth2/token` (2026-01-01 API). The `ClientCredentialsHook` handles this automatically — it caches tokens in a **class-level dict** (`ClassVar`), meaning the cache is global across all SDK instances in a process. The hook always uses a **sync** HTTP client for token requests, even in async flows (runs in a thread via `asyncio.to_thread`). All requests include `X-Version: 2026-01-01` header (via `VersionHeaderHook` for API calls, and `patch_sdk.py` for token requests).
 
 ### SDK Usage Pattern
 
@@ -114,12 +117,63 @@ Tests live in `python-sdk/tests/` (outside `src/`, safe from regeneration).
 
 **Merge order matters**: platform.yaml is LAST in the merge command because the last spec's global `servers` win. Platform's servers (EU/US/APAC) are the global default — EU is index 0 (default). All specs live in `oas/`. The server order is set in `prepare_specs.py`.
 
+## Publishing to PyPI
+
+When changes affect the SDK source code (hooks, patches, or regeneration), a new version must be published to PyPI.
+
+### Full publish flow
+
+```bash
+# 1. Bump version in BOTH files (must match)
+#    - python-sdk/gen.yaml        → python.version
+#    - python-sdk/pyproject.toml  → [project].version
+
+# 2. Update PyPI badge cache-buster in README.md
+#    [![PyPI](https://img.shields.io/pypi/v/workiva?v=X.Y.Z)]
+
+# 3. Run tests
+make test
+
+# 4. Build wheel
+make build    # → python-sdk/dist/workiva-X.Y.Z-py3-none-any.whl
+
+# 5. Publish to PyPI
+make publish  # runs twine upload (requires TWINE_PASSWORD or ~/.pypirc)
+
+# 6. Create GitHub release
+gh release create vX.Y.Z python-sdk/dist/*.whl python-sdk/dist/*.tar.gz \
+    --title "vX.Y.Z" --notes "Release notes here"
+
+# 7. Commit, push
+```
+
+### What triggers a new version
+
+- Changes to custom hooks (`_hooks/client.py`, `_hooks/polling.py`, `_hooks/exceptions.py`, `_hooks/version_header.py`, `_hooks/registration.py`)
+- Changes to `patch_sdk.py` that affect generated output
+- Changes to `prepare_specs.py` that affect the generated SDK (tokenUrl, servers, pagination, etc.)
+- SDK regeneration after OAS spec updates (`make force`)
+
+### Version files that must stay in sync
+
+| File | Field | Role |
+|------|-------|------|
+| `python-sdk/gen.yaml` | `python.version` | Controls what Speakeasy writes to pyproject.toml on regeneration |
+| `python-sdk/pyproject.toml` | `[project].version` | What `uv build` / `pip` reads |
+| `README.md` | Badge `?v=X.Y.Z` | Cache-buster for shields.io |
+
+### PyPI credentials
+
+- **Local**: `~/.pypirc` or `TWINE_PASSWORD` env var
+- **CI**: `TWINE_PASSWORD` as GitHub secret (not yet configured)
+- **API token**: generate at https://pypi.org/manage/account/token/
+
 ## File Survival Matrix
 
 | Location | Survives `make force`? |
 |----------|----------------------|
 | `oas/`, `gen.yaml`, `scripts/`, `Makefile`, `tests/` | Yes |
-| `_hooks/client.py`, `_hooks/polling.py`, `_hooks/exceptions.py` | Yes (Speakeasy preserves) |
+| `_hooks/client.py`, `_hooks/polling.py`, `_hooks/exceptions.py`, `_hooks/version_header.py` | Yes (Speakeasy preserves) |
 | `_hooks/registration.py` | Yes (generated once) |
 | `__init__.py`, `pyproject.toml`, `README.md` | Regenerated, then patched |
 | Everything else in `src/workiva/` | Regenerated (do not modify) |

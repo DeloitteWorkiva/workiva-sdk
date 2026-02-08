@@ -27,7 +27,7 @@ generation:
 generate:
   version: ""
 python:
-  version: 0.4.5
+  version: 0.4.6
   additionalDependencies:
     dev:
       pytest: ">=8.0"
