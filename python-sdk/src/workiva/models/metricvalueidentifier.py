@@ -42,7 +42,7 @@ class MetricValueIdentifierReportingPeriod(BaseModel):
     r"""The 4-digit year representing the report period for a value."""
 
 
-class MetricValueIdentifierDataTypedDict(TypedDict):
+class DataTypedDict(TypedDict):
     coordinates: NotRequired[Dict[str, str]]
     r"""A mapping of dimension ids to dimension value ids for the value.
     The maximum number of key-value dimension pairs is limited to 3.
@@ -52,7 +52,7 @@ class MetricValueIdentifierDataTypedDict(TypedDict):
     r"""Defines the reporting period for a value."""
 
 
-class MetricValueIdentifierData(BaseModel):
+class Data(BaseModel):
     coordinates: Optional[Dict[str, str]] = None
     r"""A mapping of dimension ids to dimension value ids for the value.
     The maximum number of key-value dimension pairs is limited to 3.
@@ -85,13 +85,13 @@ class MetricValueIdentifierData(BaseModel):
 class MetricValueIdentifierTypedDict(TypedDict):
     r"""Represents a metric value identifier"""
 
-    data: NotRequired[List[MetricValueIdentifierDataTypedDict]]
+    data: NotRequired[List[DataTypedDict]]
 
 
 class MetricValueIdentifier(BaseModel):
     r"""Represents a metric value identifier"""
 
-    data: Optional[List[MetricValueIdentifierData]] = None
+    data: Optional[List[Data]] = None
 
     @model_serializer(mode="wrap")
     def serialize_model(self, handler):

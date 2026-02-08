@@ -11,8 +11,9 @@ from .margins import Margins, MarginsTypedDict
 from .stroke import Stroke, StrokeTypedDict
 from .wrapstyletype import WrapStyleType
 import pydantic
-from pydantic import model_serializer
+from pydantic import field_serializer, model_serializer
 from typing_extensions import Annotated, NotRequired, TypedDict
+from workiva import models
 from workiva.types import BaseModel, Nullable, OptionalNullable, UNSET, UNSET_SENTINEL
 
 
@@ -82,6 +83,15 @@ class UnspecifiedDrawingElement(BaseModel):
 
     stroke: OptionalNullable[Stroke] = UNSET
     r"""Line stroke setting for things like shape edges. Use a null to indicate no stroke line."""
+
+    @field_serializer("wrap_style")
+    def serialize_wrap_style(self, value):
+        if isinstance(value, str):
+            try:
+                return models.WrapStyleType(value)
+            except ValueError:
+                return value
+        return value
 
     @model_serializer(mode="wrap")
     def serialize_model(self, handler):

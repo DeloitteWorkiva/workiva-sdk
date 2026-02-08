@@ -7,13 +7,14 @@ from .uniqueconstraintdto import UniqueConstraintDto, UniqueConstraintDtoTypedDi
 from datetime import datetime
 from enum import Enum
 import pydantic
-from pydantic import model_serializer
+from pydantic import field_serializer, model_serializer
 from typing import List, Optional
 from typing_extensions import Annotated, NotRequired, TypedDict
+from workiva import models, utils
 from workiva.types import BaseModel, UNSET_SENTINEL
 
 
-class TableDtoType(str, Enum):
+class TableDtoType(str, Enum, metaclass=utils.OpenEnumMeta):
     r"""The type of table"""
 
     DATA = "data"
@@ -132,6 +133,15 @@ class TableDto(BaseModel):
     version: Optional[int] = None
     r"""The version of the current representation of the entity"""
 
+    @field_serializer("type")
+    def serialize_type(self, value):
+        if isinstance(value, str):
+            try:
+                return models.TableDtoType(value)
+            except ValueError:
+                return value
+        return value
+
     @model_serializer(mode="wrap")
     def serialize_model(self, handler):
         optional_fields = set(
@@ -205,6 +215,15 @@ class TableDtoInput(BaseModel):
     hierarchy_metadata: Annotated[
         Optional[HierarchyMetadata], pydantic.Field(alias="hierarchyMetadata")
     ] = None
+
+    @field_serializer("type")
+    def serialize_type(self, value):
+        if isinstance(value, str):
+            try:
+                return models.TableDtoType(value)
+            except ValueError:
+                return value
+        return value
 
     @model_serializer(mode="wrap")
     def serialize_model(self, handler):

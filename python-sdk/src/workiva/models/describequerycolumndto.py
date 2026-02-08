@@ -3,13 +3,14 @@
 from __future__ import annotations
 from enum import Enum
 import pydantic
-from pydantic import model_serializer
+from pydantic import field_serializer, model_serializer
 from typing import Optional
 from typing_extensions import Annotated, NotRequired, TypedDict
+from workiva import models, utils
 from workiva.types import BaseModel, UNSET_SENTINEL
 
 
-class DescribeQueryColumnDtoType(str, Enum):
+class DescribeQueryColumnDtoType(str, Enum, metaclass=utils.OpenEnumMeta):
     r"""The column's type"""
 
     STRING = "string"
@@ -60,6 +61,15 @@ class DescribeQueryColumnDto(BaseModel):
 
     type: Optional[DescribeQueryColumnDtoType] = None
     r"""The column's type"""
+
+    @field_serializer("type")
+    def serialize_type(self, value):
+        if isinstance(value, str):
+            try:
+                return models.DescribeQueryColumnDtoType(value)
+            except ValueError:
+                return value
+        return value
 
     @model_serializer(mode="wrap")
     def serialize_model(self, handler):

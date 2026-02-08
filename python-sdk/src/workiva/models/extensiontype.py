@@ -2,9 +2,10 @@
 
 from __future__ import annotations
 from enum import Enum
+from workiva import utils
 
 
-class ExtensionType(str, Enum):
+class ExtensionType(str, Enum, metaclass=utils.OpenEnumMeta):
     r"""Indicates the type of the anchor extension."""
 
     COMMENT = "comment"

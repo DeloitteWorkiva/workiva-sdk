@@ -14,10 +14,10 @@ from workiva.utils import FieldMetadata, PathParamMetadata, QueryParamMetadata
 
 
 class GetTableAnchorExtensionsRequestTypedDict(TypedDict):
-    anchor_id: str
-    r"""The unique identifier of the anchor"""
     table_id: str
     r"""The unique identifier for the table"""
+    anchor_id: str
+    r"""The unique identifier of the anchor"""
     dollar_maxpagesize: NotRequired[int]
     r"""The maximum number of results to retrieve"""
     dollar_next: NotRequired[str]
@@ -27,19 +27,19 @@ class GetTableAnchorExtensionsRequestTypedDict(TypedDict):
 
 
 class GetTableAnchorExtensionsRequest(BaseModel):
-    anchor_id: Annotated[
-        str,
-        pydantic.Field(alias="anchorId"),
-        FieldMetadata(path=PathParamMetadata(style="simple", explode=False)),
-    ]
-    r"""The unique identifier of the anchor"""
-
     table_id: Annotated[
         str,
         pydantic.Field(alias="tableId"),
         FieldMetadata(path=PathParamMetadata(style="simple", explode=False)),
     ]
     r"""The unique identifier for the table"""
+
+    anchor_id: Annotated[
+        str,
+        pydantic.Field(alias="anchorId"),
+        FieldMetadata(path=PathParamMetadata(style="simple", explode=False)),
+    ]
+    r"""The unique identifier of the anchor"""
 
     dollar_maxpagesize: Annotated[
         Optional[int],

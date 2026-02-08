@@ -10,35 +10,27 @@ from workiva.types import BaseModel
 class MilestoneTypedDict(TypedDict):
     r"""A milestone representing a point in the life cycle of a document, presentation, or spreadsheet and can be used to mark progress or completion of a particular phase."""
 
-    created: ActionTypedDict
-    r"""The creation action of the milestone
-
-    """
     id: str
     r"""Identifier of a milestone."""
-    remarks: str
-    r"""The remarks associated with the milestone"""
     resource: MilestoneResourceRefTypedDict
     r"""Represents a reference to the resource associated with a milestone. The `type` property will determine which of the other properties is set.
 
     """
     title: str
     r"""The title of the milestone"""
+    remarks: str
+    r"""The remarks associated with the milestone"""
+    created: ActionTypedDict
+    r"""The creation action of the milestone
+
+    """
 
 
 class Milestone(BaseModel):
     r"""A milestone representing a point in the life cycle of a document, presentation, or spreadsheet and can be used to mark progress or completion of a particular phase."""
 
-    created: Action
-    r"""The creation action of the milestone
-
-    """
-
     id: str
     r"""Identifier of a milestone."""
-
-    remarks: str
-    r"""The remarks associated with the milestone"""
 
     resource: MilestoneResourceRef
     r"""Represents a reference to the resource associated with a milestone. The `type` property will determine which of the other properties is set.
@@ -47,3 +39,11 @@ class Milestone(BaseModel):
 
     title: str
     r"""The title of the milestone"""
+
+    remarks: str
+    r"""The remarks associated with the milestone"""
+
+    created: Action
+    r"""The creation action of the milestone
+
+    """

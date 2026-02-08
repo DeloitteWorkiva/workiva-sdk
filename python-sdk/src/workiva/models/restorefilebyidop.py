@@ -10,25 +10,25 @@ from workiva.utils import FieldMetadata, PathParamMetadata, RequestMetadata
 
 
 class RestoreFileByIDRequestTypedDict(TypedDict):
-    file_restore_options: FileRestoreOptionsTypedDict
-    r"""Request body for File restore endpoint"""
     file_id: str
     r"""The unique identifier of the file"""
+    file_restore_options: FileRestoreOptionsTypedDict
+    r"""Request body for File restore endpoint"""
 
 
 class RestoreFileByIDRequest(BaseModel):
-    file_restore_options: Annotated[
-        FileRestoreOptions,
-        FieldMetadata(request=RequestMetadata(media_type="application/json")),
-    ]
-    r"""Request body for File restore endpoint"""
-
     file_id: Annotated[
         str,
         pydantic.Field(alias="fileId"),
         FieldMetadata(path=PathParamMetadata(style="simple", explode=False)),
     ]
     r"""The unique identifier of the file"""
+
+    file_restore_options: Annotated[
+        FileRestoreOptions,
+        FieldMetadata(request=RequestMetadata(media_type="application/json")),
+    ]
+    r"""Request body for File restore endpoint"""
 
 
 class RestoreFileByIDResponseTypedDict(TypedDict):

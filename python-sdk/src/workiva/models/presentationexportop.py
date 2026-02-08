@@ -10,25 +10,25 @@ from workiva.utils import FieldMetadata, PathParamMetadata, RequestMetadata
 
 
 class PresentationExportRequestTypedDict(TypedDict):
-    presentation_export: PresentationExportTypedDict
-    r"""Details about the presentation export."""
     presentation_id: str
     r"""The unique identifier of the presentation"""
+    presentation_export: PresentationExportTypedDict
+    r"""Details about the presentation export."""
 
 
 class PresentationExportRequest(BaseModel):
-    presentation_export: Annotated[
-        PresentationExport,
-        FieldMetadata(request=RequestMetadata(media_type="application/json")),
-    ]
-    r"""Details about the presentation export."""
-
     presentation_id: Annotated[
         str,
         pydantic.Field(alias="presentationId"),
         FieldMetadata(path=PathParamMetadata(style="simple", explode=False)),
     ]
     r"""The unique identifier of the presentation"""
+
+    presentation_export: Annotated[
+        PresentationExport,
+        FieldMetadata(request=RequestMetadata(media_type="application/json")),
+    ]
+    r"""Details about the presentation export."""
 
 
 class PresentationExportResponseTypedDict(TypedDict):

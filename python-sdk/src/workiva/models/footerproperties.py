@@ -67,10 +67,10 @@ class FooterPropertiesTypedDict(TypedDict):
     r"""Properties related to the margins of a header and footer"""
     match_section_margins: NotRequired[bool]
     r"""Whether the margins match the section margins"""
-    position_from_bottom: NotRequired[Nullable[float]]
-    r"""The position from the bottom for footer in points"""
     same_as_previous: NotRequired[bool]
     r"""Whether the previous section's headers/footers shown on this section"""
+    position_from_bottom: NotRequired[Nullable[float]]
+    r"""The position from the bottom for footer in points"""
 
 
 class FooterProperties(BaseModel):
@@ -101,15 +101,15 @@ class FooterProperties(BaseModel):
     ] = False
     r"""Whether the margins match the section margins"""
 
-    position_from_bottom: Annotated[
-        OptionalNullable[float], pydantic.Field(alias="positionFromBottom")
-    ] = UNSET
-    r"""The position from the bottom for footer in points"""
-
     same_as_previous: Annotated[
         Optional[bool], pydantic.Field(alias="sameAsPrevious")
     ] = False
     r"""Whether the previous section's headers/footers shown on this section"""
+
+    position_from_bottom: Annotated[
+        OptionalNullable[float], pydantic.Field(alias="positionFromBottom")
+    ] = UNSET
+    r"""The position from the bottom for footer in points"""
 
     @model_serializer(mode="wrap")
     def serialize_model(self, handler):
@@ -120,8 +120,8 @@ class FooterProperties(BaseModel):
                 "differentLastPage",
                 "margin",
                 "matchSectionMargins",
-                "positionFromBottom",
                 "sameAsPrevious",
+                "positionFromBottom",
             ]
         )
         nullable_fields = set(["margin", "positionFromBottom"])

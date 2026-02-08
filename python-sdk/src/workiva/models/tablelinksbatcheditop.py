@@ -10,25 +10,25 @@ from workiva.utils import FieldMetadata, PathParamMetadata, RequestMetadata
 
 
 class TableLinksBatchEditRequestTypedDict(TypedDict):
-    table_links_batch_edit: TableLinksBatchEditTypedDict
-    r"""The table link edits to apply"""
     table_id: str
     r"""The unique identifier for the table"""
+    table_links_batch_edit: TableLinksBatchEditTypedDict
+    r"""The table link edits to apply"""
 
 
 class TableLinksBatchEditRequest(BaseModel):
-    table_links_batch_edit: Annotated[
-        TableLinksBatchEdit,
-        FieldMetadata(request=RequestMetadata(media_type="application/json")),
-    ]
-    r"""The table link edits to apply"""
-
     table_id: Annotated[
         str,
         pydantic.Field(alias="tableId"),
         FieldMetadata(path=PathParamMetadata(style="simple", explode=False)),
     ]
     r"""The unique identifier for the table"""
+
+    table_links_batch_edit: Annotated[
+        TableLinksBatchEdit,
+        FieldMetadata(request=RequestMetadata(media_type="application/json")),
+    ]
+    r"""The table link edits to apply"""
 
 
 class TableLinksBatchEditResponseTypedDict(TypedDict):

@@ -12,12 +12,12 @@ from workiva.utils import FieldMetadata, PathParamMetadata, QueryParamMetadata
 
 
 class GetValuesByRangeRequestTypedDict(TypedDict):
-    range: Nullable[str]
-    r"""The range of values, in A1-style notation"""
-    sheet_id: str
-    r"""The unique identifier of the sheet"""
     spreadsheet_id: str
     r"""The unique identifier of the spreadsheet"""
+    sheet_id: str
+    r"""The unique identifier of the sheet"""
+    range: Nullable[str]
+    r"""The range of values, in A1-style notation"""
     dollar_maxcellsperpage: NotRequired[int]
     r"""The maximum number of cells to retrieve. The default is 50000. The maximum allowed value is 50000."""
     dollar_next: NotRequired[str]
@@ -27,11 +27,12 @@ class GetValuesByRangeRequestTypedDict(TypedDict):
 
 
 class GetValuesByRangeRequest(BaseModel):
-    range: Annotated[
-        Nullable[str],
+    spreadsheet_id: Annotated[
+        str,
+        pydantic.Field(alias="spreadsheetId"),
         FieldMetadata(path=PathParamMetadata(style="simple", explode=False)),
     ]
-    r"""The range of values, in A1-style notation"""
+    r"""The unique identifier of the spreadsheet"""
 
     sheet_id: Annotated[
         str,
@@ -40,12 +41,11 @@ class GetValuesByRangeRequest(BaseModel):
     ]
     r"""The unique identifier of the sheet"""
 
-    spreadsheet_id: Annotated[
-        str,
-        pydantic.Field(alias="spreadsheetId"),
+    range: Annotated[
+        Nullable[str],
         FieldMetadata(path=PathParamMetadata(style="simple", explode=False)),
     ]
-    r"""The unique identifier of the spreadsheet"""
+    r"""The range of values, in A1-style notation"""
 
     dollar_maxcellsperpage: Annotated[
         Optional[int],

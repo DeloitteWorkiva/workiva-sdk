@@ -4,13 +4,14 @@ from __future__ import annotations
 from datetime import datetime
 from enum import Enum
 import pydantic
-from pydantic import model_serializer
+from pydantic import field_serializer, model_serializer
 from typing import Any, List, Optional
 from typing_extensions import Annotated, NotRequired, TypedDict
+from workiva import models, utils
 from workiva.types import BaseModel, UNSET_SENTINEL
 
 
-class GlobalParameterDtoMode(str, Enum):
+class GlobalParameterDtoMode(str, Enum, metaclass=utils.OpenEnumMeta):
     r"""The mode of the parameter"""
 
     SCALAR = "scalar"
@@ -18,7 +19,7 @@ class GlobalParameterDtoMode(str, Enum):
     MULTI_SELECT = "multiSelect"
 
 
-class GlobalParameterDtoType(str, Enum):
+class GlobalParameterDtoType(str, Enum, metaclass=utils.OpenEnumMeta):
     r"""The type of the parameter"""
 
     STRING = "string"
@@ -131,6 +132,24 @@ class GlobalParameterDto(BaseModel):
     version: Optional[int] = None
     r"""The version of the current representation of the entity"""
 
+    @field_serializer("mode")
+    def serialize_mode(self, value):
+        if isinstance(value, str):
+            try:
+                return models.GlobalParameterDtoMode(value)
+            except ValueError:
+                return value
+        return value
+
+    @field_serializer("type")
+    def serialize_type(self, value):
+        if isinstance(value, str):
+            try:
+                return models.GlobalParameterDtoType(value)
+            except ValueError:
+                return value
+        return value
+
     @model_serializer(mode="wrap")
     def serialize_model(self, handler):
         optional_fields = set(
@@ -216,6 +235,24 @@ class GlobalParameterDtoInput(BaseModel):
 
     value: Optional[Any] = None
     r"""The default value of the parameter"""
+
+    @field_serializer("mode")
+    def serialize_mode(self, value):
+        if isinstance(value, str):
+            try:
+                return models.GlobalParameterDtoMode(value)
+            except ValueError:
+                return value
+        return value
+
+    @field_serializer("type")
+    def serialize_type(self, value):
+        if isinstance(value, str):
+            try:
+                return models.GlobalParameterDtoType(value)
+            except ValueError:
+                return value
+        return value
 
     @model_serializer(mode="wrap")
     def serialize_model(self, handler):

@@ -14,10 +14,10 @@ from workiva.utils import FieldMetadata, PathParamMetadata, QueryParamMetadata
 
 
 class GetDrawingAnchorExtensionsRequestTypedDict(TypedDict):
-    anchor_id: str
-    r"""The unique identifier of the anchor"""
     drawing_id: str
     r"""The unique identifier of a drawing"""
+    anchor_id: str
+    r"""The unique identifier of the anchor"""
     dollar_maxpagesize: NotRequired[int]
     r"""The maximum number of results to retrieve"""
     dollar_next: NotRequired[str]
@@ -27,19 +27,19 @@ class GetDrawingAnchorExtensionsRequestTypedDict(TypedDict):
 
 
 class GetDrawingAnchorExtensionsRequest(BaseModel):
-    anchor_id: Annotated[
-        str,
-        pydantic.Field(alias="anchorId"),
-        FieldMetadata(path=PathParamMetadata(style="simple", explode=False)),
-    ]
-    r"""The unique identifier of the anchor"""
-
     drawing_id: Annotated[
         str,
         pydantic.Field(alias="drawingId"),
         FieldMetadata(path=PathParamMetadata(style="simple", explode=False)),
     ]
     r"""The unique identifier of a drawing"""
+
+    anchor_id: Annotated[
+        str,
+        pydantic.Field(alias="anchorId"),
+        FieldMetadata(path=PathParamMetadata(style="simple", explode=False)),
+    ]
+    r"""The unique identifier of the anchor"""
 
     dollar_maxpagesize: Annotated[
         Optional[int],

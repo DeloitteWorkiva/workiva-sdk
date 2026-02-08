@@ -28,20 +28,20 @@ CHAINS_IMPORT_CHAIN_OP_SERVERS = [
 
 
 class ChainsImportChainFileTypedDict(TypedDict):
-    content: Union[bytes, IO[bytes], io.BufferedReader]
     file_name: str
+    content: Union[bytes, IO[bytes], io.BufferedReader]
     content_type: NotRequired[str]
 
 
 class ChainsImportChainFile(BaseModel):
+    file_name: Annotated[
+        str, pydantic.Field(alias="fileName"), FieldMetadata(multipart=True)
+    ]
+
     content: Annotated[
         Union[bytes, IO[bytes], io.BufferedReader],
         pydantic.Field(alias=""),
         FieldMetadata(multipart=MultipartFormMetadata(content=True)),
-    ]
-
-    file_name: Annotated[
-        str, pydantic.Field(alias="fileName"), FieldMetadata(multipart=True)
     ]
 
     content_type: Annotated[
@@ -101,10 +101,10 @@ class ChainsImportChainRequestBody(BaseModel):
 
 
 class ChainsImportChainRequestTypedDict(TypedDict):
-    request_body: ChainsImportChainRequestBodyTypedDict
-    r"""The .chain file to import."""
     environment_id: str
     r"""The ID of the Environment."""
+    request_body: ChainsImportChainRequestBodyTypedDict
+    r"""The .chain file to import."""
     wk_target_workspace: NotRequired[str]
     r"""The `wk-target-workspace` header is only required for requests made by a service provider application. This does not apply to the majority of Workiva Chains API users. This header specifies the ID of the target workspace on which the service provider application wishes to take action. This workspace must be managed by the service provider.
 
@@ -112,16 +112,16 @@ class ChainsImportChainRequestTypedDict(TypedDict):
 
 
 class ChainsImportChainRequest(BaseModel):
+    environment_id: Annotated[
+        str, FieldMetadata(path=PathParamMetadata(style="simple", explode=False))
+    ]
+    r"""The ID of the Environment."""
+
     request_body: Annotated[
         ChainsImportChainRequestBody,
         FieldMetadata(request=RequestMetadata(media_type="multipart/form-data")),
     ]
     r"""The .chain file to import."""
-
-    environment_id: Annotated[
-        str, FieldMetadata(path=PathParamMetadata(style="simple", explode=False))
-    ]
-    r"""The ID of the Environment."""
 
     wk_target_workspace: Annotated[
         Optional[str],

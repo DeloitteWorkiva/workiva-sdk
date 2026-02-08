@@ -26,20 +26,20 @@ WDATA_UPLOAD_FILE_OP_SERVERS = [
 
 
 class WdataUploadFileFileTypedDict(TypedDict):
-    content: Union[bytes, IO[bytes], io.BufferedReader]
     file_name: str
+    content: Union[bytes, IO[bytes], io.BufferedReader]
     content_type: NotRequired[str]
 
 
 class WdataUploadFileFile(BaseModel):
+    file_name: Annotated[
+        str, pydantic.Field(alias="fileName"), FieldMetadata(multipart=True)
+    ]
+
     content: Annotated[
         Union[bytes, IO[bytes], io.BufferedReader],
         pydantic.Field(alias=""),
         FieldMetadata(multipart=MultipartFormMetadata(content=True)),
-    ]
-
-    file_name: Annotated[
-        str, pydantic.Field(alias="fileName"), FieldMetadata(multipart=True)
     ]
 
     content_type: Annotated[
@@ -97,20 +97,20 @@ class WdataUploadFileRequestBody(BaseModel):
 class WdataUploadFileRequestTypedDict(TypedDict):
     table_id: str
     r"""The unique table identifier associated with this file"""
-    request_body: NotRequired[WdataUploadFileRequestBodyTypedDict]
-    delimiter: NotRequired[str]
-    r"""The character to use as a delimiter within the file to separate one field from
-    another.  The default is comma
-    """
-    import_dto: NotRequired[str]
     name: NotRequired[str]
+    r"""No longer in use, here to ensure backwards compatibility"""
+    url: NotRequired[str]
     r"""No longer in use, here to ensure backwards compatibility"""
     source: NotRequired[str]
     r"""The data source to associate with the file, no more than 255 characters. This
     field is not in use; it only keeps track of the source
     """
-    url: NotRequired[str]
-    r"""No longer in use, here to ensure backwards compatibility"""
+    delimiter: NotRequired[str]
+    r"""The character to use as a delimiter within the file to separate one field from
+    another.  The default is comma
+    """
+    import_dto: NotRequired[str]
+    request_body: NotRequired[WdataUploadFileRequestBodyTypedDict]
 
 
 class WdataUploadFileRequest(BaseModel):
@@ -121,10 +121,25 @@ class WdataUploadFileRequest(BaseModel):
     ]
     r"""The unique table identifier associated with this file"""
 
-    request_body: Annotated[
-        Optional[WdataUploadFileRequestBody],
-        FieldMetadata(request=RequestMetadata(media_type="multipart/form-data")),
+    name: Annotated[
+        Optional[str],
+        FieldMetadata(query=QueryParamMetadata(style="form", explode=True)),
     ] = None
+    r"""No longer in use, here to ensure backwards compatibility"""
+
+    url: Annotated[
+        Optional[str],
+        FieldMetadata(query=QueryParamMetadata(style="form", explode=True)),
+    ] = None
+    r"""No longer in use, here to ensure backwards compatibility"""
+
+    source: Annotated[
+        Optional[str],
+        FieldMetadata(query=QueryParamMetadata(style="form", explode=True)),
+    ] = None
+    r"""The data source to associate with the file, no more than 255 characters. This
+    field is not in use; it only keeps track of the source
+    """
 
     delimiter: Annotated[
         Optional[str],
@@ -140,30 +155,15 @@ class WdataUploadFileRequest(BaseModel):
         FieldMetadata(query=QueryParamMetadata(style="form", explode=True)),
     ] = None
 
-    name: Annotated[
-        Optional[str],
-        FieldMetadata(query=QueryParamMetadata(style="form", explode=True)),
+    request_body: Annotated[
+        Optional[WdataUploadFileRequestBody],
+        FieldMetadata(request=RequestMetadata(media_type="multipart/form-data")),
     ] = None
-    r"""No longer in use, here to ensure backwards compatibility"""
-
-    source: Annotated[
-        Optional[str],
-        FieldMetadata(query=QueryParamMetadata(style="form", explode=True)),
-    ] = None
-    r"""The data source to associate with the file, no more than 255 characters. This
-    field is not in use; it only keeps track of the source
-    """
-
-    url: Annotated[
-        Optional[str],
-        FieldMetadata(query=QueryParamMetadata(style="form", explode=True)),
-    ] = None
-    r"""No longer in use, here to ensure backwards compatibility"""
 
     @model_serializer(mode="wrap")
     def serialize_model(self, handler):
         optional_fields = set(
-            ["RequestBody", "delimiter", "importDto", "name", "source", "url"]
+            ["name", "url", "source", "delimiter", "importDto", "RequestBody"]
         )
         serialized = handler(self)
         m = {}

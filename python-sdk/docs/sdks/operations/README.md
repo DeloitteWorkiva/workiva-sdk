@@ -6,13 +6,13 @@ Use these endpoints to manage operations, such as to check their status.
 
 ### Available Operations
 
-* [get_batch_upsertion_metric_values_results](#get_batch_upsertion_metric_values_results) - Retrieve the results of a metric values batch upsertion operation
+* [get_operation_by_id](#get_operation_by_id) - Retrieve a single operation
 * [get_copy_file_results](#get_copy_file_results) - Retrieve copy file results for a single operation
 * [get_destination_link_source_conversion_results](#get_destination_link_source_conversion_results) - Retrieves the results from a destination link source conversion.
 * [get_image_upload_creation_results](#get_image_upload_creation_results) - Retrieve results for a image upload
 * [get_import_file_results](#get_import_file_results) - Retrieve import file results for a single operation
+* [get_batch_upsertion_metric_values_results](#get_batch_upsertion_metric_values_results) - Retrieve the results of a metric values batch upsertion operation
 * [get_milestone_creation_results](#get_milestone_creation_results) - Retrieve results for a milestone creation
-* [get_operation_by_id](#get_operation_by_id) - Retrieve a single operation
 * [get_patch_document_results](#get_patch_document_results) - Retrieve results for a patch document
 * [get_patch_presentation_results](#get_patch_presentation_results) - Retrieve results for a patch presentation
 * [get_patch_section_results](#get_patch_section_results) - Retrieve results for a patch Section
@@ -22,8 +22,8 @@ Use these endpoints to manage operations, such as to check their status.
 * [get_patch_spreadsheet_results](#get_patch_spreadsheet_results) - Retrieve results for a patch spreadsheet
 * [get_patch_table_properties_results](#get_patch_table_properties_results) - Retrieve results for a patch table properties
 * [get_range_link_edit_results](#get_range_link_edit_results) - Retrieve results for a range link edit
-* [get_rich_text_anchor_creation_results](#get_rich_text_anchor_creation_results) - Retrieve results for a rich text anchor creation
 * [get_rich_text_batch_edit_results](#get_rich_text_batch_edit_results) - Retrieve results for a rich text batch edit
+* [get_rich_text_anchor_creation_results](#get_rich_text_anchor_creation_results) - Retrieve results for a rich text anchor creation
 * [get_rich_text_duplication_edit_results](#get_rich_text_duplication_edit_results) - Retrieve results for a rich text duplication edit
 * [get_rich_text_links_batch_edit_results](#get_rich_text_links_batch_edit_results) - Retrieve results for a rich text links batch edit
 * [get_table_anchor_creation_results](#get_table_anchor_creation_results) - Retrieve results for a table anchor creation
@@ -32,14 +32,14 @@ Use these endpoints to manage operations, such as to check their status.
 * [get_table_links_edit_results](#get_table_links_edit_results) - Retrieve results for a table links edit
 * [get_table_reapply_filter_results](#get_table_reapply_filter_results) - Retrieve results for a table reapply filter
 
-## get_batch_upsertion_metric_values_results
+## get_operation_by_id
 
-Returns a [`MetricValuesListResult`](ref:sustainability#metricvalueslistresult) describing the results of a metric values batch upsertion operation. <br /><br /> Note: This endpoint is rate-limited. You may experience rates as low as 1 request per second. When polling for updates, examine the `Retry-After` header and retry after that many seconds.
+Retrieves an [operation](ref:operations#operation) given its ID. <br /><br /> Note: This endpoint is rate-limited. You may experience rates as low as 1 request per second. When polling for updates, examine the `Retry-After` header and retry after that many seconds.
 
 
 ### Example Usage
 
-<!-- UsageSnippet language="python" operationID="getBatchUpsertionMetricValuesResults" method="get" path="/operations/{operationId}/metricValuesBatchUpsertionResults" -->
+<!-- UsageSnippet language="python" operationID="getOperationById" method="get" path="/operations/{operationId}" -->
 ```python
 from workiva import SDK, models
 
@@ -51,27 +51,23 @@ with SDK(
     ),
 ) as sdk:
 
-    res = sdk.operations.get_batch_upsertion_metric_values_results(operation_id="<id>", dollar_maxpagesize=1000, dollar_next="JTI0bGltaXQ9MTAwJiUyNG9mZnNldD0xMDA")
+    res = sdk.operations.get_operation_by_id(operation_id="<id>")
 
-    while res is not None:
-        # Handle items
-
-        res = res.next()
+    # Handle response
+    print(res)
 
 ```
 
 ### Parameters
 
-| Parameter                                                           | Type                                                                | Required                                                            | Description                                                         | Example                                                             |
-| ------------------------------------------------------------------- | ------------------------------------------------------------------- | ------------------------------------------------------------------- | ------------------------------------------------------------------- | ------------------------------------------------------------------- |
-| `operation_id`                                                      | *str*                                                               | :heavy_check_mark:                                                  | The unique identifier of the operation                              |                                                                     |
-| `dollar_maxpagesize`                                                | *Optional[int]*                                                     | :heavy_minus_sign:                                                  | The maximum number of results to retrieve                           |                                                                     |
-| `dollar_next`                                                       | *Optional[str]*                                                     | :heavy_minus_sign:                                                  | Pagination cursor for next set of results.                          | JTI0bGltaXQ9MTAwJiUyNG9mZnNldD0xMDA                                 |
-| `retries`                                                           | [Optional[utils.RetryConfig]](../../models/utils/retryconfig.md)    | :heavy_minus_sign:                                                  | Configuration to override the default retry behavior of the client. |                                                                     |
+| Parameter                                                           | Type                                                                | Required                                                            | Description                                                         |
+| ------------------------------------------------------------------- | ------------------------------------------------------------------- | ------------------------------------------------------------------- | ------------------------------------------------------------------- |
+| `operation_id`                                                      | *str*                                                               | :heavy_check_mark:                                                  | The unique identifier of the operation                              |
+| `retries`                                                           | [Optional[utils.RetryConfig]](../../models/utils/retryconfig.md)    | :heavy_minus_sign:                                                  | Configuration to override the default retry behavior of the client. |
 
 ### Response
 
-**[models.GetBatchUpsertionMetricValuesResultsResponse](../../models/getbatchupsertionmetricvaluesresultsresponse.md)**
+**[models.GetOperationByIDResponse](../../models/getoperationbyidresponse.md)**
 
 ### Errors
 
@@ -277,6 +273,55 @@ with SDK(
 | errors.ErrorResponse         | 500, 503                     | application/json             |
 | errors.SDKError              | 4XX, 5XX                     | \*/\*                        |
 
+## get_batch_upsertion_metric_values_results
+
+Returns a [`MetricValuesListResult`](ref:sustainability#metricvalueslistresult) describing the results of a metric values batch upsertion operation. <br /><br /> Note: This endpoint is rate-limited. You may experience rates as low as 1 request per second. When polling for updates, examine the `Retry-After` header and retry after that many seconds.
+
+
+### Example Usage
+
+<!-- UsageSnippet language="python" operationID="getBatchUpsertionMetricValuesResults" method="get" path="/operations/{operationId}/metricValuesBatchUpsertionResults" -->
+```python
+from workiva import SDK, models
+
+
+with SDK(
+    security=models.Security(
+        client_id="<YOUR_CLIENT_ID_HERE>",
+        client_secret="<YOUR_CLIENT_SECRET_HERE>",
+    ),
+) as sdk:
+
+    res = sdk.operations.get_batch_upsertion_metric_values_results(operation_id="<id>", dollar_maxpagesize=1000, dollar_next="JTI0bGltaXQ9MTAwJiUyNG9mZnNldD0xMDA")
+
+    while res is not None:
+        # Handle items
+
+        res = res.next()
+
+```
+
+### Parameters
+
+| Parameter                                                           | Type                                                                | Required                                                            | Description                                                         | Example                                                             |
+| ------------------------------------------------------------------- | ------------------------------------------------------------------- | ------------------------------------------------------------------- | ------------------------------------------------------------------- | ------------------------------------------------------------------- |
+| `operation_id`                                                      | *str*                                                               | :heavy_check_mark:                                                  | The unique identifier of the operation                              |                                                                     |
+| `dollar_maxpagesize`                                                | *Optional[int]*                                                     | :heavy_minus_sign:                                                  | The maximum number of results to retrieve                           |                                                                     |
+| `dollar_next`                                                       | *Optional[str]*                                                     | :heavy_minus_sign:                                                  | Pagination cursor for next set of results.                          | JTI0bGltaXQ9MTAwJiUyNG9mZnNldD0xMDA                                 |
+| `retries`                                                           | [Optional[utils.RetryConfig]](../../models/utils/retryconfig.md)    | :heavy_minus_sign:                                                  | Configuration to override the default retry behavior of the client. |                                                                     |
+
+### Response
+
+**[models.GetBatchUpsertionMetricValuesResultsResponse](../../models/getbatchupsertionmetricvaluesresultsresponse.md)**
+
+### Errors
+
+| Error Type                   | Status Code                  | Content Type                 |
+| ---------------------------- | ---------------------------- | ---------------------------- |
+| errors.ErrorResponse         | 400, 401, 403, 404, 409, 429 | application/json             |
+| errors.ErrorResponse         | 500, 503                     | application/json             |
+| errors.SDKError              | 4XX, 5XX                     | \*/\*                        |
+
 ## get_milestone_creation_results
 
 Returns a [`MilestoneCreationListResult`](ref:operations#milestonecreationlistresult) describing the results of a milestone creation.
@@ -324,51 +369,6 @@ with SDK(
 | errors.ErrorResponse | 400, 401, 403, 404   | application/json     |
 | errors.ErrorResponse | 500                  | application/json     |
 | errors.SDKError      | 4XX, 5XX             | \*/\*                |
-
-## get_operation_by_id
-
-Retrieves an [operation](ref:operations#operation) given its ID. <br /><br /> Note: This endpoint is rate-limited. You may experience rates as low as 1 request per second. When polling for updates, examine the `Retry-After` header and retry after that many seconds.
-
-
-### Example Usage
-
-<!-- UsageSnippet language="python" operationID="getOperationById" method="get" path="/operations/{operationId}" -->
-```python
-from workiva import SDK, models
-
-
-with SDK(
-    security=models.Security(
-        client_id="<YOUR_CLIENT_ID_HERE>",
-        client_secret="<YOUR_CLIENT_SECRET_HERE>",
-    ),
-) as sdk:
-
-    res = sdk.operations.get_operation_by_id(operation_id="<id>")
-
-    # Handle response
-    print(res)
-
-```
-
-### Parameters
-
-| Parameter                                                           | Type                                                                | Required                                                            | Description                                                         |
-| ------------------------------------------------------------------- | ------------------------------------------------------------------- | ------------------------------------------------------------------- | ------------------------------------------------------------------- |
-| `operation_id`                                                      | *str*                                                               | :heavy_check_mark:                                                  | The unique identifier of the operation                              |
-| `retries`                                                           | [Optional[utils.RetryConfig]](../../models/utils/retryconfig.md)    | :heavy_minus_sign:                                                  | Configuration to override the default retry behavior of the client. |
-
-### Response
-
-**[models.GetOperationByIDResponse](../../models/getoperationbyidresponse.md)**
-
-### Errors
-
-| Error Type                   | Status Code                  | Content Type                 |
-| ---------------------------- | ---------------------------- | ---------------------------- |
-| errors.ErrorResponse         | 400, 401, 403, 404, 409, 429 | application/json             |
-| errors.ErrorResponse         | 500, 503                     | application/json             |
-| errors.SDKError              | 4XX, 5XX                     | \*/\*                        |
 
 ## get_patch_document_results
 
@@ -770,54 +770,6 @@ with SDK(
 | errors.ErrorResponse         | 500, 503                     | application/json             |
 | errors.SDKError              | 4XX, 5XX                     | \*/\*                        |
 
-## get_rich_text_anchor_creation_results
-
-Returns a [`RichTextAnchorCreationResultCollection`](ref:operations#richtextanchorcreationresultcollection) describing the results of a rich text anchor creation.
-
-### Example Usage
-
-<!-- UsageSnippet language="python" operationID="getRichTextAnchorCreationResults" method="get" path="/operations/{operationId}/richTextAnchorCreationResults" -->
-```python
-from workiva import SDK, models
-
-
-with SDK(
-    security=models.Security(
-        client_id="<YOUR_CLIENT_ID_HERE>",
-        client_secret="<YOUR_CLIENT_SECRET_HERE>",
-    ),
-) as sdk:
-
-    res = sdk.operations.get_rich_text_anchor_creation_results(operation_id="<id>", dollar_maxpagesize=1000, dollar_next="JTI0bGltaXQ9MTAwJiUyNG9mZnNldD0xMDA")
-
-    while res is not None:
-        # Handle items
-
-        res = res.next()
-
-```
-
-### Parameters
-
-| Parameter                                                           | Type                                                                | Required                                                            | Description                                                         | Example                                                             |
-| ------------------------------------------------------------------- | ------------------------------------------------------------------- | ------------------------------------------------------------------- | ------------------------------------------------------------------- | ------------------------------------------------------------------- |
-| `operation_id`                                                      | *str*                                                               | :heavy_check_mark:                                                  | The unique identifier of the operation                              |                                                                     |
-| `dollar_maxpagesize`                                                | *Optional[int]*                                                     | :heavy_minus_sign:                                                  | The maximum number of results to retrieve                           |                                                                     |
-| `dollar_next`                                                       | *Optional[str]*                                                     | :heavy_minus_sign:                                                  | Pagination cursor for next set of results.                          | JTI0bGltaXQ9MTAwJiUyNG9mZnNldD0xMDA                                 |
-| `retries`                                                           | [Optional[utils.RetryConfig]](../../models/utils/retryconfig.md)    | :heavy_minus_sign:                                                  | Configuration to override the default retry behavior of the client. |                                                                     |
-
-### Response
-
-**[models.GetRichTextAnchorCreationResultsResponse](../../models/getrichtextanchorcreationresultsresponse.md)**
-
-### Errors
-
-| Error Type                   | Status Code                  | Content Type                 |
-| ---------------------------- | ---------------------------- | ---------------------------- |
-| errors.ErrorResponse         | 400, 401, 403, 404, 409, 429 | application/json             |
-| errors.ErrorResponse         | 500, 503                     | application/json             |
-| errors.SDKError              | 4XX, 5XX                     | \*/\*                        |
-
 ## get_rich_text_batch_edit_results
 
 Returns a [`RichTextEditListResult`](ref:operations#richtexteditlistresult) describing the results of a rich text batch edit.
@@ -857,6 +809,54 @@ with SDK(
 ### Response
 
 **[models.GetRichTextBatchEditResultsResponse](../../models/getrichtextbatcheditresultsresponse.md)**
+
+### Errors
+
+| Error Type                   | Status Code                  | Content Type                 |
+| ---------------------------- | ---------------------------- | ---------------------------- |
+| errors.ErrorResponse         | 400, 401, 403, 404, 409, 429 | application/json             |
+| errors.ErrorResponse         | 500, 503                     | application/json             |
+| errors.SDKError              | 4XX, 5XX                     | \*/\*                        |
+
+## get_rich_text_anchor_creation_results
+
+Returns a [`RichTextAnchorCreationResultCollection`](ref:operations#richtextanchorcreationresultcollection) describing the results of a rich text anchor creation.
+
+### Example Usage
+
+<!-- UsageSnippet language="python" operationID="getRichTextAnchorCreationResults" method="get" path="/operations/{operationId}/richTextAnchorCreationResults" -->
+```python
+from workiva import SDK, models
+
+
+with SDK(
+    security=models.Security(
+        client_id="<YOUR_CLIENT_ID_HERE>",
+        client_secret="<YOUR_CLIENT_SECRET_HERE>",
+    ),
+) as sdk:
+
+    res = sdk.operations.get_rich_text_anchor_creation_results(operation_id="<id>", dollar_maxpagesize=1000, dollar_next="JTI0bGltaXQ9MTAwJiUyNG9mZnNldD0xMDA")
+
+    while res is not None:
+        # Handle items
+
+        res = res.next()
+
+```
+
+### Parameters
+
+| Parameter                                                           | Type                                                                | Required                                                            | Description                                                         | Example                                                             |
+| ------------------------------------------------------------------- | ------------------------------------------------------------------- | ------------------------------------------------------------------- | ------------------------------------------------------------------- | ------------------------------------------------------------------- |
+| `operation_id`                                                      | *str*                                                               | :heavy_check_mark:                                                  | The unique identifier of the operation                              |                                                                     |
+| `dollar_maxpagesize`                                                | *Optional[int]*                                                     | :heavy_minus_sign:                                                  | The maximum number of results to retrieve                           |                                                                     |
+| `dollar_next`                                                       | *Optional[str]*                                                     | :heavy_minus_sign:                                                  | Pagination cursor for next set of results.                          | JTI0bGltaXQ9MTAwJiUyNG9mZnNldD0xMDA                                 |
+| `retries`                                                           | [Optional[utils.RetryConfig]](../../models/utils/retryconfig.md)    | :heavy_minus_sign:                                                  | Configuration to override the default retry behavior of the client. |                                                                     |
+
+### Response
+
+**[models.GetRichTextAnchorCreationResultsResponse](../../models/getrichtextanchorcreationresultsresponse.md)**
 
 ### Errors
 

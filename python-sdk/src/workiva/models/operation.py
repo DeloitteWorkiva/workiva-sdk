@@ -5,9 +5,10 @@ from .operationdetail import OperationDetail, OperationDetailTypedDict
 from datetime import datetime
 from enum import Enum
 import pydantic
-from pydantic import model_serializer
+from pydantic import field_serializer, model_serializer
 from typing import List, Optional
 from typing_extensions import Annotated, NotRequired, TypedDict
+from workiva import models, utils
 from workiva.types import BaseModel, Nullable, OptionalNullable, UNSET, UNSET_SENTINEL
 
 
@@ -83,7 +84,7 @@ class OperationCreated(BaseModel):
         return m
 
 
-class OperationStatus(str, Enum):
+class OperationStatus(str, Enum, metaclass=utils.OpenEnumMeta):
     r"""The current status of the operation"""
 
     ACKNOWLEDGED = "acknowledged"
@@ -208,6 +209,15 @@ class Operation(BaseModel):
     r"""The current status of the operation"""
 
     updated: Optional[Updated] = None
+
+    @field_serializer("status")
+    def serialize_status(self, value):
+        if isinstance(value, str):
+            try:
+                return models.OperationStatus(value)
+            except ValueError:
+                return value
+        return value
 
     @model_serializer(mode="wrap")
     def serialize_model(self, handler):

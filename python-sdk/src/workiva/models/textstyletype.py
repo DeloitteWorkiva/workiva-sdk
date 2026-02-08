@@ -2,9 +2,10 @@
 
 from __future__ import annotations
 from enum import Enum
+from workiva import utils
 
 
-class TextStyleType(str, Enum):
+class TextStyleType(str, Enum, metaclass=utils.OpenEnumMeta):
     r"""The type of the text style."""
 
     PARAGRAPH_STYLE = "paragraphStyle"

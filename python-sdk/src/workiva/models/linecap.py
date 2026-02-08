@@ -2,9 +2,10 @@
 
 from __future__ import annotations
 from enum import Enum
+from workiva import utils
 
 
-class LineCap(str, Enum):
+class LineCap(str, Enum, metaclass=utils.OpenEnumMeta):
     r"""The way the terminator of a line looks."""
 
     NONE = "none"

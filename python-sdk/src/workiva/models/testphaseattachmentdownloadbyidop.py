@@ -11,23 +11,16 @@ from workiva.utils import FieldMetadata, PathParamMetadata
 class TestPhaseAttachmentDownloadByIDRequestTypedDict(TypedDict):
     __test__ = False  # pyright: ignore[reportGeneralTypeIssues]
 
-    attachment_id: str
-    r"""The unique identifier of the attachment"""
     test_form_id: str
     r"""The unique identifier of the test form"""
     test_phase_id: str
     r"""The unique identifier of the test phase"""
+    attachment_id: str
+    r"""The unique identifier of the attachment"""
 
 
 class TestPhaseAttachmentDownloadByIDRequest(BaseModel):
     __test__ = False
-
-    attachment_id: Annotated[
-        str,
-        pydantic.Field(alias="attachmentId"),
-        FieldMetadata(path=PathParamMetadata(style="simple", explode=False)),
-    ]
-    r"""The unique identifier of the attachment"""
 
     test_form_id: Annotated[
         str,
@@ -42,6 +35,13 @@ class TestPhaseAttachmentDownloadByIDRequest(BaseModel):
         FieldMetadata(path=PathParamMetadata(style="simple", explode=False)),
     ]
     r"""The unique identifier of the test phase"""
+
+    attachment_id: Annotated[
+        str,
+        pydantic.Field(alias="attachmentId"),
+        FieldMetadata(path=PathParamMetadata(style="simple", explode=False)),
+    ]
+    r"""The unique identifier of the attachment"""
 
 
 class TestPhaseAttachmentDownloadByIDResponseTypedDict(TypedDict):

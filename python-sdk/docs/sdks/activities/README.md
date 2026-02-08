@@ -7,15 +7,15 @@ Activities enable you to retrieve a list of actions performed in the organizatio
 
 ### Available Operations
 
-* [get_activity_action_by_id](#get_activity_action_by_id) - Retrieve a single activity action
-* [get_activity_actions](#get_activity_actions) - Retrieve a list of activity actions
 * [get_activity_by_id](#get_activity_by_id) - Retrieve a single activity
+* [get_activity_actions](#get_activity_actions) - Retrieve a list of activity actions
+* [get_activity_action_by_id](#get_activity_action_by_id) - Retrieve a single activity action
 * [get_organization_activities](#get_organization_activities) - Retrieve a list of activities for an organization
 * [get_organization_workspace_activities](#get_organization_workspace_activities) - Retrieve a list of activities for a workspace
 
-## get_activity_action_by_id
+## get_activity_by_id
 
-Returns an action performed, given its ID
+Retrieves an activity given its ID.
 
 :::{admonition} Attention
 :class: danger
@@ -25,7 +25,7 @@ The Workiva Platform does not guarantee that actions taken in the platform will 
 
 ### Example Usage
 
-<!-- UsageSnippet language="python" operationID="getActivityActionById" method="get" path="/activityActions/{activityActionId}" -->
+<!-- UsageSnippet language="python" operationID="getActivityById" method="get" path="/activities/{activityId}" -->
 ```python
 from workiva import SDK, models
 
@@ -37,7 +37,7 @@ with SDK(
     ),
 ) as sdk:
 
-    res = sdk.activities.get_activity_action_by_id(activity_action_id="com.workiva.activity.retention_policy.update")
+    res = sdk.activities.get_activity_by_id(activity_id="NjE0MjIxODItOTVkYi00YmFjLWI4ZjktNzRkMDg1OTdlMDgwOlFYVmthWFJNYjJjZVFYVmthWFJNYjJjNk5ETXpaamN4TUdVMU5HRTBOR1V5Tm1JeU5ERmtOREJsWXpNMlpHWXhNVFE=")
 
     # Handle response
     print(res)
@@ -46,14 +46,14 @@ with SDK(
 
 ### Parameters
 
-| Parameter                                                           | Type                                                                | Required                                                            | Description                                                         | Example                                                             |
-| ------------------------------------------------------------------- | ------------------------------------------------------------------- | ------------------------------------------------------------------- | ------------------------------------------------------------------- | ------------------------------------------------------------------- |
-| `activity_action_id`                                                | *str*                                                               | :heavy_check_mark:                                                  | The unique identifier of the activity action                        | com.workiva.activity.retention_policy.update                        |
-| `retries`                                                           | [Optional[utils.RetryConfig]](../../models/utils/retryconfig.md)    | :heavy_minus_sign:                                                  | Configuration to override the default retry behavior of the client. |                                                                     |
+| Parameter                                                                                                                                    | Type                                                                                                                                         | Required                                                                                                                                     | Description                                                                                                                                  | Example                                                                                                                                      |
+| -------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------- |
+| `activity_id`                                                                                                                                | *str*                                                                                                                                        | :heavy_check_mark:                                                                                                                           | The unique identifier of the activity                                                                                                        | NjE0MjIxODItOTVkYi00YmFjLWI4ZjktNzRkMDg1OTdlMDgwOlFYVmthWFJNYjJjZVFYVmthWFJNYjJjNk5ETXpaamN4TUdVMU5HRTBOR1V5Tm1JeU5ERmtOREJsWXpNMlpHWXhNVFE= |
+| `retries`                                                                                                                                    | [Optional[utils.RetryConfig]](../../models/utils/retryconfig.md)                                                                             | :heavy_minus_sign:                                                                                                                           | Configuration to override the default retry behavior of the client.                                                                          |                                                                                                                                              |
 
 ### Response
 
-**[models.ActivityAction](../../models/activityaction.md)**
+**[models.Activity](../../models/activity.md)**
 
 ### Errors
 
@@ -117,9 +117,9 @@ with SDK(
 | errors.ErrorResponse         | 500, 503                     | application/json             |
 | errors.SDKError              | 4XX, 5XX                     | \*/\*                        |
 
-## get_activity_by_id
+## get_activity_action_by_id
 
-Retrieves an activity given its ID.
+Returns an action performed, given its ID
 
 :::{admonition} Attention
 :class: danger
@@ -129,7 +129,7 @@ The Workiva Platform does not guarantee that actions taken in the platform will 
 
 ### Example Usage
 
-<!-- UsageSnippet language="python" operationID="getActivityById" method="get" path="/activities/{activityId}" -->
+<!-- UsageSnippet language="python" operationID="getActivityActionById" method="get" path="/activityActions/{activityActionId}" -->
 ```python
 from workiva import SDK, models
 
@@ -141,7 +141,7 @@ with SDK(
     ),
 ) as sdk:
 
-    res = sdk.activities.get_activity_by_id(activity_id="NjE0MjIxODItOTVkYi00YmFjLWI4ZjktNzRkMDg1OTdlMDgwOlFYVmthWFJNYjJjZVFYVmthWFJNYjJjNk5ETXpaamN4TUdVMU5HRTBOR1V5Tm1JeU5ERmtOREJsWXpNMlpHWXhNVFE=")
+    res = sdk.activities.get_activity_action_by_id(activity_action_id="com.workiva.activity.retention_policy.update")
 
     # Handle response
     print(res)
@@ -150,14 +150,14 @@ with SDK(
 
 ### Parameters
 
-| Parameter                                                                                                                                    | Type                                                                                                                                         | Required                                                                                                                                     | Description                                                                                                                                  | Example                                                                                                                                      |
-| -------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------- |
-| `activity_id`                                                                                                                                | *str*                                                                                                                                        | :heavy_check_mark:                                                                                                                           | The unique identifier of the activity                                                                                                        | NjE0MjIxODItOTVkYi00YmFjLWI4ZjktNzRkMDg1OTdlMDgwOlFYVmthWFJNYjJjZVFYVmthWFJNYjJjNk5ETXpaamN4TUdVMU5HRTBOR1V5Tm1JeU5ERmtOREJsWXpNMlpHWXhNVFE= |
-| `retries`                                                                                                                                    | [Optional[utils.RetryConfig]](../../models/utils/retryconfig.md)                                                                             | :heavy_minus_sign:                                                                                                                           | Configuration to override the default retry behavior of the client.                                                                          |                                                                                                                                              |
+| Parameter                                                           | Type                                                                | Required                                                            | Description                                                         | Example                                                             |
+| ------------------------------------------------------------------- | ------------------------------------------------------------------- | ------------------------------------------------------------------- | ------------------------------------------------------------------- | ------------------------------------------------------------------- |
+| `activity_action_id`                                                | *str*                                                               | :heavy_check_mark:                                                  | The unique identifier of the activity action                        | com.workiva.activity.retention_policy.update                        |
+| `retries`                                                           | [Optional[utils.RetryConfig]](../../models/utils/retryconfig.md)    | :heavy_minus_sign:                                                  | Configuration to override the default retry behavior of the client. |                                                                     |
 
 ### Response
 
-**[models.Activity](../../models/activity.md)**
+**[models.ActivityAction](../../models/activityaction.md)**
 
 ### Errors
 
@@ -192,8 +192,8 @@ with SDK(
 ) as sdk:
 
     res = sdk.activities.get_organization_activities(request={
-        "dollar_next": "JTI0bGltaXQ9MTAwJiUyNG9mZnNldD0xMDA",
         "organization_id": "d6e178fd-4dd5-47e5-9457-68dd64b03655",
+        "dollar_next": "JTI0bGltaXQ9MTAwJiUyNG9mZnNldD0xMDA",
     })
 
     while res is not None:
@@ -247,9 +247,9 @@ with SDK(
 ) as sdk:
 
     res = sdk.activities.get_organization_workspace_activities(request={
-        "dollar_next": "JTI0bGltaXQ9MTAwJiUyNG9mZnNldD0xMDA",
         "organization_id": "d6e178fd-4dd5-47e5-9457-68dd64b03655",
         "workspace_id": "<id>",
+        "dollar_next": "JTI0bGltaXQ9MTAwJiUyNG9mZnNldD0xMDA",
     })
 
     while res is not None:

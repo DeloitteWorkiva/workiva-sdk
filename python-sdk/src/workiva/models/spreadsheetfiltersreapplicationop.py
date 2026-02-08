@@ -13,25 +13,25 @@ from workiva.utils import FieldMetadata, PathParamMetadata, RequestMetadata
 
 
 class SpreadsheetFiltersReapplicationRequestTypedDict(TypedDict):
-    spreadsheet_filters_reapplication: SpreadsheetFiltersReapplicationTypedDict
-    r"""The filter reapplication request to apply"""
     spreadsheet_id: str
     r"""The unique identifier of the spreadsheet"""
+    spreadsheet_filters_reapplication: SpreadsheetFiltersReapplicationTypedDict
+    r"""The filter reapplication request to apply"""
 
 
 class SpreadsheetFiltersReapplicationRequest(BaseModel):
-    spreadsheet_filters_reapplication: Annotated[
-        SpreadsheetFiltersReapplication,
-        FieldMetadata(request=RequestMetadata(media_type="application/json")),
-    ]
-    r"""The filter reapplication request to apply"""
-
     spreadsheet_id: Annotated[
         str,
         pydantic.Field(alias="spreadsheetId"),
         FieldMetadata(path=PathParamMetadata(style="simple", explode=False)),
     ]
     r"""The unique identifier of the spreadsheet"""
+
+    spreadsheet_filters_reapplication: Annotated[
+        SpreadsheetFiltersReapplication,
+        FieldMetadata(request=RequestMetadata(media_type="application/json")),
+    ]
+    r"""The filter reapplication request to apply"""
 
 
 class SpreadsheetFiltersReapplicationResponseTypedDict(TypedDict):

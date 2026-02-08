@@ -12,30 +12,26 @@ from workiva.utils.unmarshal_json_response import unmarshal_json_response
 class Sustainability(BaseSDK):
     r"""Endpoints to manage Sustainability Programs"""
 
-    def batch_deletion_metric_values(
+    def get_programs(
         self,
         *,
-        metric_id: str,
-        program_id: str,
-        metric_value_identifier: Union[
-            models.MetricValueIdentifier, models.MetricValueIdentifierTypedDict
-        ],
+        dollar_maxpagesize: Optional[int] = 1000,
+        dollar_next: Optional[str] = None,
+        dollar_order_by: Optional[str] = None,
+        dollar_filter: Optional[str] = None,
         retries: OptionalNullable[utils.RetryConfig] = UNSET,
         server_url: Optional[str] = None,
         timeout_ms: Optional[int] = None,
         http_headers: Optional[Mapping[str, str]] = None,
-    ):
-        r"""Initiate a batch deletion of metric values
+    ) -> Optional[models.GetProgramsResponse]:
+        r"""Retrieve a list of programs
 
-        Batch delete the given metric values.
+        Returns a paginated list of [programs](ref:sustainability#program).
 
-        For each value, provide either the id or both the reportingPeriod and coordinates (if any).
-        If both are provided, the given id will be used.
-
-
-        :param metric_id: The unique identifier of the metric
-        :param program_id: The unique identifier of the program
-        :param metric_value_identifier: The metric values to delete
+        :param dollar_maxpagesize: The maximum number of results to retrieve
+        :param dollar_next: Pagination cursor for next set of results.
+        :param dollar_order_by: One or more comma-separated expressions to indicate the order in which to sort the results.
+        :param dollar_filter: The properties to filter the results by.
         :param retries: Override the default retry configuration for this method
         :param server_url: Override the default server URL for this method
         :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
@@ -51,34 +47,26 @@ class Sustainability(BaseSDK):
         else:
             base_url = self._get_url(base_url, url_variables)
 
-        request = models.BatchDeletionMetricValuesRequest(
-            metric_id=metric_id,
-            program_id=program_id,
-            metric_value_identifier=utils.get_pydantic_model(
-                metric_value_identifier, models.MetricValueIdentifier
-            ),
+        request = models.GetProgramsRequest(
+            dollar_maxpagesize=dollar_maxpagesize,
+            dollar_next=dollar_next,
+            dollar_order_by=dollar_order_by,
+            dollar_filter=dollar_filter,
         )
 
         req = self._build_request(
-            method="POST",
-            path="/programs/{programId}/metrics/{metricId}/values/batchDeletion",
+            method="GET",
+            path="/programs",
             base_url=base_url,
             url_variables=url_variables,
             request=request,
-            request_body_required=True,
-            request_has_path_params=True,
+            request_body_required=False,
+            request_has_path_params=False,
             request_has_query_params=True,
             user_agent_header="user-agent",
             accept_header_value="application/json",
             http_headers=http_headers,
             security=self.sdk_configuration.security,
-            get_serialized_body=lambda: utils.serialize_request_body(
-                request.metric_value_identifier,
-                False,
-                False,
-                "json",
-                models.MetricValueIdentifier,
-            ),
             allow_empty_value=None,
             timeout_ms=timeout_ms,
         )
@@ -95,8 +83,8 @@ class Sustainability(BaseSDK):
             hook_ctx=HookContext(
                 config=self.sdk_configuration,
                 base_url=base_url or "",
-                operation_id="batchDeletionMetricValues",
-                oauth2_scopes=["file:write"],
+                operation_id="getPrograms",
+                oauth2_scopes=["file:read"],
                 security_source=self.sdk_configuration.security,
             ),
             request=req,
@@ -115,262 +103,31 @@ class Sustainability(BaseSDK):
             retry_config=retry_config,
         )
 
-        response_data: Any = None
-        if utils.match_response(http_res, "204", "*"):
-            return
-        if utils.match_response(
-            http_res, ["400", "401", "403", "404", "409", "429"], "application/json"
-        ):
-            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
-            raise errors.ErrorResponse(response_data, http_res)
-        if utils.match_response(http_res, ["500", "503"], "application/json"):
-            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
-            raise errors.ErrorResponse(response_data, http_res)
-        if utils.match_response(http_res, "4XX", "*"):
-            http_res_text = utils.stream_to_text(http_res)
-            raise errors.SDKError("API error occurred", http_res, http_res_text)
-        if utils.match_response(http_res, "5XX", "*"):
-            http_res_text = utils.stream_to_text(http_res)
-            raise errors.SDKError("API error occurred", http_res, http_res_text)
+        def next_func() -> Optional[models.GetProgramsResponse]:
+            body = utils.unmarshal_json(http_res.text, Union[Dict[Any, Any], List[Any]])
 
-        raise errors.SDKError("Unexpected response received", http_res)
+            next_cursor = JSONPath("$['@nextLink']").parse(body)
 
-    async def batch_deletion_metric_values_async(
-        self,
-        *,
-        metric_id: str,
-        program_id: str,
-        metric_value_identifier: Union[
-            models.MetricValueIdentifier, models.MetricValueIdentifierTypedDict
-        ],
-        retries: OptionalNullable[utils.RetryConfig] = UNSET,
-        server_url: Optional[str] = None,
-        timeout_ms: Optional[int] = None,
-        http_headers: Optional[Mapping[str, str]] = None,
-    ):
-        r"""Initiate a batch deletion of metric values
+            if len(next_cursor) == 0:
+                return None
 
-        Batch delete the given metric values.
+            next_cursor = next_cursor[0]
+            if next_cursor is None or str(next_cursor).strip() == "":
+                return None
 
-        For each value, provide either the id or both the reportingPeriod and coordinates (if any).
-        If both are provided, the given id will be used.
-
-
-        :param metric_id: The unique identifier of the metric
-        :param program_id: The unique identifier of the program
-        :param metric_value_identifier: The metric values to delete
-        :param retries: Override the default retry configuration for this method
-        :param server_url: Override the default server URL for this method
-        :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
-        :param http_headers: Additional headers to set or replace on requests.
-        """
-        base_url = None
-        url_variables = None
-        if timeout_ms is None:
-            timeout_ms = self.sdk_configuration.timeout_ms
-
-        if server_url is not None:
-            base_url = server_url
-        else:
-            base_url = self._get_url(base_url, url_variables)
-
-        request = models.BatchDeletionMetricValuesRequest(
-            metric_id=metric_id,
-            program_id=program_id,
-            metric_value_identifier=utils.get_pydantic_model(
-                metric_value_identifier, models.MetricValueIdentifier
-            ),
-        )
-
-        req = self._build_request_async(
-            method="POST",
-            path="/programs/{programId}/metrics/{metricId}/values/batchDeletion",
-            base_url=base_url,
-            url_variables=url_variables,
-            request=request,
-            request_body_required=True,
-            request_has_path_params=True,
-            request_has_query_params=True,
-            user_agent_header="user-agent",
-            accept_header_value="application/json",
-            http_headers=http_headers,
-            security=self.sdk_configuration.security,
-            get_serialized_body=lambda: utils.serialize_request_body(
-                request.metric_value_identifier,
-                False,
-                False,
-                "json",
-                models.MetricValueIdentifier,
-            ),
-            allow_empty_value=None,
-            timeout_ms=timeout_ms,
-        )
-
-        if retries == UNSET:
-            if self.sdk_configuration.retry_config is not UNSET:
-                retries = self.sdk_configuration.retry_config
-
-        retry_config = None
-        if isinstance(retries, utils.RetryConfig):
-            retry_config = (retries, ["429", "500", "502", "503", "504"])
-
-        http_res = await self.do_request_async(
-            hook_ctx=HookContext(
-                config=self.sdk_configuration,
-                base_url=base_url or "",
-                operation_id="batchDeletionMetricValues",
-                oauth2_scopes=["file:write"],
-                security_source=self.sdk_configuration.security,
-            ),
-            request=req,
-            error_status_codes=[
-                "400",
-                "401",
-                "403",
-                "404",
-                "409",
-                "429",
-                "4XX",
-                "500",
-                "503",
-                "5XX",
-            ],
-            retry_config=retry_config,
-        )
+            return self.get_programs(
+                dollar_maxpagesize=dollar_maxpagesize,
+                dollar_next=next_cursor,
+                dollar_order_by=dollar_order_by,
+                dollar_filter=dollar_filter,
+                retries=retries,
+            )
 
         response_data: Any = None
-        if utils.match_response(http_res, "204", "*"):
-            return
-        if utils.match_response(
-            http_res, ["400", "401", "403", "404", "409", "429"], "application/json"
-        ):
-            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
-            raise errors.ErrorResponse(response_data, http_res)
-        if utils.match_response(http_res, ["500", "503"], "application/json"):
-            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
-            raise errors.ErrorResponse(response_data, http_res)
-        if utils.match_response(http_res, "4XX", "*"):
-            http_res_text = await utils.stream_to_text_async(http_res)
-            raise errors.SDKError("API error occurred", http_res, http_res_text)
-        if utils.match_response(http_res, "5XX", "*"):
-            http_res_text = await utils.stream_to_text_async(http_res)
-            raise errors.SDKError("API error occurred", http_res, http_res_text)
-
-        raise errors.SDKError("Unexpected response received", http_res)
-
-    def batch_upsertion_metric_values(
-        self,
-        *,
-        metric_id: str,
-        program_id: str,
-        metric_value_upsertion: Union[
-            models.MetricValueUpsertion, models.MetricValueUpsertionTypedDict
-        ],
-        retries: OptionalNullable[utils.RetryConfig] = UNSET,
-        server_url: Optional[str] = None,
-        timeout_ms: Optional[int] = None,
-        http_headers: Optional[Mapping[str, str]] = None,
-    ) -> models.BatchUpsertionMetricValuesResponse:
-        r"""Initiate a batch upsertion of metric values
-
-        Batch upsert values for the given metric. The payload is limited to 10MB; break it into multiple requests if necessary.
-
-        For each value, provide either the id or both the reportingPeriod and coordinates (if any).
-        If both are provided, the given id will be used.
-
-        The API will validate the request and return a 202 Accepted status.
-        However, the operation will be processed asynchronously, so the values may take some time to appear in the system.
-        Poll the location provided in the Location header to check the status of the operation.
-
-        If any of the values fail to be processed, no changes will be stored in the system.
-
-
-        :param metric_id: The unique identifier of the metric
-        :param program_id: The unique identifier of the program
-        :param metric_value_upsertion: The metric values to upsert
-        :param retries: Override the default retry configuration for this method
-        :param server_url: Override the default server URL for this method
-        :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
-        :param http_headers: Additional headers to set or replace on requests.
-        """
-        base_url = None
-        url_variables = None
-        if timeout_ms is None:
-            timeout_ms = self.sdk_configuration.timeout_ms
-
-        if server_url is not None:
-            base_url = server_url
-        else:
-            base_url = self._get_url(base_url, url_variables)
-
-        request = models.BatchUpsertionMetricValuesRequest(
-            metric_id=metric_id,
-            program_id=program_id,
-            metric_value_upsertion=utils.get_pydantic_model(
-                metric_value_upsertion, models.MetricValueUpsertion
-            ),
-        )
-
-        req = self._build_request(
-            method="POST",
-            path="/programs/{programId}/metrics/{metricId}/values/batchUpsertion",
-            base_url=base_url,
-            url_variables=url_variables,
-            request=request,
-            request_body_required=True,
-            request_has_path_params=True,
-            request_has_query_params=True,
-            user_agent_header="user-agent",
-            accept_header_value="application/json",
-            http_headers=http_headers,
-            security=self.sdk_configuration.security,
-            get_serialized_body=lambda: utils.serialize_request_body(
-                request.metric_value_upsertion,
-                False,
-                False,
-                "json",
-                models.MetricValueUpsertion,
-            ),
-            allow_empty_value=None,
-            timeout_ms=timeout_ms,
-        )
-
-        if retries == UNSET:
-            if self.sdk_configuration.retry_config is not UNSET:
-                retries = self.sdk_configuration.retry_config
-
-        retry_config = None
-        if isinstance(retries, utils.RetryConfig):
-            retry_config = (retries, ["429", "500", "502", "503", "504"])
-
-        http_res = self.do_request(
-            hook_ctx=HookContext(
-                config=self.sdk_configuration,
-                base_url=base_url or "",
-                operation_id="batchUpsertionMetricValues",
-                oauth2_scopes=["file:write"],
-                security_source=self.sdk_configuration.security,
-            ),
-            request=req,
-            error_status_codes=[
-                "400",
-                "401",
-                "403",
-                "404",
-                "409",
-                "429",
-                "4XX",
-                "500",
-                "503",
-                "5XX",
-            ],
-            retry_config=retry_config,
-        )
-
-        response_data: Any = None
-        if utils.match_response(http_res, "202", "*"):
-            return models.BatchUpsertionMetricValuesResponse(
-                headers=utils.get_response_headers(http_res.headers)
+        if utils.match_response(http_res, "200", "application/json"):
+            return models.GetProgramsResponse(
+                result=unmarshal_json_response(models.ProgramsListResult, http_res),
+                next=next_func,
             )
         if utils.match_response(
             http_res, ["400", "401", "403", "404", "409", "429"], "application/json"
@@ -389,36 +146,26 @@ class Sustainability(BaseSDK):
 
         raise errors.SDKError("Unexpected response received", http_res)
 
-    async def batch_upsertion_metric_values_async(
+    async def get_programs_async(
         self,
         *,
-        metric_id: str,
-        program_id: str,
-        metric_value_upsertion: Union[
-            models.MetricValueUpsertion, models.MetricValueUpsertionTypedDict
-        ],
+        dollar_maxpagesize: Optional[int] = 1000,
+        dollar_next: Optional[str] = None,
+        dollar_order_by: Optional[str] = None,
+        dollar_filter: Optional[str] = None,
         retries: OptionalNullable[utils.RetryConfig] = UNSET,
         server_url: Optional[str] = None,
         timeout_ms: Optional[int] = None,
         http_headers: Optional[Mapping[str, str]] = None,
-    ) -> models.BatchUpsertionMetricValuesResponse:
-        r"""Initiate a batch upsertion of metric values
+    ) -> Optional[models.GetProgramsResponse]:
+        r"""Retrieve a list of programs
 
-        Batch upsert values for the given metric. The payload is limited to 10MB; break it into multiple requests if necessary.
+        Returns a paginated list of [programs](ref:sustainability#program).
 
-        For each value, provide either the id or both the reportingPeriod and coordinates (if any).
-        If both are provided, the given id will be used.
-
-        The API will validate the request and return a 202 Accepted status.
-        However, the operation will be processed asynchronously, so the values may take some time to appear in the system.
-        Poll the location provided in the Location header to check the status of the operation.
-
-        If any of the values fail to be processed, no changes will be stored in the system.
-
-
-        :param metric_id: The unique identifier of the metric
-        :param program_id: The unique identifier of the program
-        :param metric_value_upsertion: The metric values to upsert
+        :param dollar_maxpagesize: The maximum number of results to retrieve
+        :param dollar_next: Pagination cursor for next set of results.
+        :param dollar_order_by: One or more comma-separated expressions to indicate the order in which to sort the results.
+        :param dollar_filter: The properties to filter the results by.
         :param retries: Override the default retry configuration for this method
         :param server_url: Override the default server URL for this method
         :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
@@ -434,34 +181,26 @@ class Sustainability(BaseSDK):
         else:
             base_url = self._get_url(base_url, url_variables)
 
-        request = models.BatchUpsertionMetricValuesRequest(
-            metric_id=metric_id,
-            program_id=program_id,
-            metric_value_upsertion=utils.get_pydantic_model(
-                metric_value_upsertion, models.MetricValueUpsertion
-            ),
+        request = models.GetProgramsRequest(
+            dollar_maxpagesize=dollar_maxpagesize,
+            dollar_next=dollar_next,
+            dollar_order_by=dollar_order_by,
+            dollar_filter=dollar_filter,
         )
 
         req = self._build_request_async(
-            method="POST",
-            path="/programs/{programId}/metrics/{metricId}/values/batchUpsertion",
+            method="GET",
+            path="/programs",
             base_url=base_url,
             url_variables=url_variables,
             request=request,
-            request_body_required=True,
-            request_has_path_params=True,
+            request_body_required=False,
+            request_has_path_params=False,
             request_has_query_params=True,
             user_agent_header="user-agent",
             accept_header_value="application/json",
             http_headers=http_headers,
             security=self.sdk_configuration.security,
-            get_serialized_body=lambda: utils.serialize_request_body(
-                request.metric_value_upsertion,
-                False,
-                False,
-                "json",
-                models.MetricValueUpsertion,
-            ),
             allow_empty_value=None,
             timeout_ms=timeout_ms,
         )
@@ -478,8 +217,8 @@ class Sustainability(BaseSDK):
             hook_ctx=HookContext(
                 config=self.sdk_configuration,
                 base_url=base_url or "",
-                operation_id="batchUpsertionMetricValues",
-                oauth2_scopes=["file:write"],
+                operation_id="getPrograms",
+                oauth2_scopes=["file:read"],
                 security_source=self.sdk_configuration.security,
             ),
             request=req,
@@ -498,447 +237,35 @@ class Sustainability(BaseSDK):
             retry_config=retry_config,
         )
 
-        response_data: Any = None
-        if utils.match_response(http_res, "202", "*"):
-            return models.BatchUpsertionMetricValuesResponse(
-                headers=utils.get_response_headers(http_res.headers)
+        def next_func() -> Awaitable[Optional[models.GetProgramsResponse]]:
+            body = utils.unmarshal_json(http_res.text, Union[Dict[Any, Any], List[Any]])
+
+            async def empty_result():
+                return None
+
+            next_cursor = JSONPath("$['@nextLink']").parse(body)
+
+            if len(next_cursor) == 0:
+                return empty_result()
+
+            next_cursor = next_cursor[0]
+            if next_cursor is None or str(next_cursor).strip() == "":
+                return empty_result()
+
+            return self.get_programs_async(
+                dollar_maxpagesize=dollar_maxpagesize,
+                dollar_next=next_cursor,
+                dollar_order_by=dollar_order_by,
+                dollar_filter=dollar_filter,
+                retries=retries,
             )
-        if utils.match_response(
-            http_res, ["400", "401", "403", "404", "409", "429"], "application/json"
-        ):
-            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
-            raise errors.ErrorResponse(response_data, http_res)
-        if utils.match_response(http_res, ["500", "503"], "application/json"):
-            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
-            raise errors.ErrorResponse(response_data, http_res)
-        if utils.match_response(http_res, "4XX", "*"):
-            http_res_text = await utils.stream_to_text_async(http_res)
-            raise errors.SDKError("API error occurred", http_res, http_res_text)
-        if utils.match_response(http_res, "5XX", "*"):
-            http_res_text = await utils.stream_to_text_async(http_res)
-            raise errors.SDKError("API error occurred", http_res, http_res_text)
-
-        raise errors.SDKError("Unexpected response received", http_res)
-
-    def create_dimension(
-        self,
-        *,
-        program_id: str,
-        dimension: Union[models.DimensionInput, models.DimensionInputTypedDict],
-        retries: OptionalNullable[utils.RetryConfig] = UNSET,
-        server_url: Optional[str] = None,
-        timeout_ms: Optional[int] = None,
-        http_headers: Optional[Mapping[str, str]] = None,
-    ) -> models.Dimension:
-        r"""Create a new dimension
-
-        Creates a new [dimension](ref:sustainability#dimension).
-
-
-        :param program_id: The unique identifier of the program
-        :param dimension: The properties of the dimension to create
-        :param retries: Override the default retry configuration for this method
-        :param server_url: Override the default server URL for this method
-        :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
-        :param http_headers: Additional headers to set or replace on requests.
-        """
-        base_url = None
-        url_variables = None
-        if timeout_ms is None:
-            timeout_ms = self.sdk_configuration.timeout_ms
-
-        if server_url is not None:
-            base_url = server_url
-        else:
-            base_url = self._get_url(base_url, url_variables)
-
-        request = models.CreateDimensionRequest(
-            program_id=program_id,
-            dimension=utils.get_pydantic_model(dimension, models.DimensionInput),
-        )
-
-        req = self._build_request(
-            method="POST",
-            path="/programs/{programId}/dimensions",
-            base_url=base_url,
-            url_variables=url_variables,
-            request=request,
-            request_body_required=True,
-            request_has_path_params=True,
-            request_has_query_params=True,
-            user_agent_header="user-agent",
-            accept_header_value="application/json",
-            http_headers=http_headers,
-            security=self.sdk_configuration.security,
-            get_serialized_body=lambda: utils.serialize_request_body(
-                request.dimension, False, False, "json", models.DimensionInput
-            ),
-            allow_empty_value=None,
-            timeout_ms=timeout_ms,
-        )
-
-        if retries == UNSET:
-            if self.sdk_configuration.retry_config is not UNSET:
-                retries = self.sdk_configuration.retry_config
-
-        retry_config = None
-        if isinstance(retries, utils.RetryConfig):
-            retry_config = (retries, ["429", "500", "502", "503", "504"])
-
-        http_res = self.do_request(
-            hook_ctx=HookContext(
-                config=self.sdk_configuration,
-                base_url=base_url or "",
-                operation_id="createDimension",
-                oauth2_scopes=["file:write"],
-                security_source=self.sdk_configuration.security,
-            ),
-            request=req,
-            error_status_codes=[
-                "400",
-                "401",
-                "403",
-                "404",
-                "409",
-                "429",
-                "4XX",
-                "500",
-                "503",
-                "5XX",
-            ],
-            retry_config=retry_config,
-        )
 
         response_data: Any = None
-        if utils.match_response(http_res, "201", "application/json"):
-            return unmarshal_json_response(models.Dimension, http_res)
-        if utils.match_response(
-            http_res, ["400", "401", "403", "404", "409", "429"], "application/json"
-        ):
-            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
-            raise errors.ErrorResponse(response_data, http_res)
-        if utils.match_response(http_res, ["500", "503"], "application/json"):
-            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
-            raise errors.ErrorResponse(response_data, http_res)
-        if utils.match_response(http_res, "4XX", "*"):
-            http_res_text = utils.stream_to_text(http_res)
-            raise errors.SDKError("API error occurred", http_res, http_res_text)
-        if utils.match_response(http_res, "5XX", "*"):
-            http_res_text = utils.stream_to_text(http_res)
-            raise errors.SDKError("API error occurred", http_res, http_res_text)
-
-        raise errors.SDKError("Unexpected response received", http_res)
-
-    async def create_dimension_async(
-        self,
-        *,
-        program_id: str,
-        dimension: Union[models.DimensionInput, models.DimensionInputTypedDict],
-        retries: OptionalNullable[utils.RetryConfig] = UNSET,
-        server_url: Optional[str] = None,
-        timeout_ms: Optional[int] = None,
-        http_headers: Optional[Mapping[str, str]] = None,
-    ) -> models.Dimension:
-        r"""Create a new dimension
-
-        Creates a new [dimension](ref:sustainability#dimension).
-
-
-        :param program_id: The unique identifier of the program
-        :param dimension: The properties of the dimension to create
-        :param retries: Override the default retry configuration for this method
-        :param server_url: Override the default server URL for this method
-        :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
-        :param http_headers: Additional headers to set or replace on requests.
-        """
-        base_url = None
-        url_variables = None
-        if timeout_ms is None:
-            timeout_ms = self.sdk_configuration.timeout_ms
-
-        if server_url is not None:
-            base_url = server_url
-        else:
-            base_url = self._get_url(base_url, url_variables)
-
-        request = models.CreateDimensionRequest(
-            program_id=program_id,
-            dimension=utils.get_pydantic_model(dimension, models.DimensionInput),
-        )
-
-        req = self._build_request_async(
-            method="POST",
-            path="/programs/{programId}/dimensions",
-            base_url=base_url,
-            url_variables=url_variables,
-            request=request,
-            request_body_required=True,
-            request_has_path_params=True,
-            request_has_query_params=True,
-            user_agent_header="user-agent",
-            accept_header_value="application/json",
-            http_headers=http_headers,
-            security=self.sdk_configuration.security,
-            get_serialized_body=lambda: utils.serialize_request_body(
-                request.dimension, False, False, "json", models.DimensionInput
-            ),
-            allow_empty_value=None,
-            timeout_ms=timeout_ms,
-        )
-
-        if retries == UNSET:
-            if self.sdk_configuration.retry_config is not UNSET:
-                retries = self.sdk_configuration.retry_config
-
-        retry_config = None
-        if isinstance(retries, utils.RetryConfig):
-            retry_config = (retries, ["429", "500", "502", "503", "504"])
-
-        http_res = await self.do_request_async(
-            hook_ctx=HookContext(
-                config=self.sdk_configuration,
-                base_url=base_url or "",
-                operation_id="createDimension",
-                oauth2_scopes=["file:write"],
-                security_source=self.sdk_configuration.security,
-            ),
-            request=req,
-            error_status_codes=[
-                "400",
-                "401",
-                "403",
-                "404",
-                "409",
-                "429",
-                "4XX",
-                "500",
-                "503",
-                "5XX",
-            ],
-            retry_config=retry_config,
-        )
-
-        response_data: Any = None
-        if utils.match_response(http_res, "201", "application/json"):
-            return unmarshal_json_response(models.Dimension, http_res)
-        if utils.match_response(
-            http_res, ["400", "401", "403", "404", "409", "429"], "application/json"
-        ):
-            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
-            raise errors.ErrorResponse(response_data, http_res)
-        if utils.match_response(http_res, ["500", "503"], "application/json"):
-            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
-            raise errors.ErrorResponse(response_data, http_res)
-        if utils.match_response(http_res, "4XX", "*"):
-            http_res_text = await utils.stream_to_text_async(http_res)
-            raise errors.SDKError("API error occurred", http_res, http_res_text)
-        if utils.match_response(http_res, "5XX", "*"):
-            http_res_text = await utils.stream_to_text_async(http_res)
-            raise errors.SDKError("API error occurred", http_res, http_res_text)
-
-        raise errors.SDKError("Unexpected response received", http_res)
-
-    def create_metric(
-        self,
-        *,
-        program_id: str,
-        metric: Union[models.MetricInput, models.MetricInputTypedDict],
-        retries: OptionalNullable[utils.RetryConfig] = UNSET,
-        server_url: Optional[str] = None,
-        timeout_ms: Optional[int] = None,
-        http_headers: Optional[Mapping[str, str]] = None,
-    ) -> models.Metric:
-        r"""Create a new metric
-
-        Creates a new [metric](ref:sustainability#metric).
-
-
-        :param program_id: The unique identifier of the program
-        :param metric: The properties of the metric to create
-        :param retries: Override the default retry configuration for this method
-        :param server_url: Override the default server URL for this method
-        :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
-        :param http_headers: Additional headers to set or replace on requests.
-        """
-        base_url = None
-        url_variables = None
-        if timeout_ms is None:
-            timeout_ms = self.sdk_configuration.timeout_ms
-
-        if server_url is not None:
-            base_url = server_url
-        else:
-            base_url = self._get_url(base_url, url_variables)
-
-        request = models.CreateMetricRequest(
-            program_id=program_id,
-            metric=utils.get_pydantic_model(metric, models.MetricInput),
-        )
-
-        req = self._build_request(
-            method="POST",
-            path="/programs/{programId}/metrics",
-            base_url=base_url,
-            url_variables=url_variables,
-            request=request,
-            request_body_required=True,
-            request_has_path_params=True,
-            request_has_query_params=True,
-            user_agent_header="user-agent",
-            accept_header_value="application/json",
-            http_headers=http_headers,
-            security=self.sdk_configuration.security,
-            get_serialized_body=lambda: utils.serialize_request_body(
-                request.metric, False, False, "json", models.MetricInput
-            ),
-            allow_empty_value=None,
-            timeout_ms=timeout_ms,
-        )
-
-        if retries == UNSET:
-            if self.sdk_configuration.retry_config is not UNSET:
-                retries = self.sdk_configuration.retry_config
-
-        retry_config = None
-        if isinstance(retries, utils.RetryConfig):
-            retry_config = (retries, ["429", "500", "502", "503", "504"])
-
-        http_res = self.do_request(
-            hook_ctx=HookContext(
-                config=self.sdk_configuration,
-                base_url=base_url or "",
-                operation_id="createMetric",
-                oauth2_scopes=["file:write"],
-                security_source=self.sdk_configuration.security,
-            ),
-            request=req,
-            error_status_codes=[
-                "400",
-                "401",
-                "403",
-                "404",
-                "409",
-                "429",
-                "4XX",
-                "500",
-                "503",
-                "5XX",
-            ],
-            retry_config=retry_config,
-        )
-
-        response_data: Any = None
-        if utils.match_response(http_res, "201", "application/json"):
-            return unmarshal_json_response(models.Metric, http_res)
-        if utils.match_response(
-            http_res, ["400", "401", "403", "404", "409", "429"], "application/json"
-        ):
-            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
-            raise errors.ErrorResponse(response_data, http_res)
-        if utils.match_response(http_res, ["500", "503"], "application/json"):
-            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
-            raise errors.ErrorResponse(response_data, http_res)
-        if utils.match_response(http_res, "4XX", "*"):
-            http_res_text = utils.stream_to_text(http_res)
-            raise errors.SDKError("API error occurred", http_res, http_res_text)
-        if utils.match_response(http_res, "5XX", "*"):
-            http_res_text = utils.stream_to_text(http_res)
-            raise errors.SDKError("API error occurred", http_res, http_res_text)
-
-        raise errors.SDKError("Unexpected response received", http_res)
-
-    async def create_metric_async(
-        self,
-        *,
-        program_id: str,
-        metric: Union[models.MetricInput, models.MetricInputTypedDict],
-        retries: OptionalNullable[utils.RetryConfig] = UNSET,
-        server_url: Optional[str] = None,
-        timeout_ms: Optional[int] = None,
-        http_headers: Optional[Mapping[str, str]] = None,
-    ) -> models.Metric:
-        r"""Create a new metric
-
-        Creates a new [metric](ref:sustainability#metric).
-
-
-        :param program_id: The unique identifier of the program
-        :param metric: The properties of the metric to create
-        :param retries: Override the default retry configuration for this method
-        :param server_url: Override the default server URL for this method
-        :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
-        :param http_headers: Additional headers to set or replace on requests.
-        """
-        base_url = None
-        url_variables = None
-        if timeout_ms is None:
-            timeout_ms = self.sdk_configuration.timeout_ms
-
-        if server_url is not None:
-            base_url = server_url
-        else:
-            base_url = self._get_url(base_url, url_variables)
-
-        request = models.CreateMetricRequest(
-            program_id=program_id,
-            metric=utils.get_pydantic_model(metric, models.MetricInput),
-        )
-
-        req = self._build_request_async(
-            method="POST",
-            path="/programs/{programId}/metrics",
-            base_url=base_url,
-            url_variables=url_variables,
-            request=request,
-            request_body_required=True,
-            request_has_path_params=True,
-            request_has_query_params=True,
-            user_agent_header="user-agent",
-            accept_header_value="application/json",
-            http_headers=http_headers,
-            security=self.sdk_configuration.security,
-            get_serialized_body=lambda: utils.serialize_request_body(
-                request.metric, False, False, "json", models.MetricInput
-            ),
-            allow_empty_value=None,
-            timeout_ms=timeout_ms,
-        )
-
-        if retries == UNSET:
-            if self.sdk_configuration.retry_config is not UNSET:
-                retries = self.sdk_configuration.retry_config
-
-        retry_config = None
-        if isinstance(retries, utils.RetryConfig):
-            retry_config = (retries, ["429", "500", "502", "503", "504"])
-
-        http_res = await self.do_request_async(
-            hook_ctx=HookContext(
-                config=self.sdk_configuration,
-                base_url=base_url or "",
-                operation_id="createMetric",
-                oauth2_scopes=["file:write"],
-                security_source=self.sdk_configuration.security,
-            ),
-            request=req,
-            error_status_codes=[
-                "400",
-                "401",
-                "403",
-                "404",
-                "409",
-                "429",
-                "4XX",
-                "500",
-                "503",
-                "5XX",
-            ],
-            retry_config=retry_config,
-        )
-
-        response_data: Any = None
-        if utils.match_response(http_res, "201", "application/json"):
-            return unmarshal_json_response(models.Metric, http_res)
+        if utils.match_response(http_res, "200", "application/json"):
+            return models.GetProgramsResponse(
+                result=unmarshal_json_response(models.ProgramsListResult, http_res),
+                next=next_func,
+            )
         if utils.match_response(
             http_res, ["400", "401", "403", "404", "409", "429"], "application/json"
         ):
@@ -1168,2250 +495,6 @@ class Sustainability(BaseSDK):
 
         raise errors.SDKError("Unexpected response received", http_res)
 
-    def create_topic(
-        self,
-        *,
-        program_id: str,
-        topic: Union[models.TopicInput, models.TopicInputTypedDict],
-        retries: OptionalNullable[utils.RetryConfig] = UNSET,
-        server_url: Optional[str] = None,
-        timeout_ms: Optional[int] = None,
-        http_headers: Optional[Mapping[str, str]] = None,
-    ) -> models.Topic:
-        r"""Create a new topic
-
-        Creates a new [topic](ref:sustainability#topic).
-
-
-        :param program_id: The unique identifier of the program
-        :param topic: The properties of the topic to create
-        :param retries: Override the default retry configuration for this method
-        :param server_url: Override the default server URL for this method
-        :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
-        :param http_headers: Additional headers to set or replace on requests.
-        """
-        base_url = None
-        url_variables = None
-        if timeout_ms is None:
-            timeout_ms = self.sdk_configuration.timeout_ms
-
-        if server_url is not None:
-            base_url = server_url
-        else:
-            base_url = self._get_url(base_url, url_variables)
-
-        request = models.CreateTopicRequest(
-            program_id=program_id,
-            topic=utils.get_pydantic_model(topic, models.TopicInput),
-        )
-
-        req = self._build_request(
-            method="POST",
-            path="/programs/{programId}/topics",
-            base_url=base_url,
-            url_variables=url_variables,
-            request=request,
-            request_body_required=True,
-            request_has_path_params=True,
-            request_has_query_params=True,
-            user_agent_header="user-agent",
-            accept_header_value="application/json",
-            http_headers=http_headers,
-            security=self.sdk_configuration.security,
-            get_serialized_body=lambda: utils.serialize_request_body(
-                request.topic, False, False, "json", models.TopicInput
-            ),
-            allow_empty_value=None,
-            timeout_ms=timeout_ms,
-        )
-
-        if retries == UNSET:
-            if self.sdk_configuration.retry_config is not UNSET:
-                retries = self.sdk_configuration.retry_config
-
-        retry_config = None
-        if isinstance(retries, utils.RetryConfig):
-            retry_config = (retries, ["429", "500", "502", "503", "504"])
-
-        http_res = self.do_request(
-            hook_ctx=HookContext(
-                config=self.sdk_configuration,
-                base_url=base_url or "",
-                operation_id="createTopic",
-                oauth2_scopes=["file:write"],
-                security_source=self.sdk_configuration.security,
-            ),
-            request=req,
-            error_status_codes=[
-                "400",
-                "401",
-                "403",
-                "404",
-                "409",
-                "429",
-                "4XX",
-                "500",
-                "503",
-                "5XX",
-            ],
-            retry_config=retry_config,
-        )
-
-        response_data: Any = None
-        if utils.match_response(http_res, "201", "application/json"):
-            return unmarshal_json_response(models.Topic, http_res)
-        if utils.match_response(
-            http_res, ["400", "401", "403", "404", "409", "429"], "application/json"
-        ):
-            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
-            raise errors.ErrorResponse(response_data, http_res)
-        if utils.match_response(http_res, ["500", "503"], "application/json"):
-            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
-            raise errors.ErrorResponse(response_data, http_res)
-        if utils.match_response(http_res, "4XX", "*"):
-            http_res_text = utils.stream_to_text(http_res)
-            raise errors.SDKError("API error occurred", http_res, http_res_text)
-        if utils.match_response(http_res, "5XX", "*"):
-            http_res_text = utils.stream_to_text(http_res)
-            raise errors.SDKError("API error occurred", http_res, http_res_text)
-
-        raise errors.SDKError("Unexpected response received", http_res)
-
-    async def create_topic_async(
-        self,
-        *,
-        program_id: str,
-        topic: Union[models.TopicInput, models.TopicInputTypedDict],
-        retries: OptionalNullable[utils.RetryConfig] = UNSET,
-        server_url: Optional[str] = None,
-        timeout_ms: Optional[int] = None,
-        http_headers: Optional[Mapping[str, str]] = None,
-    ) -> models.Topic:
-        r"""Create a new topic
-
-        Creates a new [topic](ref:sustainability#topic).
-
-
-        :param program_id: The unique identifier of the program
-        :param topic: The properties of the topic to create
-        :param retries: Override the default retry configuration for this method
-        :param server_url: Override the default server URL for this method
-        :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
-        :param http_headers: Additional headers to set or replace on requests.
-        """
-        base_url = None
-        url_variables = None
-        if timeout_ms is None:
-            timeout_ms = self.sdk_configuration.timeout_ms
-
-        if server_url is not None:
-            base_url = server_url
-        else:
-            base_url = self._get_url(base_url, url_variables)
-
-        request = models.CreateTopicRequest(
-            program_id=program_id,
-            topic=utils.get_pydantic_model(topic, models.TopicInput),
-        )
-
-        req = self._build_request_async(
-            method="POST",
-            path="/programs/{programId}/topics",
-            base_url=base_url,
-            url_variables=url_variables,
-            request=request,
-            request_body_required=True,
-            request_has_path_params=True,
-            request_has_query_params=True,
-            user_agent_header="user-agent",
-            accept_header_value="application/json",
-            http_headers=http_headers,
-            security=self.sdk_configuration.security,
-            get_serialized_body=lambda: utils.serialize_request_body(
-                request.topic, False, False, "json", models.TopicInput
-            ),
-            allow_empty_value=None,
-            timeout_ms=timeout_ms,
-        )
-
-        if retries == UNSET:
-            if self.sdk_configuration.retry_config is not UNSET:
-                retries = self.sdk_configuration.retry_config
-
-        retry_config = None
-        if isinstance(retries, utils.RetryConfig):
-            retry_config = (retries, ["429", "500", "502", "503", "504"])
-
-        http_res = await self.do_request_async(
-            hook_ctx=HookContext(
-                config=self.sdk_configuration,
-                base_url=base_url or "",
-                operation_id="createTopic",
-                oauth2_scopes=["file:write"],
-                security_source=self.sdk_configuration.security,
-            ),
-            request=req,
-            error_status_codes=[
-                "400",
-                "401",
-                "403",
-                "404",
-                "409",
-                "429",
-                "4XX",
-                "500",
-                "503",
-                "5XX",
-            ],
-            retry_config=retry_config,
-        )
-
-        response_data: Any = None
-        if utils.match_response(http_res, "201", "application/json"):
-            return unmarshal_json_response(models.Topic, http_res)
-        if utils.match_response(
-            http_res, ["400", "401", "403", "404", "409", "429"], "application/json"
-        ):
-            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
-            raise errors.ErrorResponse(response_data, http_res)
-        if utils.match_response(http_res, ["500", "503"], "application/json"):
-            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
-            raise errors.ErrorResponse(response_data, http_res)
-        if utils.match_response(http_res, "4XX", "*"):
-            http_res_text = await utils.stream_to_text_async(http_res)
-            raise errors.SDKError("API error occurred", http_res, http_res_text)
-        if utils.match_response(http_res, "5XX", "*"):
-            http_res_text = await utils.stream_to_text_async(http_res)
-            raise errors.SDKError("API error occurred", http_res, http_res_text)
-
-        raise errors.SDKError("Unexpected response received", http_res)
-
-    def create_value(
-        self,
-        *,
-        metric_id: str,
-        program_id: str,
-        metric_value: Union[models.MetricValue, models.MetricValueTypedDict],
-        retries: OptionalNullable[utils.RetryConfig] = UNSET,
-        server_url: Optional[str] = None,
-        timeout_ms: Optional[int] = None,
-        http_headers: Optional[Mapping[str, str]] = None,
-    ) -> models.MetricValueOutput:
-        r"""Create a new metric value
-
-        Creates a new [metric value](ref:sustainability#metricvalue)
-
-
-        :param metric_id: The unique identifier of the metric
-        :param program_id: The unique identifier of the program
-        :param metric_value: The properties of the metric value to create
-        :param retries: Override the default retry configuration for this method
-        :param server_url: Override the default server URL for this method
-        :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
-        :param http_headers: Additional headers to set or replace on requests.
-        """
-        base_url = None
-        url_variables = None
-        if timeout_ms is None:
-            timeout_ms = self.sdk_configuration.timeout_ms
-
-        if server_url is not None:
-            base_url = server_url
-        else:
-            base_url = self._get_url(base_url, url_variables)
-
-        request = models.CreateValueRequest(
-            metric_id=metric_id,
-            program_id=program_id,
-            metric_value=utils.get_pydantic_model(metric_value, models.MetricValue),
-        )
-
-        req = self._build_request(
-            method="POST",
-            path="/programs/{programId}/metrics/{metricId}/values",
-            base_url=base_url,
-            url_variables=url_variables,
-            request=request,
-            request_body_required=True,
-            request_has_path_params=True,
-            request_has_query_params=True,
-            user_agent_header="user-agent",
-            accept_header_value="application/json",
-            http_headers=http_headers,
-            security=self.sdk_configuration.security,
-            get_serialized_body=lambda: utils.serialize_request_body(
-                request.metric_value, False, False, "json", models.MetricValue
-            ),
-            allow_empty_value=None,
-            timeout_ms=timeout_ms,
-        )
-
-        if retries == UNSET:
-            if self.sdk_configuration.retry_config is not UNSET:
-                retries = self.sdk_configuration.retry_config
-
-        retry_config = None
-        if isinstance(retries, utils.RetryConfig):
-            retry_config = (retries, ["429", "500", "502", "503", "504"])
-
-        http_res = self.do_request(
-            hook_ctx=HookContext(
-                config=self.sdk_configuration,
-                base_url=base_url or "",
-                operation_id="createValue",
-                oauth2_scopes=["file:write"],
-                security_source=self.sdk_configuration.security,
-            ),
-            request=req,
-            error_status_codes=[
-                "400",
-                "401",
-                "403",
-                "404",
-                "409",
-                "429",
-                "4XX",
-                "500",
-                "503",
-                "5XX",
-            ],
-            retry_config=retry_config,
-        )
-
-        response_data: Any = None
-        if utils.match_response(http_res, "201", "application/json"):
-            return unmarshal_json_response(models.MetricValueOutput, http_res)
-        if utils.match_response(
-            http_res, ["400", "401", "403", "404", "409", "429"], "application/json"
-        ):
-            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
-            raise errors.ErrorResponse(response_data, http_res)
-        if utils.match_response(http_res, ["500", "503"], "application/json"):
-            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
-            raise errors.ErrorResponse(response_data, http_res)
-        if utils.match_response(http_res, "4XX", "*"):
-            http_res_text = utils.stream_to_text(http_res)
-            raise errors.SDKError("API error occurred", http_res, http_res_text)
-        if utils.match_response(http_res, "5XX", "*"):
-            http_res_text = utils.stream_to_text(http_res)
-            raise errors.SDKError("API error occurred", http_res, http_res_text)
-
-        raise errors.SDKError("Unexpected response received", http_res)
-
-    async def create_value_async(
-        self,
-        *,
-        metric_id: str,
-        program_id: str,
-        metric_value: Union[models.MetricValue, models.MetricValueTypedDict],
-        retries: OptionalNullable[utils.RetryConfig] = UNSET,
-        server_url: Optional[str] = None,
-        timeout_ms: Optional[int] = None,
-        http_headers: Optional[Mapping[str, str]] = None,
-    ) -> models.MetricValueOutput:
-        r"""Create a new metric value
-
-        Creates a new [metric value](ref:sustainability#metricvalue)
-
-
-        :param metric_id: The unique identifier of the metric
-        :param program_id: The unique identifier of the program
-        :param metric_value: The properties of the metric value to create
-        :param retries: Override the default retry configuration for this method
-        :param server_url: Override the default server URL for this method
-        :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
-        :param http_headers: Additional headers to set or replace on requests.
-        """
-        base_url = None
-        url_variables = None
-        if timeout_ms is None:
-            timeout_ms = self.sdk_configuration.timeout_ms
-
-        if server_url is not None:
-            base_url = server_url
-        else:
-            base_url = self._get_url(base_url, url_variables)
-
-        request = models.CreateValueRequest(
-            metric_id=metric_id,
-            program_id=program_id,
-            metric_value=utils.get_pydantic_model(metric_value, models.MetricValue),
-        )
-
-        req = self._build_request_async(
-            method="POST",
-            path="/programs/{programId}/metrics/{metricId}/values",
-            base_url=base_url,
-            url_variables=url_variables,
-            request=request,
-            request_body_required=True,
-            request_has_path_params=True,
-            request_has_query_params=True,
-            user_agent_header="user-agent",
-            accept_header_value="application/json",
-            http_headers=http_headers,
-            security=self.sdk_configuration.security,
-            get_serialized_body=lambda: utils.serialize_request_body(
-                request.metric_value, False, False, "json", models.MetricValue
-            ),
-            allow_empty_value=None,
-            timeout_ms=timeout_ms,
-        )
-
-        if retries == UNSET:
-            if self.sdk_configuration.retry_config is not UNSET:
-                retries = self.sdk_configuration.retry_config
-
-        retry_config = None
-        if isinstance(retries, utils.RetryConfig):
-            retry_config = (retries, ["429", "500", "502", "503", "504"])
-
-        http_res = await self.do_request_async(
-            hook_ctx=HookContext(
-                config=self.sdk_configuration,
-                base_url=base_url or "",
-                operation_id="createValue",
-                oauth2_scopes=["file:write"],
-                security_source=self.sdk_configuration.security,
-            ),
-            request=req,
-            error_status_codes=[
-                "400",
-                "401",
-                "403",
-                "404",
-                "409",
-                "429",
-                "4XX",
-                "500",
-                "503",
-                "5XX",
-            ],
-            retry_config=retry_config,
-        )
-
-        response_data: Any = None
-        if utils.match_response(http_res, "201", "application/json"):
-            return unmarshal_json_response(models.MetricValueOutput, http_res)
-        if utils.match_response(
-            http_res, ["400", "401", "403", "404", "409", "429"], "application/json"
-        ):
-            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
-            raise errors.ErrorResponse(response_data, http_res)
-        if utils.match_response(http_res, ["500", "503"], "application/json"):
-            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
-            raise errors.ErrorResponse(response_data, http_res)
-        if utils.match_response(http_res, "4XX", "*"):
-            http_res_text = await utils.stream_to_text_async(http_res)
-            raise errors.SDKError("API error occurred", http_res, http_res_text)
-        if utils.match_response(http_res, "5XX", "*"):
-            http_res_text = await utils.stream_to_text_async(http_res)
-            raise errors.SDKError("API error occurred", http_res, http_res_text)
-
-        raise errors.SDKError("Unexpected response received", http_res)
-
-    def delete_metric_by_id(
-        self,
-        *,
-        metric_id: str,
-        program_id: str,
-        retries: OptionalNullable[utils.RetryConfig] = UNSET,
-        server_url: Optional[str] = None,
-        timeout_ms: Optional[int] = None,
-        http_headers: Optional[Mapping[str, str]] = None,
-    ):
-        r"""Delete a single metric
-
-        Deletes a [metric](ref:sustainability#metric) given its ID
-
-
-        :param metric_id: The unique identifier of the metric
-        :param program_id: The unique identifier of the program
-        :param retries: Override the default retry configuration for this method
-        :param server_url: Override the default server URL for this method
-        :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
-        :param http_headers: Additional headers to set or replace on requests.
-        """
-        base_url = None
-        url_variables = None
-        if timeout_ms is None:
-            timeout_ms = self.sdk_configuration.timeout_ms
-
-        if server_url is not None:
-            base_url = server_url
-        else:
-            base_url = self._get_url(base_url, url_variables)
-
-        request = models.DeleteMetricByIDRequest(
-            metric_id=metric_id,
-            program_id=program_id,
-        )
-
-        req = self._build_request(
-            method="DELETE",
-            path="/programs/{programId}/metrics/{metricId}",
-            base_url=base_url,
-            url_variables=url_variables,
-            request=request,
-            request_body_required=False,
-            request_has_path_params=True,
-            request_has_query_params=True,
-            user_agent_header="user-agent",
-            accept_header_value="application/json",
-            http_headers=http_headers,
-            security=self.sdk_configuration.security,
-            allow_empty_value=None,
-            timeout_ms=timeout_ms,
-        )
-
-        if retries == UNSET:
-            if self.sdk_configuration.retry_config is not UNSET:
-                retries = self.sdk_configuration.retry_config
-
-        retry_config = None
-        if isinstance(retries, utils.RetryConfig):
-            retry_config = (retries, ["429", "500", "502", "503", "504"])
-
-        http_res = self.do_request(
-            hook_ctx=HookContext(
-                config=self.sdk_configuration,
-                base_url=base_url or "",
-                operation_id="deleteMetricById",
-                oauth2_scopes=["file:write"],
-                security_source=self.sdk_configuration.security,
-            ),
-            request=req,
-            error_status_codes=[
-                "400",
-                "401",
-                "403",
-                "404",
-                "409",
-                "429",
-                "4XX",
-                "500",
-                "503",
-                "5XX",
-            ],
-            retry_config=retry_config,
-        )
-
-        response_data: Any = None
-        if utils.match_response(http_res, "204", "*"):
-            return
-        if utils.match_response(
-            http_res, ["400", "401", "403", "404", "409", "429"], "application/json"
-        ):
-            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
-            raise errors.ErrorResponse(response_data, http_res)
-        if utils.match_response(http_res, ["500", "503"], "application/json"):
-            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
-            raise errors.ErrorResponse(response_data, http_res)
-        if utils.match_response(http_res, "4XX", "*"):
-            http_res_text = utils.stream_to_text(http_res)
-            raise errors.SDKError("API error occurred", http_res, http_res_text)
-        if utils.match_response(http_res, "5XX", "*"):
-            http_res_text = utils.stream_to_text(http_res)
-            raise errors.SDKError("API error occurred", http_res, http_res_text)
-
-        raise errors.SDKError("Unexpected response received", http_res)
-
-    async def delete_metric_by_id_async(
-        self,
-        *,
-        metric_id: str,
-        program_id: str,
-        retries: OptionalNullable[utils.RetryConfig] = UNSET,
-        server_url: Optional[str] = None,
-        timeout_ms: Optional[int] = None,
-        http_headers: Optional[Mapping[str, str]] = None,
-    ):
-        r"""Delete a single metric
-
-        Deletes a [metric](ref:sustainability#metric) given its ID
-
-
-        :param metric_id: The unique identifier of the metric
-        :param program_id: The unique identifier of the program
-        :param retries: Override the default retry configuration for this method
-        :param server_url: Override the default server URL for this method
-        :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
-        :param http_headers: Additional headers to set or replace on requests.
-        """
-        base_url = None
-        url_variables = None
-        if timeout_ms is None:
-            timeout_ms = self.sdk_configuration.timeout_ms
-
-        if server_url is not None:
-            base_url = server_url
-        else:
-            base_url = self._get_url(base_url, url_variables)
-
-        request = models.DeleteMetricByIDRequest(
-            metric_id=metric_id,
-            program_id=program_id,
-        )
-
-        req = self._build_request_async(
-            method="DELETE",
-            path="/programs/{programId}/metrics/{metricId}",
-            base_url=base_url,
-            url_variables=url_variables,
-            request=request,
-            request_body_required=False,
-            request_has_path_params=True,
-            request_has_query_params=True,
-            user_agent_header="user-agent",
-            accept_header_value="application/json",
-            http_headers=http_headers,
-            security=self.sdk_configuration.security,
-            allow_empty_value=None,
-            timeout_ms=timeout_ms,
-        )
-
-        if retries == UNSET:
-            if self.sdk_configuration.retry_config is not UNSET:
-                retries = self.sdk_configuration.retry_config
-
-        retry_config = None
-        if isinstance(retries, utils.RetryConfig):
-            retry_config = (retries, ["429", "500", "502", "503", "504"])
-
-        http_res = await self.do_request_async(
-            hook_ctx=HookContext(
-                config=self.sdk_configuration,
-                base_url=base_url or "",
-                operation_id="deleteMetricById",
-                oauth2_scopes=["file:write"],
-                security_source=self.sdk_configuration.security,
-            ),
-            request=req,
-            error_status_codes=[
-                "400",
-                "401",
-                "403",
-                "404",
-                "409",
-                "429",
-                "4XX",
-                "500",
-                "503",
-                "5XX",
-            ],
-            retry_config=retry_config,
-        )
-
-        response_data: Any = None
-        if utils.match_response(http_res, "204", "*"):
-            return
-        if utils.match_response(
-            http_res, ["400", "401", "403", "404", "409", "429"], "application/json"
-        ):
-            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
-            raise errors.ErrorResponse(response_data, http_res)
-        if utils.match_response(http_res, ["500", "503"], "application/json"):
-            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
-            raise errors.ErrorResponse(response_data, http_res)
-        if utils.match_response(http_res, "4XX", "*"):
-            http_res_text = await utils.stream_to_text_async(http_res)
-            raise errors.SDKError("API error occurred", http_res, http_res_text)
-        if utils.match_response(http_res, "5XX", "*"):
-            http_res_text = await utils.stream_to_text_async(http_res)
-            raise errors.SDKError("API error occurred", http_res, http_res_text)
-
-        raise errors.SDKError("Unexpected response received", http_res)
-
-    def delete_metric_value_by_id(
-        self,
-        *,
-        metric_id: str,
-        metric_value_id: str,
-        program_id: str,
-        retries: OptionalNullable[utils.RetryConfig] = UNSET,
-        server_url: Optional[str] = None,
-        timeout_ms: Optional[int] = None,
-        http_headers: Optional[Mapping[str, str]] = None,
-    ):
-        r"""Delete a single metric value
-
-        Deletes a [metric value](ref:sustainability#metricvalue) value given its ID
-
-
-        :param metric_id: The unique identifier of the metric
-        :param metric_value_id: The unique identifier of the value
-        :param program_id: The unique identifier of the program
-        :param retries: Override the default retry configuration for this method
-        :param server_url: Override the default server URL for this method
-        :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
-        :param http_headers: Additional headers to set or replace on requests.
-        """
-        base_url = None
-        url_variables = None
-        if timeout_ms is None:
-            timeout_ms = self.sdk_configuration.timeout_ms
-
-        if server_url is not None:
-            base_url = server_url
-        else:
-            base_url = self._get_url(base_url, url_variables)
-
-        request = models.DeleteMetricValueByIDRequest(
-            metric_id=metric_id,
-            metric_value_id=metric_value_id,
-            program_id=program_id,
-        )
-
-        req = self._build_request(
-            method="DELETE",
-            path="/programs/{programId}/metrics/{metricId}/values/{metricValueId}",
-            base_url=base_url,
-            url_variables=url_variables,
-            request=request,
-            request_body_required=False,
-            request_has_path_params=True,
-            request_has_query_params=True,
-            user_agent_header="user-agent",
-            accept_header_value="application/json",
-            http_headers=http_headers,
-            security=self.sdk_configuration.security,
-            allow_empty_value=None,
-            timeout_ms=timeout_ms,
-        )
-
-        if retries == UNSET:
-            if self.sdk_configuration.retry_config is not UNSET:
-                retries = self.sdk_configuration.retry_config
-
-        retry_config = None
-        if isinstance(retries, utils.RetryConfig):
-            retry_config = (retries, ["429", "500", "502", "503", "504"])
-
-        http_res = self.do_request(
-            hook_ctx=HookContext(
-                config=self.sdk_configuration,
-                base_url=base_url or "",
-                operation_id="deleteMetricValueById",
-                oauth2_scopes=["file:write"],
-                security_source=self.sdk_configuration.security,
-            ),
-            request=req,
-            error_status_codes=[
-                "400",
-                "401",
-                "403",
-                "404",
-                "409",
-                "429",
-                "4XX",
-                "500",
-                "503",
-                "5XX",
-            ],
-            retry_config=retry_config,
-        )
-
-        response_data: Any = None
-        if utils.match_response(http_res, "204", "*"):
-            return
-        if utils.match_response(
-            http_res, ["400", "401", "403", "404", "409", "429"], "application/json"
-        ):
-            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
-            raise errors.ErrorResponse(response_data, http_res)
-        if utils.match_response(http_res, ["500", "503"], "application/json"):
-            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
-            raise errors.ErrorResponse(response_data, http_res)
-        if utils.match_response(http_res, "4XX", "*"):
-            http_res_text = utils.stream_to_text(http_res)
-            raise errors.SDKError("API error occurred", http_res, http_res_text)
-        if utils.match_response(http_res, "5XX", "*"):
-            http_res_text = utils.stream_to_text(http_res)
-            raise errors.SDKError("API error occurred", http_res, http_res_text)
-
-        raise errors.SDKError("Unexpected response received", http_res)
-
-    async def delete_metric_value_by_id_async(
-        self,
-        *,
-        metric_id: str,
-        metric_value_id: str,
-        program_id: str,
-        retries: OptionalNullable[utils.RetryConfig] = UNSET,
-        server_url: Optional[str] = None,
-        timeout_ms: Optional[int] = None,
-        http_headers: Optional[Mapping[str, str]] = None,
-    ):
-        r"""Delete a single metric value
-
-        Deletes a [metric value](ref:sustainability#metricvalue) value given its ID
-
-
-        :param metric_id: The unique identifier of the metric
-        :param metric_value_id: The unique identifier of the value
-        :param program_id: The unique identifier of the program
-        :param retries: Override the default retry configuration for this method
-        :param server_url: Override the default server URL for this method
-        :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
-        :param http_headers: Additional headers to set or replace on requests.
-        """
-        base_url = None
-        url_variables = None
-        if timeout_ms is None:
-            timeout_ms = self.sdk_configuration.timeout_ms
-
-        if server_url is not None:
-            base_url = server_url
-        else:
-            base_url = self._get_url(base_url, url_variables)
-
-        request = models.DeleteMetricValueByIDRequest(
-            metric_id=metric_id,
-            metric_value_id=metric_value_id,
-            program_id=program_id,
-        )
-
-        req = self._build_request_async(
-            method="DELETE",
-            path="/programs/{programId}/metrics/{metricId}/values/{metricValueId}",
-            base_url=base_url,
-            url_variables=url_variables,
-            request=request,
-            request_body_required=False,
-            request_has_path_params=True,
-            request_has_query_params=True,
-            user_agent_header="user-agent",
-            accept_header_value="application/json",
-            http_headers=http_headers,
-            security=self.sdk_configuration.security,
-            allow_empty_value=None,
-            timeout_ms=timeout_ms,
-        )
-
-        if retries == UNSET:
-            if self.sdk_configuration.retry_config is not UNSET:
-                retries = self.sdk_configuration.retry_config
-
-        retry_config = None
-        if isinstance(retries, utils.RetryConfig):
-            retry_config = (retries, ["429", "500", "502", "503", "504"])
-
-        http_res = await self.do_request_async(
-            hook_ctx=HookContext(
-                config=self.sdk_configuration,
-                base_url=base_url or "",
-                operation_id="deleteMetricValueById",
-                oauth2_scopes=["file:write"],
-                security_source=self.sdk_configuration.security,
-            ),
-            request=req,
-            error_status_codes=[
-                "400",
-                "401",
-                "403",
-                "404",
-                "409",
-                "429",
-                "4XX",
-                "500",
-                "503",
-                "5XX",
-            ],
-            retry_config=retry_config,
-        )
-
-        response_data: Any = None
-        if utils.match_response(http_res, "204", "*"):
-            return
-        if utils.match_response(
-            http_res, ["400", "401", "403", "404", "409", "429"], "application/json"
-        ):
-            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
-            raise errors.ErrorResponse(response_data, http_res)
-        if utils.match_response(http_res, ["500", "503"], "application/json"):
-            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
-            raise errors.ErrorResponse(response_data, http_res)
-        if utils.match_response(http_res, "4XX", "*"):
-            http_res_text = await utils.stream_to_text_async(http_res)
-            raise errors.SDKError("API error occurred", http_res, http_res_text)
-        if utils.match_response(http_res, "5XX", "*"):
-            http_res_text = await utils.stream_to_text_async(http_res)
-            raise errors.SDKError("API error occurred", http_res, http_res_text)
-
-        raise errors.SDKError("Unexpected response received", http_res)
-
-    def delete_topic_by_id(
-        self,
-        *,
-        program_id: str,
-        topic_id: str,
-        retries: OptionalNullable[utils.RetryConfig] = UNSET,
-        server_url: Optional[str] = None,
-        timeout_ms: Optional[int] = None,
-        http_headers: Optional[Mapping[str, str]] = None,
-    ):
-        r"""Delete a single topic
-
-        Deletes a [topic](ref:sustainability#topic) given its ID
-
-
-        :param program_id: The unique identifier of the program
-        :param topic_id: The unique identifier of the topic
-        :param retries: Override the default retry configuration for this method
-        :param server_url: Override the default server URL for this method
-        :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
-        :param http_headers: Additional headers to set or replace on requests.
-        """
-        base_url = None
-        url_variables = None
-        if timeout_ms is None:
-            timeout_ms = self.sdk_configuration.timeout_ms
-
-        if server_url is not None:
-            base_url = server_url
-        else:
-            base_url = self._get_url(base_url, url_variables)
-
-        request = models.DeleteTopicByIDRequest(
-            program_id=program_id,
-            topic_id=topic_id,
-        )
-
-        req = self._build_request(
-            method="DELETE",
-            path="/programs/{programId}/topics/{topicId}",
-            base_url=base_url,
-            url_variables=url_variables,
-            request=request,
-            request_body_required=False,
-            request_has_path_params=True,
-            request_has_query_params=True,
-            user_agent_header="user-agent",
-            accept_header_value="application/json",
-            http_headers=http_headers,
-            security=self.sdk_configuration.security,
-            allow_empty_value=None,
-            timeout_ms=timeout_ms,
-        )
-
-        if retries == UNSET:
-            if self.sdk_configuration.retry_config is not UNSET:
-                retries = self.sdk_configuration.retry_config
-
-        retry_config = None
-        if isinstance(retries, utils.RetryConfig):
-            retry_config = (retries, ["429", "500", "502", "503", "504"])
-
-        http_res = self.do_request(
-            hook_ctx=HookContext(
-                config=self.sdk_configuration,
-                base_url=base_url or "",
-                operation_id="deleteTopicById",
-                oauth2_scopes=["file:write"],
-                security_source=self.sdk_configuration.security,
-            ),
-            request=req,
-            error_status_codes=[
-                "400",
-                "401",
-                "403",
-                "404",
-                "409",
-                "429",
-                "4XX",
-                "500",
-                "503",
-                "5XX",
-            ],
-            retry_config=retry_config,
-        )
-
-        response_data: Any = None
-        if utils.match_response(http_res, "204", "*"):
-            return
-        if utils.match_response(
-            http_res, ["400", "401", "403", "404", "409", "429"], "application/json"
-        ):
-            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
-            raise errors.ErrorResponse(response_data, http_res)
-        if utils.match_response(http_res, ["500", "503"], "application/json"):
-            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
-            raise errors.ErrorResponse(response_data, http_res)
-        if utils.match_response(http_res, "4XX", "*"):
-            http_res_text = utils.stream_to_text(http_res)
-            raise errors.SDKError("API error occurred", http_res, http_res_text)
-        if utils.match_response(http_res, "5XX", "*"):
-            http_res_text = utils.stream_to_text(http_res)
-            raise errors.SDKError("API error occurred", http_res, http_res_text)
-
-        raise errors.SDKError("Unexpected response received", http_res)
-
-    async def delete_topic_by_id_async(
-        self,
-        *,
-        program_id: str,
-        topic_id: str,
-        retries: OptionalNullable[utils.RetryConfig] = UNSET,
-        server_url: Optional[str] = None,
-        timeout_ms: Optional[int] = None,
-        http_headers: Optional[Mapping[str, str]] = None,
-    ):
-        r"""Delete a single topic
-
-        Deletes a [topic](ref:sustainability#topic) given its ID
-
-
-        :param program_id: The unique identifier of the program
-        :param topic_id: The unique identifier of the topic
-        :param retries: Override the default retry configuration for this method
-        :param server_url: Override the default server URL for this method
-        :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
-        :param http_headers: Additional headers to set or replace on requests.
-        """
-        base_url = None
-        url_variables = None
-        if timeout_ms is None:
-            timeout_ms = self.sdk_configuration.timeout_ms
-
-        if server_url is not None:
-            base_url = server_url
-        else:
-            base_url = self._get_url(base_url, url_variables)
-
-        request = models.DeleteTopicByIDRequest(
-            program_id=program_id,
-            topic_id=topic_id,
-        )
-
-        req = self._build_request_async(
-            method="DELETE",
-            path="/programs/{programId}/topics/{topicId}",
-            base_url=base_url,
-            url_variables=url_variables,
-            request=request,
-            request_body_required=False,
-            request_has_path_params=True,
-            request_has_query_params=True,
-            user_agent_header="user-agent",
-            accept_header_value="application/json",
-            http_headers=http_headers,
-            security=self.sdk_configuration.security,
-            allow_empty_value=None,
-            timeout_ms=timeout_ms,
-        )
-
-        if retries == UNSET:
-            if self.sdk_configuration.retry_config is not UNSET:
-                retries = self.sdk_configuration.retry_config
-
-        retry_config = None
-        if isinstance(retries, utils.RetryConfig):
-            retry_config = (retries, ["429", "500", "502", "503", "504"])
-
-        http_res = await self.do_request_async(
-            hook_ctx=HookContext(
-                config=self.sdk_configuration,
-                base_url=base_url or "",
-                operation_id="deleteTopicById",
-                oauth2_scopes=["file:write"],
-                security_source=self.sdk_configuration.security,
-            ),
-            request=req,
-            error_status_codes=[
-                "400",
-                "401",
-                "403",
-                "404",
-                "409",
-                "429",
-                "4XX",
-                "500",
-                "503",
-                "5XX",
-            ],
-            retry_config=retry_config,
-        )
-
-        response_data: Any = None
-        if utils.match_response(http_res, "204", "*"):
-            return
-        if utils.match_response(
-            http_res, ["400", "401", "403", "404", "409", "429"], "application/json"
-        ):
-            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
-            raise errors.ErrorResponse(response_data, http_res)
-        if utils.match_response(http_res, ["500", "503"], "application/json"):
-            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
-            raise errors.ErrorResponse(response_data, http_res)
-        if utils.match_response(http_res, "4XX", "*"):
-            http_res_text = await utils.stream_to_text_async(http_res)
-            raise errors.SDKError("API error occurred", http_res, http_res_text)
-        if utils.match_response(http_res, "5XX", "*"):
-            http_res_text = await utils.stream_to_text_async(http_res)
-            raise errors.SDKError("API error occurred", http_res, http_res_text)
-
-        raise errors.SDKError("Unexpected response received", http_res)
-
-    def get_dimension_by_id(
-        self,
-        *,
-        dimension_id: str,
-        program_id: str,
-        retries: OptionalNullable[utils.RetryConfig] = UNSET,
-        server_url: Optional[str] = None,
-        timeout_ms: Optional[int] = None,
-        http_headers: Optional[Mapping[str, str]] = None,
-    ) -> models.Dimension:
-        r"""Retrieve a single dimension
-
-        Retrieves a [dimension](ref:sustainability#dimension) given its ID
-
-        :param dimension_id: The unique identifier of the dimension
-        :param program_id: The unique identifier of the program
-        :param retries: Override the default retry configuration for this method
-        :param server_url: Override the default server URL for this method
-        :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
-        :param http_headers: Additional headers to set or replace on requests.
-        """
-        base_url = None
-        url_variables = None
-        if timeout_ms is None:
-            timeout_ms = self.sdk_configuration.timeout_ms
-
-        if server_url is not None:
-            base_url = server_url
-        else:
-            base_url = self._get_url(base_url, url_variables)
-
-        request = models.GetDimensionByIDRequest(
-            dimension_id=dimension_id,
-            program_id=program_id,
-        )
-
-        req = self._build_request(
-            method="GET",
-            path="/programs/{programId}/dimensions/{dimensionId}",
-            base_url=base_url,
-            url_variables=url_variables,
-            request=request,
-            request_body_required=False,
-            request_has_path_params=True,
-            request_has_query_params=True,
-            user_agent_header="user-agent",
-            accept_header_value="application/json",
-            http_headers=http_headers,
-            security=self.sdk_configuration.security,
-            allow_empty_value=None,
-            timeout_ms=timeout_ms,
-        )
-
-        if retries == UNSET:
-            if self.sdk_configuration.retry_config is not UNSET:
-                retries = self.sdk_configuration.retry_config
-
-        retry_config = None
-        if isinstance(retries, utils.RetryConfig):
-            retry_config = (retries, ["429", "500", "502", "503", "504"])
-
-        http_res = self.do_request(
-            hook_ctx=HookContext(
-                config=self.sdk_configuration,
-                base_url=base_url or "",
-                operation_id="getDimensionById",
-                oauth2_scopes=["file:read"],
-                security_source=self.sdk_configuration.security,
-            ),
-            request=req,
-            error_status_codes=[
-                "400",
-                "401",
-                "403",
-                "404",
-                "409",
-                "429",
-                "4XX",
-                "500",
-                "503",
-                "5XX",
-            ],
-            retry_config=retry_config,
-        )
-
-        response_data: Any = None
-        if utils.match_response(http_res, "200", "application/json"):
-            return unmarshal_json_response(models.Dimension, http_res)
-        if utils.match_response(
-            http_res, ["400", "401", "403", "404", "409", "429"], "application/json"
-        ):
-            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
-            raise errors.ErrorResponse(response_data, http_res)
-        if utils.match_response(http_res, ["500", "503"], "application/json"):
-            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
-            raise errors.ErrorResponse(response_data, http_res)
-        if utils.match_response(http_res, "4XX", "*"):
-            http_res_text = utils.stream_to_text(http_res)
-            raise errors.SDKError("API error occurred", http_res, http_res_text)
-        if utils.match_response(http_res, "5XX", "*"):
-            http_res_text = utils.stream_to_text(http_res)
-            raise errors.SDKError("API error occurred", http_res, http_res_text)
-
-        raise errors.SDKError("Unexpected response received", http_res)
-
-    async def get_dimension_by_id_async(
-        self,
-        *,
-        dimension_id: str,
-        program_id: str,
-        retries: OptionalNullable[utils.RetryConfig] = UNSET,
-        server_url: Optional[str] = None,
-        timeout_ms: Optional[int] = None,
-        http_headers: Optional[Mapping[str, str]] = None,
-    ) -> models.Dimension:
-        r"""Retrieve a single dimension
-
-        Retrieves a [dimension](ref:sustainability#dimension) given its ID
-
-        :param dimension_id: The unique identifier of the dimension
-        :param program_id: The unique identifier of the program
-        :param retries: Override the default retry configuration for this method
-        :param server_url: Override the default server URL for this method
-        :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
-        :param http_headers: Additional headers to set or replace on requests.
-        """
-        base_url = None
-        url_variables = None
-        if timeout_ms is None:
-            timeout_ms = self.sdk_configuration.timeout_ms
-
-        if server_url is not None:
-            base_url = server_url
-        else:
-            base_url = self._get_url(base_url, url_variables)
-
-        request = models.GetDimensionByIDRequest(
-            dimension_id=dimension_id,
-            program_id=program_id,
-        )
-
-        req = self._build_request_async(
-            method="GET",
-            path="/programs/{programId}/dimensions/{dimensionId}",
-            base_url=base_url,
-            url_variables=url_variables,
-            request=request,
-            request_body_required=False,
-            request_has_path_params=True,
-            request_has_query_params=True,
-            user_agent_header="user-agent",
-            accept_header_value="application/json",
-            http_headers=http_headers,
-            security=self.sdk_configuration.security,
-            allow_empty_value=None,
-            timeout_ms=timeout_ms,
-        )
-
-        if retries == UNSET:
-            if self.sdk_configuration.retry_config is not UNSET:
-                retries = self.sdk_configuration.retry_config
-
-        retry_config = None
-        if isinstance(retries, utils.RetryConfig):
-            retry_config = (retries, ["429", "500", "502", "503", "504"])
-
-        http_res = await self.do_request_async(
-            hook_ctx=HookContext(
-                config=self.sdk_configuration,
-                base_url=base_url or "",
-                operation_id="getDimensionById",
-                oauth2_scopes=["file:read"],
-                security_source=self.sdk_configuration.security,
-            ),
-            request=req,
-            error_status_codes=[
-                "400",
-                "401",
-                "403",
-                "404",
-                "409",
-                "429",
-                "4XX",
-                "500",
-                "503",
-                "5XX",
-            ],
-            retry_config=retry_config,
-        )
-
-        response_data: Any = None
-        if utils.match_response(http_res, "200", "application/json"):
-            return unmarshal_json_response(models.Dimension, http_res)
-        if utils.match_response(
-            http_res, ["400", "401", "403", "404", "409", "429"], "application/json"
-        ):
-            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
-            raise errors.ErrorResponse(response_data, http_res)
-        if utils.match_response(http_res, ["500", "503"], "application/json"):
-            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
-            raise errors.ErrorResponse(response_data, http_res)
-        if utils.match_response(http_res, "4XX", "*"):
-            http_res_text = await utils.stream_to_text_async(http_res)
-            raise errors.SDKError("API error occurred", http_res, http_res_text)
-        if utils.match_response(http_res, "5XX", "*"):
-            http_res_text = await utils.stream_to_text_async(http_res)
-            raise errors.SDKError("API error occurred", http_res, http_res_text)
-
-        raise errors.SDKError("Unexpected response received", http_res)
-
-    def get_dimensions(
-        self,
-        *,
-        request: Union[
-            models.GetDimensionsRequest, models.GetDimensionsRequestTypedDict
-        ],
-        retries: OptionalNullable[utils.RetryConfig] = UNSET,
-        server_url: Optional[str] = None,
-        timeout_ms: Optional[int] = None,
-        http_headers: Optional[Mapping[str, str]] = None,
-    ) -> Optional[models.GetDimensionsResponse]:
-        r"""Retrieve a list of dimensions
-
-        Returns a paginated list of [dimensions](ref:sustainability#dimension).
-
-        :param request: The request object to send.
-        :param retries: Override the default retry configuration for this method
-        :param server_url: Override the default server URL for this method
-        :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
-        :param http_headers: Additional headers to set or replace on requests.
-        """
-        base_url = None
-        url_variables = None
-        if timeout_ms is None:
-            timeout_ms = self.sdk_configuration.timeout_ms
-
-        if server_url is not None:
-            base_url = server_url
-        else:
-            base_url = self._get_url(base_url, url_variables)
-
-        if not isinstance(request, BaseModel):
-            request = utils.unmarshal(request, models.GetDimensionsRequest)
-        request = cast(models.GetDimensionsRequest, request)
-
-        req = self._build_request(
-            method="GET",
-            path="/programs/{programId}/dimensions",
-            base_url=base_url,
-            url_variables=url_variables,
-            request=request,
-            request_body_required=False,
-            request_has_path_params=True,
-            request_has_query_params=True,
-            user_agent_header="user-agent",
-            accept_header_value="application/json",
-            http_headers=http_headers,
-            security=self.sdk_configuration.security,
-            allow_empty_value=None,
-            timeout_ms=timeout_ms,
-        )
-
-        if retries == UNSET:
-            if self.sdk_configuration.retry_config is not UNSET:
-                retries = self.sdk_configuration.retry_config
-
-        retry_config = None
-        if isinstance(retries, utils.RetryConfig):
-            retry_config = (retries, ["429", "500", "502", "503", "504"])
-
-        http_res = self.do_request(
-            hook_ctx=HookContext(
-                config=self.sdk_configuration,
-                base_url=base_url or "",
-                operation_id="getDimensions",
-                oauth2_scopes=["file:read"],
-                security_source=self.sdk_configuration.security,
-            ),
-            request=req,
-            error_status_codes=[
-                "400",
-                "401",
-                "403",
-                "404",
-                "409",
-                "429",
-                "4XX",
-                "500",
-                "503",
-                "5XX",
-            ],
-            retry_config=retry_config,
-        )
-
-        def next_func() -> Optional[models.GetDimensionsResponse]:
-            body = utils.unmarshal_json(http_res.text, Union[Dict[Any, Any], List[Any]])
-
-            next_cursor = JSONPath("$['@nextLink']").parse(body)
-
-            if len(next_cursor) == 0:
-                return None
-
-            next_cursor = next_cursor[0]
-            if next_cursor is None or str(next_cursor).strip() == "":
-                return None
-
-            return self.get_dimensions(
-                request=models.GetDimensionsRequest(
-                    program_id=request.program_id,
-                    dollar_filter=request.dollar_filter,
-                    dollar_maxpagesize=request.dollar_maxpagesize,
-                    dollar_next=next_cursor,
-                    dollar_order_by=request.dollar_order_by,
-                ),
-                retries=retries,
-            )
-
-        response_data: Any = None
-        if utils.match_response(http_res, "200", "application/json"):
-            return models.GetDimensionsResponse(
-                result=unmarshal_json_response(models.DimensionsListResult, http_res),
-                next=next_func,
-            )
-        if utils.match_response(
-            http_res, ["400", "401", "403", "404", "409", "429"], "application/json"
-        ):
-            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
-            raise errors.ErrorResponse(response_data, http_res)
-        if utils.match_response(http_res, ["500", "503"], "application/json"):
-            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
-            raise errors.ErrorResponse(response_data, http_res)
-        if utils.match_response(http_res, "4XX", "*"):
-            http_res_text = utils.stream_to_text(http_res)
-            raise errors.SDKError("API error occurred", http_res, http_res_text)
-        if utils.match_response(http_res, "5XX", "*"):
-            http_res_text = utils.stream_to_text(http_res)
-            raise errors.SDKError("API error occurred", http_res, http_res_text)
-
-        raise errors.SDKError("Unexpected response received", http_res)
-
-    async def get_dimensions_async(
-        self,
-        *,
-        request: Union[
-            models.GetDimensionsRequest, models.GetDimensionsRequestTypedDict
-        ],
-        retries: OptionalNullable[utils.RetryConfig] = UNSET,
-        server_url: Optional[str] = None,
-        timeout_ms: Optional[int] = None,
-        http_headers: Optional[Mapping[str, str]] = None,
-    ) -> Optional[models.GetDimensionsResponse]:
-        r"""Retrieve a list of dimensions
-
-        Returns a paginated list of [dimensions](ref:sustainability#dimension).
-
-        :param request: The request object to send.
-        :param retries: Override the default retry configuration for this method
-        :param server_url: Override the default server URL for this method
-        :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
-        :param http_headers: Additional headers to set or replace on requests.
-        """
-        base_url = None
-        url_variables = None
-        if timeout_ms is None:
-            timeout_ms = self.sdk_configuration.timeout_ms
-
-        if server_url is not None:
-            base_url = server_url
-        else:
-            base_url = self._get_url(base_url, url_variables)
-
-        if not isinstance(request, BaseModel):
-            request = utils.unmarshal(request, models.GetDimensionsRequest)
-        request = cast(models.GetDimensionsRequest, request)
-
-        req = self._build_request_async(
-            method="GET",
-            path="/programs/{programId}/dimensions",
-            base_url=base_url,
-            url_variables=url_variables,
-            request=request,
-            request_body_required=False,
-            request_has_path_params=True,
-            request_has_query_params=True,
-            user_agent_header="user-agent",
-            accept_header_value="application/json",
-            http_headers=http_headers,
-            security=self.sdk_configuration.security,
-            allow_empty_value=None,
-            timeout_ms=timeout_ms,
-        )
-
-        if retries == UNSET:
-            if self.sdk_configuration.retry_config is not UNSET:
-                retries = self.sdk_configuration.retry_config
-
-        retry_config = None
-        if isinstance(retries, utils.RetryConfig):
-            retry_config = (retries, ["429", "500", "502", "503", "504"])
-
-        http_res = await self.do_request_async(
-            hook_ctx=HookContext(
-                config=self.sdk_configuration,
-                base_url=base_url or "",
-                operation_id="getDimensions",
-                oauth2_scopes=["file:read"],
-                security_source=self.sdk_configuration.security,
-            ),
-            request=req,
-            error_status_codes=[
-                "400",
-                "401",
-                "403",
-                "404",
-                "409",
-                "429",
-                "4XX",
-                "500",
-                "503",
-                "5XX",
-            ],
-            retry_config=retry_config,
-        )
-
-        def next_func() -> Awaitable[Optional[models.GetDimensionsResponse]]:
-            body = utils.unmarshal_json(http_res.text, Union[Dict[Any, Any], List[Any]])
-
-            async def empty_result():
-                return None
-
-            next_cursor = JSONPath("$['@nextLink']").parse(body)
-
-            if len(next_cursor) == 0:
-                return empty_result()
-
-            next_cursor = next_cursor[0]
-            if next_cursor is None or str(next_cursor).strip() == "":
-                return empty_result()
-
-            return self.get_dimensions_async(
-                request=models.GetDimensionsRequest(
-                    program_id=request.program_id,
-                    dollar_filter=request.dollar_filter,
-                    dollar_maxpagesize=request.dollar_maxpagesize,
-                    dollar_next=next_cursor,
-                    dollar_order_by=request.dollar_order_by,
-                ),
-                retries=retries,
-            )
-
-        response_data: Any = None
-        if utils.match_response(http_res, "200", "application/json"):
-            return models.GetDimensionsResponse(
-                result=unmarshal_json_response(models.DimensionsListResult, http_res),
-                next=next_func,
-            )
-        if utils.match_response(
-            http_res, ["400", "401", "403", "404", "409", "429"], "application/json"
-        ):
-            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
-            raise errors.ErrorResponse(response_data, http_res)
-        if utils.match_response(http_res, ["500", "503"], "application/json"):
-            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
-            raise errors.ErrorResponse(response_data, http_res)
-        if utils.match_response(http_res, "4XX", "*"):
-            http_res_text = await utils.stream_to_text_async(http_res)
-            raise errors.SDKError("API error occurred", http_res, http_res_text)
-        if utils.match_response(http_res, "5XX", "*"):
-            http_res_text = await utils.stream_to_text_async(http_res)
-            raise errors.SDKError("API error occurred", http_res, http_res_text)
-
-        raise errors.SDKError("Unexpected response received", http_res)
-
-    def get_metric_by_id(
-        self,
-        *,
-        metric_id: str,
-        program_id: str,
-        retries: OptionalNullable[utils.RetryConfig] = UNSET,
-        server_url: Optional[str] = None,
-        timeout_ms: Optional[int] = None,
-        http_headers: Optional[Mapping[str, str]] = None,
-    ) -> models.Metric:
-        r"""Retrieve a single metric
-
-        Retrieves a [`Metric`](ref:sustainability#metric) given its ID
-
-        :param metric_id: The unique identifier of the metric
-        :param program_id: The unique identifier of the program
-        :param retries: Override the default retry configuration for this method
-        :param server_url: Override the default server URL for this method
-        :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
-        :param http_headers: Additional headers to set or replace on requests.
-        """
-        base_url = None
-        url_variables = None
-        if timeout_ms is None:
-            timeout_ms = self.sdk_configuration.timeout_ms
-
-        if server_url is not None:
-            base_url = server_url
-        else:
-            base_url = self._get_url(base_url, url_variables)
-
-        request = models.GetMetricByIDRequest(
-            metric_id=metric_id,
-            program_id=program_id,
-        )
-
-        req = self._build_request(
-            method="GET",
-            path="/programs/{programId}/metrics/{metricId}",
-            base_url=base_url,
-            url_variables=url_variables,
-            request=request,
-            request_body_required=False,
-            request_has_path_params=True,
-            request_has_query_params=True,
-            user_agent_header="user-agent",
-            accept_header_value="application/json",
-            http_headers=http_headers,
-            security=self.sdk_configuration.security,
-            allow_empty_value=None,
-            timeout_ms=timeout_ms,
-        )
-
-        if retries == UNSET:
-            if self.sdk_configuration.retry_config is not UNSET:
-                retries = self.sdk_configuration.retry_config
-
-        retry_config = None
-        if isinstance(retries, utils.RetryConfig):
-            retry_config = (retries, ["429", "500", "502", "503", "504"])
-
-        http_res = self.do_request(
-            hook_ctx=HookContext(
-                config=self.sdk_configuration,
-                base_url=base_url or "",
-                operation_id="getMetricById",
-                oauth2_scopes=["file:read"],
-                security_source=self.sdk_configuration.security,
-            ),
-            request=req,
-            error_status_codes=[
-                "400",
-                "401",
-                "403",
-                "404",
-                "409",
-                "429",
-                "4XX",
-                "500",
-                "503",
-                "5XX",
-            ],
-            retry_config=retry_config,
-        )
-
-        response_data: Any = None
-        if utils.match_response(http_res, "200", "application/json"):
-            return unmarshal_json_response(models.Metric, http_res)
-        if utils.match_response(
-            http_res, ["400", "401", "403", "404", "409", "429"], "application/json"
-        ):
-            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
-            raise errors.ErrorResponse(response_data, http_res)
-        if utils.match_response(http_res, ["500", "503"], "application/json"):
-            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
-            raise errors.ErrorResponse(response_data, http_res)
-        if utils.match_response(http_res, "4XX", "*"):
-            http_res_text = utils.stream_to_text(http_res)
-            raise errors.SDKError("API error occurred", http_res, http_res_text)
-        if utils.match_response(http_res, "5XX", "*"):
-            http_res_text = utils.stream_to_text(http_res)
-            raise errors.SDKError("API error occurred", http_res, http_res_text)
-
-        raise errors.SDKError("Unexpected response received", http_res)
-
-    async def get_metric_by_id_async(
-        self,
-        *,
-        metric_id: str,
-        program_id: str,
-        retries: OptionalNullable[utils.RetryConfig] = UNSET,
-        server_url: Optional[str] = None,
-        timeout_ms: Optional[int] = None,
-        http_headers: Optional[Mapping[str, str]] = None,
-    ) -> models.Metric:
-        r"""Retrieve a single metric
-
-        Retrieves a [`Metric`](ref:sustainability#metric) given its ID
-
-        :param metric_id: The unique identifier of the metric
-        :param program_id: The unique identifier of the program
-        :param retries: Override the default retry configuration for this method
-        :param server_url: Override the default server URL for this method
-        :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
-        :param http_headers: Additional headers to set or replace on requests.
-        """
-        base_url = None
-        url_variables = None
-        if timeout_ms is None:
-            timeout_ms = self.sdk_configuration.timeout_ms
-
-        if server_url is not None:
-            base_url = server_url
-        else:
-            base_url = self._get_url(base_url, url_variables)
-
-        request = models.GetMetricByIDRequest(
-            metric_id=metric_id,
-            program_id=program_id,
-        )
-
-        req = self._build_request_async(
-            method="GET",
-            path="/programs/{programId}/metrics/{metricId}",
-            base_url=base_url,
-            url_variables=url_variables,
-            request=request,
-            request_body_required=False,
-            request_has_path_params=True,
-            request_has_query_params=True,
-            user_agent_header="user-agent",
-            accept_header_value="application/json",
-            http_headers=http_headers,
-            security=self.sdk_configuration.security,
-            allow_empty_value=None,
-            timeout_ms=timeout_ms,
-        )
-
-        if retries == UNSET:
-            if self.sdk_configuration.retry_config is not UNSET:
-                retries = self.sdk_configuration.retry_config
-
-        retry_config = None
-        if isinstance(retries, utils.RetryConfig):
-            retry_config = (retries, ["429", "500", "502", "503", "504"])
-
-        http_res = await self.do_request_async(
-            hook_ctx=HookContext(
-                config=self.sdk_configuration,
-                base_url=base_url or "",
-                operation_id="getMetricById",
-                oauth2_scopes=["file:read"],
-                security_source=self.sdk_configuration.security,
-            ),
-            request=req,
-            error_status_codes=[
-                "400",
-                "401",
-                "403",
-                "404",
-                "409",
-                "429",
-                "4XX",
-                "500",
-                "503",
-                "5XX",
-            ],
-            retry_config=retry_config,
-        )
-
-        response_data: Any = None
-        if utils.match_response(http_res, "200", "application/json"):
-            return unmarshal_json_response(models.Metric, http_res)
-        if utils.match_response(
-            http_res, ["400", "401", "403", "404", "409", "429"], "application/json"
-        ):
-            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
-            raise errors.ErrorResponse(response_data, http_res)
-        if utils.match_response(http_res, ["500", "503"], "application/json"):
-            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
-            raise errors.ErrorResponse(response_data, http_res)
-        if utils.match_response(http_res, "4XX", "*"):
-            http_res_text = await utils.stream_to_text_async(http_res)
-            raise errors.SDKError("API error occurred", http_res, http_res_text)
-        if utils.match_response(http_res, "5XX", "*"):
-            http_res_text = await utils.stream_to_text_async(http_res)
-            raise errors.SDKError("API error occurred", http_res, http_res_text)
-
-        raise errors.SDKError("Unexpected response received", http_res)
-
-    def get_metric_value_by_id(
-        self,
-        *,
-        metric_id: str,
-        metric_value_id: str,
-        program_id: str,
-        retries: OptionalNullable[utils.RetryConfig] = UNSET,
-        server_url: Optional[str] = None,
-        timeout_ms: Optional[int] = None,
-        http_headers: Optional[Mapping[str, str]] = None,
-    ) -> models.MetricValueOutput:
-        r"""Retrieve a single metric value
-
-        Retrieves a [metric value](ref:sustainability#metricvalue) value given its ID
-
-
-        :param metric_id: The unique identifier of the metric
-        :param metric_value_id: The unique identifier of the value
-        :param program_id: The unique identifier of the program
-        :param retries: Override the default retry configuration for this method
-        :param server_url: Override the default server URL for this method
-        :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
-        :param http_headers: Additional headers to set or replace on requests.
-        """
-        base_url = None
-        url_variables = None
-        if timeout_ms is None:
-            timeout_ms = self.sdk_configuration.timeout_ms
-
-        if server_url is not None:
-            base_url = server_url
-        else:
-            base_url = self._get_url(base_url, url_variables)
-
-        request = models.GetMetricValueByIDRequest(
-            metric_id=metric_id,
-            metric_value_id=metric_value_id,
-            program_id=program_id,
-        )
-
-        req = self._build_request(
-            method="GET",
-            path="/programs/{programId}/metrics/{metricId}/values/{metricValueId}",
-            base_url=base_url,
-            url_variables=url_variables,
-            request=request,
-            request_body_required=False,
-            request_has_path_params=True,
-            request_has_query_params=True,
-            user_agent_header="user-agent",
-            accept_header_value="application/json",
-            http_headers=http_headers,
-            security=self.sdk_configuration.security,
-            allow_empty_value=None,
-            timeout_ms=timeout_ms,
-        )
-
-        if retries == UNSET:
-            if self.sdk_configuration.retry_config is not UNSET:
-                retries = self.sdk_configuration.retry_config
-
-        retry_config = None
-        if isinstance(retries, utils.RetryConfig):
-            retry_config = (retries, ["429", "500", "502", "503", "504"])
-
-        http_res = self.do_request(
-            hook_ctx=HookContext(
-                config=self.sdk_configuration,
-                base_url=base_url or "",
-                operation_id="getMetricValueById",
-                oauth2_scopes=["file:read"],
-                security_source=self.sdk_configuration.security,
-            ),
-            request=req,
-            error_status_codes=[
-                "400",
-                "401",
-                "403",
-                "404",
-                "409",
-                "429",
-                "4XX",
-                "500",
-                "503",
-                "5XX",
-            ],
-            retry_config=retry_config,
-        )
-
-        response_data: Any = None
-        if utils.match_response(http_res, "200", "application/json"):
-            return unmarshal_json_response(models.MetricValueOutput, http_res)
-        if utils.match_response(
-            http_res, ["400", "401", "403", "404", "409", "429"], "application/json"
-        ):
-            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
-            raise errors.ErrorResponse(response_data, http_res)
-        if utils.match_response(http_res, ["500", "503"], "application/json"):
-            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
-            raise errors.ErrorResponse(response_data, http_res)
-        if utils.match_response(http_res, "4XX", "*"):
-            http_res_text = utils.stream_to_text(http_res)
-            raise errors.SDKError("API error occurred", http_res, http_res_text)
-        if utils.match_response(http_res, "5XX", "*"):
-            http_res_text = utils.stream_to_text(http_res)
-            raise errors.SDKError("API error occurred", http_res, http_res_text)
-
-        raise errors.SDKError("Unexpected response received", http_res)
-
-    async def get_metric_value_by_id_async(
-        self,
-        *,
-        metric_id: str,
-        metric_value_id: str,
-        program_id: str,
-        retries: OptionalNullable[utils.RetryConfig] = UNSET,
-        server_url: Optional[str] = None,
-        timeout_ms: Optional[int] = None,
-        http_headers: Optional[Mapping[str, str]] = None,
-    ) -> models.MetricValueOutput:
-        r"""Retrieve a single metric value
-
-        Retrieves a [metric value](ref:sustainability#metricvalue) value given its ID
-
-
-        :param metric_id: The unique identifier of the metric
-        :param metric_value_id: The unique identifier of the value
-        :param program_id: The unique identifier of the program
-        :param retries: Override the default retry configuration for this method
-        :param server_url: Override the default server URL for this method
-        :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
-        :param http_headers: Additional headers to set or replace on requests.
-        """
-        base_url = None
-        url_variables = None
-        if timeout_ms is None:
-            timeout_ms = self.sdk_configuration.timeout_ms
-
-        if server_url is not None:
-            base_url = server_url
-        else:
-            base_url = self._get_url(base_url, url_variables)
-
-        request = models.GetMetricValueByIDRequest(
-            metric_id=metric_id,
-            metric_value_id=metric_value_id,
-            program_id=program_id,
-        )
-
-        req = self._build_request_async(
-            method="GET",
-            path="/programs/{programId}/metrics/{metricId}/values/{metricValueId}",
-            base_url=base_url,
-            url_variables=url_variables,
-            request=request,
-            request_body_required=False,
-            request_has_path_params=True,
-            request_has_query_params=True,
-            user_agent_header="user-agent",
-            accept_header_value="application/json",
-            http_headers=http_headers,
-            security=self.sdk_configuration.security,
-            allow_empty_value=None,
-            timeout_ms=timeout_ms,
-        )
-
-        if retries == UNSET:
-            if self.sdk_configuration.retry_config is not UNSET:
-                retries = self.sdk_configuration.retry_config
-
-        retry_config = None
-        if isinstance(retries, utils.RetryConfig):
-            retry_config = (retries, ["429", "500", "502", "503", "504"])
-
-        http_res = await self.do_request_async(
-            hook_ctx=HookContext(
-                config=self.sdk_configuration,
-                base_url=base_url or "",
-                operation_id="getMetricValueById",
-                oauth2_scopes=["file:read"],
-                security_source=self.sdk_configuration.security,
-            ),
-            request=req,
-            error_status_codes=[
-                "400",
-                "401",
-                "403",
-                "404",
-                "409",
-                "429",
-                "4XX",
-                "500",
-                "503",
-                "5XX",
-            ],
-            retry_config=retry_config,
-        )
-
-        response_data: Any = None
-        if utils.match_response(http_res, "200", "application/json"):
-            return unmarshal_json_response(models.MetricValueOutput, http_res)
-        if utils.match_response(
-            http_res, ["400", "401", "403", "404", "409", "429"], "application/json"
-        ):
-            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
-            raise errors.ErrorResponse(response_data, http_res)
-        if utils.match_response(http_res, ["500", "503"], "application/json"):
-            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
-            raise errors.ErrorResponse(response_data, http_res)
-        if utils.match_response(http_res, "4XX", "*"):
-            http_res_text = await utils.stream_to_text_async(http_res)
-            raise errors.SDKError("API error occurred", http_res, http_res_text)
-        if utils.match_response(http_res, "5XX", "*"):
-            http_res_text = await utils.stream_to_text_async(http_res)
-            raise errors.SDKError("API error occurred", http_res, http_res_text)
-
-        raise errors.SDKError("Unexpected response received", http_res)
-
-    def get_metrics(
-        self,
-        *,
-        request: Union[models.GetMetricsRequest, models.GetMetricsRequestTypedDict],
-        retries: OptionalNullable[utils.RetryConfig] = UNSET,
-        server_url: Optional[str] = None,
-        timeout_ms: Optional[int] = None,
-        http_headers: Optional[Mapping[str, str]] = None,
-    ) -> Optional[models.GetMetricsResponse]:
-        r"""Retrieve a list of metrics
-
-        Returns a paginated list of [Metrics](ref:sustainability#metric).
-
-        :param request: The request object to send.
-        :param retries: Override the default retry configuration for this method
-        :param server_url: Override the default server URL for this method
-        :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
-        :param http_headers: Additional headers to set or replace on requests.
-        """
-        base_url = None
-        url_variables = None
-        if timeout_ms is None:
-            timeout_ms = self.sdk_configuration.timeout_ms
-
-        if server_url is not None:
-            base_url = server_url
-        else:
-            base_url = self._get_url(base_url, url_variables)
-
-        if not isinstance(request, BaseModel):
-            request = utils.unmarshal(request, models.GetMetricsRequest)
-        request = cast(models.GetMetricsRequest, request)
-
-        req = self._build_request(
-            method="GET",
-            path="/programs/{programId}/metrics",
-            base_url=base_url,
-            url_variables=url_variables,
-            request=request,
-            request_body_required=False,
-            request_has_path_params=True,
-            request_has_query_params=True,
-            user_agent_header="user-agent",
-            accept_header_value="application/json",
-            http_headers=http_headers,
-            security=self.sdk_configuration.security,
-            allow_empty_value=None,
-            timeout_ms=timeout_ms,
-        )
-
-        if retries == UNSET:
-            if self.sdk_configuration.retry_config is not UNSET:
-                retries = self.sdk_configuration.retry_config
-
-        retry_config = None
-        if isinstance(retries, utils.RetryConfig):
-            retry_config = (retries, ["429", "500", "502", "503", "504"])
-
-        http_res = self.do_request(
-            hook_ctx=HookContext(
-                config=self.sdk_configuration,
-                base_url=base_url or "",
-                operation_id="getMetrics",
-                oauth2_scopes=["file:read"],
-                security_source=self.sdk_configuration.security,
-            ),
-            request=req,
-            error_status_codes=[
-                "400",
-                "401",
-                "403",
-                "404",
-                "409",
-                "429",
-                "4XX",
-                "500",
-                "503",
-                "5XX",
-            ],
-            retry_config=retry_config,
-        )
-
-        def next_func() -> Optional[models.GetMetricsResponse]:
-            body = utils.unmarshal_json(http_res.text, Union[Dict[Any, Any], List[Any]])
-
-            next_cursor = JSONPath("$['@nextLink']").parse(body)
-
-            if len(next_cursor) == 0:
-                return None
-
-            next_cursor = next_cursor[0]
-            if next_cursor is None or str(next_cursor).strip() == "":
-                return None
-
-            return self.get_metrics(
-                request=models.GetMetricsRequest(
-                    program_id=request.program_id,
-                    dollar_filter=request.dollar_filter,
-                    dollar_maxpagesize=request.dollar_maxpagesize,
-                    dollar_next=next_cursor,
-                    dollar_order_by=request.dollar_order_by,
-                ),
-                retries=retries,
-            )
-
-        response_data: Any = None
-        if utils.match_response(http_res, "200", "application/json"):
-            return models.GetMetricsResponse(
-                result=unmarshal_json_response(models.MetricsListResult, http_res),
-                next=next_func,
-            )
-        if utils.match_response(
-            http_res, ["400", "401", "403", "404", "409", "429"], "application/json"
-        ):
-            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
-            raise errors.ErrorResponse(response_data, http_res)
-        if utils.match_response(http_res, ["500", "503"], "application/json"):
-            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
-            raise errors.ErrorResponse(response_data, http_res)
-        if utils.match_response(http_res, "4XX", "*"):
-            http_res_text = utils.stream_to_text(http_res)
-            raise errors.SDKError("API error occurred", http_res, http_res_text)
-        if utils.match_response(http_res, "5XX", "*"):
-            http_res_text = utils.stream_to_text(http_res)
-            raise errors.SDKError("API error occurred", http_res, http_res_text)
-
-        raise errors.SDKError("Unexpected response received", http_res)
-
-    async def get_metrics_async(
-        self,
-        *,
-        request: Union[models.GetMetricsRequest, models.GetMetricsRequestTypedDict],
-        retries: OptionalNullable[utils.RetryConfig] = UNSET,
-        server_url: Optional[str] = None,
-        timeout_ms: Optional[int] = None,
-        http_headers: Optional[Mapping[str, str]] = None,
-    ) -> Optional[models.GetMetricsResponse]:
-        r"""Retrieve a list of metrics
-
-        Returns a paginated list of [Metrics](ref:sustainability#metric).
-
-        :param request: The request object to send.
-        :param retries: Override the default retry configuration for this method
-        :param server_url: Override the default server URL for this method
-        :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
-        :param http_headers: Additional headers to set or replace on requests.
-        """
-        base_url = None
-        url_variables = None
-        if timeout_ms is None:
-            timeout_ms = self.sdk_configuration.timeout_ms
-
-        if server_url is not None:
-            base_url = server_url
-        else:
-            base_url = self._get_url(base_url, url_variables)
-
-        if not isinstance(request, BaseModel):
-            request = utils.unmarshal(request, models.GetMetricsRequest)
-        request = cast(models.GetMetricsRequest, request)
-
-        req = self._build_request_async(
-            method="GET",
-            path="/programs/{programId}/metrics",
-            base_url=base_url,
-            url_variables=url_variables,
-            request=request,
-            request_body_required=False,
-            request_has_path_params=True,
-            request_has_query_params=True,
-            user_agent_header="user-agent",
-            accept_header_value="application/json",
-            http_headers=http_headers,
-            security=self.sdk_configuration.security,
-            allow_empty_value=None,
-            timeout_ms=timeout_ms,
-        )
-
-        if retries == UNSET:
-            if self.sdk_configuration.retry_config is not UNSET:
-                retries = self.sdk_configuration.retry_config
-
-        retry_config = None
-        if isinstance(retries, utils.RetryConfig):
-            retry_config = (retries, ["429", "500", "502", "503", "504"])
-
-        http_res = await self.do_request_async(
-            hook_ctx=HookContext(
-                config=self.sdk_configuration,
-                base_url=base_url or "",
-                operation_id="getMetrics",
-                oauth2_scopes=["file:read"],
-                security_source=self.sdk_configuration.security,
-            ),
-            request=req,
-            error_status_codes=[
-                "400",
-                "401",
-                "403",
-                "404",
-                "409",
-                "429",
-                "4XX",
-                "500",
-                "503",
-                "5XX",
-            ],
-            retry_config=retry_config,
-        )
-
-        def next_func() -> Awaitable[Optional[models.GetMetricsResponse]]:
-            body = utils.unmarshal_json(http_res.text, Union[Dict[Any, Any], List[Any]])
-
-            async def empty_result():
-                return None
-
-            next_cursor = JSONPath("$['@nextLink']").parse(body)
-
-            if len(next_cursor) == 0:
-                return empty_result()
-
-            next_cursor = next_cursor[0]
-            if next_cursor is None or str(next_cursor).strip() == "":
-                return empty_result()
-
-            return self.get_metrics_async(
-                request=models.GetMetricsRequest(
-                    program_id=request.program_id,
-                    dollar_filter=request.dollar_filter,
-                    dollar_maxpagesize=request.dollar_maxpagesize,
-                    dollar_next=next_cursor,
-                    dollar_order_by=request.dollar_order_by,
-                ),
-                retries=retries,
-            )
-
-        response_data: Any = None
-        if utils.match_response(http_res, "200", "application/json"):
-            return models.GetMetricsResponse(
-                result=unmarshal_json_response(models.MetricsListResult, http_res),
-                next=next_func,
-            )
-        if utils.match_response(
-            http_res, ["400", "401", "403", "404", "409", "429"], "application/json"
-        ):
-            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
-            raise errors.ErrorResponse(response_data, http_res)
-        if utils.match_response(http_res, ["500", "503"], "application/json"):
-            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
-            raise errors.ErrorResponse(response_data, http_res)
-        if utils.match_response(http_res, "4XX", "*"):
-            http_res_text = await utils.stream_to_text_async(http_res)
-            raise errors.SDKError("API error occurred", http_res, http_res_text)
-        if utils.match_response(http_res, "5XX", "*"):
-            http_res_text = await utils.stream_to_text_async(http_res)
-            raise errors.SDKError("API error occurred", http_res, http_res_text)
-
-        raise errors.SDKError("Unexpected response received", http_res)
-
     def get_program_by_id(
         self,
         *,
@@ -3599,2056 +682,6 @@ class Sustainability(BaseSDK):
         response_data: Any = None
         if utils.match_response(http_res, "200", "application/json"):
             return unmarshal_json_response(models.Program, http_res)
-        if utils.match_response(
-            http_res, ["400", "401", "403", "404", "409", "429"], "application/json"
-        ):
-            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
-            raise errors.ErrorResponse(response_data, http_res)
-        if utils.match_response(http_res, ["500", "503"], "application/json"):
-            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
-            raise errors.ErrorResponse(response_data, http_res)
-        if utils.match_response(http_res, "4XX", "*"):
-            http_res_text = await utils.stream_to_text_async(http_res)
-            raise errors.SDKError("API error occurred", http_res, http_res_text)
-        if utils.match_response(http_res, "5XX", "*"):
-            http_res_text = await utils.stream_to_text_async(http_res)
-            raise errors.SDKError("API error occurred", http_res, http_res_text)
-
-        raise errors.SDKError("Unexpected response received", http_res)
-
-    def get_program_permissions(
-        self,
-        *,
-        program_id: str,
-        dollar_filter: Optional[str] = None,
-        dollar_maxpagesize: Optional[int] = 1000,
-        dollar_next: Optional[str] = None,
-        retries: OptionalNullable[utils.RetryConfig] = UNSET,
-        server_url: Optional[str] = None,
-        timeout_ms: Optional[int] = None,
-        http_headers: Optional[Mapping[str, str]] = None,
-    ) -> Optional[models.GetProgramPermissionsResponse]:
-        r"""Retrieve permissions for a program
-
-        Retrieves a paginated list of permissions for a given Sustainability Program
-
-
-        :param program_id: The unique identifier of the program
-        :param dollar_filter: The properties to filter the results by.
-        :param dollar_maxpagesize: The maximum number of results to retrieve
-        :param dollar_next: Pagination cursor for next set of results.
-        :param retries: Override the default retry configuration for this method
-        :param server_url: Override the default server URL for this method
-        :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
-        :param http_headers: Additional headers to set or replace on requests.
-        """
-        base_url = None
-        url_variables = None
-        if timeout_ms is None:
-            timeout_ms = self.sdk_configuration.timeout_ms
-
-        if server_url is not None:
-            base_url = server_url
-        else:
-            base_url = self._get_url(base_url, url_variables)
-
-        request = models.GetProgramPermissionsRequest(
-            dollar_filter=dollar_filter,
-            dollar_maxpagesize=dollar_maxpagesize,
-            dollar_next=dollar_next,
-            program_id=program_id,
-        )
-
-        req = self._build_request(
-            method="GET",
-            path="/programs/{programId}/permissions",
-            base_url=base_url,
-            url_variables=url_variables,
-            request=request,
-            request_body_required=False,
-            request_has_path_params=True,
-            request_has_query_params=True,
-            user_agent_header="user-agent",
-            accept_header_value="application/json",
-            http_headers=http_headers,
-            security=self.sdk_configuration.security,
-            allow_empty_value=None,
-            timeout_ms=timeout_ms,
-        )
-
-        if retries == UNSET:
-            if self.sdk_configuration.retry_config is not UNSET:
-                retries = self.sdk_configuration.retry_config
-
-        retry_config = None
-        if isinstance(retries, utils.RetryConfig):
-            retry_config = (retries, ["429", "500", "502", "503", "504"])
-
-        http_res = self.do_request(
-            hook_ctx=HookContext(
-                config=self.sdk_configuration,
-                base_url=base_url or "",
-                operation_id="getProgramPermissions",
-                oauth2_scopes=["file:read"],
-                security_source=self.sdk_configuration.security,
-            ),
-            request=req,
-            error_status_codes=[
-                "400",
-                "401",
-                "403",
-                "404",
-                "409",
-                "429",
-                "4XX",
-                "500",
-                "503",
-                "5XX",
-            ],
-            retry_config=retry_config,
-        )
-
-        def next_func() -> Optional[models.GetProgramPermissionsResponse]:
-            body = utils.unmarshal_json(http_res.text, Union[Dict[Any, Any], List[Any]])
-
-            next_cursor = JSONPath("$['@nextLink']").parse(body)
-
-            if len(next_cursor) == 0:
-                return None
-
-            next_cursor = next_cursor[0]
-            if next_cursor is None or str(next_cursor).strip() == "":
-                return None
-
-            return self.get_program_permissions(
-                program_id=program_id,
-                dollar_filter=dollar_filter,
-                dollar_maxpagesize=dollar_maxpagesize,
-                dollar_next=next_cursor,
-                retries=retries,
-            )
-
-        response_data: Any = None
-        if utils.match_response(http_res, "200", "application/json"):
-            return models.GetProgramPermissionsResponse(
-                result=unmarshal_json_response(
-                    models.ResourcePermissionsListResult, http_res
-                ),
-                next=next_func,
-            )
-        if utils.match_response(
-            http_res, ["400", "401", "403", "404", "409", "429"], "application/json"
-        ):
-            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
-            raise errors.ErrorResponse(response_data, http_res)
-        if utils.match_response(http_res, ["500", "503"], "application/json"):
-            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
-            raise errors.ErrorResponse(response_data, http_res)
-        if utils.match_response(http_res, "4XX", "*"):
-            http_res_text = utils.stream_to_text(http_res)
-            raise errors.SDKError("API error occurred", http_res, http_res_text)
-        if utils.match_response(http_res, "5XX", "*"):
-            http_res_text = utils.stream_to_text(http_res)
-            raise errors.SDKError("API error occurred", http_res, http_res_text)
-
-        raise errors.SDKError("Unexpected response received", http_res)
-
-    async def get_program_permissions_async(
-        self,
-        *,
-        program_id: str,
-        dollar_filter: Optional[str] = None,
-        dollar_maxpagesize: Optional[int] = 1000,
-        dollar_next: Optional[str] = None,
-        retries: OptionalNullable[utils.RetryConfig] = UNSET,
-        server_url: Optional[str] = None,
-        timeout_ms: Optional[int] = None,
-        http_headers: Optional[Mapping[str, str]] = None,
-    ) -> Optional[models.GetProgramPermissionsResponse]:
-        r"""Retrieve permissions for a program
-
-        Retrieves a paginated list of permissions for a given Sustainability Program
-
-
-        :param program_id: The unique identifier of the program
-        :param dollar_filter: The properties to filter the results by.
-        :param dollar_maxpagesize: The maximum number of results to retrieve
-        :param dollar_next: Pagination cursor for next set of results.
-        :param retries: Override the default retry configuration for this method
-        :param server_url: Override the default server URL for this method
-        :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
-        :param http_headers: Additional headers to set or replace on requests.
-        """
-        base_url = None
-        url_variables = None
-        if timeout_ms is None:
-            timeout_ms = self.sdk_configuration.timeout_ms
-
-        if server_url is not None:
-            base_url = server_url
-        else:
-            base_url = self._get_url(base_url, url_variables)
-
-        request = models.GetProgramPermissionsRequest(
-            dollar_filter=dollar_filter,
-            dollar_maxpagesize=dollar_maxpagesize,
-            dollar_next=dollar_next,
-            program_id=program_id,
-        )
-
-        req = self._build_request_async(
-            method="GET",
-            path="/programs/{programId}/permissions",
-            base_url=base_url,
-            url_variables=url_variables,
-            request=request,
-            request_body_required=False,
-            request_has_path_params=True,
-            request_has_query_params=True,
-            user_agent_header="user-agent",
-            accept_header_value="application/json",
-            http_headers=http_headers,
-            security=self.sdk_configuration.security,
-            allow_empty_value=None,
-            timeout_ms=timeout_ms,
-        )
-
-        if retries == UNSET:
-            if self.sdk_configuration.retry_config is not UNSET:
-                retries = self.sdk_configuration.retry_config
-
-        retry_config = None
-        if isinstance(retries, utils.RetryConfig):
-            retry_config = (retries, ["429", "500", "502", "503", "504"])
-
-        http_res = await self.do_request_async(
-            hook_ctx=HookContext(
-                config=self.sdk_configuration,
-                base_url=base_url or "",
-                operation_id="getProgramPermissions",
-                oauth2_scopes=["file:read"],
-                security_source=self.sdk_configuration.security,
-            ),
-            request=req,
-            error_status_codes=[
-                "400",
-                "401",
-                "403",
-                "404",
-                "409",
-                "429",
-                "4XX",
-                "500",
-                "503",
-                "5XX",
-            ],
-            retry_config=retry_config,
-        )
-
-        def next_func() -> Awaitable[Optional[models.GetProgramPermissionsResponse]]:
-            body = utils.unmarshal_json(http_res.text, Union[Dict[Any, Any], List[Any]])
-
-            async def empty_result():
-                return None
-
-            next_cursor = JSONPath("$['@nextLink']").parse(body)
-
-            if len(next_cursor) == 0:
-                return empty_result()
-
-            next_cursor = next_cursor[0]
-            if next_cursor is None or str(next_cursor).strip() == "":
-                return empty_result()
-
-            return self.get_program_permissions_async(
-                program_id=program_id,
-                dollar_filter=dollar_filter,
-                dollar_maxpagesize=dollar_maxpagesize,
-                dollar_next=next_cursor,
-                retries=retries,
-            )
-
-        response_data: Any = None
-        if utils.match_response(http_res, "200", "application/json"):
-            return models.GetProgramPermissionsResponse(
-                result=unmarshal_json_response(
-                    models.ResourcePermissionsListResult, http_res
-                ),
-                next=next_func,
-            )
-        if utils.match_response(
-            http_res, ["400", "401", "403", "404", "409", "429"], "application/json"
-        ):
-            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
-            raise errors.ErrorResponse(response_data, http_res)
-        if utils.match_response(http_res, ["500", "503"], "application/json"):
-            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
-            raise errors.ErrorResponse(response_data, http_res)
-        if utils.match_response(http_res, "4XX", "*"):
-            http_res_text = await utils.stream_to_text_async(http_res)
-            raise errors.SDKError("API error occurred", http_res, http_res_text)
-        if utils.match_response(http_res, "5XX", "*"):
-            http_res_text = await utils.stream_to_text_async(http_res)
-            raise errors.SDKError("API error occurred", http_res, http_res_text)
-
-        raise errors.SDKError("Unexpected response received", http_res)
-
-    def get_programs(
-        self,
-        *,
-        dollar_filter: Optional[str] = None,
-        dollar_maxpagesize: Optional[int] = 1000,
-        dollar_next: Optional[str] = None,
-        dollar_order_by: Optional[str] = None,
-        retries: OptionalNullable[utils.RetryConfig] = UNSET,
-        server_url: Optional[str] = None,
-        timeout_ms: Optional[int] = None,
-        http_headers: Optional[Mapping[str, str]] = None,
-    ) -> Optional[models.GetProgramsResponse]:
-        r"""Retrieve a list of programs
-
-        Returns a paginated list of [programs](ref:sustainability#program).
-
-        :param dollar_filter: The properties to filter the results by.
-        :param dollar_maxpagesize: The maximum number of results to retrieve
-        :param dollar_next: Pagination cursor for next set of results.
-        :param dollar_order_by: One or more comma-separated expressions to indicate the order in which to sort the results.
-        :param retries: Override the default retry configuration for this method
-        :param server_url: Override the default server URL for this method
-        :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
-        :param http_headers: Additional headers to set or replace on requests.
-        """
-        base_url = None
-        url_variables = None
-        if timeout_ms is None:
-            timeout_ms = self.sdk_configuration.timeout_ms
-
-        if server_url is not None:
-            base_url = server_url
-        else:
-            base_url = self._get_url(base_url, url_variables)
-
-        request = models.GetProgramsRequest(
-            dollar_filter=dollar_filter,
-            dollar_maxpagesize=dollar_maxpagesize,
-            dollar_next=dollar_next,
-            dollar_order_by=dollar_order_by,
-        )
-
-        req = self._build_request(
-            method="GET",
-            path="/programs",
-            base_url=base_url,
-            url_variables=url_variables,
-            request=request,
-            request_body_required=False,
-            request_has_path_params=False,
-            request_has_query_params=True,
-            user_agent_header="user-agent",
-            accept_header_value="application/json",
-            http_headers=http_headers,
-            security=self.sdk_configuration.security,
-            allow_empty_value=None,
-            timeout_ms=timeout_ms,
-        )
-
-        if retries == UNSET:
-            if self.sdk_configuration.retry_config is not UNSET:
-                retries = self.sdk_configuration.retry_config
-
-        retry_config = None
-        if isinstance(retries, utils.RetryConfig):
-            retry_config = (retries, ["429", "500", "502", "503", "504"])
-
-        http_res = self.do_request(
-            hook_ctx=HookContext(
-                config=self.sdk_configuration,
-                base_url=base_url or "",
-                operation_id="getPrograms",
-                oauth2_scopes=["file:read"],
-                security_source=self.sdk_configuration.security,
-            ),
-            request=req,
-            error_status_codes=[
-                "400",
-                "401",
-                "403",
-                "404",
-                "409",
-                "429",
-                "4XX",
-                "500",
-                "503",
-                "5XX",
-            ],
-            retry_config=retry_config,
-        )
-
-        def next_func() -> Optional[models.GetProgramsResponse]:
-            body = utils.unmarshal_json(http_res.text, Union[Dict[Any, Any], List[Any]])
-
-            next_cursor = JSONPath("$['@nextLink']").parse(body)
-
-            if len(next_cursor) == 0:
-                return None
-
-            next_cursor = next_cursor[0]
-            if next_cursor is None or str(next_cursor).strip() == "":
-                return None
-
-            return self.get_programs(
-                dollar_filter=dollar_filter,
-                dollar_maxpagesize=dollar_maxpagesize,
-                dollar_next=next_cursor,
-                dollar_order_by=dollar_order_by,
-                retries=retries,
-            )
-
-        response_data: Any = None
-        if utils.match_response(http_res, "200", "application/json"):
-            return models.GetProgramsResponse(
-                result=unmarshal_json_response(models.ProgramsListResult, http_res),
-                next=next_func,
-            )
-        if utils.match_response(
-            http_res, ["400", "401", "403", "404", "409", "429"], "application/json"
-        ):
-            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
-            raise errors.ErrorResponse(response_data, http_res)
-        if utils.match_response(http_res, ["500", "503"], "application/json"):
-            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
-            raise errors.ErrorResponse(response_data, http_res)
-        if utils.match_response(http_res, "4XX", "*"):
-            http_res_text = utils.stream_to_text(http_res)
-            raise errors.SDKError("API error occurred", http_res, http_res_text)
-        if utils.match_response(http_res, "5XX", "*"):
-            http_res_text = utils.stream_to_text(http_res)
-            raise errors.SDKError("API error occurred", http_res, http_res_text)
-
-        raise errors.SDKError("Unexpected response received", http_res)
-
-    async def get_programs_async(
-        self,
-        *,
-        dollar_filter: Optional[str] = None,
-        dollar_maxpagesize: Optional[int] = 1000,
-        dollar_next: Optional[str] = None,
-        dollar_order_by: Optional[str] = None,
-        retries: OptionalNullable[utils.RetryConfig] = UNSET,
-        server_url: Optional[str] = None,
-        timeout_ms: Optional[int] = None,
-        http_headers: Optional[Mapping[str, str]] = None,
-    ) -> Optional[models.GetProgramsResponse]:
-        r"""Retrieve a list of programs
-
-        Returns a paginated list of [programs](ref:sustainability#program).
-
-        :param dollar_filter: The properties to filter the results by.
-        :param dollar_maxpagesize: The maximum number of results to retrieve
-        :param dollar_next: Pagination cursor for next set of results.
-        :param dollar_order_by: One or more comma-separated expressions to indicate the order in which to sort the results.
-        :param retries: Override the default retry configuration for this method
-        :param server_url: Override the default server URL for this method
-        :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
-        :param http_headers: Additional headers to set or replace on requests.
-        """
-        base_url = None
-        url_variables = None
-        if timeout_ms is None:
-            timeout_ms = self.sdk_configuration.timeout_ms
-
-        if server_url is not None:
-            base_url = server_url
-        else:
-            base_url = self._get_url(base_url, url_variables)
-
-        request = models.GetProgramsRequest(
-            dollar_filter=dollar_filter,
-            dollar_maxpagesize=dollar_maxpagesize,
-            dollar_next=dollar_next,
-            dollar_order_by=dollar_order_by,
-        )
-
-        req = self._build_request_async(
-            method="GET",
-            path="/programs",
-            base_url=base_url,
-            url_variables=url_variables,
-            request=request,
-            request_body_required=False,
-            request_has_path_params=False,
-            request_has_query_params=True,
-            user_agent_header="user-agent",
-            accept_header_value="application/json",
-            http_headers=http_headers,
-            security=self.sdk_configuration.security,
-            allow_empty_value=None,
-            timeout_ms=timeout_ms,
-        )
-
-        if retries == UNSET:
-            if self.sdk_configuration.retry_config is not UNSET:
-                retries = self.sdk_configuration.retry_config
-
-        retry_config = None
-        if isinstance(retries, utils.RetryConfig):
-            retry_config = (retries, ["429", "500", "502", "503", "504"])
-
-        http_res = await self.do_request_async(
-            hook_ctx=HookContext(
-                config=self.sdk_configuration,
-                base_url=base_url or "",
-                operation_id="getPrograms",
-                oauth2_scopes=["file:read"],
-                security_source=self.sdk_configuration.security,
-            ),
-            request=req,
-            error_status_codes=[
-                "400",
-                "401",
-                "403",
-                "404",
-                "409",
-                "429",
-                "4XX",
-                "500",
-                "503",
-                "5XX",
-            ],
-            retry_config=retry_config,
-        )
-
-        def next_func() -> Awaitable[Optional[models.GetProgramsResponse]]:
-            body = utils.unmarshal_json(http_res.text, Union[Dict[Any, Any], List[Any]])
-
-            async def empty_result():
-                return None
-
-            next_cursor = JSONPath("$['@nextLink']").parse(body)
-
-            if len(next_cursor) == 0:
-                return empty_result()
-
-            next_cursor = next_cursor[0]
-            if next_cursor is None or str(next_cursor).strip() == "":
-                return empty_result()
-
-            return self.get_programs_async(
-                dollar_filter=dollar_filter,
-                dollar_maxpagesize=dollar_maxpagesize,
-                dollar_next=next_cursor,
-                dollar_order_by=dollar_order_by,
-                retries=retries,
-            )
-
-        response_data: Any = None
-        if utils.match_response(http_res, "200", "application/json"):
-            return models.GetProgramsResponse(
-                result=unmarshal_json_response(models.ProgramsListResult, http_res),
-                next=next_func,
-            )
-        if utils.match_response(
-            http_res, ["400", "401", "403", "404", "409", "429"], "application/json"
-        ):
-            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
-            raise errors.ErrorResponse(response_data, http_res)
-        if utils.match_response(http_res, ["500", "503"], "application/json"):
-            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
-            raise errors.ErrorResponse(response_data, http_res)
-        if utils.match_response(http_res, "4XX", "*"):
-            http_res_text = await utils.stream_to_text_async(http_res)
-            raise errors.SDKError("API error occurred", http_res, http_res_text)
-        if utils.match_response(http_res, "5XX", "*"):
-            http_res_text = await utils.stream_to_text_async(http_res)
-            raise errors.SDKError("API error occurred", http_res, http_res_text)
-
-        raise errors.SDKError("Unexpected response received", http_res)
-
-    def get_topic_by_id(
-        self,
-        *,
-        program_id: str,
-        topic_id: str,
-        retries: OptionalNullable[utils.RetryConfig] = UNSET,
-        server_url: Optional[str] = None,
-        timeout_ms: Optional[int] = None,
-        http_headers: Optional[Mapping[str, str]] = None,
-    ) -> models.Topic:
-        r"""Retrieve a single topic
-
-        Retrieves a [topic](ref:sustainability#topic) given its ID
-
-
-        :param program_id: The unique identifier of the program
-        :param topic_id: The unique identifier of the topic
-        :param retries: Override the default retry configuration for this method
-        :param server_url: Override the default server URL for this method
-        :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
-        :param http_headers: Additional headers to set or replace on requests.
-        """
-        base_url = None
-        url_variables = None
-        if timeout_ms is None:
-            timeout_ms = self.sdk_configuration.timeout_ms
-
-        if server_url is not None:
-            base_url = server_url
-        else:
-            base_url = self._get_url(base_url, url_variables)
-
-        request = models.GetTopicByIDRequest(
-            program_id=program_id,
-            topic_id=topic_id,
-        )
-
-        req = self._build_request(
-            method="GET",
-            path="/programs/{programId}/topics/{topicId}",
-            base_url=base_url,
-            url_variables=url_variables,
-            request=request,
-            request_body_required=False,
-            request_has_path_params=True,
-            request_has_query_params=True,
-            user_agent_header="user-agent",
-            accept_header_value="application/json",
-            http_headers=http_headers,
-            security=self.sdk_configuration.security,
-            allow_empty_value=None,
-            timeout_ms=timeout_ms,
-        )
-
-        if retries == UNSET:
-            if self.sdk_configuration.retry_config is not UNSET:
-                retries = self.sdk_configuration.retry_config
-
-        retry_config = None
-        if isinstance(retries, utils.RetryConfig):
-            retry_config = (retries, ["429", "500", "502", "503", "504"])
-
-        http_res = self.do_request(
-            hook_ctx=HookContext(
-                config=self.sdk_configuration,
-                base_url=base_url or "",
-                operation_id="getTopicById",
-                oauth2_scopes=["file:read"],
-                security_source=self.sdk_configuration.security,
-            ),
-            request=req,
-            error_status_codes=[
-                "400",
-                "401",
-                "403",
-                "404",
-                "409",
-                "429",
-                "4XX",
-                "500",
-                "503",
-                "5XX",
-            ],
-            retry_config=retry_config,
-        )
-
-        response_data: Any = None
-        if utils.match_response(http_res, "200", "application/json"):
-            return unmarshal_json_response(models.Topic, http_res)
-        if utils.match_response(
-            http_res, ["400", "401", "403", "404", "409", "429"], "application/json"
-        ):
-            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
-            raise errors.ErrorResponse(response_data, http_res)
-        if utils.match_response(http_res, ["500", "503"], "application/json"):
-            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
-            raise errors.ErrorResponse(response_data, http_res)
-        if utils.match_response(http_res, "4XX", "*"):
-            http_res_text = utils.stream_to_text(http_res)
-            raise errors.SDKError("API error occurred", http_res, http_res_text)
-        if utils.match_response(http_res, "5XX", "*"):
-            http_res_text = utils.stream_to_text(http_res)
-            raise errors.SDKError("API error occurred", http_res, http_res_text)
-
-        raise errors.SDKError("Unexpected response received", http_res)
-
-    async def get_topic_by_id_async(
-        self,
-        *,
-        program_id: str,
-        topic_id: str,
-        retries: OptionalNullable[utils.RetryConfig] = UNSET,
-        server_url: Optional[str] = None,
-        timeout_ms: Optional[int] = None,
-        http_headers: Optional[Mapping[str, str]] = None,
-    ) -> models.Topic:
-        r"""Retrieve a single topic
-
-        Retrieves a [topic](ref:sustainability#topic) given its ID
-
-
-        :param program_id: The unique identifier of the program
-        :param topic_id: The unique identifier of the topic
-        :param retries: Override the default retry configuration for this method
-        :param server_url: Override the default server URL for this method
-        :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
-        :param http_headers: Additional headers to set or replace on requests.
-        """
-        base_url = None
-        url_variables = None
-        if timeout_ms is None:
-            timeout_ms = self.sdk_configuration.timeout_ms
-
-        if server_url is not None:
-            base_url = server_url
-        else:
-            base_url = self._get_url(base_url, url_variables)
-
-        request = models.GetTopicByIDRequest(
-            program_id=program_id,
-            topic_id=topic_id,
-        )
-
-        req = self._build_request_async(
-            method="GET",
-            path="/programs/{programId}/topics/{topicId}",
-            base_url=base_url,
-            url_variables=url_variables,
-            request=request,
-            request_body_required=False,
-            request_has_path_params=True,
-            request_has_query_params=True,
-            user_agent_header="user-agent",
-            accept_header_value="application/json",
-            http_headers=http_headers,
-            security=self.sdk_configuration.security,
-            allow_empty_value=None,
-            timeout_ms=timeout_ms,
-        )
-
-        if retries == UNSET:
-            if self.sdk_configuration.retry_config is not UNSET:
-                retries = self.sdk_configuration.retry_config
-
-        retry_config = None
-        if isinstance(retries, utils.RetryConfig):
-            retry_config = (retries, ["429", "500", "502", "503", "504"])
-
-        http_res = await self.do_request_async(
-            hook_ctx=HookContext(
-                config=self.sdk_configuration,
-                base_url=base_url or "",
-                operation_id="getTopicById",
-                oauth2_scopes=["file:read"],
-                security_source=self.sdk_configuration.security,
-            ),
-            request=req,
-            error_status_codes=[
-                "400",
-                "401",
-                "403",
-                "404",
-                "409",
-                "429",
-                "4XX",
-                "500",
-                "503",
-                "5XX",
-            ],
-            retry_config=retry_config,
-        )
-
-        response_data: Any = None
-        if utils.match_response(http_res, "200", "application/json"):
-            return unmarshal_json_response(models.Topic, http_res)
-        if utils.match_response(
-            http_res, ["400", "401", "403", "404", "409", "429"], "application/json"
-        ):
-            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
-            raise errors.ErrorResponse(response_data, http_res)
-        if utils.match_response(http_res, ["500", "503"], "application/json"):
-            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
-            raise errors.ErrorResponse(response_data, http_res)
-        if utils.match_response(http_res, "4XX", "*"):
-            http_res_text = await utils.stream_to_text_async(http_res)
-            raise errors.SDKError("API error occurred", http_res, http_res_text)
-        if utils.match_response(http_res, "5XX", "*"):
-            http_res_text = await utils.stream_to_text_async(http_res)
-            raise errors.SDKError("API error occurred", http_res, http_res_text)
-
-        raise errors.SDKError("Unexpected response received", http_res)
-
-    def get_topics(
-        self,
-        *,
-        request: Union[models.GetTopicsRequest, models.GetTopicsRequestTypedDict],
-        retries: OptionalNullable[utils.RetryConfig] = UNSET,
-        server_url: Optional[str] = None,
-        timeout_ms: Optional[int] = None,
-        http_headers: Optional[Mapping[str, str]] = None,
-    ) -> Optional[models.GetTopicsResponse]:
-        r"""Retrieve a list of topics
-
-        Returns a paginated list of [topics](ref:sustainability#topic).
-
-        :param request: The request object to send.
-        :param retries: Override the default retry configuration for this method
-        :param server_url: Override the default server URL for this method
-        :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
-        :param http_headers: Additional headers to set or replace on requests.
-        """
-        base_url = None
-        url_variables = None
-        if timeout_ms is None:
-            timeout_ms = self.sdk_configuration.timeout_ms
-
-        if server_url is not None:
-            base_url = server_url
-        else:
-            base_url = self._get_url(base_url, url_variables)
-
-        if not isinstance(request, BaseModel):
-            request = utils.unmarshal(request, models.GetTopicsRequest)
-        request = cast(models.GetTopicsRequest, request)
-
-        req = self._build_request(
-            method="GET",
-            path="/programs/{programId}/topics",
-            base_url=base_url,
-            url_variables=url_variables,
-            request=request,
-            request_body_required=False,
-            request_has_path_params=True,
-            request_has_query_params=True,
-            user_agent_header="user-agent",
-            accept_header_value="application/json",
-            http_headers=http_headers,
-            security=self.sdk_configuration.security,
-            allow_empty_value=None,
-            timeout_ms=timeout_ms,
-        )
-
-        if retries == UNSET:
-            if self.sdk_configuration.retry_config is not UNSET:
-                retries = self.sdk_configuration.retry_config
-
-        retry_config = None
-        if isinstance(retries, utils.RetryConfig):
-            retry_config = (retries, ["429", "500", "502", "503", "504"])
-
-        http_res = self.do_request(
-            hook_ctx=HookContext(
-                config=self.sdk_configuration,
-                base_url=base_url or "",
-                operation_id="getTopics",
-                oauth2_scopes=["file:read"],
-                security_source=self.sdk_configuration.security,
-            ),
-            request=req,
-            error_status_codes=[
-                "400",
-                "401",
-                "403",
-                "404",
-                "409",
-                "429",
-                "4XX",
-                "500",
-                "503",
-                "5XX",
-            ],
-            retry_config=retry_config,
-        )
-
-        def next_func() -> Optional[models.GetTopicsResponse]:
-            body = utils.unmarshal_json(http_res.text, Union[Dict[Any, Any], List[Any]])
-
-            next_cursor = JSONPath("$['@nextLink']").parse(body)
-
-            if len(next_cursor) == 0:
-                return None
-
-            next_cursor = next_cursor[0]
-            if next_cursor is None or str(next_cursor).strip() == "":
-                return None
-
-            return self.get_topics(
-                request=models.GetTopicsRequest(
-                    program_id=request.program_id,
-                    dollar_filter=request.dollar_filter,
-                    dollar_maxpagesize=request.dollar_maxpagesize,
-                    dollar_next=next_cursor,
-                    dollar_order_by=request.dollar_order_by,
-                ),
-                retries=retries,
-            )
-
-        response_data: Any = None
-        if utils.match_response(http_res, "200", "application/json"):
-            return models.GetTopicsResponse(
-                result=unmarshal_json_response(models.TopicsListResult, http_res),
-                next=next_func,
-            )
-        if utils.match_response(
-            http_res, ["400", "401", "403", "404", "409", "429"], "application/json"
-        ):
-            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
-            raise errors.ErrorResponse(response_data, http_res)
-        if utils.match_response(http_res, ["500", "503"], "application/json"):
-            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
-            raise errors.ErrorResponse(response_data, http_res)
-        if utils.match_response(http_res, "4XX", "*"):
-            http_res_text = utils.stream_to_text(http_res)
-            raise errors.SDKError("API error occurred", http_res, http_res_text)
-        if utils.match_response(http_res, "5XX", "*"):
-            http_res_text = utils.stream_to_text(http_res)
-            raise errors.SDKError("API error occurred", http_res, http_res_text)
-
-        raise errors.SDKError("Unexpected response received", http_res)
-
-    async def get_topics_async(
-        self,
-        *,
-        request: Union[models.GetTopicsRequest, models.GetTopicsRequestTypedDict],
-        retries: OptionalNullable[utils.RetryConfig] = UNSET,
-        server_url: Optional[str] = None,
-        timeout_ms: Optional[int] = None,
-        http_headers: Optional[Mapping[str, str]] = None,
-    ) -> Optional[models.GetTopicsResponse]:
-        r"""Retrieve a list of topics
-
-        Returns a paginated list of [topics](ref:sustainability#topic).
-
-        :param request: The request object to send.
-        :param retries: Override the default retry configuration for this method
-        :param server_url: Override the default server URL for this method
-        :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
-        :param http_headers: Additional headers to set or replace on requests.
-        """
-        base_url = None
-        url_variables = None
-        if timeout_ms is None:
-            timeout_ms = self.sdk_configuration.timeout_ms
-
-        if server_url is not None:
-            base_url = server_url
-        else:
-            base_url = self._get_url(base_url, url_variables)
-
-        if not isinstance(request, BaseModel):
-            request = utils.unmarshal(request, models.GetTopicsRequest)
-        request = cast(models.GetTopicsRequest, request)
-
-        req = self._build_request_async(
-            method="GET",
-            path="/programs/{programId}/topics",
-            base_url=base_url,
-            url_variables=url_variables,
-            request=request,
-            request_body_required=False,
-            request_has_path_params=True,
-            request_has_query_params=True,
-            user_agent_header="user-agent",
-            accept_header_value="application/json",
-            http_headers=http_headers,
-            security=self.sdk_configuration.security,
-            allow_empty_value=None,
-            timeout_ms=timeout_ms,
-        )
-
-        if retries == UNSET:
-            if self.sdk_configuration.retry_config is not UNSET:
-                retries = self.sdk_configuration.retry_config
-
-        retry_config = None
-        if isinstance(retries, utils.RetryConfig):
-            retry_config = (retries, ["429", "500", "502", "503", "504"])
-
-        http_res = await self.do_request_async(
-            hook_ctx=HookContext(
-                config=self.sdk_configuration,
-                base_url=base_url or "",
-                operation_id="getTopics",
-                oauth2_scopes=["file:read"],
-                security_source=self.sdk_configuration.security,
-            ),
-            request=req,
-            error_status_codes=[
-                "400",
-                "401",
-                "403",
-                "404",
-                "409",
-                "429",
-                "4XX",
-                "500",
-                "503",
-                "5XX",
-            ],
-            retry_config=retry_config,
-        )
-
-        def next_func() -> Awaitable[Optional[models.GetTopicsResponse]]:
-            body = utils.unmarshal_json(http_res.text, Union[Dict[Any, Any], List[Any]])
-
-            async def empty_result():
-                return None
-
-            next_cursor = JSONPath("$['@nextLink']").parse(body)
-
-            if len(next_cursor) == 0:
-                return empty_result()
-
-            next_cursor = next_cursor[0]
-            if next_cursor is None or str(next_cursor).strip() == "":
-                return empty_result()
-
-            return self.get_topics_async(
-                request=models.GetTopicsRequest(
-                    program_id=request.program_id,
-                    dollar_filter=request.dollar_filter,
-                    dollar_maxpagesize=request.dollar_maxpagesize,
-                    dollar_next=next_cursor,
-                    dollar_order_by=request.dollar_order_by,
-                ),
-                retries=retries,
-            )
-
-        response_data: Any = None
-        if utils.match_response(http_res, "200", "application/json"):
-            return models.GetTopicsResponse(
-                result=unmarshal_json_response(models.TopicsListResult, http_res),
-                next=next_func,
-            )
-        if utils.match_response(
-            http_res, ["400", "401", "403", "404", "409", "429"], "application/json"
-        ):
-            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
-            raise errors.ErrorResponse(response_data, http_res)
-        if utils.match_response(http_res, ["500", "503"], "application/json"):
-            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
-            raise errors.ErrorResponse(response_data, http_res)
-        if utils.match_response(http_res, "4XX", "*"):
-            http_res_text = await utils.stream_to_text_async(http_res)
-            raise errors.SDKError("API error occurred", http_res, http_res_text)
-        if utils.match_response(http_res, "5XX", "*"):
-            http_res_text = await utils.stream_to_text_async(http_res)
-            raise errors.SDKError("API error occurred", http_res, http_res_text)
-
-        raise errors.SDKError("Unexpected response received", http_res)
-
-    def get_values(
-        self,
-        *,
-        request: Union[models.GetValuesRequest, models.GetValuesRequestTypedDict],
-        retries: OptionalNullable[utils.RetryConfig] = UNSET,
-        server_url: Optional[str] = None,
-        timeout_ms: Optional[int] = None,
-        http_headers: Optional[Mapping[str, str]] = None,
-    ) -> Optional[models.GetValuesResponse]:
-        r"""Retrieve a list of metric values
-
-        Returns a paginated list of [metric Values](ref:sustainability#metricvalue)
-
-        :param request: The request object to send.
-        :param retries: Override the default retry configuration for this method
-        :param server_url: Override the default server URL for this method
-        :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
-        :param http_headers: Additional headers to set or replace on requests.
-        """
-        base_url = None
-        url_variables = None
-        if timeout_ms is None:
-            timeout_ms = self.sdk_configuration.timeout_ms
-
-        if server_url is not None:
-            base_url = server_url
-        else:
-            base_url = self._get_url(base_url, url_variables)
-
-        if not isinstance(request, BaseModel):
-            request = utils.unmarshal(request, models.GetValuesRequest)
-        request = cast(models.GetValuesRequest, request)
-
-        req = self._build_request(
-            method="GET",
-            path="/programs/{programId}/metrics/{metricId}/values",
-            base_url=base_url,
-            url_variables=url_variables,
-            request=request,
-            request_body_required=False,
-            request_has_path_params=True,
-            request_has_query_params=True,
-            user_agent_header="user-agent",
-            accept_header_value="application/json",
-            http_headers=http_headers,
-            security=self.sdk_configuration.security,
-            allow_empty_value=None,
-            timeout_ms=timeout_ms,
-        )
-
-        if retries == UNSET:
-            if self.sdk_configuration.retry_config is not UNSET:
-                retries = self.sdk_configuration.retry_config
-
-        retry_config = None
-        if isinstance(retries, utils.RetryConfig):
-            retry_config = (retries, ["429", "500", "502", "503", "504"])
-
-        http_res = self.do_request(
-            hook_ctx=HookContext(
-                config=self.sdk_configuration,
-                base_url=base_url or "",
-                operation_id="getValues",
-                oauth2_scopes=["file:read"],
-                security_source=self.sdk_configuration.security,
-            ),
-            request=req,
-            error_status_codes=[
-                "400",
-                "401",
-                "403",
-                "404",
-                "409",
-                "429",
-                "4XX",
-                "500",
-                "503",
-                "5XX",
-            ],
-            retry_config=retry_config,
-        )
-
-        def next_func() -> Optional[models.GetValuesResponse]:
-            body = utils.unmarshal_json(http_res.text, Union[Dict[Any, Any], List[Any]])
-
-            next_cursor = JSONPath("$['@nextLink']").parse(body)
-
-            if len(next_cursor) == 0:
-                return None
-
-            next_cursor = next_cursor[0]
-            if next_cursor is None or str(next_cursor).strip() == "":
-                return None
-
-            return self.get_values(
-                request=models.GetValuesRequest(
-                    metric_id=request.metric_id,
-                    program_id=request.program_id,
-                    dollar_filter=request.dollar_filter,
-                    dollar_maxpagesize=request.dollar_maxpagesize,
-                    dollar_next=next_cursor,
-                    dollar_order_by=request.dollar_order_by,
-                ),
-                retries=retries,
-            )
-
-        response_data: Any = None
-        if utils.match_response(http_res, "200", "application/json"):
-            return models.GetValuesResponse(
-                result=unmarshal_json_response(models.MetricValuesListResult, http_res),
-                next=next_func,
-            )
-        if utils.match_response(
-            http_res, ["400", "401", "403", "404", "409", "429"], "application/json"
-        ):
-            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
-            raise errors.ErrorResponse(response_data, http_res)
-        if utils.match_response(http_res, ["500", "503"], "application/json"):
-            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
-            raise errors.ErrorResponse(response_data, http_res)
-        if utils.match_response(http_res, "4XX", "*"):
-            http_res_text = utils.stream_to_text(http_res)
-            raise errors.SDKError("API error occurred", http_res, http_res_text)
-        if utils.match_response(http_res, "5XX", "*"):
-            http_res_text = utils.stream_to_text(http_res)
-            raise errors.SDKError("API error occurred", http_res, http_res_text)
-
-        raise errors.SDKError("Unexpected response received", http_res)
-
-    async def get_values_async(
-        self,
-        *,
-        request: Union[models.GetValuesRequest, models.GetValuesRequestTypedDict],
-        retries: OptionalNullable[utils.RetryConfig] = UNSET,
-        server_url: Optional[str] = None,
-        timeout_ms: Optional[int] = None,
-        http_headers: Optional[Mapping[str, str]] = None,
-    ) -> Optional[models.GetValuesResponse]:
-        r"""Retrieve a list of metric values
-
-        Returns a paginated list of [metric Values](ref:sustainability#metricvalue)
-
-        :param request: The request object to send.
-        :param retries: Override the default retry configuration for this method
-        :param server_url: Override the default server URL for this method
-        :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
-        :param http_headers: Additional headers to set or replace on requests.
-        """
-        base_url = None
-        url_variables = None
-        if timeout_ms is None:
-            timeout_ms = self.sdk_configuration.timeout_ms
-
-        if server_url is not None:
-            base_url = server_url
-        else:
-            base_url = self._get_url(base_url, url_variables)
-
-        if not isinstance(request, BaseModel):
-            request = utils.unmarshal(request, models.GetValuesRequest)
-        request = cast(models.GetValuesRequest, request)
-
-        req = self._build_request_async(
-            method="GET",
-            path="/programs/{programId}/metrics/{metricId}/values",
-            base_url=base_url,
-            url_variables=url_variables,
-            request=request,
-            request_body_required=False,
-            request_has_path_params=True,
-            request_has_query_params=True,
-            user_agent_header="user-agent",
-            accept_header_value="application/json",
-            http_headers=http_headers,
-            security=self.sdk_configuration.security,
-            allow_empty_value=None,
-            timeout_ms=timeout_ms,
-        )
-
-        if retries == UNSET:
-            if self.sdk_configuration.retry_config is not UNSET:
-                retries = self.sdk_configuration.retry_config
-
-        retry_config = None
-        if isinstance(retries, utils.RetryConfig):
-            retry_config = (retries, ["429", "500", "502", "503", "504"])
-
-        http_res = await self.do_request_async(
-            hook_ctx=HookContext(
-                config=self.sdk_configuration,
-                base_url=base_url or "",
-                operation_id="getValues",
-                oauth2_scopes=["file:read"],
-                security_source=self.sdk_configuration.security,
-            ),
-            request=req,
-            error_status_codes=[
-                "400",
-                "401",
-                "403",
-                "404",
-                "409",
-                "429",
-                "4XX",
-                "500",
-                "503",
-                "5XX",
-            ],
-            retry_config=retry_config,
-        )
-
-        def next_func() -> Awaitable[Optional[models.GetValuesResponse]]:
-            body = utils.unmarshal_json(http_res.text, Union[Dict[Any, Any], List[Any]])
-
-            async def empty_result():
-                return None
-
-            next_cursor = JSONPath("$['@nextLink']").parse(body)
-
-            if len(next_cursor) == 0:
-                return empty_result()
-
-            next_cursor = next_cursor[0]
-            if next_cursor is None or str(next_cursor).strip() == "":
-                return empty_result()
-
-            return self.get_values_async(
-                request=models.GetValuesRequest(
-                    metric_id=request.metric_id,
-                    program_id=request.program_id,
-                    dollar_filter=request.dollar_filter,
-                    dollar_maxpagesize=request.dollar_maxpagesize,
-                    dollar_next=next_cursor,
-                    dollar_order_by=request.dollar_order_by,
-                ),
-                retries=retries,
-            )
-
-        response_data: Any = None
-        if utils.match_response(http_res, "200", "application/json"):
-            return models.GetValuesResponse(
-                result=unmarshal_json_response(models.MetricValuesListResult, http_res),
-                next=next_func,
-            )
-        if utils.match_response(
-            http_res, ["400", "401", "403", "404", "409", "429"], "application/json"
-        ):
-            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
-            raise errors.ErrorResponse(response_data, http_res)
-        if utils.match_response(http_res, ["500", "503"], "application/json"):
-            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
-            raise errors.ErrorResponse(response_data, http_res)
-        if utils.match_response(http_res, "4XX", "*"):
-            http_res_text = await utils.stream_to_text_async(http_res)
-            raise errors.SDKError("API error occurred", http_res, http_res_text)
-        if utils.match_response(http_res, "5XX", "*"):
-            http_res_text = await utils.stream_to_text_async(http_res)
-            raise errors.SDKError("API error occurred", http_res, http_res_text)
-
-        raise errors.SDKError("Unexpected response received", http_res)
-
-    def partially_update_dimension_by_id(
-        self,
-        *,
-        dimension_id: str,
-        program_id: str,
-        request_body: Union[
-            List[models.JSONPatchOperation], List[models.JSONPatchOperationTypedDict]
-        ],
-        retries: OptionalNullable[utils.RetryConfig] = UNSET,
-        server_url: Optional[str] = None,
-        timeout_ms: Optional[int] = None,
-        http_headers: Optional[Mapping[str, str]] = None,
-    ) -> models.Dimension:
-        r"""Partially update a single dimension
-
-        Partially updates the properties of a [dimension](ref:sustainability#dimension). Only one property may be updated at a time.
-        ### Options
-        |Path|PATCH Operations Supported|
-        |---|---|
-        |`/active`|`replace`, `test`|
-        |`/name`|`replace`, `test`|
-        |`/values`|`replace`, `test`|
-
-
-        :param dimension_id: The unique identifier of the dimension
-        :param program_id: The unique identifier of the program
-        :param request_body: A collection of patch operations to apply to the [dimension](ref:sustainability#dimension). Currently only one operation may be applied at a time.
-        :param retries: Override the default retry configuration for this method
-        :param server_url: Override the default server URL for this method
-        :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
-        :param http_headers: Additional headers to set or replace on requests.
-        """
-        base_url = None
-        url_variables = None
-        if timeout_ms is None:
-            timeout_ms = self.sdk_configuration.timeout_ms
-
-        if server_url is not None:
-            base_url = server_url
-        else:
-            base_url = self._get_url(base_url, url_variables)
-
-        request = models.PartiallyUpdateDimensionByIDRequest(
-            dimension_id=dimension_id,
-            program_id=program_id,
-            request_body=utils.get_pydantic_model(
-                request_body, List[models.JSONPatchOperation]
-            ),
-        )
-
-        req = self._build_request(
-            method="PATCH",
-            path="/programs/{programId}/dimensions/{dimensionId}",
-            base_url=base_url,
-            url_variables=url_variables,
-            request=request,
-            request_body_required=True,
-            request_has_path_params=True,
-            request_has_query_params=True,
-            user_agent_header="user-agent",
-            accept_header_value="application/json",
-            http_headers=http_headers,
-            security=self.sdk_configuration.security,
-            get_serialized_body=lambda: utils.serialize_request_body(
-                request.request_body,
-                False,
-                False,
-                "json",
-                List[models.JSONPatchOperation],
-            ),
-            allow_empty_value=None,
-            timeout_ms=timeout_ms,
-        )
-
-        if retries == UNSET:
-            if self.sdk_configuration.retry_config is not UNSET:
-                retries = self.sdk_configuration.retry_config
-
-        retry_config = None
-        if isinstance(retries, utils.RetryConfig):
-            retry_config = (retries, ["429", "500", "502", "503", "504"])
-
-        http_res = self.do_request(
-            hook_ctx=HookContext(
-                config=self.sdk_configuration,
-                base_url=base_url or "",
-                operation_id="partiallyUpdateDimensionById",
-                oauth2_scopes=["file:write"],
-                security_source=self.sdk_configuration.security,
-            ),
-            request=req,
-            error_status_codes=[
-                "400",
-                "401",
-                "403",
-                "404",
-                "409",
-                "429",
-                "4XX",
-                "500",
-                "503",
-                "5XX",
-            ],
-            retry_config=retry_config,
-        )
-
-        response_data: Any = None
-        if utils.match_response(http_res, "200", "application/json"):
-            return unmarshal_json_response(models.Dimension, http_res)
-        if utils.match_response(
-            http_res, ["400", "401", "403", "404", "409", "429"], "application/json"
-        ):
-            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
-            raise errors.ErrorResponse(response_data, http_res)
-        if utils.match_response(http_res, ["500", "503"], "application/json"):
-            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
-            raise errors.ErrorResponse(response_data, http_res)
-        if utils.match_response(http_res, "4XX", "*"):
-            http_res_text = utils.stream_to_text(http_res)
-            raise errors.SDKError("API error occurred", http_res, http_res_text)
-        if utils.match_response(http_res, "5XX", "*"):
-            http_res_text = utils.stream_to_text(http_res)
-            raise errors.SDKError("API error occurred", http_res, http_res_text)
-
-        raise errors.SDKError("Unexpected response received", http_res)
-
-    async def partially_update_dimension_by_id_async(
-        self,
-        *,
-        dimension_id: str,
-        program_id: str,
-        request_body: Union[
-            List[models.JSONPatchOperation], List[models.JSONPatchOperationTypedDict]
-        ],
-        retries: OptionalNullable[utils.RetryConfig] = UNSET,
-        server_url: Optional[str] = None,
-        timeout_ms: Optional[int] = None,
-        http_headers: Optional[Mapping[str, str]] = None,
-    ) -> models.Dimension:
-        r"""Partially update a single dimension
-
-        Partially updates the properties of a [dimension](ref:sustainability#dimension). Only one property may be updated at a time.
-        ### Options
-        |Path|PATCH Operations Supported|
-        |---|---|
-        |`/active`|`replace`, `test`|
-        |`/name`|`replace`, `test`|
-        |`/values`|`replace`, `test`|
-
-
-        :param dimension_id: The unique identifier of the dimension
-        :param program_id: The unique identifier of the program
-        :param request_body: A collection of patch operations to apply to the [dimension](ref:sustainability#dimension). Currently only one operation may be applied at a time.
-        :param retries: Override the default retry configuration for this method
-        :param server_url: Override the default server URL for this method
-        :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
-        :param http_headers: Additional headers to set or replace on requests.
-        """
-        base_url = None
-        url_variables = None
-        if timeout_ms is None:
-            timeout_ms = self.sdk_configuration.timeout_ms
-
-        if server_url is not None:
-            base_url = server_url
-        else:
-            base_url = self._get_url(base_url, url_variables)
-
-        request = models.PartiallyUpdateDimensionByIDRequest(
-            dimension_id=dimension_id,
-            program_id=program_id,
-            request_body=utils.get_pydantic_model(
-                request_body, List[models.JSONPatchOperation]
-            ),
-        )
-
-        req = self._build_request_async(
-            method="PATCH",
-            path="/programs/{programId}/dimensions/{dimensionId}",
-            base_url=base_url,
-            url_variables=url_variables,
-            request=request,
-            request_body_required=True,
-            request_has_path_params=True,
-            request_has_query_params=True,
-            user_agent_header="user-agent",
-            accept_header_value="application/json",
-            http_headers=http_headers,
-            security=self.sdk_configuration.security,
-            get_serialized_body=lambda: utils.serialize_request_body(
-                request.request_body,
-                False,
-                False,
-                "json",
-                List[models.JSONPatchOperation],
-            ),
-            allow_empty_value=None,
-            timeout_ms=timeout_ms,
-        )
-
-        if retries == UNSET:
-            if self.sdk_configuration.retry_config is not UNSET:
-                retries = self.sdk_configuration.retry_config
-
-        retry_config = None
-        if isinstance(retries, utils.RetryConfig):
-            retry_config = (retries, ["429", "500", "502", "503", "504"])
-
-        http_res = await self.do_request_async(
-            hook_ctx=HookContext(
-                config=self.sdk_configuration,
-                base_url=base_url or "",
-                operation_id="partiallyUpdateDimensionById",
-                oauth2_scopes=["file:write"],
-                security_source=self.sdk_configuration.security,
-            ),
-            request=req,
-            error_status_codes=[
-                "400",
-                "401",
-                "403",
-                "404",
-                "409",
-                "429",
-                "4XX",
-                "500",
-                "503",
-                "5XX",
-            ],
-            retry_config=retry_config,
-        )
-
-        response_data: Any = None
-        if utils.match_response(http_res, "200", "application/json"):
-            return unmarshal_json_response(models.Dimension, http_res)
-        if utils.match_response(
-            http_res, ["400", "401", "403", "404", "409", "429"], "application/json"
-        ):
-            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
-            raise errors.ErrorResponse(response_data, http_res)
-        if utils.match_response(http_res, ["500", "503"], "application/json"):
-            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
-            raise errors.ErrorResponse(response_data, http_res)
-        if utils.match_response(http_res, "4XX", "*"):
-            http_res_text = await utils.stream_to_text_async(http_res)
-            raise errors.SDKError("API error occurred", http_res, http_res_text)
-        if utils.match_response(http_res, "5XX", "*"):
-            http_res_text = await utils.stream_to_text_async(http_res)
-            raise errors.SDKError("API error occurred", http_res, http_res_text)
-
-        raise errors.SDKError("Unexpected response received", http_res)
-
-    def partially_update_metric_by_id(
-        self,
-        *,
-        metric_id: str,
-        program_id: str,
-        request_body: Union[
-            List[models.JSONPatchOperation], List[models.JSONPatchOperationTypedDict]
-        ],
-        retries: OptionalNullable[utils.RetryConfig] = UNSET,
-        server_url: Optional[str] = None,
-        timeout_ms: Optional[int] = None,
-        http_headers: Optional[Mapping[str, str]] = None,
-    ) -> models.Metric:
-        r"""Partially update a single metric
-
-        Partially updates the properties of a [metric](ref:sustainability#metric). Only one property may be updated at a time.
-        ### Options
-        |Path|PATCH Operations Supported|
-        |---|---|
-        |`/datatype`|`replace`|
-        |`/description`|`replace`, `test`|
-        |`/index`|`replace`, `test`|
-        |`/name`|`replace`, `test`|
-        |`/requireNotes`|`replace`, `test`|
-        |`/requireSupportingAttachments`|`replace`, `test`|
-        |`/topic`|`replace`, `test`|
-        |`/unit`|`replace`, `test`|
-
-
-        :param metric_id: The unique identifier of the metric
-        :param program_id: The unique identifier of the program
-        :param request_body: A collection of patch operations to apply to the [metric](ref:sustainability#metric). Currently only one operation may be applied at a time.
-        :param retries: Override the default retry configuration for this method
-        :param server_url: Override the default server URL for this method
-        :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
-        :param http_headers: Additional headers to set or replace on requests.
-        """
-        base_url = None
-        url_variables = None
-        if timeout_ms is None:
-            timeout_ms = self.sdk_configuration.timeout_ms
-
-        if server_url is not None:
-            base_url = server_url
-        else:
-            base_url = self._get_url(base_url, url_variables)
-
-        request = models.PartiallyUpdateMetricByIDRequest(
-            metric_id=metric_id,
-            program_id=program_id,
-            request_body=utils.get_pydantic_model(
-                request_body, List[models.JSONPatchOperation]
-            ),
-        )
-
-        req = self._build_request(
-            method="PATCH",
-            path="/programs/{programId}/metrics/{metricId}",
-            base_url=base_url,
-            url_variables=url_variables,
-            request=request,
-            request_body_required=True,
-            request_has_path_params=True,
-            request_has_query_params=True,
-            user_agent_header="user-agent",
-            accept_header_value="application/json",
-            http_headers=http_headers,
-            security=self.sdk_configuration.security,
-            get_serialized_body=lambda: utils.serialize_request_body(
-                request.request_body,
-                False,
-                False,
-                "json",
-                List[models.JSONPatchOperation],
-            ),
-            allow_empty_value=None,
-            timeout_ms=timeout_ms,
-        )
-
-        if retries == UNSET:
-            if self.sdk_configuration.retry_config is not UNSET:
-                retries = self.sdk_configuration.retry_config
-
-        retry_config = None
-        if isinstance(retries, utils.RetryConfig):
-            retry_config = (retries, ["429", "500", "502", "503", "504"])
-
-        http_res = self.do_request(
-            hook_ctx=HookContext(
-                config=self.sdk_configuration,
-                base_url=base_url or "",
-                operation_id="partiallyUpdateMetricById",
-                oauth2_scopes=["file:write"],
-                security_source=self.sdk_configuration.security,
-            ),
-            request=req,
-            error_status_codes=[
-                "400",
-                "401",
-                "403",
-                "404",
-                "409",
-                "429",
-                "4XX",
-                "500",
-                "503",
-                "5XX",
-            ],
-            retry_config=retry_config,
-        )
-
-        response_data: Any = None
-        if utils.match_response(http_res, "200", "application/json"):
-            return unmarshal_json_response(models.Metric, http_res)
-        if utils.match_response(
-            http_res, ["400", "401", "403", "404", "409", "429"], "application/json"
-        ):
-            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
-            raise errors.ErrorResponse(response_data, http_res)
-        if utils.match_response(http_res, ["500", "503"], "application/json"):
-            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
-            raise errors.ErrorResponse(response_data, http_res)
-        if utils.match_response(http_res, "4XX", "*"):
-            http_res_text = utils.stream_to_text(http_res)
-            raise errors.SDKError("API error occurred", http_res, http_res_text)
-        if utils.match_response(http_res, "5XX", "*"):
-            http_res_text = utils.stream_to_text(http_res)
-            raise errors.SDKError("API error occurred", http_res, http_res_text)
-
-        raise errors.SDKError("Unexpected response received", http_res)
-
-    async def partially_update_metric_by_id_async(
-        self,
-        *,
-        metric_id: str,
-        program_id: str,
-        request_body: Union[
-            List[models.JSONPatchOperation], List[models.JSONPatchOperationTypedDict]
-        ],
-        retries: OptionalNullable[utils.RetryConfig] = UNSET,
-        server_url: Optional[str] = None,
-        timeout_ms: Optional[int] = None,
-        http_headers: Optional[Mapping[str, str]] = None,
-    ) -> models.Metric:
-        r"""Partially update a single metric
-
-        Partially updates the properties of a [metric](ref:sustainability#metric). Only one property may be updated at a time.
-        ### Options
-        |Path|PATCH Operations Supported|
-        |---|---|
-        |`/datatype`|`replace`|
-        |`/description`|`replace`, `test`|
-        |`/index`|`replace`, `test`|
-        |`/name`|`replace`, `test`|
-        |`/requireNotes`|`replace`, `test`|
-        |`/requireSupportingAttachments`|`replace`, `test`|
-        |`/topic`|`replace`, `test`|
-        |`/unit`|`replace`, `test`|
-
-
-        :param metric_id: The unique identifier of the metric
-        :param program_id: The unique identifier of the program
-        :param request_body: A collection of patch operations to apply to the [metric](ref:sustainability#metric). Currently only one operation may be applied at a time.
-        :param retries: Override the default retry configuration for this method
-        :param server_url: Override the default server URL for this method
-        :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
-        :param http_headers: Additional headers to set or replace on requests.
-        """
-        base_url = None
-        url_variables = None
-        if timeout_ms is None:
-            timeout_ms = self.sdk_configuration.timeout_ms
-
-        if server_url is not None:
-            base_url = server_url
-        else:
-            base_url = self._get_url(base_url, url_variables)
-
-        request = models.PartiallyUpdateMetricByIDRequest(
-            metric_id=metric_id,
-            program_id=program_id,
-            request_body=utils.get_pydantic_model(
-                request_body, List[models.JSONPatchOperation]
-            ),
-        )
-
-        req = self._build_request_async(
-            method="PATCH",
-            path="/programs/{programId}/metrics/{metricId}",
-            base_url=base_url,
-            url_variables=url_variables,
-            request=request,
-            request_body_required=True,
-            request_has_path_params=True,
-            request_has_query_params=True,
-            user_agent_header="user-agent",
-            accept_header_value="application/json",
-            http_headers=http_headers,
-            security=self.sdk_configuration.security,
-            get_serialized_body=lambda: utils.serialize_request_body(
-                request.request_body,
-                False,
-                False,
-                "json",
-                List[models.JSONPatchOperation],
-            ),
-            allow_empty_value=None,
-            timeout_ms=timeout_ms,
-        )
-
-        if retries == UNSET:
-            if self.sdk_configuration.retry_config is not UNSET:
-                retries = self.sdk_configuration.retry_config
-
-        retry_config = None
-        if isinstance(retries, utils.RetryConfig):
-            retry_config = (retries, ["429", "500", "502", "503", "504"])
-
-        http_res = await self.do_request_async(
-            hook_ctx=HookContext(
-                config=self.sdk_configuration,
-                base_url=base_url or "",
-                operation_id="partiallyUpdateMetricById",
-                oauth2_scopes=["file:write"],
-                security_source=self.sdk_configuration.security,
-            ),
-            request=req,
-            error_status_codes=[
-                "400",
-                "401",
-                "403",
-                "404",
-                "409",
-                "429",
-                "4XX",
-                "500",
-                "503",
-                "5XX",
-            ],
-            retry_config=retry_config,
-        )
-
-        response_data: Any = None
-        if utils.match_response(http_res, "200", "application/json"):
-            return unmarshal_json_response(models.Metric, http_res)
-        if utils.match_response(
-            http_res, ["400", "401", "403", "404", "409", "429"], "application/json"
-        ):
-            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
-            raise errors.ErrorResponse(response_data, http_res)
-        if utils.match_response(http_res, ["500", "503"], "application/json"):
-            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
-            raise errors.ErrorResponse(response_data, http_res)
-        if utils.match_response(http_res, "4XX", "*"):
-            http_res_text = await utils.stream_to_text_async(http_res)
-            raise errors.SDKError("API error occurred", http_res, http_res_text)
-        if utils.match_response(http_res, "5XX", "*"):
-            http_res_text = await utils.stream_to_text_async(http_res)
-            raise errors.SDKError("API error occurred", http_res, http_res_text)
-
-        raise errors.SDKError("Unexpected response received", http_res)
-
-    def partially_update_metric_value_by_id(
-        self,
-        *,
-        metric_id: str,
-        metric_value_id: str,
-        program_id: str,
-        request_body: Union[
-            List[models.JSONPatchOperation], List[models.JSONPatchOperationTypedDict]
-        ],
-        retries: OptionalNullable[utils.RetryConfig] = UNSET,
-        server_url: Optional[str] = None,
-        timeout_ms: Optional[int] = None,
-        http_headers: Optional[Mapping[str, str]] = None,
-    ) -> models.MetricValueOutput:
-        r"""Partially update a single metric value
-
-        Partially updates the properties of a [metric value](ref:sustainability#metricvalue) value. Only one property may be updated at a time.
-        ### Options
-        |Path|PATCH Operations Supported|
-        |---|---|
-        |`/notes`|`replace`, `test`|
-        |`/value`|`replace`, `test`|
-
-
-        :param metric_id: The unique identifier of the metric
-        :param metric_value_id: The unique identifier of the value
-        :param program_id: The unique identifier of the program
-        :param request_body: A collection of patch operations to apply to the metric value. Currently only one operation may be applied at a time.
-        :param retries: Override the default retry configuration for this method
-        :param server_url: Override the default server URL for this method
-        :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
-        :param http_headers: Additional headers to set or replace on requests.
-        """
-        base_url = None
-        url_variables = None
-        if timeout_ms is None:
-            timeout_ms = self.sdk_configuration.timeout_ms
-
-        if server_url is not None:
-            base_url = server_url
-        else:
-            base_url = self._get_url(base_url, url_variables)
-
-        request = models.PartiallyUpdateMetricValueByIDRequest(
-            metric_id=metric_id,
-            metric_value_id=metric_value_id,
-            program_id=program_id,
-            request_body=utils.get_pydantic_model(
-                request_body, List[models.JSONPatchOperation]
-            ),
-        )
-
-        req = self._build_request(
-            method="PATCH",
-            path="/programs/{programId}/metrics/{metricId}/values/{metricValueId}",
-            base_url=base_url,
-            url_variables=url_variables,
-            request=request,
-            request_body_required=True,
-            request_has_path_params=True,
-            request_has_query_params=True,
-            user_agent_header="user-agent",
-            accept_header_value="application/json",
-            http_headers=http_headers,
-            security=self.sdk_configuration.security,
-            get_serialized_body=lambda: utils.serialize_request_body(
-                request.request_body,
-                False,
-                False,
-                "json",
-                List[models.JSONPatchOperation],
-            ),
-            allow_empty_value=None,
-            timeout_ms=timeout_ms,
-        )
-
-        if retries == UNSET:
-            if self.sdk_configuration.retry_config is not UNSET:
-                retries = self.sdk_configuration.retry_config
-
-        retry_config = None
-        if isinstance(retries, utils.RetryConfig):
-            retry_config = (retries, ["429", "500", "502", "503", "504"])
-
-        http_res = self.do_request(
-            hook_ctx=HookContext(
-                config=self.sdk_configuration,
-                base_url=base_url or "",
-                operation_id="partiallyUpdateMetricValueById",
-                oauth2_scopes=["file:write"],
-                security_source=self.sdk_configuration.security,
-            ),
-            request=req,
-            error_status_codes=[
-                "400",
-                "401",
-                "403",
-                "404",
-                "409",
-                "429",
-                "4XX",
-                "500",
-                "503",
-                "5XX",
-            ],
-            retry_config=retry_config,
-        )
-
-        response_data: Any = None
-        if utils.match_response(http_res, "200", "application/json"):
-            return unmarshal_json_response(models.MetricValueOutput, http_res)
-        if utils.match_response(
-            http_res, ["400", "401", "403", "404", "409", "429"], "application/json"
-        ):
-            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
-            raise errors.ErrorResponse(response_data, http_res)
-        if utils.match_response(http_res, ["500", "503"], "application/json"):
-            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
-            raise errors.ErrorResponse(response_data, http_res)
-        if utils.match_response(http_res, "4XX", "*"):
-            http_res_text = utils.stream_to_text(http_res)
-            raise errors.SDKError("API error occurred", http_res, http_res_text)
-        if utils.match_response(http_res, "5XX", "*"):
-            http_res_text = utils.stream_to_text(http_res)
-            raise errors.SDKError("API error occurred", http_res, http_res_text)
-
-        raise errors.SDKError("Unexpected response received", http_res)
-
-    async def partially_update_metric_value_by_id_async(
-        self,
-        *,
-        metric_id: str,
-        metric_value_id: str,
-        program_id: str,
-        request_body: Union[
-            List[models.JSONPatchOperation], List[models.JSONPatchOperationTypedDict]
-        ],
-        retries: OptionalNullable[utils.RetryConfig] = UNSET,
-        server_url: Optional[str] = None,
-        timeout_ms: Optional[int] = None,
-        http_headers: Optional[Mapping[str, str]] = None,
-    ) -> models.MetricValueOutput:
-        r"""Partially update a single metric value
-
-        Partially updates the properties of a [metric value](ref:sustainability#metricvalue) value. Only one property may be updated at a time.
-        ### Options
-        |Path|PATCH Operations Supported|
-        |---|---|
-        |`/notes`|`replace`, `test`|
-        |`/value`|`replace`, `test`|
-
-
-        :param metric_id: The unique identifier of the metric
-        :param metric_value_id: The unique identifier of the value
-        :param program_id: The unique identifier of the program
-        :param request_body: A collection of patch operations to apply to the metric value. Currently only one operation may be applied at a time.
-        :param retries: Override the default retry configuration for this method
-        :param server_url: Override the default server URL for this method
-        :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
-        :param http_headers: Additional headers to set or replace on requests.
-        """
-        base_url = None
-        url_variables = None
-        if timeout_ms is None:
-            timeout_ms = self.sdk_configuration.timeout_ms
-
-        if server_url is not None:
-            base_url = server_url
-        else:
-            base_url = self._get_url(base_url, url_variables)
-
-        request = models.PartiallyUpdateMetricValueByIDRequest(
-            metric_id=metric_id,
-            metric_value_id=metric_value_id,
-            program_id=program_id,
-            request_body=utils.get_pydantic_model(
-                request_body, List[models.JSONPatchOperation]
-            ),
-        )
-
-        req = self._build_request_async(
-            method="PATCH",
-            path="/programs/{programId}/metrics/{metricId}/values/{metricValueId}",
-            base_url=base_url,
-            url_variables=url_variables,
-            request=request,
-            request_body_required=True,
-            request_has_path_params=True,
-            request_has_query_params=True,
-            user_agent_header="user-agent",
-            accept_header_value="application/json",
-            http_headers=http_headers,
-            security=self.sdk_configuration.security,
-            get_serialized_body=lambda: utils.serialize_request_body(
-                request.request_body,
-                False,
-                False,
-                "json",
-                List[models.JSONPatchOperation],
-            ),
-            allow_empty_value=None,
-            timeout_ms=timeout_ms,
-        )
-
-        if retries == UNSET:
-            if self.sdk_configuration.retry_config is not UNSET:
-                retries = self.sdk_configuration.retry_config
-
-        retry_config = None
-        if isinstance(retries, utils.RetryConfig):
-            retry_config = (retries, ["429", "500", "502", "503", "504"])
-
-        http_res = await self.do_request_async(
-            hook_ctx=HookContext(
-                config=self.sdk_configuration,
-                base_url=base_url or "",
-                operation_id="partiallyUpdateMetricValueById",
-                oauth2_scopes=["file:write"],
-                security_source=self.sdk_configuration.security,
-            ),
-            request=req,
-            error_status_codes=[
-                "400",
-                "401",
-                "403",
-                "404",
-                "409",
-                "429",
-                "4XX",
-                "500",
-                "503",
-                "5XX",
-            ],
-            retry_config=retry_config,
-        )
-
-        response_data: Any = None
-        if utils.match_response(http_res, "200", "application/json"):
-            return unmarshal_json_response(models.MetricValueOutput, http_res)
         if utils.match_response(
             http_res, ["400", "401", "403", "404", "409", "429"], "application/json"
         ):
@@ -5908,33 +941,22 @@ class Sustainability(BaseSDK):
 
         raise errors.SDKError("Unexpected response received", http_res)
 
-    def partially_update_topic_by_id(
+    def get_dimensions(
         self,
         *,
-        program_id: str,
-        topic_id: str,
-        request_body: Union[
-            List[models.JSONPatchOperation], List[models.JSONPatchOperationTypedDict]
+        request: Union[
+            models.GetDimensionsRequest, models.GetDimensionsRequestTypedDict
         ],
         retries: OptionalNullable[utils.RetryConfig] = UNSET,
         server_url: Optional[str] = None,
         timeout_ms: Optional[int] = None,
         http_headers: Optional[Mapping[str, str]] = None,
-    ) -> models.Topic:
-        r"""Partially update a single topic
+    ) -> Optional[models.GetDimensionsResponse]:
+        r"""Retrieve a list of dimensions
 
-        Partially updates the properties of a [topic](ref:sustainability#topic). Only one property may be updated at a time.
-        ### Options
-        |Path|PATCH Operations Supported|
-        |---|---|
-        |`/index`|`replace`, `test`|
-        |`/name`|`replace`, `test`|
-        |`/parent`|`replace`, `test`|
+        Returns a paginated list of [dimensions](ref:sustainability#dimension).
 
-
-        :param program_id: The unique identifier of the program
-        :param topic_id: The unique identifier of the topic
-        :param request_body: A collection of patch operations to apply to the [topic](ref:sustainability#topic). Currently only one operation may be applied at a time.
+        :param request: The request object to send.
         :param retries: Override the default retry configuration for this method
         :param server_url: Override the default server URL for this method
         :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
@@ -5950,9 +972,711 @@ class Sustainability(BaseSDK):
         else:
             base_url = self._get_url(base_url, url_variables)
 
-        request = models.PartiallyUpdateTopicByIDRequest(
+        if not isinstance(request, BaseModel):
+            request = utils.unmarshal(request, models.GetDimensionsRequest)
+        request = cast(models.GetDimensionsRequest, request)
+
+        req = self._build_request(
+            method="GET",
+            path="/programs/{programId}/dimensions",
+            base_url=base_url,
+            url_variables=url_variables,
+            request=request,
+            request_body_required=False,
+            request_has_path_params=True,
+            request_has_query_params=True,
+            user_agent_header="user-agent",
+            accept_header_value="application/json",
+            http_headers=http_headers,
+            security=self.sdk_configuration.security,
+            allow_empty_value=None,
+            timeout_ms=timeout_ms,
+        )
+
+        if retries == UNSET:
+            if self.sdk_configuration.retry_config is not UNSET:
+                retries = self.sdk_configuration.retry_config
+
+        retry_config = None
+        if isinstance(retries, utils.RetryConfig):
+            retry_config = (retries, ["429", "500", "502", "503", "504"])
+
+        http_res = self.do_request(
+            hook_ctx=HookContext(
+                config=self.sdk_configuration,
+                base_url=base_url or "",
+                operation_id="getDimensions",
+                oauth2_scopes=["file:read"],
+                security_source=self.sdk_configuration.security,
+            ),
+            request=req,
+            error_status_codes=[
+                "400",
+                "401",
+                "403",
+                "404",
+                "409",
+                "429",
+                "4XX",
+                "500",
+                "503",
+                "5XX",
+            ],
+            retry_config=retry_config,
+        )
+
+        def next_func() -> Optional[models.GetDimensionsResponse]:
+            body = utils.unmarshal_json(http_res.text, Union[Dict[Any, Any], List[Any]])
+
+            next_cursor = JSONPath("$['@nextLink']").parse(body)
+
+            if len(next_cursor) == 0:
+                return None
+
+            next_cursor = next_cursor[0]
+            if next_cursor is None or str(next_cursor).strip() == "":
+                return None
+
+            return self.get_dimensions(
+                request=models.GetDimensionsRequest(
+                    program_id=request.program_id,
+                    dollar_maxpagesize=request.dollar_maxpagesize,
+                    dollar_next=next_cursor,
+                    dollar_filter=request.dollar_filter,
+                    dollar_order_by=request.dollar_order_by,
+                ),
+                retries=retries,
+            )
+
+        response_data: Any = None
+        if utils.match_response(http_res, "200", "application/json"):
+            return models.GetDimensionsResponse(
+                result=unmarshal_json_response(models.DimensionsListResult, http_res),
+                next=next_func,
+            )
+        if utils.match_response(
+            http_res, ["400", "401", "403", "404", "409", "429"], "application/json"
+        ):
+            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
+            raise errors.ErrorResponse(response_data, http_res)
+        if utils.match_response(http_res, ["500", "503"], "application/json"):
+            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
+            raise errors.ErrorResponse(response_data, http_res)
+        if utils.match_response(http_res, "4XX", "*"):
+            http_res_text = utils.stream_to_text(http_res)
+            raise errors.SDKError("API error occurred", http_res, http_res_text)
+        if utils.match_response(http_res, "5XX", "*"):
+            http_res_text = utils.stream_to_text(http_res)
+            raise errors.SDKError("API error occurred", http_res, http_res_text)
+
+        raise errors.SDKError("Unexpected response received", http_res)
+
+    async def get_dimensions_async(
+        self,
+        *,
+        request: Union[
+            models.GetDimensionsRequest, models.GetDimensionsRequestTypedDict
+        ],
+        retries: OptionalNullable[utils.RetryConfig] = UNSET,
+        server_url: Optional[str] = None,
+        timeout_ms: Optional[int] = None,
+        http_headers: Optional[Mapping[str, str]] = None,
+    ) -> Optional[models.GetDimensionsResponse]:
+        r"""Retrieve a list of dimensions
+
+        Returns a paginated list of [dimensions](ref:sustainability#dimension).
+
+        :param request: The request object to send.
+        :param retries: Override the default retry configuration for this method
+        :param server_url: Override the default server URL for this method
+        :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
+        :param http_headers: Additional headers to set or replace on requests.
+        """
+        base_url = None
+        url_variables = None
+        if timeout_ms is None:
+            timeout_ms = self.sdk_configuration.timeout_ms
+
+        if server_url is not None:
+            base_url = server_url
+        else:
+            base_url = self._get_url(base_url, url_variables)
+
+        if not isinstance(request, BaseModel):
+            request = utils.unmarshal(request, models.GetDimensionsRequest)
+        request = cast(models.GetDimensionsRequest, request)
+
+        req = self._build_request_async(
+            method="GET",
+            path="/programs/{programId}/dimensions",
+            base_url=base_url,
+            url_variables=url_variables,
+            request=request,
+            request_body_required=False,
+            request_has_path_params=True,
+            request_has_query_params=True,
+            user_agent_header="user-agent",
+            accept_header_value="application/json",
+            http_headers=http_headers,
+            security=self.sdk_configuration.security,
+            allow_empty_value=None,
+            timeout_ms=timeout_ms,
+        )
+
+        if retries == UNSET:
+            if self.sdk_configuration.retry_config is not UNSET:
+                retries = self.sdk_configuration.retry_config
+
+        retry_config = None
+        if isinstance(retries, utils.RetryConfig):
+            retry_config = (retries, ["429", "500", "502", "503", "504"])
+
+        http_res = await self.do_request_async(
+            hook_ctx=HookContext(
+                config=self.sdk_configuration,
+                base_url=base_url or "",
+                operation_id="getDimensions",
+                oauth2_scopes=["file:read"],
+                security_source=self.sdk_configuration.security,
+            ),
+            request=req,
+            error_status_codes=[
+                "400",
+                "401",
+                "403",
+                "404",
+                "409",
+                "429",
+                "4XX",
+                "500",
+                "503",
+                "5XX",
+            ],
+            retry_config=retry_config,
+        )
+
+        def next_func() -> Awaitable[Optional[models.GetDimensionsResponse]]:
+            body = utils.unmarshal_json(http_res.text, Union[Dict[Any, Any], List[Any]])
+
+            async def empty_result():
+                return None
+
+            next_cursor = JSONPath("$['@nextLink']").parse(body)
+
+            if len(next_cursor) == 0:
+                return empty_result()
+
+            next_cursor = next_cursor[0]
+            if next_cursor is None or str(next_cursor).strip() == "":
+                return empty_result()
+
+            return self.get_dimensions_async(
+                request=models.GetDimensionsRequest(
+                    program_id=request.program_id,
+                    dollar_maxpagesize=request.dollar_maxpagesize,
+                    dollar_next=next_cursor,
+                    dollar_filter=request.dollar_filter,
+                    dollar_order_by=request.dollar_order_by,
+                ),
+                retries=retries,
+            )
+
+        response_data: Any = None
+        if utils.match_response(http_res, "200", "application/json"):
+            return models.GetDimensionsResponse(
+                result=unmarshal_json_response(models.DimensionsListResult, http_res),
+                next=next_func,
+            )
+        if utils.match_response(
+            http_res, ["400", "401", "403", "404", "409", "429"], "application/json"
+        ):
+            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
+            raise errors.ErrorResponse(response_data, http_res)
+        if utils.match_response(http_res, ["500", "503"], "application/json"):
+            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
+            raise errors.ErrorResponse(response_data, http_res)
+        if utils.match_response(http_res, "4XX", "*"):
+            http_res_text = await utils.stream_to_text_async(http_res)
+            raise errors.SDKError("API error occurred", http_res, http_res_text)
+        if utils.match_response(http_res, "5XX", "*"):
+            http_res_text = await utils.stream_to_text_async(http_res)
+            raise errors.SDKError("API error occurred", http_res, http_res_text)
+
+        raise errors.SDKError("Unexpected response received", http_res)
+
+    def create_dimension(
+        self,
+        *,
+        program_id: str,
+        dimension: Union[models.DimensionInput, models.DimensionInputTypedDict],
+        retries: OptionalNullable[utils.RetryConfig] = UNSET,
+        server_url: Optional[str] = None,
+        timeout_ms: Optional[int] = None,
+        http_headers: Optional[Mapping[str, str]] = None,
+    ) -> models.Dimension:
+        r"""Create a new dimension
+
+        Creates a new [dimension](ref:sustainability#dimension).
+
+
+        :param program_id: The unique identifier of the program
+        :param dimension: The properties of the dimension to create
+        :param retries: Override the default retry configuration for this method
+        :param server_url: Override the default server URL for this method
+        :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
+        :param http_headers: Additional headers to set or replace on requests.
+        """
+        base_url = None
+        url_variables = None
+        if timeout_ms is None:
+            timeout_ms = self.sdk_configuration.timeout_ms
+
+        if server_url is not None:
+            base_url = server_url
+        else:
+            base_url = self._get_url(base_url, url_variables)
+
+        request = models.CreateDimensionRequest(
             program_id=program_id,
-            topic_id=topic_id,
+            dimension=utils.get_pydantic_model(dimension, models.DimensionInput),
+        )
+
+        req = self._build_request(
+            method="POST",
+            path="/programs/{programId}/dimensions",
+            base_url=base_url,
+            url_variables=url_variables,
+            request=request,
+            request_body_required=True,
+            request_has_path_params=True,
+            request_has_query_params=True,
+            user_agent_header="user-agent",
+            accept_header_value="application/json",
+            http_headers=http_headers,
+            security=self.sdk_configuration.security,
+            get_serialized_body=lambda: utils.serialize_request_body(
+                request.dimension, False, False, "json", models.DimensionInput
+            ),
+            allow_empty_value=None,
+            timeout_ms=timeout_ms,
+        )
+
+        if retries == UNSET:
+            if self.sdk_configuration.retry_config is not UNSET:
+                retries = self.sdk_configuration.retry_config
+
+        retry_config = None
+        if isinstance(retries, utils.RetryConfig):
+            retry_config = (retries, ["429", "500", "502", "503", "504"])
+
+        http_res = self.do_request(
+            hook_ctx=HookContext(
+                config=self.sdk_configuration,
+                base_url=base_url or "",
+                operation_id="createDimension",
+                oauth2_scopes=["file:write"],
+                security_source=self.sdk_configuration.security,
+            ),
+            request=req,
+            error_status_codes=[
+                "400",
+                "401",
+                "403",
+                "404",
+                "409",
+                "429",
+                "4XX",
+                "500",
+                "503",
+                "5XX",
+            ],
+            retry_config=retry_config,
+        )
+
+        response_data: Any = None
+        if utils.match_response(http_res, "201", "application/json"):
+            return unmarshal_json_response(models.Dimension, http_res)
+        if utils.match_response(
+            http_res, ["400", "401", "403", "404", "409", "429"], "application/json"
+        ):
+            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
+            raise errors.ErrorResponse(response_data, http_res)
+        if utils.match_response(http_res, ["500", "503"], "application/json"):
+            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
+            raise errors.ErrorResponse(response_data, http_res)
+        if utils.match_response(http_res, "4XX", "*"):
+            http_res_text = utils.stream_to_text(http_res)
+            raise errors.SDKError("API error occurred", http_res, http_res_text)
+        if utils.match_response(http_res, "5XX", "*"):
+            http_res_text = utils.stream_to_text(http_res)
+            raise errors.SDKError("API error occurred", http_res, http_res_text)
+
+        raise errors.SDKError("Unexpected response received", http_res)
+
+    async def create_dimension_async(
+        self,
+        *,
+        program_id: str,
+        dimension: Union[models.DimensionInput, models.DimensionInputTypedDict],
+        retries: OptionalNullable[utils.RetryConfig] = UNSET,
+        server_url: Optional[str] = None,
+        timeout_ms: Optional[int] = None,
+        http_headers: Optional[Mapping[str, str]] = None,
+    ) -> models.Dimension:
+        r"""Create a new dimension
+
+        Creates a new [dimension](ref:sustainability#dimension).
+
+
+        :param program_id: The unique identifier of the program
+        :param dimension: The properties of the dimension to create
+        :param retries: Override the default retry configuration for this method
+        :param server_url: Override the default server URL for this method
+        :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
+        :param http_headers: Additional headers to set or replace on requests.
+        """
+        base_url = None
+        url_variables = None
+        if timeout_ms is None:
+            timeout_ms = self.sdk_configuration.timeout_ms
+
+        if server_url is not None:
+            base_url = server_url
+        else:
+            base_url = self._get_url(base_url, url_variables)
+
+        request = models.CreateDimensionRequest(
+            program_id=program_id,
+            dimension=utils.get_pydantic_model(dimension, models.DimensionInput),
+        )
+
+        req = self._build_request_async(
+            method="POST",
+            path="/programs/{programId}/dimensions",
+            base_url=base_url,
+            url_variables=url_variables,
+            request=request,
+            request_body_required=True,
+            request_has_path_params=True,
+            request_has_query_params=True,
+            user_agent_header="user-agent",
+            accept_header_value="application/json",
+            http_headers=http_headers,
+            security=self.sdk_configuration.security,
+            get_serialized_body=lambda: utils.serialize_request_body(
+                request.dimension, False, False, "json", models.DimensionInput
+            ),
+            allow_empty_value=None,
+            timeout_ms=timeout_ms,
+        )
+
+        if retries == UNSET:
+            if self.sdk_configuration.retry_config is not UNSET:
+                retries = self.sdk_configuration.retry_config
+
+        retry_config = None
+        if isinstance(retries, utils.RetryConfig):
+            retry_config = (retries, ["429", "500", "502", "503", "504"])
+
+        http_res = await self.do_request_async(
+            hook_ctx=HookContext(
+                config=self.sdk_configuration,
+                base_url=base_url or "",
+                operation_id="createDimension",
+                oauth2_scopes=["file:write"],
+                security_source=self.sdk_configuration.security,
+            ),
+            request=req,
+            error_status_codes=[
+                "400",
+                "401",
+                "403",
+                "404",
+                "409",
+                "429",
+                "4XX",
+                "500",
+                "503",
+                "5XX",
+            ],
+            retry_config=retry_config,
+        )
+
+        response_data: Any = None
+        if utils.match_response(http_res, "201", "application/json"):
+            return unmarshal_json_response(models.Dimension, http_res)
+        if utils.match_response(
+            http_res, ["400", "401", "403", "404", "409", "429"], "application/json"
+        ):
+            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
+            raise errors.ErrorResponse(response_data, http_res)
+        if utils.match_response(http_res, ["500", "503"], "application/json"):
+            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
+            raise errors.ErrorResponse(response_data, http_res)
+        if utils.match_response(http_res, "4XX", "*"):
+            http_res_text = await utils.stream_to_text_async(http_res)
+            raise errors.SDKError("API error occurred", http_res, http_res_text)
+        if utils.match_response(http_res, "5XX", "*"):
+            http_res_text = await utils.stream_to_text_async(http_res)
+            raise errors.SDKError("API error occurred", http_res, http_res_text)
+
+        raise errors.SDKError("Unexpected response received", http_res)
+
+    def get_dimension_by_id(
+        self,
+        *,
+        program_id: str,
+        dimension_id: str,
+        retries: OptionalNullable[utils.RetryConfig] = UNSET,
+        server_url: Optional[str] = None,
+        timeout_ms: Optional[int] = None,
+        http_headers: Optional[Mapping[str, str]] = None,
+    ) -> models.Dimension:
+        r"""Retrieve a single dimension
+
+        Retrieves a [dimension](ref:sustainability#dimension) given its ID
+
+        :param program_id: The unique identifier of the program
+        :param dimension_id: The unique identifier of the dimension
+        :param retries: Override the default retry configuration for this method
+        :param server_url: Override the default server URL for this method
+        :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
+        :param http_headers: Additional headers to set or replace on requests.
+        """
+        base_url = None
+        url_variables = None
+        if timeout_ms is None:
+            timeout_ms = self.sdk_configuration.timeout_ms
+
+        if server_url is not None:
+            base_url = server_url
+        else:
+            base_url = self._get_url(base_url, url_variables)
+
+        request = models.GetDimensionByIDRequest(
+            program_id=program_id,
+            dimension_id=dimension_id,
+        )
+
+        req = self._build_request(
+            method="GET",
+            path="/programs/{programId}/dimensions/{dimensionId}",
+            base_url=base_url,
+            url_variables=url_variables,
+            request=request,
+            request_body_required=False,
+            request_has_path_params=True,
+            request_has_query_params=True,
+            user_agent_header="user-agent",
+            accept_header_value="application/json",
+            http_headers=http_headers,
+            security=self.sdk_configuration.security,
+            allow_empty_value=None,
+            timeout_ms=timeout_ms,
+        )
+
+        if retries == UNSET:
+            if self.sdk_configuration.retry_config is not UNSET:
+                retries = self.sdk_configuration.retry_config
+
+        retry_config = None
+        if isinstance(retries, utils.RetryConfig):
+            retry_config = (retries, ["429", "500", "502", "503", "504"])
+
+        http_res = self.do_request(
+            hook_ctx=HookContext(
+                config=self.sdk_configuration,
+                base_url=base_url or "",
+                operation_id="getDimensionById",
+                oauth2_scopes=["file:read"],
+                security_source=self.sdk_configuration.security,
+            ),
+            request=req,
+            error_status_codes=[
+                "400",
+                "401",
+                "403",
+                "404",
+                "409",
+                "429",
+                "4XX",
+                "500",
+                "503",
+                "5XX",
+            ],
+            retry_config=retry_config,
+        )
+
+        response_data: Any = None
+        if utils.match_response(http_res, "200", "application/json"):
+            return unmarshal_json_response(models.Dimension, http_res)
+        if utils.match_response(
+            http_res, ["400", "401", "403", "404", "409", "429"], "application/json"
+        ):
+            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
+            raise errors.ErrorResponse(response_data, http_res)
+        if utils.match_response(http_res, ["500", "503"], "application/json"):
+            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
+            raise errors.ErrorResponse(response_data, http_res)
+        if utils.match_response(http_res, "4XX", "*"):
+            http_res_text = utils.stream_to_text(http_res)
+            raise errors.SDKError("API error occurred", http_res, http_res_text)
+        if utils.match_response(http_res, "5XX", "*"):
+            http_res_text = utils.stream_to_text(http_res)
+            raise errors.SDKError("API error occurred", http_res, http_res_text)
+
+        raise errors.SDKError("Unexpected response received", http_res)
+
+    async def get_dimension_by_id_async(
+        self,
+        *,
+        program_id: str,
+        dimension_id: str,
+        retries: OptionalNullable[utils.RetryConfig] = UNSET,
+        server_url: Optional[str] = None,
+        timeout_ms: Optional[int] = None,
+        http_headers: Optional[Mapping[str, str]] = None,
+    ) -> models.Dimension:
+        r"""Retrieve a single dimension
+
+        Retrieves a [dimension](ref:sustainability#dimension) given its ID
+
+        :param program_id: The unique identifier of the program
+        :param dimension_id: The unique identifier of the dimension
+        :param retries: Override the default retry configuration for this method
+        :param server_url: Override the default server URL for this method
+        :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
+        :param http_headers: Additional headers to set or replace on requests.
+        """
+        base_url = None
+        url_variables = None
+        if timeout_ms is None:
+            timeout_ms = self.sdk_configuration.timeout_ms
+
+        if server_url is not None:
+            base_url = server_url
+        else:
+            base_url = self._get_url(base_url, url_variables)
+
+        request = models.GetDimensionByIDRequest(
+            program_id=program_id,
+            dimension_id=dimension_id,
+        )
+
+        req = self._build_request_async(
+            method="GET",
+            path="/programs/{programId}/dimensions/{dimensionId}",
+            base_url=base_url,
+            url_variables=url_variables,
+            request=request,
+            request_body_required=False,
+            request_has_path_params=True,
+            request_has_query_params=True,
+            user_agent_header="user-agent",
+            accept_header_value="application/json",
+            http_headers=http_headers,
+            security=self.sdk_configuration.security,
+            allow_empty_value=None,
+            timeout_ms=timeout_ms,
+        )
+
+        if retries == UNSET:
+            if self.sdk_configuration.retry_config is not UNSET:
+                retries = self.sdk_configuration.retry_config
+
+        retry_config = None
+        if isinstance(retries, utils.RetryConfig):
+            retry_config = (retries, ["429", "500", "502", "503", "504"])
+
+        http_res = await self.do_request_async(
+            hook_ctx=HookContext(
+                config=self.sdk_configuration,
+                base_url=base_url or "",
+                operation_id="getDimensionById",
+                oauth2_scopes=["file:read"],
+                security_source=self.sdk_configuration.security,
+            ),
+            request=req,
+            error_status_codes=[
+                "400",
+                "401",
+                "403",
+                "404",
+                "409",
+                "429",
+                "4XX",
+                "500",
+                "503",
+                "5XX",
+            ],
+            retry_config=retry_config,
+        )
+
+        response_data: Any = None
+        if utils.match_response(http_res, "200", "application/json"):
+            return unmarshal_json_response(models.Dimension, http_res)
+        if utils.match_response(
+            http_res, ["400", "401", "403", "404", "409", "429"], "application/json"
+        ):
+            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
+            raise errors.ErrorResponse(response_data, http_res)
+        if utils.match_response(http_res, ["500", "503"], "application/json"):
+            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
+            raise errors.ErrorResponse(response_data, http_res)
+        if utils.match_response(http_res, "4XX", "*"):
+            http_res_text = await utils.stream_to_text_async(http_res)
+            raise errors.SDKError("API error occurred", http_res, http_res_text)
+        if utils.match_response(http_res, "5XX", "*"):
+            http_res_text = await utils.stream_to_text_async(http_res)
+            raise errors.SDKError("API error occurred", http_res, http_res_text)
+
+        raise errors.SDKError("Unexpected response received", http_res)
+
+    def partially_update_dimension_by_id(
+        self,
+        *,
+        program_id: str,
+        dimension_id: str,
+        request_body: Union[
+            List[models.JSONPatchOperation], List[models.JSONPatchOperationTypedDict]
+        ],
+        retries: OptionalNullable[utils.RetryConfig] = UNSET,
+        server_url: Optional[str] = None,
+        timeout_ms: Optional[int] = None,
+        http_headers: Optional[Mapping[str, str]] = None,
+    ) -> models.Dimension:
+        r"""Partially update a single dimension
+
+        Partially updates the properties of a [dimension](ref:sustainability#dimension). Only one property may be updated at a time.
+        ### Options
+        |Path|PATCH Operations Supported|
+        |---|---|
+        |`/active`|`replace`, `test`|
+        |`/name`|`replace`, `test`|
+        |`/values`|`replace`, `test`|
+
+
+        :param program_id: The unique identifier of the program
+        :param dimension_id: The unique identifier of the dimension
+        :param request_body: A collection of patch operations to apply to the [dimension](ref:sustainability#dimension). Currently only one operation may be applied at a time.
+        :param retries: Override the default retry configuration for this method
+        :param server_url: Override the default server URL for this method
+        :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
+        :param http_headers: Additional headers to set or replace on requests.
+        """
+        base_url = None
+        url_variables = None
+        if timeout_ms is None:
+            timeout_ms = self.sdk_configuration.timeout_ms
+
+        if server_url is not None:
+            base_url = server_url
+        else:
+            base_url = self._get_url(base_url, url_variables)
+
+        request = models.PartiallyUpdateDimensionByIDRequest(
+            program_id=program_id,
+            dimension_id=dimension_id,
             request_body=utils.get_pydantic_model(
                 request_body, List[models.JSONPatchOperation]
             ),
@@ -5960,7 +1684,7 @@ class Sustainability(BaseSDK):
 
         req = self._build_request(
             method="PATCH",
-            path="/programs/{programId}/topics/{topicId}",
+            path="/programs/{programId}/dimensions/{dimensionId}",
             base_url=base_url,
             url_variables=url_variables,
             request=request,
@@ -5994,7 +1718,7 @@ class Sustainability(BaseSDK):
             hook_ctx=HookContext(
                 config=self.sdk_configuration,
                 base_url=base_url or "",
-                operation_id="partiallyUpdateTopicById",
+                operation_id="partiallyUpdateDimensionById",
                 oauth2_scopes=["file:write"],
                 security_source=self.sdk_configuration.security,
             ),
@@ -6016,7 +1740,7 @@ class Sustainability(BaseSDK):
 
         response_data: Any = None
         if utils.match_response(http_res, "200", "application/json"):
-            return unmarshal_json_response(models.Topic, http_res)
+            return unmarshal_json_response(models.Dimension, http_res)
         if utils.match_response(
             http_res, ["400", "401", "403", "404", "409", "429"], "application/json"
         ):
@@ -6034,11 +1758,11 @@ class Sustainability(BaseSDK):
 
         raise errors.SDKError("Unexpected response received", http_res)
 
-    async def partially_update_topic_by_id_async(
+    async def partially_update_dimension_by_id_async(
         self,
         *,
         program_id: str,
-        topic_id: str,
+        dimension_id: str,
         request_body: Union[
             List[models.JSONPatchOperation], List[models.JSONPatchOperationTypedDict]
         ],
@@ -6046,21 +1770,21 @@ class Sustainability(BaseSDK):
         server_url: Optional[str] = None,
         timeout_ms: Optional[int] = None,
         http_headers: Optional[Mapping[str, str]] = None,
-    ) -> models.Topic:
-        r"""Partially update a single topic
+    ) -> models.Dimension:
+        r"""Partially update a single dimension
 
-        Partially updates the properties of a [topic](ref:sustainability#topic). Only one property may be updated at a time.
+        Partially updates the properties of a [dimension](ref:sustainability#dimension). Only one property may be updated at a time.
         ### Options
         |Path|PATCH Operations Supported|
         |---|---|
-        |`/index`|`replace`, `test`|
+        |`/active`|`replace`, `test`|
         |`/name`|`replace`, `test`|
-        |`/parent`|`replace`, `test`|
+        |`/values`|`replace`, `test`|
 
 
         :param program_id: The unique identifier of the program
-        :param topic_id: The unique identifier of the topic
-        :param request_body: A collection of patch operations to apply to the [topic](ref:sustainability#topic). Currently only one operation may be applied at a time.
+        :param dimension_id: The unique identifier of the dimension
+        :param request_body: A collection of patch operations to apply to the [dimension](ref:sustainability#dimension). Currently only one operation may be applied at a time.
         :param retries: Override the default retry configuration for this method
         :param server_url: Override the default server URL for this method
         :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
@@ -6076,9 +1800,9 @@ class Sustainability(BaseSDK):
         else:
             base_url = self._get_url(base_url, url_variables)
 
-        request = models.PartiallyUpdateTopicByIDRequest(
+        request = models.PartiallyUpdateDimensionByIDRequest(
             program_id=program_id,
-            topic_id=topic_id,
+            dimension_id=dimension_id,
             request_body=utils.get_pydantic_model(
                 request_body, List[models.JSONPatchOperation]
             ),
@@ -6086,7 +1810,7 @@ class Sustainability(BaseSDK):
 
         req = self._build_request_async(
             method="PATCH",
-            path="/programs/{programId}/topics/{topicId}",
+            path="/programs/{programId}/dimensions/{dimensionId}",
             base_url=base_url,
             url_variables=url_variables,
             request=request,
@@ -6120,7 +1844,7 @@ class Sustainability(BaseSDK):
             hook_ctx=HookContext(
                 config=self.sdk_configuration,
                 base_url=base_url or "",
-                operation_id="partiallyUpdateTopicById",
+                operation_id="partiallyUpdateDimensionById",
                 oauth2_scopes=["file:write"],
                 security_source=self.sdk_configuration.security,
             ),
@@ -6142,7 +1866,3134 @@ class Sustainability(BaseSDK):
 
         response_data: Any = None
         if utils.match_response(http_res, "200", "application/json"):
-            return unmarshal_json_response(models.Topic, http_res)
+            return unmarshal_json_response(models.Dimension, http_res)
+        if utils.match_response(
+            http_res, ["400", "401", "403", "404", "409", "429"], "application/json"
+        ):
+            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
+            raise errors.ErrorResponse(response_data, http_res)
+        if utils.match_response(http_res, ["500", "503"], "application/json"):
+            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
+            raise errors.ErrorResponse(response_data, http_res)
+        if utils.match_response(http_res, "4XX", "*"):
+            http_res_text = await utils.stream_to_text_async(http_res)
+            raise errors.SDKError("API error occurred", http_res, http_res_text)
+        if utils.match_response(http_res, "5XX", "*"):
+            http_res_text = await utils.stream_to_text_async(http_res)
+            raise errors.SDKError("API error occurred", http_res, http_res_text)
+
+        raise errors.SDKError("Unexpected response received", http_res)
+
+    def get_metrics(
+        self,
+        *,
+        request: Union[models.GetMetricsRequest, models.GetMetricsRequestTypedDict],
+        retries: OptionalNullable[utils.RetryConfig] = UNSET,
+        server_url: Optional[str] = None,
+        timeout_ms: Optional[int] = None,
+        http_headers: Optional[Mapping[str, str]] = None,
+    ) -> Optional[models.GetMetricsResponse]:
+        r"""Retrieve a list of metrics
+
+        Returns a paginated list of [Metrics](ref:sustainability#metric).
+
+        :param request: The request object to send.
+        :param retries: Override the default retry configuration for this method
+        :param server_url: Override the default server URL for this method
+        :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
+        :param http_headers: Additional headers to set or replace on requests.
+        """
+        base_url = None
+        url_variables = None
+        if timeout_ms is None:
+            timeout_ms = self.sdk_configuration.timeout_ms
+
+        if server_url is not None:
+            base_url = server_url
+        else:
+            base_url = self._get_url(base_url, url_variables)
+
+        if not isinstance(request, BaseModel):
+            request = utils.unmarshal(request, models.GetMetricsRequest)
+        request = cast(models.GetMetricsRequest, request)
+
+        req = self._build_request(
+            method="GET",
+            path="/programs/{programId}/metrics",
+            base_url=base_url,
+            url_variables=url_variables,
+            request=request,
+            request_body_required=False,
+            request_has_path_params=True,
+            request_has_query_params=True,
+            user_agent_header="user-agent",
+            accept_header_value="application/json",
+            http_headers=http_headers,
+            security=self.sdk_configuration.security,
+            allow_empty_value=None,
+            timeout_ms=timeout_ms,
+        )
+
+        if retries == UNSET:
+            if self.sdk_configuration.retry_config is not UNSET:
+                retries = self.sdk_configuration.retry_config
+
+        retry_config = None
+        if isinstance(retries, utils.RetryConfig):
+            retry_config = (retries, ["429", "500", "502", "503", "504"])
+
+        http_res = self.do_request(
+            hook_ctx=HookContext(
+                config=self.sdk_configuration,
+                base_url=base_url or "",
+                operation_id="getMetrics",
+                oauth2_scopes=["file:read"],
+                security_source=self.sdk_configuration.security,
+            ),
+            request=req,
+            error_status_codes=[
+                "400",
+                "401",
+                "403",
+                "404",
+                "409",
+                "429",
+                "4XX",
+                "500",
+                "503",
+                "5XX",
+            ],
+            retry_config=retry_config,
+        )
+
+        def next_func() -> Optional[models.GetMetricsResponse]:
+            body = utils.unmarshal_json(http_res.text, Union[Dict[Any, Any], List[Any]])
+
+            next_cursor = JSONPath("$['@nextLink']").parse(body)
+
+            if len(next_cursor) == 0:
+                return None
+
+            next_cursor = next_cursor[0]
+            if next_cursor is None or str(next_cursor).strip() == "":
+                return None
+
+            return self.get_metrics(
+                request=models.GetMetricsRequest(
+                    program_id=request.program_id,
+                    dollar_maxpagesize=request.dollar_maxpagesize,
+                    dollar_next=next_cursor,
+                    dollar_order_by=request.dollar_order_by,
+                    dollar_filter=request.dollar_filter,
+                ),
+                retries=retries,
+            )
+
+        response_data: Any = None
+        if utils.match_response(http_res, "200", "application/json"):
+            return models.GetMetricsResponse(
+                result=unmarshal_json_response(models.MetricsListResult, http_res),
+                next=next_func,
+            )
+        if utils.match_response(
+            http_res, ["400", "401", "403", "404", "409", "429"], "application/json"
+        ):
+            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
+            raise errors.ErrorResponse(response_data, http_res)
+        if utils.match_response(http_res, ["500", "503"], "application/json"):
+            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
+            raise errors.ErrorResponse(response_data, http_res)
+        if utils.match_response(http_res, "4XX", "*"):
+            http_res_text = utils.stream_to_text(http_res)
+            raise errors.SDKError("API error occurred", http_res, http_res_text)
+        if utils.match_response(http_res, "5XX", "*"):
+            http_res_text = utils.stream_to_text(http_res)
+            raise errors.SDKError("API error occurred", http_res, http_res_text)
+
+        raise errors.SDKError("Unexpected response received", http_res)
+
+    async def get_metrics_async(
+        self,
+        *,
+        request: Union[models.GetMetricsRequest, models.GetMetricsRequestTypedDict],
+        retries: OptionalNullable[utils.RetryConfig] = UNSET,
+        server_url: Optional[str] = None,
+        timeout_ms: Optional[int] = None,
+        http_headers: Optional[Mapping[str, str]] = None,
+    ) -> Optional[models.GetMetricsResponse]:
+        r"""Retrieve a list of metrics
+
+        Returns a paginated list of [Metrics](ref:sustainability#metric).
+
+        :param request: The request object to send.
+        :param retries: Override the default retry configuration for this method
+        :param server_url: Override the default server URL for this method
+        :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
+        :param http_headers: Additional headers to set or replace on requests.
+        """
+        base_url = None
+        url_variables = None
+        if timeout_ms is None:
+            timeout_ms = self.sdk_configuration.timeout_ms
+
+        if server_url is not None:
+            base_url = server_url
+        else:
+            base_url = self._get_url(base_url, url_variables)
+
+        if not isinstance(request, BaseModel):
+            request = utils.unmarshal(request, models.GetMetricsRequest)
+        request = cast(models.GetMetricsRequest, request)
+
+        req = self._build_request_async(
+            method="GET",
+            path="/programs/{programId}/metrics",
+            base_url=base_url,
+            url_variables=url_variables,
+            request=request,
+            request_body_required=False,
+            request_has_path_params=True,
+            request_has_query_params=True,
+            user_agent_header="user-agent",
+            accept_header_value="application/json",
+            http_headers=http_headers,
+            security=self.sdk_configuration.security,
+            allow_empty_value=None,
+            timeout_ms=timeout_ms,
+        )
+
+        if retries == UNSET:
+            if self.sdk_configuration.retry_config is not UNSET:
+                retries = self.sdk_configuration.retry_config
+
+        retry_config = None
+        if isinstance(retries, utils.RetryConfig):
+            retry_config = (retries, ["429", "500", "502", "503", "504"])
+
+        http_res = await self.do_request_async(
+            hook_ctx=HookContext(
+                config=self.sdk_configuration,
+                base_url=base_url or "",
+                operation_id="getMetrics",
+                oauth2_scopes=["file:read"],
+                security_source=self.sdk_configuration.security,
+            ),
+            request=req,
+            error_status_codes=[
+                "400",
+                "401",
+                "403",
+                "404",
+                "409",
+                "429",
+                "4XX",
+                "500",
+                "503",
+                "5XX",
+            ],
+            retry_config=retry_config,
+        )
+
+        def next_func() -> Awaitable[Optional[models.GetMetricsResponse]]:
+            body = utils.unmarshal_json(http_res.text, Union[Dict[Any, Any], List[Any]])
+
+            async def empty_result():
+                return None
+
+            next_cursor = JSONPath("$['@nextLink']").parse(body)
+
+            if len(next_cursor) == 0:
+                return empty_result()
+
+            next_cursor = next_cursor[0]
+            if next_cursor is None or str(next_cursor).strip() == "":
+                return empty_result()
+
+            return self.get_metrics_async(
+                request=models.GetMetricsRequest(
+                    program_id=request.program_id,
+                    dollar_maxpagesize=request.dollar_maxpagesize,
+                    dollar_next=next_cursor,
+                    dollar_order_by=request.dollar_order_by,
+                    dollar_filter=request.dollar_filter,
+                ),
+                retries=retries,
+            )
+
+        response_data: Any = None
+        if utils.match_response(http_res, "200", "application/json"):
+            return models.GetMetricsResponse(
+                result=unmarshal_json_response(models.MetricsListResult, http_res),
+                next=next_func,
+            )
+        if utils.match_response(
+            http_res, ["400", "401", "403", "404", "409", "429"], "application/json"
+        ):
+            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
+            raise errors.ErrorResponse(response_data, http_res)
+        if utils.match_response(http_res, ["500", "503"], "application/json"):
+            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
+            raise errors.ErrorResponse(response_data, http_res)
+        if utils.match_response(http_res, "4XX", "*"):
+            http_res_text = await utils.stream_to_text_async(http_res)
+            raise errors.SDKError("API error occurred", http_res, http_res_text)
+        if utils.match_response(http_res, "5XX", "*"):
+            http_res_text = await utils.stream_to_text_async(http_res)
+            raise errors.SDKError("API error occurred", http_res, http_res_text)
+
+        raise errors.SDKError("Unexpected response received", http_res)
+
+    def create_metric(
+        self,
+        *,
+        program_id: str,
+        metric: Union[models.MetricInput, models.MetricInputTypedDict],
+        retries: OptionalNullable[utils.RetryConfig] = UNSET,
+        server_url: Optional[str] = None,
+        timeout_ms: Optional[int] = None,
+        http_headers: Optional[Mapping[str, str]] = None,
+    ) -> models.Metric:
+        r"""Create a new metric
+
+        Creates a new [metric](ref:sustainability#metric).
+
+
+        :param program_id: The unique identifier of the program
+        :param metric: The properties of the metric to create
+        :param retries: Override the default retry configuration for this method
+        :param server_url: Override the default server URL for this method
+        :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
+        :param http_headers: Additional headers to set or replace on requests.
+        """
+        base_url = None
+        url_variables = None
+        if timeout_ms is None:
+            timeout_ms = self.sdk_configuration.timeout_ms
+
+        if server_url is not None:
+            base_url = server_url
+        else:
+            base_url = self._get_url(base_url, url_variables)
+
+        request = models.CreateMetricRequest(
+            program_id=program_id,
+            metric=utils.get_pydantic_model(metric, models.MetricInput),
+        )
+
+        req = self._build_request(
+            method="POST",
+            path="/programs/{programId}/metrics",
+            base_url=base_url,
+            url_variables=url_variables,
+            request=request,
+            request_body_required=True,
+            request_has_path_params=True,
+            request_has_query_params=True,
+            user_agent_header="user-agent",
+            accept_header_value="application/json",
+            http_headers=http_headers,
+            security=self.sdk_configuration.security,
+            get_serialized_body=lambda: utils.serialize_request_body(
+                request.metric, False, False, "json", models.MetricInput
+            ),
+            allow_empty_value=None,
+            timeout_ms=timeout_ms,
+        )
+
+        if retries == UNSET:
+            if self.sdk_configuration.retry_config is not UNSET:
+                retries = self.sdk_configuration.retry_config
+
+        retry_config = None
+        if isinstance(retries, utils.RetryConfig):
+            retry_config = (retries, ["429", "500", "502", "503", "504"])
+
+        http_res = self.do_request(
+            hook_ctx=HookContext(
+                config=self.sdk_configuration,
+                base_url=base_url or "",
+                operation_id="createMetric",
+                oauth2_scopes=["file:write"],
+                security_source=self.sdk_configuration.security,
+            ),
+            request=req,
+            error_status_codes=[
+                "400",
+                "401",
+                "403",
+                "404",
+                "409",
+                "429",
+                "4XX",
+                "500",
+                "503",
+                "5XX",
+            ],
+            retry_config=retry_config,
+        )
+
+        response_data: Any = None
+        if utils.match_response(http_res, "201", "application/json"):
+            return unmarshal_json_response(models.Metric, http_res)
+        if utils.match_response(
+            http_res, ["400", "401", "403", "404", "409", "429"], "application/json"
+        ):
+            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
+            raise errors.ErrorResponse(response_data, http_res)
+        if utils.match_response(http_res, ["500", "503"], "application/json"):
+            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
+            raise errors.ErrorResponse(response_data, http_res)
+        if utils.match_response(http_res, "4XX", "*"):
+            http_res_text = utils.stream_to_text(http_res)
+            raise errors.SDKError("API error occurred", http_res, http_res_text)
+        if utils.match_response(http_res, "5XX", "*"):
+            http_res_text = utils.stream_to_text(http_res)
+            raise errors.SDKError("API error occurred", http_res, http_res_text)
+
+        raise errors.SDKError("Unexpected response received", http_res)
+
+    async def create_metric_async(
+        self,
+        *,
+        program_id: str,
+        metric: Union[models.MetricInput, models.MetricInputTypedDict],
+        retries: OptionalNullable[utils.RetryConfig] = UNSET,
+        server_url: Optional[str] = None,
+        timeout_ms: Optional[int] = None,
+        http_headers: Optional[Mapping[str, str]] = None,
+    ) -> models.Metric:
+        r"""Create a new metric
+
+        Creates a new [metric](ref:sustainability#metric).
+
+
+        :param program_id: The unique identifier of the program
+        :param metric: The properties of the metric to create
+        :param retries: Override the default retry configuration for this method
+        :param server_url: Override the default server URL for this method
+        :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
+        :param http_headers: Additional headers to set or replace on requests.
+        """
+        base_url = None
+        url_variables = None
+        if timeout_ms is None:
+            timeout_ms = self.sdk_configuration.timeout_ms
+
+        if server_url is not None:
+            base_url = server_url
+        else:
+            base_url = self._get_url(base_url, url_variables)
+
+        request = models.CreateMetricRequest(
+            program_id=program_id,
+            metric=utils.get_pydantic_model(metric, models.MetricInput),
+        )
+
+        req = self._build_request_async(
+            method="POST",
+            path="/programs/{programId}/metrics",
+            base_url=base_url,
+            url_variables=url_variables,
+            request=request,
+            request_body_required=True,
+            request_has_path_params=True,
+            request_has_query_params=True,
+            user_agent_header="user-agent",
+            accept_header_value="application/json",
+            http_headers=http_headers,
+            security=self.sdk_configuration.security,
+            get_serialized_body=lambda: utils.serialize_request_body(
+                request.metric, False, False, "json", models.MetricInput
+            ),
+            allow_empty_value=None,
+            timeout_ms=timeout_ms,
+        )
+
+        if retries == UNSET:
+            if self.sdk_configuration.retry_config is not UNSET:
+                retries = self.sdk_configuration.retry_config
+
+        retry_config = None
+        if isinstance(retries, utils.RetryConfig):
+            retry_config = (retries, ["429", "500", "502", "503", "504"])
+
+        http_res = await self.do_request_async(
+            hook_ctx=HookContext(
+                config=self.sdk_configuration,
+                base_url=base_url or "",
+                operation_id="createMetric",
+                oauth2_scopes=["file:write"],
+                security_source=self.sdk_configuration.security,
+            ),
+            request=req,
+            error_status_codes=[
+                "400",
+                "401",
+                "403",
+                "404",
+                "409",
+                "429",
+                "4XX",
+                "500",
+                "503",
+                "5XX",
+            ],
+            retry_config=retry_config,
+        )
+
+        response_data: Any = None
+        if utils.match_response(http_res, "201", "application/json"):
+            return unmarshal_json_response(models.Metric, http_res)
+        if utils.match_response(
+            http_res, ["400", "401", "403", "404", "409", "429"], "application/json"
+        ):
+            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
+            raise errors.ErrorResponse(response_data, http_res)
+        if utils.match_response(http_res, ["500", "503"], "application/json"):
+            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
+            raise errors.ErrorResponse(response_data, http_res)
+        if utils.match_response(http_res, "4XX", "*"):
+            http_res_text = await utils.stream_to_text_async(http_res)
+            raise errors.SDKError("API error occurred", http_res, http_res_text)
+        if utils.match_response(http_res, "5XX", "*"):
+            http_res_text = await utils.stream_to_text_async(http_res)
+            raise errors.SDKError("API error occurred", http_res, http_res_text)
+
+        raise errors.SDKError("Unexpected response received", http_res)
+
+    def delete_metric_by_id(
+        self,
+        *,
+        program_id: str,
+        metric_id: str,
+        retries: OptionalNullable[utils.RetryConfig] = UNSET,
+        server_url: Optional[str] = None,
+        timeout_ms: Optional[int] = None,
+        http_headers: Optional[Mapping[str, str]] = None,
+    ):
+        r"""Delete a single metric
+
+        Deletes a [metric](ref:sustainability#metric) given its ID
+
+
+        :param program_id: The unique identifier of the program
+        :param metric_id: The unique identifier of the metric
+        :param retries: Override the default retry configuration for this method
+        :param server_url: Override the default server URL for this method
+        :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
+        :param http_headers: Additional headers to set or replace on requests.
+        """
+        base_url = None
+        url_variables = None
+        if timeout_ms is None:
+            timeout_ms = self.sdk_configuration.timeout_ms
+
+        if server_url is not None:
+            base_url = server_url
+        else:
+            base_url = self._get_url(base_url, url_variables)
+
+        request = models.DeleteMetricByIDRequest(
+            program_id=program_id,
+            metric_id=metric_id,
+        )
+
+        req = self._build_request(
+            method="DELETE",
+            path="/programs/{programId}/metrics/{metricId}",
+            base_url=base_url,
+            url_variables=url_variables,
+            request=request,
+            request_body_required=False,
+            request_has_path_params=True,
+            request_has_query_params=True,
+            user_agent_header="user-agent",
+            accept_header_value="application/json",
+            http_headers=http_headers,
+            security=self.sdk_configuration.security,
+            allow_empty_value=None,
+            timeout_ms=timeout_ms,
+        )
+
+        if retries == UNSET:
+            if self.sdk_configuration.retry_config is not UNSET:
+                retries = self.sdk_configuration.retry_config
+
+        retry_config = None
+        if isinstance(retries, utils.RetryConfig):
+            retry_config = (retries, ["429", "500", "502", "503", "504"])
+
+        http_res = self.do_request(
+            hook_ctx=HookContext(
+                config=self.sdk_configuration,
+                base_url=base_url or "",
+                operation_id="deleteMetricById",
+                oauth2_scopes=["file:write"],
+                security_source=self.sdk_configuration.security,
+            ),
+            request=req,
+            error_status_codes=[
+                "400",
+                "401",
+                "403",
+                "404",
+                "409",
+                "429",
+                "4XX",
+                "500",
+                "503",
+                "5XX",
+            ],
+            retry_config=retry_config,
+        )
+
+        response_data: Any = None
+        if utils.match_response(http_res, "204", "*"):
+            return
+        if utils.match_response(
+            http_res, ["400", "401", "403", "404", "409", "429"], "application/json"
+        ):
+            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
+            raise errors.ErrorResponse(response_data, http_res)
+        if utils.match_response(http_res, ["500", "503"], "application/json"):
+            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
+            raise errors.ErrorResponse(response_data, http_res)
+        if utils.match_response(http_res, "4XX", "*"):
+            http_res_text = utils.stream_to_text(http_res)
+            raise errors.SDKError("API error occurred", http_res, http_res_text)
+        if utils.match_response(http_res, "5XX", "*"):
+            http_res_text = utils.stream_to_text(http_res)
+            raise errors.SDKError("API error occurred", http_res, http_res_text)
+
+        raise errors.SDKError("Unexpected response received", http_res)
+
+    async def delete_metric_by_id_async(
+        self,
+        *,
+        program_id: str,
+        metric_id: str,
+        retries: OptionalNullable[utils.RetryConfig] = UNSET,
+        server_url: Optional[str] = None,
+        timeout_ms: Optional[int] = None,
+        http_headers: Optional[Mapping[str, str]] = None,
+    ):
+        r"""Delete a single metric
+
+        Deletes a [metric](ref:sustainability#metric) given its ID
+
+
+        :param program_id: The unique identifier of the program
+        :param metric_id: The unique identifier of the metric
+        :param retries: Override the default retry configuration for this method
+        :param server_url: Override the default server URL for this method
+        :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
+        :param http_headers: Additional headers to set or replace on requests.
+        """
+        base_url = None
+        url_variables = None
+        if timeout_ms is None:
+            timeout_ms = self.sdk_configuration.timeout_ms
+
+        if server_url is not None:
+            base_url = server_url
+        else:
+            base_url = self._get_url(base_url, url_variables)
+
+        request = models.DeleteMetricByIDRequest(
+            program_id=program_id,
+            metric_id=metric_id,
+        )
+
+        req = self._build_request_async(
+            method="DELETE",
+            path="/programs/{programId}/metrics/{metricId}",
+            base_url=base_url,
+            url_variables=url_variables,
+            request=request,
+            request_body_required=False,
+            request_has_path_params=True,
+            request_has_query_params=True,
+            user_agent_header="user-agent",
+            accept_header_value="application/json",
+            http_headers=http_headers,
+            security=self.sdk_configuration.security,
+            allow_empty_value=None,
+            timeout_ms=timeout_ms,
+        )
+
+        if retries == UNSET:
+            if self.sdk_configuration.retry_config is not UNSET:
+                retries = self.sdk_configuration.retry_config
+
+        retry_config = None
+        if isinstance(retries, utils.RetryConfig):
+            retry_config = (retries, ["429", "500", "502", "503", "504"])
+
+        http_res = await self.do_request_async(
+            hook_ctx=HookContext(
+                config=self.sdk_configuration,
+                base_url=base_url or "",
+                operation_id="deleteMetricById",
+                oauth2_scopes=["file:write"],
+                security_source=self.sdk_configuration.security,
+            ),
+            request=req,
+            error_status_codes=[
+                "400",
+                "401",
+                "403",
+                "404",
+                "409",
+                "429",
+                "4XX",
+                "500",
+                "503",
+                "5XX",
+            ],
+            retry_config=retry_config,
+        )
+
+        response_data: Any = None
+        if utils.match_response(http_res, "204", "*"):
+            return
+        if utils.match_response(
+            http_res, ["400", "401", "403", "404", "409", "429"], "application/json"
+        ):
+            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
+            raise errors.ErrorResponse(response_data, http_res)
+        if utils.match_response(http_res, ["500", "503"], "application/json"):
+            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
+            raise errors.ErrorResponse(response_data, http_res)
+        if utils.match_response(http_res, "4XX", "*"):
+            http_res_text = await utils.stream_to_text_async(http_res)
+            raise errors.SDKError("API error occurred", http_res, http_res_text)
+        if utils.match_response(http_res, "5XX", "*"):
+            http_res_text = await utils.stream_to_text_async(http_res)
+            raise errors.SDKError("API error occurred", http_res, http_res_text)
+
+        raise errors.SDKError("Unexpected response received", http_res)
+
+    def get_metric_by_id(
+        self,
+        *,
+        program_id: str,
+        metric_id: str,
+        retries: OptionalNullable[utils.RetryConfig] = UNSET,
+        server_url: Optional[str] = None,
+        timeout_ms: Optional[int] = None,
+        http_headers: Optional[Mapping[str, str]] = None,
+    ) -> models.Metric:
+        r"""Retrieve a single metric
+
+        Retrieves a [`Metric`](ref:sustainability#metric) given its ID
+
+        :param program_id: The unique identifier of the program
+        :param metric_id: The unique identifier of the metric
+        :param retries: Override the default retry configuration for this method
+        :param server_url: Override the default server URL for this method
+        :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
+        :param http_headers: Additional headers to set or replace on requests.
+        """
+        base_url = None
+        url_variables = None
+        if timeout_ms is None:
+            timeout_ms = self.sdk_configuration.timeout_ms
+
+        if server_url is not None:
+            base_url = server_url
+        else:
+            base_url = self._get_url(base_url, url_variables)
+
+        request = models.GetMetricByIDRequest(
+            program_id=program_id,
+            metric_id=metric_id,
+        )
+
+        req = self._build_request(
+            method="GET",
+            path="/programs/{programId}/metrics/{metricId}",
+            base_url=base_url,
+            url_variables=url_variables,
+            request=request,
+            request_body_required=False,
+            request_has_path_params=True,
+            request_has_query_params=True,
+            user_agent_header="user-agent",
+            accept_header_value="application/json",
+            http_headers=http_headers,
+            security=self.sdk_configuration.security,
+            allow_empty_value=None,
+            timeout_ms=timeout_ms,
+        )
+
+        if retries == UNSET:
+            if self.sdk_configuration.retry_config is not UNSET:
+                retries = self.sdk_configuration.retry_config
+
+        retry_config = None
+        if isinstance(retries, utils.RetryConfig):
+            retry_config = (retries, ["429", "500", "502", "503", "504"])
+
+        http_res = self.do_request(
+            hook_ctx=HookContext(
+                config=self.sdk_configuration,
+                base_url=base_url or "",
+                operation_id="getMetricById",
+                oauth2_scopes=["file:read"],
+                security_source=self.sdk_configuration.security,
+            ),
+            request=req,
+            error_status_codes=[
+                "400",
+                "401",
+                "403",
+                "404",
+                "409",
+                "429",
+                "4XX",
+                "500",
+                "503",
+                "5XX",
+            ],
+            retry_config=retry_config,
+        )
+
+        response_data: Any = None
+        if utils.match_response(http_res, "200", "application/json"):
+            return unmarshal_json_response(models.Metric, http_res)
+        if utils.match_response(
+            http_res, ["400", "401", "403", "404", "409", "429"], "application/json"
+        ):
+            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
+            raise errors.ErrorResponse(response_data, http_res)
+        if utils.match_response(http_res, ["500", "503"], "application/json"):
+            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
+            raise errors.ErrorResponse(response_data, http_res)
+        if utils.match_response(http_res, "4XX", "*"):
+            http_res_text = utils.stream_to_text(http_res)
+            raise errors.SDKError("API error occurred", http_res, http_res_text)
+        if utils.match_response(http_res, "5XX", "*"):
+            http_res_text = utils.stream_to_text(http_res)
+            raise errors.SDKError("API error occurred", http_res, http_res_text)
+
+        raise errors.SDKError("Unexpected response received", http_res)
+
+    async def get_metric_by_id_async(
+        self,
+        *,
+        program_id: str,
+        metric_id: str,
+        retries: OptionalNullable[utils.RetryConfig] = UNSET,
+        server_url: Optional[str] = None,
+        timeout_ms: Optional[int] = None,
+        http_headers: Optional[Mapping[str, str]] = None,
+    ) -> models.Metric:
+        r"""Retrieve a single metric
+
+        Retrieves a [`Metric`](ref:sustainability#metric) given its ID
+
+        :param program_id: The unique identifier of the program
+        :param metric_id: The unique identifier of the metric
+        :param retries: Override the default retry configuration for this method
+        :param server_url: Override the default server URL for this method
+        :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
+        :param http_headers: Additional headers to set or replace on requests.
+        """
+        base_url = None
+        url_variables = None
+        if timeout_ms is None:
+            timeout_ms = self.sdk_configuration.timeout_ms
+
+        if server_url is not None:
+            base_url = server_url
+        else:
+            base_url = self._get_url(base_url, url_variables)
+
+        request = models.GetMetricByIDRequest(
+            program_id=program_id,
+            metric_id=metric_id,
+        )
+
+        req = self._build_request_async(
+            method="GET",
+            path="/programs/{programId}/metrics/{metricId}",
+            base_url=base_url,
+            url_variables=url_variables,
+            request=request,
+            request_body_required=False,
+            request_has_path_params=True,
+            request_has_query_params=True,
+            user_agent_header="user-agent",
+            accept_header_value="application/json",
+            http_headers=http_headers,
+            security=self.sdk_configuration.security,
+            allow_empty_value=None,
+            timeout_ms=timeout_ms,
+        )
+
+        if retries == UNSET:
+            if self.sdk_configuration.retry_config is not UNSET:
+                retries = self.sdk_configuration.retry_config
+
+        retry_config = None
+        if isinstance(retries, utils.RetryConfig):
+            retry_config = (retries, ["429", "500", "502", "503", "504"])
+
+        http_res = await self.do_request_async(
+            hook_ctx=HookContext(
+                config=self.sdk_configuration,
+                base_url=base_url or "",
+                operation_id="getMetricById",
+                oauth2_scopes=["file:read"],
+                security_source=self.sdk_configuration.security,
+            ),
+            request=req,
+            error_status_codes=[
+                "400",
+                "401",
+                "403",
+                "404",
+                "409",
+                "429",
+                "4XX",
+                "500",
+                "503",
+                "5XX",
+            ],
+            retry_config=retry_config,
+        )
+
+        response_data: Any = None
+        if utils.match_response(http_res, "200", "application/json"):
+            return unmarshal_json_response(models.Metric, http_res)
+        if utils.match_response(
+            http_res, ["400", "401", "403", "404", "409", "429"], "application/json"
+        ):
+            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
+            raise errors.ErrorResponse(response_data, http_res)
+        if utils.match_response(http_res, ["500", "503"], "application/json"):
+            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
+            raise errors.ErrorResponse(response_data, http_res)
+        if utils.match_response(http_res, "4XX", "*"):
+            http_res_text = await utils.stream_to_text_async(http_res)
+            raise errors.SDKError("API error occurred", http_res, http_res_text)
+        if utils.match_response(http_res, "5XX", "*"):
+            http_res_text = await utils.stream_to_text_async(http_res)
+            raise errors.SDKError("API error occurred", http_res, http_res_text)
+
+        raise errors.SDKError("Unexpected response received", http_res)
+
+    def partially_update_metric_by_id(
+        self,
+        *,
+        program_id: str,
+        metric_id: str,
+        request_body: Union[
+            List[models.JSONPatchOperation], List[models.JSONPatchOperationTypedDict]
+        ],
+        retries: OptionalNullable[utils.RetryConfig] = UNSET,
+        server_url: Optional[str] = None,
+        timeout_ms: Optional[int] = None,
+        http_headers: Optional[Mapping[str, str]] = None,
+    ) -> models.Metric:
+        r"""Partially update a single metric
+
+        Partially updates the properties of a [metric](ref:sustainability#metric). Only one property may be updated at a time.
+        ### Options
+        |Path|PATCH Operations Supported|
+        |---|---|
+        |`/datatype`|`replace`|
+        |`/description`|`replace`, `test`|
+        |`/index`|`replace`, `test`|
+        |`/name`|`replace`, `test`|
+        |`/requireNotes`|`replace`, `test`|
+        |`/requireSupportingAttachments`|`replace`, `test`|
+        |`/topic`|`replace`, `test`|
+        |`/unit`|`replace`, `test`|
+
+
+        :param program_id: The unique identifier of the program
+        :param metric_id: The unique identifier of the metric
+        :param request_body: A collection of patch operations to apply to the [metric](ref:sustainability#metric). Currently only one operation may be applied at a time.
+        :param retries: Override the default retry configuration for this method
+        :param server_url: Override the default server URL for this method
+        :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
+        :param http_headers: Additional headers to set or replace on requests.
+        """
+        base_url = None
+        url_variables = None
+        if timeout_ms is None:
+            timeout_ms = self.sdk_configuration.timeout_ms
+
+        if server_url is not None:
+            base_url = server_url
+        else:
+            base_url = self._get_url(base_url, url_variables)
+
+        request = models.PartiallyUpdateMetricByIDRequest(
+            program_id=program_id,
+            metric_id=metric_id,
+            request_body=utils.get_pydantic_model(
+                request_body, List[models.JSONPatchOperation]
+            ),
+        )
+
+        req = self._build_request(
+            method="PATCH",
+            path="/programs/{programId}/metrics/{metricId}",
+            base_url=base_url,
+            url_variables=url_variables,
+            request=request,
+            request_body_required=True,
+            request_has_path_params=True,
+            request_has_query_params=True,
+            user_agent_header="user-agent",
+            accept_header_value="application/json",
+            http_headers=http_headers,
+            security=self.sdk_configuration.security,
+            get_serialized_body=lambda: utils.serialize_request_body(
+                request.request_body,
+                False,
+                False,
+                "json",
+                List[models.JSONPatchOperation],
+            ),
+            allow_empty_value=None,
+            timeout_ms=timeout_ms,
+        )
+
+        if retries == UNSET:
+            if self.sdk_configuration.retry_config is not UNSET:
+                retries = self.sdk_configuration.retry_config
+
+        retry_config = None
+        if isinstance(retries, utils.RetryConfig):
+            retry_config = (retries, ["429", "500", "502", "503", "504"])
+
+        http_res = self.do_request(
+            hook_ctx=HookContext(
+                config=self.sdk_configuration,
+                base_url=base_url or "",
+                operation_id="partiallyUpdateMetricById",
+                oauth2_scopes=["file:write"],
+                security_source=self.sdk_configuration.security,
+            ),
+            request=req,
+            error_status_codes=[
+                "400",
+                "401",
+                "403",
+                "404",
+                "409",
+                "429",
+                "4XX",
+                "500",
+                "503",
+                "5XX",
+            ],
+            retry_config=retry_config,
+        )
+
+        response_data: Any = None
+        if utils.match_response(http_res, "200", "application/json"):
+            return unmarshal_json_response(models.Metric, http_res)
+        if utils.match_response(
+            http_res, ["400", "401", "403", "404", "409", "429"], "application/json"
+        ):
+            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
+            raise errors.ErrorResponse(response_data, http_res)
+        if utils.match_response(http_res, ["500", "503"], "application/json"):
+            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
+            raise errors.ErrorResponse(response_data, http_res)
+        if utils.match_response(http_res, "4XX", "*"):
+            http_res_text = utils.stream_to_text(http_res)
+            raise errors.SDKError("API error occurred", http_res, http_res_text)
+        if utils.match_response(http_res, "5XX", "*"):
+            http_res_text = utils.stream_to_text(http_res)
+            raise errors.SDKError("API error occurred", http_res, http_res_text)
+
+        raise errors.SDKError("Unexpected response received", http_res)
+
+    async def partially_update_metric_by_id_async(
+        self,
+        *,
+        program_id: str,
+        metric_id: str,
+        request_body: Union[
+            List[models.JSONPatchOperation], List[models.JSONPatchOperationTypedDict]
+        ],
+        retries: OptionalNullable[utils.RetryConfig] = UNSET,
+        server_url: Optional[str] = None,
+        timeout_ms: Optional[int] = None,
+        http_headers: Optional[Mapping[str, str]] = None,
+    ) -> models.Metric:
+        r"""Partially update a single metric
+
+        Partially updates the properties of a [metric](ref:sustainability#metric). Only one property may be updated at a time.
+        ### Options
+        |Path|PATCH Operations Supported|
+        |---|---|
+        |`/datatype`|`replace`|
+        |`/description`|`replace`, `test`|
+        |`/index`|`replace`, `test`|
+        |`/name`|`replace`, `test`|
+        |`/requireNotes`|`replace`, `test`|
+        |`/requireSupportingAttachments`|`replace`, `test`|
+        |`/topic`|`replace`, `test`|
+        |`/unit`|`replace`, `test`|
+
+
+        :param program_id: The unique identifier of the program
+        :param metric_id: The unique identifier of the metric
+        :param request_body: A collection of patch operations to apply to the [metric](ref:sustainability#metric). Currently only one operation may be applied at a time.
+        :param retries: Override the default retry configuration for this method
+        :param server_url: Override the default server URL for this method
+        :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
+        :param http_headers: Additional headers to set or replace on requests.
+        """
+        base_url = None
+        url_variables = None
+        if timeout_ms is None:
+            timeout_ms = self.sdk_configuration.timeout_ms
+
+        if server_url is not None:
+            base_url = server_url
+        else:
+            base_url = self._get_url(base_url, url_variables)
+
+        request = models.PartiallyUpdateMetricByIDRequest(
+            program_id=program_id,
+            metric_id=metric_id,
+            request_body=utils.get_pydantic_model(
+                request_body, List[models.JSONPatchOperation]
+            ),
+        )
+
+        req = self._build_request_async(
+            method="PATCH",
+            path="/programs/{programId}/metrics/{metricId}",
+            base_url=base_url,
+            url_variables=url_variables,
+            request=request,
+            request_body_required=True,
+            request_has_path_params=True,
+            request_has_query_params=True,
+            user_agent_header="user-agent",
+            accept_header_value="application/json",
+            http_headers=http_headers,
+            security=self.sdk_configuration.security,
+            get_serialized_body=lambda: utils.serialize_request_body(
+                request.request_body,
+                False,
+                False,
+                "json",
+                List[models.JSONPatchOperation],
+            ),
+            allow_empty_value=None,
+            timeout_ms=timeout_ms,
+        )
+
+        if retries == UNSET:
+            if self.sdk_configuration.retry_config is not UNSET:
+                retries = self.sdk_configuration.retry_config
+
+        retry_config = None
+        if isinstance(retries, utils.RetryConfig):
+            retry_config = (retries, ["429", "500", "502", "503", "504"])
+
+        http_res = await self.do_request_async(
+            hook_ctx=HookContext(
+                config=self.sdk_configuration,
+                base_url=base_url or "",
+                operation_id="partiallyUpdateMetricById",
+                oauth2_scopes=["file:write"],
+                security_source=self.sdk_configuration.security,
+            ),
+            request=req,
+            error_status_codes=[
+                "400",
+                "401",
+                "403",
+                "404",
+                "409",
+                "429",
+                "4XX",
+                "500",
+                "503",
+                "5XX",
+            ],
+            retry_config=retry_config,
+        )
+
+        response_data: Any = None
+        if utils.match_response(http_res, "200", "application/json"):
+            return unmarshal_json_response(models.Metric, http_res)
+        if utils.match_response(
+            http_res, ["400", "401", "403", "404", "409", "429"], "application/json"
+        ):
+            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
+            raise errors.ErrorResponse(response_data, http_res)
+        if utils.match_response(http_res, ["500", "503"], "application/json"):
+            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
+            raise errors.ErrorResponse(response_data, http_res)
+        if utils.match_response(http_res, "4XX", "*"):
+            http_res_text = await utils.stream_to_text_async(http_res)
+            raise errors.SDKError("API error occurred", http_res, http_res_text)
+        if utils.match_response(http_res, "5XX", "*"):
+            http_res_text = await utils.stream_to_text_async(http_res)
+            raise errors.SDKError("API error occurred", http_res, http_res_text)
+
+        raise errors.SDKError("Unexpected response received", http_res)
+
+    def get_values(
+        self,
+        *,
+        request: Union[models.GetValuesRequest, models.GetValuesRequestTypedDict],
+        retries: OptionalNullable[utils.RetryConfig] = UNSET,
+        server_url: Optional[str] = None,
+        timeout_ms: Optional[int] = None,
+        http_headers: Optional[Mapping[str, str]] = None,
+    ) -> Optional[models.GetValuesResponse]:
+        r"""Retrieve a list of metric values
+
+        Returns a paginated list of [metric Values](ref:sustainability#metricvalue)
+
+        :param request: The request object to send.
+        :param retries: Override the default retry configuration for this method
+        :param server_url: Override the default server URL for this method
+        :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
+        :param http_headers: Additional headers to set or replace on requests.
+        """
+        base_url = None
+        url_variables = None
+        if timeout_ms is None:
+            timeout_ms = self.sdk_configuration.timeout_ms
+
+        if server_url is not None:
+            base_url = server_url
+        else:
+            base_url = self._get_url(base_url, url_variables)
+
+        if not isinstance(request, BaseModel):
+            request = utils.unmarshal(request, models.GetValuesRequest)
+        request = cast(models.GetValuesRequest, request)
+
+        req = self._build_request(
+            method="GET",
+            path="/programs/{programId}/metrics/{metricId}/values",
+            base_url=base_url,
+            url_variables=url_variables,
+            request=request,
+            request_body_required=False,
+            request_has_path_params=True,
+            request_has_query_params=True,
+            user_agent_header="user-agent",
+            accept_header_value="application/json",
+            http_headers=http_headers,
+            security=self.sdk_configuration.security,
+            allow_empty_value=None,
+            timeout_ms=timeout_ms,
+        )
+
+        if retries == UNSET:
+            if self.sdk_configuration.retry_config is not UNSET:
+                retries = self.sdk_configuration.retry_config
+
+        retry_config = None
+        if isinstance(retries, utils.RetryConfig):
+            retry_config = (retries, ["429", "500", "502", "503", "504"])
+
+        http_res = self.do_request(
+            hook_ctx=HookContext(
+                config=self.sdk_configuration,
+                base_url=base_url or "",
+                operation_id="getValues",
+                oauth2_scopes=["file:read"],
+                security_source=self.sdk_configuration.security,
+            ),
+            request=req,
+            error_status_codes=[
+                "400",
+                "401",
+                "403",
+                "404",
+                "409",
+                "429",
+                "4XX",
+                "500",
+                "503",
+                "5XX",
+            ],
+            retry_config=retry_config,
+        )
+
+        def next_func() -> Optional[models.GetValuesResponse]:
+            body = utils.unmarshal_json(http_res.text, Union[Dict[Any, Any], List[Any]])
+
+            next_cursor = JSONPath("$['@nextLink']").parse(body)
+
+            if len(next_cursor) == 0:
+                return None
+
+            next_cursor = next_cursor[0]
+            if next_cursor is None or str(next_cursor).strip() == "":
+                return None
+
+            return self.get_values(
+                request=models.GetValuesRequest(
+                    program_id=request.program_id,
+                    metric_id=request.metric_id,
+                    dollar_maxpagesize=request.dollar_maxpagesize,
+                    dollar_next=next_cursor,
+                    dollar_filter=request.dollar_filter,
+                    dollar_order_by=request.dollar_order_by,
+                ),
+                retries=retries,
+            )
+
+        response_data: Any = None
+        if utils.match_response(http_res, "200", "application/json"):
+            return models.GetValuesResponse(
+                result=unmarshal_json_response(models.MetricValuesListResult, http_res),
+                next=next_func,
+            )
+        if utils.match_response(
+            http_res, ["400", "401", "403", "404", "409", "429"], "application/json"
+        ):
+            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
+            raise errors.ErrorResponse(response_data, http_res)
+        if utils.match_response(http_res, ["500", "503"], "application/json"):
+            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
+            raise errors.ErrorResponse(response_data, http_res)
+        if utils.match_response(http_res, "4XX", "*"):
+            http_res_text = utils.stream_to_text(http_res)
+            raise errors.SDKError("API error occurred", http_res, http_res_text)
+        if utils.match_response(http_res, "5XX", "*"):
+            http_res_text = utils.stream_to_text(http_res)
+            raise errors.SDKError("API error occurred", http_res, http_res_text)
+
+        raise errors.SDKError("Unexpected response received", http_res)
+
+    async def get_values_async(
+        self,
+        *,
+        request: Union[models.GetValuesRequest, models.GetValuesRequestTypedDict],
+        retries: OptionalNullable[utils.RetryConfig] = UNSET,
+        server_url: Optional[str] = None,
+        timeout_ms: Optional[int] = None,
+        http_headers: Optional[Mapping[str, str]] = None,
+    ) -> Optional[models.GetValuesResponse]:
+        r"""Retrieve a list of metric values
+
+        Returns a paginated list of [metric Values](ref:sustainability#metricvalue)
+
+        :param request: The request object to send.
+        :param retries: Override the default retry configuration for this method
+        :param server_url: Override the default server URL for this method
+        :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
+        :param http_headers: Additional headers to set or replace on requests.
+        """
+        base_url = None
+        url_variables = None
+        if timeout_ms is None:
+            timeout_ms = self.sdk_configuration.timeout_ms
+
+        if server_url is not None:
+            base_url = server_url
+        else:
+            base_url = self._get_url(base_url, url_variables)
+
+        if not isinstance(request, BaseModel):
+            request = utils.unmarshal(request, models.GetValuesRequest)
+        request = cast(models.GetValuesRequest, request)
+
+        req = self._build_request_async(
+            method="GET",
+            path="/programs/{programId}/metrics/{metricId}/values",
+            base_url=base_url,
+            url_variables=url_variables,
+            request=request,
+            request_body_required=False,
+            request_has_path_params=True,
+            request_has_query_params=True,
+            user_agent_header="user-agent",
+            accept_header_value="application/json",
+            http_headers=http_headers,
+            security=self.sdk_configuration.security,
+            allow_empty_value=None,
+            timeout_ms=timeout_ms,
+        )
+
+        if retries == UNSET:
+            if self.sdk_configuration.retry_config is not UNSET:
+                retries = self.sdk_configuration.retry_config
+
+        retry_config = None
+        if isinstance(retries, utils.RetryConfig):
+            retry_config = (retries, ["429", "500", "502", "503", "504"])
+
+        http_res = await self.do_request_async(
+            hook_ctx=HookContext(
+                config=self.sdk_configuration,
+                base_url=base_url or "",
+                operation_id="getValues",
+                oauth2_scopes=["file:read"],
+                security_source=self.sdk_configuration.security,
+            ),
+            request=req,
+            error_status_codes=[
+                "400",
+                "401",
+                "403",
+                "404",
+                "409",
+                "429",
+                "4XX",
+                "500",
+                "503",
+                "5XX",
+            ],
+            retry_config=retry_config,
+        )
+
+        def next_func() -> Awaitable[Optional[models.GetValuesResponse]]:
+            body = utils.unmarshal_json(http_res.text, Union[Dict[Any, Any], List[Any]])
+
+            async def empty_result():
+                return None
+
+            next_cursor = JSONPath("$['@nextLink']").parse(body)
+
+            if len(next_cursor) == 0:
+                return empty_result()
+
+            next_cursor = next_cursor[0]
+            if next_cursor is None or str(next_cursor).strip() == "":
+                return empty_result()
+
+            return self.get_values_async(
+                request=models.GetValuesRequest(
+                    program_id=request.program_id,
+                    metric_id=request.metric_id,
+                    dollar_maxpagesize=request.dollar_maxpagesize,
+                    dollar_next=next_cursor,
+                    dollar_filter=request.dollar_filter,
+                    dollar_order_by=request.dollar_order_by,
+                ),
+                retries=retries,
+            )
+
+        response_data: Any = None
+        if utils.match_response(http_res, "200", "application/json"):
+            return models.GetValuesResponse(
+                result=unmarshal_json_response(models.MetricValuesListResult, http_res),
+                next=next_func,
+            )
+        if utils.match_response(
+            http_res, ["400", "401", "403", "404", "409", "429"], "application/json"
+        ):
+            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
+            raise errors.ErrorResponse(response_data, http_res)
+        if utils.match_response(http_res, ["500", "503"], "application/json"):
+            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
+            raise errors.ErrorResponse(response_data, http_res)
+        if utils.match_response(http_res, "4XX", "*"):
+            http_res_text = await utils.stream_to_text_async(http_res)
+            raise errors.SDKError("API error occurred", http_res, http_res_text)
+        if utils.match_response(http_res, "5XX", "*"):
+            http_res_text = await utils.stream_to_text_async(http_res)
+            raise errors.SDKError("API error occurred", http_res, http_res_text)
+
+        raise errors.SDKError("Unexpected response received", http_res)
+
+    def create_value(
+        self,
+        *,
+        program_id: str,
+        metric_id: str,
+        metric_value: Union[models.MetricValueInput, models.MetricValueInputTypedDict],
+        retries: OptionalNullable[utils.RetryConfig] = UNSET,
+        server_url: Optional[str] = None,
+        timeout_ms: Optional[int] = None,
+        http_headers: Optional[Mapping[str, str]] = None,
+    ) -> models.MetricValue:
+        r"""Create a new metric value
+
+        Creates a new [metric value](ref:sustainability#metricvalue)
+
+
+        :param program_id: The unique identifier of the program
+        :param metric_id: The unique identifier of the metric
+        :param metric_value: The properties of the metric value to create
+        :param retries: Override the default retry configuration for this method
+        :param server_url: Override the default server URL for this method
+        :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
+        :param http_headers: Additional headers to set or replace on requests.
+        """
+        base_url = None
+        url_variables = None
+        if timeout_ms is None:
+            timeout_ms = self.sdk_configuration.timeout_ms
+
+        if server_url is not None:
+            base_url = server_url
+        else:
+            base_url = self._get_url(base_url, url_variables)
+
+        request = models.CreateValueRequest(
+            program_id=program_id,
+            metric_id=metric_id,
+            metric_value=utils.get_pydantic_model(
+                metric_value, models.MetricValueInput
+            ),
+        )
+
+        req = self._build_request(
+            method="POST",
+            path="/programs/{programId}/metrics/{metricId}/values",
+            base_url=base_url,
+            url_variables=url_variables,
+            request=request,
+            request_body_required=True,
+            request_has_path_params=True,
+            request_has_query_params=True,
+            user_agent_header="user-agent",
+            accept_header_value="application/json",
+            http_headers=http_headers,
+            security=self.sdk_configuration.security,
+            get_serialized_body=lambda: utils.serialize_request_body(
+                request.metric_value, False, False, "json", models.MetricValueInput
+            ),
+            allow_empty_value=None,
+            timeout_ms=timeout_ms,
+        )
+
+        if retries == UNSET:
+            if self.sdk_configuration.retry_config is not UNSET:
+                retries = self.sdk_configuration.retry_config
+
+        retry_config = None
+        if isinstance(retries, utils.RetryConfig):
+            retry_config = (retries, ["429", "500", "502", "503", "504"])
+
+        http_res = self.do_request(
+            hook_ctx=HookContext(
+                config=self.sdk_configuration,
+                base_url=base_url or "",
+                operation_id="createValue",
+                oauth2_scopes=["file:write"],
+                security_source=self.sdk_configuration.security,
+            ),
+            request=req,
+            error_status_codes=[
+                "400",
+                "401",
+                "403",
+                "404",
+                "409",
+                "429",
+                "4XX",
+                "500",
+                "503",
+                "5XX",
+            ],
+            retry_config=retry_config,
+        )
+
+        response_data: Any = None
+        if utils.match_response(http_res, "201", "application/json"):
+            return unmarshal_json_response(models.MetricValue, http_res)
+        if utils.match_response(
+            http_res, ["400", "401", "403", "404", "409", "429"], "application/json"
+        ):
+            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
+            raise errors.ErrorResponse(response_data, http_res)
+        if utils.match_response(http_res, ["500", "503"], "application/json"):
+            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
+            raise errors.ErrorResponse(response_data, http_res)
+        if utils.match_response(http_res, "4XX", "*"):
+            http_res_text = utils.stream_to_text(http_res)
+            raise errors.SDKError("API error occurred", http_res, http_res_text)
+        if utils.match_response(http_res, "5XX", "*"):
+            http_res_text = utils.stream_to_text(http_res)
+            raise errors.SDKError("API error occurred", http_res, http_res_text)
+
+        raise errors.SDKError("Unexpected response received", http_res)
+
+    async def create_value_async(
+        self,
+        *,
+        program_id: str,
+        metric_id: str,
+        metric_value: Union[models.MetricValueInput, models.MetricValueInputTypedDict],
+        retries: OptionalNullable[utils.RetryConfig] = UNSET,
+        server_url: Optional[str] = None,
+        timeout_ms: Optional[int] = None,
+        http_headers: Optional[Mapping[str, str]] = None,
+    ) -> models.MetricValue:
+        r"""Create a new metric value
+
+        Creates a new [metric value](ref:sustainability#metricvalue)
+
+
+        :param program_id: The unique identifier of the program
+        :param metric_id: The unique identifier of the metric
+        :param metric_value: The properties of the metric value to create
+        :param retries: Override the default retry configuration for this method
+        :param server_url: Override the default server URL for this method
+        :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
+        :param http_headers: Additional headers to set or replace on requests.
+        """
+        base_url = None
+        url_variables = None
+        if timeout_ms is None:
+            timeout_ms = self.sdk_configuration.timeout_ms
+
+        if server_url is not None:
+            base_url = server_url
+        else:
+            base_url = self._get_url(base_url, url_variables)
+
+        request = models.CreateValueRequest(
+            program_id=program_id,
+            metric_id=metric_id,
+            metric_value=utils.get_pydantic_model(
+                metric_value, models.MetricValueInput
+            ),
+        )
+
+        req = self._build_request_async(
+            method="POST",
+            path="/programs/{programId}/metrics/{metricId}/values",
+            base_url=base_url,
+            url_variables=url_variables,
+            request=request,
+            request_body_required=True,
+            request_has_path_params=True,
+            request_has_query_params=True,
+            user_agent_header="user-agent",
+            accept_header_value="application/json",
+            http_headers=http_headers,
+            security=self.sdk_configuration.security,
+            get_serialized_body=lambda: utils.serialize_request_body(
+                request.metric_value, False, False, "json", models.MetricValueInput
+            ),
+            allow_empty_value=None,
+            timeout_ms=timeout_ms,
+        )
+
+        if retries == UNSET:
+            if self.sdk_configuration.retry_config is not UNSET:
+                retries = self.sdk_configuration.retry_config
+
+        retry_config = None
+        if isinstance(retries, utils.RetryConfig):
+            retry_config = (retries, ["429", "500", "502", "503", "504"])
+
+        http_res = await self.do_request_async(
+            hook_ctx=HookContext(
+                config=self.sdk_configuration,
+                base_url=base_url or "",
+                operation_id="createValue",
+                oauth2_scopes=["file:write"],
+                security_source=self.sdk_configuration.security,
+            ),
+            request=req,
+            error_status_codes=[
+                "400",
+                "401",
+                "403",
+                "404",
+                "409",
+                "429",
+                "4XX",
+                "500",
+                "503",
+                "5XX",
+            ],
+            retry_config=retry_config,
+        )
+
+        response_data: Any = None
+        if utils.match_response(http_res, "201", "application/json"):
+            return unmarshal_json_response(models.MetricValue, http_res)
+        if utils.match_response(
+            http_res, ["400", "401", "403", "404", "409", "429"], "application/json"
+        ):
+            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
+            raise errors.ErrorResponse(response_data, http_res)
+        if utils.match_response(http_res, ["500", "503"], "application/json"):
+            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
+            raise errors.ErrorResponse(response_data, http_res)
+        if utils.match_response(http_res, "4XX", "*"):
+            http_res_text = await utils.stream_to_text_async(http_res)
+            raise errors.SDKError("API error occurred", http_res, http_res_text)
+        if utils.match_response(http_res, "5XX", "*"):
+            http_res_text = await utils.stream_to_text_async(http_res)
+            raise errors.SDKError("API error occurred", http_res, http_res_text)
+
+        raise errors.SDKError("Unexpected response received", http_res)
+
+    def delete_metric_value_by_id(
+        self,
+        *,
+        program_id: str,
+        metric_id: str,
+        metric_value_id: str,
+        retries: OptionalNullable[utils.RetryConfig] = UNSET,
+        server_url: Optional[str] = None,
+        timeout_ms: Optional[int] = None,
+        http_headers: Optional[Mapping[str, str]] = None,
+    ):
+        r"""Delete a single metric value
+
+        Deletes a [metric value](ref:sustainability#metricvalue) value given its ID
+
+
+        :param program_id: The unique identifier of the program
+        :param metric_id: The unique identifier of the metric
+        :param metric_value_id: The unique identifier of the value
+        :param retries: Override the default retry configuration for this method
+        :param server_url: Override the default server URL for this method
+        :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
+        :param http_headers: Additional headers to set or replace on requests.
+        """
+        base_url = None
+        url_variables = None
+        if timeout_ms is None:
+            timeout_ms = self.sdk_configuration.timeout_ms
+
+        if server_url is not None:
+            base_url = server_url
+        else:
+            base_url = self._get_url(base_url, url_variables)
+
+        request = models.DeleteMetricValueByIDRequest(
+            program_id=program_id,
+            metric_id=metric_id,
+            metric_value_id=metric_value_id,
+        )
+
+        req = self._build_request(
+            method="DELETE",
+            path="/programs/{programId}/metrics/{metricId}/values/{metricValueId}",
+            base_url=base_url,
+            url_variables=url_variables,
+            request=request,
+            request_body_required=False,
+            request_has_path_params=True,
+            request_has_query_params=True,
+            user_agent_header="user-agent",
+            accept_header_value="application/json",
+            http_headers=http_headers,
+            security=self.sdk_configuration.security,
+            allow_empty_value=None,
+            timeout_ms=timeout_ms,
+        )
+
+        if retries == UNSET:
+            if self.sdk_configuration.retry_config is not UNSET:
+                retries = self.sdk_configuration.retry_config
+
+        retry_config = None
+        if isinstance(retries, utils.RetryConfig):
+            retry_config = (retries, ["429", "500", "502", "503", "504"])
+
+        http_res = self.do_request(
+            hook_ctx=HookContext(
+                config=self.sdk_configuration,
+                base_url=base_url or "",
+                operation_id="deleteMetricValueById",
+                oauth2_scopes=["file:write"],
+                security_source=self.sdk_configuration.security,
+            ),
+            request=req,
+            error_status_codes=[
+                "400",
+                "401",
+                "403",
+                "404",
+                "409",
+                "429",
+                "4XX",
+                "500",
+                "503",
+                "5XX",
+            ],
+            retry_config=retry_config,
+        )
+
+        response_data: Any = None
+        if utils.match_response(http_res, "204", "*"):
+            return
+        if utils.match_response(
+            http_res, ["400", "401", "403", "404", "409", "429"], "application/json"
+        ):
+            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
+            raise errors.ErrorResponse(response_data, http_res)
+        if utils.match_response(http_res, ["500", "503"], "application/json"):
+            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
+            raise errors.ErrorResponse(response_data, http_res)
+        if utils.match_response(http_res, "4XX", "*"):
+            http_res_text = utils.stream_to_text(http_res)
+            raise errors.SDKError("API error occurred", http_res, http_res_text)
+        if utils.match_response(http_res, "5XX", "*"):
+            http_res_text = utils.stream_to_text(http_res)
+            raise errors.SDKError("API error occurred", http_res, http_res_text)
+
+        raise errors.SDKError("Unexpected response received", http_res)
+
+    async def delete_metric_value_by_id_async(
+        self,
+        *,
+        program_id: str,
+        metric_id: str,
+        metric_value_id: str,
+        retries: OptionalNullable[utils.RetryConfig] = UNSET,
+        server_url: Optional[str] = None,
+        timeout_ms: Optional[int] = None,
+        http_headers: Optional[Mapping[str, str]] = None,
+    ):
+        r"""Delete a single metric value
+
+        Deletes a [metric value](ref:sustainability#metricvalue) value given its ID
+
+
+        :param program_id: The unique identifier of the program
+        :param metric_id: The unique identifier of the metric
+        :param metric_value_id: The unique identifier of the value
+        :param retries: Override the default retry configuration for this method
+        :param server_url: Override the default server URL for this method
+        :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
+        :param http_headers: Additional headers to set or replace on requests.
+        """
+        base_url = None
+        url_variables = None
+        if timeout_ms is None:
+            timeout_ms = self.sdk_configuration.timeout_ms
+
+        if server_url is not None:
+            base_url = server_url
+        else:
+            base_url = self._get_url(base_url, url_variables)
+
+        request = models.DeleteMetricValueByIDRequest(
+            program_id=program_id,
+            metric_id=metric_id,
+            metric_value_id=metric_value_id,
+        )
+
+        req = self._build_request_async(
+            method="DELETE",
+            path="/programs/{programId}/metrics/{metricId}/values/{metricValueId}",
+            base_url=base_url,
+            url_variables=url_variables,
+            request=request,
+            request_body_required=False,
+            request_has_path_params=True,
+            request_has_query_params=True,
+            user_agent_header="user-agent",
+            accept_header_value="application/json",
+            http_headers=http_headers,
+            security=self.sdk_configuration.security,
+            allow_empty_value=None,
+            timeout_ms=timeout_ms,
+        )
+
+        if retries == UNSET:
+            if self.sdk_configuration.retry_config is not UNSET:
+                retries = self.sdk_configuration.retry_config
+
+        retry_config = None
+        if isinstance(retries, utils.RetryConfig):
+            retry_config = (retries, ["429", "500", "502", "503", "504"])
+
+        http_res = await self.do_request_async(
+            hook_ctx=HookContext(
+                config=self.sdk_configuration,
+                base_url=base_url or "",
+                operation_id="deleteMetricValueById",
+                oauth2_scopes=["file:write"],
+                security_source=self.sdk_configuration.security,
+            ),
+            request=req,
+            error_status_codes=[
+                "400",
+                "401",
+                "403",
+                "404",
+                "409",
+                "429",
+                "4XX",
+                "500",
+                "503",
+                "5XX",
+            ],
+            retry_config=retry_config,
+        )
+
+        response_data: Any = None
+        if utils.match_response(http_res, "204", "*"):
+            return
+        if utils.match_response(
+            http_res, ["400", "401", "403", "404", "409", "429"], "application/json"
+        ):
+            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
+            raise errors.ErrorResponse(response_data, http_res)
+        if utils.match_response(http_res, ["500", "503"], "application/json"):
+            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
+            raise errors.ErrorResponse(response_data, http_res)
+        if utils.match_response(http_res, "4XX", "*"):
+            http_res_text = await utils.stream_to_text_async(http_res)
+            raise errors.SDKError("API error occurred", http_res, http_res_text)
+        if utils.match_response(http_res, "5XX", "*"):
+            http_res_text = await utils.stream_to_text_async(http_res)
+            raise errors.SDKError("API error occurred", http_res, http_res_text)
+
+        raise errors.SDKError("Unexpected response received", http_res)
+
+    def get_metric_value_by_id(
+        self,
+        *,
+        program_id: str,
+        metric_id: str,
+        metric_value_id: str,
+        retries: OptionalNullable[utils.RetryConfig] = UNSET,
+        server_url: Optional[str] = None,
+        timeout_ms: Optional[int] = None,
+        http_headers: Optional[Mapping[str, str]] = None,
+    ) -> models.MetricValue:
+        r"""Retrieve a single metric value
+
+        Retrieves a [metric value](ref:sustainability#metricvalue) value given its ID
+
+
+        :param program_id: The unique identifier of the program
+        :param metric_id: The unique identifier of the metric
+        :param metric_value_id: The unique identifier of the value
+        :param retries: Override the default retry configuration for this method
+        :param server_url: Override the default server URL for this method
+        :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
+        :param http_headers: Additional headers to set or replace on requests.
+        """
+        base_url = None
+        url_variables = None
+        if timeout_ms is None:
+            timeout_ms = self.sdk_configuration.timeout_ms
+
+        if server_url is not None:
+            base_url = server_url
+        else:
+            base_url = self._get_url(base_url, url_variables)
+
+        request = models.GetMetricValueByIDRequest(
+            program_id=program_id,
+            metric_id=metric_id,
+            metric_value_id=metric_value_id,
+        )
+
+        req = self._build_request(
+            method="GET",
+            path="/programs/{programId}/metrics/{metricId}/values/{metricValueId}",
+            base_url=base_url,
+            url_variables=url_variables,
+            request=request,
+            request_body_required=False,
+            request_has_path_params=True,
+            request_has_query_params=True,
+            user_agent_header="user-agent",
+            accept_header_value="application/json",
+            http_headers=http_headers,
+            security=self.sdk_configuration.security,
+            allow_empty_value=None,
+            timeout_ms=timeout_ms,
+        )
+
+        if retries == UNSET:
+            if self.sdk_configuration.retry_config is not UNSET:
+                retries = self.sdk_configuration.retry_config
+
+        retry_config = None
+        if isinstance(retries, utils.RetryConfig):
+            retry_config = (retries, ["429", "500", "502", "503", "504"])
+
+        http_res = self.do_request(
+            hook_ctx=HookContext(
+                config=self.sdk_configuration,
+                base_url=base_url or "",
+                operation_id="getMetricValueById",
+                oauth2_scopes=["file:read"],
+                security_source=self.sdk_configuration.security,
+            ),
+            request=req,
+            error_status_codes=[
+                "400",
+                "401",
+                "403",
+                "404",
+                "409",
+                "429",
+                "4XX",
+                "500",
+                "503",
+                "5XX",
+            ],
+            retry_config=retry_config,
+        )
+
+        response_data: Any = None
+        if utils.match_response(http_res, "200", "application/json"):
+            return unmarshal_json_response(models.MetricValue, http_res)
+        if utils.match_response(
+            http_res, ["400", "401", "403", "404", "409", "429"], "application/json"
+        ):
+            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
+            raise errors.ErrorResponse(response_data, http_res)
+        if utils.match_response(http_res, ["500", "503"], "application/json"):
+            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
+            raise errors.ErrorResponse(response_data, http_res)
+        if utils.match_response(http_res, "4XX", "*"):
+            http_res_text = utils.stream_to_text(http_res)
+            raise errors.SDKError("API error occurred", http_res, http_res_text)
+        if utils.match_response(http_res, "5XX", "*"):
+            http_res_text = utils.stream_to_text(http_res)
+            raise errors.SDKError("API error occurred", http_res, http_res_text)
+
+        raise errors.SDKError("Unexpected response received", http_res)
+
+    async def get_metric_value_by_id_async(
+        self,
+        *,
+        program_id: str,
+        metric_id: str,
+        metric_value_id: str,
+        retries: OptionalNullable[utils.RetryConfig] = UNSET,
+        server_url: Optional[str] = None,
+        timeout_ms: Optional[int] = None,
+        http_headers: Optional[Mapping[str, str]] = None,
+    ) -> models.MetricValue:
+        r"""Retrieve a single metric value
+
+        Retrieves a [metric value](ref:sustainability#metricvalue) value given its ID
+
+
+        :param program_id: The unique identifier of the program
+        :param metric_id: The unique identifier of the metric
+        :param metric_value_id: The unique identifier of the value
+        :param retries: Override the default retry configuration for this method
+        :param server_url: Override the default server URL for this method
+        :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
+        :param http_headers: Additional headers to set or replace on requests.
+        """
+        base_url = None
+        url_variables = None
+        if timeout_ms is None:
+            timeout_ms = self.sdk_configuration.timeout_ms
+
+        if server_url is not None:
+            base_url = server_url
+        else:
+            base_url = self._get_url(base_url, url_variables)
+
+        request = models.GetMetricValueByIDRequest(
+            program_id=program_id,
+            metric_id=metric_id,
+            metric_value_id=metric_value_id,
+        )
+
+        req = self._build_request_async(
+            method="GET",
+            path="/programs/{programId}/metrics/{metricId}/values/{metricValueId}",
+            base_url=base_url,
+            url_variables=url_variables,
+            request=request,
+            request_body_required=False,
+            request_has_path_params=True,
+            request_has_query_params=True,
+            user_agent_header="user-agent",
+            accept_header_value="application/json",
+            http_headers=http_headers,
+            security=self.sdk_configuration.security,
+            allow_empty_value=None,
+            timeout_ms=timeout_ms,
+        )
+
+        if retries == UNSET:
+            if self.sdk_configuration.retry_config is not UNSET:
+                retries = self.sdk_configuration.retry_config
+
+        retry_config = None
+        if isinstance(retries, utils.RetryConfig):
+            retry_config = (retries, ["429", "500", "502", "503", "504"])
+
+        http_res = await self.do_request_async(
+            hook_ctx=HookContext(
+                config=self.sdk_configuration,
+                base_url=base_url or "",
+                operation_id="getMetricValueById",
+                oauth2_scopes=["file:read"],
+                security_source=self.sdk_configuration.security,
+            ),
+            request=req,
+            error_status_codes=[
+                "400",
+                "401",
+                "403",
+                "404",
+                "409",
+                "429",
+                "4XX",
+                "500",
+                "503",
+                "5XX",
+            ],
+            retry_config=retry_config,
+        )
+
+        response_data: Any = None
+        if utils.match_response(http_res, "200", "application/json"):
+            return unmarshal_json_response(models.MetricValue, http_res)
+        if utils.match_response(
+            http_res, ["400", "401", "403", "404", "409", "429"], "application/json"
+        ):
+            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
+            raise errors.ErrorResponse(response_data, http_res)
+        if utils.match_response(http_res, ["500", "503"], "application/json"):
+            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
+            raise errors.ErrorResponse(response_data, http_res)
+        if utils.match_response(http_res, "4XX", "*"):
+            http_res_text = await utils.stream_to_text_async(http_res)
+            raise errors.SDKError("API error occurred", http_res, http_res_text)
+        if utils.match_response(http_res, "5XX", "*"):
+            http_res_text = await utils.stream_to_text_async(http_res)
+            raise errors.SDKError("API error occurred", http_res, http_res_text)
+
+        raise errors.SDKError("Unexpected response received", http_res)
+
+    def partially_update_metric_value_by_id(
+        self,
+        *,
+        program_id: str,
+        metric_id: str,
+        metric_value_id: str,
+        request_body: Union[
+            List[models.JSONPatchOperation], List[models.JSONPatchOperationTypedDict]
+        ],
+        retries: OptionalNullable[utils.RetryConfig] = UNSET,
+        server_url: Optional[str] = None,
+        timeout_ms: Optional[int] = None,
+        http_headers: Optional[Mapping[str, str]] = None,
+    ) -> models.MetricValue:
+        r"""Partially update a single metric value
+
+        Partially updates the properties of a [metric value](ref:sustainability#metricvalue) value. Only one property may be updated at a time.
+        ### Options
+        |Path|PATCH Operations Supported|
+        |---|---|
+        |`/notes`|`replace`, `test`|
+        |`/value`|`replace`, `test`|
+
+
+        :param program_id: The unique identifier of the program
+        :param metric_id: The unique identifier of the metric
+        :param metric_value_id: The unique identifier of the value
+        :param request_body: A collection of patch operations to apply to the metric value. Currently only one operation may be applied at a time.
+        :param retries: Override the default retry configuration for this method
+        :param server_url: Override the default server URL for this method
+        :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
+        :param http_headers: Additional headers to set or replace on requests.
+        """
+        base_url = None
+        url_variables = None
+        if timeout_ms is None:
+            timeout_ms = self.sdk_configuration.timeout_ms
+
+        if server_url is not None:
+            base_url = server_url
+        else:
+            base_url = self._get_url(base_url, url_variables)
+
+        request = models.PartiallyUpdateMetricValueByIDRequest(
+            program_id=program_id,
+            metric_id=metric_id,
+            metric_value_id=metric_value_id,
+            request_body=utils.get_pydantic_model(
+                request_body, List[models.JSONPatchOperation]
+            ),
+        )
+
+        req = self._build_request(
+            method="PATCH",
+            path="/programs/{programId}/metrics/{metricId}/values/{metricValueId}",
+            base_url=base_url,
+            url_variables=url_variables,
+            request=request,
+            request_body_required=True,
+            request_has_path_params=True,
+            request_has_query_params=True,
+            user_agent_header="user-agent",
+            accept_header_value="application/json",
+            http_headers=http_headers,
+            security=self.sdk_configuration.security,
+            get_serialized_body=lambda: utils.serialize_request_body(
+                request.request_body,
+                False,
+                False,
+                "json",
+                List[models.JSONPatchOperation],
+            ),
+            allow_empty_value=None,
+            timeout_ms=timeout_ms,
+        )
+
+        if retries == UNSET:
+            if self.sdk_configuration.retry_config is not UNSET:
+                retries = self.sdk_configuration.retry_config
+
+        retry_config = None
+        if isinstance(retries, utils.RetryConfig):
+            retry_config = (retries, ["429", "500", "502", "503", "504"])
+
+        http_res = self.do_request(
+            hook_ctx=HookContext(
+                config=self.sdk_configuration,
+                base_url=base_url or "",
+                operation_id="partiallyUpdateMetricValueById",
+                oauth2_scopes=["file:write"],
+                security_source=self.sdk_configuration.security,
+            ),
+            request=req,
+            error_status_codes=[
+                "400",
+                "401",
+                "403",
+                "404",
+                "409",
+                "429",
+                "4XX",
+                "500",
+                "503",
+                "5XX",
+            ],
+            retry_config=retry_config,
+        )
+
+        response_data: Any = None
+        if utils.match_response(http_res, "200", "application/json"):
+            return unmarshal_json_response(models.MetricValue, http_res)
+        if utils.match_response(
+            http_res, ["400", "401", "403", "404", "409", "429"], "application/json"
+        ):
+            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
+            raise errors.ErrorResponse(response_data, http_res)
+        if utils.match_response(http_res, ["500", "503"], "application/json"):
+            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
+            raise errors.ErrorResponse(response_data, http_res)
+        if utils.match_response(http_res, "4XX", "*"):
+            http_res_text = utils.stream_to_text(http_res)
+            raise errors.SDKError("API error occurred", http_res, http_res_text)
+        if utils.match_response(http_res, "5XX", "*"):
+            http_res_text = utils.stream_to_text(http_res)
+            raise errors.SDKError("API error occurred", http_res, http_res_text)
+
+        raise errors.SDKError("Unexpected response received", http_res)
+
+    async def partially_update_metric_value_by_id_async(
+        self,
+        *,
+        program_id: str,
+        metric_id: str,
+        metric_value_id: str,
+        request_body: Union[
+            List[models.JSONPatchOperation], List[models.JSONPatchOperationTypedDict]
+        ],
+        retries: OptionalNullable[utils.RetryConfig] = UNSET,
+        server_url: Optional[str] = None,
+        timeout_ms: Optional[int] = None,
+        http_headers: Optional[Mapping[str, str]] = None,
+    ) -> models.MetricValue:
+        r"""Partially update a single metric value
+
+        Partially updates the properties of a [metric value](ref:sustainability#metricvalue) value. Only one property may be updated at a time.
+        ### Options
+        |Path|PATCH Operations Supported|
+        |---|---|
+        |`/notes`|`replace`, `test`|
+        |`/value`|`replace`, `test`|
+
+
+        :param program_id: The unique identifier of the program
+        :param metric_id: The unique identifier of the metric
+        :param metric_value_id: The unique identifier of the value
+        :param request_body: A collection of patch operations to apply to the metric value. Currently only one operation may be applied at a time.
+        :param retries: Override the default retry configuration for this method
+        :param server_url: Override the default server URL for this method
+        :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
+        :param http_headers: Additional headers to set or replace on requests.
+        """
+        base_url = None
+        url_variables = None
+        if timeout_ms is None:
+            timeout_ms = self.sdk_configuration.timeout_ms
+
+        if server_url is not None:
+            base_url = server_url
+        else:
+            base_url = self._get_url(base_url, url_variables)
+
+        request = models.PartiallyUpdateMetricValueByIDRequest(
+            program_id=program_id,
+            metric_id=metric_id,
+            metric_value_id=metric_value_id,
+            request_body=utils.get_pydantic_model(
+                request_body, List[models.JSONPatchOperation]
+            ),
+        )
+
+        req = self._build_request_async(
+            method="PATCH",
+            path="/programs/{programId}/metrics/{metricId}/values/{metricValueId}",
+            base_url=base_url,
+            url_variables=url_variables,
+            request=request,
+            request_body_required=True,
+            request_has_path_params=True,
+            request_has_query_params=True,
+            user_agent_header="user-agent",
+            accept_header_value="application/json",
+            http_headers=http_headers,
+            security=self.sdk_configuration.security,
+            get_serialized_body=lambda: utils.serialize_request_body(
+                request.request_body,
+                False,
+                False,
+                "json",
+                List[models.JSONPatchOperation],
+            ),
+            allow_empty_value=None,
+            timeout_ms=timeout_ms,
+        )
+
+        if retries == UNSET:
+            if self.sdk_configuration.retry_config is not UNSET:
+                retries = self.sdk_configuration.retry_config
+
+        retry_config = None
+        if isinstance(retries, utils.RetryConfig):
+            retry_config = (retries, ["429", "500", "502", "503", "504"])
+
+        http_res = await self.do_request_async(
+            hook_ctx=HookContext(
+                config=self.sdk_configuration,
+                base_url=base_url or "",
+                operation_id="partiallyUpdateMetricValueById",
+                oauth2_scopes=["file:write"],
+                security_source=self.sdk_configuration.security,
+            ),
+            request=req,
+            error_status_codes=[
+                "400",
+                "401",
+                "403",
+                "404",
+                "409",
+                "429",
+                "4XX",
+                "500",
+                "503",
+                "5XX",
+            ],
+            retry_config=retry_config,
+        )
+
+        response_data: Any = None
+        if utils.match_response(http_res, "200", "application/json"):
+            return unmarshal_json_response(models.MetricValue, http_res)
+        if utils.match_response(
+            http_res, ["400", "401", "403", "404", "409", "429"], "application/json"
+        ):
+            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
+            raise errors.ErrorResponse(response_data, http_res)
+        if utils.match_response(http_res, ["500", "503"], "application/json"):
+            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
+            raise errors.ErrorResponse(response_data, http_res)
+        if utils.match_response(http_res, "4XX", "*"):
+            http_res_text = await utils.stream_to_text_async(http_res)
+            raise errors.SDKError("API error occurred", http_res, http_res_text)
+        if utils.match_response(http_res, "5XX", "*"):
+            http_res_text = await utils.stream_to_text_async(http_res)
+            raise errors.SDKError("API error occurred", http_res, http_res_text)
+
+        raise errors.SDKError("Unexpected response received", http_res)
+
+    def batch_deletion_metric_values(
+        self,
+        *,
+        program_id: str,
+        metric_id: str,
+        metric_value_identifier: Union[
+            models.MetricValueIdentifier, models.MetricValueIdentifierTypedDict
+        ],
+        retries: OptionalNullable[utils.RetryConfig] = UNSET,
+        server_url: Optional[str] = None,
+        timeout_ms: Optional[int] = None,
+        http_headers: Optional[Mapping[str, str]] = None,
+    ):
+        r"""Initiate a batch deletion of metric values
+
+        Batch delete the given metric values.
+
+        For each value, provide either the id or both the reportingPeriod and coordinates (if any).
+        If both are provided, the given id will be used.
+
+
+        :param program_id: The unique identifier of the program
+        :param metric_id: The unique identifier of the metric
+        :param metric_value_identifier: The metric values to delete
+        :param retries: Override the default retry configuration for this method
+        :param server_url: Override the default server URL for this method
+        :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
+        :param http_headers: Additional headers to set or replace on requests.
+        """
+        base_url = None
+        url_variables = None
+        if timeout_ms is None:
+            timeout_ms = self.sdk_configuration.timeout_ms
+
+        if server_url is not None:
+            base_url = server_url
+        else:
+            base_url = self._get_url(base_url, url_variables)
+
+        request = models.BatchDeletionMetricValuesRequest(
+            program_id=program_id,
+            metric_id=metric_id,
+            metric_value_identifier=utils.get_pydantic_model(
+                metric_value_identifier, models.MetricValueIdentifier
+            ),
+        )
+
+        req = self._build_request(
+            method="POST",
+            path="/programs/{programId}/metrics/{metricId}/values/batchDeletion",
+            base_url=base_url,
+            url_variables=url_variables,
+            request=request,
+            request_body_required=True,
+            request_has_path_params=True,
+            request_has_query_params=True,
+            user_agent_header="user-agent",
+            accept_header_value="application/json",
+            http_headers=http_headers,
+            security=self.sdk_configuration.security,
+            get_serialized_body=lambda: utils.serialize_request_body(
+                request.metric_value_identifier,
+                False,
+                False,
+                "json",
+                models.MetricValueIdentifier,
+            ),
+            allow_empty_value=None,
+            timeout_ms=timeout_ms,
+        )
+
+        if retries == UNSET:
+            if self.sdk_configuration.retry_config is not UNSET:
+                retries = self.sdk_configuration.retry_config
+
+        retry_config = None
+        if isinstance(retries, utils.RetryConfig):
+            retry_config = (retries, ["429", "500", "502", "503", "504"])
+
+        http_res = self.do_request(
+            hook_ctx=HookContext(
+                config=self.sdk_configuration,
+                base_url=base_url or "",
+                operation_id="batchDeletionMetricValues",
+                oauth2_scopes=["file:write"],
+                security_source=self.sdk_configuration.security,
+            ),
+            request=req,
+            error_status_codes=[
+                "400",
+                "401",
+                "403",
+                "404",
+                "409",
+                "429",
+                "4XX",
+                "500",
+                "503",
+                "5XX",
+            ],
+            retry_config=retry_config,
+        )
+
+        response_data: Any = None
+        if utils.match_response(http_res, "204", "*"):
+            return
+        if utils.match_response(
+            http_res, ["400", "401", "403", "404", "409", "429"], "application/json"
+        ):
+            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
+            raise errors.ErrorResponse(response_data, http_res)
+        if utils.match_response(http_res, ["500", "503"], "application/json"):
+            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
+            raise errors.ErrorResponse(response_data, http_res)
+        if utils.match_response(http_res, "4XX", "*"):
+            http_res_text = utils.stream_to_text(http_res)
+            raise errors.SDKError("API error occurred", http_res, http_res_text)
+        if utils.match_response(http_res, "5XX", "*"):
+            http_res_text = utils.stream_to_text(http_res)
+            raise errors.SDKError("API error occurred", http_res, http_res_text)
+
+        raise errors.SDKError("Unexpected response received", http_res)
+
+    async def batch_deletion_metric_values_async(
+        self,
+        *,
+        program_id: str,
+        metric_id: str,
+        metric_value_identifier: Union[
+            models.MetricValueIdentifier, models.MetricValueIdentifierTypedDict
+        ],
+        retries: OptionalNullable[utils.RetryConfig] = UNSET,
+        server_url: Optional[str] = None,
+        timeout_ms: Optional[int] = None,
+        http_headers: Optional[Mapping[str, str]] = None,
+    ):
+        r"""Initiate a batch deletion of metric values
+
+        Batch delete the given metric values.
+
+        For each value, provide either the id or both the reportingPeriod and coordinates (if any).
+        If both are provided, the given id will be used.
+
+
+        :param program_id: The unique identifier of the program
+        :param metric_id: The unique identifier of the metric
+        :param metric_value_identifier: The metric values to delete
+        :param retries: Override the default retry configuration for this method
+        :param server_url: Override the default server URL for this method
+        :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
+        :param http_headers: Additional headers to set or replace on requests.
+        """
+        base_url = None
+        url_variables = None
+        if timeout_ms is None:
+            timeout_ms = self.sdk_configuration.timeout_ms
+
+        if server_url is not None:
+            base_url = server_url
+        else:
+            base_url = self._get_url(base_url, url_variables)
+
+        request = models.BatchDeletionMetricValuesRequest(
+            program_id=program_id,
+            metric_id=metric_id,
+            metric_value_identifier=utils.get_pydantic_model(
+                metric_value_identifier, models.MetricValueIdentifier
+            ),
+        )
+
+        req = self._build_request_async(
+            method="POST",
+            path="/programs/{programId}/metrics/{metricId}/values/batchDeletion",
+            base_url=base_url,
+            url_variables=url_variables,
+            request=request,
+            request_body_required=True,
+            request_has_path_params=True,
+            request_has_query_params=True,
+            user_agent_header="user-agent",
+            accept_header_value="application/json",
+            http_headers=http_headers,
+            security=self.sdk_configuration.security,
+            get_serialized_body=lambda: utils.serialize_request_body(
+                request.metric_value_identifier,
+                False,
+                False,
+                "json",
+                models.MetricValueIdentifier,
+            ),
+            allow_empty_value=None,
+            timeout_ms=timeout_ms,
+        )
+
+        if retries == UNSET:
+            if self.sdk_configuration.retry_config is not UNSET:
+                retries = self.sdk_configuration.retry_config
+
+        retry_config = None
+        if isinstance(retries, utils.RetryConfig):
+            retry_config = (retries, ["429", "500", "502", "503", "504"])
+
+        http_res = await self.do_request_async(
+            hook_ctx=HookContext(
+                config=self.sdk_configuration,
+                base_url=base_url or "",
+                operation_id="batchDeletionMetricValues",
+                oauth2_scopes=["file:write"],
+                security_source=self.sdk_configuration.security,
+            ),
+            request=req,
+            error_status_codes=[
+                "400",
+                "401",
+                "403",
+                "404",
+                "409",
+                "429",
+                "4XX",
+                "500",
+                "503",
+                "5XX",
+            ],
+            retry_config=retry_config,
+        )
+
+        response_data: Any = None
+        if utils.match_response(http_res, "204", "*"):
+            return
+        if utils.match_response(
+            http_res, ["400", "401", "403", "404", "409", "429"], "application/json"
+        ):
+            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
+            raise errors.ErrorResponse(response_data, http_res)
+        if utils.match_response(http_res, ["500", "503"], "application/json"):
+            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
+            raise errors.ErrorResponse(response_data, http_res)
+        if utils.match_response(http_res, "4XX", "*"):
+            http_res_text = await utils.stream_to_text_async(http_res)
+            raise errors.SDKError("API error occurred", http_res, http_res_text)
+        if utils.match_response(http_res, "5XX", "*"):
+            http_res_text = await utils.stream_to_text_async(http_res)
+            raise errors.SDKError("API error occurred", http_res, http_res_text)
+
+        raise errors.SDKError("Unexpected response received", http_res)
+
+    def batch_upsertion_metric_values(
+        self,
+        *,
+        program_id: str,
+        metric_id: str,
+        metric_value_upsertion: Union[
+            models.MetricValueUpsertion, models.MetricValueUpsertionTypedDict
+        ],
+        retries: OptionalNullable[utils.RetryConfig] = UNSET,
+        server_url: Optional[str] = None,
+        timeout_ms: Optional[int] = None,
+        http_headers: Optional[Mapping[str, str]] = None,
+    ) -> models.BatchUpsertionMetricValuesResponse:
+        r"""Initiate a batch upsertion of metric values
+
+        Batch upsert values for the given metric. The payload is limited to 10MB; break it into multiple requests if necessary.
+
+        For each value, provide either the id or both the reportingPeriod and coordinates (if any).
+        If both are provided, the given id will be used.
+
+        The API will validate the request and return a 202 Accepted status.
+        However, the operation will be processed asynchronously, so the values may take some time to appear in the system.
+        Poll the location provided in the Location header to check the status of the operation.
+
+        If any of the values fail to be processed, no changes will be stored in the system.
+
+
+        :param program_id: The unique identifier of the program
+        :param metric_id: The unique identifier of the metric
+        :param metric_value_upsertion: The metric values to upsert
+        :param retries: Override the default retry configuration for this method
+        :param server_url: Override the default server URL for this method
+        :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
+        :param http_headers: Additional headers to set or replace on requests.
+        """
+        base_url = None
+        url_variables = None
+        if timeout_ms is None:
+            timeout_ms = self.sdk_configuration.timeout_ms
+
+        if server_url is not None:
+            base_url = server_url
+        else:
+            base_url = self._get_url(base_url, url_variables)
+
+        request = models.BatchUpsertionMetricValuesRequest(
+            program_id=program_id,
+            metric_id=metric_id,
+            metric_value_upsertion=utils.get_pydantic_model(
+                metric_value_upsertion, models.MetricValueUpsertion
+            ),
+        )
+
+        req = self._build_request(
+            method="POST",
+            path="/programs/{programId}/metrics/{metricId}/values/batchUpsertion",
+            base_url=base_url,
+            url_variables=url_variables,
+            request=request,
+            request_body_required=True,
+            request_has_path_params=True,
+            request_has_query_params=True,
+            user_agent_header="user-agent",
+            accept_header_value="application/json",
+            http_headers=http_headers,
+            security=self.sdk_configuration.security,
+            get_serialized_body=lambda: utils.serialize_request_body(
+                request.metric_value_upsertion,
+                False,
+                False,
+                "json",
+                models.MetricValueUpsertion,
+            ),
+            allow_empty_value=None,
+            timeout_ms=timeout_ms,
+        )
+
+        if retries == UNSET:
+            if self.sdk_configuration.retry_config is not UNSET:
+                retries = self.sdk_configuration.retry_config
+
+        retry_config = None
+        if isinstance(retries, utils.RetryConfig):
+            retry_config = (retries, ["429", "500", "502", "503", "504"])
+
+        http_res = self.do_request(
+            hook_ctx=HookContext(
+                config=self.sdk_configuration,
+                base_url=base_url or "",
+                operation_id="batchUpsertionMetricValues",
+                oauth2_scopes=["file:write"],
+                security_source=self.sdk_configuration.security,
+            ),
+            request=req,
+            error_status_codes=[
+                "400",
+                "401",
+                "403",
+                "404",
+                "409",
+                "429",
+                "4XX",
+                "500",
+                "503",
+                "5XX",
+            ],
+            retry_config=retry_config,
+        )
+
+        response_data: Any = None
+        if utils.match_response(http_res, "202", "*"):
+            return models.BatchUpsertionMetricValuesResponse(
+                headers=utils.get_response_headers(http_res.headers)
+            )
+        if utils.match_response(
+            http_res, ["400", "401", "403", "404", "409", "429"], "application/json"
+        ):
+            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
+            raise errors.ErrorResponse(response_data, http_res)
+        if utils.match_response(http_res, ["500", "503"], "application/json"):
+            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
+            raise errors.ErrorResponse(response_data, http_res)
+        if utils.match_response(http_res, "4XX", "*"):
+            http_res_text = utils.stream_to_text(http_res)
+            raise errors.SDKError("API error occurred", http_res, http_res_text)
+        if utils.match_response(http_res, "5XX", "*"):
+            http_res_text = utils.stream_to_text(http_res)
+            raise errors.SDKError("API error occurred", http_res, http_res_text)
+
+        raise errors.SDKError("Unexpected response received", http_res)
+
+    async def batch_upsertion_metric_values_async(
+        self,
+        *,
+        program_id: str,
+        metric_id: str,
+        metric_value_upsertion: Union[
+            models.MetricValueUpsertion, models.MetricValueUpsertionTypedDict
+        ],
+        retries: OptionalNullable[utils.RetryConfig] = UNSET,
+        server_url: Optional[str] = None,
+        timeout_ms: Optional[int] = None,
+        http_headers: Optional[Mapping[str, str]] = None,
+    ) -> models.BatchUpsertionMetricValuesResponse:
+        r"""Initiate a batch upsertion of metric values
+
+        Batch upsert values for the given metric. The payload is limited to 10MB; break it into multiple requests if necessary.
+
+        For each value, provide either the id or both the reportingPeriod and coordinates (if any).
+        If both are provided, the given id will be used.
+
+        The API will validate the request and return a 202 Accepted status.
+        However, the operation will be processed asynchronously, so the values may take some time to appear in the system.
+        Poll the location provided in the Location header to check the status of the operation.
+
+        If any of the values fail to be processed, no changes will be stored in the system.
+
+
+        :param program_id: The unique identifier of the program
+        :param metric_id: The unique identifier of the metric
+        :param metric_value_upsertion: The metric values to upsert
+        :param retries: Override the default retry configuration for this method
+        :param server_url: Override the default server URL for this method
+        :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
+        :param http_headers: Additional headers to set or replace on requests.
+        """
+        base_url = None
+        url_variables = None
+        if timeout_ms is None:
+            timeout_ms = self.sdk_configuration.timeout_ms
+
+        if server_url is not None:
+            base_url = server_url
+        else:
+            base_url = self._get_url(base_url, url_variables)
+
+        request = models.BatchUpsertionMetricValuesRequest(
+            program_id=program_id,
+            metric_id=metric_id,
+            metric_value_upsertion=utils.get_pydantic_model(
+                metric_value_upsertion, models.MetricValueUpsertion
+            ),
+        )
+
+        req = self._build_request_async(
+            method="POST",
+            path="/programs/{programId}/metrics/{metricId}/values/batchUpsertion",
+            base_url=base_url,
+            url_variables=url_variables,
+            request=request,
+            request_body_required=True,
+            request_has_path_params=True,
+            request_has_query_params=True,
+            user_agent_header="user-agent",
+            accept_header_value="application/json",
+            http_headers=http_headers,
+            security=self.sdk_configuration.security,
+            get_serialized_body=lambda: utils.serialize_request_body(
+                request.metric_value_upsertion,
+                False,
+                False,
+                "json",
+                models.MetricValueUpsertion,
+            ),
+            allow_empty_value=None,
+            timeout_ms=timeout_ms,
+        )
+
+        if retries == UNSET:
+            if self.sdk_configuration.retry_config is not UNSET:
+                retries = self.sdk_configuration.retry_config
+
+        retry_config = None
+        if isinstance(retries, utils.RetryConfig):
+            retry_config = (retries, ["429", "500", "502", "503", "504"])
+
+        http_res = await self.do_request_async(
+            hook_ctx=HookContext(
+                config=self.sdk_configuration,
+                base_url=base_url or "",
+                operation_id="batchUpsertionMetricValues",
+                oauth2_scopes=["file:write"],
+                security_source=self.sdk_configuration.security,
+            ),
+            request=req,
+            error_status_codes=[
+                "400",
+                "401",
+                "403",
+                "404",
+                "409",
+                "429",
+                "4XX",
+                "500",
+                "503",
+                "5XX",
+            ],
+            retry_config=retry_config,
+        )
+
+        response_data: Any = None
+        if utils.match_response(http_res, "202", "*"):
+            return models.BatchUpsertionMetricValuesResponse(
+                headers=utils.get_response_headers(http_res.headers)
+            )
+        if utils.match_response(
+            http_res, ["400", "401", "403", "404", "409", "429"], "application/json"
+        ):
+            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
+            raise errors.ErrorResponse(response_data, http_res)
+        if utils.match_response(http_res, ["500", "503"], "application/json"):
+            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
+            raise errors.ErrorResponse(response_data, http_res)
+        if utils.match_response(http_res, "4XX", "*"):
+            http_res_text = await utils.stream_to_text_async(http_res)
+            raise errors.SDKError("API error occurred", http_res, http_res_text)
+        if utils.match_response(http_res, "5XX", "*"):
+            http_res_text = await utils.stream_to_text_async(http_res)
+            raise errors.SDKError("API error occurred", http_res, http_res_text)
+
+        raise errors.SDKError("Unexpected response received", http_res)
+
+    def get_program_permissions(
+        self,
+        *,
+        program_id: str,
+        dollar_filter: Optional[str] = None,
+        dollar_maxpagesize: Optional[int] = 1000,
+        dollar_next: Optional[str] = None,
+        retries: OptionalNullable[utils.RetryConfig] = UNSET,
+        server_url: Optional[str] = None,
+        timeout_ms: Optional[int] = None,
+        http_headers: Optional[Mapping[str, str]] = None,
+    ) -> Optional[models.GetProgramPermissionsResponse]:
+        r"""Retrieve permissions for a program
+
+        Retrieves a paginated list of permissions for a given Sustainability Program
+
+
+        :param program_id: The unique identifier of the program
+        :param dollar_filter: The properties to filter the results by.
+        :param dollar_maxpagesize: The maximum number of results to retrieve
+        :param dollar_next: Pagination cursor for next set of results.
+        :param retries: Override the default retry configuration for this method
+        :param server_url: Override the default server URL for this method
+        :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
+        :param http_headers: Additional headers to set or replace on requests.
+        """
+        base_url = None
+        url_variables = None
+        if timeout_ms is None:
+            timeout_ms = self.sdk_configuration.timeout_ms
+
+        if server_url is not None:
+            base_url = server_url
+        else:
+            base_url = self._get_url(base_url, url_variables)
+
+        request = models.GetProgramPermissionsRequest(
+            program_id=program_id,
+            dollar_filter=dollar_filter,
+            dollar_maxpagesize=dollar_maxpagesize,
+            dollar_next=dollar_next,
+        )
+
+        req = self._build_request(
+            method="GET",
+            path="/programs/{programId}/permissions",
+            base_url=base_url,
+            url_variables=url_variables,
+            request=request,
+            request_body_required=False,
+            request_has_path_params=True,
+            request_has_query_params=True,
+            user_agent_header="user-agent",
+            accept_header_value="application/json",
+            http_headers=http_headers,
+            security=self.sdk_configuration.security,
+            allow_empty_value=None,
+            timeout_ms=timeout_ms,
+        )
+
+        if retries == UNSET:
+            if self.sdk_configuration.retry_config is not UNSET:
+                retries = self.sdk_configuration.retry_config
+
+        retry_config = None
+        if isinstance(retries, utils.RetryConfig):
+            retry_config = (retries, ["429", "500", "502", "503", "504"])
+
+        http_res = self.do_request(
+            hook_ctx=HookContext(
+                config=self.sdk_configuration,
+                base_url=base_url or "",
+                operation_id="getProgramPermissions",
+                oauth2_scopes=["file:read"],
+                security_source=self.sdk_configuration.security,
+            ),
+            request=req,
+            error_status_codes=[
+                "400",
+                "401",
+                "403",
+                "404",
+                "409",
+                "429",
+                "4XX",
+                "500",
+                "503",
+                "5XX",
+            ],
+            retry_config=retry_config,
+        )
+
+        def next_func() -> Optional[models.GetProgramPermissionsResponse]:
+            body = utils.unmarshal_json(http_res.text, Union[Dict[Any, Any], List[Any]])
+
+            next_cursor = JSONPath("$['@nextLink']").parse(body)
+
+            if len(next_cursor) == 0:
+                return None
+
+            next_cursor = next_cursor[0]
+            if next_cursor is None or str(next_cursor).strip() == "":
+                return None
+
+            return self.get_program_permissions(
+                program_id=program_id,
+                dollar_filter=dollar_filter,
+                dollar_maxpagesize=dollar_maxpagesize,
+                dollar_next=next_cursor,
+                retries=retries,
+            )
+
+        response_data: Any = None
+        if utils.match_response(http_res, "200", "application/json"):
+            return models.GetProgramPermissionsResponse(
+                result=unmarshal_json_response(
+                    models.ResourcePermissionsListResult, http_res
+                ),
+                next=next_func,
+            )
+        if utils.match_response(
+            http_res, ["400", "401", "403", "404", "409", "429"], "application/json"
+        ):
+            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
+            raise errors.ErrorResponse(response_data, http_res)
+        if utils.match_response(http_res, ["500", "503"], "application/json"):
+            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
+            raise errors.ErrorResponse(response_data, http_res)
+        if utils.match_response(http_res, "4XX", "*"):
+            http_res_text = utils.stream_to_text(http_res)
+            raise errors.SDKError("API error occurred", http_res, http_res_text)
+        if utils.match_response(http_res, "5XX", "*"):
+            http_res_text = utils.stream_to_text(http_res)
+            raise errors.SDKError("API error occurred", http_res, http_res_text)
+
+        raise errors.SDKError("Unexpected response received", http_res)
+
+    async def get_program_permissions_async(
+        self,
+        *,
+        program_id: str,
+        dollar_filter: Optional[str] = None,
+        dollar_maxpagesize: Optional[int] = 1000,
+        dollar_next: Optional[str] = None,
+        retries: OptionalNullable[utils.RetryConfig] = UNSET,
+        server_url: Optional[str] = None,
+        timeout_ms: Optional[int] = None,
+        http_headers: Optional[Mapping[str, str]] = None,
+    ) -> Optional[models.GetProgramPermissionsResponse]:
+        r"""Retrieve permissions for a program
+
+        Retrieves a paginated list of permissions for a given Sustainability Program
+
+
+        :param program_id: The unique identifier of the program
+        :param dollar_filter: The properties to filter the results by.
+        :param dollar_maxpagesize: The maximum number of results to retrieve
+        :param dollar_next: Pagination cursor for next set of results.
+        :param retries: Override the default retry configuration for this method
+        :param server_url: Override the default server URL for this method
+        :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
+        :param http_headers: Additional headers to set or replace on requests.
+        """
+        base_url = None
+        url_variables = None
+        if timeout_ms is None:
+            timeout_ms = self.sdk_configuration.timeout_ms
+
+        if server_url is not None:
+            base_url = server_url
+        else:
+            base_url = self._get_url(base_url, url_variables)
+
+        request = models.GetProgramPermissionsRequest(
+            program_id=program_id,
+            dollar_filter=dollar_filter,
+            dollar_maxpagesize=dollar_maxpagesize,
+            dollar_next=dollar_next,
+        )
+
+        req = self._build_request_async(
+            method="GET",
+            path="/programs/{programId}/permissions",
+            base_url=base_url,
+            url_variables=url_variables,
+            request=request,
+            request_body_required=False,
+            request_has_path_params=True,
+            request_has_query_params=True,
+            user_agent_header="user-agent",
+            accept_header_value="application/json",
+            http_headers=http_headers,
+            security=self.sdk_configuration.security,
+            allow_empty_value=None,
+            timeout_ms=timeout_ms,
+        )
+
+        if retries == UNSET:
+            if self.sdk_configuration.retry_config is not UNSET:
+                retries = self.sdk_configuration.retry_config
+
+        retry_config = None
+        if isinstance(retries, utils.RetryConfig):
+            retry_config = (retries, ["429", "500", "502", "503", "504"])
+
+        http_res = await self.do_request_async(
+            hook_ctx=HookContext(
+                config=self.sdk_configuration,
+                base_url=base_url or "",
+                operation_id="getProgramPermissions",
+                oauth2_scopes=["file:read"],
+                security_source=self.sdk_configuration.security,
+            ),
+            request=req,
+            error_status_codes=[
+                "400",
+                "401",
+                "403",
+                "404",
+                "409",
+                "429",
+                "4XX",
+                "500",
+                "503",
+                "5XX",
+            ],
+            retry_config=retry_config,
+        )
+
+        def next_func() -> Awaitable[Optional[models.GetProgramPermissionsResponse]]:
+            body = utils.unmarshal_json(http_res.text, Union[Dict[Any, Any], List[Any]])
+
+            async def empty_result():
+                return None
+
+            next_cursor = JSONPath("$['@nextLink']").parse(body)
+
+            if len(next_cursor) == 0:
+                return empty_result()
+
+            next_cursor = next_cursor[0]
+            if next_cursor is None or str(next_cursor).strip() == "":
+                return empty_result()
+
+            return self.get_program_permissions_async(
+                program_id=program_id,
+                dollar_filter=dollar_filter,
+                dollar_maxpagesize=dollar_maxpagesize,
+                dollar_next=next_cursor,
+                retries=retries,
+            )
+
+        response_data: Any = None
+        if utils.match_response(http_res, "200", "application/json"):
+            return models.GetProgramPermissionsResponse(
+                result=unmarshal_json_response(
+                    models.ResourcePermissionsListResult, http_res
+                ),
+                next=next_func,
+            )
         if utils.match_response(
             http_res, ["400", "401", "403", "404", "409", "429"], "application/json"
         ):
@@ -6381,6 +5232,1159 @@ class Sustainability(BaseSDK):
         response_data: Any = None
         if utils.match_response(http_res, "204", "*"):
             return
+        if utils.match_response(
+            http_res, ["400", "401", "403", "404", "409", "429"], "application/json"
+        ):
+            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
+            raise errors.ErrorResponse(response_data, http_res)
+        if utils.match_response(http_res, ["500", "503"], "application/json"):
+            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
+            raise errors.ErrorResponse(response_data, http_res)
+        if utils.match_response(http_res, "4XX", "*"):
+            http_res_text = await utils.stream_to_text_async(http_res)
+            raise errors.SDKError("API error occurred", http_res, http_res_text)
+        if utils.match_response(http_res, "5XX", "*"):
+            http_res_text = await utils.stream_to_text_async(http_res)
+            raise errors.SDKError("API error occurred", http_res, http_res_text)
+
+        raise errors.SDKError("Unexpected response received", http_res)
+
+    def get_topics(
+        self,
+        *,
+        request: Union[models.GetTopicsRequest, models.GetTopicsRequestTypedDict],
+        retries: OptionalNullable[utils.RetryConfig] = UNSET,
+        server_url: Optional[str] = None,
+        timeout_ms: Optional[int] = None,
+        http_headers: Optional[Mapping[str, str]] = None,
+    ) -> Optional[models.GetTopicsResponse]:
+        r"""Retrieve a list of topics
+
+        Returns a paginated list of [topics](ref:sustainability#topic).
+
+        :param request: The request object to send.
+        :param retries: Override the default retry configuration for this method
+        :param server_url: Override the default server URL for this method
+        :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
+        :param http_headers: Additional headers to set or replace on requests.
+        """
+        base_url = None
+        url_variables = None
+        if timeout_ms is None:
+            timeout_ms = self.sdk_configuration.timeout_ms
+
+        if server_url is not None:
+            base_url = server_url
+        else:
+            base_url = self._get_url(base_url, url_variables)
+
+        if not isinstance(request, BaseModel):
+            request = utils.unmarshal(request, models.GetTopicsRequest)
+        request = cast(models.GetTopicsRequest, request)
+
+        req = self._build_request(
+            method="GET",
+            path="/programs/{programId}/topics",
+            base_url=base_url,
+            url_variables=url_variables,
+            request=request,
+            request_body_required=False,
+            request_has_path_params=True,
+            request_has_query_params=True,
+            user_agent_header="user-agent",
+            accept_header_value="application/json",
+            http_headers=http_headers,
+            security=self.sdk_configuration.security,
+            allow_empty_value=None,
+            timeout_ms=timeout_ms,
+        )
+
+        if retries == UNSET:
+            if self.sdk_configuration.retry_config is not UNSET:
+                retries = self.sdk_configuration.retry_config
+
+        retry_config = None
+        if isinstance(retries, utils.RetryConfig):
+            retry_config = (retries, ["429", "500", "502", "503", "504"])
+
+        http_res = self.do_request(
+            hook_ctx=HookContext(
+                config=self.sdk_configuration,
+                base_url=base_url or "",
+                operation_id="getTopics",
+                oauth2_scopes=["file:read"],
+                security_source=self.sdk_configuration.security,
+            ),
+            request=req,
+            error_status_codes=[
+                "400",
+                "401",
+                "403",
+                "404",
+                "409",
+                "429",
+                "4XX",
+                "500",
+                "503",
+                "5XX",
+            ],
+            retry_config=retry_config,
+        )
+
+        def next_func() -> Optional[models.GetTopicsResponse]:
+            body = utils.unmarshal_json(http_res.text, Union[Dict[Any, Any], List[Any]])
+
+            next_cursor = JSONPath("$['@nextLink']").parse(body)
+
+            if len(next_cursor) == 0:
+                return None
+
+            next_cursor = next_cursor[0]
+            if next_cursor is None or str(next_cursor).strip() == "":
+                return None
+
+            return self.get_topics(
+                request=models.GetTopicsRequest(
+                    program_id=request.program_id,
+                    dollar_maxpagesize=request.dollar_maxpagesize,
+                    dollar_next=next_cursor,
+                    dollar_filter=request.dollar_filter,
+                    dollar_order_by=request.dollar_order_by,
+                ),
+                retries=retries,
+            )
+
+        response_data: Any = None
+        if utils.match_response(http_res, "200", "application/json"):
+            return models.GetTopicsResponse(
+                result=unmarshal_json_response(models.TopicsListResult, http_res),
+                next=next_func,
+            )
+        if utils.match_response(
+            http_res, ["400", "401", "403", "404", "409", "429"], "application/json"
+        ):
+            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
+            raise errors.ErrorResponse(response_data, http_res)
+        if utils.match_response(http_res, ["500", "503"], "application/json"):
+            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
+            raise errors.ErrorResponse(response_data, http_res)
+        if utils.match_response(http_res, "4XX", "*"):
+            http_res_text = utils.stream_to_text(http_res)
+            raise errors.SDKError("API error occurred", http_res, http_res_text)
+        if utils.match_response(http_res, "5XX", "*"):
+            http_res_text = utils.stream_to_text(http_res)
+            raise errors.SDKError("API error occurred", http_res, http_res_text)
+
+        raise errors.SDKError("Unexpected response received", http_res)
+
+    async def get_topics_async(
+        self,
+        *,
+        request: Union[models.GetTopicsRequest, models.GetTopicsRequestTypedDict],
+        retries: OptionalNullable[utils.RetryConfig] = UNSET,
+        server_url: Optional[str] = None,
+        timeout_ms: Optional[int] = None,
+        http_headers: Optional[Mapping[str, str]] = None,
+    ) -> Optional[models.GetTopicsResponse]:
+        r"""Retrieve a list of topics
+
+        Returns a paginated list of [topics](ref:sustainability#topic).
+
+        :param request: The request object to send.
+        :param retries: Override the default retry configuration for this method
+        :param server_url: Override the default server URL for this method
+        :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
+        :param http_headers: Additional headers to set or replace on requests.
+        """
+        base_url = None
+        url_variables = None
+        if timeout_ms is None:
+            timeout_ms = self.sdk_configuration.timeout_ms
+
+        if server_url is not None:
+            base_url = server_url
+        else:
+            base_url = self._get_url(base_url, url_variables)
+
+        if not isinstance(request, BaseModel):
+            request = utils.unmarshal(request, models.GetTopicsRequest)
+        request = cast(models.GetTopicsRequest, request)
+
+        req = self._build_request_async(
+            method="GET",
+            path="/programs/{programId}/topics",
+            base_url=base_url,
+            url_variables=url_variables,
+            request=request,
+            request_body_required=False,
+            request_has_path_params=True,
+            request_has_query_params=True,
+            user_agent_header="user-agent",
+            accept_header_value="application/json",
+            http_headers=http_headers,
+            security=self.sdk_configuration.security,
+            allow_empty_value=None,
+            timeout_ms=timeout_ms,
+        )
+
+        if retries == UNSET:
+            if self.sdk_configuration.retry_config is not UNSET:
+                retries = self.sdk_configuration.retry_config
+
+        retry_config = None
+        if isinstance(retries, utils.RetryConfig):
+            retry_config = (retries, ["429", "500", "502", "503", "504"])
+
+        http_res = await self.do_request_async(
+            hook_ctx=HookContext(
+                config=self.sdk_configuration,
+                base_url=base_url or "",
+                operation_id="getTopics",
+                oauth2_scopes=["file:read"],
+                security_source=self.sdk_configuration.security,
+            ),
+            request=req,
+            error_status_codes=[
+                "400",
+                "401",
+                "403",
+                "404",
+                "409",
+                "429",
+                "4XX",
+                "500",
+                "503",
+                "5XX",
+            ],
+            retry_config=retry_config,
+        )
+
+        def next_func() -> Awaitable[Optional[models.GetTopicsResponse]]:
+            body = utils.unmarshal_json(http_res.text, Union[Dict[Any, Any], List[Any]])
+
+            async def empty_result():
+                return None
+
+            next_cursor = JSONPath("$['@nextLink']").parse(body)
+
+            if len(next_cursor) == 0:
+                return empty_result()
+
+            next_cursor = next_cursor[0]
+            if next_cursor is None or str(next_cursor).strip() == "":
+                return empty_result()
+
+            return self.get_topics_async(
+                request=models.GetTopicsRequest(
+                    program_id=request.program_id,
+                    dollar_maxpagesize=request.dollar_maxpagesize,
+                    dollar_next=next_cursor,
+                    dollar_filter=request.dollar_filter,
+                    dollar_order_by=request.dollar_order_by,
+                ),
+                retries=retries,
+            )
+
+        response_data: Any = None
+        if utils.match_response(http_res, "200", "application/json"):
+            return models.GetTopicsResponse(
+                result=unmarshal_json_response(models.TopicsListResult, http_res),
+                next=next_func,
+            )
+        if utils.match_response(
+            http_res, ["400", "401", "403", "404", "409", "429"], "application/json"
+        ):
+            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
+            raise errors.ErrorResponse(response_data, http_res)
+        if utils.match_response(http_res, ["500", "503"], "application/json"):
+            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
+            raise errors.ErrorResponse(response_data, http_res)
+        if utils.match_response(http_res, "4XX", "*"):
+            http_res_text = await utils.stream_to_text_async(http_res)
+            raise errors.SDKError("API error occurred", http_res, http_res_text)
+        if utils.match_response(http_res, "5XX", "*"):
+            http_res_text = await utils.stream_to_text_async(http_res)
+            raise errors.SDKError("API error occurred", http_res, http_res_text)
+
+        raise errors.SDKError("Unexpected response received", http_res)
+
+    def create_topic(
+        self,
+        *,
+        program_id: str,
+        topic: Union[models.TopicInput, models.TopicInputTypedDict],
+        retries: OptionalNullable[utils.RetryConfig] = UNSET,
+        server_url: Optional[str] = None,
+        timeout_ms: Optional[int] = None,
+        http_headers: Optional[Mapping[str, str]] = None,
+    ) -> models.Topic:
+        r"""Create a new topic
+
+        Creates a new [topic](ref:sustainability#topic).
+
+
+        :param program_id: The unique identifier of the program
+        :param topic: The properties of the topic to create
+        :param retries: Override the default retry configuration for this method
+        :param server_url: Override the default server URL for this method
+        :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
+        :param http_headers: Additional headers to set or replace on requests.
+        """
+        base_url = None
+        url_variables = None
+        if timeout_ms is None:
+            timeout_ms = self.sdk_configuration.timeout_ms
+
+        if server_url is not None:
+            base_url = server_url
+        else:
+            base_url = self._get_url(base_url, url_variables)
+
+        request = models.CreateTopicRequest(
+            program_id=program_id,
+            topic=utils.get_pydantic_model(topic, models.TopicInput),
+        )
+
+        req = self._build_request(
+            method="POST",
+            path="/programs/{programId}/topics",
+            base_url=base_url,
+            url_variables=url_variables,
+            request=request,
+            request_body_required=True,
+            request_has_path_params=True,
+            request_has_query_params=True,
+            user_agent_header="user-agent",
+            accept_header_value="application/json",
+            http_headers=http_headers,
+            security=self.sdk_configuration.security,
+            get_serialized_body=lambda: utils.serialize_request_body(
+                request.topic, False, False, "json", models.TopicInput
+            ),
+            allow_empty_value=None,
+            timeout_ms=timeout_ms,
+        )
+
+        if retries == UNSET:
+            if self.sdk_configuration.retry_config is not UNSET:
+                retries = self.sdk_configuration.retry_config
+
+        retry_config = None
+        if isinstance(retries, utils.RetryConfig):
+            retry_config = (retries, ["429", "500", "502", "503", "504"])
+
+        http_res = self.do_request(
+            hook_ctx=HookContext(
+                config=self.sdk_configuration,
+                base_url=base_url or "",
+                operation_id="createTopic",
+                oauth2_scopes=["file:write"],
+                security_source=self.sdk_configuration.security,
+            ),
+            request=req,
+            error_status_codes=[
+                "400",
+                "401",
+                "403",
+                "404",
+                "409",
+                "429",
+                "4XX",
+                "500",
+                "503",
+                "5XX",
+            ],
+            retry_config=retry_config,
+        )
+
+        response_data: Any = None
+        if utils.match_response(http_res, "201", "application/json"):
+            return unmarshal_json_response(models.Topic, http_res)
+        if utils.match_response(
+            http_res, ["400", "401", "403", "404", "409", "429"], "application/json"
+        ):
+            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
+            raise errors.ErrorResponse(response_data, http_res)
+        if utils.match_response(http_res, ["500", "503"], "application/json"):
+            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
+            raise errors.ErrorResponse(response_data, http_res)
+        if utils.match_response(http_res, "4XX", "*"):
+            http_res_text = utils.stream_to_text(http_res)
+            raise errors.SDKError("API error occurred", http_res, http_res_text)
+        if utils.match_response(http_res, "5XX", "*"):
+            http_res_text = utils.stream_to_text(http_res)
+            raise errors.SDKError("API error occurred", http_res, http_res_text)
+
+        raise errors.SDKError("Unexpected response received", http_res)
+
+    async def create_topic_async(
+        self,
+        *,
+        program_id: str,
+        topic: Union[models.TopicInput, models.TopicInputTypedDict],
+        retries: OptionalNullable[utils.RetryConfig] = UNSET,
+        server_url: Optional[str] = None,
+        timeout_ms: Optional[int] = None,
+        http_headers: Optional[Mapping[str, str]] = None,
+    ) -> models.Topic:
+        r"""Create a new topic
+
+        Creates a new [topic](ref:sustainability#topic).
+
+
+        :param program_id: The unique identifier of the program
+        :param topic: The properties of the topic to create
+        :param retries: Override the default retry configuration for this method
+        :param server_url: Override the default server URL for this method
+        :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
+        :param http_headers: Additional headers to set or replace on requests.
+        """
+        base_url = None
+        url_variables = None
+        if timeout_ms is None:
+            timeout_ms = self.sdk_configuration.timeout_ms
+
+        if server_url is not None:
+            base_url = server_url
+        else:
+            base_url = self._get_url(base_url, url_variables)
+
+        request = models.CreateTopicRequest(
+            program_id=program_id,
+            topic=utils.get_pydantic_model(topic, models.TopicInput),
+        )
+
+        req = self._build_request_async(
+            method="POST",
+            path="/programs/{programId}/topics",
+            base_url=base_url,
+            url_variables=url_variables,
+            request=request,
+            request_body_required=True,
+            request_has_path_params=True,
+            request_has_query_params=True,
+            user_agent_header="user-agent",
+            accept_header_value="application/json",
+            http_headers=http_headers,
+            security=self.sdk_configuration.security,
+            get_serialized_body=lambda: utils.serialize_request_body(
+                request.topic, False, False, "json", models.TopicInput
+            ),
+            allow_empty_value=None,
+            timeout_ms=timeout_ms,
+        )
+
+        if retries == UNSET:
+            if self.sdk_configuration.retry_config is not UNSET:
+                retries = self.sdk_configuration.retry_config
+
+        retry_config = None
+        if isinstance(retries, utils.RetryConfig):
+            retry_config = (retries, ["429", "500", "502", "503", "504"])
+
+        http_res = await self.do_request_async(
+            hook_ctx=HookContext(
+                config=self.sdk_configuration,
+                base_url=base_url or "",
+                operation_id="createTopic",
+                oauth2_scopes=["file:write"],
+                security_source=self.sdk_configuration.security,
+            ),
+            request=req,
+            error_status_codes=[
+                "400",
+                "401",
+                "403",
+                "404",
+                "409",
+                "429",
+                "4XX",
+                "500",
+                "503",
+                "5XX",
+            ],
+            retry_config=retry_config,
+        )
+
+        response_data: Any = None
+        if utils.match_response(http_res, "201", "application/json"):
+            return unmarshal_json_response(models.Topic, http_res)
+        if utils.match_response(
+            http_res, ["400", "401", "403", "404", "409", "429"], "application/json"
+        ):
+            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
+            raise errors.ErrorResponse(response_data, http_res)
+        if utils.match_response(http_res, ["500", "503"], "application/json"):
+            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
+            raise errors.ErrorResponse(response_data, http_res)
+        if utils.match_response(http_res, "4XX", "*"):
+            http_res_text = await utils.stream_to_text_async(http_res)
+            raise errors.SDKError("API error occurred", http_res, http_res_text)
+        if utils.match_response(http_res, "5XX", "*"):
+            http_res_text = await utils.stream_to_text_async(http_res)
+            raise errors.SDKError("API error occurred", http_res, http_res_text)
+
+        raise errors.SDKError("Unexpected response received", http_res)
+
+    def delete_topic_by_id(
+        self,
+        *,
+        program_id: str,
+        topic_id: str,
+        retries: OptionalNullable[utils.RetryConfig] = UNSET,
+        server_url: Optional[str] = None,
+        timeout_ms: Optional[int] = None,
+        http_headers: Optional[Mapping[str, str]] = None,
+    ):
+        r"""Delete a single topic
+
+        Deletes a [topic](ref:sustainability#topic) given its ID
+
+
+        :param program_id: The unique identifier of the program
+        :param topic_id: The unique identifier of the topic
+        :param retries: Override the default retry configuration for this method
+        :param server_url: Override the default server URL for this method
+        :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
+        :param http_headers: Additional headers to set or replace on requests.
+        """
+        base_url = None
+        url_variables = None
+        if timeout_ms is None:
+            timeout_ms = self.sdk_configuration.timeout_ms
+
+        if server_url is not None:
+            base_url = server_url
+        else:
+            base_url = self._get_url(base_url, url_variables)
+
+        request = models.DeleteTopicByIDRequest(
+            program_id=program_id,
+            topic_id=topic_id,
+        )
+
+        req = self._build_request(
+            method="DELETE",
+            path="/programs/{programId}/topics/{topicId}",
+            base_url=base_url,
+            url_variables=url_variables,
+            request=request,
+            request_body_required=False,
+            request_has_path_params=True,
+            request_has_query_params=True,
+            user_agent_header="user-agent",
+            accept_header_value="application/json",
+            http_headers=http_headers,
+            security=self.sdk_configuration.security,
+            allow_empty_value=None,
+            timeout_ms=timeout_ms,
+        )
+
+        if retries == UNSET:
+            if self.sdk_configuration.retry_config is not UNSET:
+                retries = self.sdk_configuration.retry_config
+
+        retry_config = None
+        if isinstance(retries, utils.RetryConfig):
+            retry_config = (retries, ["429", "500", "502", "503", "504"])
+
+        http_res = self.do_request(
+            hook_ctx=HookContext(
+                config=self.sdk_configuration,
+                base_url=base_url or "",
+                operation_id="deleteTopicById",
+                oauth2_scopes=["file:write"],
+                security_source=self.sdk_configuration.security,
+            ),
+            request=req,
+            error_status_codes=[
+                "400",
+                "401",
+                "403",
+                "404",
+                "409",
+                "429",
+                "4XX",
+                "500",
+                "503",
+                "5XX",
+            ],
+            retry_config=retry_config,
+        )
+
+        response_data: Any = None
+        if utils.match_response(http_res, "204", "*"):
+            return
+        if utils.match_response(
+            http_res, ["400", "401", "403", "404", "409", "429"], "application/json"
+        ):
+            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
+            raise errors.ErrorResponse(response_data, http_res)
+        if utils.match_response(http_res, ["500", "503"], "application/json"):
+            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
+            raise errors.ErrorResponse(response_data, http_res)
+        if utils.match_response(http_res, "4XX", "*"):
+            http_res_text = utils.stream_to_text(http_res)
+            raise errors.SDKError("API error occurred", http_res, http_res_text)
+        if utils.match_response(http_res, "5XX", "*"):
+            http_res_text = utils.stream_to_text(http_res)
+            raise errors.SDKError("API error occurred", http_res, http_res_text)
+
+        raise errors.SDKError("Unexpected response received", http_res)
+
+    async def delete_topic_by_id_async(
+        self,
+        *,
+        program_id: str,
+        topic_id: str,
+        retries: OptionalNullable[utils.RetryConfig] = UNSET,
+        server_url: Optional[str] = None,
+        timeout_ms: Optional[int] = None,
+        http_headers: Optional[Mapping[str, str]] = None,
+    ):
+        r"""Delete a single topic
+
+        Deletes a [topic](ref:sustainability#topic) given its ID
+
+
+        :param program_id: The unique identifier of the program
+        :param topic_id: The unique identifier of the topic
+        :param retries: Override the default retry configuration for this method
+        :param server_url: Override the default server URL for this method
+        :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
+        :param http_headers: Additional headers to set or replace on requests.
+        """
+        base_url = None
+        url_variables = None
+        if timeout_ms is None:
+            timeout_ms = self.sdk_configuration.timeout_ms
+
+        if server_url is not None:
+            base_url = server_url
+        else:
+            base_url = self._get_url(base_url, url_variables)
+
+        request = models.DeleteTopicByIDRequest(
+            program_id=program_id,
+            topic_id=topic_id,
+        )
+
+        req = self._build_request_async(
+            method="DELETE",
+            path="/programs/{programId}/topics/{topicId}",
+            base_url=base_url,
+            url_variables=url_variables,
+            request=request,
+            request_body_required=False,
+            request_has_path_params=True,
+            request_has_query_params=True,
+            user_agent_header="user-agent",
+            accept_header_value="application/json",
+            http_headers=http_headers,
+            security=self.sdk_configuration.security,
+            allow_empty_value=None,
+            timeout_ms=timeout_ms,
+        )
+
+        if retries == UNSET:
+            if self.sdk_configuration.retry_config is not UNSET:
+                retries = self.sdk_configuration.retry_config
+
+        retry_config = None
+        if isinstance(retries, utils.RetryConfig):
+            retry_config = (retries, ["429", "500", "502", "503", "504"])
+
+        http_res = await self.do_request_async(
+            hook_ctx=HookContext(
+                config=self.sdk_configuration,
+                base_url=base_url or "",
+                operation_id="deleteTopicById",
+                oauth2_scopes=["file:write"],
+                security_source=self.sdk_configuration.security,
+            ),
+            request=req,
+            error_status_codes=[
+                "400",
+                "401",
+                "403",
+                "404",
+                "409",
+                "429",
+                "4XX",
+                "500",
+                "503",
+                "5XX",
+            ],
+            retry_config=retry_config,
+        )
+
+        response_data: Any = None
+        if utils.match_response(http_res, "204", "*"):
+            return
+        if utils.match_response(
+            http_res, ["400", "401", "403", "404", "409", "429"], "application/json"
+        ):
+            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
+            raise errors.ErrorResponse(response_data, http_res)
+        if utils.match_response(http_res, ["500", "503"], "application/json"):
+            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
+            raise errors.ErrorResponse(response_data, http_res)
+        if utils.match_response(http_res, "4XX", "*"):
+            http_res_text = await utils.stream_to_text_async(http_res)
+            raise errors.SDKError("API error occurred", http_res, http_res_text)
+        if utils.match_response(http_res, "5XX", "*"):
+            http_res_text = await utils.stream_to_text_async(http_res)
+            raise errors.SDKError("API error occurred", http_res, http_res_text)
+
+        raise errors.SDKError("Unexpected response received", http_res)
+
+    def get_topic_by_id(
+        self,
+        *,
+        program_id: str,
+        topic_id: str,
+        retries: OptionalNullable[utils.RetryConfig] = UNSET,
+        server_url: Optional[str] = None,
+        timeout_ms: Optional[int] = None,
+        http_headers: Optional[Mapping[str, str]] = None,
+    ) -> models.Topic:
+        r"""Retrieve a single topic
+
+        Retrieves a [topic](ref:sustainability#topic) given its ID
+
+
+        :param program_id: The unique identifier of the program
+        :param topic_id: The unique identifier of the topic
+        :param retries: Override the default retry configuration for this method
+        :param server_url: Override the default server URL for this method
+        :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
+        :param http_headers: Additional headers to set or replace on requests.
+        """
+        base_url = None
+        url_variables = None
+        if timeout_ms is None:
+            timeout_ms = self.sdk_configuration.timeout_ms
+
+        if server_url is not None:
+            base_url = server_url
+        else:
+            base_url = self._get_url(base_url, url_variables)
+
+        request = models.GetTopicByIDRequest(
+            program_id=program_id,
+            topic_id=topic_id,
+        )
+
+        req = self._build_request(
+            method="GET",
+            path="/programs/{programId}/topics/{topicId}",
+            base_url=base_url,
+            url_variables=url_variables,
+            request=request,
+            request_body_required=False,
+            request_has_path_params=True,
+            request_has_query_params=True,
+            user_agent_header="user-agent",
+            accept_header_value="application/json",
+            http_headers=http_headers,
+            security=self.sdk_configuration.security,
+            allow_empty_value=None,
+            timeout_ms=timeout_ms,
+        )
+
+        if retries == UNSET:
+            if self.sdk_configuration.retry_config is not UNSET:
+                retries = self.sdk_configuration.retry_config
+
+        retry_config = None
+        if isinstance(retries, utils.RetryConfig):
+            retry_config = (retries, ["429", "500", "502", "503", "504"])
+
+        http_res = self.do_request(
+            hook_ctx=HookContext(
+                config=self.sdk_configuration,
+                base_url=base_url or "",
+                operation_id="getTopicById",
+                oauth2_scopes=["file:read"],
+                security_source=self.sdk_configuration.security,
+            ),
+            request=req,
+            error_status_codes=[
+                "400",
+                "401",
+                "403",
+                "404",
+                "409",
+                "429",
+                "4XX",
+                "500",
+                "503",
+                "5XX",
+            ],
+            retry_config=retry_config,
+        )
+
+        response_data: Any = None
+        if utils.match_response(http_res, "200", "application/json"):
+            return unmarshal_json_response(models.Topic, http_res)
+        if utils.match_response(
+            http_res, ["400", "401", "403", "404", "409", "429"], "application/json"
+        ):
+            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
+            raise errors.ErrorResponse(response_data, http_res)
+        if utils.match_response(http_res, ["500", "503"], "application/json"):
+            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
+            raise errors.ErrorResponse(response_data, http_res)
+        if utils.match_response(http_res, "4XX", "*"):
+            http_res_text = utils.stream_to_text(http_res)
+            raise errors.SDKError("API error occurred", http_res, http_res_text)
+        if utils.match_response(http_res, "5XX", "*"):
+            http_res_text = utils.stream_to_text(http_res)
+            raise errors.SDKError("API error occurred", http_res, http_res_text)
+
+        raise errors.SDKError("Unexpected response received", http_res)
+
+    async def get_topic_by_id_async(
+        self,
+        *,
+        program_id: str,
+        topic_id: str,
+        retries: OptionalNullable[utils.RetryConfig] = UNSET,
+        server_url: Optional[str] = None,
+        timeout_ms: Optional[int] = None,
+        http_headers: Optional[Mapping[str, str]] = None,
+    ) -> models.Topic:
+        r"""Retrieve a single topic
+
+        Retrieves a [topic](ref:sustainability#topic) given its ID
+
+
+        :param program_id: The unique identifier of the program
+        :param topic_id: The unique identifier of the topic
+        :param retries: Override the default retry configuration for this method
+        :param server_url: Override the default server URL for this method
+        :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
+        :param http_headers: Additional headers to set or replace on requests.
+        """
+        base_url = None
+        url_variables = None
+        if timeout_ms is None:
+            timeout_ms = self.sdk_configuration.timeout_ms
+
+        if server_url is not None:
+            base_url = server_url
+        else:
+            base_url = self._get_url(base_url, url_variables)
+
+        request = models.GetTopicByIDRequest(
+            program_id=program_id,
+            topic_id=topic_id,
+        )
+
+        req = self._build_request_async(
+            method="GET",
+            path="/programs/{programId}/topics/{topicId}",
+            base_url=base_url,
+            url_variables=url_variables,
+            request=request,
+            request_body_required=False,
+            request_has_path_params=True,
+            request_has_query_params=True,
+            user_agent_header="user-agent",
+            accept_header_value="application/json",
+            http_headers=http_headers,
+            security=self.sdk_configuration.security,
+            allow_empty_value=None,
+            timeout_ms=timeout_ms,
+        )
+
+        if retries == UNSET:
+            if self.sdk_configuration.retry_config is not UNSET:
+                retries = self.sdk_configuration.retry_config
+
+        retry_config = None
+        if isinstance(retries, utils.RetryConfig):
+            retry_config = (retries, ["429", "500", "502", "503", "504"])
+
+        http_res = await self.do_request_async(
+            hook_ctx=HookContext(
+                config=self.sdk_configuration,
+                base_url=base_url or "",
+                operation_id="getTopicById",
+                oauth2_scopes=["file:read"],
+                security_source=self.sdk_configuration.security,
+            ),
+            request=req,
+            error_status_codes=[
+                "400",
+                "401",
+                "403",
+                "404",
+                "409",
+                "429",
+                "4XX",
+                "500",
+                "503",
+                "5XX",
+            ],
+            retry_config=retry_config,
+        )
+
+        response_data: Any = None
+        if utils.match_response(http_res, "200", "application/json"):
+            return unmarshal_json_response(models.Topic, http_res)
+        if utils.match_response(
+            http_res, ["400", "401", "403", "404", "409", "429"], "application/json"
+        ):
+            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
+            raise errors.ErrorResponse(response_data, http_res)
+        if utils.match_response(http_res, ["500", "503"], "application/json"):
+            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
+            raise errors.ErrorResponse(response_data, http_res)
+        if utils.match_response(http_res, "4XX", "*"):
+            http_res_text = await utils.stream_to_text_async(http_res)
+            raise errors.SDKError("API error occurred", http_res, http_res_text)
+        if utils.match_response(http_res, "5XX", "*"):
+            http_res_text = await utils.stream_to_text_async(http_res)
+            raise errors.SDKError("API error occurred", http_res, http_res_text)
+
+        raise errors.SDKError("Unexpected response received", http_res)
+
+    def partially_update_topic_by_id(
+        self,
+        *,
+        program_id: str,
+        topic_id: str,
+        request_body: Union[
+            List[models.JSONPatchOperation], List[models.JSONPatchOperationTypedDict]
+        ],
+        retries: OptionalNullable[utils.RetryConfig] = UNSET,
+        server_url: Optional[str] = None,
+        timeout_ms: Optional[int] = None,
+        http_headers: Optional[Mapping[str, str]] = None,
+    ) -> models.Topic:
+        r"""Partially update a single topic
+
+        Partially updates the properties of a [topic](ref:sustainability#topic). Only one property may be updated at a time.
+        ### Options
+        |Path|PATCH Operations Supported|
+        |---|---|
+        |`/index`|`replace`, `test`|
+        |`/name`|`replace`, `test`|
+        |`/parent`|`replace`, `test`|
+
+
+        :param program_id: The unique identifier of the program
+        :param topic_id: The unique identifier of the topic
+        :param request_body: A collection of patch operations to apply to the [topic](ref:sustainability#topic). Currently only one operation may be applied at a time.
+        :param retries: Override the default retry configuration for this method
+        :param server_url: Override the default server URL for this method
+        :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
+        :param http_headers: Additional headers to set or replace on requests.
+        """
+        base_url = None
+        url_variables = None
+        if timeout_ms is None:
+            timeout_ms = self.sdk_configuration.timeout_ms
+
+        if server_url is not None:
+            base_url = server_url
+        else:
+            base_url = self._get_url(base_url, url_variables)
+
+        request = models.PartiallyUpdateTopicByIDRequest(
+            program_id=program_id,
+            topic_id=topic_id,
+            request_body=utils.get_pydantic_model(
+                request_body, List[models.JSONPatchOperation]
+            ),
+        )
+
+        req = self._build_request(
+            method="PATCH",
+            path="/programs/{programId}/topics/{topicId}",
+            base_url=base_url,
+            url_variables=url_variables,
+            request=request,
+            request_body_required=True,
+            request_has_path_params=True,
+            request_has_query_params=True,
+            user_agent_header="user-agent",
+            accept_header_value="application/json",
+            http_headers=http_headers,
+            security=self.sdk_configuration.security,
+            get_serialized_body=lambda: utils.serialize_request_body(
+                request.request_body,
+                False,
+                False,
+                "json",
+                List[models.JSONPatchOperation],
+            ),
+            allow_empty_value=None,
+            timeout_ms=timeout_ms,
+        )
+
+        if retries == UNSET:
+            if self.sdk_configuration.retry_config is not UNSET:
+                retries = self.sdk_configuration.retry_config
+
+        retry_config = None
+        if isinstance(retries, utils.RetryConfig):
+            retry_config = (retries, ["429", "500", "502", "503", "504"])
+
+        http_res = self.do_request(
+            hook_ctx=HookContext(
+                config=self.sdk_configuration,
+                base_url=base_url or "",
+                operation_id="partiallyUpdateTopicById",
+                oauth2_scopes=["file:write"],
+                security_source=self.sdk_configuration.security,
+            ),
+            request=req,
+            error_status_codes=[
+                "400",
+                "401",
+                "403",
+                "404",
+                "409",
+                "429",
+                "4XX",
+                "500",
+                "503",
+                "5XX",
+            ],
+            retry_config=retry_config,
+        )
+
+        response_data: Any = None
+        if utils.match_response(http_res, "200", "application/json"):
+            return unmarshal_json_response(models.Topic, http_res)
+        if utils.match_response(
+            http_res, ["400", "401", "403", "404", "409", "429"], "application/json"
+        ):
+            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
+            raise errors.ErrorResponse(response_data, http_res)
+        if utils.match_response(http_res, ["500", "503"], "application/json"):
+            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
+            raise errors.ErrorResponse(response_data, http_res)
+        if utils.match_response(http_res, "4XX", "*"):
+            http_res_text = utils.stream_to_text(http_res)
+            raise errors.SDKError("API error occurred", http_res, http_res_text)
+        if utils.match_response(http_res, "5XX", "*"):
+            http_res_text = utils.stream_to_text(http_res)
+            raise errors.SDKError("API error occurred", http_res, http_res_text)
+
+        raise errors.SDKError("Unexpected response received", http_res)
+
+    async def partially_update_topic_by_id_async(
+        self,
+        *,
+        program_id: str,
+        topic_id: str,
+        request_body: Union[
+            List[models.JSONPatchOperation], List[models.JSONPatchOperationTypedDict]
+        ],
+        retries: OptionalNullable[utils.RetryConfig] = UNSET,
+        server_url: Optional[str] = None,
+        timeout_ms: Optional[int] = None,
+        http_headers: Optional[Mapping[str, str]] = None,
+    ) -> models.Topic:
+        r"""Partially update a single topic
+
+        Partially updates the properties of a [topic](ref:sustainability#topic). Only one property may be updated at a time.
+        ### Options
+        |Path|PATCH Operations Supported|
+        |---|---|
+        |`/index`|`replace`, `test`|
+        |`/name`|`replace`, `test`|
+        |`/parent`|`replace`, `test`|
+
+
+        :param program_id: The unique identifier of the program
+        :param topic_id: The unique identifier of the topic
+        :param request_body: A collection of patch operations to apply to the [topic](ref:sustainability#topic). Currently only one operation may be applied at a time.
+        :param retries: Override the default retry configuration for this method
+        :param server_url: Override the default server URL for this method
+        :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
+        :param http_headers: Additional headers to set or replace on requests.
+        """
+        base_url = None
+        url_variables = None
+        if timeout_ms is None:
+            timeout_ms = self.sdk_configuration.timeout_ms
+
+        if server_url is not None:
+            base_url = server_url
+        else:
+            base_url = self._get_url(base_url, url_variables)
+
+        request = models.PartiallyUpdateTopicByIDRequest(
+            program_id=program_id,
+            topic_id=topic_id,
+            request_body=utils.get_pydantic_model(
+                request_body, List[models.JSONPatchOperation]
+            ),
+        )
+
+        req = self._build_request_async(
+            method="PATCH",
+            path="/programs/{programId}/topics/{topicId}",
+            base_url=base_url,
+            url_variables=url_variables,
+            request=request,
+            request_body_required=True,
+            request_has_path_params=True,
+            request_has_query_params=True,
+            user_agent_header="user-agent",
+            accept_header_value="application/json",
+            http_headers=http_headers,
+            security=self.sdk_configuration.security,
+            get_serialized_body=lambda: utils.serialize_request_body(
+                request.request_body,
+                False,
+                False,
+                "json",
+                List[models.JSONPatchOperation],
+            ),
+            allow_empty_value=None,
+            timeout_ms=timeout_ms,
+        )
+
+        if retries == UNSET:
+            if self.sdk_configuration.retry_config is not UNSET:
+                retries = self.sdk_configuration.retry_config
+
+        retry_config = None
+        if isinstance(retries, utils.RetryConfig):
+            retry_config = (retries, ["429", "500", "502", "503", "504"])
+
+        http_res = await self.do_request_async(
+            hook_ctx=HookContext(
+                config=self.sdk_configuration,
+                base_url=base_url or "",
+                operation_id="partiallyUpdateTopicById",
+                oauth2_scopes=["file:write"],
+                security_source=self.sdk_configuration.security,
+            ),
+            request=req,
+            error_status_codes=[
+                "400",
+                "401",
+                "403",
+                "404",
+                "409",
+                "429",
+                "4XX",
+                "500",
+                "503",
+                "5XX",
+            ],
+            retry_config=retry_config,
+        )
+
+        response_data: Any = None
+        if utils.match_response(http_res, "200", "application/json"):
+            return unmarshal_json_response(models.Topic, http_res)
         if utils.match_response(
             http_res, ["400", "401", "403", "404", "409", "429"], "application/json"
         ):

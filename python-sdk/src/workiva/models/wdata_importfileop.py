@@ -19,21 +19,21 @@ WDATA_IMPORT_FILE_OP_SERVERS = [
 
 
 class WdataImportFileRequestTypedDict(TypedDict):
-    import_dto: ImportDtoTypedDict
-    r"""The representation of the table to import"""
     table_id: str
     r"""The unique identifier of the table"""
+    import_dto: ImportDtoTypedDict
+    r"""The representation of the table to import"""
 
 
 class WdataImportFileRequest(BaseModel):
-    import_dto: Annotated[
-        ImportDto, FieldMetadata(request=RequestMetadata(media_type="application/json"))
-    ]
-    r"""The representation of the table to import"""
-
     table_id: Annotated[
         str,
         pydantic.Field(alias="tableId"),
         FieldMetadata(path=PathParamMetadata(style="simple", explode=False)),
     ]
     r"""The unique identifier of the table"""
+
+    import_dto: Annotated[
+        ImportDto, FieldMetadata(request=RequestMetadata(media_type="application/json"))
+    ]
+    r"""The representation of the table to import"""

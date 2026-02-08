@@ -14,12 +14,12 @@ from workiva.utils import FieldMetadata, PathParamMetadata, QueryParamMetadata
 
 
 class GetWorkspaceGroupMembersRequestTypedDict(TypedDict):
-    group_id: str
-    r"""The unique identifier of the group"""
     organization_id: str
     r"""The unique identifier of the organization"""
     workspace_id: str
     r"""The unique identifier of the workspace"""
+    group_id: str
+    r"""The unique identifier of the group"""
     dollar_maxpagesize: NotRequired[int]
     r"""The maximum number of results to retrieve"""
     dollar_next: NotRequired[str]
@@ -27,13 +27,6 @@ class GetWorkspaceGroupMembersRequestTypedDict(TypedDict):
 
 
 class GetWorkspaceGroupMembersRequest(BaseModel):
-    group_id: Annotated[
-        str,
-        pydantic.Field(alias="groupId"),
-        FieldMetadata(path=PathParamMetadata(style="simple", explode=False)),
-    ]
-    r"""The unique identifier of the group"""
-
     organization_id: Annotated[
         str,
         pydantic.Field(alias="organizationId"),
@@ -47,6 +40,13 @@ class GetWorkspaceGroupMembersRequest(BaseModel):
         FieldMetadata(path=PathParamMetadata(style="simple", explode=False)),
     ]
     r"""The unique identifier of the workspace"""
+
+    group_id: Annotated[
+        str,
+        pydantic.Field(alias="groupId"),
+        FieldMetadata(path=PathParamMetadata(style="simple", explode=False)),
+    ]
+    r"""The unique identifier of the group"""
 
     dollar_maxpagesize: Annotated[
         Optional[int],

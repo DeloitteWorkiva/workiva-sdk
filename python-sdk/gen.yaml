@@ -1,9 +1,11 @@
 configVersion: 2.0.0
 generation:
   sdkClassName: SDK
+  maintainOpenAPIOrder: true
   usageSnippets:
     optionalPropertyRendering: withExample
     sdkInitStyle: constructor
+  useClassNamesForArrayFields: true
   fixes:
     nameResolutionFeb2025: false
     parameterOrderingFeb2024: false
@@ -15,6 +17,8 @@ generation:
     oAuth2ClientCredentialsEnabled: true
     oAuth2PasswordEnabled: false
     hoistGlobalSecurity: true
+  inferSSEOverload: true
+  sdkHooksConfigAccess: true
   schemas:
     allOfMergeStrategy: shallowMerge
   requestBodyFieldName: ""
@@ -30,12 +34,12 @@ python:
   version: 0.4.5
   additionalDependencies:
     dev:
-      pytest: ">=8.0"
-      pytest-asyncio: ">=0.24"
-      pytest-cov: ">=6.0"
-      respx: ">=0.22"
+      pytest: '>=8.0'
+      pytest-asyncio: '>=0.24'
+      pytest-cov: '>=6.0'
+      respx: '>=0.22'
     main:
-      typing-extensions: ">=4.11"
+      typing-extensions: '>=4.11'
   allowedRedefinedBuiltins:
     - id
     - object
@@ -56,6 +60,7 @@ python:
   flattenGlobalSecurity: true
   flattenRequests: false
   flatteningOrder: parameters-first
+  forwardCompatibleEnumsByDefault: true
   imports:
     option: openapi
     paths:

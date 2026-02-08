@@ -3,13 +3,14 @@
 from __future__ import annotations
 from .usergroup import UserGroup, UserGroupTypedDict
 from enum import Enum
-from pydantic import model_serializer
+from pydantic import field_serializer, model_serializer
 from typing import List, Optional
 from typing_extensions import NotRequired, TypedDict
+from workiva import models, utils
 from workiva.types import BaseModel, UNSET_SENTINEL
 
 
-class Name(str, Enum):
+class Name(str, Enum, metaclass=utils.OpenEnumMeta):
     READ = "read"
     EXECUTE = "execute"
     WRITE = "write"
@@ -46,6 +47,15 @@ class ChainPermission(BaseModel):
     object_type: Optional[str] = None
 
     user_groups: Optional[List[UserGroup]] = None
+
+    @field_serializer("name")
+    def serialize_name(self, value):
+        if isinstance(value, str):
+            try:
+                return models.Name(value)
+            except ValueError:
+                return value
+        return value
 
     @model_serializer(mode="wrap")
     def serialize_model(self, handler):

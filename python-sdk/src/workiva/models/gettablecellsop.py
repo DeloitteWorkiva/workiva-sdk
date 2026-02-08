@@ -13,20 +13,20 @@ from workiva.utils import FieldMetadata, PathParamMetadata, QueryParamMetadata
 class GetTableCellsRequestTypedDict(TypedDict):
     table_id: str
     r"""The unique identifier for the table"""
+    dollar_revision: NotRequired[str]
+    r"""Returns resources at a specific revision"""
     dollar_maxcellsperpage: NotRequired[int]
     r"""The maximum number of cells to retrieve. The default is 50000. The maximum allowed value is 50000."""
     dollar_next: NotRequired[str]
     r"""Pagination cursor for next set of results."""
-    dollar_revision: NotRequired[str]
-    r"""Returns resources at a specific revision"""
-    start_column: NotRequired[int]
-    r"""The inclusive start column of the range of cells to retrieve. If this parameter is omitted, then the range will be unbounded in this direction."""
     start_row: NotRequired[int]
     r"""The inclusive start row of the range of cells to retrieve. If this parameter is omitted, then the range will be unbounded in this direction."""
-    stop_column: NotRequired[int]
-    r"""The inclusive stop column of the range of cells to retrieve. If this parameter is omitted, then the range will be unbounded in this direction."""
     stop_row: NotRequired[int]
     r"""The inclusive stop row of the range of cells to retrieve. If this parameter is omitted, then the range will be unbounded in this direction."""
+    start_column: NotRequired[int]
+    r"""The inclusive start column of the range of cells to retrieve. If this parameter is omitted, then the range will be unbounded in this direction."""
+    stop_column: NotRequired[int]
+    r"""The inclusive stop column of the range of cells to retrieve. If this parameter is omitted, then the range will be unbounded in this direction."""
 
 
 class GetTableCellsRequest(BaseModel):
@@ -36,6 +36,13 @@ class GetTableCellsRequest(BaseModel):
         FieldMetadata(path=PathParamMetadata(style="simple", explode=False)),
     ]
     r"""The unique identifier for the table"""
+
+    dollar_revision: Annotated[
+        Optional[str],
+        pydantic.Field(alias="$revision"),
+        FieldMetadata(query=QueryParamMetadata(style="form", explode=True)),
+    ] = None
+    r"""Returns resources at a specific revision"""
 
     dollar_maxcellsperpage: Annotated[
         Optional[int],
@@ -51,33 +58,12 @@ class GetTableCellsRequest(BaseModel):
     ] = None
     r"""Pagination cursor for next set of results."""
 
-    dollar_revision: Annotated[
-        Optional[str],
-        pydantic.Field(alias="$revision"),
-        FieldMetadata(query=QueryParamMetadata(style="form", explode=True)),
-    ] = None
-    r"""Returns resources at a specific revision"""
-
-    start_column: Annotated[
-        Optional[int],
-        pydantic.Field(alias="startColumn"),
-        FieldMetadata(query=QueryParamMetadata(style="form", explode=True)),
-    ] = None
-    r"""The inclusive start column of the range of cells to retrieve. If this parameter is omitted, then the range will be unbounded in this direction."""
-
     start_row: Annotated[
         Optional[int],
         pydantic.Field(alias="startRow"),
         FieldMetadata(query=QueryParamMetadata(style="form", explode=True)),
     ] = None
     r"""The inclusive start row of the range of cells to retrieve. If this parameter is omitted, then the range will be unbounded in this direction."""
-
-    stop_column: Annotated[
-        Optional[int],
-        pydantic.Field(alias="stopColumn"),
-        FieldMetadata(query=QueryParamMetadata(style="form", explode=True)),
-    ] = None
-    r"""The inclusive stop column of the range of cells to retrieve. If this parameter is omitted, then the range will be unbounded in this direction."""
 
     stop_row: Annotated[
         Optional[int],
@@ -86,17 +72,31 @@ class GetTableCellsRequest(BaseModel):
     ] = None
     r"""The inclusive stop row of the range of cells to retrieve. If this parameter is omitted, then the range will be unbounded in this direction."""
 
+    start_column: Annotated[
+        Optional[int],
+        pydantic.Field(alias="startColumn"),
+        FieldMetadata(query=QueryParamMetadata(style="form", explode=True)),
+    ] = None
+    r"""The inclusive start column of the range of cells to retrieve. If this parameter is omitted, then the range will be unbounded in this direction."""
+
+    stop_column: Annotated[
+        Optional[int],
+        pydantic.Field(alias="stopColumn"),
+        FieldMetadata(query=QueryParamMetadata(style="form", explode=True)),
+    ] = None
+    r"""The inclusive stop column of the range of cells to retrieve. If this parameter is omitted, then the range will be unbounded in this direction."""
+
     @model_serializer(mode="wrap")
     def serialize_model(self, handler):
         optional_fields = set(
             [
+                "$revision",
                 "$maxcellsperpage",
                 "$next",
-                "$revision",
-                "startColumn",
                 "startRow",
-                "stopColumn",
                 "stopRow",
+                "startColumn",
+                "stopColumn",
             ]
         )
         serialized = handler(self)

@@ -3,9 +3,10 @@
 from __future__ import annotations
 from .color import Color, ColorTypedDict
 from .strokepattern import StrokePattern
-from pydantic import model_serializer
+from pydantic import field_serializer, model_serializer
 from typing import Optional
 from typing_extensions import NotRequired, TypedDict
+from workiva import models
 from workiva.types import BaseModel, UNSET_SENTINEL
 
 
@@ -31,6 +32,15 @@ class Stroke(BaseModel):
 
     width: Optional[float] = 1
     r"""The width of the stroke in points."""
+
+    @field_serializer("pattern")
+    def serialize_pattern(self, value):
+        if isinstance(value, str):
+            try:
+                return models.StrokePattern(value)
+            except ValueError:
+                return value
+        return value
 
     @model_serializer(mode="wrap")
     def serialize_model(self, handler):

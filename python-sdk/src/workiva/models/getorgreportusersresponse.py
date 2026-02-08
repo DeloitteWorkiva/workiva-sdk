@@ -3,9 +3,10 @@
 from __future__ import annotations
 from enum import Enum
 import pydantic
-from pydantic import model_serializer
+from pydantic import field_serializer, model_serializer
 from typing import Any, Dict, List, Optional
 from typing_extensions import Annotated, NotRequired, TypedDict
+from workiva import models, utils
 from workiva.types import BaseModel, Nullable, OptionalNullable, UNSET, UNSET_SENTINEL
 
 
@@ -168,14 +169,14 @@ class Relationships(BaseModel):
     pass
 
 
-class GetOrgReportUsersResponseType(str, Enum):
+class GetOrgReportUsersResponseType(str, Enum, metaclass=utils.OpenEnumMeta):
     r"""The resource type (File)"""
 
     ORG_REPORT_USER = "orgReportUser"
     FILE = "File"
 
 
-class DataTypedDict(TypedDict):
+class GetOrgReportUsersResponseDataTypedDict(TypedDict):
     attributes: NotRequired[AttributesTypedDict]
     id: NotRequired[str]
     r"""The resource ID"""
@@ -186,7 +187,7 @@ class DataTypedDict(TypedDict):
     r"""The resource type (File)"""
 
 
-class Data(BaseModel):
+class GetOrgReportUsersResponseData(BaseModel):
     attributes: Optional[Attributes] = None
 
     id: Optional[str] = None
@@ -199,6 +200,15 @@ class Data(BaseModel):
 
     type: Optional[GetOrgReportUsersResponseType] = None
     r"""The resource type (File)"""
+
+    @field_serializer("type")
+    def serialize_type(self, value):
+        if isinstance(value, str):
+            try:
+                return models.GetOrgReportUsersResponseType(value)
+            except ValueError:
+                return value
+        return value
 
     @model_serializer(mode="wrap")
     def serialize_model(self, handler):
@@ -322,7 +332,7 @@ class Links(BaseModel):
 class GetOrgReportUsersResponseTypedDict(TypedDict):
     r"""A report of Organization Users"""
 
-    data: List[DataTypedDict]
+    data: List[GetOrgReportUsersResponseDataTypedDict]
     included: NotRequired[Nullable[List[IncludedTypedDict]]]
     r"""Any additional included resources"""
     jsonapi: NotRequired[Nullable[JsonapiTypedDict]]
@@ -334,7 +344,7 @@ class GetOrgReportUsersResponseTypedDict(TypedDict):
 class GetOrgReportUsersResponse(BaseModel):
     r"""A report of Organization Users"""
 
-    data: List[Data]
+    data: List[GetOrgReportUsersResponseData]
 
     included: OptionalNullable[List[Included]] = UNSET
     r"""Any additional included resources"""

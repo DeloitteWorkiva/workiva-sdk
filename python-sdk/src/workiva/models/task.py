@@ -209,6 +209,8 @@ class TaskTypedDict(TypedDict):
 
     title: str
     r"""The title of the task."""
+    id: NotRequired[str]
+    r"""The unique identifier of the task."""
     approval_steps: NotRequired[List[TaskApprovalStepTypedDict]]
     r"""The approval process for the task where applicable."""
     assignees: NotRequired[List[TaskUserTypedDict]]
@@ -218,8 +220,6 @@ class TaskTypedDict(TypedDict):
     r"""The task description."""
     due_date: NotRequired[Nullable[datetime]]
     r"""An ISO 8601 datetime indicating a deadline for the task to be completed. Will be converted to UTC if another time zone is included."""
-    id: NotRequired[str]
-    r"""The unique identifier of the task."""
     location: NotRequired[Nullable[LocationTypedDict]]
     modified: NotRequired[TaskModifiedTypedDict]
     notifications_disabled: NotRequired[bool]
@@ -241,6 +241,9 @@ class Task(BaseModel):
     title: str
     r"""The title of the task."""
 
+    id: Optional[str] = None
+    r"""The unique identifier of the task."""
+
     approval_steps: Annotated[
         Optional[List[TaskApprovalStep]], pydantic.Field(alias="approvalSteps")
     ] = None
@@ -258,9 +261,6 @@ class Task(BaseModel):
         UNSET
     )
     r"""An ISO 8601 datetime indicating a deadline for the task to be completed. Will be converted to UTC if another time zone is included."""
-
-    id: Optional[str] = None
-    r"""The unique identifier of the task."""
 
     location: OptionalNullable[Location] = UNSET
 
@@ -287,12 +287,12 @@ class Task(BaseModel):
     def serialize_model(self, handler):
         optional_fields = set(
             [
+                "id",
                 "approvalSteps",
                 "assignees",
                 "created",
                 "description",
                 "dueDate",
-                "id",
                 "location",
                 "modified",
                 "notificationsDisabled",

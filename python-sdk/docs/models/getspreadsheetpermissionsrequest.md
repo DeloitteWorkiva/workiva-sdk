@@ -5,7 +5,7 @@
 
 | Field                                      | Type                                       | Required                                   | Description                                | Example                                    |
 | ------------------------------------------ | ------------------------------------------ | ------------------------------------------ | ------------------------------------------ | ------------------------------------------ |
+| `spreadsheet_id`                           | *str*                                      | :heavy_check_mark:                         | The unique identifier of the spreadsheet   |                                            |
 | `dollar_filter`                            | *Optional[str]*                            | :heavy_minus_sign:                         | The properties to filter the results by.   |                                            |
 | `dollar_maxpagesize`                       | *Optional[int]*                            | :heavy_minus_sign:                         | The maximum number of results to retrieve  |                                            |
 | `dollar_next`                              | *Optional[str]*                            | :heavy_minus_sign:                         | Pagination cursor for next set of results. | JTI0bGltaXQ9MTAwJiUyNG9mZnNldD0xMDA        |
-| `spreadsheet_id`                           | *str*                                      | :heavy_check_mark:                         | The unique identifier of the spreadsheet   |                                            |

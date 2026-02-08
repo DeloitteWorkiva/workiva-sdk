@@ -19,22 +19,22 @@ WDATA_EXPORT_FILE_TO_SPREADSHEETS_OP_SERVERS = [
 
 
 class WdataExportFileToSpreadsheetsRequestTypedDict(TypedDict):
-    export_file_dto: ExportFileDtoTypedDict
-    r"""The representation of the file to export"""
     file_id: str
     r"""The unique identifier of the file"""
+    export_file_dto: ExportFileDtoTypedDict
+    r"""The representation of the file to export"""
 
 
 class WdataExportFileToSpreadsheetsRequest(BaseModel):
-    export_file_dto: Annotated[
-        ExportFileDto,
-        FieldMetadata(request=RequestMetadata(media_type="application/json")),
-    ]
-    r"""The representation of the file to export"""
-
     file_id: Annotated[
         str,
         pydantic.Field(alias="fileId"),
         FieldMetadata(path=PathParamMetadata(style="simple", explode=False)),
     ]
     r"""The unique identifier of the file"""
+
+    export_file_dto: Annotated[
+        ExportFileDto,
+        FieldMetadata(request=RequestMetadata(media_type="application/json")),
+    ]
+    r"""The representation of the file to export"""

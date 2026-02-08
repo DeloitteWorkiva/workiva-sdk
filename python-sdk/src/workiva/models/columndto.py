@@ -2,13 +2,14 @@
 
 from __future__ import annotations
 from enum import Enum
-from pydantic import model_serializer
+from pydantic import field_serializer, model_serializer
 from typing import Any, Dict, Optional
 from typing_extensions import NotRequired, TypedDict
+from workiva import models, utils
 from workiva.types import BaseModel, UNSET_SENTINEL
 
 
-class ColumnDtoMode(str, Enum):
+class Mode(str, Enum, metaclass=utils.OpenEnumMeta):
     r"""This property is for future use, currently always set to nullable"""
 
     NULLABLE = "nullable"
@@ -16,7 +17,7 @@ class ColumnDtoMode(str, Enum):
     REPEATED = "repeated"
 
 
-class ColumnDtoType(str, Enum):
+class ColumnDtoType(str, Enum, metaclass=utils.OpenEnumMeta):
     r"""The type of column"""
 
     STRING = "string"
@@ -43,7 +44,7 @@ class ColumnDtoTypedDict(TypedDict):
     r"""May be at most 255 characters in length"""
     metadata: NotRequired[Dict[str, Any]]
     r"""Optional type metadata. Current allowed parameters are: 'formatString' allows users to define their own Java8 datetime format string.'numberFormat' allows parsing of alternative decimal formats such as 1.000,00"""
-    mode: NotRequired[ColumnDtoMode]
+    mode: NotRequired[Mode]
     r"""This property is for future use, currently always set to nullable"""
 
 
@@ -63,8 +64,26 @@ class ColumnDto(BaseModel):
     metadata: Optional[Dict[str, Any]] = None
     r"""Optional type metadata. Current allowed parameters are: 'formatString' allows users to define their own Java8 datetime format string.'numberFormat' allows parsing of alternative decimal formats such as 1.000,00"""
 
-    mode: Optional[ColumnDtoMode] = None
+    mode: Optional[Mode] = None
     r"""This property is for future use, currently always set to nullable"""
+
+    @field_serializer("mode")
+    def serialize_mode(self, value):
+        if isinstance(value, str):
+            try:
+                return models.Mode(value)
+            except ValueError:
+                return value
+        return value
+
+    @field_serializer("type")
+    def serialize_type(self, value):
+        if isinstance(value, str):
+            try:
+                return models.ColumnDtoType(value)
+            except ValueError:
+                return value
+        return value
 
     @model_serializer(mode="wrap")
     def serialize_model(self, handler):

@@ -19,17 +19,17 @@ class TablePropertiesTypedDict(TypedDict):
 
     id: str
     r"""The unique identifier for the table."""
+    revision: str
+    r"""Identifies a unique revision of content. The same revision can be used for any content request within a file because revisions are allocated at the file-level.
+    When querying for content, this can be used to get a consistent version of the content. When editing content, this can be used to make the change to the content at a known state. In either case, omitting the revision (when allowed) will always default to the latest revision of the file.
+
+    """
     lock: Nullable[TableLockType]
     r"""The type of lock applied to this table, if any. Note this property is not tied to revision and will always reflect the table's current lock state."""
     name: str
     r"""The name of the table. This will match the name of the sheet if this table is in a spreadsheet."""
     resize_rows_to_fit: Nullable[bool]
     r"""Whether the rows of the table will resize automatically to fit the content of the cells."""
-    revision: str
-    r"""Identifies a unique revision of content. The same revision can be used for any content request within a file because revisions are allocated at the file-level.
-    When querying for content, this can be used to get a consistent version of the content. When editing content, this can be used to make the change to the content at a known state. In either case, omitting the revision (when allowed) will always default to the latest revision of the file.
-
-    """
     sheet: str
     r"""The unique identifier of the sheet."""
 
@@ -39,6 +39,12 @@ class TableProperties(BaseModel):
 
     id: str
     r"""The unique identifier for the table."""
+
+    revision: str
+    r"""Identifies a unique revision of content. The same revision can be used for any content request within a file because revisions are allocated at the file-level.
+    When querying for content, this can be used to get a consistent version of the content. When editing content, this can be used to make the change to the content at a known state. In either case, omitting the revision (when allowed) will always default to the latest revision of the file.
+
+    """
 
     lock: Nullable[TableLockType]
     r"""The type of lock applied to this table, if any. Note this property is not tied to revision and will always reflect the table's current lock state."""
@@ -50,12 +56,6 @@ class TableProperties(BaseModel):
         Nullable[bool], pydantic.Field(alias="resizeRowsToFit")
     ]
     r"""Whether the rows of the table will resize automatically to fit the content of the cells."""
-
-    revision: str
-    r"""Identifies a unique revision of content. The same revision can be used for any content request within a file because revisions are allocated at the file-level.
-    When querying for content, this can be used to get a consistent version of the content. When editing content, this can be used to make the change to the content at a known state. In either case, omitting the revision (when allowed) will always default to the latest revision of the file.
-
-    """
 
     sheet: str
     r"""The unique identifier of the sheet."""

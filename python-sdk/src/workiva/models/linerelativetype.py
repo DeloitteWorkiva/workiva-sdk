@@ -2,9 +2,10 @@
 
 from __future__ import annotations
 from enum import Enum
+from workiva import utils
 
 
-class LineRelativeType(str, Enum):
+class LineRelativeType(str, Enum, metaclass=utils.OpenEnumMeta):
     r"""The relative position type used for the head and tail of a line drawing element."""
 
     DESIGN_PAGE_RELATIVE = "designPageRelative"

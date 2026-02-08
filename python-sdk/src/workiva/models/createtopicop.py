@@ -9,22 +9,22 @@ from workiva.utils import FieldMetadata, PathParamMetadata, RequestMetadata
 
 
 class CreateTopicRequestTypedDict(TypedDict):
-    topic: TopicInputTypedDict
-    r"""The properties of the topic to create"""
     program_id: str
     r"""The unique identifier of the program"""
+    topic: TopicInputTypedDict
+    r"""The properties of the topic to create"""
 
 
 class CreateTopicRequest(BaseModel):
-    topic: Annotated[
-        TopicInput,
-        FieldMetadata(request=RequestMetadata(media_type="application/json")),
-    ]
-    r"""The properties of the topic to create"""
-
     program_id: Annotated[
         str,
         pydantic.Field(alias="programId"),
         FieldMetadata(path=PathParamMetadata(style="simple", explode=False)),
     ]
     r"""The unique identifier of the program"""
+
+    topic: Annotated[
+        TopicInput,
+        FieldMetadata(request=RequestMetadata(media_type="application/json")),
+    ]
+    r"""The properties of the topic to create"""

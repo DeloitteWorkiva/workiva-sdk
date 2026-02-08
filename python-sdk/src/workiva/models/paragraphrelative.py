@@ -9,22 +9,22 @@ from workiva.types import BaseModel
 class ParagraphRelativeTypedDict(TypedDict):
     r"""Represents a position relative to the start of the paragraph corresponding to the paragraph index."""
 
-    paragraph_index: int
-    r"""The zero-based inclusive index of a paragraph."""
     x: float
     r"""The horizontal offset in points typically from the left edge."""
     y: float
     r"""The vertical offset in points typically from the top edge where larger numbers are further down/"""
+    paragraph_index: int
+    r"""The zero-based inclusive index of a paragraph."""
 
 
 class ParagraphRelative(BaseModel):
     r"""Represents a position relative to the start of the paragraph corresponding to the paragraph index."""
 
-    paragraph_index: Annotated[int, pydantic.Field(alias="paragraphIndex")]
-    r"""The zero-based inclusive index of a paragraph."""
-
     x: float
     r"""The horizontal offset in points typically from the left edge."""
 
     y: float
     r"""The vertical offset in points typically from the top edge where larger numbers are further down/"""
+
+    paragraph_index: Annotated[int, pydantic.Field(alias="paragraphIndex")]
+    r"""The zero-based inclusive index of a paragraph."""

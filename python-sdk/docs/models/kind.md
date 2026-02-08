@@ -5,9 +5,11 @@ Kind of the file
 
 ## Values
 
-| Name           | Value          |
-| -------------- | -------------- |
-| `DOCUMENT`     | Document       |
-| `SPREADSHEET`  | Spreadsheet    |
-| `PRESENTATION` | Presentation   |
-| `FOLDER`       | Folder         |
+| Name                  | Value                 |
+| --------------------- | --------------------- |
+| `DOCUMENT`            | Document              |
+| `SPREADSHEET`         | Spreadsheet           |
+| `PRESENTATION`        | Presentation          |
+| `FOLDER`              | Folder                |
+| `SCRIPT`              | Script                |
+| `SUPPORTING_DOCUMENT` | SupportingDocument    |

@@ -14,24 +14,32 @@ from workiva.utils import FieldMetadata, PathParamMetadata, RequestMetadata
 
 
 class SampleAttachmentUploadRequestTypedDict(TypedDict):
-    graph_attachment_upload: GraphAttachmentUploadTypedDict
-    r"""Details about the attachment upload"""
-    matrix_id: str
-    r"""The unique identifier of the matrix"""
-    sample_id: str
-    r"""The unique identifier of the sample"""
     test_form_id: str
     r"""The unique identifier of the test form"""
     test_phase_id: str
     r"""The unique identifier of the test phase"""
+    matrix_id: str
+    r"""The unique identifier of the matrix"""
+    sample_id: str
+    r"""The unique identifier of the sample"""
+    graph_attachment_upload: GraphAttachmentUploadTypedDict
+    r"""Details about the attachment upload"""
 
 
 class SampleAttachmentUploadRequest(BaseModel):
-    graph_attachment_upload: Annotated[
-        GraphAttachmentUpload,
-        FieldMetadata(request=RequestMetadata(media_type="application/json")),
+    test_form_id: Annotated[
+        str,
+        pydantic.Field(alias="testFormId"),
+        FieldMetadata(path=PathParamMetadata(style="simple", explode=False)),
     ]
-    r"""Details about the attachment upload"""
+    r"""The unique identifier of the test form"""
+
+    test_phase_id: Annotated[
+        str,
+        pydantic.Field(alias="testPhaseId"),
+        FieldMetadata(path=PathParamMetadata(style="simple", explode=False)),
+    ]
+    r"""The unique identifier of the test phase"""
 
     matrix_id: Annotated[
         str,
@@ -47,19 +55,11 @@ class SampleAttachmentUploadRequest(BaseModel):
     ]
     r"""The unique identifier of the sample"""
 
-    test_form_id: Annotated[
-        str,
-        pydantic.Field(alias="testFormId"),
-        FieldMetadata(path=PathParamMetadata(style="simple", explode=False)),
+    graph_attachment_upload: Annotated[
+        GraphAttachmentUpload,
+        FieldMetadata(request=RequestMetadata(media_type="application/json")),
     ]
-    r"""The unique identifier of the test form"""
-
-    test_phase_id: Annotated[
-        str,
-        pydantic.Field(alias="testPhaseId"),
-        FieldMetadata(path=PathParamMetadata(style="simple", explode=False)),
-    ]
-    r"""The unique identifier of the test phase"""
+    r"""Details about the attachment upload"""
 
 
 class SampleAttachmentUploadResponseTypedDict(TypedDict):

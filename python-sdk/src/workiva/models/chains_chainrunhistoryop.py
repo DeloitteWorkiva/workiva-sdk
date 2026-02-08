@@ -20,42 +20,30 @@ CHAINS_CHAIN_RUN_HISTORY_OP_SERVERS = [
 
 
 class ChainsChainRunHistoryRequestTypedDict(TypedDict):
-    chain_id: str
-    r"""The ID of the Chain."""
     environment_id: str
     r"""The ID of the Environment."""
-    cursor: NotRequired[str]
-    r"""Cursor value returned from the API, indicating page information."""
-    end_date: NotRequired[str]
-    r"""End Date (Unix timestamp)."""
+    chain_id: str
+    r"""The ID of the Chain."""
     limit: NotRequired[str]
     r"""Limit number of chainRuns returned (max 50)."""
+    cursor: NotRequired[str]
+    r"""Cursor value returned from the API, indicating page information."""
     start_date: NotRequired[str]
     r"""Start Date (Unix timestamp)."""
+    end_date: NotRequired[str]
+    r"""End Date (Unix timestamp)."""
 
 
 class ChainsChainRunHistoryRequest(BaseModel):
-    chain_id: Annotated[
-        str, FieldMetadata(path=PathParamMetadata(style="simple", explode=False))
-    ]
-    r"""The ID of the Chain."""
-
     environment_id: Annotated[
         str, FieldMetadata(path=PathParamMetadata(style="simple", explode=False))
     ]
     r"""The ID of the Environment."""
 
-    cursor: Annotated[
-        Optional[str],
-        FieldMetadata(query=QueryParamMetadata(style="form", explode=True)),
-    ] = None
-    r"""Cursor value returned from the API, indicating page information."""
-
-    end_date: Annotated[
-        Optional[str],
-        FieldMetadata(query=QueryParamMetadata(style="form", explode=True)),
-    ] = None
-    r"""End Date (Unix timestamp)."""
+    chain_id: Annotated[
+        str, FieldMetadata(path=PathParamMetadata(style="simple", explode=False))
+    ]
+    r"""The ID of the Chain."""
 
     limit: Annotated[
         Optional[str],
@@ -63,15 +51,27 @@ class ChainsChainRunHistoryRequest(BaseModel):
     ] = None
     r"""Limit number of chainRuns returned (max 50)."""
 
+    cursor: Annotated[
+        Optional[str],
+        FieldMetadata(query=QueryParamMetadata(style="form", explode=True)),
+    ] = None
+    r"""Cursor value returned from the API, indicating page information."""
+
     start_date: Annotated[
         Optional[str],
         FieldMetadata(query=QueryParamMetadata(style="form", explode=True)),
     ] = None
     r"""Start Date (Unix timestamp)."""
 
+    end_date: Annotated[
+        Optional[str],
+        FieldMetadata(query=QueryParamMetadata(style="form", explode=True)),
+    ] = None
+    r"""End Date (Unix timestamp)."""
+
     @model_serializer(mode="wrap")
     def serialize_model(self, handler):
-        optional_fields = set(["cursor", "end_date", "limit", "start_date"])
+        optional_fields = set(["limit", "cursor", "start_date", "end_date"])
         serialized = handler(self)
         m = {}
 

@@ -10,33 +10,34 @@ from workiva.utils import FieldMetadata, PathParamMetadata, RequestMetadata
 
 
 class SampleAttachmentExportByIDRequestTypedDict(TypedDict):
-    graph_attachment_export: GraphAttachmentExportTypedDict
-    r"""Details about the attachment export"""
-    attachment_id: str
-    r"""The unique identifier of the attachment"""
-    matrix_id: str
-    r"""The unique identifier of the matrix"""
-    sample_id: str
-    r"""The unique identifier of the sample"""
     test_form_id: str
     r"""The unique identifier of the test form"""
     test_phase_id: str
     r"""The unique identifier of the test phase"""
+    matrix_id: str
+    r"""The unique identifier of the matrix"""
+    sample_id: str
+    r"""The unique identifier of the sample"""
+    attachment_id: str
+    r"""The unique identifier of the attachment"""
+    graph_attachment_export: GraphAttachmentExportTypedDict
+    r"""Details about the attachment export"""
 
 
 class SampleAttachmentExportByIDRequest(BaseModel):
-    graph_attachment_export: Annotated[
-        GraphAttachmentExport,
-        FieldMetadata(request=RequestMetadata(media_type="application/json")),
-    ]
-    r"""Details about the attachment export"""
-
-    attachment_id: Annotated[
+    test_form_id: Annotated[
         str,
-        pydantic.Field(alias="attachmentId"),
+        pydantic.Field(alias="testFormId"),
         FieldMetadata(path=PathParamMetadata(style="simple", explode=False)),
     ]
-    r"""The unique identifier of the attachment"""
+    r"""The unique identifier of the test form"""
+
+    test_phase_id: Annotated[
+        str,
+        pydantic.Field(alias="testPhaseId"),
+        FieldMetadata(path=PathParamMetadata(style="simple", explode=False)),
+    ]
+    r"""The unique identifier of the test phase"""
 
     matrix_id: Annotated[
         str,
@@ -52,19 +53,18 @@ class SampleAttachmentExportByIDRequest(BaseModel):
     ]
     r"""The unique identifier of the sample"""
 
-    test_form_id: Annotated[
+    attachment_id: Annotated[
         str,
-        pydantic.Field(alias="testFormId"),
+        pydantic.Field(alias="attachmentId"),
         FieldMetadata(path=PathParamMetadata(style="simple", explode=False)),
     ]
-    r"""The unique identifier of the test form"""
+    r"""The unique identifier of the attachment"""
 
-    test_phase_id: Annotated[
-        str,
-        pydantic.Field(alias="testPhaseId"),
-        FieldMetadata(path=PathParamMetadata(style="simple", explode=False)),
+    graph_attachment_export: Annotated[
+        GraphAttachmentExport,
+        FieldMetadata(request=RequestMetadata(media_type="application/json")),
     ]
-    r"""The unique identifier of the test phase"""
+    r"""Details about the attachment export"""
 
 
 class SampleAttachmentExportByIDResponseTypedDict(TypedDict):

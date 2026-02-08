@@ -4,9 +4,10 @@ from __future__ import annotations
 from datetime import datetime
 from enum import Enum
 import pydantic
-from pydantic import model_serializer
+from pydantic import field_serializer, model_serializer
 from typing import Any, List, Optional
 from typing_extensions import Annotated, NotRequired, TypedDict
+from workiva import models, utils
 from workiva.types import BaseModel, Nullable, OptionalNullable, UNSET, UNSET_SENTINEL
 
 
@@ -82,14 +83,14 @@ class SpreadsheetCreated(BaseModel):
         return m
 
 
-class SpreadsheetAllLinks(str, Enum):
+class SpreadsheetAllLinks(str, Enum, metaclass=utils.OpenEnumMeta):
     r"""Indicates the status of all links."""
 
     PUBLISHED = "published"
     UNPUBLISHED = "unpublished"
 
 
-class SpreadsheetOwnLinks(str, Enum):
+class SpreadsheetOwnLinks(str, Enum, metaclass=utils.OpenEnumMeta):
     r"""Indicates the status of links one has last edited."""
 
     PUBLISHED = "published"
@@ -113,6 +114,24 @@ class SpreadsheetLinksStatus(BaseModel):
 
     own_links: Annotated[SpreadsheetOwnLinks, pydantic.Field(alias="ownLinks")]
     r"""Indicates the status of links one has last edited."""
+
+    @field_serializer("all_links")
+    def serialize_all_links(self, value):
+        if isinstance(value, str):
+            try:
+                return models.SpreadsheetAllLinks(value)
+            except ValueError:
+                return value
+        return value
+
+    @field_serializer("own_links")
+    def serialize_own_links(self, value):
+        if isinstance(value, str):
+            try:
+                return models.SpreadsheetOwnLinks(value)
+            except ValueError:
+                return value
+        return value
 
 
 class SpreadsheetLock(str, Enum):

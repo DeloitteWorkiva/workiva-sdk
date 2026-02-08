@@ -17,19 +17,19 @@ CHAINS_GET_COMMANDS_OP_SERVERS = [
 
 
 class ChainsGetCommandsRequestTypedDict(TypedDict):
-    chain_id: str
-    r"""The ID of the Chain."""
     environment_id: str
     r"""The ID of the Environment."""
+    chain_id: str
+    r"""The ID of the Chain."""
 
 
 class ChainsGetCommandsRequest(BaseModel):
-    chain_id: Annotated[
-        str, FieldMetadata(path=PathParamMetadata(style="simple", explode=False))
-    ]
-    r"""The ID of the Chain."""
-
     environment_id: Annotated[
         str, FieldMetadata(path=PathParamMetadata(style="simple", explode=False))
     ]
     r"""The ID of the Environment."""
+
+    chain_id: Annotated[
+        str, FieldMetadata(path=PathParamMetadata(style="simple", explode=False))
+    ]
+    r"""The ID of the Chain."""

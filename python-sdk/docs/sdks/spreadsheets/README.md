@@ -6,42 +6,39 @@ Spreadsheets enable you to work with large, complex data in a familiar, collabor
 
 ### Available Operations
 
-* [copy_sheet](#copy_sheet) - Copy sheet
-* [create_sheet](#create_sheet) - Create a new sheet in a spreadsheet
-* [delete_dataset_by_sheet_id](#delete_dataset_by_sheet_id) - Delete a single dataset
-* [delete_sheet_by_id](#delete_sheet_by_id) - Delete a single sheet
-* [get_datasets](#get_datasets) - Retrieve a list of datasets
-* [get_sheet_by_id](#get_sheet_by_id) - Retrieve a single sheet
-* [get_sheet_data](#get_sheet_data) - Retrieve data from a sheet
-* [get_sheet_permissions](#get_sheet_permissions) - Retrieve permissions for a sheet in a spreadsheet
-* [get_sheets](#get_sheets) - Retrieve a list of sheets
-* [get_spreadsheet_by_id](#get_spreadsheet_by_id) - Retrieve a single spreadsheet
-* [get_spreadsheet_milestones](#get_spreadsheet_milestones) - Retrieve a list of milestones for a spreadsheet
-* [get_spreadsheet_permissions](#get_spreadsheet_permissions) - Retrieve permissions for a spreadsheet
 * [get_spreadsheets](#get_spreadsheets) - Retrieve a list of spreadsheets
-* [get_values_by_range](#get_values_by_range) - Retrieve a list of range values
-* [partially_update_sheet_by_id](#partially_update_sheet_by_id) - Partially update a single sheet
+* [get_spreadsheet_by_id](#get_spreadsheet_by_id) - Retrieve a single spreadsheet
 * [partially_update_spreadsheet_by_id](#partially_update_spreadsheet_by_id) - Partially update a single spreadsheet
-* [sheet_permissions_modification](#sheet_permissions_modification) - Modify permissions on a given sheet of a spreadsheet
+* [get_datasets](#get_datasets) - Retrieve a list of datasets
+* [upsert_datasets](#upsert_datasets) - Bulk upsert of datasets
 * [spreadsheet_export](#spreadsheet_export) - Initiate a spreadsheet export
 * [spreadsheet_filters_reapplication](#spreadsheet_filters_reapplication) - Reapply filters to the spreadsheet
 * [spreadsheet_links_publication](#spreadsheet_links_publication) - Initiate publication of links in a spreadsheet
+* [get_spreadsheet_milestones](#get_spreadsheet_milestones) - Retrieve a list of milestones for a spreadsheet
+* [get_spreadsheet_permissions](#get_spreadsheet_permissions) - Retrieve permissions for a spreadsheet
 * [spreadsheet_permissions_modification](#spreadsheet_permissions_modification) - Modify permissions on a spreadsheet
+* [get_sheets](#get_sheets) - Retrieve a list of sheets
+* [create_sheet](#create_sheet) - Create a new sheet in a spreadsheet
+* [delete_sheet_by_id](#delete_sheet_by_id) - Delete a single sheet
+* [get_sheet_by_id](#get_sheet_by_id) - Retrieve a single sheet
+* [partially_update_sheet_by_id](#partially_update_sheet_by_id) - Partially update a single sheet
+* [copy_sheet](#copy_sheet) - Copy sheet
+* [delete_dataset_by_sheet_id](#delete_dataset_by_sheet_id) - Delete a single dataset
+* [get_sheet_permissions](#get_sheet_permissions) - Retrieve permissions for a sheet in a spreadsheet
+* [sheet_permissions_modification](#sheet_permissions_modification) - Modify permissions on a given sheet of a spreadsheet
+* [get_sheet_data](#get_sheet_data) - Retrieve data from a sheet
 * [update_sheet](#update_sheet) - Update sheet content
+* [get_values_by_range](#get_values_by_range) - Retrieve a list of range values
 * [update_values_by_range](#update_values_by_range) - Update values in a range
-* [upsert_datasets](#upsert_datasets) - Bulk upsert of datasets
 
-## copy_sheet
+## get_spreadsheets
 
-Asynchronously copies a [sheet](ref:spreadsheets#sheet) given details about the copy's destination within the same or another spreadsheet. Options are specified using a [SheetCopy](ref:spreadsheets#sheetcopy) object.
+Returns a paginated list of [spreadsheets](ref:spreadsheets#spreadsheet).
 
-This endpoint copies a sheet's content, but does not copy labels, comments, or tasks. It will copy over most formatting, however it does not copy user-defined style guides across spreadsheets. So if the source sheet has  formatting that depends on a user-defined style guide, that formatting will be lost when copying to a new spreadsheet.
-
-Unless otherwise specified, the copy appears at the top level of its  destination spreadsheet, with an index of 0, and with the same name as the original sheet.
 
 ### Example Usage
 
-<!-- UsageSnippet language="python" operationID="copySheet" method="post" path="/spreadsheets/{spreadsheetId}/sheets/{sheetId}/copy" -->
+<!-- UsageSnippet language="python" operationID="getSpreadsheets" method="get" path="/spreadsheets" -->
 ```python
 from workiva import SDK, models
 
@@ -53,30 +50,28 @@ with SDK(
     ),
 ) as sdk:
 
-    res = sdk.spreadsheets.copy_sheet(sheet_id="<id>", spreadsheet_id="<id>", sheet_copy={
-        "sheet_index": 2,
-        "sheet_name": "Q1",
-        "sheet_parent": "5bbf8aa3cea54465762af96e3ca411c7",
-        "spreadsheet": "c65d9572a7464037a383d6235633cf74",
-    })
+    res = sdk.spreadsheets.get_spreadsheets(dollar_maxpagesize=1000, dollar_next="JTI0bGltaXQ9MTAwJiUyNG9mZnNldD0xMDA")
 
-    # Handle response
-    print(res)
+    while res is not None:
+        # Handle items
+
+        res = res.next()
 
 ```
 
 ### Parameters
 
-| Parameter                                                           | Type                                                                | Required                                                            | Description                                                         |
-| ------------------------------------------------------------------- | ------------------------------------------------------------------- | ------------------------------------------------------------------- | ------------------------------------------------------------------- |
-| `sheet_id`                                                          | *str*                                                               | :heavy_check_mark:                                                  | The unique identifier of the sheet                                  |
-| `spreadsheet_id`                                                    | *str*                                                               | :heavy_check_mark:                                                  | The unique identifier of the spreadsheet                            |
-| `sheet_copy`                                                        | [models.SheetCopy](../../models/sheetcopy.md)                       | :heavy_check_mark:                                                  | A SheetCopy object                                                  |
-| `retries`                                                           | [Optional[utils.RetryConfig]](../../models/utils/retryconfig.md)    | :heavy_minus_sign:                                                  | Configuration to override the default retry behavior of the client. |
+| Parameter                                                                                   | Type                                                                                        | Required                                                                                    | Description                                                                                 | Example                                                                                     |
+| ------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------- |
+| `dollar_filter`                                                                             | *Optional[str]*                                                                             | :heavy_minus_sign:                                                                          | The properties to filter the results by.                                                    |                                                                                             |
+| `dollar_order_by`                                                                           | *Optional[str]*                                                                             | :heavy_minus_sign:                                                                          | One or more comma-separated expressions to indicate the order in which to sort the results. |                                                                                             |
+| `dollar_maxpagesize`                                                                        | *Optional[int]*                                                                             | :heavy_minus_sign:                                                                          | The maximum number of results to retrieve                                                   |                                                                                             |
+| `dollar_next`                                                                               | *Optional[str]*                                                                             | :heavy_minus_sign:                                                                          | Pagination cursor for next set of results.                                                  | JTI0bGltaXQ9MTAwJiUyNG9mZnNldD0xMDA                                                         |
+| `retries`                                                                                   | [Optional[utils.RetryConfig]](../../models/utils/retryconfig.md)                            | :heavy_minus_sign:                                                                          | Configuration to override the default retry behavior of the client.                         |                                                                                             |
 
 ### Response
 
-**[models.CopySheetResponse](../../models/copysheetresponse.md)**
+**[models.GetSpreadsheetsResponse](../../models/getspreadsheetsresponse.md)**
 
 ### Errors
 
@@ -86,14 +81,14 @@ with SDK(
 | errors.ErrorResponse         | 500, 503                     | application/json             |
 | errors.SDKError              | 4XX, 5XX                     | \*/\*                        |
 
-## create_sheet
+## get_spreadsheet_by_id
 
-Creates a new [sheet](ref:spreadsheets#sheet) in a [spreadsheet](ref:spreadsheets#spreadsheet), given its properties. If the sheet name provided isn't unique, a number is appended to make it unique. By default, creates a top-level sheet in the top-most position.
+Retrieves a [spreadsheet](ref:spreadsheets#spreadsheet) given its ID.
 
 
 ### Example Usage
 
-<!-- UsageSnippet language="python" operationID="createSheet" method="post" path="/spreadsheets/{spreadsheetId}/sheets" -->
+<!-- UsageSnippet language="python" operationID="getSpreadsheetById" method="get" path="/spreadsheets/{spreadsheetId}" -->
 ```python
 from workiva import SDK, models
 
@@ -105,55 +100,7 @@ with SDK(
     ),
 ) as sdk:
 
-    res = sdk.spreadsheets.create_sheet(spreadsheet_id="<id>", sheet={
-        "index": 2,
-        "name": "Q3",
-    })
-
-    # Handle response
-    print(res)
-
-```
-
-### Parameters
-
-| Parameter                                                           | Type                                                                | Required                                                            | Description                                                         |
-| ------------------------------------------------------------------- | ------------------------------------------------------------------- | ------------------------------------------------------------------- | ------------------------------------------------------------------- |
-| `spreadsheet_id`                                                    | *str*                                                               | :heavy_check_mark:                                                  | The unique identifier of the spreadsheet                            |
-| `sheet`                                                             | [models.SheetInput](../../models/sheetinput.md)                     | :heavy_check_mark:                                                  | The properties of the sheet to create                               |
-| `retries`                                                           | [Optional[utils.RetryConfig]](../../models/utils/retryconfig.md)    | :heavy_minus_sign:                                                  | Configuration to override the default retry behavior of the client. |
-
-### Response
-
-**[models.Sheet](../../models/sheet.md)**
-
-### Errors
-
-| Error Type                   | Status Code                  | Content Type                 |
-| ---------------------------- | ---------------------------- | ---------------------------- |
-| errors.ErrorResponse         | 400, 401, 403, 404, 409, 429 | application/json             |
-| errors.ErrorResponse         | 500, 503                     | application/json             |
-| errors.SDKError              | 4XX, 5XX                     | \*/\*                        |
-
-## delete_dataset_by_sheet_id
-
-Deletes the [dataset](ref:spreadsheets#dataset) for the specified [sheet](ref:spreadsheets#sheet). <br /><br /> When you delete a dataset, you can select whether to leave its associated values in place. To delete its values, pass `true` for query parameter `$deletevalues` (default is `false`).
-
-### Example Usage
-
-<!-- UsageSnippet language="python" operationID="deleteDatasetBySheetId" method="delete" path="/spreadsheets/{spreadsheetId}/sheets/{sheetId}/dataset" -->
-```python
-from workiva import SDK, models
-
-
-with SDK(
-    security=models.Security(
-        client_id="<YOUR_CLIENT_ID_HERE>",
-        client_secret="<YOUR_CLIENT_SECRET_HERE>",
-    ),
-) as sdk:
-
-    res = sdk.spreadsheets.delete_dataset_by_sheet_id(sheet_id="<id>", spreadsheet_id="<id>", dollar_deletevalues=False)
+    res = sdk.spreadsheets.get_spreadsheet_by_id(spreadsheet_id="<id>", dollar_revision="1A2B3C4D")
 
     # Handle response
     print(res)
@@ -164,14 +111,13 @@ with SDK(
 
 | Parameter                                                           | Type                                                                | Required                                                            | Description                                                         | Example                                                             |
 | ------------------------------------------------------------------- | ------------------------------------------------------------------- | ------------------------------------------------------------------- | ------------------------------------------------------------------- | ------------------------------------------------------------------- |
-| `sheet_id`                                                          | *str*                                                               | :heavy_check_mark:                                                  | The unique identifier of the sheet                                  |                                                                     |
 | `spreadsheet_id`                                                    | *str*                                                               | :heavy_check_mark:                                                  | The unique identifier of the spreadsheet                            |                                                                     |
-| `dollar_deletevalues`                                               | *Optional[bool]*                                                    | :heavy_minus_sign:                                                  | Indicates whether values should be deleted along with the dataset   | false                                                               |
+| `dollar_revision`                                                   | *Optional[str]*                                                     | :heavy_minus_sign:                                                  | Returns resources at a specific revision                            | 1A2B3C4D                                                            |
 | `retries`                                                           | [Optional[utils.RetryConfig]](../../models/utils/retryconfig.md)    | :heavy_minus_sign:                                                  | Configuration to override the default retry behavior of the client. |                                                                     |
 
 ### Response
 
-**[models.DeleteDatasetBySheetIDResponse](../../models/deletedatasetbysheetidresponse.md)**
+**[models.Spreadsheet](../../models/spreadsheet.md)**
 
 ### Errors
 
@@ -181,14 +127,92 @@ with SDK(
 | errors.ErrorResponse         | 500, 503                     | application/json             |
 | errors.SDKError              | 4XX, 5XX                     | \*/\*                        |
 
-## delete_sheet_by_id
+## partially_update_spreadsheet_by_id
 
-Deletes a [sheet](ref:spreadsheets#sheet) given its ID.
+Updates the properties of a [spreadsheet](ref:spreadsheets#spreadsheet).
+
+This is a long running operation. Responses include a `Location` header,
+which indicates where to poll for results. For more details on long-running job polling,
+see [Operations endpoint](ref:getoperationbyid).
+
+### Options
+| Path                              | PATCH Operations Supported         |
+|-----------------------------------|------------------------------------|
+| `/customFields/<custom field id>` | `add`, `remove`, `replace`, `test` |
+| `/customFieldGroups`              | `add`, `remove`, `replace`, `test` |
+| `/sheetCustomFieldGroups`         | `add`, `remove`, `replace`, `test` |
+| `/lock`                           | `replace`                          |
+
+### Examples
+
+#### Add a custom field value
+
+```json
+[
+  {
+    "op": "add",
+    "path": "/customFields/com.workiva.gsr.legal_entity",
+    "value": "Workiva"
+  }
+]
+```
+
+#### Remove a custom field value
+
+```json
+[
+  {
+    "op": "remove",
+    "path": "/customFields/com.workiva.gsr.legal_entity"
+  }
+]
+```
+
+#### Replace a custom field value
+
+```json
+[
+  {
+    "op": "replace",
+    "path": "/customFields/com.workiva.gsr.legal_entity",
+    "value": "Workiva, Inc."
+  }
+]
+```
+
+#### Verifying customFieldGroup is empty before replacing the list
+
+```json
+[
+  {
+    "op": "test",
+    "path": "/customFieldGroups",
+    "value": []
+  },
+  {
+    "op": "replace",
+    "path": "/customFieldGroups",
+    "value": ["gsr.reporting"]
+  }
+]
+```
+
+#### Adding a customFieldGroup to the end of a list
+
+```json
+[
+  {
+    "op": "add",
+    "path": "/customFieldGroups/-",
+    "value": "gsr.reporting"
+  }
+]
+```
 
 
-### Example Usage
+### Example Usage: BadRequest
 
-<!-- UsageSnippet language="python" operationID="deleteSheetById" method="delete" path="/spreadsheets/{spreadsheetId}/sheets/{sheetId}" -->
+<!-- UsageSnippet language="python" operationID="partiallyUpdateSpreadsheetById" method="patch" path="/spreadsheets/{spreadsheetId}" example="BadRequest" -->
 ```python
 from workiva import SDK, models
 
@@ -200,19 +224,56 @@ with SDK(
     ),
 ) as sdk:
 
-    sdk.spreadsheets.delete_sheet_by_id(sheet_id="<id>", spreadsheet_id="<id>")
+    res = sdk.spreadsheets.partially_update_spreadsheet_by_id(spreadsheet_id="<id>", request_body=[
+        {
+            "op": models.Op.REPLACE,
+            "path": "/name",
+            "value": "New name",
+        },
+    ])
 
-    # Use the SDK ...
+    # Handle response
+    print(res)
+
+```
+### Example Usage: body
+
+<!-- UsageSnippet language="python" operationID="partiallyUpdateSpreadsheetById" method="patch" path="/spreadsheets/{spreadsheetId}" example="body" -->
+```python
+from workiva import SDK, models
+
+
+with SDK(
+    security=models.Security(
+        client_id="<YOUR_CLIENT_ID_HERE>",
+        client_secret="<YOUR_CLIENT_SECRET_HERE>",
+    ),
+) as sdk:
+
+    res = sdk.spreadsheets.partially_update_spreadsheet_by_id(spreadsheet_id="<id>", request_body=[
+        {
+            "op": models.Op.REPLACE,
+            "path": "/customFields/com.workiva.gsr.legal_entity",
+            "value": "US Entity",
+        },
+    ])
+
+    # Handle response
+    print(res)
 
 ```
 
 ### Parameters
 
-| Parameter                                                           | Type                                                                | Required                                                            | Description                                                         |
-| ------------------------------------------------------------------- | ------------------------------------------------------------------- | ------------------------------------------------------------------- | ------------------------------------------------------------------- |
-| `sheet_id`                                                          | *str*                                                               | :heavy_check_mark:                                                  | The unique identifier of the sheet                                  |
-| `spreadsheet_id`                                                    | *str*                                                               | :heavy_check_mark:                                                  | The unique identifier of the spreadsheet                            |
-| `retries`                                                           | [Optional[utils.RetryConfig]](../../models/utils/retryconfig.md)    | :heavy_minus_sign:                                                  | Configuration to override the default retry behavior of the client. |
+| Parameter                                                             | Type                                                                  | Required                                                              | Description                                                           |
+| --------------------------------------------------------------------- | --------------------------------------------------------------------- | --------------------------------------------------------------------- | --------------------------------------------------------------------- |
+| `spreadsheet_id`                                                      | *str*                                                                 | :heavy_check_mark:                                                    | The unique identifier of the spreadsheet                              |
+| `request_body`                                                        | List[[models.JSONPatchOperation](../../models/jsonpatchoperation.md)] | :heavy_check_mark:                                                    | A collection of patch operations to apply to the spreadsheet.         |
+| `retries`                                                             | [Optional[utils.RetryConfig]](../../models/utils/retryconfig.md)      | :heavy_minus_sign:                                                    | Configuration to override the default retry behavior of the client.   |
+
+### Response
+
+**[models.PartiallyUpdateSpreadsheetByIDResponse](../../models/partiallyupdatespreadsheetbyidresponse.md)**
 
 ### Errors
 
@@ -266,14 +327,13 @@ with SDK(
 | errors.ErrorResponse         | 500, 503                     | application/json             |
 | errors.SDKError              | 4XX, 5XX                     | \*/\*                        |
 
-## get_sheet_by_id
+## upsert_datasets
 
-Retrieves a [sheet](ref:spreadsheets#sheet) given its ID.
-
+Asynchronously upserts an array of [datasets](ref:spreadsheets#dataset) to a [spreadsheet](ref:spreadsheets#spreadsheet), given their properties. Each [sheet](ref:spreadsheets#sheet) can have only one dataset, and its range will always start with `A1`. <br /><br /> Bulk upsertion creates or updates datasets in sheets and performs any calculations after it completes. When complete, the dataset's range is locked through both the UI and endpoints that write values to a sheet. To change the values in a dataset, either upsert new values using this endpoint again, or delete the dataset. <br /><br /> If any dataset fails to upsert, no datasets upsert, and no changes commit. <br /><br /> Each dataset in the array requires `sheet` and `values`. Partial upserts are not supported. <br /><br /> Values may be strings, numbers, integers, or booleans. To indicate an empty cell, provide an empty string.
 
 ### Example Usage
 
-<!-- UsageSnippet language="python" operationID="getSheetById" method="get" path="/spreadsheets/{spreadsheetId}/sheets/{sheetId}" -->
+<!-- UsageSnippet language="python" operationID="upsertDatasets" method="post" path="/spreadsheets/{spreadsheetId}/datasets/bulkUpsert" example="BadRequest" -->
 ```python
 from workiva import SDK, models
 
@@ -285,65 +345,10 @@ with SDK(
     ),
 ) as sdk:
 
-    res = sdk.spreadsheets.get_sheet_by_id(sheet_id="<id>", spreadsheet_id="<id>", dollar_revision="1A2B3C4D")
+    res = sdk.spreadsheets.upsert_datasets(spreadsheet_id="<id>", request_body=[])
 
     # Handle response
     print(res)
-
-```
-
-### Parameters
-
-| Parameter                                                           | Type                                                                | Required                                                            | Description                                                         | Example                                                             |
-| ------------------------------------------------------------------- | ------------------------------------------------------------------- | ------------------------------------------------------------------- | ------------------------------------------------------------------- | ------------------------------------------------------------------- |
-| `sheet_id`                                                          | *str*                                                               | :heavy_check_mark:                                                  | The unique identifier of the sheet                                  |                                                                     |
-| `spreadsheet_id`                                                    | *str*                                                               | :heavy_check_mark:                                                  | The unique identifier of the spreadsheet                            |                                                                     |
-| `dollar_revision`                                                   | *Optional[str]*                                                     | :heavy_minus_sign:                                                  | Returns resources at a specific revision                            | 1A2B3C4D                                                            |
-| `retries`                                                           | [Optional[utils.RetryConfig]](../../models/utils/retryconfig.md)    | :heavy_minus_sign:                                                  | Configuration to override the default retry behavior of the client. |                                                                     |
-
-### Response
-
-**[models.Sheet](../../models/sheet.md)**
-
-### Errors
-
-| Error Type                   | Status Code                  | Content Type                 |
-| ---------------------------- | ---------------------------- | ---------------------------- |
-| errors.ErrorResponse         | 400, 401, 403, 404, 409, 429 | application/json             |
-| errors.ErrorResponse         | 500, 503                     | application/json             |
-| errors.SDKError              | 4XX, 5XX                     | \*/\*                        |
-
-## get_sheet_data
-
-Retrieve data from a range in a sheet. Includes the value & formatting of cells, visibility of columns and cells, merged ranges, etc.
-Limit the results to particular fields by providing a comma-separated list of paths, rooted at the `data` object.
-Example: $fields=cells.calculatedValue,cells.formats.valueFormat <br /><br /> Note: This endpoint is rate-limited. You may experience rates as low as 600 requests per minute.  This rate is shared across your workspace. When you encounter a 429, examine the `Retry-After`  header and retry after that many seconds.
-
-### Example Usage
-
-<!-- UsageSnippet language="python" operationID="getSheetData" method="get" path="/spreadsheets/{spreadsheetId}/sheets/{sheetId}/sheetdata" -->
-```python
-from workiva import SDK, models
-
-
-with SDK(
-    security=models.Security(
-        client_id="<YOUR_CLIENT_ID_HERE>",
-        client_secret="<YOUR_CLIENT_SECRET_HERE>",
-    ),
-) as sdk:
-
-    res = sdk.spreadsheets.get_sheet_data(request={
-        "dollar_cellrange": "A2:B",
-        "dollar_next": "JTI0bGltaXQ9MTAwJiUyNG9mZnNldD0xMDA",
-        "sheet_id": "<id>",
-        "spreadsheet_id": "<id>",
-    })
-
-    while res is not None:
-        # Handle items
-
-        res = res.next()
 
 ```
 
@@ -351,12 +356,13 @@ with SDK(
 
 | Parameter                                                           | Type                                                                | Required                                                            | Description                                                         |
 | ------------------------------------------------------------------- | ------------------------------------------------------------------- | ------------------------------------------------------------------- | ------------------------------------------------------------------- |
-| `request`                                                           | [models.GetSheetDataRequest](../../models/getsheetdatarequest.md)   | :heavy_check_mark:                                                  | The request object to use for the request.                          |
+| `spreadsheet_id`                                                    | *str*                                                               | :heavy_check_mark:                                                  | The unique identifier of the spreadsheet                            |
+| `request_body`                                                      | List[[models.DatasetInput](../../models/datasetinput.md)]           | :heavy_check_mark:                                                  | An array of datasets                                                |
 | `retries`                                                           | [Optional[utils.RetryConfig]](../../models/utils/retryconfig.md)    | :heavy_minus_sign:                                                  | Configuration to override the default retry behavior of the client. |
 
 ### Response
 
-**[models.GetSheetDataResponse](../../models/getsheetdataresponse.md)**
+**[models.UpsertDatasetsResponse](../../models/upsertdatasetsresponse.md)**
 
 ### Errors
 
@@ -366,14 +372,18 @@ with SDK(
 | errors.ErrorResponse         | 500, 503                     | application/json             |
 | errors.SDKError              | 4XX, 5XX                     | \*/\*                        |
 
-## get_sheet_permissions
+## spreadsheet_export
 
-Retrieves a paginated list of permissions for the given sheet in a spreadsheet
+Asynchronously exports a [spreadsheet](ref:spreadsheets#spreadsheet) as .XLSX, .PDF, or .CSV.
+
+Responses include a `Location` header, which indicates where to poll for export results. For more details on long-running job polling, see [Operations endpoint](ref:getoperationbyid). When the export completes, its status will be `completed`, and the response body includes a `resourceURL`. To download the exported file, perform a GET on the `resourceURL` with the same authentication credentials and flow as the export request. For more details, see [Authentication documentation](ref:authentication).
+
+Note: To export to .PDF, the spreadsheet can have no more than 250,000 cells.
 
 
 ### Example Usage
 
-<!-- UsageSnippet language="python" operationID="getSheetPermissions" method="get" path="/spreadsheets/{spreadsheetId}/sheets/{sheetId}/permissions" -->
+<!-- UsageSnippet language="python" operationID="spreadsheetExport" method="post" path="/spreadsheets/{spreadsheetId}/export" example="BadRequest" -->
 ```python
 from workiva import SDK, models
 
@@ -385,107 +395,17 @@ with SDK(
     ),
 ) as sdk:
 
-    res = sdk.spreadsheets.get_sheet_permissions(request={
-        "dollar_next": "JTI0bGltaXQ9MTAwJiUyNG9mZnNldD0xMDA",
-        "sheet_id": "<id>",
-        "spreadsheet_id": "<id>",
+    res = sdk.spreadsheets.spreadsheet_export(spreadsheet_id="<id>", spreadsheet_export={
+        "format_": models.SpreadsheetExportFormat.XLSX,
+        "sheets": [
+            "7c8d8c4a46784455bg68t36f9d8232d8",
+            "54bgd83b471e5902f1a8e8c9a299c9fb",
+        ],
+        "xlsx_options": {
+            "export_as_formulas": True,
+            "export_precision": models.ExportPrecision.DISPLAYED,
+        },
     })
-
-    while res is not None:
-        # Handle items
-
-        res = res.next()
-
-```
-
-### Parameters
-
-| Parameter                                                                       | Type                                                                            | Required                                                                        | Description                                                                     |
-| ------------------------------------------------------------------------------- | ------------------------------------------------------------------------------- | ------------------------------------------------------------------------------- | ------------------------------------------------------------------------------- |
-| `request`                                                                       | [models.GetSheetPermissionsRequest](../../models/getsheetpermissionsrequest.md) | :heavy_check_mark:                                                              | The request object to use for the request.                                      |
-| `retries`                                                                       | [Optional[utils.RetryConfig]](../../models/utils/retryconfig.md)                | :heavy_minus_sign:                                                              | Configuration to override the default retry behavior of the client.             |
-
-### Response
-
-**[models.GetSheetPermissionsResponse](../../models/getsheetpermissionsresponse.md)**
-
-### Errors
-
-| Error Type                   | Status Code                  | Content Type                 |
-| ---------------------------- | ---------------------------- | ---------------------------- |
-| errors.ErrorResponse         | 400, 401, 403, 404, 409, 429 | application/json             |
-| errors.ErrorResponse         | 500, 503                     | application/json             |
-| errors.SDKError              | 4XX, 5XX                     | \*/\*                        |
-
-## get_sheets
-
-Returns a list of [sheets](ref:spreadsheets#sheet).
-
-### Example Usage
-
-<!-- UsageSnippet language="python" operationID="getSheets" method="get" path="/spreadsheets/{spreadsheetId}/sheets" -->
-```python
-from workiva import SDK, models
-
-
-with SDK(
-    security=models.Security(
-        client_id="<YOUR_CLIENT_ID_HERE>",
-        client_secret="<YOUR_CLIENT_SECRET_HERE>",
-    ),
-) as sdk:
-
-    res = sdk.spreadsheets.get_sheets(spreadsheet_id="<id>", dollar_maxpagesize=1000, dollar_next="JTI0bGltaXQ9MTAwJiUyNG9mZnNldD0xMDA", dollar_revision="1A2B3C4D")
-
-    while res is not None:
-        # Handle items
-
-        res = res.next()
-
-```
-
-### Parameters
-
-| Parameter                                                           | Type                                                                | Required                                                            | Description                                                         | Example                                                             |
-| ------------------------------------------------------------------- | ------------------------------------------------------------------- | ------------------------------------------------------------------- | ------------------------------------------------------------------- | ------------------------------------------------------------------- |
-| `spreadsheet_id`                                                    | *str*                                                               | :heavy_check_mark:                                                  | The unique identifier of the spreadsheet                            |                                                                     |
-| `dollar_maxpagesize`                                                | *Optional[int]*                                                     | :heavy_minus_sign:                                                  | The maximum number of results to retrieve                           |                                                                     |
-| `dollar_next`                                                       | *Optional[str]*                                                     | :heavy_minus_sign:                                                  | Pagination cursor for next set of results.                          | JTI0bGltaXQ9MTAwJiUyNG9mZnNldD0xMDA                                 |
-| `dollar_revision`                                                   | *Optional[str]*                                                     | :heavy_minus_sign:                                                  | Returns resources at a specific revision                            | 1A2B3C4D                                                            |
-| `retries`                                                           | [Optional[utils.RetryConfig]](../../models/utils/retryconfig.md)    | :heavy_minus_sign:                                                  | Configuration to override the default retry behavior of the client. |                                                                     |
-
-### Response
-
-**[models.GetSheetsResponse](../../models/getsheetsresponse.md)**
-
-### Errors
-
-| Error Type                   | Status Code                  | Content Type                 |
-| ---------------------------- | ---------------------------- | ---------------------------- |
-| errors.ErrorResponse         | 400, 401, 403, 404, 409, 429 | application/json             |
-| errors.ErrorResponse         | 500, 503                     | application/json             |
-| errors.SDKError              | 4XX, 5XX                     | \*/\*                        |
-
-## get_spreadsheet_by_id
-
-Retrieves a [spreadsheet](ref:spreadsheets#spreadsheet) given its ID.
-
-
-### Example Usage
-
-<!-- UsageSnippet language="python" operationID="getSpreadsheetById" method="get" path="/spreadsheets/{spreadsheetId}" -->
-```python
-from workiva import SDK, models
-
-
-with SDK(
-    security=models.Security(
-        client_id="<YOUR_CLIENT_ID_HERE>",
-        client_secret="<YOUR_CLIENT_SECRET_HERE>",
-    ),
-) as sdk:
-
-    res = sdk.spreadsheets.get_spreadsheet_by_id(spreadsheet_id="<id>", dollar_revision="1A2B3C4D")
 
     # Handle response
     print(res)
@@ -494,15 +414,117 @@ with SDK(
 
 ### Parameters
 
-| Parameter                                                           | Type                                                                | Required                                                            | Description                                                         | Example                                                             |
-| ------------------------------------------------------------------- | ------------------------------------------------------------------- | ------------------------------------------------------------------- | ------------------------------------------------------------------- | ------------------------------------------------------------------- |
-| `spreadsheet_id`                                                    | *str*                                                               | :heavy_check_mark:                                                  | The unique identifier of the spreadsheet                            |                                                                     |
-| `dollar_revision`                                                   | *Optional[str]*                                                     | :heavy_minus_sign:                                                  | Returns resources at a specific revision                            | 1A2B3C4D                                                            |
-| `retries`                                                           | [Optional[utils.RetryConfig]](../../models/utils/retryconfig.md)    | :heavy_minus_sign:                                                  | Configuration to override the default retry behavior of the client. |                                                                     |
+| Parameter                                                                                                                                                                               | Type                                                                                                                                                                                    | Required                                                                                                                                                                                | Description                                                                                                                                                                             | Example                                                                                                                                                                                 |
+| --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `spreadsheet_id`                                                                                                                                                                        | *str*                                                                                                                                                                                   | :heavy_check_mark:                                                                                                                                                                      | The unique identifier of the spreadsheet                                                                                                                                                |                                                                                                                                                                                         |
+| `spreadsheet_export`                                                                                                                                                                    | [models.SpreadsheetExport](../../models/spreadsheetexport.md)                                                                                                                           | :heavy_check_mark:                                                                                                                                                                      | Details about the spreadsheet export, including its format and options                                                                                                                  | {<br/>"format": "xlsx",<br/>"sheets": [<br/>"7c8d8c4a46784455bg68t36f9d8232d8",<br/>"54bgd83b471e5902f1a8e8c9a299c9fb"<br/>],<br/>"xlsxOptions": {<br/>"exportAsFormulas": true,<br/>"exportPrecision": "displayed"<br/>}<br/>} |
+| `retries`                                                                                                                                                                               | [Optional[utils.RetryConfig]](../../models/utils/retryconfig.md)                                                                                                                        | :heavy_minus_sign:                                                                                                                                                                      | Configuration to override the default retry behavior of the client.                                                                                                                     |                                                                                                                                                                                         |
 
 ### Response
 
-**[models.Spreadsheet](../../models/spreadsheet.md)**
+**[models.SpreadsheetExportResponse](../../models/spreadsheetexportresponse.md)**
+
+### Errors
+
+| Error Type                   | Status Code                  | Content Type                 |
+| ---------------------------- | ---------------------------- | ---------------------------- |
+| errors.ErrorResponse         | 400, 401, 403, 404, 409, 429 | application/json             |
+| errors.ErrorResponse         | 500, 503                     | application/json             |
+| errors.SDKError              | 4XX, 5XX                     | \*/\*                        |
+
+## spreadsheet_filters_reapplication
+
+Performs a [`SpreadsheetFiltersReapplication`](ref:content#spreadsheetfiltersreapplication) on the specified spreadsheet.
+This endpoint is used to refresh the spreadsheet's filters based on the latest state or configuration changes.
+The filters are reapplied in the context of the spreadsheet's current data state.
+
+This is a long-running operation. Responses include a `Location` header, which indicates where to poll for results.
+For more details on long-running job polling, see [Operations endpoint](ref:getoperationbyid).
+
+
+### Example Usage
+
+<!-- UsageSnippet language="python" operationID="spreadsheetFiltersReapplication" method="post" path="/spreadsheets/{spreadsheetId}/filters/reapplication" example="BadRequest" -->
+```python
+from workiva import SDK, models
+
+
+with SDK(
+    security=models.Security(
+        client_id="<YOUR_CLIENT_ID_HERE>",
+        client_secret="<YOUR_CLIENT_SECRET_HERE>",
+    ),
+) as sdk:
+
+    res = sdk.spreadsheets.spreadsheet_filters_reapplication(spreadsheet_id="<id>", spreadsheet_filters_reapplication={
+        "ignore_non_editable_filters": True,
+    })
+
+    # Handle response
+    print(res)
+
+```
+
+### Parameters
+
+| Parameter                                                                                 | Type                                                                                      | Required                                                                                  | Description                                                                               | Example                                                                                   |
+| ----------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------- |
+| `spreadsheet_id`                                                                          | *str*                                                                                     | :heavy_check_mark:                                                                        | The unique identifier of the spreadsheet                                                  |                                                                                           |
+| `spreadsheet_filters_reapplication`                                                       | [models.SpreadsheetFiltersReapplication](../../models/spreadsheetfiltersreapplication.md) | :heavy_check_mark:                                                                        | The filter reapplication request to apply                                                 | {<br/>"ignoreNonEditableFilters": true<br/>}                                              |
+| `retries`                                                                                 | [Optional[utils.RetryConfig]](../../models/utils/retryconfig.md)                          | :heavy_minus_sign:                                                                        | Configuration to override the default retry behavior of the client.                       |                                                                                           |
+
+### Response
+
+**[models.SpreadsheetFiltersReapplicationResponse](../../models/spreadsheetfiltersreapplicationresponse.md)**
+
+### Errors
+
+| Error Type                   | Status Code                  | Content Type                 |
+| ---------------------------- | ---------------------------- | ---------------------------- |
+| errors.ErrorResponse         | 400, 401, 403, 404, 409, 429 | application/json             |
+| errors.ErrorResponse         | 500, 503                     | application/json             |
+| errors.SDKError              | 4XX, 5XX                     | \*/\*                        |
+
+## spreadsheet_links_publication
+
+Publishes the links in a spreadsheet - either all (as document owner) or only one's own. Content at the latest spreadsheet revision will be used for publish.
+The response also includes a `Location` header, which indicates where to poll for operation results. For more details on long-running job polling, see [Operations endpoint](ref:getoperationbyid).
+
+
+### Example Usage
+
+<!-- UsageSnippet language="python" operationID="spreadsheetLinksPublication" method="post" path="/spreadsheets/{spreadsheetId}/links/publication" example="BadRequest" -->
+```python
+from workiva import SDK, models
+
+
+with SDK(
+    security=models.Security(
+        client_id="<YOUR_CLIENT_ID_HERE>",
+        client_secret="<YOUR_CLIENT_SECRET_HERE>",
+    ),
+) as sdk:
+
+    res = sdk.spreadsheets.spreadsheet_links_publication(spreadsheet_id="<id>", links_publication_options={
+        "publish_type": models.PublishType.ALL_LINKS,
+    })
+
+    # Handle response
+    print(res)
+
+```
+
+### Parameters
+
+| Parameter                                                                 | Type                                                                      | Required                                                                  | Description                                                               |
+| ------------------------------------------------------------------------- | ------------------------------------------------------------------------- | ------------------------------------------------------------------------- | ------------------------------------------------------------------------- |
+| `spreadsheet_id`                                                          | *str*                                                                     | :heavy_check_mark:                                                        | The unique identifier of the spreadsheet                                  |
+| `links_publication_options`                                               | [models.LinksPublicationOptions](../../models/linkspublicationoptions.md) | :heavy_check_mark:                                                        | Details about the link publication.                                       |
+| `retries`                                                                 | [Optional[utils.RetryConfig]](../../models/utils/retryconfig.md)          | :heavy_minus_sign:                                                        | Configuration to override the default retry behavior of the client.       |
+
+### Response
+
+**[models.SpreadsheetLinksPublicationResponse](../../models/spreadsheetlinkspublicationresponse.md)**
 
 ### Errors
 
@@ -609,14 +631,14 @@ with SDK(
 | errors.ErrorResponse         | 500, 503                     | application/json             |
 | errors.SDKError              | 4XX, 5XX                     | \*/\*                        |
 
-## get_spreadsheets
+## spreadsheet_permissions_modification
 
-Returns a paginated list of [spreadsheets](ref:spreadsheets#spreadsheet).
+Assign and/or revoke permissions on a spreadsheet. If any modification in a request fails, all modifications on that request fail. <br /><br /> _To modify an existing permission, the existing permission must first be  explicitly revoked. Then, the new permission needs to be assigned. This  can be done in a single request by sending `toAssign` and `toRevoke` in  the request body._
 
 
 ### Example Usage
 
-<!-- UsageSnippet language="python" operationID="getSpreadsheets" method="get" path="/spreadsheets" -->
+<!-- UsageSnippet language="python" operationID="spreadsheetPermissionsModification" method="post" path="/spreadsheets/{spreadsheetId}/permissions/modification" example="BadRequest" -->
 ```python
 from workiva import SDK, models
 
@@ -628,28 +650,32 @@ with SDK(
     ),
 ) as sdk:
 
-    res = sdk.spreadsheets.get_spreadsheets(dollar_maxpagesize=1000, dollar_next="JTI0bGltaXQ9MTAwJiUyNG9mZnNldD0xMDA")
+    sdk.spreadsheets.spreadsheet_permissions_modification(spreadsheet_id="<id>", resource_permissions_modification={
+        "to_assign": [
+            {
+                "permission": "598e8fa3-3e7c-4fb7-b662-f44522216e2b",
+                "principal": "V0ZVc2VyHzU2NDg2NjU2MjQ0NDQ5Mjg",
+            },
+        ],
+        "to_revoke": [
+            {
+                "permission": "85aa87ee-beb9-4417-8fa0-420e9de63534",
+                "principal": "V0ZVc2VyHzU2NDg2NjU2MjQ0NDQ5Mjg",
+            },
+        ],
+    })
 
-    while res is not None:
-        # Handle items
-
-        res = res.next()
+    # Use the SDK ...
 
 ```
 
 ### Parameters
 
-| Parameter                                                                                   | Type                                                                                        | Required                                                                                    | Description                                                                                 | Example                                                                                     |
-| ------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------- |
-| `dollar_filter`                                                                             | *Optional[str]*                                                                             | :heavy_minus_sign:                                                                          | The properties to filter the results by.                                                    |                                                                                             |
-| `dollar_maxpagesize`                                                                        | *Optional[int]*                                                                             | :heavy_minus_sign:                                                                          | The maximum number of results to retrieve                                                   |                                                                                             |
-| `dollar_next`                                                                               | *Optional[str]*                                                                             | :heavy_minus_sign:                                                                          | Pagination cursor for next set of results.                                                  | JTI0bGltaXQ9MTAwJiUyNG9mZnNldD0xMDA                                                         |
-| `dollar_order_by`                                                                           | *Optional[str]*                                                                             | :heavy_minus_sign:                                                                          | One or more comma-separated expressions to indicate the order in which to sort the results. |                                                                                             |
-| `retries`                                                                                   | [Optional[utils.RetryConfig]](../../models/utils/retryconfig.md)                            | :heavy_minus_sign:                                                                          | Configuration to override the default retry behavior of the client.                         |                                                                                             |
-
-### Response
-
-**[models.GetSpreadsheetsResponse](../../models/getspreadsheetsresponse.md)**
+| Parameter                                                                                                                                                                                                                                              | Type                                                                                                                                                                                                                                                   | Required                                                                                                                                                                                                                                               | Description                                                                                                                                                                                                                                            | Example                                                                                                                                                                                                                                                |
+| ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `spreadsheet_id`                                                                                                                                                                                                                                       | *str*                                                                                                                                                                                                                                                  | :heavy_check_mark:                                                                                                                                                                                                                                     | The unique identifier of the spreadsheet                                                                                                                                                                                                               |                                                                                                                                                                                                                                                        |
+| `resource_permissions_modification`                                                                                                                                                                                                                    | [models.ResourcePermissionsModification](../../models/resourcepermissionsmodification.md)                                                                                                                                                              | :heavy_check_mark:                                                                                                                                                                                                                                     | Details about the spreadsheet permissions modification.                                                                                                                                                                                                | {<br/>"toAssign": [<br/>{<br/>"permission": "598e8fa3-3e7c-4fb7-b662-f44522216e2b",<br/>"principal": "V0ZVc2VyHzU2NDg2NjU2MjQ0NDQ5Mjg"<br/>}<br/>],<br/>"toRevoke": [<br/>{<br/>"permission": "85aa87ee-beb9-4417-8fa0-420e9de63534",<br/>"principal": "V0ZVc2VyHzU2NDg2NjU2MjQ0NDQ5Mjg"<br/>}<br/>]<br/>} |
+| `retries`                                                                                                                                                                                                                                              | [Optional[utils.RetryConfig]](../../models/utils/retryconfig.md)                                                                                                                                                                                       | :heavy_minus_sign:                                                                                                                                                                                                                                     | Configuration to override the default retry behavior of the client.                                                                                                                                                                                    |                                                                                                                                                                                                                                                        |
 
 ### Errors
 
@@ -659,14 +685,13 @@ with SDK(
 | errors.ErrorResponse         | 500, 503                     | application/json             |
 | errors.SDKError              | 4XX, 5XX                     | \*/\*                        |
 
-## get_values_by_range
+## get_sheets
 
-Returns the paginated values for a specified range.
-When you retrieve values from a range, Ones scale is used regardless of the cell's scale formatting.
+Returns a list of [sheets](ref:spreadsheets#sheet).
 
 ### Example Usage
 
-<!-- UsageSnippet language="python" operationID="getValuesByRange" method="get" path="/spreadsheets/{spreadsheetId}/sheets/{sheetId}/values/{range}" -->
+<!-- UsageSnippet language="python" operationID="getSheets" method="get" path="/spreadsheets/{spreadsheetId}/sheets" -->
 ```python
 from workiva import SDK, models
 
@@ -678,13 +703,7 @@ with SDK(
     ),
 ) as sdk:
 
-    res = sdk.spreadsheets.get_values_by_range(request={
-        "dollar_next": "JTI0bGltaXQ9MTAwJiUyNG9mZnNldD0xMDA",
-        "dollar_valuestyle": models.ValueStyle.RAW,
-        "range": None,
-        "sheet_id": "<id>",
-        "spreadsheet_id": "<id>",
-    })
+    res = sdk.spreadsheets.get_sheets(spreadsheet_id="<id>", dollar_revision="1A2B3C4D", dollar_maxpagesize=1000, dollar_next="JTI0bGltaXQ9MTAwJiUyNG9mZnNldD0xMDA")
 
     while res is not None:
         # Handle items
@@ -695,14 +714,181 @@ with SDK(
 
 ### Parameters
 
-| Parameter                                                                 | Type                                                                      | Required                                                                  | Description                                                               |
-| ------------------------------------------------------------------------- | ------------------------------------------------------------------------- | ------------------------------------------------------------------------- | ------------------------------------------------------------------------- |
-| `request`                                                                 | [models.GetValuesByRangeRequest](../../models/getvaluesbyrangerequest.md) | :heavy_check_mark:                                                        | The request object to use for the request.                                |
-| `retries`                                                                 | [Optional[utils.RetryConfig]](../../models/utils/retryconfig.md)          | :heavy_minus_sign:                                                        | Configuration to override the default retry behavior of the client.       |
+| Parameter                                                           | Type                                                                | Required                                                            | Description                                                         | Example                                                             |
+| ------------------------------------------------------------------- | ------------------------------------------------------------------- | ------------------------------------------------------------------- | ------------------------------------------------------------------- | ------------------------------------------------------------------- |
+| `spreadsheet_id`                                                    | *str*                                                               | :heavy_check_mark:                                                  | The unique identifier of the spreadsheet                            |                                                                     |
+| `dollar_revision`                                                   | *Optional[str]*                                                     | :heavy_minus_sign:                                                  | Returns resources at a specific revision                            | 1A2B3C4D                                                            |
+| `dollar_maxpagesize`                                                | *Optional[int]*                                                     | :heavy_minus_sign:                                                  | The maximum number of results to retrieve                           |                                                                     |
+| `dollar_next`                                                       | *Optional[str]*                                                     | :heavy_minus_sign:                                                  | Pagination cursor for next set of results.                          | JTI0bGltaXQ9MTAwJiUyNG9mZnNldD0xMDA                                 |
+| `retries`                                                           | [Optional[utils.RetryConfig]](../../models/utils/retryconfig.md)    | :heavy_minus_sign:                                                  | Configuration to override the default retry behavior of the client. |                                                                     |
 
 ### Response
 
-**[models.GetValuesByRangeResponse](../../models/getvaluesbyrangeresponse.md)**
+**[models.GetSheetsResponse](../../models/getsheetsresponse.md)**
+
+### Errors
+
+| Error Type                   | Status Code                  | Content Type                 |
+| ---------------------------- | ---------------------------- | ---------------------------- |
+| errors.ErrorResponse         | 400, 401, 403, 404, 409, 429 | application/json             |
+| errors.ErrorResponse         | 500, 503                     | application/json             |
+| errors.SDKError              | 4XX, 5XX                     | \*/\*                        |
+
+## create_sheet
+
+Creates a new [sheet](ref:spreadsheets#sheet) in a [spreadsheet](ref:spreadsheets#spreadsheet), given its properties. If the sheet name provided isn't unique, a number is appended to make it unique. By default, creates a top-level sheet in the top-most position.
+
+
+### Example Usage: BadRequest
+
+<!-- UsageSnippet language="python" operationID="createSheet" method="post" path="/spreadsheets/{spreadsheetId}/sheets" example="BadRequest" -->
+```python
+from workiva import SDK, models
+
+
+with SDK(
+    security=models.Security(
+        client_id="<YOUR_CLIENT_ID_HERE>",
+        client_secret="<YOUR_CLIENT_SECRET_HERE>",
+    ),
+) as sdk:
+
+    res = sdk.spreadsheets.create_sheet(spreadsheet_id="<id>", sheet={
+        "id": "27f1b61c04ae4b0991bc73c631914e1d",
+        "index": 1,
+        "name": "Q1",
+        "table": {
+            "table": "WA7i5vbm7lNaEn6XT97lNaEn6XT9AtcW5vb22BJjMrqxmrujMrqxmru",
+        },
+    })
+
+    # Handle response
+    print(res)
+
+```
+### Example Usage: body
+
+<!-- UsageSnippet language="python" operationID="createSheet" method="post" path="/spreadsheets/{spreadsheetId}/sheets" example="body" -->
+```python
+from workiva import SDK, models
+
+
+with SDK(
+    security=models.Security(
+        client_id="<YOUR_CLIENT_ID_HERE>",
+        client_secret="<YOUR_CLIENT_SECRET_HERE>",
+    ),
+) as sdk:
+
+    res = sdk.spreadsheets.create_sheet(spreadsheet_id="<id>", sheet={
+        "index": 2,
+        "name": "Q3",
+    })
+
+    # Handle response
+    print(res)
+
+```
+
+### Parameters
+
+| Parameter                                                           | Type                                                                | Required                                                            | Description                                                         |
+| ------------------------------------------------------------------- | ------------------------------------------------------------------- | ------------------------------------------------------------------- | ------------------------------------------------------------------- |
+| `spreadsheet_id`                                                    | *str*                                                               | :heavy_check_mark:                                                  | The unique identifier of the spreadsheet                            |
+| `sheet`                                                             | [models.SheetInput](../../models/sheetinput.md)                     | :heavy_check_mark:                                                  | The properties of the sheet to create                               |
+| `retries`                                                           | [Optional[utils.RetryConfig]](../../models/utils/retryconfig.md)    | :heavy_minus_sign:                                                  | Configuration to override the default retry behavior of the client. |
+
+### Response
+
+**[models.Sheet](../../models/sheet.md)**
+
+### Errors
+
+| Error Type                   | Status Code                  | Content Type                 |
+| ---------------------------- | ---------------------------- | ---------------------------- |
+| errors.ErrorResponse         | 400, 401, 403, 404, 409, 429 | application/json             |
+| errors.ErrorResponse         | 500, 503                     | application/json             |
+| errors.SDKError              | 4XX, 5XX                     | \*/\*                        |
+
+## delete_sheet_by_id
+
+Deletes a [sheet](ref:spreadsheets#sheet) given its ID.
+
+
+### Example Usage
+
+<!-- UsageSnippet language="python" operationID="deleteSheetById" method="delete" path="/spreadsheets/{spreadsheetId}/sheets/{sheetId}" -->
+```python
+from workiva import SDK, models
+
+
+with SDK(
+    security=models.Security(
+        client_id="<YOUR_CLIENT_ID_HERE>",
+        client_secret="<YOUR_CLIENT_SECRET_HERE>",
+    ),
+) as sdk:
+
+    sdk.spreadsheets.delete_sheet_by_id(spreadsheet_id="<id>", sheet_id="<id>")
+
+    # Use the SDK ...
+
+```
+
+### Parameters
+
+| Parameter                                                           | Type                                                                | Required                                                            | Description                                                         |
+| ------------------------------------------------------------------- | ------------------------------------------------------------------- | ------------------------------------------------------------------- | ------------------------------------------------------------------- |
+| `spreadsheet_id`                                                    | *str*                                                               | :heavy_check_mark:                                                  | The unique identifier of the spreadsheet                            |
+| `sheet_id`                                                          | *str*                                                               | :heavy_check_mark:                                                  | The unique identifier of the sheet                                  |
+| `retries`                                                           | [Optional[utils.RetryConfig]](../../models/utils/retryconfig.md)    | :heavy_minus_sign:                                                  | Configuration to override the default retry behavior of the client. |
+
+### Errors
+
+| Error Type                   | Status Code                  | Content Type                 |
+| ---------------------------- | ---------------------------- | ---------------------------- |
+| errors.ErrorResponse         | 400, 401, 403, 404, 409, 429 | application/json             |
+| errors.ErrorResponse         | 500, 503                     | application/json             |
+| errors.SDKError              | 4XX, 5XX                     | \*/\*                        |
+
+## get_sheet_by_id
+
+Retrieves a [sheet](ref:spreadsheets#sheet) given its ID.
+
+
+### Example Usage
+
+<!-- UsageSnippet language="python" operationID="getSheetById" method="get" path="/spreadsheets/{spreadsheetId}/sheets/{sheetId}" -->
+```python
+from workiva import SDK, models
+
+
+with SDK(
+    security=models.Security(
+        client_id="<YOUR_CLIENT_ID_HERE>",
+        client_secret="<YOUR_CLIENT_SECRET_HERE>",
+    ),
+) as sdk:
+
+    res = sdk.spreadsheets.get_sheet_by_id(spreadsheet_id="<id>", sheet_id="<id>", dollar_revision="1A2B3C4D")
+
+    # Handle response
+    print(res)
+
+```
+
+### Parameters
+
+| Parameter                                                           | Type                                                                | Required                                                            | Description                                                         | Example                                                             |
+| ------------------------------------------------------------------- | ------------------------------------------------------------------- | ------------------------------------------------------------------- | ------------------------------------------------------------------- | ------------------------------------------------------------------- |
+| `spreadsheet_id`                                                    | *str*                                                               | :heavy_check_mark:                                                  | The unique identifier of the spreadsheet                            |                                                                     |
+| `sheet_id`                                                          | *str*                                                               | :heavy_check_mark:                                                  | The unique identifier of the sheet                                  |                                                                     |
+| `dollar_revision`                                                   | *Optional[str]*                                                     | :heavy_minus_sign:                                                  | Returns resources at a specific revision                            | 1A2B3C4D                                                            |
+| `retries`                                                           | [Optional[utils.RetryConfig]](../../models/utils/retryconfig.md)    | :heavy_minus_sign:                                                  | Configuration to override the default retry behavior of the client. |                                                                     |
+
+### Response
+
+**[models.Sheet](../../models/sheet.md)**
 
 ### Errors
 
@@ -812,9 +998,9 @@ see [Operations endpoint](ref:getoperationbyid).
 ```
 
 
-### Example Usage
+### Example Usage: BadRequest
 
-<!-- UsageSnippet language="python" operationID="partiallyUpdateSheetById" method="patch" path="/spreadsheets/{spreadsheetId}/sheets/{sheetId}" -->
+<!-- UsageSnippet language="python" operationID="partiallyUpdateSheetById" method="patch" path="/spreadsheets/{spreadsheetId}/sheets/{sheetId}" example="BadRequest" -->
 ```python
 from workiva import SDK, models
 
@@ -826,7 +1012,33 @@ with SDK(
     ),
 ) as sdk:
 
-    res = sdk.spreadsheets.partially_update_sheet_by_id(sheet_id="<id>", spreadsheet_id="<id>", request_body=[
+    res = sdk.spreadsheets.partially_update_sheet_by_id(spreadsheet_id="<id>", sheet_id="<id>", request_body=[
+        {
+            "op": models.Op.REPLACE,
+            "path": "/name",
+            "value": "New name",
+        },
+    ])
+
+    # Handle response
+    print(res)
+
+```
+### Example Usage: body
+
+<!-- UsageSnippet language="python" operationID="partiallyUpdateSheetById" method="patch" path="/spreadsheets/{spreadsheetId}/sheets/{sheetId}" example="body" -->
+```python
+from workiva import SDK, models
+
+
+with SDK(
+    security=models.Security(
+        client_id="<YOUR_CLIENT_ID_HERE>",
+        client_secret="<YOUR_CLIENT_SECRET_HERE>",
+    ),
+) as sdk:
+
+    res = sdk.spreadsheets.partially_update_sheet_by_id(spreadsheet_id="<id>", sheet_id="<id>", request_body=[
         {
             "op": models.Op.REPLACE,
             "path": "/name",
@@ -843,8 +1055,8 @@ with SDK(
 
 | Parameter                                                             | Type                                                                  | Required                                                              | Description                                                           |
 | --------------------------------------------------------------------- | --------------------------------------------------------------------- | --------------------------------------------------------------------- | --------------------------------------------------------------------- |
-| `sheet_id`                                                            | *str*                                                                 | :heavy_check_mark:                                                    | The unique identifier of the sheet                                    |
 | `spreadsheet_id`                                                      | *str*                                                                 | :heavy_check_mark:                                                    | The unique identifier of the spreadsheet                              |
+| `sheet_id`                                                            | *str*                                                                 | :heavy_check_mark:                                                    | The unique identifier of the sheet                                    |
 | `request_body`                                                        | List[[models.JSONPatchOperation](../../models/jsonpatchoperation.md)] | :heavy_check_mark:                                                    | A collection of patch operations to apply to the sheet.               |
 | `retries`                                                             | [Optional[utils.RetryConfig]](../../models/utils/retryconfig.md)      | :heavy_minus_sign:                                                    | Configuration to override the default retry behavior of the client.   |
 
@@ -860,92 +1072,17 @@ with SDK(
 | errors.ErrorResponse         | 500, 503                     | application/json             |
 | errors.SDKError              | 4XX, 5XX                     | \*/\*                        |
 
-## partially_update_spreadsheet_by_id
+## copy_sheet
 
-Updates the properties of a [spreadsheet](ref:spreadsheets#spreadsheet).
+Asynchronously copies a [sheet](ref:spreadsheets#sheet) given details about the copy's destination within the same or another spreadsheet. Options are specified using a [SheetCopy](ref:spreadsheets#sheetcopy) object.
 
-This is a long running operation. Responses include a `Location` header,
-which indicates where to poll for results. For more details on long-running job polling,
-see [Operations endpoint](ref:getoperationbyid).
+This endpoint copies a sheet's content, but does not copy labels, comments, or tasks. It will copy over most formatting, however it does not copy user-defined style guides across spreadsheets. So if the source sheet has  formatting that depends on a user-defined style guide, that formatting will be lost when copying to a new spreadsheet.
 
-### Options
-| Path                              | PATCH Operations Supported         |
-|-----------------------------------|------------------------------------|
-| `/customFields/<custom field id>` | `add`, `remove`, `replace`, `test` |
-| `/customFieldGroups`              | `add`, `remove`, `replace`, `test` |
-| `/sheetCustomFieldGroups`         | `add`, `remove`, `replace`, `test` |
-| `/lock`                           | `replace`                          |
-
-### Examples
-
-#### Add a custom field value
-
-```json
-[
-  {
-    "op": "add",
-    "path": "/customFields/com.workiva.gsr.legal_entity",
-    "value": "Workiva"
-  }
-]
-```
-
-#### Remove a custom field value
-
-```json
-[
-  {
-    "op": "remove",
-    "path": "/customFields/com.workiva.gsr.legal_entity"
-  }
-]
-```
-
-#### Replace a custom field value
-
-```json
-[
-  {
-    "op": "replace",
-    "path": "/customFields/com.workiva.gsr.legal_entity",
-    "value": "Workiva, Inc."
-  }
-]
-```
-
-#### Verifying customFieldGroup is empty before replacing the list
-
-```json
-[
-  {
-    "op": "test",
-    "path": "/customFieldGroups",
-    "value": []
-  },
-  {
-    "op": "replace",
-    "path": "/customFieldGroups",
-    "value": ["gsr.reporting"]
-  }
-]
-```
-
-#### Adding a customFieldGroup to the end of a list
-
-```json
-[
-  {
-    "op": "add",
-    "path": "/customFieldGroups/-",
-    "value": "gsr.reporting"
-  }
-]
-```
-
+Unless otherwise specified, the copy appears at the top level of its  destination spreadsheet, with an index of 0, and with the same name as the original sheet.
 
 ### Example Usage
 
-<!-- UsageSnippet language="python" operationID="partiallyUpdateSpreadsheetById" method="patch" path="/spreadsheets/{spreadsheetId}" -->
+<!-- UsageSnippet language="python" operationID="copySheet" method="post" path="/spreadsheets/{spreadsheetId}/sheets/{sheetId}/copy" example="BadRequest" -->
 ```python
 from workiva import SDK, models
 
@@ -957,13 +1094,12 @@ with SDK(
     ),
 ) as sdk:
 
-    res = sdk.spreadsheets.partially_update_spreadsheet_by_id(spreadsheet_id="<id>", request_body=[
-        {
-            "op": models.Op.REPLACE,
-            "path": "/customFields/com.workiva.gsr.legal_entity",
-            "value": "US Entity",
-        },
-    ])
+    res = sdk.spreadsheets.copy_sheet(spreadsheet_id="<id>", sheet_id="<id>", sheet_copy={
+        "sheet_index": 2,
+        "sheet_name": "Q1",
+        "sheet_parent": "5bbf8aa3cea54465762af96e3ca411c7",
+        "spreadsheet": "c65d9572a7464037a383d6235633cf74",
+    })
 
     # Handle response
     print(res)
@@ -972,15 +1108,113 @@ with SDK(
 
 ### Parameters
 
-| Parameter                                                             | Type                                                                  | Required                                                              | Description                                                           |
-| --------------------------------------------------------------------- | --------------------------------------------------------------------- | --------------------------------------------------------------------- | --------------------------------------------------------------------- |
-| `spreadsheet_id`                                                      | *str*                                                                 | :heavy_check_mark:                                                    | The unique identifier of the spreadsheet                              |
-| `request_body`                                                        | List[[models.JSONPatchOperation](../../models/jsonpatchoperation.md)] | :heavy_check_mark:                                                    | A collection of patch operations to apply to the spreadsheet.         |
-| `retries`                                                             | [Optional[utils.RetryConfig]](../../models/utils/retryconfig.md)      | :heavy_minus_sign:                                                    | Configuration to override the default retry behavior of the client.   |
+| Parameter                                                           | Type                                                                | Required                                                            | Description                                                         |
+| ------------------------------------------------------------------- | ------------------------------------------------------------------- | ------------------------------------------------------------------- | ------------------------------------------------------------------- |
+| `spreadsheet_id`                                                    | *str*                                                               | :heavy_check_mark:                                                  | The unique identifier of the spreadsheet                            |
+| `sheet_id`                                                          | *str*                                                               | :heavy_check_mark:                                                  | The unique identifier of the sheet                                  |
+| `sheet_copy`                                                        | [models.SheetCopy](../../models/sheetcopy.md)                       | :heavy_check_mark:                                                  | A SheetCopy object                                                  |
+| `retries`                                                           | [Optional[utils.RetryConfig]](../../models/utils/retryconfig.md)    | :heavy_minus_sign:                                                  | Configuration to override the default retry behavior of the client. |
 
 ### Response
 
-**[models.PartiallyUpdateSpreadsheetByIDResponse](../../models/partiallyupdatespreadsheetbyidresponse.md)**
+**[models.CopySheetResponse](../../models/copysheetresponse.md)**
+
+### Errors
+
+| Error Type                   | Status Code                  | Content Type                 |
+| ---------------------------- | ---------------------------- | ---------------------------- |
+| errors.ErrorResponse         | 400, 401, 403, 404, 409, 429 | application/json             |
+| errors.ErrorResponse         | 500, 503                     | application/json             |
+| errors.SDKError              | 4XX, 5XX                     | \*/\*                        |
+
+## delete_dataset_by_sheet_id
+
+Deletes the [dataset](ref:spreadsheets#dataset) for the specified [sheet](ref:spreadsheets#sheet). <br /><br /> When you delete a dataset, you can select whether to leave its associated values in place. To delete its values, pass `true` for query parameter `$deletevalues` (default is `false`).
+
+### Example Usage
+
+<!-- UsageSnippet language="python" operationID="deleteDatasetBySheetId" method="delete" path="/spreadsheets/{spreadsheetId}/sheets/{sheetId}/dataset" -->
+```python
+from workiva import SDK, models
+
+
+with SDK(
+    security=models.Security(
+        client_id="<YOUR_CLIENT_ID_HERE>",
+        client_secret="<YOUR_CLIENT_SECRET_HERE>",
+    ),
+) as sdk:
+
+    res = sdk.spreadsheets.delete_dataset_by_sheet_id(spreadsheet_id="<id>", sheet_id="<id>", dollar_deletevalues=False)
+
+    # Handle response
+    print(res)
+
+```
+
+### Parameters
+
+| Parameter                                                           | Type                                                                | Required                                                            | Description                                                         | Example                                                             |
+| ------------------------------------------------------------------- | ------------------------------------------------------------------- | ------------------------------------------------------------------- | ------------------------------------------------------------------- | ------------------------------------------------------------------- |
+| `spreadsheet_id`                                                    | *str*                                                               | :heavy_check_mark:                                                  | The unique identifier of the spreadsheet                            |                                                                     |
+| `sheet_id`                                                          | *str*                                                               | :heavy_check_mark:                                                  | The unique identifier of the sheet                                  |                                                                     |
+| `dollar_deletevalues`                                               | *Optional[bool]*                                                    | :heavy_minus_sign:                                                  | Indicates whether values should be deleted along with the dataset   | false                                                               |
+| `retries`                                                           | [Optional[utils.RetryConfig]](../../models/utils/retryconfig.md)    | :heavy_minus_sign:                                                  | Configuration to override the default retry behavior of the client. |                                                                     |
+
+### Response
+
+**[models.DeleteDatasetBySheetIDResponse](../../models/deletedatasetbysheetidresponse.md)**
+
+### Errors
+
+| Error Type                   | Status Code                  | Content Type                 |
+| ---------------------------- | ---------------------------- | ---------------------------- |
+| errors.ErrorResponse         | 400, 401, 403, 404, 409, 429 | application/json             |
+| errors.ErrorResponse         | 500, 503                     | application/json             |
+| errors.SDKError              | 4XX, 5XX                     | \*/\*                        |
+
+## get_sheet_permissions
+
+Retrieves a paginated list of permissions for the given sheet in a spreadsheet
+
+
+### Example Usage
+
+<!-- UsageSnippet language="python" operationID="getSheetPermissions" method="get" path="/spreadsheets/{spreadsheetId}/sheets/{sheetId}/permissions" -->
+```python
+from workiva import SDK, models
+
+
+with SDK(
+    security=models.Security(
+        client_id="<YOUR_CLIENT_ID_HERE>",
+        client_secret="<YOUR_CLIENT_SECRET_HERE>",
+    ),
+) as sdk:
+
+    res = sdk.spreadsheets.get_sheet_permissions(request={
+        "spreadsheet_id": "<id>",
+        "sheet_id": "<id>",
+        "dollar_next": "JTI0bGltaXQ9MTAwJiUyNG9mZnNldD0xMDA",
+    })
+
+    while res is not None:
+        # Handle items
+
+        res = res.next()
+
+```
+
+### Parameters
+
+| Parameter                                                                       | Type                                                                            | Required                                                                        | Description                                                                     |
+| ------------------------------------------------------------------------------- | ------------------------------------------------------------------------------- | ------------------------------------------------------------------------------- | ------------------------------------------------------------------------------- |
+| `request`                                                                       | [models.GetSheetPermissionsRequest](../../models/getsheetpermissionsrequest.md) | :heavy_check_mark:                                                              | The request object to use for the request.                                      |
+| `retries`                                                                       | [Optional[utils.RetryConfig]](../../models/utils/retryconfig.md)                | :heavy_minus_sign:                                                              | Configuration to override the default retry behavior of the client.             |
+
+### Response
+
+**[models.GetSheetPermissionsResponse](../../models/getsheetpermissionsresponse.md)**
 
 ### Errors
 
@@ -997,7 +1231,7 @@ Assign and/or revoke permissions on a sheet. If any modification in a request fa
 
 ### Example Usage
 
-<!-- UsageSnippet language="python" operationID="sheetPermissionsModification" method="post" path="/spreadsheets/{spreadsheetId}/sheets/{sheetId}/permissions/modification" -->
+<!-- UsageSnippet language="python" operationID="sheetPermissionsModification" method="post" path="/spreadsheets/{spreadsheetId}/sheets/{sheetId}/permissions/modification" example="BadRequest" -->
 ```python
 from workiva import SDK, models
 
@@ -1009,7 +1243,7 @@ with SDK(
     ),
 ) as sdk:
 
-    sdk.spreadsheets.sheet_permissions_modification(sheet_id="<id>", spreadsheet_id="<id>", resource_permissions_modification={
+    sdk.spreadsheets.sheet_permissions_modification(spreadsheet_id="<id>", sheet_id="<id>", resource_permissions_modification={
         "to_assign": [
             {
                 "permission": "598e8fa3-3e7c-4fb7-b662-f44522216e2b",
@@ -1032,8 +1266,8 @@ with SDK(
 
 | Parameter                                                                                                                                                                                                                                              | Type                                                                                                                                                                                                                                                   | Required                                                                                                                                                                                                                                               | Description                                                                                                                                                                                                                                            | Example                                                                                                                                                                                                                                                |
 | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `sheet_id`                                                                                                                                                                                                                                             | *str*                                                                                                                                                                                                                                                  | :heavy_check_mark:                                                                                                                                                                                                                                     | The unique identifier of the sheet                                                                                                                                                                                                                     |                                                                                                                                                                                                                                                        |
 | `spreadsheet_id`                                                                                                                                                                                                                                       | *str*                                                                                                                                                                                                                                                  | :heavy_check_mark:                                                                                                                                                                                                                                     | The unique identifier of the spreadsheet                                                                                                                                                                                                               |                                                                                                                                                                                                                                                        |
+| `sheet_id`                                                                                                                                                                                                                                             | *str*                                                                                                                                                                                                                                                  | :heavy_check_mark:                                                                                                                                                                                                                                     | The unique identifier of the sheet                                                                                                                                                                                                                     |                                                                                                                                                                                                                                                        |
 | `resource_permissions_modification`                                                                                                                                                                                                                    | [models.ResourcePermissionsModification](../../models/resourcepermissionsmodification.md)                                                                                                                                                              | :heavy_check_mark:                                                                                                                                                                                                                                     | Details about the sheet permissions modification.                                                                                                                                                                                                      | {<br/>"toAssign": [<br/>{<br/>"permission": "598e8fa3-3e7c-4fb7-b662-f44522216e2b",<br/>"principal": "V0ZVc2VyHzU2NDg2NjU2MjQ0NDQ5Mjg"<br/>}<br/>],<br/>"toRevoke": [<br/>{<br/>"permission": "85aa87ee-beb9-4417-8fa0-420e9de63534",<br/>"principal": "V0ZVc2VyHzU2NDg2NjU2MjQ0NDQ5Mjg"<br/>}<br/>]<br/>} |
 | `retries`                                                                                                                                                                                                                                              | [Optional[utils.RetryConfig]](../../models/utils/retryconfig.md)                                                                                                                                                                                       | :heavy_minus_sign:                                                                                                                                                                                                                                     | Configuration to override the default retry behavior of the client.                                                                                                                                                                                    |                                                                                                                                                                                                                                                        |
 
@@ -1045,18 +1279,15 @@ with SDK(
 | errors.ErrorResponse         | 500, 503                     | application/json             |
 | errors.SDKError              | 4XX, 5XX                     | \*/\*                        |
 
-## spreadsheet_export
+## get_sheet_data
 
-Asynchronously exports a [spreadsheet](ref:spreadsheets#spreadsheet) as .XLSX, .PDF, or .CSV.
-
-Responses include a `Location` header, which indicates where to poll for export results. For more details on long-running job polling, see [Operations endpoint](ref:getoperationbyid). When the export completes, its status will be `completed`, and the response body includes a `resourceURL`. To download the exported file, perform a GET on the `resourceURL` with the same authentication credentials and flow as the export request. For more details, see [Authentication documentation](ref:authentication).
-
-Note: To export to .PDF, the spreadsheet can have no more than 250,000 cells.
-
+Retrieve data from a range in a sheet. Includes the value & formatting of cells, visibility of columns and cells, merged ranges, etc.
+Limit the results to particular fields by providing a comma-separated list of paths, rooted at the `data` object.
+Example: $fields=cells.calculatedValue,cells.formats.valueFormat <br /><br /> Note: This endpoint is rate-limited. You may experience rates as low as 600 requests per minute.  This rate is shared across your workspace. When you encounter a 429, examine the `Retry-After`  header and retry after that many seconds.
 
 ### Example Usage
 
-<!-- UsageSnippet language="python" operationID="spreadsheetExport" method="post" path="/spreadsheets/{spreadsheetId}/export" -->
+<!-- UsageSnippet language="python" operationID="getSheetData" method="get" path="/spreadsheets/{spreadsheetId}/sheets/{sheetId}/sheetdata" -->
 ```python
 from workiva import SDK, models
 
@@ -1068,190 +1299,30 @@ with SDK(
     ),
 ) as sdk:
 
-    res = sdk.spreadsheets.spreadsheet_export(spreadsheet_id="<id>", spreadsheet_export={
-        "format_": models.SpreadsheetExportFormat.XLSX,
-        "sheets": [
-            "7c8d8c4a46784455bg68t36f9d8232d8",
-            "54bgd83b471e5902f1a8e8c9a299c9fb",
-        ],
-        "xlsx_options": {
-            "export_as_formulas": True,
-            "export_precision": models.ExportPrecision.DISPLAYED,
-        },
+    res = sdk.spreadsheets.get_sheet_data(request={
+        "spreadsheet_id": "<id>",
+        "sheet_id": "<id>",
+        "dollar_cellrange": "A2:B",
+        "dollar_next": "JTI0bGltaXQ9MTAwJiUyNG9mZnNldD0xMDA",
     })
 
-    # Handle response
-    print(res)
+    while res is not None:
+        # Handle items
+
+        res = res.next()
 
 ```
 
 ### Parameters
 
-| Parameter                                                                                                                                                                               | Type                                                                                                                                                                                    | Required                                                                                                                                                                                | Description                                                                                                                                                                             | Example                                                                                                                                                                                 |
-| --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `spreadsheet_id`                                                                                                                                                                        | *str*                                                                                                                                                                                   | :heavy_check_mark:                                                                                                                                                                      | The unique identifier of the spreadsheet                                                                                                                                                |                                                                                                                                                                                         |
-| `spreadsheet_export`                                                                                                                                                                    | [models.SpreadsheetExport](../../models/spreadsheetexport.md)                                                                                                                           | :heavy_check_mark:                                                                                                                                                                      | Details about the spreadsheet export, including its format and options                                                                                                                  | {<br/>"format": "xlsx",<br/>"sheets": [<br/>"7c8d8c4a46784455bg68t36f9d8232d8",<br/>"54bgd83b471e5902f1a8e8c9a299c9fb"<br/>],<br/>"xlsxOptions": {<br/>"exportAsFormulas": true,<br/>"exportPrecision": "displayed"<br/>}<br/>} |
-| `retries`                                                                                                                                                                               | [Optional[utils.RetryConfig]](../../models/utils/retryconfig.md)                                                                                                                        | :heavy_minus_sign:                                                                                                                                                                      | Configuration to override the default retry behavior of the client.                                                                                                                     |                                                                                                                                                                                         |
+| Parameter                                                           | Type                                                                | Required                                                            | Description                                                         |
+| ------------------------------------------------------------------- | ------------------------------------------------------------------- | ------------------------------------------------------------------- | ------------------------------------------------------------------- |
+| `request`                                                           | [models.GetSheetDataRequest](../../models/getsheetdatarequest.md)   | :heavy_check_mark:                                                  | The request object to use for the request.                          |
+| `retries`                                                           | [Optional[utils.RetryConfig]](../../models/utils/retryconfig.md)    | :heavy_minus_sign:                                                  | Configuration to override the default retry behavior of the client. |
 
 ### Response
 
-**[models.SpreadsheetExportResponse](../../models/spreadsheetexportresponse.md)**
-
-### Errors
-
-| Error Type                   | Status Code                  | Content Type                 |
-| ---------------------------- | ---------------------------- | ---------------------------- |
-| errors.ErrorResponse         | 400, 401, 403, 404, 409, 429 | application/json             |
-| errors.ErrorResponse         | 500, 503                     | application/json             |
-| errors.SDKError              | 4XX, 5XX                     | \*/\*                        |
-
-## spreadsheet_filters_reapplication
-
-Performs a [`SpreadsheetFiltersReapplication`](ref:content#spreadsheetfiltersreapplication) on the specified spreadsheet.
-This endpoint is used to refresh the spreadsheet's filters based on the latest state or configuration changes.
-The filters are reapplied in the context of the spreadsheet's current data state.
-
-This is a long-running operation. Responses include a `Location` header, which indicates where to poll for results.
-For more details on long-running job polling, see [Operations endpoint](ref:getoperationbyid).
-
-
-### Example Usage
-
-<!-- UsageSnippet language="python" operationID="spreadsheetFiltersReapplication" method="post" path="/spreadsheets/{spreadsheetId}/filters/reapplication" -->
-```python
-from workiva import SDK, models
-
-
-with SDK(
-    security=models.Security(
-        client_id="<YOUR_CLIENT_ID_HERE>",
-        client_secret="<YOUR_CLIENT_SECRET_HERE>",
-    ),
-) as sdk:
-
-    res = sdk.spreadsheets.spreadsheet_filters_reapplication(spreadsheet_id="<id>", spreadsheet_filters_reapplication={
-        "ignore_non_editable_filters": True,
-    })
-
-    # Handle response
-    print(res)
-
-```
-
-### Parameters
-
-| Parameter                                                                                 | Type                                                                                      | Required                                                                                  | Description                                                                               | Example                                                                                   |
-| ----------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------- |
-| `spreadsheet_id`                                                                          | *str*                                                                                     | :heavy_check_mark:                                                                        | The unique identifier of the spreadsheet                                                  |                                                                                           |
-| `spreadsheet_filters_reapplication`                                                       | [models.SpreadsheetFiltersReapplication](../../models/spreadsheetfiltersreapplication.md) | :heavy_check_mark:                                                                        | The filter reapplication request to apply                                                 | {<br/>"ignoreNonEditableFilters": true<br/>}                                              |
-| `retries`                                                                                 | [Optional[utils.RetryConfig]](../../models/utils/retryconfig.md)                          | :heavy_minus_sign:                                                                        | Configuration to override the default retry behavior of the client.                       |                                                                                           |
-
-### Response
-
-**[models.SpreadsheetFiltersReapplicationResponse](../../models/spreadsheetfiltersreapplicationresponse.md)**
-
-### Errors
-
-| Error Type                   | Status Code                  | Content Type                 |
-| ---------------------------- | ---------------------------- | ---------------------------- |
-| errors.ErrorResponse         | 400, 401, 403, 404, 409, 429 | application/json             |
-| errors.ErrorResponse         | 500, 503                     | application/json             |
-| errors.SDKError              | 4XX, 5XX                     | \*/\*                        |
-
-## spreadsheet_links_publication
-
-Publishes the links in a spreadsheet - either all (as document owner) or only one's own. Content at the latest spreadsheet revision will be used for publish.
-The response also includes a `Location` header, which indicates where to poll for operation results. For more details on long-running job polling, see [Operations endpoint](ref:getoperationbyid).
-
-
-### Example Usage
-
-<!-- UsageSnippet language="python" operationID="spreadsheetLinksPublication" method="post" path="/spreadsheets/{spreadsheetId}/links/publication" -->
-```python
-from workiva import SDK, models
-
-
-with SDK(
-    security=models.Security(
-        client_id="<YOUR_CLIENT_ID_HERE>",
-        client_secret="<YOUR_CLIENT_SECRET_HERE>",
-    ),
-) as sdk:
-
-    res = sdk.spreadsheets.spreadsheet_links_publication(spreadsheet_id="<id>", links_publication_options={
-        "publish_type": models.PublishType.ALL_LINKS,
-    })
-
-    # Handle response
-    print(res)
-
-```
-
-### Parameters
-
-| Parameter                                                                 | Type                                                                      | Required                                                                  | Description                                                               |
-| ------------------------------------------------------------------------- | ------------------------------------------------------------------------- | ------------------------------------------------------------------------- | ------------------------------------------------------------------------- |
-| `spreadsheet_id`                                                          | *str*                                                                     | :heavy_check_mark:                                                        | The unique identifier of the spreadsheet                                  |
-| `links_publication_options`                                               | [models.LinksPublicationOptions](../../models/linkspublicationoptions.md) | :heavy_check_mark:                                                        | Details about the link publication.                                       |
-| `retries`                                                                 | [Optional[utils.RetryConfig]](../../models/utils/retryconfig.md)          | :heavy_minus_sign:                                                        | Configuration to override the default retry behavior of the client.       |
-
-### Response
-
-**[models.SpreadsheetLinksPublicationResponse](../../models/spreadsheetlinkspublicationresponse.md)**
-
-### Errors
-
-| Error Type                   | Status Code                  | Content Type                 |
-| ---------------------------- | ---------------------------- | ---------------------------- |
-| errors.ErrorResponse         | 400, 401, 403, 404, 409, 429 | application/json             |
-| errors.ErrorResponse         | 500, 503                     | application/json             |
-| errors.SDKError              | 4XX, 5XX                     | \*/\*                        |
-
-## spreadsheet_permissions_modification
-
-Assign and/or revoke permissions on a spreadsheet. If any modification in a request fails, all modifications on that request fail. <br /><br /> _To modify an existing permission, the existing permission must first be  explicitly revoked. Then, the new permission needs to be assigned. This  can be done in a single request by sending `toAssign` and `toRevoke` in  the request body._
-
-
-### Example Usage
-
-<!-- UsageSnippet language="python" operationID="spreadsheetPermissionsModification" method="post" path="/spreadsheets/{spreadsheetId}/permissions/modification" -->
-```python
-from workiva import SDK, models
-
-
-with SDK(
-    security=models.Security(
-        client_id="<YOUR_CLIENT_ID_HERE>",
-        client_secret="<YOUR_CLIENT_SECRET_HERE>",
-    ),
-) as sdk:
-
-    sdk.spreadsheets.spreadsheet_permissions_modification(spreadsheet_id="<id>", resource_permissions_modification={
-        "to_assign": [
-            {
-                "permission": "598e8fa3-3e7c-4fb7-b662-f44522216e2b",
-                "principal": "V0ZVc2VyHzU2NDg2NjU2MjQ0NDQ5Mjg",
-            },
-        ],
-        "to_revoke": [
-            {
-                "permission": "85aa87ee-beb9-4417-8fa0-420e9de63534",
-                "principal": "V0ZVc2VyHzU2NDg2NjU2MjQ0NDQ5Mjg",
-            },
-        ],
-    })
-
-    # Use the SDK ...
-
-```
-
-### Parameters
-
-| Parameter                                                                                                                                                                                                                                              | Type                                                                                                                                                                                                                                                   | Required                                                                                                                                                                                                                                               | Description                                                                                                                                                                                                                                            | Example                                                                                                                                                                                                                                                |
-| ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `spreadsheet_id`                                                                                                                                                                                                                                       | *str*                                                                                                                                                                                                                                                  | :heavy_check_mark:                                                                                                                                                                                                                                     | The unique identifier of the spreadsheet                                                                                                                                                                                                               |                                                                                                                                                                                                                                                        |
-| `resource_permissions_modification`                                                                                                                                                                                                                    | [models.ResourcePermissionsModification](../../models/resourcepermissionsmodification.md)                                                                                                                                                              | :heavy_check_mark:                                                                                                                                                                                                                                     | Details about the spreadsheet permissions modification.                                                                                                                                                                                                | {<br/>"toAssign": [<br/>{<br/>"permission": "598e8fa3-3e7c-4fb7-b662-f44522216e2b",<br/>"principal": "V0ZVc2VyHzU2NDg2NjU2MjQ0NDQ5Mjg"<br/>}<br/>],<br/>"toRevoke": [<br/>{<br/>"permission": "85aa87ee-beb9-4417-8fa0-420e9de63534",<br/>"principal": "V0ZVc2VyHzU2NDg2NjU2MjQ0NDQ5Mjg"<br/>}<br/>]<br/>} |
-| `retries`                                                                                                                                                                                                                                              | [Optional[utils.RetryConfig]](../../models/utils/retryconfig.md)                                                                                                                                                                                       | :heavy_minus_sign:                                                                                                                                                                                                                                     | Configuration to override the default retry behavior of the client.                                                                                                                                                                                    |                                                                                                                                                                                                                                                        |
+**[models.GetSheetDataResponse](../../models/getsheetdataresponse.md)**
 
 ### Errors
 
@@ -1267,7 +1338,7 @@ Asynchronously submits a [SheetUpdate](ref:spreadsheets#sheetupdate) to a [sheet
 
 ### Example Usage
 
-<!-- UsageSnippet language="python" operationID="updateSheet" method="post" path="/spreadsheets/{spreadsheetId}/sheets/{sheetId}/update" -->
+<!-- UsageSnippet language="python" operationID="updateSheet" method="post" path="/spreadsheets/{spreadsheetId}/sheets/{sheetId}/update" example="BadRequest" -->
 ```python
 from workiva import SDK, models
 
@@ -1279,7 +1350,7 @@ with SDK(
     ),
 ) as sdk:
 
-    res = sdk.spreadsheets.update_sheet(sheet_id="<id>", spreadsheet_id="<id>", sheet_update=models.SheetUpdate(
+    res = sdk.spreadsheets.update_sheet(spreadsheet_id="<id>", sheet_id="<id>", sheet_update=models.SheetUpdate(
         apply_borders=models.SheetUpdateApplyBorders(
             borders=[
                 models.ApplyBorders(
@@ -1558,8 +1629,8 @@ with SDK(
 
 | Parameter                                                           | Type                                                                | Required                                                            | Description                                                         |
 | ------------------------------------------------------------------- | ------------------------------------------------------------------- | ------------------------------------------------------------------- | ------------------------------------------------------------------- |
-| `sheet_id`                                                          | *str*                                                               | :heavy_check_mark:                                                  | The unique identifier of the sheet                                  |
 | `spreadsheet_id`                                                    | *str*                                                               | :heavy_check_mark:                                                  | The unique identifier of the spreadsheet                            |
+| `sheet_id`                                                          | *str*                                                               | :heavy_check_mark:                                                  | The unique identifier of the sheet                                  |
 | `sheet_update`                                                      | [models.SheetUpdate](../../models/sheetupdate.md)                   | :heavy_check_mark:                                                  | A SheetUpdate                                                       |
 | `retries`                                                           | [Optional[utils.RetryConfig]](../../models/utils/retryconfig.md)    | :heavy_minus_sign:                                                  | Configuration to override the default retry behavior of the client. |
 
@@ -1575,15 +1646,14 @@ with SDK(
 | errors.ErrorResponse         | 500, 503                     | application/json             |
 | errors.SDKError              | 4XX, 5XX                     | \*/\*                        |
 
-## update_values_by_range
+## get_values_by_range
 
-Overwrites all values in a range with new values. The provided range must not exceed the specified range. If the provided range of values is *smaller* than the specified range, it clears all cells in the range **and** those not covered by the range values. Rows of values in the provided range must be of equal length. An empty range of values is valid and may be used to clear a range.
-To indicate that a cell's value shouldn't be replaced, use the special cell value `null`.
-When you add a value to a cell, it uses Ones scale regardless of the cell's scale formatting.
+Returns the paginated values for a specified range.
+When you retrieve values from a range, Ones scale is used regardless of the cell's scale formatting.
 
 ### Example Usage
 
-<!-- UsageSnippet language="python" operationID="updateValuesByRange" method="put" path="/spreadsheets/{spreadsheetId}/sheets/{sheetId}/values/{range}" -->
+<!-- UsageSnippet language="python" operationID="getValuesByRange" method="get" path="/spreadsheets/{spreadsheetId}/sheets/{sheetId}/values/{range}" -->
 ```python
 from workiva import SDK, models
 
@@ -1595,7 +1665,93 @@ with SDK(
     ),
 ) as sdk:
 
-    res = sdk.spreadsheets.update_values_by_range(range="<value>", sheet_id="<id>", spreadsheet_id="<id>", range_values={
+    res = sdk.spreadsheets.get_values_by_range(request={
+        "spreadsheet_id": "<id>",
+        "sheet_id": "<id>",
+        "range": None,
+        "dollar_next": "JTI0bGltaXQ9MTAwJiUyNG9mZnNldD0xMDA",
+        "dollar_valuestyle": models.ValueStyle.RAW,
+    })
+
+    while res is not None:
+        # Handle items
+
+        res = res.next()
+
+```
+
+### Parameters
+
+| Parameter                                                                 | Type                                                                      | Required                                                                  | Description                                                               |
+| ------------------------------------------------------------------------- | ------------------------------------------------------------------------- | ------------------------------------------------------------------------- | ------------------------------------------------------------------------- |
+| `request`                                                                 | [models.GetValuesByRangeRequest](../../models/getvaluesbyrangerequest.md) | :heavy_check_mark:                                                        | The request object to use for the request.                                |
+| `retries`                                                                 | [Optional[utils.RetryConfig]](../../models/utils/retryconfig.md)          | :heavy_minus_sign:                                                        | Configuration to override the default retry behavior of the client.       |
+
+### Response
+
+**[models.GetValuesByRangeResponse](../../models/getvaluesbyrangeresponse.md)**
+
+### Errors
+
+| Error Type                   | Status Code                  | Content Type                 |
+| ---------------------------- | ---------------------------- | ---------------------------- |
+| errors.ErrorResponse         | 400, 401, 403, 404, 409, 429 | application/json             |
+| errors.ErrorResponse         | 500, 503                     | application/json             |
+| errors.SDKError              | 4XX, 5XX                     | \*/\*                        |
+
+## update_values_by_range
+
+Overwrites all values in a range with new values. The provided range must not exceed the specified range. If the provided range of values is *smaller* than the specified range, it clears all cells in the range **and** those not covered by the range values. Rows of values in the provided range must be of equal length. An empty range of values is valid and may be used to clear a range.
+To indicate that a cell's value shouldn't be replaced, use the special cell value `null`.
+When you add a value to a cell, it uses Ones scale regardless of the cell's scale formatting.
+
+### Example Usage: BadRequest
+
+<!-- UsageSnippet language="python" operationID="updateValuesByRange" method="put" path="/spreadsheets/{spreadsheetId}/sheets/{sheetId}/values/{range}" example="BadRequest" -->
+```python
+from workiva import SDK, models
+
+
+with SDK(
+    security=models.Security(
+        client_id="<YOUR_CLIENT_ID_HERE>",
+        client_secret="<YOUR_CLIENT_SECRET_HERE>",
+    ),
+) as sdk:
+
+    res = sdk.spreadsheets.update_values_by_range(spreadsheet_id="<id>", sheet_id="<id>", range="<value>", range_values={
+        "range": "A1:B2",
+        "values": [
+            [
+                1,
+                4,
+            ],
+            [
+                2,
+                "",
+            ],
+        ],
+    })
+
+    # Handle response
+    print(res)
+
+```
+### Example Usage: body
+
+<!-- UsageSnippet language="python" operationID="updateValuesByRange" method="put" path="/spreadsheets/{spreadsheetId}/sheets/{sheetId}/values/{range}" example="body" -->
+```python
+from workiva import SDK, models
+
+
+with SDK(
+    security=models.Security(
+        client_id="<YOUR_CLIENT_ID_HERE>",
+        client_secret="<YOUR_CLIENT_SECRET_HERE>",
+    ),
+) as sdk:
+
+    res = sdk.spreadsheets.update_values_by_range(spreadsheet_id="<id>", sheet_id="<id>", range="<value>", range_values={
         "values": [
             [
                 1,
@@ -1617,60 +1773,15 @@ with SDK(
 
 | Parameter                                                           | Type                                                                | Required                                                            | Description                                                         |
 | ------------------------------------------------------------------- | ------------------------------------------------------------------- | ------------------------------------------------------------------- | ------------------------------------------------------------------- |
-| `range`                                                             | *Nullable[str]*                                                     | :heavy_check_mark:                                                  | The range of values, in A1-style notation                           |
-| `sheet_id`                                                          | *str*                                                               | :heavy_check_mark:                                                  | The unique identifier of the sheet                                  |
 | `spreadsheet_id`                                                    | *str*                                                               | :heavy_check_mark:                                                  | The unique identifier of the spreadsheet                            |
+| `sheet_id`                                                          | *str*                                                               | :heavy_check_mark:                                                  | The unique identifier of the sheet                                  |
+| `range`                                                             | *Nullable[str]*                                                     | :heavy_check_mark:                                                  | The range of values, in A1-style notation                           |
 | `range_values`                                                      | [models.RangeValues](../../models/rangevalues.md)                   | :heavy_check_mark:                                                  | All values for the range, not just those to update                  |
 | `retries`                                                           | [Optional[utils.RetryConfig]](../../models/utils/retryconfig.md)    | :heavy_minus_sign:                                                  | Configuration to override the default retry behavior of the client. |
 
 ### Response
 
 **[models.UpdateValuesByRangeResponse](../../models/updatevaluesbyrangeresponse.md)**
-
-### Errors
-
-| Error Type                   | Status Code                  | Content Type                 |
-| ---------------------------- | ---------------------------- | ---------------------------- |
-| errors.ErrorResponse         | 400, 401, 403, 404, 409, 429 | application/json             |
-| errors.ErrorResponse         | 500, 503                     | application/json             |
-| errors.SDKError              | 4XX, 5XX                     | \*/\*                        |
-
-## upsert_datasets
-
-Asynchronously upserts an array of [datasets](ref:spreadsheets#dataset) to a [spreadsheet](ref:spreadsheets#spreadsheet), given their properties. Each [sheet](ref:spreadsheets#sheet) can have only one dataset, and its range will always start with `A1`. <br /><br /> Bulk upsertion creates or updates datasets in sheets and performs any calculations after it completes. When complete, the dataset's range is locked through both the UI and endpoints that write values to a sheet. To change the values in a dataset, either upsert new values using this endpoint again, or delete the dataset. <br /><br /> If any dataset fails to upsert, no datasets upsert, and no changes commit. <br /><br /> Each dataset in the array requires `sheet` and `values`. Partial upserts are not supported. <br /><br /> Values may be strings, numbers, integers, or booleans. To indicate an empty cell, provide an empty string.
-
-### Example Usage
-
-<!-- UsageSnippet language="python" operationID="upsertDatasets" method="post" path="/spreadsheets/{spreadsheetId}/datasets/bulkUpsert" -->
-```python
-from workiva import SDK, models
-
-
-with SDK(
-    security=models.Security(
-        client_id="<YOUR_CLIENT_ID_HERE>",
-        client_secret="<YOUR_CLIENT_SECRET_HERE>",
-    ),
-) as sdk:
-
-    res = sdk.spreadsheets.upsert_datasets(spreadsheet_id="<id>", request_body=[])
-
-    # Handle response
-    print(res)
-
-```
-
-### Parameters
-
-| Parameter                                                           | Type                                                                | Required                                                            | Description                                                         |
-| ------------------------------------------------------------------- | ------------------------------------------------------------------- | ------------------------------------------------------------------- | ------------------------------------------------------------------- |
-| `spreadsheet_id`                                                    | *str*                                                               | :heavy_check_mark:                                                  | The unique identifier of the spreadsheet                            |
-| `request_body`                                                      | List[[models.DatasetInput](../../models/datasetinput.md)]           | :heavy_check_mark:                                                  | An array of datasets                                                |
-| `retries`                                                           | [Optional[utils.RetryConfig]](../../models/utils/retryconfig.md)    | :heavy_minus_sign:                                                  | Configuration to override the default retry behavior of the client. |
-
-### Response
-
-**[models.UpsertDatasetsResponse](../../models/upsertdatasetsresponse.md)**
 
 ### Errors
 

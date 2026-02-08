@@ -13,12 +13,12 @@ from workiva.utils import FieldMetadata, PathParamMetadata, QueryParamMetadata
 class GetSectionsRequestTypedDict(TypedDict):
     document_id: str
     r"""The unique identifier of the document"""
+    dollar_revision: NotRequired[str]
+    r"""Returns resources at a specific revision"""
     dollar_maxpagesize: NotRequired[int]
     r"""The maximum number of results to retrieve"""
     dollar_next: NotRequired[str]
     r"""Pagination cursor for next set of results."""
-    dollar_revision: NotRequired[str]
-    r"""Returns resources at a specific revision"""
 
 
 class GetSectionsRequest(BaseModel):
@@ -28,6 +28,13 @@ class GetSectionsRequest(BaseModel):
         FieldMetadata(path=PathParamMetadata(style="simple", explode=False)),
     ]
     r"""The unique identifier of the document"""
+
+    dollar_revision: Annotated[
+        Optional[str],
+        pydantic.Field(alias="$revision"),
+        FieldMetadata(query=QueryParamMetadata(style="form", explode=True)),
+    ] = None
+    r"""Returns resources at a specific revision"""
 
     dollar_maxpagesize: Annotated[
         Optional[int],
@@ -43,16 +50,9 @@ class GetSectionsRequest(BaseModel):
     ] = None
     r"""Pagination cursor for next set of results."""
 
-    dollar_revision: Annotated[
-        Optional[str],
-        pydantic.Field(alias="$revision"),
-        FieldMetadata(query=QueryParamMetadata(style="form", explode=True)),
-    ] = None
-    r"""Returns resources at a specific revision"""
-
     @model_serializer(mode="wrap")
     def serialize_model(self, handler):
-        optional_fields = set(["$maxpagesize", "$next", "$revision"])
+        optional_fields = set(["$revision", "$maxpagesize", "$next"])
         serialized = handler(self)
         m = {}
 

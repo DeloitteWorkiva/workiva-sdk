@@ -3,9 +3,10 @@
 from __future__ import annotations
 from .listsequencetype import ListSequenceType
 import pydantic
-from pydantic import model_serializer
+from pydantic import field_serializer, model_serializer
 from typing import Optional
 from typing_extensions import Annotated, NotRequired, TypedDict
+from workiva import models
 from workiva.types import BaseModel, Nullable, OptionalNullable, UNSET, UNSET_SENTINEL
 
 
@@ -38,6 +39,15 @@ class ListProgressionStyle(BaseModel):
     r"""The custom glyph to use for unordered lists. If the sequenceType is not set to unordered, then this field is ignored.
 
     """
+
+    @field_serializer("sequence_type")
+    def serialize_sequence_type(self, value):
+        if isinstance(value, str):
+            try:
+                return models.ListSequenceType(value)
+            except ValueError:
+                return value
+        return value
 
     @model_serializer(mode="wrap")
     def serialize_model(self, handler):

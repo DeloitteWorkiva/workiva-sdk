@@ -2,8 +2,9 @@
 
 from __future__ import annotations
 from enum import Enum
+from workiva import utils
 
 
-class Combinator(str, Enum):
+class Combinator(str, Enum, metaclass=utils.OpenEnumMeta):
     AND = "AND"
     OR = "OR"

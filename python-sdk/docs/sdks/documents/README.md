@@ -6,34 +6,32 @@ Documents enable you to organize and review data in collaborative files with lin
 
 ### Available Operations
 
-* [copy_section](#copy_section) - Copy section
-* [create_section](#create_section) - Create a new section in a document
-* [delete_section_by_id](#delete_section_by_id) - Delete a single section
+* [get_documents](#get_documents) - Retrieve a list of documents
+* [get_document_by_id](#get_document_by_id) - Retrieve a single document
+* [partially_update_document_by_id](#partially_update_document_by_id) - Partially update a single document
 * [document_export](#document_export) - Initiate a document export
 * [document_filters_reapplication](#document_filters_reapplication) - Reapply filters to the document
 * [document_links_publication](#document_links_publication) - Initiate publication of links in a document
-* [document_permissions_modification](#document_permissions_modification) - Modify permissions on a document
-* [edit_sections](#edit_sections) - Initiate sections edits
-* [get_document_by_id](#get_document_by_id) - Retrieve a single document
 * [get_document_milestones](#get_document_milestones) - Retrieve a list of milestones for a document
 * [get_document_permissions](#get_document_permissions) - Retrieve permissions for a document
-* [get_documents](#get_documents) - Retrieve a list of documents
-* [get_section_by_id](#get_section_by_id) - Retrieve a single section
-* [get_section_permissions](#get_section_permissions) - Retrieve permissions for a section in a document
+* [document_permissions_modification](#document_permissions_modification) - Modify permissions on a document
 * [get_sections](#get_sections) - Retrieve a list of sections
-* [partially_update_document_by_id](#partially_update_document_by_id) - Partially update a single document
+* [create_section](#create_section) - Create a new section in a document
+* [delete_section_by_id](#delete_section_by_id) - Delete a single section
+* [get_section_by_id](#get_section_by_id) - Retrieve a single section
 * [partially_update_section_by_id](#partially_update_section_by_id) - Partially update a single section
+* [copy_section](#copy_section) - Copy section
+* [edit_sections](#edit_sections) - Initiate sections edits
+* [get_section_permissions](#get_section_permissions) - Retrieve permissions for a section in a document
 * [section_permissions_modification](#section_permissions_modification) - Modify permissions on a given section of a document
 
-## copy_section
+## get_documents
 
-Asynchronously copies a [section](ref:documents#section) given details about the copy's destination within the same or another document. Options are specified using a [SectionCopy](ref:documents#sectioncopy) object.
-
-Copies only the section's content — not any labels, comments, tasks, or formatting from a style guide. Unless otherwise specified, the copy appears at the top level of its destination document, with an index of 0, and with the same name as the original section.
+Returns a paginated list of [documents](ref:documents#document).
 
 ### Example Usage
 
-<!-- UsageSnippet language="python" operationID="copySection" method="post" path="/documents/{documentId}/sections/{sectionId}/copy" -->
+<!-- UsageSnippet language="python" operationID="getDocuments" method="get" path="/documents" -->
 ```python
 from workiva import SDK, models
 
@@ -45,30 +43,28 @@ with SDK(
     ),
 ) as sdk:
 
-    res = sdk.documents.copy_section(document_id="<id>", section_id="<id>", section_copy={
-        "document": "327afa1a152f372fa1aeadb35ed28925d",
-        "section_index": 2,
-        "section_name": "October 2020",
-        "section_parent": "327afa1a152f372fa1aeadb35ed28925d_1",
-    })
+    res = sdk.documents.get_documents(dollar_maxpagesize=1000, dollar_next="JTI0bGltaXQ9MTAwJiUyNG9mZnNldD0xMDA")
 
-    # Handle response
-    print(res)
+    while res is not None:
+        # Handle items
+
+        res = res.next()
 
 ```
 
 ### Parameters
 
-| Parameter                                                           | Type                                                                | Required                                                            | Description                                                         |
-| ------------------------------------------------------------------- | ------------------------------------------------------------------- | ------------------------------------------------------------------- | ------------------------------------------------------------------- |
-| `document_id`                                                       | *str*                                                               | :heavy_check_mark:                                                  | The unique identifier of the document                               |
-| `section_id`                                                        | *str*                                                               | :heavy_check_mark:                                                  | The unique identifier of the section                                |
-| `section_copy`                                                      | [models.SectionCopy](../../models/sectioncopy.md)                   | :heavy_check_mark:                                                  | A SectionCopy object                                                |
-| `retries`                                                           | [Optional[utils.RetryConfig]](../../models/utils/retryconfig.md)    | :heavy_minus_sign:                                                  | Configuration to override the default retry behavior of the client. |
+| Parameter                                                                                   | Type                                                                                        | Required                                                                                    | Description                                                                                 | Example                                                                                     |
+| ------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------- |
+| `dollar_filter`                                                                             | *Optional[str]*                                                                             | :heavy_minus_sign:                                                                          | The properties to filter the results by.                                                    |                                                                                             |
+| `dollar_order_by`                                                                           | *Optional[str]*                                                                             | :heavy_minus_sign:                                                                          | One or more comma-separated expressions to indicate the order in which to sort the results. |                                                                                             |
+| `dollar_maxpagesize`                                                                        | *Optional[int]*                                                                             | :heavy_minus_sign:                                                                          | The maximum number of results to retrieve                                                   |                                                                                             |
+| `dollar_next`                                                                               | *Optional[str]*                                                                             | :heavy_minus_sign:                                                                          | Pagination cursor for next set of results.                                                  | JTI0bGltaXQ9MTAwJiUyNG9mZnNldD0xMDA                                                         |
+| `retries`                                                                                   | [Optional[utils.RetryConfig]](../../models/utils/retryconfig.md)                            | :heavy_minus_sign:                                                                          | Configuration to override the default retry behavior of the client.                         |                                                                                             |
 
 ### Response
 
-**[models.CopySectionResponse](../../models/copysectionresponse.md)**
+**[models.GetDocumentsResponse](../../models/getdocumentsresponse.md)**
 
 ### Errors
 
@@ -78,14 +74,14 @@ with SDK(
 | errors.ErrorResponse         | 500, 503                     | application/json             |
 | errors.SDKError              | 4XX, 5XX                     | \*/\*                        |
 
-## create_section
+## get_document_by_id
 
-Creates a new [section](ref:documents#section) in a [document](ref:documents#document), given its properties. By default, the new section appears at the top-most position.
+Retrieves a [document](ref:documents#document) given its ID.
 
 
 ### Example Usage
 
-<!-- UsageSnippet language="python" operationID="createSection" method="post" path="/documents/{documentId}/sections" -->
+<!-- UsageSnippet language="python" operationID="getDocumentById" method="get" path="/documents/{documentId}" -->
 ```python
 from workiva import SDK, models
 
@@ -97,46 +93,146 @@ with SDK(
     ),
 ) as sdk:
 
-    res = sdk.documents.create_section(document_id="<id>", section={
-        "name": "Risk Factor",
-        "parent": {
-            "id": "a8b3adb687644b27fafcb3a9875f0f0d_18",
+    res = sdk.documents.get_document_by_id(document_id="<id>", dollar_expand="?$expand=relationships\n")
+
+    # Handle response
+    print(res)
+
+```
+
+### Parameters
+
+| Parameter                                                           | Type                                                                | Required                                                            | Description                                                         | Example                                                             |
+| ------------------------------------------------------------------- | ------------------------------------------------------------------- | ------------------------------------------------------------------- | ------------------------------------------------------------------- | ------------------------------------------------------------------- |
+| `document_id`                                                       | *str*                                                               | :heavy_check_mark:                                                  | The unique identifier of the document                               |                                                                     |
+| `dollar_expand`                                                     | *Optional[str]*                                                     | :heavy_minus_sign:                                                  | Returns related resources inline with the main resource             | ?$expand=relationships<br/>                                         |
+| `retries`                                                           | [Optional[utils.RetryConfig]](../../models/utils/retryconfig.md)    | :heavy_minus_sign:                                                  | Configuration to override the default retry behavior of the client. |                                                                     |
+
+### Response
+
+**[models.Document](../../models/document.md)**
+
+### Errors
+
+| Error Type                   | Status Code                  | Content Type                 |
+| ---------------------------- | ---------------------------- | ---------------------------- |
+| errors.ErrorResponse         | 400, 401, 403, 404, 409, 429 | application/json             |
+| errors.ErrorResponse         | 500, 503                     | application/json             |
+| errors.SDKError              | 4XX, 5XX                     | \*/\*                        |
+
+## partially_update_document_by_id
+
+Updates the properties of a [document](ref:documents#document).
+
+This is a long running operation. Responses include a `Location` header,
+which indicates where to poll for results. For more details on long-running job polling,
+see [Operations endpoint](ref:getoperationbyid).
+
+### Options
+
+|Path                             |PATCH Operations Supported        |
+|---------------------------------|----------------------------------|
+|`/customFields/<custom field id>`|`add`, `remove`, `replace`, `test`|
+|`/customFieldGroups`             |`add`, `remove`, `replace`, `test`|
+|`/sectionCustomFieldGroups`      |`add`, `remove`, `replace`, `test`|
+|`/lock`                          |`replace`                         |
+
+### Examples
+
+#### Add a custom field value
+
+```json
+[
+  {
+    "op": "add",
+    "path": "/customFields/com.workiva.gsr.legal_entity",
+    "value": "Workiva"
+  }
+]
+```
+
+#### Remove a custom field value
+
+```json
+[
+  {
+    "op": "remove",
+    "path": "/customFields/com.workiva.gsr.legal_entity"
+  }
+]
+```
+
+#### Replace a custom field value
+
+```json
+[
+  {
+    "op": "replace",
+    "path": "/customFields/com.workiva.gsr.legal_entity",
+    "value": "Workiva, Inc."
+  }
+]
+```
+
+#### Verifying customFieldGroup is empty before replacing the list
+
+```json
+[
+  {
+    "op": "test",
+    "path": "/customFieldGroups",
+    "value": []
+  },
+  {
+    "op": "replace",
+    "path": "/customFieldGroups",
+    "value": ["gsr.reporting"]
+  }
+]
+```
+
+#### Adding a customFieldGroup to the end of a list
+
+```json
+[
+  {
+    "op": "add",
+    "path": "/customFieldGroups/-",
+    "value": "gsr.reporting"
+  }
+]
+```
+
+
+### Example Usage: BadRequest
+
+<!-- UsageSnippet language="python" operationID="partiallyUpdateDocumentById" method="patch" path="/documents/{documentId}" example="BadRequest" -->
+```python
+from workiva import SDK, models
+
+
+with SDK(
+    security=models.Security(
+        client_id="<YOUR_CLIENT_ID_HERE>",
+        client_secret="<YOUR_CLIENT_SECRET_HERE>",
+    ),
+) as sdk:
+
+    res = sdk.documents.partially_update_document_by_id(document_id="<id>", request_body=[
+        {
+            "op": models.Op.REPLACE,
+            "path": "/name",
+            "value": "New name",
         },
-    })
+    ])
 
     # Handle response
     print(res)
 
 ```
+### Example Usage: body
 
-### Parameters
-
-| Parameter                                                           | Type                                                                | Required                                                            | Description                                                         |
-| ------------------------------------------------------------------- | ------------------------------------------------------------------- | ------------------------------------------------------------------- | ------------------------------------------------------------------- |
-| `document_id`                                                       | *str*                                                               | :heavy_check_mark:                                                  | The unique identifier of the document                               |
-| `section`                                                           | [models.SectionInput](../../models/sectioninput.md)                 | :heavy_check_mark:                                                  | The properties of the section to create                             |
-| `retries`                                                           | [Optional[utils.RetryConfig]](../../models/utils/retryconfig.md)    | :heavy_minus_sign:                                                  | Configuration to override the default retry behavior of the client. |
-
-### Response
-
-**[models.Section](../../models/section.md)**
-
-### Errors
-
-| Error Type                   | Status Code                  | Content Type                 |
-| ---------------------------- | ---------------------------- | ---------------------------- |
-| errors.ErrorResponse         | 400, 401, 403, 404, 409, 429 | application/json             |
-| errors.ErrorResponse         | 500, 503                     | application/json             |
-| errors.SDKError              | 4XX, 5XX                     | \*/\*                        |
-
-## delete_section_by_id
-
-Deletes a [section](ref:documents#section) given its ID.
-
-
-### Example Usage
-
-<!-- UsageSnippet language="python" operationID="deleteSectionById" method="delete" path="/documents/{documentId}/sections/{sectionId}" -->
+<!-- UsageSnippet language="python" operationID="partiallyUpdateDocumentById" method="patch" path="/documents/{documentId}" example="body" -->
 ```python
 from workiva import SDK, models
 
@@ -148,19 +244,30 @@ with SDK(
     ),
 ) as sdk:
 
-    sdk.documents.delete_section_by_id(document_id="<id>", section_id="<id>")
+    res = sdk.documents.partially_update_document_by_id(document_id="<id>", request_body=[
+        {
+            "op": models.Op.REPLACE,
+            "path": "/customFields/com.workiva.gsr.legal_entity",
+            "value": "US Entity",
+        },
+    ])
 
-    # Use the SDK ...
+    # Handle response
+    print(res)
 
 ```
 
 ### Parameters
 
-| Parameter                                                           | Type                                                                | Required                                                            | Description                                                         |
-| ------------------------------------------------------------------- | ------------------------------------------------------------------- | ------------------------------------------------------------------- | ------------------------------------------------------------------- |
-| `document_id`                                                       | *str*                                                               | :heavy_check_mark:                                                  | The unique identifier of the document                               |
-| `section_id`                                                        | *str*                                                               | :heavy_check_mark:                                                  | The unique identifier of the section                                |
-| `retries`                                                           | [Optional[utils.RetryConfig]](../../models/utils/retryconfig.md)    | :heavy_minus_sign:                                                  | Configuration to override the default retry behavior of the client. |
+| Parameter                                                             | Type                                                                  | Required                                                              | Description                                                           |
+| --------------------------------------------------------------------- | --------------------------------------------------------------------- | --------------------------------------------------------------------- | --------------------------------------------------------------------- |
+| `document_id`                                                         | *str*                                                                 | :heavy_check_mark:                                                    | The unique identifier of the document                                 |
+| `request_body`                                                        | List[[models.JSONPatchOperation](../../models/jsonpatchoperation.md)] | :heavy_check_mark:                                                    | A collection of patch operations to apply to the document.            |
+| `retries`                                                             | [Optional[utils.RetryConfig]](../../models/utils/retryconfig.md)      | :heavy_minus_sign:                                                    | Configuration to override the default retry behavior of the client.   |
+
+### Response
+
+**[models.PartiallyUpdateDocumentByIDResponse](../../models/partiallyupdatedocumentbyidresponse.md)**
 
 ### Errors
 
@@ -179,7 +286,7 @@ Responses include a `Location` header, which indicates where to poll for export 
 
 ### Example Usage
 
-<!-- UsageSnippet language="python" operationID="documentExport" method="post" path="/documents/{documentId}/export" -->
+<!-- UsageSnippet language="python" operationID="documentExport" method="post" path="/documents/{documentId}/export" example="BadRequest" -->
 ```python
 from workiva import SDK, models
 
@@ -196,7 +303,7 @@ with SDK(
             "include_leader_dots": True,
             "show_table_cell_shading": True,
         },
-        "format_": models.Format.DOCX,
+        "format_": models.DocumentExportFormat.DOCX,
         "sections": [
             "a8b3adb687644b27fafcb3a9875f0f0d_18",
             "a8b3adb687644b27fafcb3a9875f0f0d_19",
@@ -240,7 +347,7 @@ For more details on long-running job polling, see [Operations endpoint](ref:geto
 
 ### Example Usage
 
-<!-- UsageSnippet language="python" operationID="documentFiltersReapplication" method="post" path="/documents/{documentId}/filters/reapplication" -->
+<!-- UsageSnippet language="python" operationID="documentFiltersReapplication" method="post" path="/documents/{documentId}/filters/reapplication" example="BadRequest" -->
 ```python
 from workiva import SDK, models
 
@@ -290,7 +397,7 @@ The response also includes a `Location` header, which indicates where to poll fo
 
 ### Example Usage
 
-<!-- UsageSnippet language="python" operationID="documentLinksPublication" method="post" path="/documents/{documentId}/links/publication" -->
+<!-- UsageSnippet language="python" operationID="documentLinksPublication" method="post" path="/documents/{documentId}/links/publication" example="BadRequest" -->
 ```python
 from workiva import SDK, models
 
@@ -322,166 +429,6 @@ with SDK(
 ### Response
 
 **[models.DocumentLinksPublicationResponse](../../models/documentlinkspublicationresponse.md)**
-
-### Errors
-
-| Error Type                   | Status Code                  | Content Type                 |
-| ---------------------------- | ---------------------------- | ---------------------------- |
-| errors.ErrorResponse         | 400, 401, 403, 404, 409, 429 | application/json             |
-| errors.ErrorResponse         | 500, 503                     | application/json             |
-| errors.SDKError              | 4XX, 5XX                     | \*/\*                        |
-
-## document_permissions_modification
-
-Assign and/or revoke permissions on a document. If any modification in a request fails, all modifications on that request fail. <br /><br /> _To modify an existing permission, the existing permission must first be  explicitly revoked. Then, the new permission needs to be assigned. This  can be done in a single request by sending `toAssign` and `toRevoke` in  the request body._
-
-
-### Example Usage
-
-<!-- UsageSnippet language="python" operationID="documentPermissionsModification" method="post" path="/documents/{documentId}/permissions/modification" -->
-```python
-from workiva import SDK, models
-
-
-with SDK(
-    security=models.Security(
-        client_id="<YOUR_CLIENT_ID_HERE>",
-        client_secret="<YOUR_CLIENT_SECRET_HERE>",
-    ),
-) as sdk:
-
-    sdk.documents.document_permissions_modification(document_id="<id>", resource_permissions_modification={
-        "to_assign": [
-            {
-                "permission": "598e8fa3-3e7c-4fb7-b662-f44522216e2b",
-                "principal": "V0ZVc2VyHzU2NDg2NjU2MjQ0NDQ5Mjg",
-            },
-        ],
-        "to_revoke": [
-            {
-                "permission": "85aa87ee-beb9-4417-8fa0-420e9de63534",
-                "principal": "V0ZVc2VyHzU2NDg2NjU2MjQ0NDQ5Mjg",
-            },
-        ],
-    })
-
-    # Use the SDK ...
-
-```
-
-### Parameters
-
-| Parameter                                                                                                                                                                                                                                              | Type                                                                                                                                                                                                                                                   | Required                                                                                                                                                                                                                                               | Description                                                                                                                                                                                                                                            | Example                                                                                                                                                                                                                                                |
-| ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `document_id`                                                                                                                                                                                                                                          | *str*                                                                                                                                                                                                                                                  | :heavy_check_mark:                                                                                                                                                                                                                                     | The unique identifier of the document                                                                                                                                                                                                                  |                                                                                                                                                                                                                                                        |
-| `resource_permissions_modification`                                                                                                                                                                                                                    | [models.ResourcePermissionsModification](../../models/resourcepermissionsmodification.md)                                                                                                                                                              | :heavy_check_mark:                                                                                                                                                                                                                                     | Details about the document permissions modification.                                                                                                                                                                                                   | {<br/>"toAssign": [<br/>{<br/>"permission": "598e8fa3-3e7c-4fb7-b662-f44522216e2b",<br/>"principal": "V0ZVc2VyHzU2NDg2NjU2MjQ0NDQ5Mjg"<br/>}<br/>],<br/>"toRevoke": [<br/>{<br/>"permission": "85aa87ee-beb9-4417-8fa0-420e9de63534",<br/>"principal": "V0ZVc2VyHzU2NDg2NjU2MjQ0NDQ5Mjg"<br/>}<br/>]<br/>} |
-| `retries`                                                                                                                                                                                                                                              | [Optional[utils.RetryConfig]](../../models/utils/retryconfig.md)                                                                                                                                                                                       | :heavy_minus_sign:                                                                                                                                                                                                                                     | Configuration to override the default retry behavior of the client.                                                                                                                                                                                    |                                                                                                                                                                                                                                                        |
-
-### Errors
-
-| Error Type                   | Status Code                  | Content Type                 |
-| ---------------------------- | ---------------------------- | ---------------------------- |
-| errors.ErrorResponse         | 400, 401, 403, 404, 409, 429 | application/json             |
-| errors.ErrorResponse         | 500, 503                     | application/json             |
-| errors.SDKError              | 4XX, 5XX                     | \*/\*                        |
-
-## edit_sections
-
-Updates the properties of a collection of [sections](ref:documents#section) in a document using [SectionsEdits](ref:documents#sectionsedit) request. This is a long running operation.
-Responses include a `Location` header, which indicates where to poll for results. For more details on long-running job polling, see [Operations endpoint](ref:getoperationbyid). When the update completes, its status will be `completed`.
-
-
-### Example Usage
-
-<!-- UsageSnippet language="python" operationID="editSections" method="post" path="/documents/{documentId}/sections/edit" -->
-```python
-from workiva import SDK, models
-
-
-with SDK(
-    security=models.Security(
-        client_id="<YOUR_CLIENT_ID_HERE>",
-        client_secret="<YOUR_CLIENT_SECRET_HERE>",
-    ),
-) as sdk:
-
-    res = sdk.documents.edit_sections(document_id="<id>", sections_edits={
-        "data": [
-            {
-                "set_non_printing": {
-                    "non_printing": True,
-                    "selection": [
-                        "9fdff0887cb5425292dfb1fdd759753a_35",
-                        "9fdff0887cb5425292dfb1fdd759753a_50",
-                    ],
-                },
-                "type": models.SectionEditType.SET_NON_PRINTING,
-            },
-        ],
-    })
-
-    # Handle response
-    print(res)
-
-```
-
-### Parameters
-
-| Parameter                                                                                                                                                                                                                                                                                                                                                       | Type                                                                                                                                                                                                                                                                                                                                                            | Required                                                                                                                                                                                                                                                                                                                                                        | Description                                                                                                                                                                                                                                                                                                                                                     | Example                                                                                                                                                                                                                                                                                                                                                         |
-| --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `document_id`                                                                                                                                                                                                                                                                                                                                                   | *str*                                                                                                                                                                                                                                                                                                                                                           | :heavy_check_mark:                                                                                                                                                                                                                                                                                                                                              | The unique identifier of the document                                                                                                                                                                                                                                                                                                                           |                                                                                                                                                                                                                                                                                                                                                                 |
-| `sections_edits`                                                                                                                                                                                                                                                                                                                                                | [models.SectionsEdits](../../models/sectionsedits.md)                                                                                                                                                                                                                                                                                                           | :heavy_check_mark:                                                                                                                                                                                                                                                                                                                                              | The edits for one or more sections in a document                                                                                                                                                                                                                                                                                                                | {<br/>"data": [<br/>{<br/>"setNonPrinting": {<br/>"nonPrinting": true,<br/>"selection": [<br/>"9fdff0887cb5425292dfb1fdd759753a_35",<br/>"9fdff0887cb5425292dfb1fdd759753a_50"<br/>]<br/>},<br/>"type": "setNonPrinting"<br/>},<br/>{<br/>"setNonPrinting": {<br/>"nonPrinting": false,<br/>"selection": [<br/>"9fdff0887cb5425292dfb1fdd759753a_45",<br/>"9fdff0887cb5425292dfb1fdd759753a_40"<br/>]<br/>},<br/>"type": "setNonPrinting"<br/>}<br/>]<br/>} |
-| `retries`                                                                                                                                                                                                                                                                                                                                                       | [Optional[utils.RetryConfig]](../../models/utils/retryconfig.md)                                                                                                                                                                                                                                                                                                | :heavy_minus_sign:                                                                                                                                                                                                                                                                                                                                              | Configuration to override the default retry behavior of the client.                                                                                                                                                                                                                                                                                             |                                                                                                                                                                                                                                                                                                                                                                 |
-
-### Response
-
-**[models.EditSectionsResponse](../../models/editsectionsresponse.md)**
-
-### Errors
-
-| Error Type                   | Status Code                  | Content Type                 |
-| ---------------------------- | ---------------------------- | ---------------------------- |
-| errors.ErrorResponse         | 400, 401, 403, 404, 409, 429 | application/json             |
-| errors.ErrorResponse         | 500, 503                     | application/json             |
-| errors.SDKError              | 4XX, 5XX                     | \*/\*                        |
-
-## get_document_by_id
-
-Retrieves a [document](ref:documents#document) given its ID.
-
-
-### Example Usage
-
-<!-- UsageSnippet language="python" operationID="getDocumentById" method="get" path="/documents/{documentId}" -->
-```python
-from workiva import SDK, models
-
-
-with SDK(
-    security=models.Security(
-        client_id="<YOUR_CLIENT_ID_HERE>",
-        client_secret="<YOUR_CLIENT_SECRET_HERE>",
-    ),
-) as sdk:
-
-    res = sdk.documents.get_document_by_id(document_id="<id>", dollar_expand="?$expand=relationships\n")
-
-    # Handle response
-    print(res)
-
-```
-
-### Parameters
-
-| Parameter                                                           | Type                                                                | Required                                                            | Description                                                         | Example                                                             |
-| ------------------------------------------------------------------- | ------------------------------------------------------------------- | ------------------------------------------------------------------- | ------------------------------------------------------------------- | ------------------------------------------------------------------- |
-| `document_id`                                                       | *str*                                                               | :heavy_check_mark:                                                  | The unique identifier of the document                               |                                                                     |
-| `dollar_expand`                                                     | *Optional[str]*                                                     | :heavy_minus_sign:                                                  | Returns related resources inline with the main resource             | ?$expand=relationships<br/>                                         |
-| `retries`                                                           | [Optional[utils.RetryConfig]](../../models/utils/retryconfig.md)    | :heavy_minus_sign:                                                  | Configuration to override the default retry behavior of the client. |                                                                     |
-
-### Response
-
-**[models.Document](../../models/document.md)**
 
 ### Errors
 
@@ -588,13 +535,14 @@ with SDK(
 | errors.ErrorResponse         | 500, 503                     | application/json             |
 | errors.SDKError              | 4XX, 5XX                     | \*/\*                        |
 
-## get_documents
+## document_permissions_modification
 
-Returns a paginated list of [documents](ref:documents#document).
+Assign and/or revoke permissions on a document. If any modification in a request fails, all modifications on that request fail. <br /><br /> _To modify an existing permission, the existing permission must first be  explicitly revoked. Then, the new permission needs to be assigned. This  can be done in a single request by sending `toAssign` and `toRevoke` in  the request body._
+
 
 ### Example Usage
 
-<!-- UsageSnippet language="python" operationID="getDocuments" method="get" path="/documents" -->
+<!-- UsageSnippet language="python" operationID="documentPermissionsModification" method="post" path="/documents/{documentId}/permissions/modification" example="BadRequest" -->
 ```python
 from workiva import SDK, models
 
@@ -606,7 +554,61 @@ with SDK(
     ),
 ) as sdk:
 
-    res = sdk.documents.get_documents(dollar_maxpagesize=1000, dollar_next="JTI0bGltaXQ9MTAwJiUyNG9mZnNldD0xMDA")
+    sdk.documents.document_permissions_modification(document_id="<id>", resource_permissions_modification={
+        "to_assign": [
+            {
+                "permission": "598e8fa3-3e7c-4fb7-b662-f44522216e2b",
+                "principal": "V0ZVc2VyHzU2NDg2NjU2MjQ0NDQ5Mjg",
+            },
+        ],
+        "to_revoke": [
+            {
+                "permission": "85aa87ee-beb9-4417-8fa0-420e9de63534",
+                "principal": "V0ZVc2VyHzU2NDg2NjU2MjQ0NDQ5Mjg",
+            },
+        ],
+    })
+
+    # Use the SDK ...
+
+```
+
+### Parameters
+
+| Parameter                                                                                                                                                                                                                                              | Type                                                                                                                                                                                                                                                   | Required                                                                                                                                                                                                                                               | Description                                                                                                                                                                                                                                            | Example                                                                                                                                                                                                                                                |
+| ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `document_id`                                                                                                                                                                                                                                          | *str*                                                                                                                                                                                                                                                  | :heavy_check_mark:                                                                                                                                                                                                                                     | The unique identifier of the document                                                                                                                                                                                                                  |                                                                                                                                                                                                                                                        |
+| `resource_permissions_modification`                                                                                                                                                                                                                    | [models.ResourcePermissionsModification](../../models/resourcepermissionsmodification.md)                                                                                                                                                              | :heavy_check_mark:                                                                                                                                                                                                                                     | Details about the document permissions modification.                                                                                                                                                                                                   | {<br/>"toAssign": [<br/>{<br/>"permission": "598e8fa3-3e7c-4fb7-b662-f44522216e2b",<br/>"principal": "V0ZVc2VyHzU2NDg2NjU2MjQ0NDQ5Mjg"<br/>}<br/>],<br/>"toRevoke": [<br/>{<br/>"permission": "85aa87ee-beb9-4417-8fa0-420e9de63534",<br/>"principal": "V0ZVc2VyHzU2NDg2NjU2MjQ0NDQ5Mjg"<br/>}<br/>]<br/>} |
+| `retries`                                                                                                                                                                                                                                              | [Optional[utils.RetryConfig]](../../models/utils/retryconfig.md)                                                                                                                                                                                       | :heavy_minus_sign:                                                                                                                                                                                                                                     | Configuration to override the default retry behavior of the client.                                                                                                                                                                                    |                                                                                                                                                                                                                                                        |
+
+### Errors
+
+| Error Type                   | Status Code                  | Content Type                 |
+| ---------------------------- | ---------------------------- | ---------------------------- |
+| errors.ErrorResponse         | 400, 401, 403, 404, 409, 429 | application/json             |
+| errors.ErrorResponse         | 500, 503                     | application/json             |
+| errors.SDKError              | 4XX, 5XX                     | \*/\*                        |
+
+## get_sections
+
+Returns a list of [sections](ref:documents#section).
+
+
+### Example Usage
+
+<!-- UsageSnippet language="python" operationID="getSections" method="get" path="/documents/{documentId}/sections" -->
+```python
+from workiva import SDK, models
+
+
+with SDK(
+    security=models.Security(
+        client_id="<YOUR_CLIENT_ID_HERE>",
+        client_secret="<YOUR_CLIENT_SECRET_HERE>",
+    ),
+) as sdk:
+
+    res = sdk.documents.get_sections(document_id="<id>", dollar_revision="1A2B3C4D", dollar_maxpagesize=1000, dollar_next="JTI0bGltaXQ9MTAwJiUyNG9mZnNldD0xMDA")
 
     while res is not None:
         # Handle items
@@ -617,17 +619,134 @@ with SDK(
 
 ### Parameters
 
-| Parameter                                                                                   | Type                                                                                        | Required                                                                                    | Description                                                                                 | Example                                                                                     |
-| ------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------- |
-| `dollar_filter`                                                                             | *Optional[str]*                                                                             | :heavy_minus_sign:                                                                          | The properties to filter the results by.                                                    |                                                                                             |
-| `dollar_maxpagesize`                                                                        | *Optional[int]*                                                                             | :heavy_minus_sign:                                                                          | The maximum number of results to retrieve                                                   |                                                                                             |
-| `dollar_next`                                                                               | *Optional[str]*                                                                             | :heavy_minus_sign:                                                                          | Pagination cursor for next set of results.                                                  | JTI0bGltaXQ9MTAwJiUyNG9mZnNldD0xMDA                                                         |
-| `dollar_order_by`                                                                           | *Optional[str]*                                                                             | :heavy_minus_sign:                                                                          | One or more comma-separated expressions to indicate the order in which to sort the results. |                                                                                             |
-| `retries`                                                                                   | [Optional[utils.RetryConfig]](../../models/utils/retryconfig.md)                            | :heavy_minus_sign:                                                                          | Configuration to override the default retry behavior of the client.                         |                                                                                             |
+| Parameter                                                           | Type                                                                | Required                                                            | Description                                                         | Example                                                             |
+| ------------------------------------------------------------------- | ------------------------------------------------------------------- | ------------------------------------------------------------------- | ------------------------------------------------------------------- | ------------------------------------------------------------------- |
+| `document_id`                                                       | *str*                                                               | :heavy_check_mark:                                                  | The unique identifier of the document                               |                                                                     |
+| `dollar_revision`                                                   | *Optional[str]*                                                     | :heavy_minus_sign:                                                  | Returns resources at a specific revision                            | 1A2B3C4D                                                            |
+| `dollar_maxpagesize`                                                | *Optional[int]*                                                     | :heavy_minus_sign:                                                  | The maximum number of results to retrieve                           |                                                                     |
+| `dollar_next`                                                       | *Optional[str]*                                                     | :heavy_minus_sign:                                                  | Pagination cursor for next set of results.                          | JTI0bGltaXQ9MTAwJiUyNG9mZnNldD0xMDA                                 |
+| `retries`                                                           | [Optional[utils.RetryConfig]](../../models/utils/retryconfig.md)    | :heavy_minus_sign:                                                  | Configuration to override the default retry behavior of the client. |                                                                     |
 
 ### Response
 
-**[models.GetDocumentsResponse](../../models/getdocumentsresponse.md)**
+**[models.GetSectionsResponse](../../models/getsectionsresponse.md)**
+
+### Errors
+
+| Error Type                   | Status Code                  | Content Type                 |
+| ---------------------------- | ---------------------------- | ---------------------------- |
+| errors.ErrorResponse         | 400, 401, 403, 404, 409, 429 | application/json             |
+| errors.ErrorResponse         | 500, 503                     | application/json             |
+| errors.SDKError              | 4XX, 5XX                     | \*/\*                        |
+
+## create_section
+
+Creates a new [section](ref:documents#section) in a [document](ref:documents#document), given its properties. By default, the new section appears at the top-most position.
+
+
+### Example Usage: BadRequest
+
+<!-- UsageSnippet language="python" operationID="createSection" method="post" path="/documents/{documentId}/sections" example="BadRequest" -->
+```python
+from workiva import SDK, models
+
+
+with SDK(
+    security=models.Security(
+        client_id="<YOUR_CLIENT_ID_HERE>",
+        client_secret="<YOUR_CLIENT_SECRET_HERE>",
+    ),
+) as sdk:
+
+    res = sdk.documents.create_section(document_id="<id>", section={
+        "id": "a8b3adb687644b27fafcb3a9875f0f0d_18",
+        "index": 1,
+        "name": "Risk factors",
+        "non_printing": True,
+    })
+
+    # Handle response
+    print(res)
+
+```
+### Example Usage: body
+
+<!-- UsageSnippet language="python" operationID="createSection" method="post" path="/documents/{documentId}/sections" example="body" -->
+```python
+from workiva import SDK, models
+
+
+with SDK(
+    security=models.Security(
+        client_id="<YOUR_CLIENT_ID_HERE>",
+        client_secret="<YOUR_CLIENT_SECRET_HERE>",
+    ),
+) as sdk:
+
+    res = sdk.documents.create_section(document_id="<id>", section={
+        "name": "Risk Factor",
+        "parent": {
+            "id": "a8b3adb687644b27fafcb3a9875f0f0d_18",
+        },
+    })
+
+    # Handle response
+    print(res)
+
+```
+
+### Parameters
+
+| Parameter                                                           | Type                                                                | Required                                                            | Description                                                         |
+| ------------------------------------------------------------------- | ------------------------------------------------------------------- | ------------------------------------------------------------------- | ------------------------------------------------------------------- |
+| `document_id`                                                       | *str*                                                               | :heavy_check_mark:                                                  | The unique identifier of the document                               |
+| `section`                                                           | [models.SectionInput](../../models/sectioninput.md)                 | :heavy_check_mark:                                                  | The properties of the section to create                             |
+| `retries`                                                           | [Optional[utils.RetryConfig]](../../models/utils/retryconfig.md)    | :heavy_minus_sign:                                                  | Configuration to override the default retry behavior of the client. |
+
+### Response
+
+**[models.Section](../../models/section.md)**
+
+### Errors
+
+| Error Type                   | Status Code                  | Content Type                 |
+| ---------------------------- | ---------------------------- | ---------------------------- |
+| errors.ErrorResponse         | 400, 401, 403, 404, 409, 429 | application/json             |
+| errors.ErrorResponse         | 500, 503                     | application/json             |
+| errors.SDKError              | 4XX, 5XX                     | \*/\*                        |
+
+## delete_section_by_id
+
+Deletes a [section](ref:documents#section) given its ID.
+
+
+### Example Usage
+
+<!-- UsageSnippet language="python" operationID="deleteSectionById" method="delete" path="/documents/{documentId}/sections/{sectionId}" -->
+```python
+from workiva import SDK, models
+
+
+with SDK(
+    security=models.Security(
+        client_id="<YOUR_CLIENT_ID_HERE>",
+        client_secret="<YOUR_CLIENT_SECRET_HERE>",
+    ),
+) as sdk:
+
+    sdk.documents.delete_section_by_id(document_id="<id>", section_id="<id>")
+
+    # Use the SDK ...
+
+```
+
+### Parameters
+
+| Parameter                                                           | Type                                                                | Required                                                            | Description                                                         |
+| ------------------------------------------------------------------- | ------------------------------------------------------------------- | ------------------------------------------------------------------- | ------------------------------------------------------------------- |
+| `document_id`                                                       | *str*                                                               | :heavy_check_mark:                                                  | The unique identifier of the document                               |
+| `section_id`                                                        | *str*                                                               | :heavy_check_mark:                                                  | The unique identifier of the section                                |
+| `retries`                                                           | [Optional[utils.RetryConfig]](../../models/utils/retryconfig.md)    | :heavy_minus_sign:                                                  | Configuration to override the default retry behavior of the client. |
 
 ### Errors
 
@@ -676,238 +795,6 @@ with SDK(
 ### Response
 
 **[models.Section](../../models/section.md)**
-
-### Errors
-
-| Error Type                   | Status Code                  | Content Type                 |
-| ---------------------------- | ---------------------------- | ---------------------------- |
-| errors.ErrorResponse         | 400, 401, 403, 404, 409, 429 | application/json             |
-| errors.ErrorResponse         | 500, 503                     | application/json             |
-| errors.SDKError              | 4XX, 5XX                     | \*/\*                        |
-
-## get_section_permissions
-
-Retrieves a paginated list of permissions for the given section in a document
-
-
-### Example Usage
-
-<!-- UsageSnippet language="python" operationID="getSectionPermissions" method="get" path="/documents/{documentId}/sections/{sectionId}/permissions" -->
-```python
-from workiva import SDK, models
-
-
-with SDK(
-    security=models.Security(
-        client_id="<YOUR_CLIENT_ID_HERE>",
-        client_secret="<YOUR_CLIENT_SECRET_HERE>",
-    ),
-) as sdk:
-
-    res = sdk.documents.get_section_permissions(request={
-        "dollar_next": "JTI0bGltaXQ9MTAwJiUyNG9mZnNldD0xMDA",
-        "document_id": "<id>",
-        "section_id": "<id>",
-    })
-
-    while res is not None:
-        # Handle items
-
-        res = res.next()
-
-```
-
-### Parameters
-
-| Parameter                                                                           | Type                                                                                | Required                                                                            | Description                                                                         |
-| ----------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------- |
-| `request`                                                                           | [models.GetSectionPermissionsRequest](../../models/getsectionpermissionsrequest.md) | :heavy_check_mark:                                                                  | The request object to use for the request.                                          |
-| `retries`                                                                           | [Optional[utils.RetryConfig]](../../models/utils/retryconfig.md)                    | :heavy_minus_sign:                                                                  | Configuration to override the default retry behavior of the client.                 |
-
-### Response
-
-**[models.GetSectionPermissionsResponse](../../models/getsectionpermissionsresponse.md)**
-
-### Errors
-
-| Error Type                   | Status Code                  | Content Type                 |
-| ---------------------------- | ---------------------------- | ---------------------------- |
-| errors.ErrorResponse         | 400, 401, 403, 404, 409, 429 | application/json             |
-| errors.ErrorResponse         | 500, 503                     | application/json             |
-| errors.SDKError              | 4XX, 5XX                     | \*/\*                        |
-
-## get_sections
-
-Returns a list of [sections](ref:documents#section).
-
-
-### Example Usage
-
-<!-- UsageSnippet language="python" operationID="getSections" method="get" path="/documents/{documentId}/sections" -->
-```python
-from workiva import SDK, models
-
-
-with SDK(
-    security=models.Security(
-        client_id="<YOUR_CLIENT_ID_HERE>",
-        client_secret="<YOUR_CLIENT_SECRET_HERE>",
-    ),
-) as sdk:
-
-    res = sdk.documents.get_sections(document_id="<id>", dollar_maxpagesize=1000, dollar_next="JTI0bGltaXQ9MTAwJiUyNG9mZnNldD0xMDA", dollar_revision="1A2B3C4D")
-
-    while res is not None:
-        # Handle items
-
-        res = res.next()
-
-```
-
-### Parameters
-
-| Parameter                                                           | Type                                                                | Required                                                            | Description                                                         | Example                                                             |
-| ------------------------------------------------------------------- | ------------------------------------------------------------------- | ------------------------------------------------------------------- | ------------------------------------------------------------------- | ------------------------------------------------------------------- |
-| `document_id`                                                       | *str*                                                               | :heavy_check_mark:                                                  | The unique identifier of the document                               |                                                                     |
-| `dollar_maxpagesize`                                                | *Optional[int]*                                                     | :heavy_minus_sign:                                                  | The maximum number of results to retrieve                           |                                                                     |
-| `dollar_next`                                                       | *Optional[str]*                                                     | :heavy_minus_sign:                                                  | Pagination cursor for next set of results.                          | JTI0bGltaXQ9MTAwJiUyNG9mZnNldD0xMDA                                 |
-| `dollar_revision`                                                   | *Optional[str]*                                                     | :heavy_minus_sign:                                                  | Returns resources at a specific revision                            | 1A2B3C4D                                                            |
-| `retries`                                                           | [Optional[utils.RetryConfig]](../../models/utils/retryconfig.md)    | :heavy_minus_sign:                                                  | Configuration to override the default retry behavior of the client. |                                                                     |
-
-### Response
-
-**[models.GetSectionsResponse](../../models/getsectionsresponse.md)**
-
-### Errors
-
-| Error Type                   | Status Code                  | Content Type                 |
-| ---------------------------- | ---------------------------- | ---------------------------- |
-| errors.ErrorResponse         | 400, 401, 403, 404, 409, 429 | application/json             |
-| errors.ErrorResponse         | 500, 503                     | application/json             |
-| errors.SDKError              | 4XX, 5XX                     | \*/\*                        |
-
-## partially_update_document_by_id
-
-Updates the properties of a [document](ref:documents#document).
-
-This is a long running operation. Responses include a `Location` header,
-which indicates where to poll for results. For more details on long-running job polling,
-see [Operations endpoint](ref:getoperationbyid).
-
-### Options
-
-|Path                             |PATCH Operations Supported        |
-|---------------------------------|----------------------------------|
-|`/customFields/<custom field id>`|`add`, `remove`, `replace`, `test`|
-|`/customFieldGroups`             |`add`, `remove`, `replace`, `test`|
-|`/sectionCustomFieldGroups`      |`add`, `remove`, `replace`, `test`|
-|`/lock`                          |`replace`                         |
-
-### Examples
-
-#### Add a custom field value
-
-```json
-[
-  {
-    "op": "add",
-    "path": "/customFields/com.workiva.gsr.legal_entity",
-    "value": "Workiva"
-  }
-]
-```
-
-#### Remove a custom field value
-
-```json
-[
-  {
-    "op": "remove",
-    "path": "/customFields/com.workiva.gsr.legal_entity"
-  }
-]
-```
-
-#### Replace a custom field value
-
-```json
-[
-  {
-    "op": "replace",
-    "path": "/customFields/com.workiva.gsr.legal_entity",
-    "value": "Workiva, Inc."
-  }
-]
-```
-
-#### Verifying customFieldGroup is empty before replacing the list
-
-```json
-[
-  {
-    "op": "test",
-    "path": "/customFieldGroups",
-    "value": []
-  },
-  {
-    "op": "replace",
-    "path": "/customFieldGroups",
-    "value": ["gsr.reporting"]
-  }
-]
-```
-
-#### Adding a customFieldGroup to the end of a list
-
-```json
-[
-  {
-    "op": "add",
-    "path": "/customFieldGroups/-",
-    "value": "gsr.reporting"
-  }
-]
-```
-
-
-### Example Usage
-
-<!-- UsageSnippet language="python" operationID="partiallyUpdateDocumentById" method="patch" path="/documents/{documentId}" -->
-```python
-from workiva import SDK, models
-
-
-with SDK(
-    security=models.Security(
-        client_id="<YOUR_CLIENT_ID_HERE>",
-        client_secret="<YOUR_CLIENT_SECRET_HERE>",
-    ),
-) as sdk:
-
-    res = sdk.documents.partially_update_document_by_id(document_id="<id>", request_body=[
-        {
-            "op": models.Op.REPLACE,
-            "path": "/customFields/com.workiva.gsr.legal_entity",
-            "value": "US Entity",
-        },
-    ])
-
-    # Handle response
-    print(res)
-
-```
-
-### Parameters
-
-| Parameter                                                             | Type                                                                  | Required                                                              | Description                                                           |
-| --------------------------------------------------------------------- | --------------------------------------------------------------------- | --------------------------------------------------------------------- | --------------------------------------------------------------------- |
-| `document_id`                                                         | *str*                                                                 | :heavy_check_mark:                                                    | The unique identifier of the document                                 |
-| `request_body`                                                        | List[[models.JSONPatchOperation](../../models/jsonpatchoperation.md)] | :heavy_check_mark:                                                    | A collection of patch operations to apply to the document.            |
-| `retries`                                                             | [Optional[utils.RetryConfig]](../../models/utils/retryconfig.md)      | :heavy_minus_sign:                                                    | Configuration to override the default retry behavior of the client.   |
-
-### Response
-
-**[models.PartiallyUpdateDocumentByIDResponse](../../models/partiallyupdatedocumentbyidresponse.md)**
 
 ### Errors
 
@@ -1049,9 +936,35 @@ see [Operations endpoint](ref:getoperationbyid).
 ```
 
 
-### Example Usage
+### Example Usage: BadRequest
 
-<!-- UsageSnippet language="python" operationID="partiallyUpdateSectionById" method="patch" path="/documents/{documentId}/sections/{sectionId}" -->
+<!-- UsageSnippet language="python" operationID="partiallyUpdateSectionById" method="patch" path="/documents/{documentId}/sections/{sectionId}" example="BadRequest" -->
+```python
+from workiva import SDK, models
+
+
+with SDK(
+    security=models.Security(
+        client_id="<YOUR_CLIENT_ID_HERE>",
+        client_secret="<YOUR_CLIENT_SECRET_HERE>",
+    ),
+) as sdk:
+
+    res = sdk.documents.partially_update_section_by_id(document_id="<id>", section_id="<id>", request_body=[
+        {
+            "op": models.Op.REPLACE,
+            "path": "/name",
+            "value": "New name",
+        },
+    ])
+
+    # Handle response
+    print(res)
+
+```
+### Example Usage: body
+
+<!-- UsageSnippet language="python" operationID="partiallyUpdateSectionById" method="patch" path="/documents/{documentId}/sections/{sectionId}" example="body" -->
 ```python
 from workiva import SDK, models
 
@@ -1097,6 +1010,213 @@ with SDK(
 | errors.ErrorResponse         | 500, 503                     | application/json             |
 | errors.SDKError              | 4XX, 5XX                     | \*/\*                        |
 
+## copy_section
+
+Asynchronously copies a [section](ref:documents#section) given details about the copy's destination within the same or another document. Options are specified using a [SectionCopy](ref:documents#sectioncopy) object.
+
+Copies only the section's content — not any labels, comments, tasks, or formatting from a style guide. Unless otherwise specified, the copy appears at the top level of its destination document, with an index of 0, and with the same name as the original section.
+
+### Example Usage
+
+<!-- UsageSnippet language="python" operationID="copySection" method="post" path="/documents/{documentId}/sections/{sectionId}/copy" example="BadRequest" -->
+```python
+from workiva import SDK, models
+
+
+with SDK(
+    security=models.Security(
+        client_id="<YOUR_CLIENT_ID_HERE>",
+        client_secret="<YOUR_CLIENT_SECRET_HERE>",
+    ),
+) as sdk:
+
+    res = sdk.documents.copy_section(document_id="<id>", section_id="<id>", section_copy={
+        "document": "327afa1a152f372fa1aeadb35ed28925d",
+        "section_index": 2,
+        "section_name": "October 2020",
+        "section_parent": "327afa1a152f372fa1aeadb35ed28925d_1",
+    })
+
+    # Handle response
+    print(res)
+
+```
+
+### Parameters
+
+| Parameter                                                           | Type                                                                | Required                                                            | Description                                                         |
+| ------------------------------------------------------------------- | ------------------------------------------------------------------- | ------------------------------------------------------------------- | ------------------------------------------------------------------- |
+| `document_id`                                                       | *str*                                                               | :heavy_check_mark:                                                  | The unique identifier of the document                               |
+| `section_id`                                                        | *str*                                                               | :heavy_check_mark:                                                  | The unique identifier of the section                                |
+| `section_copy`                                                      | [models.SectionCopy](../../models/sectioncopy.md)                   | :heavy_check_mark:                                                  | A SectionCopy object                                                |
+| `retries`                                                           | [Optional[utils.RetryConfig]](../../models/utils/retryconfig.md)    | :heavy_minus_sign:                                                  | Configuration to override the default retry behavior of the client. |
+
+### Response
+
+**[models.CopySectionResponse](../../models/copysectionresponse.md)**
+
+### Errors
+
+| Error Type                   | Status Code                  | Content Type                 |
+| ---------------------------- | ---------------------------- | ---------------------------- |
+| errors.ErrorResponse         | 400, 401, 403, 404, 409, 429 | application/json             |
+| errors.ErrorResponse         | 500, 503                     | application/json             |
+| errors.SDKError              | 4XX, 5XX                     | \*/\*                        |
+
+## edit_sections
+
+Updates the properties of a collection of [sections](ref:documents#section) in a document using [SectionsEdits](ref:documents#sectionsedit) request. This is a long running operation.
+Responses include a `Location` header, which indicates where to poll for results. For more details on long-running job polling, see [Operations endpoint](ref:getoperationbyid). When the update completes, its status will be `completed`.
+
+
+### Example Usage: BadRequest
+
+<!-- UsageSnippet language="python" operationID="editSections" method="post" path="/documents/{documentId}/sections/edit" example="BadRequest" -->
+```python
+from workiva import SDK, models
+
+
+with SDK(
+    security=models.Security(
+        client_id="<YOUR_CLIENT_ID_HERE>",
+        client_secret="<YOUR_CLIENT_SECRET_HERE>",
+    ),
+) as sdk:
+
+    res = sdk.documents.edit_sections(document_id="<id>", sections_edits={
+        "data": [
+            {
+                "set_non_printing": {
+                    "non_printing": True,
+                    "selection": [
+                        "9fdff0887cb5425292dfb1fdd759753a_35",
+                        "9fdff0887cb5425292dfb1fdd759753a_50",
+                    ],
+                },
+                "type": models.SectionEditType.SET_NON_PRINTING,
+            },
+            {
+                "set_non_printing": {
+                    "non_printing": False,
+                    "selection": [
+                        "9fdff0887cb5425292dfb1fdd759753a_45",
+                        "9fdff0887cb5425292dfb1fdd759753a_40",
+                    ],
+                },
+                "type": models.SectionEditType.SET_NON_PRINTING,
+            },
+        ],
+    })
+
+    # Handle response
+    print(res)
+
+```
+### Example Usage: body
+
+<!-- UsageSnippet language="python" operationID="editSections" method="post" path="/documents/{documentId}/sections/edit" example="body" -->
+```python
+from workiva import SDK, models
+
+
+with SDK(
+    security=models.Security(
+        client_id="<YOUR_CLIENT_ID_HERE>",
+        client_secret="<YOUR_CLIENT_SECRET_HERE>",
+    ),
+) as sdk:
+
+    res = sdk.documents.edit_sections(document_id="<id>", sections_edits={
+        "data": [
+            {
+                "set_non_printing": {
+                    "non_printing": True,
+                    "selection": [
+                        "9fdff0887cb5425292dfb1fdd759753a_35",
+                        "9fdff0887cb5425292dfb1fdd759753a_50",
+                    ],
+                },
+                "type": models.SectionEditType.SET_NON_PRINTING,
+            },
+        ],
+    })
+
+    # Handle response
+    print(res)
+
+```
+
+### Parameters
+
+| Parameter                                                                                                                                                                                                                                                                                                                                                       | Type                                                                                                                                                                                                                                                                                                                                                            | Required                                                                                                                                                                                                                                                                                                                                                        | Description                                                                                                                                                                                                                                                                                                                                                     | Example                                                                                                                                                                                                                                                                                                                                                         |
+| --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `document_id`                                                                                                                                                                                                                                                                                                                                                   | *str*                                                                                                                                                                                                                                                                                                                                                           | :heavy_check_mark:                                                                                                                                                                                                                                                                                                                                              | The unique identifier of the document                                                                                                                                                                                                                                                                                                                           |                                                                                                                                                                                                                                                                                                                                                                 |
+| `sections_edits`                                                                                                                                                                                                                                                                                                                                                | [models.SectionsEdits](../../models/sectionsedits.md)                                                                                                                                                                                                                                                                                                           | :heavy_check_mark:                                                                                                                                                                                                                                                                                                                                              | The edits for one or more sections in a document                                                                                                                                                                                                                                                                                                                | {<br/>"data": [<br/>{<br/>"setNonPrinting": {<br/>"nonPrinting": true,<br/>"selection": [<br/>"9fdff0887cb5425292dfb1fdd759753a_35",<br/>"9fdff0887cb5425292dfb1fdd759753a_50"<br/>]<br/>},<br/>"type": "setNonPrinting"<br/>},<br/>{<br/>"setNonPrinting": {<br/>"nonPrinting": false,<br/>"selection": [<br/>"9fdff0887cb5425292dfb1fdd759753a_45",<br/>"9fdff0887cb5425292dfb1fdd759753a_40"<br/>]<br/>},<br/>"type": "setNonPrinting"<br/>}<br/>]<br/>} |
+| `retries`                                                                                                                                                                                                                                                                                                                                                       | [Optional[utils.RetryConfig]](../../models/utils/retryconfig.md)                                                                                                                                                                                                                                                                                                | :heavy_minus_sign:                                                                                                                                                                                                                                                                                                                                              | Configuration to override the default retry behavior of the client.                                                                                                                                                                                                                                                                                             |                                                                                                                                                                                                                                                                                                                                                                 |
+
+### Response
+
+**[models.EditSectionsResponse](../../models/editsectionsresponse.md)**
+
+### Errors
+
+| Error Type                   | Status Code                  | Content Type                 |
+| ---------------------------- | ---------------------------- | ---------------------------- |
+| errors.ErrorResponse         | 400, 401, 403, 404, 409, 429 | application/json             |
+| errors.ErrorResponse         | 500, 503                     | application/json             |
+| errors.SDKError              | 4XX, 5XX                     | \*/\*                        |
+
+## get_section_permissions
+
+Retrieves a paginated list of permissions for the given section in a document
+
+
+### Example Usage
+
+<!-- UsageSnippet language="python" operationID="getSectionPermissions" method="get" path="/documents/{documentId}/sections/{sectionId}/permissions" -->
+```python
+from workiva import SDK, models
+
+
+with SDK(
+    security=models.Security(
+        client_id="<YOUR_CLIENT_ID_HERE>",
+        client_secret="<YOUR_CLIENT_SECRET_HERE>",
+    ),
+) as sdk:
+
+    res = sdk.documents.get_section_permissions(request={
+        "document_id": "<id>",
+        "section_id": "<id>",
+        "dollar_next": "JTI0bGltaXQ9MTAwJiUyNG9mZnNldD0xMDA",
+    })
+
+    while res is not None:
+        # Handle items
+
+        res = res.next()
+
+```
+
+### Parameters
+
+| Parameter                                                                           | Type                                                                                | Required                                                                            | Description                                                                         |
+| ----------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------- |
+| `request`                                                                           | [models.GetSectionPermissionsRequest](../../models/getsectionpermissionsrequest.md) | :heavy_check_mark:                                                                  | The request object to use for the request.                                          |
+| `retries`                                                                           | [Optional[utils.RetryConfig]](../../models/utils/retryconfig.md)                    | :heavy_minus_sign:                                                                  | Configuration to override the default retry behavior of the client.                 |
+
+### Response
+
+**[models.GetSectionPermissionsResponse](../../models/getsectionpermissionsresponse.md)**
+
+### Errors
+
+| Error Type                   | Status Code                  | Content Type                 |
+| ---------------------------- | ---------------------------- | ---------------------------- |
+| errors.ErrorResponse         | 400, 401, 403, 404, 409, 429 | application/json             |
+| errors.ErrorResponse         | 500, 503                     | application/json             |
+| errors.SDKError              | 4XX, 5XX                     | \*/\*                        |
+
 ## section_permissions_modification
 
 Assign and/or revoke permissions on a section. If any modification in a request fails, all modifications on that request fail. <br /><br /> _To modify an existing permission, the existing permission must first be  explicitly revoked. Then, the new permission needs to be assigned. This  can be done in a single request by sending `toAssign` and `toRevoke` in  the request body._
@@ -1104,7 +1224,7 @@ Assign and/or revoke permissions on a section. If any modification in a request 
 
 ### Example Usage
 
-<!-- UsageSnippet language="python" operationID="sectionPermissionsModification" method="post" path="/documents/{documentId}/sections/{sectionId}/permissions/modification" -->
+<!-- UsageSnippet language="python" operationID="sectionPermissionsModification" method="post" path="/documents/{documentId}/sections/{sectionId}/permissions/modification" example="BadRequest" -->
 ```python
 from workiva import SDK, models
 

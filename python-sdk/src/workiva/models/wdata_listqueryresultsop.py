@@ -26,14 +26,14 @@ WDATA_LIST_QUERY_RESULTS_OP_SERVERS = [
 class WdataListQueryResultsRequestTypedDict(TypedDict):
     query_id: str
     r"""The unique identifier of the query"""
+    user_specific: NotRequired[bool]
+    r"""Limit results to those created by the current user"""
     cursor: NotRequired[str]
     r"""A paging cursor; if included, `limit` is ignored"""
     limit: NotRequired[str]
     r"""The number of query results to return, from 1 to 1000; by default, 1000"""
     offset: NotRequired[int]
     r"""The item to start with on the page, greater than or equal to 0; by default, 0"""
-    user_specific: NotRequired[bool]
-    r"""Limit results to those created by the current user"""
 
 
 class WdataListQueryResultsRequest(BaseModel):
@@ -43,6 +43,13 @@ class WdataListQueryResultsRequest(BaseModel):
         FieldMetadata(query=QueryParamMetadata(style="form", explode=True)),
     ]
     r"""The unique identifier of the query"""
+
+    user_specific: Annotated[
+        Optional[bool],
+        pydantic.Field(alias="userSpecific"),
+        FieldMetadata(query=QueryParamMetadata(style="form", explode=True)),
+    ] = False
+    r"""Limit results to those created by the current user"""
 
     cursor: Annotated[
         Optional[str],
@@ -62,16 +69,9 @@ class WdataListQueryResultsRequest(BaseModel):
     ] = 0
     r"""The item to start with on the page, greater than or equal to 0; by default, 0"""
 
-    user_specific: Annotated[
-        Optional[bool],
-        pydantic.Field(alias="userSpecific"),
-        FieldMetadata(query=QueryParamMetadata(style="form", explode=True)),
-    ] = False
-    r"""Limit results to those created by the current user"""
-
     @model_serializer(mode="wrap")
     def serialize_model(self, handler):
-        optional_fields = set(["cursor", "limit", "offset", "userSpecific"])
+        optional_fields = set(["userSpecific", "cursor", "limit", "offset"])
         serialized = handler(self)
         m = {}
 

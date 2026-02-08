@@ -4,9 +4,10 @@ from __future__ import annotations
 from .linecap import LineCap
 from .linecapsize import LineCapSize
 from .linerelativeposition import LineRelativePosition, LineRelativePositionTypedDict
-from pydantic import model_serializer
+from pydantic import field_serializer, model_serializer
 from typing import Optional
 from typing_extensions import NotRequired, TypedDict
+from workiva import models
 from workiva.types import BaseModel, UNSET_SENTINEL
 
 
@@ -38,6 +39,24 @@ class LineTerminator(BaseModel):
 
     size: Optional[LineCapSize] = LineCapSize.MEDIUM
     r"""The size of a cap at a line terminator."""
+
+    @field_serializer("cap")
+    def serialize_cap(self, value):
+        if isinstance(value, str):
+            try:
+                return models.LineCap(value)
+            except ValueError:
+                return value
+        return value
+
+    @field_serializer("size")
+    def serialize_size(self, value):
+        if isinstance(value, str):
+            try:
+                return models.LineCapSize(value)
+            except ValueError:
+                return value
+        return value
 
     @model_serializer(mode="wrap")
     def serialize_model(self, handler):

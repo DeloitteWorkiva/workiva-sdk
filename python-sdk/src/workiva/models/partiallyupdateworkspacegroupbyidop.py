@@ -10,30 +10,17 @@ from workiva.utils import FieldMetadata, PathParamMetadata, RequestMetadata
 
 
 class PartiallyUpdateWorkspaceGroupByIDRequestTypedDict(TypedDict):
-    request_body: List[JSONPatchOperationTypedDict]
-    r"""A collection of patch operations to apply to the group."""
-    group_id: str
-    r"""The unique identifier of the group"""
     organization_id: str
     r"""The unique identifier of the organization"""
     workspace_id: str
     r"""The unique identifier of the workspace"""
+    group_id: str
+    r"""The unique identifier of the group"""
+    request_body: List[JSONPatchOperationTypedDict]
+    r"""A collection of patch operations to apply to the group."""
 
 
 class PartiallyUpdateWorkspaceGroupByIDRequest(BaseModel):
-    request_body: Annotated[
-        List[JSONPatchOperation],
-        FieldMetadata(request=RequestMetadata(media_type="application/json")),
-    ]
-    r"""A collection of patch operations to apply to the group."""
-
-    group_id: Annotated[
-        str,
-        pydantic.Field(alias="groupId"),
-        FieldMetadata(path=PathParamMetadata(style="simple", explode=False)),
-    ]
-    r"""The unique identifier of the group"""
-
     organization_id: Annotated[
         str,
         pydantic.Field(alias="organizationId"),
@@ -47,3 +34,16 @@ class PartiallyUpdateWorkspaceGroupByIDRequest(BaseModel):
         FieldMetadata(path=PathParamMetadata(style="simple", explode=False)),
     ]
     r"""The unique identifier of the workspace"""
+
+    group_id: Annotated[
+        str,
+        pydantic.Field(alias="groupId"),
+        FieldMetadata(path=PathParamMetadata(style="simple", explode=False)),
+    ]
+    r"""The unique identifier of the group"""
+
+    request_body: Annotated[
+        List[JSONPatchOperation],
+        FieldMetadata(request=RequestMetadata(media_type="application/json")),
+    ]
+    r"""A collection of patch operations to apply to the group."""

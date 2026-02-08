@@ -10,22 +10,22 @@ from workiva.types import BaseModel
 class DrawingRichTextSelectionTypedDict(TypedDict):
     r"""Describes a selection within a drawing element's text"""
 
-    drawing_element: str
-    r"""Identifier of the drawing element"""
     start: CaretTypedDict
     r"""A caret (as in Caret Navigation) is a location between two characters in a paragraph."""
     stop: CaretTypedDict
     r"""A caret (as in Caret Navigation) is a location between two characters in a paragraph."""
+    drawing_element: str
+    r"""Identifier of the drawing element"""
 
 
 class DrawingRichTextSelection(BaseModel):
     r"""Describes a selection within a drawing element's text"""
-
-    drawing_element: Annotated[str, pydantic.Field(alias="drawingElement")]
-    r"""Identifier of the drawing element"""
 
     start: Caret
     r"""A caret (as in Caret Navigation) is a location between two characters in a paragraph."""
 
     stop: Caret
     r"""A caret (as in Caret Navigation) is a location between two characters in a paragraph."""
+
+    drawing_element: Annotated[str, pydantic.Field(alias="drawingElement")]
+    r"""Identifier of the drawing element"""

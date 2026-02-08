@@ -3,12 +3,13 @@
 from __future__ import annotations
 from .richtextbaselineshift import RichTextBaselineShift
 import pydantic
-from pydantic import model_serializer
+from pydantic import field_serializer, model_serializer
 from typing_extensions import Annotated, NotRequired, TypedDict
+from workiva import models
 from workiva.types import BaseModel, Nullable, OptionalNullable, UNSET, UNSET_SENTINEL
 
 
-class BackgroundColorTypedDict(TypedDict):
+class ApplicableTextFormatBackgroundColorTypedDict(TypedDict):
     r"""Represents a color."""
 
     blue: int
@@ -19,7 +20,7 @@ class BackgroundColorTypedDict(TypedDict):
     r"""The red component of the color."""
 
 
-class BackgroundColor(BaseModel):
+class ApplicableTextFormatBackgroundColor(BaseModel):
     r"""Represents a color."""
 
     blue: int
@@ -32,7 +33,7 @@ class BackgroundColor(BaseModel):
     r"""The red component of the color."""
 
 
-class TextColorTypedDict(TypedDict):
+class ApplicableTextFormatTextColorTypedDict(TypedDict):
     r"""Represents a color."""
 
     blue: int
@@ -43,7 +44,7 @@ class TextColorTypedDict(TypedDict):
     r"""The red component of the color."""
 
 
-class TextColor(BaseModel):
+class ApplicableTextFormatTextColor(BaseModel):
     r"""Represents a color."""
 
     blue: int
@@ -59,7 +60,9 @@ class TextColor(BaseModel):
 class ApplicableTextFormatTypedDict(TypedDict):
     r"""Formatting options to be applied to rich text elements"""
 
-    background_color: NotRequired[Nullable[BackgroundColorTypedDict]]
+    background_color: NotRequired[
+        Nullable[ApplicableTextFormatBackgroundColorTypedDict]
+    ]
     baseline_shift: NotRequired[Nullable[RichTextBaselineShift]]
     r"""Indicates the offset from the baseline of the characters. The baseline is the imaginary bottom line for a line of text which the bottom of the characters are placed, not including any descender such as g, j, p, and y have. `superscript` shifts the baseline up and reduces the rendered font size to 65% of the specified font size. `subscript` works the same as `superscript` except it moves the baseline down. `baseline` uses the default size and baseline for regular text. type: string
 
@@ -78,7 +81,7 @@ class ApplicableTextFormatTypedDict(TypedDict):
     r"""The font size of the characters in points"""
     strikethrough: NotRequired[Nullable[bool]]
     r"""Whether or not the text is struck through"""
-    text_color: NotRequired[Nullable[TextColorTypedDict]]
+    text_color: NotRequired[Nullable[ApplicableTextFormatTextColorTypedDict]]
     underline: NotRequired[Nullable[bool]]
     r"""Whether or not to underline the text"""
 
@@ -87,7 +90,8 @@ class ApplicableTextFormat(BaseModel):
     r"""Formatting options to be applied to rich text elements"""
 
     background_color: Annotated[
-        OptionalNullable[BackgroundColor], pydantic.Field(alias="backgroundColor")
+        OptionalNullable[ApplicableTextFormatBackgroundColor],
+        pydantic.Field(alias="backgroundColor"),
     ] = UNSET
 
     baseline_shift: Annotated[
@@ -120,11 +124,21 @@ class ApplicableTextFormat(BaseModel):
     r"""Whether or not the text is struck through"""
 
     text_color: Annotated[
-        OptionalNullable[TextColor], pydantic.Field(alias="textColor")
+        OptionalNullable[ApplicableTextFormatTextColor],
+        pydantic.Field(alias="textColor"),
     ] = UNSET
 
     underline: OptionalNullable[bool] = False
     r"""Whether or not to underline the text"""
+
+    @field_serializer("baseline_shift")
+    def serialize_baseline_shift(self, value):
+        if isinstance(value, str):
+            try:
+                return models.RichTextBaselineShift(value)
+            except ValueError:
+                return value
+        return value
 
     @model_serializer(mode="wrap")
     def serialize_model(self, handler):

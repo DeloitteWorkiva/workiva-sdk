@@ -22,22 +22,22 @@ WDATA_UPDATE_PARAMETER_OP_SERVERS = [
 
 
 class WdataUpdateParameterRequestTypedDict(TypedDict):
-    global_parameter_dto: GlobalParameterDtoInputTypedDict
-    r"""The representation of the parameter to update"""
     parameter_id: str
     r"""The unique identifier of the parameter"""
+    global_parameter_dto: GlobalParameterDtoInputTypedDict
+    r"""The representation of the parameter to update"""
 
 
 class WdataUpdateParameterRequest(BaseModel):
-    global_parameter_dto: Annotated[
-        GlobalParameterDtoInput,
-        FieldMetadata(request=RequestMetadata(media_type="application/json")),
-    ]
-    r"""The representation of the parameter to update"""
-
     parameter_id: Annotated[
         str,
         pydantic.Field(alias="parameterId"),
         FieldMetadata(path=PathParamMetadata(style="simple", explode=False)),
     ]
     r"""The unique identifier of the parameter"""
+
+    global_parameter_dto: Annotated[
+        GlobalParameterDtoInput,
+        FieldMetadata(request=RequestMetadata(media_type="application/json")),
+    ]
+    r"""The representation of the parameter to update"""

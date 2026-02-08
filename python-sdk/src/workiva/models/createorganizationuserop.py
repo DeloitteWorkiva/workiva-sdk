@@ -9,22 +9,22 @@ from workiva.utils import FieldMetadata, PathParamMetadata, RequestMetadata
 
 
 class CreateOrganizationUserRequestTypedDict(TypedDict):
-    organization_user: OrganizationUserInputTypedDict
-    r"""The properties of the user to create"""
     organization_id: str
     r"""The unique identifier of the organization"""
+    organization_user: OrganizationUserInputTypedDict
+    r"""The properties of the user to create"""
 
 
 class CreateOrganizationUserRequest(BaseModel):
-    organization_user: Annotated[
-        OrganizationUserInput,
-        FieldMetadata(request=RequestMetadata(media_type="application/json")),
-    ]
-    r"""The properties of the user to create"""
-
     organization_id: Annotated[
         str,
         pydantic.Field(alias="organizationId"),
         FieldMetadata(path=PathParamMetadata(style="simple", explode=False)),
     ]
     r"""The unique identifier of the organization"""
+
+    organization_user: Annotated[
+        OrganizationUserInput,
+        FieldMetadata(request=RequestMetadata(media_type="application/json")),
+    ]
+    r"""The properties of the user to create"""

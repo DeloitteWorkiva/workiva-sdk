@@ -5,9 +5,10 @@ from .richtextformat import RichTextFormat, RichTextFormatTypedDict
 from .styleref import StyleRef, StyleRefTypedDict
 from enum import Enum
 import pydantic
-from pydantic import model_serializer
+from pydantic import field_serializer, model_serializer
 from typing import Optional
 from typing_extensions import Annotated, NotRequired, TypedDict
+from workiva import models, utils
 from workiva.types import BaseModel, Nullable, OptionalNullable, UNSET, UNSET_SENTINEL
 
 
@@ -150,7 +151,7 @@ class SourceTextElementTextSpan(BaseModel):
         return m
 
 
-class SourceTextElementType(str, Enum):
+class SourceTextElementType(str, Enum, metaclass=utils.OpenEnumMeta):
     r"""The type of the text element in rich text that is from a source link."""
 
     SOFT_RETURN = "softReturn"
@@ -247,6 +248,15 @@ class SourceTextElement(BaseModel):
     r"""The type of the text element in rich text that is from a source link."""
 
     unspecified: OptionalNullable[Unspecified] = UNSET
+
+    @field_serializer("type")
+    def serialize_type(self, value):
+        if isinstance(value, str):
+            try:
+                return models.SourceTextElementType(value)
+            except ValueError:
+                return value
+        return value
 
     @model_serializer(mode="wrap")
     def serialize_model(self, handler):

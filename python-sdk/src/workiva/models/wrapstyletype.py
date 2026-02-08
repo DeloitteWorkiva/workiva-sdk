@@ -2,9 +2,10 @@
 
 from __future__ import annotations
 from enum import Enum
+from workiva import utils
 
 
-class WrapStyleType(str, Enum):
+class WrapStyleType(str, Enum, metaclass=utils.OpenEnumMeta):
     r"""The relative position type"""
 
     IN_FRONT_OF_TEXT = "inFrontOfText"

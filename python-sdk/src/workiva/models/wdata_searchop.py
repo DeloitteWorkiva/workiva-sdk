@@ -23,26 +23,26 @@ WDATA_SEARCH_OP_SERVERS = [
 
 
 class WdataSearchRequestTypedDict(TypedDict):
-    cursor: NotRequired[str]
-    r"""A paging cursor; if included, `limit` is ignored"""
-    description: NotRequired[str]
-    r"""The description to use when fuzzy-matching entities"""
-    limit: NotRequired[int]
-    r"""The number of folders to return, from 1 to 1000; by default, 1000"""
     name: NotRequired[str]
     r"""The name to use when fuzzy-matching entities"""
-    offset: NotRequired[int]
-    r"""The item to start with on the page, greater than or equal to 0; by default, 0"""
+    description: NotRequired[str]
+    r"""The description to use when fuzzy-matching entities"""
     type: NotRequired[List[int]]
     r"""To limit the scope, the type of entity to return in the results"""
+    cursor: NotRequired[str]
+    r"""A paging cursor; if included, `limit` is ignored"""
+    limit: NotRequired[int]
+    r"""The number of folders to return, from 1 to 1000; by default, 1000"""
+    offset: NotRequired[int]
+    r"""The item to start with on the page, greater than or equal to 0; by default, 0"""
 
 
 class WdataSearchRequest(BaseModel):
-    cursor: Annotated[
+    name: Annotated[
         Optional[str],
         FieldMetadata(query=QueryParamMetadata(style="form", explode=True)),
     ] = None
-    r"""A paging cursor; if included, `limit` is ignored"""
+    r"""The name to use when fuzzy-matching entities"""
 
     description: Annotated[
         Optional[str],
@@ -50,17 +50,23 @@ class WdataSearchRequest(BaseModel):
     ] = None
     r"""The description to use when fuzzy-matching entities"""
 
+    type: Annotated[
+        Optional[List[int]],
+        FieldMetadata(query=QueryParamMetadata(style="form", explode=True)),
+    ] = None
+    r"""To limit the scope, the type of entity to return in the results"""
+
+    cursor: Annotated[
+        Optional[str],
+        FieldMetadata(query=QueryParamMetadata(style="form", explode=True)),
+    ] = None
+    r"""A paging cursor; if included, `limit` is ignored"""
+
     limit: Annotated[
         Optional[int],
         FieldMetadata(query=QueryParamMetadata(style="form", explode=True)),
     ] = 1000
     r"""The number of folders to return, from 1 to 1000; by default, 1000"""
-
-    name: Annotated[
-        Optional[str],
-        FieldMetadata(query=QueryParamMetadata(style="form", explode=True)),
-    ] = None
-    r"""The name to use when fuzzy-matching entities"""
 
     offset: Annotated[
         Optional[int],
@@ -68,16 +74,10 @@ class WdataSearchRequest(BaseModel):
     ] = None
     r"""The item to start with on the page, greater than or equal to 0; by default, 0"""
 
-    type: Annotated[
-        Optional[List[int]],
-        FieldMetadata(query=QueryParamMetadata(style="form", explode=True)),
-    ] = None
-    r"""To limit the scope, the type of entity to return in the results"""
-
     @model_serializer(mode="wrap")
     def serialize_model(self, handler):
         optional_fields = set(
-            ["cursor", "description", "limit", "name", "offset", "type"]
+            ["name", "description", "type", "cursor", "limit", "offset"]
         )
         serialized = handler(self)
         m = {}

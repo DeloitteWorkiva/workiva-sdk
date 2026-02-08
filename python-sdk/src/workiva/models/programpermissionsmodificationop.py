@@ -12,22 +12,22 @@ from workiva.utils import FieldMetadata, PathParamMetadata, RequestMetadata
 
 
 class ProgramPermissionsModificationRequestTypedDict(TypedDict):
-    resource_permissions_modification: ResourcePermissionsModificationTypedDict
-    r"""Details about the Sustainability Program permissions modification."""
     program_id: str
     r"""The unique identifier of the program"""
+    resource_permissions_modification: ResourcePermissionsModificationTypedDict
+    r"""Details about the Sustainability Program permissions modification."""
 
 
 class ProgramPermissionsModificationRequest(BaseModel):
-    resource_permissions_modification: Annotated[
-        ResourcePermissionsModification,
-        FieldMetadata(request=RequestMetadata(media_type="application/json")),
-    ]
-    r"""Details about the Sustainability Program permissions modification."""
-
     program_id: Annotated[
         str,
         pydantic.Field(alias="programId"),
         FieldMetadata(path=PathParamMetadata(style="simple", explode=False)),
     ]
     r"""The unique identifier of the program"""
+
+    resource_permissions_modification: Annotated[
+        ResourcePermissionsModification,
+        FieldMetadata(request=RequestMetadata(media_type="application/json")),
+    ]
+    r"""Details about the Sustainability Program permissions modification."""

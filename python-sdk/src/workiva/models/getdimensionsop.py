@@ -13,12 +13,12 @@ from workiva.utils import FieldMetadata, PathParamMetadata, QueryParamMetadata
 class GetDimensionsRequestTypedDict(TypedDict):
     program_id: str
     r"""The unique identifier of the program"""
-    dollar_filter: NotRequired[str]
-    r"""The properties to filter the results by."""
     dollar_maxpagesize: NotRequired[int]
     r"""The maximum number of results to retrieve"""
     dollar_next: NotRequired[str]
     r"""Pagination cursor for next set of results."""
+    dollar_filter: NotRequired[str]
+    r"""The properties to filter the results by."""
     dollar_order_by: NotRequired[str]
     r"""One or more comma-separated expressions to indicate the order in which to sort the results."""
 
@@ -30,13 +30,6 @@ class GetDimensionsRequest(BaseModel):
         FieldMetadata(path=PathParamMetadata(style="simple", explode=False)),
     ]
     r"""The unique identifier of the program"""
-
-    dollar_filter: Annotated[
-        Optional[str],
-        pydantic.Field(alias="$filter"),
-        FieldMetadata(query=QueryParamMetadata(style="form", explode=True)),
-    ] = None
-    r"""The properties to filter the results by."""
 
     dollar_maxpagesize: Annotated[
         Optional[int],
@@ -52,6 +45,13 @@ class GetDimensionsRequest(BaseModel):
     ] = None
     r"""Pagination cursor for next set of results."""
 
+    dollar_filter: Annotated[
+        Optional[str],
+        pydantic.Field(alias="$filter"),
+        FieldMetadata(query=QueryParamMetadata(style="form", explode=True)),
+    ] = None
+    r"""The properties to filter the results by."""
+
     dollar_order_by: Annotated[
         Optional[str],
         pydantic.Field(alias="$orderBy"),
@@ -61,7 +61,7 @@ class GetDimensionsRequest(BaseModel):
 
     @model_serializer(mode="wrap")
     def serialize_model(self, handler):
-        optional_fields = set(["$filter", "$maxpagesize", "$next", "$orderBy"])
+        optional_fields = set(["$maxpagesize", "$next", "$filter", "$orderBy"])
         serialized = handler(self)
         m = {}
 

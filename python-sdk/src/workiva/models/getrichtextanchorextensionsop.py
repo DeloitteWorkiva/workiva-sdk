@@ -14,10 +14,10 @@ from workiva.utils import FieldMetadata, PathParamMetadata, QueryParamMetadata
 
 
 class GetRichTextAnchorExtensionsRequestTypedDict(TypedDict):
-    anchor_id: str
-    r"""The unique identifier of the anchor"""
     rich_text_id: str
     r"""The unique identifier of the rich text content"""
+    anchor_id: str
+    r"""The unique identifier of the anchor"""
     dollar_maxpagesize: NotRequired[int]
     r"""The maximum number of results to retrieve"""
     dollar_next: NotRequired[str]
@@ -27,19 +27,19 @@ class GetRichTextAnchorExtensionsRequestTypedDict(TypedDict):
 
 
 class GetRichTextAnchorExtensionsRequest(BaseModel):
-    anchor_id: Annotated[
-        str,
-        pydantic.Field(alias="anchorId"),
-        FieldMetadata(path=PathParamMetadata(style="simple", explode=False)),
-    ]
-    r"""The unique identifier of the anchor"""
-
     rich_text_id: Annotated[
         str,
         pydantic.Field(alias="richTextId"),
         FieldMetadata(path=PathParamMetadata(style="simple", explode=False)),
     ]
     r"""The unique identifier of the rich text content"""
+
+    anchor_id: Annotated[
+        str,
+        pydantic.Field(alias="anchorId"),
+        FieldMetadata(path=PathParamMetadata(style="simple", explode=False)),
+    ]
+    r"""The unique identifier of the anchor"""
 
     dollar_maxpagesize: Annotated[
         Optional[int],

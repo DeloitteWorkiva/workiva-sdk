@@ -10,28 +10,28 @@ from workiva.utils import FieldMetadata, PathParamMetadata, QueryParamMetadata
 
 
 class GetRichTextAnchorByIDRequestTypedDict(TypedDict):
-    anchor_id: str
-    r"""The unique identifier of the anchor"""
     rich_text_id: str
     r"""The unique identifier of the rich text content"""
+    anchor_id: str
+    r"""The unique identifier of the anchor"""
     dollar_revision: NotRequired[str]
     r"""Returns resources at a specific revision"""
 
 
 class GetRichTextAnchorByIDRequest(BaseModel):
-    anchor_id: Annotated[
-        str,
-        pydantic.Field(alias="anchorId"),
-        FieldMetadata(path=PathParamMetadata(style="simple", explode=False)),
-    ]
-    r"""The unique identifier of the anchor"""
-
     rich_text_id: Annotated[
         str,
         pydantic.Field(alias="richTextId"),
         FieldMetadata(path=PathParamMetadata(style="simple", explode=False)),
     ]
     r"""The unique identifier of the rich text content"""
+
+    anchor_id: Annotated[
+        str,
+        pydantic.Field(alias="anchorId"),
+        FieldMetadata(path=PathParamMetadata(style="simple", explode=False)),
+    ]
+    r"""The unique identifier of the anchor"""
 
     dollar_revision: Annotated[
         Optional[str],

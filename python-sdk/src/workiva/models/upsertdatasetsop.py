@@ -10,25 +10,25 @@ from workiva.utils import FieldMetadata, PathParamMetadata, RequestMetadata
 
 
 class UpsertDatasetsRequestTypedDict(TypedDict):
-    request_body: List[DatasetInputTypedDict]
-    r"""An array of datasets"""
     spreadsheet_id: str
     r"""The unique identifier of the spreadsheet"""
+    request_body: List[DatasetInputTypedDict]
+    r"""An array of datasets"""
 
 
 class UpsertDatasetsRequest(BaseModel):
-    request_body: Annotated[
-        List[DatasetInput],
-        FieldMetadata(request=RequestMetadata(media_type="application/json")),
-    ]
-    r"""An array of datasets"""
-
     spreadsheet_id: Annotated[
         str,
         pydantic.Field(alias="spreadsheetId"),
         FieldMetadata(path=PathParamMetadata(style="simple", explode=False)),
     ]
     r"""The unique identifier of the spreadsheet"""
+
+    request_body: Annotated[
+        List[DatasetInput],
+        FieldMetadata(request=RequestMetadata(media_type="application/json")),
+    ]
+    r"""An array of datasets"""
 
 
 class UpsertDatasetsResponseTypedDict(TypedDict):

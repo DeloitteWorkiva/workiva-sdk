@@ -9,22 +9,22 @@ from workiva.utils import FieldMetadata, PathParamMetadata, RequestMetadata
 
 
 class CreateSectionRequestTypedDict(TypedDict):
-    section: SectionInputTypedDict
-    r"""The properties of the section to create"""
     document_id: str
     r"""The unique identifier of the document"""
+    section: SectionInputTypedDict
+    r"""The properties of the section to create"""
 
 
 class CreateSectionRequest(BaseModel):
-    section: Annotated[
-        SectionInput,
-        FieldMetadata(request=RequestMetadata(media_type="application/json")),
-    ]
-    r"""The properties of the section to create"""
-
     document_id: Annotated[
         str,
         pydantic.Field(alias="documentId"),
         FieldMetadata(path=PathParamMetadata(style="simple", explode=False)),
     ]
     r"""The unique identifier of the document"""
+
+    section: Annotated[
+        SectionInput,
+        FieldMetadata(request=RequestMetadata(media_type="application/json")),
+    ]
+    r"""The properties of the section to create"""

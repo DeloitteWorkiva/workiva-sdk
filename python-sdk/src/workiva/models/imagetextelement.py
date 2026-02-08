@@ -21,8 +21,6 @@ class ImageTextElementTypedDict(TypedDict):
     """
     format_: NotRequired[Nullable[RichTextFormatTypedDict]]
     r"""The formatting options applied to rich text elements."""
-    image: NotRequired[ImageRefTypedDict]
-    r"""A reference to image content in a document, spreadsheet, or presentation"""
     length: NotRequired[int]
     r"""The number of characters (32-bit unicode code point) for a text element or range of text in a selection. Most elements will have a length of 1, even if it is dynamic content which will be replaced by possibly multiple characters. The lengths are used when editing with offsets from an element. The sum of the lengths up to a specific element from another is the offset between those text elements.
 
@@ -33,6 +31,8 @@ class ImageTextElementTypedDict(TypedDict):
     """
     style: NotRequired[StyleRefTypedDict]
     r"""A reference to a style."""
+    image: NotRequired[ImageRefTypedDict]
+    r"""A reference to image content in a document, spreadsheet, or presentation"""
 
 
 class ImageTextElement(BaseModel):
@@ -48,9 +48,6 @@ class ImageTextElement(BaseModel):
     ] = UNSET
     r"""The formatting options applied to rich text elements."""
 
-    image: Optional[ImageRef] = None
-    r"""A reference to image content in a document, spreadsheet, or presentation"""
-
     length: Optional[int] = 1
     r"""The number of characters (32-bit unicode code point) for a text element or range of text in a selection. Most elements will have a length of 1, even if it is dynamic content which will be replaced by possibly multiple characters. The lengths are used when editing with offsets from an element. The sum of the lengths up to a specific element from another is the offset between those text elements.
 
@@ -64,9 +61,12 @@ class ImageTextElement(BaseModel):
     style: Optional[StyleRef] = None
     r"""A reference to a style."""
 
+    image: Optional[ImageRef] = None
+    r"""A reference to image content in a document, spreadsheet, or presentation"""
+
     @model_serializer(mode="wrap")
     def serialize_model(self, handler):
-        optional_fields = set(["format", "image", "length", "offset", "style"])
+        optional_fields = set(["format", "length", "offset", "style", "image"])
         nullable_fields = set(["format"])
         serialized = handler(self)
         m = {}

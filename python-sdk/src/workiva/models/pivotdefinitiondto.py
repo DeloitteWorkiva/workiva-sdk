@@ -19,13 +19,14 @@ from .pivotviewdefinitionvaluedto import (
 )
 from enum import Enum
 import pydantic
-from pydantic import model_serializer
+from pydantic import field_serializer, model_serializer
 from typing import List, Optional
 from typing_extensions import Annotated, NotRequired, TypedDict
+from workiva import models, utils
 from workiva.types import BaseModel, UNSET_SENTINEL
 
 
-class GrandTotalEnabled(str, Enum):
+class GrandTotalEnabled(str, Enum, metaclass=utils.OpenEnumMeta):
     r"""The level to which Grand Totals are enabled.  It is defaulted to DISABLED."""
 
     ENABLED = "ENABLED"
@@ -34,7 +35,7 @@ class GrandTotalEnabled(str, Enum):
     DISABLED = "DISABLED"
 
 
-class PivotViewType(str, Enum):
+class PivotViewType(str, Enum, metaclass=utils.OpenEnumMeta):
     r"""The type of pivot view. Options are currently Classic and Compact."""
 
     CLASSIC = "CLASSIC"
@@ -42,7 +43,7 @@ class PivotViewType(str, Enum):
     FLAT = "FLAT"
 
 
-class SubtotalEnabled(str, Enum):
+class SubtotalEnabled(str, Enum, metaclass=utils.OpenEnumMeta):
     r"""The level to which Subtotals are enabled.  It is defaulted to DISABLED."""
 
     ENABLED = "ENABLED"
@@ -121,6 +122,33 @@ class PivotDefinitionDto(BaseModel):
 
     values: Optional[List[PivotViewDefinitionValueDto]] = None
     r"""The values associated with the pivot view"""
+
+    @field_serializer("grand_total_enabled")
+    def serialize_grand_total_enabled(self, value):
+        if isinstance(value, str):
+            try:
+                return models.GrandTotalEnabled(value)
+            except ValueError:
+                return value
+        return value
+
+    @field_serializer("pivot_view_type")
+    def serialize_pivot_view_type(self, value):
+        if isinstance(value, str):
+            try:
+                return models.PivotViewType(value)
+            except ValueError:
+                return value
+        return value
+
+    @field_serializer("subtotal_enabled")
+    def serialize_subtotal_enabled(self, value):
+        if isinstance(value, str):
+            try:
+                return models.SubtotalEnabled(value)
+            except ValueError:
+                return value
+        return value
 
     @model_serializer(mode="wrap")
     def serialize_model(self, handler):
@@ -218,6 +246,33 @@ class PivotDefinitionDtoInput(BaseModel):
 
     values: Optional[List[PivotViewDefinitionValueDto]] = None
     r"""The values associated with the pivot view"""
+
+    @field_serializer("grand_total_enabled")
+    def serialize_grand_total_enabled(self, value):
+        if isinstance(value, str):
+            try:
+                return models.GrandTotalEnabled(value)
+            except ValueError:
+                return value
+        return value
+
+    @field_serializer("pivot_view_type")
+    def serialize_pivot_view_type(self, value):
+        if isinstance(value, str):
+            try:
+                return models.PivotViewType(value)
+            except ValueError:
+                return value
+        return value
+
+    @field_serializer("subtotal_enabled")
+    def serialize_subtotal_enabled(self, value):
+        if isinstance(value, str):
+            try:
+                return models.SubtotalEnabled(value)
+            except ValueError:
+                return value
+        return value
 
     @model_serializer(mode="wrap")
     def serialize_model(self, handler):

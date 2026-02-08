@@ -1,11 +1,12 @@
 # Options
 
-Edit cells options
+Options for creating a new workspace membership
+
 
 
 ## Fields
 
-| Field                                              | Type                                               | Required                                           | Description                                        |
-| -------------------------------------------------- | -------------------------------------------------- | -------------------------------------------------- | -------------------------------------------------- |
-| `apply_entered_in_scaling`                         | *Optional[bool]*                                   | :heavy_minus_sign:                                 | Whether or not to apply `enteredIn` scaling<br/>   |
-| `skip_edit_merge_children`                         | *Optional[bool]*                                   | :heavy_minus_sign:                                 | Whether or not to skip edits to merge child cells<br/> |
+| Field                                                                                                             | Type                                                                                                              | Required                                                                                                          | Description                                                                                                       | Example                                                                                                           |
+| ----------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------- |
+| `notify_new_member`                                                                                               | *Optional[bool]*                                                                                                  | :heavy_minus_sign:                                                                                                | Whether or not a notification should be sent to the user when they are added to the workspace. False by default.  | true                                                                                                              |
+| `send_welcome_email`                                                                                              | *Optional[bool]*                                                                                                  | :heavy_minus_sign:                                                                                                | Whether or not a welcome email should be sent to the user when they are added to the workspace. False by default. | true                                                                                                              |

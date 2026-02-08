@@ -8,15 +8,22 @@ from workiva.utils import FieldMetadata, PathParamMetadata
 
 
 class DeleteMetricValueByIDRequestTypedDict(TypedDict):
+    program_id: str
+    r"""The unique identifier of the program"""
     metric_id: str
     r"""The unique identifier of the metric"""
     metric_value_id: str
     r"""The unique identifier of the value"""
-    program_id: str
-    r"""The unique identifier of the program"""
 
 
 class DeleteMetricValueByIDRequest(BaseModel):
+    program_id: Annotated[
+        str,
+        pydantic.Field(alias="programId"),
+        FieldMetadata(path=PathParamMetadata(style="simple", explode=False)),
+    ]
+    r"""The unique identifier of the program"""
+
     metric_id: Annotated[
         str,
         pydantic.Field(alias="metricId"),
@@ -30,10 +37,3 @@ class DeleteMetricValueByIDRequest(BaseModel):
         FieldMetadata(path=PathParamMetadata(style="simple", explode=False)),
     ]
     r"""The unique identifier of the value"""
-
-    program_id: Annotated[
-        str,
-        pydantic.Field(alias="programId"),
-        FieldMetadata(path=PathParamMetadata(style="simple", explode=False)),
-    ]
-    r"""The unique identifier of the program"""

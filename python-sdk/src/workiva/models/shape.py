@@ -14,9 +14,10 @@ from .shapetype import ShapeType
 from .stroke import Stroke, StrokeTypedDict
 from .wrapstyletype import WrapStyleType
 import pydantic
-from pydantic import model_serializer
+from pydantic import field_serializer, model_serializer
 from typing import List, Optional
 from typing_extensions import Annotated, NotRequired, TypedDict
+from workiva import models
 from workiva.types import BaseModel, Nullable, OptionalNullable, UNSET, UNSET_SENTINEL
 
 
@@ -40,6 +41,8 @@ class ShapeTypedDict(TypedDict):
     """
     position: DrawingRelativePositionTypedDict
     r"""The relative position of a drawing element."""
+    wrap_style: Nullable[WrapStyleType]
+    r"""The relative position type"""
     shape_type: ShapeType
     r"""The type of a shape to draw. Some shapes are aliased to others;
     for example, decision is an alias of diamond. The shape \"offPageReference\" 
@@ -47,10 +50,10 @@ class ShapeTypedDict(TypedDict):
     export if used.
 
     """
-    wrap_style: Nullable[WrapStyleType]
-    r"""The relative position type"""
     fill: NotRequired[Nullable[FillTypedDict]]
     r"""A shape or box fill settings for things like shapes. Use a null to indicate no fill."""
+    stroke: NotRequired[Nullable[StrokeTypedDict]]
+    r"""Line stroke setting for things like shape edges. Use a null to indicate no stroke line."""
     paddings: NotRequired[PaddingsTypedDict]
     r"""The paddings of a rectangle for properties of objects such as a shape, text box, or page."""
     paragraphs: NotRequired[List[ParagraphTypedDict]]
@@ -61,8 +64,6 @@ class ShapeTypedDict(TypedDict):
     meaning the position and dimensions are for the shape without any rotation.
 
     """
-    stroke: NotRequired[Nullable[StrokeTypedDict]]
-    r"""Line stroke setting for things like shape edges. Use a null to indicate no stroke line."""
 
 
 class Shape(BaseModel):
@@ -89,6 +90,9 @@ class Shape(BaseModel):
     position: DrawingRelativePosition
     r"""The relative position of a drawing element."""
 
+    wrap_style: Annotated[Nullable[WrapStyleType], pydantic.Field(alias="wrapStyle")]
+    r"""The relative position type"""
+
     shape_type: Annotated[ShapeType, pydantic.Field(alias="shapeType")]
     r"""The type of a shape to draw. Some shapes are aliased to others;
     for example, decision is an alias of diamond. The shape \"offPageReference\" 
@@ -97,11 +101,11 @@ class Shape(BaseModel):
 
     """
 
-    wrap_style: Annotated[Nullable[WrapStyleType], pydantic.Field(alias="wrapStyle")]
-    r"""The relative position type"""
-
     fill: OptionalNullable[Fill] = UNSET
     r"""A shape or box fill settings for things like shapes. Use a null to indicate no fill."""
+
+    stroke: OptionalNullable[Stroke] = UNSET
+    r"""Line stroke setting for things like shape edges. Use a null to indicate no stroke line."""
 
     paddings: Optional[Paddings] = None
     r"""The paddings of a rectangle for properties of objects such as a shape, text box, or page."""
@@ -116,12 +120,27 @@ class Shape(BaseModel):
 
     """
 
-    stroke: OptionalNullable[Stroke] = UNSET
-    r"""Line stroke setting for things like shape edges. Use a null to indicate no stroke line."""
+    @field_serializer("wrap_style")
+    def serialize_wrap_style(self, value):
+        if isinstance(value, str):
+            try:
+                return models.WrapStyleType(value)
+            except ValueError:
+                return value
+        return value
+
+    @field_serializer("shape_type")
+    def serialize_shape_type(self, value):
+        if isinstance(value, str):
+            try:
+                return models.ShapeType(value)
+            except ValueError:
+                return value
+        return value
 
     @model_serializer(mode="wrap")
     def serialize_model(self, handler):
-        optional_fields = set(["fill", "paddings", "paragraphs", "rotation", "stroke"])
+        optional_fields = set(["fill", "stroke", "paddings", "paragraphs", "rotation"])
         nullable_fields = set(["fill", "margins", "stroke", "wrapStyle"])
         serialized = handler(self)
         m = {}

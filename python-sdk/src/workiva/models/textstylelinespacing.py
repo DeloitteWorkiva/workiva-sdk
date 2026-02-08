@@ -3,9 +3,10 @@
 from __future__ import annotations
 from .linespacingunit import LineSpacingUnit
 import pydantic
-from pydantic import model_serializer
+from pydantic import field_serializer, model_serializer
 from typing import Optional
 from typing_extensions import Annotated, NotRequired, TypedDict
+from workiva import models
 from workiva.types import BaseModel, UNSET_SENTINEL
 
 
@@ -39,6 +40,15 @@ class TextStyleLineSpacing(BaseModel):
 
     unit: Optional[LineSpacingUnit] = None
     r"""The units for a line spacing value as a percent of line height or points."""
+
+    @field_serializer("unit")
+    def serialize_unit(self, value):
+        if isinstance(value, str):
+            try:
+                return models.LineSpacingUnit(value)
+            except ValueError:
+                return value
+        return value
 
     @model_serializer(mode="wrap")
     def serialize_model(self, handler):

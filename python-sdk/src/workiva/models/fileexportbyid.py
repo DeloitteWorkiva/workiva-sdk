@@ -73,12 +73,12 @@ class FileExportByIDPdfOptionsTypedDict(TypedDict):
     r"""Whether to include leader dots when exporting to .PDF. False by default."""
     include_track_changes: NotRequired[bool]
     r"""Whether to include track changes when exporting to .PDF. False by default."""
-    remove_space_from_partial_export: NotRequired[bool]
-    r"""Whether to remove space from partial exports when exporting to .PDF. False by default."""
     tag_for_web_accessibility: NotRequired[bool]
     r"""Whether to tag for web accessibility when exporting to .PDF. False by default."""
     use_cmyk_colorspace: NotRequired[bool]
     r"""Whether to use CMYK colorspace when exporting to .PDF. False by default."""
+    remove_space_from_partial_export: NotRequired[bool]
+    r"""Whether to remove space from partial exports when exporting to .PDF. False by default."""
 
 
 class FileExportByIDPdfOptions(BaseModel):
@@ -119,11 +119,6 @@ class FileExportByIDPdfOptions(BaseModel):
     ] = False
     r"""Whether to include track changes when exporting to .PDF. False by default."""
 
-    remove_space_from_partial_export: Annotated[
-        Optional[bool], pydantic.Field(alias="removeSpaceFromPartialExport")
-    ] = False
-    r"""Whether to remove space from partial exports when exporting to .PDF. False by default."""
-
     tag_for_web_accessibility: Annotated[
         Optional[bool], pydantic.Field(alias="tagForWebAccessibility")
     ] = False
@@ -133,6 +128,11 @@ class FileExportByIDPdfOptions(BaseModel):
         Optional[bool], pydantic.Field(alias="useCmykColorspace")
     ] = False
     r"""Whether to use CMYK colorspace when exporting to .PDF. False by default."""
+
+    remove_space_from_partial_export: Annotated[
+        Optional[bool], pydantic.Field(alias="removeSpaceFromPartialExport")
+    ] = False
+    r"""Whether to remove space from partial exports when exporting to .PDF. False by default."""
 
     @model_serializer(mode="wrap")
     def serialize_model(self, handler):
@@ -145,9 +145,9 @@ class FileExportByIDPdfOptions(BaseModel):
                 "includeHyperlinks",
                 "includeLeaderDots",
                 "includeTrackChanges",
-                "removeSpaceFromPartialExport",
                 "tagForWebAccessibility",
                 "useCmykColorspace",
+                "removeSpaceFromPartialExport",
             ]
         )
         serialized = handler(self)

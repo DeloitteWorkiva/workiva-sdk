@@ -9,22 +9,22 @@ from workiva.utils import FieldMetadata, PathParamMetadata, RequestMetadata
 
 
 class SubmitTaskActionRequestTypedDict(TypedDict):
-    task_action: TaskActionTypedDict
-    r"""The action to be applied on the task."""
     task_id: str
     r"""The unique identifier of the task"""
+    task_action: TaskActionTypedDict
+    r"""The action to be applied on the task."""
 
 
 class SubmitTaskActionRequest(BaseModel):
-    task_action: Annotated[
-        TaskAction,
-        FieldMetadata(request=RequestMetadata(media_type="application/json")),
-    ]
-    r"""The action to be applied on the task."""
-
     task_id: Annotated[
         str,
         pydantic.Field(alias="taskId"),
         FieldMetadata(path=PathParamMetadata(style="simple", explode=False)),
     ]
     r"""The unique identifier of the task"""
+
+    task_action: Annotated[
+        TaskAction,
+        FieldMetadata(request=RequestMetadata(media_type="application/json")),
+    ]
+    r"""The action to be applied on the task."""

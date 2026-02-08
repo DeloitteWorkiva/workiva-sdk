@@ -20,13 +20,6 @@ CHAINS_CHAIN_FILTER_SEARCH_OP_SERVERS = [
 ]
 
 
-class Sort(str, Enum):
-    r"""Sort direction (by date)."""
-
-    DESC = "desc"
-    ASC = "asc"
-
-
 class QueryParamState(str, Enum):
     r"""The state of the Chain Run."""
 
@@ -38,53 +31,42 @@ class QueryParamState(str, Enum):
     COMPLETED = "completed"
 
 
+class Sort(str, Enum):
+    r"""Sort direction (by date)."""
+
+    DESC = "desc"
+    ASC = "asc"
+
+
 class ChainsChainFilterSearchRequestTypedDict(TypedDict):
-    chain_id: NotRequired[List[str]]
-    r"""The ID(s) of the Chains to return."""
-    cursor: NotRequired[str]
-    r"""Cursor value returned from the API, indicating page information."""
-    end_date: NotRequired[str]
-    r"""End Date (Unix timestamp)."""
     environment_id: NotRequired[List[str]]
     r"""The ID(s) of the Environments to search. Not required for superusers or company admins."""
-    sort: NotRequired[Sort]
-    r"""Sort direction (by date)."""
+    chain_id: NotRequired[List[str]]
+    r"""The ID(s) of the Chains to return."""
     start_date: NotRequired[str]
     r"""Start Date (Unix timestamp)."""
+    end_date: NotRequired[str]
+    r"""End Date (Unix timestamp)."""
     state: NotRequired[QueryParamState]
     r"""The state of the Chain Run."""
+    sort: NotRequired[Sort]
+    r"""Sort direction (by date)."""
+    cursor: NotRequired[str]
+    r"""Cursor value returned from the API, indicating page information."""
 
 
 class ChainsChainFilterSearchRequest(BaseModel):
-    chain_id: Annotated[
-        Optional[List[str]],
-        FieldMetadata(query=QueryParamMetadata(style="form", explode=False)),
-    ] = None
-    r"""The ID(s) of the Chains to return."""
-
-    cursor: Annotated[
-        Optional[str],
-        FieldMetadata(query=QueryParamMetadata(style="form", explode=True)),
-    ] = None
-    r"""Cursor value returned from the API, indicating page information."""
-
-    end_date: Annotated[
-        Optional[str],
-        FieldMetadata(query=QueryParamMetadata(style="form", explode=True)),
-    ] = None
-    r"""End Date (Unix timestamp)."""
-
     environment_id: Annotated[
         Optional[List[str]],
         FieldMetadata(query=QueryParamMetadata(style="form", explode=False)),
     ] = None
     r"""The ID(s) of the Environments to search. Not required for superusers or company admins."""
 
-    sort: Annotated[
-        Optional[Sort],
-        FieldMetadata(query=QueryParamMetadata(style="form", explode=True)),
+    chain_id: Annotated[
+        Optional[List[str]],
+        FieldMetadata(query=QueryParamMetadata(style="form", explode=False)),
     ] = None
-    r"""Sort direction (by date)."""
+    r"""The ID(s) of the Chains to return."""
 
     start_date: Annotated[
         Optional[str],
@@ -92,23 +74,41 @@ class ChainsChainFilterSearchRequest(BaseModel):
     ] = None
     r"""Start Date (Unix timestamp)."""
 
+    end_date: Annotated[
+        Optional[str],
+        FieldMetadata(query=QueryParamMetadata(style="form", explode=True)),
+    ] = None
+    r"""End Date (Unix timestamp)."""
+
     state: Annotated[
         Optional[QueryParamState],
         FieldMetadata(query=QueryParamMetadata(style="form", explode=True)),
     ] = None
     r"""The state of the Chain Run."""
 
+    sort: Annotated[
+        Optional[Sort],
+        FieldMetadata(query=QueryParamMetadata(style="form", explode=True)),
+    ] = None
+    r"""Sort direction (by date)."""
+
+    cursor: Annotated[
+        Optional[str],
+        FieldMetadata(query=QueryParamMetadata(style="form", explode=True)),
+    ] = None
+    r"""Cursor value returned from the API, indicating page information."""
+
     @model_serializer(mode="wrap")
     def serialize_model(self, handler):
         optional_fields = set(
             [
-                "chain_id",
-                "cursor",
-                "end_date",
                 "environment_id",
-                "sort",
+                "chain_id",
                 "start_date",
+                "end_date",
                 "state",
+                "sort",
+                "cursor",
             ]
         )
         serialized = handler(self)

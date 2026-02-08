@@ -11,10 +11,10 @@ from workiva.utils import FieldMetadata, PathParamMetadata, QueryParamMetadata
 
 
 class GetRangeLinkDestinationsRequestTypedDict(TypedDict):
-    range_link_id: str
-    r"""The unique identifier of a range link."""
     table_id: str
     r"""The unique identifier for the table"""
+    range_link_id: str
+    r"""The unique identifier of a range link."""
     dollar_maxpagesize: NotRequired[int]
     r"""The maximum number of results to retrieve"""
     dollar_next: NotRequired[str]
@@ -24,19 +24,19 @@ class GetRangeLinkDestinationsRequestTypedDict(TypedDict):
 
 
 class GetRangeLinkDestinationsRequest(BaseModel):
-    range_link_id: Annotated[
-        str,
-        pydantic.Field(alias="rangeLinkId"),
-        FieldMetadata(path=PathParamMetadata(style="simple", explode=False)),
-    ]
-    r"""The unique identifier of a range link."""
-
     table_id: Annotated[
         str,
         pydantic.Field(alias="tableId"),
         FieldMetadata(path=PathParamMetadata(style="simple", explode=False)),
     ]
     r"""The unique identifier for the table"""
+
+    range_link_id: Annotated[
+        str,
+        pydantic.Field(alias="rangeLinkId"),
+        FieldMetadata(path=PathParamMetadata(style="simple", explode=False)),
+    ]
+    r"""The unique identifier of a range link."""
 
     dollar_maxpagesize: Annotated[
         Optional[int],

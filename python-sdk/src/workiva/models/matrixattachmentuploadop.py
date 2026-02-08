@@ -14,30 +14,17 @@ from workiva.utils import FieldMetadata, PathParamMetadata, RequestMetadata
 
 
 class MatrixAttachmentUploadRequestTypedDict(TypedDict):
-    graph_attachment_upload: GraphAttachmentUploadTypedDict
-    r"""Details about the attachment upload"""
-    matrix_id: str
-    r"""The unique identifier of the matrix"""
     test_form_id: str
     r"""The unique identifier of the test form"""
     test_phase_id: str
     r"""The unique identifier of the test phase"""
+    matrix_id: str
+    r"""The unique identifier of the matrix"""
+    graph_attachment_upload: GraphAttachmentUploadTypedDict
+    r"""Details about the attachment upload"""
 
 
 class MatrixAttachmentUploadRequest(BaseModel):
-    graph_attachment_upload: Annotated[
-        GraphAttachmentUpload,
-        FieldMetadata(request=RequestMetadata(media_type="application/json")),
-    ]
-    r"""Details about the attachment upload"""
-
-    matrix_id: Annotated[
-        str,
-        pydantic.Field(alias="matrixId"),
-        FieldMetadata(path=PathParamMetadata(style="simple", explode=False)),
-    ]
-    r"""The unique identifier of the matrix"""
-
     test_form_id: Annotated[
         str,
         pydantic.Field(alias="testFormId"),
@@ -51,6 +38,19 @@ class MatrixAttachmentUploadRequest(BaseModel):
         FieldMetadata(path=PathParamMetadata(style="simple", explode=False)),
     ]
     r"""The unique identifier of the test phase"""
+
+    matrix_id: Annotated[
+        str,
+        pydantic.Field(alias="matrixId"),
+        FieldMetadata(path=PathParamMetadata(style="simple", explode=False)),
+    ]
+    r"""The unique identifier of the matrix"""
+
+    graph_attachment_upload: Annotated[
+        GraphAttachmentUpload,
+        FieldMetadata(request=RequestMetadata(media_type="application/json")),
+    ]
+    r"""Details about the attachment upload"""
 
 
 class MatrixAttachmentUploadResponseTypedDict(TypedDict):

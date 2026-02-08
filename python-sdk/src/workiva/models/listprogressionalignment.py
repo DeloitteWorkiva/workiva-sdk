@@ -2,9 +2,10 @@
 
 from __future__ import annotations
 from .listglyphalignment import ListGlyphAlignment
-from pydantic import model_serializer
+from pydantic import field_serializer, model_serializer
 from typing import Optional
 from typing_extensions import NotRequired, TypedDict
+from workiva import models
 from workiva.types import BaseModel, UNSET_SENTINEL
 
 
@@ -20,6 +21,15 @@ class ListProgressionAlignment(BaseModel):
 
     alignment: Optional[ListGlyphAlignment] = ListGlyphAlignment.GLYPH_ALIGN_LEFT
     r"""How the list glyph is aligned relative to the indentation point of the list level."""
+
+    @field_serializer("alignment")
+    def serialize_alignment(self, value):
+        if isinstance(value, str):
+            try:
+                return models.ListGlyphAlignment(value)
+            except ValueError:
+                return value
+        return value
 
     @model_serializer(mode="wrap")
     def serialize_model(self, handler):

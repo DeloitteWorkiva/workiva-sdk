@@ -12,24 +12,26 @@ from workiva.utils.unmarshal_json_response import unmarshal_json_response
 class Files(BaseSDK):
     r"""Endpoints to manage files and folders."""
 
-    def copy_file(
+    def get_files(
         self,
         *,
-        file_id: str,
-        file_copy: Union[models.FileCopy, models.FileCopyTypedDict],
+        dollar_filter: Optional[str] = None,
+        dollar_order_by: Optional[str] = None,
+        dollar_maxpagesize: Optional[int] = 1000,
+        dollar_next: Optional[str] = None,
         retries: OptionalNullable[utils.RetryConfig] = UNSET,
         server_url: Optional[str] = None,
         timeout_ms: Optional[int] = None,
         http_headers: Optional[Mapping[str, str]] = None,
-    ) -> models.CopyFileResponse:
-        r"""Initiate a file copy
+    ) -> Optional[models.GetFilesResponse]:
+        r"""Retrieve a list of files
 
-        Copy a file to a new location. This is a long running operation. Responses include a `Location` header, which indicates where to poll for copy results. For more details on long-running job polling, see [Operations endpoint](ref:getoperationbyid).
-        Once the operation is completed, the `resourceUrl` field will be populated with a link to the   [Retrieve copy file results for a single operation endpoint](ref:getcopyfileresults)  to see the results of the File Copy Request.
+        Returns a paginated list of [files](ref:files#file).
 
-
-        :param file_id: The unique identifier of the file
-        :param file_copy: The details of the file copy
+        :param dollar_filter: The properties to filter the results by.
+        :param dollar_order_by: One or more comma-separated expressions to indicate the order in which to sort the results.
+        :param dollar_maxpagesize: The maximum number of results to retrieve
+        :param dollar_next: Pagination cursor for next set of results.
         :param retries: Override the default retry configuration for this method
         :param server_url: Override the default server URL for this method
         :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
@@ -45,27 +47,26 @@ class Files(BaseSDK):
         else:
             base_url = self._get_url(base_url, url_variables)
 
-        request = models.CopyFileRequest(
-            file_id=file_id,
-            file_copy=utils.get_pydantic_model(file_copy, models.FileCopy),
+        request = models.GetFilesRequest(
+            dollar_filter=dollar_filter,
+            dollar_order_by=dollar_order_by,
+            dollar_maxpagesize=dollar_maxpagesize,
+            dollar_next=dollar_next,
         )
 
         req = self._build_request(
-            method="POST",
-            path="/files/{fileId}/copy",
+            method="GET",
+            path="/files",
             base_url=base_url,
             url_variables=url_variables,
             request=request,
-            request_body_required=True,
-            request_has_path_params=True,
+            request_body_required=False,
+            request_has_path_params=False,
             request_has_query_params=True,
             user_agent_header="user-agent",
             accept_header_value="application/json",
             http_headers=http_headers,
             security=self.sdk_configuration.security,
-            get_serialized_body=lambda: utils.serialize_request_body(
-                request.file_copy, False, False, "json", models.FileCopy
-            ),
             allow_empty_value=None,
             timeout_ms=timeout_ms,
         )
@@ -82,8 +83,8 @@ class Files(BaseSDK):
             hook_ctx=HookContext(
                 config=self.sdk_configuration,
                 base_url=base_url or "",
-                operation_id="copyFile",
-                oauth2_scopes=["file:write"],
+                operation_id="getFiles",
+                oauth2_scopes=["file:read"],
                 security_source=self.sdk_configuration.security,
             ),
             request=req,
@@ -102,10 +103,31 @@ class Files(BaseSDK):
             retry_config=retry_config,
         )
 
+        def next_func() -> Optional[models.GetFilesResponse]:
+            body = utils.unmarshal_json(http_res.text, Union[Dict[Any, Any], List[Any]])
+
+            next_cursor = JSONPath("$['@nextLink']").parse(body)
+
+            if len(next_cursor) == 0:
+                return None
+
+            next_cursor = next_cursor[0]
+            if next_cursor is None or str(next_cursor).strip() == "":
+                return None
+
+            return self.get_files(
+                dollar_filter=dollar_filter,
+                dollar_order_by=dollar_order_by,
+                dollar_maxpagesize=dollar_maxpagesize,
+                dollar_next=next_cursor,
+                retries=retries,
+            )
+
         response_data: Any = None
-        if utils.match_response(http_res, "202", "*"):
-            return models.CopyFileResponse(
-                headers=utils.get_response_headers(http_res.headers)
+        if utils.match_response(http_res, "200", "application/json"):
+            return models.GetFilesResponse(
+                result=unmarshal_json_response(models.FilesListResult, http_res),
+                next=next_func,
             )
         if utils.match_response(
             http_res, ["400", "401", "403", "404", "409", "429"], "application/json"
@@ -124,24 +146,26 @@ class Files(BaseSDK):
 
         raise errors.SDKError("Unexpected response received", http_res)
 
-    async def copy_file_async(
+    async def get_files_async(
         self,
         *,
-        file_id: str,
-        file_copy: Union[models.FileCopy, models.FileCopyTypedDict],
+        dollar_filter: Optional[str] = None,
+        dollar_order_by: Optional[str] = None,
+        dollar_maxpagesize: Optional[int] = 1000,
+        dollar_next: Optional[str] = None,
         retries: OptionalNullable[utils.RetryConfig] = UNSET,
         server_url: Optional[str] = None,
         timeout_ms: Optional[int] = None,
         http_headers: Optional[Mapping[str, str]] = None,
-    ) -> models.CopyFileResponse:
-        r"""Initiate a file copy
+    ) -> Optional[models.GetFilesResponse]:
+        r"""Retrieve a list of files
 
-        Copy a file to a new location. This is a long running operation. Responses include a `Location` header, which indicates where to poll for copy results. For more details on long-running job polling, see [Operations endpoint](ref:getoperationbyid).
-        Once the operation is completed, the `resourceUrl` field will be populated with a link to the   [Retrieve copy file results for a single operation endpoint](ref:getcopyfileresults)  to see the results of the File Copy Request.
+        Returns a paginated list of [files](ref:files#file).
 
-
-        :param file_id: The unique identifier of the file
-        :param file_copy: The details of the file copy
+        :param dollar_filter: The properties to filter the results by.
+        :param dollar_order_by: One or more comma-separated expressions to indicate the order in which to sort the results.
+        :param dollar_maxpagesize: The maximum number of results to retrieve
+        :param dollar_next: Pagination cursor for next set of results.
         :param retries: Override the default retry configuration for this method
         :param server_url: Override the default server URL for this method
         :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
@@ -157,27 +181,26 @@ class Files(BaseSDK):
         else:
             base_url = self._get_url(base_url, url_variables)
 
-        request = models.CopyFileRequest(
-            file_id=file_id,
-            file_copy=utils.get_pydantic_model(file_copy, models.FileCopy),
+        request = models.GetFilesRequest(
+            dollar_filter=dollar_filter,
+            dollar_order_by=dollar_order_by,
+            dollar_maxpagesize=dollar_maxpagesize,
+            dollar_next=dollar_next,
         )
 
         req = self._build_request_async(
-            method="POST",
-            path="/files/{fileId}/copy",
+            method="GET",
+            path="/files",
             base_url=base_url,
             url_variables=url_variables,
             request=request,
-            request_body_required=True,
-            request_has_path_params=True,
+            request_body_required=False,
+            request_has_path_params=False,
             request_has_query_params=True,
             user_agent_header="user-agent",
             accept_header_value="application/json",
             http_headers=http_headers,
             security=self.sdk_configuration.security,
-            get_serialized_body=lambda: utils.serialize_request_body(
-                request.file_copy, False, False, "json", models.FileCopy
-            ),
             allow_empty_value=None,
             timeout_ms=timeout_ms,
         )
@@ -194,8 +217,8 @@ class Files(BaseSDK):
             hook_ctx=HookContext(
                 config=self.sdk_configuration,
                 base_url=base_url or "",
-                operation_id="copyFile",
-                oauth2_scopes=["file:write"],
+                operation_id="getFiles",
+                oauth2_scopes=["file:read"],
                 security_source=self.sdk_configuration.security,
             ),
             request=req,
@@ -214,10 +237,34 @@ class Files(BaseSDK):
             retry_config=retry_config,
         )
 
+        def next_func() -> Awaitable[Optional[models.GetFilesResponse]]:
+            body = utils.unmarshal_json(http_res.text, Union[Dict[Any, Any], List[Any]])
+
+            async def empty_result():
+                return None
+
+            next_cursor = JSONPath("$['@nextLink']").parse(body)
+
+            if len(next_cursor) == 0:
+                return empty_result()
+
+            next_cursor = next_cursor[0]
+            if next_cursor is None or str(next_cursor).strip() == "":
+                return empty_result()
+
+            return self.get_files_async(
+                dollar_filter=dollar_filter,
+                dollar_order_by=dollar_order_by,
+                dollar_maxpagesize=dollar_maxpagesize,
+                dollar_next=next_cursor,
+                retries=retries,
+            )
+
         response_data: Any = None
-        if utils.match_response(http_res, "202", "*"):
-            return models.CopyFileResponse(
-                headers=utils.get_response_headers(http_res.headers)
+        if utils.match_response(http_res, "200", "application/json"):
+            return models.GetFilesResponse(
+                result=unmarshal_json_response(models.FilesListResult, http_res),
+                next=next_func,
             )
         if utils.match_response(
             http_res, ["400", "401", "403", "404", "409", "429"], "application/json"
@@ -492,25 +539,22 @@ class Files(BaseSDK):
 
         raise errors.SDKError("Unexpected response received", http_res)
 
-    def export_file_by_id(
+    def import_file(
         self,
         *,
-        file_id: str,
-        file_export_by_id: Union[models.FileExportByID, models.FileExportByIDTypedDict],
+        request: Union[models.FileImport, models.FileImportTypedDict],
         retries: OptionalNullable[utils.RetryConfig] = UNSET,
         server_url: Optional[str] = None,
         timeout_ms: Optional[int] = None,
         http_headers: Optional[Mapping[str, str]] = None,
-    ) -> models.ExportFileByIDResponse:
-        r"""Initiate a file export by ID
+    ) -> models.ImportFileResponse:
+        r"""Initiate a file import
 
-        Export a file by its unique ID. This is a long running operation. Responses include a `Location` header, which indicates where to poll for export results. For  more details on long-running job polling, see [Operations endpoint](ref:getoperationbyid).
-        When the export process is complete, the status of the Operation  will change to completed. The `resourceUrl` field of the operation will contain  the download url of the exported file. To download the file, perform a GET against  the `resourceUrl` with the same authentication credentials and flow as the export request.  For more details, see Authentication documentation.
-        For more on Document, Spreadsheet, and Presentation export options, see the following: [Documents](https://developers.workiva.com/2026-01-01/platform-documentexport), [Spreadsheets](https://developers.workiva.com/2026-01-01/platform-spreadsheetexport), and [Presentations](https://developers.workiva.com/2026-01-01/platform-presentationexport).
+        Import a file for conversion to a Workiva equivalent. This is a long running operation.
+        Response includes an `uploadUrl` which indicates where to upload the file for import. To upload the file, perform a PUT against the `uploadUrl` with the same authentication credentials and flow as the import request. For more details, see [Authentication documentation](ref:authentication).
 
 
-        :param file_id: The unique identifier of the file
-        :param file_export_by_id: The details of the file export.
+        :param request: The request object to send.
         :param retries: Override the default retry configuration for this method
         :param server_url: Override the default server URL for this method
         :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
@@ -526,978 +570,26 @@ class Files(BaseSDK):
         else:
             base_url = self._get_url(base_url, url_variables)
 
-        request = models.ExportFileByIDRequest(
-            file_id=file_id,
-            file_export_by_id=utils.get_pydantic_model(
-                file_export_by_id, models.FileExportByID
-            ),
-        )
+        if not isinstance(request, BaseModel):
+            request = utils.unmarshal(request, models.FileImport)
+        request = cast(models.FileImport, request)
 
         req = self._build_request(
             method="POST",
-            path="/files/{fileId}/export",
+            path="/files/import",
             base_url=base_url,
             url_variables=url_variables,
             request=request,
             request_body_required=True,
-            request_has_path_params=True,
-            request_has_query_params=True,
-            user_agent_header="user-agent",
-            accept_header_value="application/json",
-            http_headers=http_headers,
-            security=self.sdk_configuration.security,
-            get_serialized_body=lambda: utils.serialize_request_body(
-                request.file_export_by_id, False, False, "json", models.FileExportByID
-            ),
-            allow_empty_value=None,
-            timeout_ms=timeout_ms,
-        )
-
-        if retries == UNSET:
-            if self.sdk_configuration.retry_config is not UNSET:
-                retries = self.sdk_configuration.retry_config
-
-        retry_config = None
-        if isinstance(retries, utils.RetryConfig):
-            retry_config = (retries, ["429", "500", "502", "503", "504"])
-
-        http_res = self.do_request(
-            hook_ctx=HookContext(
-                config=self.sdk_configuration,
-                base_url=base_url or "",
-                operation_id="exportFileById",
-                oauth2_scopes=["file:write"],
-                security_source=self.sdk_configuration.security,
-            ),
-            request=req,
-            error_status_codes=[
-                "400",
-                "401",
-                "403",
-                "404",
-                "409",
-                "429",
-                "4XX",
-                "500",
-                "503",
-                "5XX",
-            ],
-            retry_config=retry_config,
-        )
-
-        response_data: Any = None
-        if utils.match_response(http_res, "202", "*"):
-            return models.ExportFileByIDResponse(
-                headers=utils.get_response_headers(http_res.headers)
-            )
-        if utils.match_response(
-            http_res, ["400", "401", "403", "404", "409", "429"], "application/json"
-        ):
-            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
-            raise errors.ErrorResponse(response_data, http_res)
-        if utils.match_response(http_res, ["500", "503"], "application/json"):
-            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
-            raise errors.ErrorResponse(response_data, http_res)
-        if utils.match_response(http_res, "4XX", "*"):
-            http_res_text = utils.stream_to_text(http_res)
-            raise errors.SDKError("API error occurred", http_res, http_res_text)
-        if utils.match_response(http_res, "5XX", "*"):
-            http_res_text = utils.stream_to_text(http_res)
-            raise errors.SDKError("API error occurred", http_res, http_res_text)
-
-        raise errors.SDKError("Unexpected response received", http_res)
-
-    async def export_file_by_id_async(
-        self,
-        *,
-        file_id: str,
-        file_export_by_id: Union[models.FileExportByID, models.FileExportByIDTypedDict],
-        retries: OptionalNullable[utils.RetryConfig] = UNSET,
-        server_url: Optional[str] = None,
-        timeout_ms: Optional[int] = None,
-        http_headers: Optional[Mapping[str, str]] = None,
-    ) -> models.ExportFileByIDResponse:
-        r"""Initiate a file export by ID
-
-        Export a file by its unique ID. This is a long running operation. Responses include a `Location` header, which indicates where to poll for export results. For  more details on long-running job polling, see [Operations endpoint](ref:getoperationbyid).
-        When the export process is complete, the status of the Operation  will change to completed. The `resourceUrl` field of the operation will contain  the download url of the exported file. To download the file, perform a GET against  the `resourceUrl` with the same authentication credentials and flow as the export request.  For more details, see Authentication documentation.
-        For more on Document, Spreadsheet, and Presentation export options, see the following: [Documents](https://developers.workiva.com/2026-01-01/platform-documentexport), [Spreadsheets](https://developers.workiva.com/2026-01-01/platform-spreadsheetexport), and [Presentations](https://developers.workiva.com/2026-01-01/platform-presentationexport).
-
-
-        :param file_id: The unique identifier of the file
-        :param file_export_by_id: The details of the file export.
-        :param retries: Override the default retry configuration for this method
-        :param server_url: Override the default server URL for this method
-        :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
-        :param http_headers: Additional headers to set or replace on requests.
-        """
-        base_url = None
-        url_variables = None
-        if timeout_ms is None:
-            timeout_ms = self.sdk_configuration.timeout_ms
-
-        if server_url is not None:
-            base_url = server_url
-        else:
-            base_url = self._get_url(base_url, url_variables)
-
-        request = models.ExportFileByIDRequest(
-            file_id=file_id,
-            file_export_by_id=utils.get_pydantic_model(
-                file_export_by_id, models.FileExportByID
-            ),
-        )
-
-        req = self._build_request_async(
-            method="POST",
-            path="/files/{fileId}/export",
-            base_url=base_url,
-            url_variables=url_variables,
-            request=request,
-            request_body_required=True,
-            request_has_path_params=True,
-            request_has_query_params=True,
-            user_agent_header="user-agent",
-            accept_header_value="application/json",
-            http_headers=http_headers,
-            security=self.sdk_configuration.security,
-            get_serialized_body=lambda: utils.serialize_request_body(
-                request.file_export_by_id, False, False, "json", models.FileExportByID
-            ),
-            allow_empty_value=None,
-            timeout_ms=timeout_ms,
-        )
-
-        if retries == UNSET:
-            if self.sdk_configuration.retry_config is not UNSET:
-                retries = self.sdk_configuration.retry_config
-
-        retry_config = None
-        if isinstance(retries, utils.RetryConfig):
-            retry_config = (retries, ["429", "500", "502", "503", "504"])
-
-        http_res = await self.do_request_async(
-            hook_ctx=HookContext(
-                config=self.sdk_configuration,
-                base_url=base_url or "",
-                operation_id="exportFileById",
-                oauth2_scopes=["file:write"],
-                security_source=self.sdk_configuration.security,
-            ),
-            request=req,
-            error_status_codes=[
-                "400",
-                "401",
-                "403",
-                "404",
-                "409",
-                "429",
-                "4XX",
-                "500",
-                "503",
-                "5XX",
-            ],
-            retry_config=retry_config,
-        )
-
-        response_data: Any = None
-        if utils.match_response(http_res, "202", "*"):
-            return models.ExportFileByIDResponse(
-                headers=utils.get_response_headers(http_res.headers)
-            )
-        if utils.match_response(
-            http_res, ["400", "401", "403", "404", "409", "429"], "application/json"
-        ):
-            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
-            raise errors.ErrorResponse(response_data, http_res)
-        if utils.match_response(http_res, ["500", "503"], "application/json"):
-            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
-            raise errors.ErrorResponse(response_data, http_res)
-        if utils.match_response(http_res, "4XX", "*"):
-            http_res_text = await utils.stream_to_text_async(http_res)
-            raise errors.SDKError("API error occurred", http_res, http_res_text)
-        if utils.match_response(http_res, "5XX", "*"):
-            http_res_text = await utils.stream_to_text_async(http_res)
-            raise errors.SDKError("API error occurred", http_res, http_res_text)
-
-        raise errors.SDKError("Unexpected response received", http_res)
-
-    def file_permissions_modification(
-        self,
-        *,
-        file_id: str,
-        resource_permissions_modification: Union[
-            models.ResourcePermissionsModification,
-            models.ResourcePermissionsModificationTypedDict,
-        ],
-        retries: OptionalNullable[utils.RetryConfig] = UNSET,
-        server_url: Optional[str] = None,
-        timeout_ms: Optional[int] = None,
-        http_headers: Optional[Mapping[str, str]] = None,
-    ):
-        r"""Modify permissions on a file
-
-        Assign and/or revoke permissions on a file. If any modification in a request fails, all modifications on that request fail. <br /><br /> _To modify an existing permission, the existing permission must first be  explicitly revoked. Then, the new permission needs to be assigned. This  can be done in a single request by sending `toAssign` and `toRevoke` in  the request body._
-
-
-        :param file_id: The unique identifier of the file
-        :param resource_permissions_modification: Details about the file permissions modification.
-        :param retries: Override the default retry configuration for this method
-        :param server_url: Override the default server URL for this method
-        :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
-        :param http_headers: Additional headers to set or replace on requests.
-        """
-        base_url = None
-        url_variables = None
-        if timeout_ms is None:
-            timeout_ms = self.sdk_configuration.timeout_ms
-
-        if server_url is not None:
-            base_url = server_url
-        else:
-            base_url = self._get_url(base_url, url_variables)
-
-        request = models.FilePermissionsModificationRequest(
-            file_id=file_id,
-            resource_permissions_modification=utils.get_pydantic_model(
-                resource_permissions_modification,
-                models.ResourcePermissionsModification,
-            ),
-        )
-
-        req = self._build_request(
-            method="POST",
-            path="/files/{fileId}/permissions/modification",
-            base_url=base_url,
-            url_variables=url_variables,
-            request=request,
-            request_body_required=True,
-            request_has_path_params=True,
-            request_has_query_params=True,
-            user_agent_header="user-agent",
-            accept_header_value="application/json",
-            http_headers=http_headers,
-            security=self.sdk_configuration.security,
-            get_serialized_body=lambda: utils.serialize_request_body(
-                request.resource_permissions_modification,
-                False,
-                False,
-                "json",
-                models.ResourcePermissionsModification,
-            ),
-            allow_empty_value=None,
-            timeout_ms=timeout_ms,
-        )
-
-        if retries == UNSET:
-            if self.sdk_configuration.retry_config is not UNSET:
-                retries = self.sdk_configuration.retry_config
-
-        retry_config = None
-        if isinstance(retries, utils.RetryConfig):
-            retry_config = (retries, ["429", "500", "502", "503", "504"])
-
-        http_res = self.do_request(
-            hook_ctx=HookContext(
-                config=self.sdk_configuration,
-                base_url=base_url or "",
-                operation_id="filePermissionsModification",
-                oauth2_scopes=["file:write"],
-                security_source=self.sdk_configuration.security,
-            ),
-            request=req,
-            error_status_codes=[
-                "400",
-                "401",
-                "403",
-                "404",
-                "409",
-                "429",
-                "4XX",
-                "500",
-                "503",
-                "5XX",
-            ],
-            retry_config=retry_config,
-        )
-
-        response_data: Any = None
-        if utils.match_response(http_res, "204", "*"):
-            return
-        if utils.match_response(
-            http_res, ["400", "401", "403", "404", "409", "429"], "application/json"
-        ):
-            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
-            raise errors.ErrorResponse(response_data, http_res)
-        if utils.match_response(http_res, ["500", "503"], "application/json"):
-            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
-            raise errors.ErrorResponse(response_data, http_res)
-        if utils.match_response(http_res, "4XX", "*"):
-            http_res_text = utils.stream_to_text(http_res)
-            raise errors.SDKError("API error occurred", http_res, http_res_text)
-        if utils.match_response(http_res, "5XX", "*"):
-            http_res_text = utils.stream_to_text(http_res)
-            raise errors.SDKError("API error occurred", http_res, http_res_text)
-
-        raise errors.SDKError("Unexpected response received", http_res)
-
-    async def file_permissions_modification_async(
-        self,
-        *,
-        file_id: str,
-        resource_permissions_modification: Union[
-            models.ResourcePermissionsModification,
-            models.ResourcePermissionsModificationTypedDict,
-        ],
-        retries: OptionalNullable[utils.RetryConfig] = UNSET,
-        server_url: Optional[str] = None,
-        timeout_ms: Optional[int] = None,
-        http_headers: Optional[Mapping[str, str]] = None,
-    ):
-        r"""Modify permissions on a file
-
-        Assign and/or revoke permissions on a file. If any modification in a request fails, all modifications on that request fail. <br /><br /> _To modify an existing permission, the existing permission must first be  explicitly revoked. Then, the new permission needs to be assigned. This  can be done in a single request by sending `toAssign` and `toRevoke` in  the request body._
-
-
-        :param file_id: The unique identifier of the file
-        :param resource_permissions_modification: Details about the file permissions modification.
-        :param retries: Override the default retry configuration for this method
-        :param server_url: Override the default server URL for this method
-        :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
-        :param http_headers: Additional headers to set or replace on requests.
-        """
-        base_url = None
-        url_variables = None
-        if timeout_ms is None:
-            timeout_ms = self.sdk_configuration.timeout_ms
-
-        if server_url is not None:
-            base_url = server_url
-        else:
-            base_url = self._get_url(base_url, url_variables)
-
-        request = models.FilePermissionsModificationRequest(
-            file_id=file_id,
-            resource_permissions_modification=utils.get_pydantic_model(
-                resource_permissions_modification,
-                models.ResourcePermissionsModification,
-            ),
-        )
-
-        req = self._build_request_async(
-            method="POST",
-            path="/files/{fileId}/permissions/modification",
-            base_url=base_url,
-            url_variables=url_variables,
-            request=request,
-            request_body_required=True,
-            request_has_path_params=True,
-            request_has_query_params=True,
-            user_agent_header="user-agent",
-            accept_header_value="application/json",
-            http_headers=http_headers,
-            security=self.sdk_configuration.security,
-            get_serialized_body=lambda: utils.serialize_request_body(
-                request.resource_permissions_modification,
-                False,
-                False,
-                "json",
-                models.ResourcePermissionsModification,
-            ),
-            allow_empty_value=None,
-            timeout_ms=timeout_ms,
-        )
-
-        if retries == UNSET:
-            if self.sdk_configuration.retry_config is not UNSET:
-                retries = self.sdk_configuration.retry_config
-
-        retry_config = None
-        if isinstance(retries, utils.RetryConfig):
-            retry_config = (retries, ["429", "500", "502", "503", "504"])
-
-        http_res = await self.do_request_async(
-            hook_ctx=HookContext(
-                config=self.sdk_configuration,
-                base_url=base_url or "",
-                operation_id="filePermissionsModification",
-                oauth2_scopes=["file:write"],
-                security_source=self.sdk_configuration.security,
-            ),
-            request=req,
-            error_status_codes=[
-                "400",
-                "401",
-                "403",
-                "404",
-                "409",
-                "429",
-                "4XX",
-                "500",
-                "503",
-                "5XX",
-            ],
-            retry_config=retry_config,
-        )
-
-        response_data: Any = None
-        if utils.match_response(http_res, "204", "*"):
-            return
-        if utils.match_response(
-            http_res, ["400", "401", "403", "404", "409", "429"], "application/json"
-        ):
-            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
-            raise errors.ErrorResponse(response_data, http_res)
-        if utils.match_response(http_res, ["500", "503"], "application/json"):
-            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
-            raise errors.ErrorResponse(response_data, http_res)
-        if utils.match_response(http_res, "4XX", "*"):
-            http_res_text = await utils.stream_to_text_async(http_res)
-            raise errors.SDKError("API error occurred", http_res, http_res_text)
-        if utils.match_response(http_res, "5XX", "*"):
-            http_res_text = await utils.stream_to_text_async(http_res)
-            raise errors.SDKError("API error occurred", http_res, http_res_text)
-
-        raise errors.SDKError("Unexpected response received", http_res)
-
-    def get_file_by_id(
-        self,
-        *,
-        file_id: str,
-        retries: OptionalNullable[utils.RetryConfig] = UNSET,
-        server_url: Optional[str] = None,
-        timeout_ms: Optional[int] = None,
-        http_headers: Optional[Mapping[str, str]] = None,
-    ) -> models.File:
-        r"""Retrieve a single file
-
-        Retrieves a [file](ref:files#file) given its ID
-
-
-        :param file_id: The unique identifier of the file
-        :param retries: Override the default retry configuration for this method
-        :param server_url: Override the default server URL for this method
-        :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
-        :param http_headers: Additional headers to set or replace on requests.
-        """
-        base_url = None
-        url_variables = None
-        if timeout_ms is None:
-            timeout_ms = self.sdk_configuration.timeout_ms
-
-        if server_url is not None:
-            base_url = server_url
-        else:
-            base_url = self._get_url(base_url, url_variables)
-
-        request = models.GetFileByIDRequest(
-            file_id=file_id,
-        )
-
-        req = self._build_request(
-            method="GET",
-            path="/files/{fileId}",
-            base_url=base_url,
-            url_variables=url_variables,
-            request=request,
-            request_body_required=False,
-            request_has_path_params=True,
-            request_has_query_params=True,
-            user_agent_header="user-agent",
-            accept_header_value="application/json",
-            http_headers=http_headers,
-            security=self.sdk_configuration.security,
-            allow_empty_value=None,
-            timeout_ms=timeout_ms,
-        )
-
-        if retries == UNSET:
-            if self.sdk_configuration.retry_config is not UNSET:
-                retries = self.sdk_configuration.retry_config
-
-        retry_config = None
-        if isinstance(retries, utils.RetryConfig):
-            retry_config = (retries, ["429", "500", "502", "503", "504"])
-
-        http_res = self.do_request(
-            hook_ctx=HookContext(
-                config=self.sdk_configuration,
-                base_url=base_url or "",
-                operation_id="getFileById",
-                oauth2_scopes=["file:read"],
-                security_source=self.sdk_configuration.security,
-            ),
-            request=req,
-            error_status_codes=[
-                "400",
-                "401",
-                "403",
-                "404",
-                "409",
-                "429",
-                "4XX",
-                "500",
-                "503",
-                "5XX",
-            ],
-            retry_config=retry_config,
-        )
-
-        response_data: Any = None
-        if utils.match_response(http_res, "200", "application/json"):
-            return unmarshal_json_response(models.File, http_res)
-        if utils.match_response(
-            http_res, ["400", "401", "403", "404", "409", "429"], "application/json"
-        ):
-            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
-            raise errors.ErrorResponse(response_data, http_res)
-        if utils.match_response(http_res, ["500", "503"], "application/json"):
-            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
-            raise errors.ErrorResponse(response_data, http_res)
-        if utils.match_response(http_res, "4XX", "*"):
-            http_res_text = utils.stream_to_text(http_res)
-            raise errors.SDKError("API error occurred", http_res, http_res_text)
-        if utils.match_response(http_res, "5XX", "*"):
-            http_res_text = utils.stream_to_text(http_res)
-            raise errors.SDKError("API error occurred", http_res, http_res_text)
-
-        raise errors.SDKError("Unexpected response received", http_res)
-
-    async def get_file_by_id_async(
-        self,
-        *,
-        file_id: str,
-        retries: OptionalNullable[utils.RetryConfig] = UNSET,
-        server_url: Optional[str] = None,
-        timeout_ms: Optional[int] = None,
-        http_headers: Optional[Mapping[str, str]] = None,
-    ) -> models.File:
-        r"""Retrieve a single file
-
-        Retrieves a [file](ref:files#file) given its ID
-
-
-        :param file_id: The unique identifier of the file
-        :param retries: Override the default retry configuration for this method
-        :param server_url: Override the default server URL for this method
-        :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
-        :param http_headers: Additional headers to set or replace on requests.
-        """
-        base_url = None
-        url_variables = None
-        if timeout_ms is None:
-            timeout_ms = self.sdk_configuration.timeout_ms
-
-        if server_url is not None:
-            base_url = server_url
-        else:
-            base_url = self._get_url(base_url, url_variables)
-
-        request = models.GetFileByIDRequest(
-            file_id=file_id,
-        )
-
-        req = self._build_request_async(
-            method="GET",
-            path="/files/{fileId}",
-            base_url=base_url,
-            url_variables=url_variables,
-            request=request,
-            request_body_required=False,
-            request_has_path_params=True,
-            request_has_query_params=True,
-            user_agent_header="user-agent",
-            accept_header_value="application/json",
-            http_headers=http_headers,
-            security=self.sdk_configuration.security,
-            allow_empty_value=None,
-            timeout_ms=timeout_ms,
-        )
-
-        if retries == UNSET:
-            if self.sdk_configuration.retry_config is not UNSET:
-                retries = self.sdk_configuration.retry_config
-
-        retry_config = None
-        if isinstance(retries, utils.RetryConfig):
-            retry_config = (retries, ["429", "500", "502", "503", "504"])
-
-        http_res = await self.do_request_async(
-            hook_ctx=HookContext(
-                config=self.sdk_configuration,
-                base_url=base_url or "",
-                operation_id="getFileById",
-                oauth2_scopes=["file:read"],
-                security_source=self.sdk_configuration.security,
-            ),
-            request=req,
-            error_status_codes=[
-                "400",
-                "401",
-                "403",
-                "404",
-                "409",
-                "429",
-                "4XX",
-                "500",
-                "503",
-                "5XX",
-            ],
-            retry_config=retry_config,
-        )
-
-        response_data: Any = None
-        if utils.match_response(http_res, "200", "application/json"):
-            return unmarshal_json_response(models.File, http_res)
-        if utils.match_response(
-            http_res, ["400", "401", "403", "404", "409", "429"], "application/json"
-        ):
-            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
-            raise errors.ErrorResponse(response_data, http_res)
-        if utils.match_response(http_res, ["500", "503"], "application/json"):
-            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
-            raise errors.ErrorResponse(response_data, http_res)
-        if utils.match_response(http_res, "4XX", "*"):
-            http_res_text = await utils.stream_to_text_async(http_res)
-            raise errors.SDKError("API error occurred", http_res, http_res_text)
-        if utils.match_response(http_res, "5XX", "*"):
-            http_res_text = await utils.stream_to_text_async(http_res)
-            raise errors.SDKError("API error occurred", http_res, http_res_text)
-
-        raise errors.SDKError("Unexpected response received", http_res)
-
-    def get_file_permissions(
-        self,
-        *,
-        file_id: str,
-        dollar_filter: Optional[str] = None,
-        dollar_maxpagesize: Optional[int] = 1000,
-        dollar_next: Optional[str] = None,
-        retries: OptionalNullable[utils.RetryConfig] = UNSET,
-        server_url: Optional[str] = None,
-        timeout_ms: Optional[int] = None,
-        http_headers: Optional[Mapping[str, str]] = None,
-    ) -> Optional[models.GetFilePermissionsResponse]:
-        r"""Retrieve permissions for a file
-
-        Retrieves a paginated list of permissions for a given file
-
-
-        :param file_id: The unique identifier of the file
-        :param dollar_filter: The properties to filter the results by.
-        :param dollar_maxpagesize: The maximum number of results to retrieve
-        :param dollar_next: Pagination cursor for next set of results.
-        :param retries: Override the default retry configuration for this method
-        :param server_url: Override the default server URL for this method
-        :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
-        :param http_headers: Additional headers to set or replace on requests.
-        """
-        base_url = None
-        url_variables = None
-        if timeout_ms is None:
-            timeout_ms = self.sdk_configuration.timeout_ms
-
-        if server_url is not None:
-            base_url = server_url
-        else:
-            base_url = self._get_url(base_url, url_variables)
-
-        request = models.GetFilePermissionsRequest(
-            dollar_filter=dollar_filter,
-            dollar_maxpagesize=dollar_maxpagesize,
-            dollar_next=dollar_next,
-            file_id=file_id,
-        )
-
-        req = self._build_request(
-            method="GET",
-            path="/files/{fileId}/permissions",
-            base_url=base_url,
-            url_variables=url_variables,
-            request=request,
-            request_body_required=False,
-            request_has_path_params=True,
-            request_has_query_params=True,
-            user_agent_header="user-agent",
-            accept_header_value="application/json",
-            http_headers=http_headers,
-            security=self.sdk_configuration.security,
-            allow_empty_value=None,
-            timeout_ms=timeout_ms,
-        )
-
-        if retries == UNSET:
-            if self.sdk_configuration.retry_config is not UNSET:
-                retries = self.sdk_configuration.retry_config
-
-        retry_config = None
-        if isinstance(retries, utils.RetryConfig):
-            retry_config = (retries, ["429", "500", "502", "503", "504"])
-
-        http_res = self.do_request(
-            hook_ctx=HookContext(
-                config=self.sdk_configuration,
-                base_url=base_url or "",
-                operation_id="getFilePermissions",
-                oauth2_scopes=["file:read"],
-                security_source=self.sdk_configuration.security,
-            ),
-            request=req,
-            error_status_codes=[
-                "400",
-                "401",
-                "403",
-                "404",
-                "409",
-                "429",
-                "4XX",
-                "500",
-                "503",
-                "5XX",
-            ],
-            retry_config=retry_config,
-        )
-
-        def next_func() -> Optional[models.GetFilePermissionsResponse]:
-            body = utils.unmarshal_json(http_res.text, Union[Dict[Any, Any], List[Any]])
-
-            next_cursor = JSONPath("$['@nextLink']").parse(body)
-
-            if len(next_cursor) == 0:
-                return None
-
-            next_cursor = next_cursor[0]
-            if next_cursor is None or str(next_cursor).strip() == "":
-                return None
-
-            return self.get_file_permissions(
-                file_id=file_id,
-                dollar_filter=dollar_filter,
-                dollar_maxpagesize=dollar_maxpagesize,
-                dollar_next=next_cursor,
-                retries=retries,
-            )
-
-        response_data: Any = None
-        if utils.match_response(http_res, "200", "application/json"):
-            return models.GetFilePermissionsResponse(
-                result=unmarshal_json_response(
-                    models.ResourcePermissionsListResult, http_res
-                ),
-                next=next_func,
-            )
-        if utils.match_response(
-            http_res, ["400", "401", "403", "404", "409", "429"], "application/json"
-        ):
-            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
-            raise errors.ErrorResponse(response_data, http_res)
-        if utils.match_response(http_res, ["500", "503"], "application/json"):
-            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
-            raise errors.ErrorResponse(response_data, http_res)
-        if utils.match_response(http_res, "4XX", "*"):
-            http_res_text = utils.stream_to_text(http_res)
-            raise errors.SDKError("API error occurred", http_res, http_res_text)
-        if utils.match_response(http_res, "5XX", "*"):
-            http_res_text = utils.stream_to_text(http_res)
-            raise errors.SDKError("API error occurred", http_res, http_res_text)
-
-        raise errors.SDKError("Unexpected response received", http_res)
-
-    async def get_file_permissions_async(
-        self,
-        *,
-        file_id: str,
-        dollar_filter: Optional[str] = None,
-        dollar_maxpagesize: Optional[int] = 1000,
-        dollar_next: Optional[str] = None,
-        retries: OptionalNullable[utils.RetryConfig] = UNSET,
-        server_url: Optional[str] = None,
-        timeout_ms: Optional[int] = None,
-        http_headers: Optional[Mapping[str, str]] = None,
-    ) -> Optional[models.GetFilePermissionsResponse]:
-        r"""Retrieve permissions for a file
-
-        Retrieves a paginated list of permissions for a given file
-
-
-        :param file_id: The unique identifier of the file
-        :param dollar_filter: The properties to filter the results by.
-        :param dollar_maxpagesize: The maximum number of results to retrieve
-        :param dollar_next: Pagination cursor for next set of results.
-        :param retries: Override the default retry configuration for this method
-        :param server_url: Override the default server URL for this method
-        :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
-        :param http_headers: Additional headers to set or replace on requests.
-        """
-        base_url = None
-        url_variables = None
-        if timeout_ms is None:
-            timeout_ms = self.sdk_configuration.timeout_ms
-
-        if server_url is not None:
-            base_url = server_url
-        else:
-            base_url = self._get_url(base_url, url_variables)
-
-        request = models.GetFilePermissionsRequest(
-            dollar_filter=dollar_filter,
-            dollar_maxpagesize=dollar_maxpagesize,
-            dollar_next=dollar_next,
-            file_id=file_id,
-        )
-
-        req = self._build_request_async(
-            method="GET",
-            path="/files/{fileId}/permissions",
-            base_url=base_url,
-            url_variables=url_variables,
-            request=request,
-            request_body_required=False,
-            request_has_path_params=True,
-            request_has_query_params=True,
-            user_agent_header="user-agent",
-            accept_header_value="application/json",
-            http_headers=http_headers,
-            security=self.sdk_configuration.security,
-            allow_empty_value=None,
-            timeout_ms=timeout_ms,
-        )
-
-        if retries == UNSET:
-            if self.sdk_configuration.retry_config is not UNSET:
-                retries = self.sdk_configuration.retry_config
-
-        retry_config = None
-        if isinstance(retries, utils.RetryConfig):
-            retry_config = (retries, ["429", "500", "502", "503", "504"])
-
-        http_res = await self.do_request_async(
-            hook_ctx=HookContext(
-                config=self.sdk_configuration,
-                base_url=base_url or "",
-                operation_id="getFilePermissions",
-                oauth2_scopes=["file:read"],
-                security_source=self.sdk_configuration.security,
-            ),
-            request=req,
-            error_status_codes=[
-                "400",
-                "401",
-                "403",
-                "404",
-                "409",
-                "429",
-                "4XX",
-                "500",
-                "503",
-                "5XX",
-            ],
-            retry_config=retry_config,
-        )
-
-        def next_func() -> Awaitable[Optional[models.GetFilePermissionsResponse]]:
-            body = utils.unmarshal_json(http_res.text, Union[Dict[Any, Any], List[Any]])
-
-            async def empty_result():
-                return None
-
-            next_cursor = JSONPath("$['@nextLink']").parse(body)
-
-            if len(next_cursor) == 0:
-                return empty_result()
-
-            next_cursor = next_cursor[0]
-            if next_cursor is None or str(next_cursor).strip() == "":
-                return empty_result()
-
-            return self.get_file_permissions_async(
-                file_id=file_id,
-                dollar_filter=dollar_filter,
-                dollar_maxpagesize=dollar_maxpagesize,
-                dollar_next=next_cursor,
-                retries=retries,
-            )
-
-        response_data: Any = None
-        if utils.match_response(http_res, "200", "application/json"):
-            return models.GetFilePermissionsResponse(
-                result=unmarshal_json_response(
-                    models.ResourcePermissionsListResult, http_res
-                ),
-                next=next_func,
-            )
-        if utils.match_response(
-            http_res, ["400", "401", "403", "404", "409", "429"], "application/json"
-        ):
-            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
-            raise errors.ErrorResponse(response_data, http_res)
-        if utils.match_response(http_res, ["500", "503"], "application/json"):
-            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
-            raise errors.ErrorResponse(response_data, http_res)
-        if utils.match_response(http_res, "4XX", "*"):
-            http_res_text = await utils.stream_to_text_async(http_res)
-            raise errors.SDKError("API error occurred", http_res, http_res_text)
-        if utils.match_response(http_res, "5XX", "*"):
-            http_res_text = await utils.stream_to_text_async(http_res)
-            raise errors.SDKError("API error occurred", http_res, http_res_text)
-
-        raise errors.SDKError("Unexpected response received", http_res)
-
-    def get_files(
-        self,
-        *,
-        dollar_filter: Optional[str] = None,
-        dollar_maxpagesize: Optional[int] = 1000,
-        dollar_next: Optional[str] = None,
-        dollar_order_by: Optional[str] = None,
-        retries: OptionalNullable[utils.RetryConfig] = UNSET,
-        server_url: Optional[str] = None,
-        timeout_ms: Optional[int] = None,
-        http_headers: Optional[Mapping[str, str]] = None,
-    ) -> Optional[models.GetFilesResponse]:
-        r"""Retrieve a list of files
-
-        Returns a paginated list of [files](ref:files#file).
-
-        :param dollar_filter: The properties to filter the results by.
-        :param dollar_maxpagesize: The maximum number of results to retrieve
-        :param dollar_next: Pagination cursor for next set of results.
-        :param dollar_order_by: One or more comma-separated expressions to indicate the order in which to sort the results.
-        :param retries: Override the default retry configuration for this method
-        :param server_url: Override the default server URL for this method
-        :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
-        :param http_headers: Additional headers to set or replace on requests.
-        """
-        base_url = None
-        url_variables = None
-        if timeout_ms is None:
-            timeout_ms = self.sdk_configuration.timeout_ms
-
-        if server_url is not None:
-            base_url = server_url
-        else:
-            base_url = self._get_url(base_url, url_variables)
-
-        request = models.GetFilesRequest(
-            dollar_filter=dollar_filter,
-            dollar_maxpagesize=dollar_maxpagesize,
-            dollar_next=dollar_next,
-            dollar_order_by=dollar_order_by,
-        )
-
-        req = self._build_request(
-            method="GET",
-            path="/files",
-            base_url=base_url,
-            url_variables=url_variables,
-            request=request,
-            request_body_required=False,
             request_has_path_params=False,
             request_has_query_params=True,
             user_agent_header="user-agent",
             accept_header_value="application/json",
             http_headers=http_headers,
             security=self.sdk_configuration.security,
+            get_serialized_body=lambda: utils.serialize_request_body(
+                request, False, False, "json", models.FileImport
+            ),
             allow_empty_value=None,
             timeout_ms=timeout_ms,
         )
@@ -1514,8 +606,8 @@ class Files(BaseSDK):
             hook_ctx=HookContext(
                 config=self.sdk_configuration,
                 base_url=base_url or "",
-                operation_id="getFiles",
-                oauth2_scopes=["file:read"],
+                operation_id="importFile",
+                oauth2_scopes=["file:write"],
                 security_source=self.sdk_configuration.security,
             ),
             request=req,
@@ -1534,31 +626,11 @@ class Files(BaseSDK):
             retry_config=retry_config,
         )
 
-        def next_func() -> Optional[models.GetFilesResponse]:
-            body = utils.unmarshal_json(http_res.text, Union[Dict[Any, Any], List[Any]])
-
-            next_cursor = JSONPath("$['@nextLink']").parse(body)
-
-            if len(next_cursor) == 0:
-                return None
-
-            next_cursor = next_cursor[0]
-            if next_cursor is None or str(next_cursor).strip() == "":
-                return None
-
-            return self.get_files(
-                dollar_filter=dollar_filter,
-                dollar_maxpagesize=dollar_maxpagesize,
-                dollar_next=next_cursor,
-                dollar_order_by=dollar_order_by,
-                retries=retries,
-            )
-
         response_data: Any = None
-        if utils.match_response(http_res, "200", "application/json"):
-            return models.GetFilesResponse(
-                result=unmarshal_json_response(models.FilesListResult, http_res),
-                next=next_func,
+        if utils.match_response(http_res, "202", "application/json"):
+            return models.ImportFileResponse(
+                result=unmarshal_json_response(models.FileImportResponse, http_res),
+                headers=utils.get_response_headers(http_res.headers),
             )
         if utils.match_response(
             http_res, ["400", "401", "403", "404", "409", "429"], "application/json"
@@ -1577,26 +649,22 @@ class Files(BaseSDK):
 
         raise errors.SDKError("Unexpected response received", http_res)
 
-    async def get_files_async(
+    async def import_file_async(
         self,
         *,
-        dollar_filter: Optional[str] = None,
-        dollar_maxpagesize: Optional[int] = 1000,
-        dollar_next: Optional[str] = None,
-        dollar_order_by: Optional[str] = None,
+        request: Union[models.FileImport, models.FileImportTypedDict],
         retries: OptionalNullable[utils.RetryConfig] = UNSET,
         server_url: Optional[str] = None,
         timeout_ms: Optional[int] = None,
         http_headers: Optional[Mapping[str, str]] = None,
-    ) -> Optional[models.GetFilesResponse]:
-        r"""Retrieve a list of files
+    ) -> models.ImportFileResponse:
+        r"""Initiate a file import
 
-        Returns a paginated list of [files](ref:files#file).
+        Import a file for conversion to a Workiva equivalent. This is a long running operation.
+        Response includes an `uploadUrl` which indicates where to upload the file for import. To upload the file, perform a PUT against the `uploadUrl` with the same authentication credentials and flow as the import request. For more details, see [Authentication documentation](ref:authentication).
 
-        :param dollar_filter: The properties to filter the results by.
-        :param dollar_maxpagesize: The maximum number of results to retrieve
-        :param dollar_next: Pagination cursor for next set of results.
-        :param dollar_order_by: One or more comma-separated expressions to indicate the order in which to sort the results.
+
+        :param request: The request object to send.
         :param retries: Override the default retry configuration for this method
         :param server_url: Override the default server URL for this method
         :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
@@ -1612,26 +680,26 @@ class Files(BaseSDK):
         else:
             base_url = self._get_url(base_url, url_variables)
 
-        request = models.GetFilesRequest(
-            dollar_filter=dollar_filter,
-            dollar_maxpagesize=dollar_maxpagesize,
-            dollar_next=dollar_next,
-            dollar_order_by=dollar_order_by,
-        )
+        if not isinstance(request, BaseModel):
+            request = utils.unmarshal(request, models.FileImport)
+        request = cast(models.FileImport, request)
 
         req = self._build_request_async(
-            method="GET",
-            path="/files",
+            method="POST",
+            path="/files/import",
             base_url=base_url,
             url_variables=url_variables,
             request=request,
-            request_body_required=False,
+            request_body_required=True,
             request_has_path_params=False,
             request_has_query_params=True,
             user_agent_header="user-agent",
             accept_header_value="application/json",
             http_headers=http_headers,
             security=self.sdk_configuration.security,
+            get_serialized_body=lambda: utils.serialize_request_body(
+                request, False, False, "json", models.FileImport
+            ),
             allow_empty_value=None,
             timeout_ms=timeout_ms,
         )
@@ -1648,8 +716,8 @@ class Files(BaseSDK):
             hook_ctx=HookContext(
                 config=self.sdk_configuration,
                 base_url=base_url or "",
-                operation_id="getFiles",
-                oauth2_scopes=["file:read"],
+                operation_id="importFile",
+                oauth2_scopes=["file:write"],
                 security_source=self.sdk_configuration.security,
             ),
             request=req,
@@ -1668,34 +736,11 @@ class Files(BaseSDK):
             retry_config=retry_config,
         )
 
-        def next_func() -> Awaitable[Optional[models.GetFilesResponse]]:
-            body = utils.unmarshal_json(http_res.text, Union[Dict[Any, Any], List[Any]])
-
-            async def empty_result():
-                return None
-
-            next_cursor = JSONPath("$['@nextLink']").parse(body)
-
-            if len(next_cursor) == 0:
-                return empty_result()
-
-            next_cursor = next_cursor[0]
-            if next_cursor is None or str(next_cursor).strip() == "":
-                return empty_result()
-
-            return self.get_files_async(
-                dollar_filter=dollar_filter,
-                dollar_maxpagesize=dollar_maxpagesize,
-                dollar_next=next_cursor,
-                dollar_order_by=dollar_order_by,
-                retries=retries,
-            )
-
         response_data: Any = None
-        if utils.match_response(http_res, "200", "application/json"):
-            return models.GetFilesResponse(
-                result=unmarshal_json_response(models.FilesListResult, http_res),
-                next=next_func,
+        if utils.match_response(http_res, "202", "application/json"):
+            return models.ImportFileResponse(
+                result=unmarshal_json_response(models.FileImportResponse, http_res),
+                headers=utils.get_response_headers(http_res.headers),
             )
         if utils.match_response(
             http_res, ["400", "401", "403", "404", "409", "429"], "application/json"
@@ -1969,22 +1014,21 @@ class Files(BaseSDK):
 
         raise errors.SDKError("Unexpected response received", http_res)
 
-    def import_file(
+    def get_file_by_id(
         self,
         *,
-        request: Union[models.FileImport, models.FileImportTypedDict],
+        file_id: str,
         retries: OptionalNullable[utils.RetryConfig] = UNSET,
         server_url: Optional[str] = None,
         timeout_ms: Optional[int] = None,
         http_headers: Optional[Mapping[str, str]] = None,
-    ) -> models.ImportFileResponse:
-        r"""Initiate a file import
+    ) -> models.File:
+        r"""Retrieve a single file
 
-        Import a file for conversion to a Workiva equivalent. This is a long running operation.
-        Response includes an `uploadUrl` which indicates where to upload the file for import. To upload the file, perform a PUT against the `uploadUrl` with the same authentication credentials and flow as the import request. For more details, see [Authentication documentation](ref:authentication).
+        Retrieves a [file](ref:files#file) given its ID
 
 
-        :param request: The request object to send.
+        :param file_id: The unique identifier of the file
         :param retries: Override the default retry configuration for this method
         :param server_url: Override the default server URL for this method
         :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
@@ -2000,26 +1044,23 @@ class Files(BaseSDK):
         else:
             base_url = self._get_url(base_url, url_variables)
 
-        if not isinstance(request, BaseModel):
-            request = utils.unmarshal(request, models.FileImport)
-        request = cast(models.FileImport, request)
+        request = models.GetFileByIDRequest(
+            file_id=file_id,
+        )
 
         req = self._build_request(
-            method="POST",
-            path="/files/import",
+            method="GET",
+            path="/files/{fileId}",
             base_url=base_url,
             url_variables=url_variables,
             request=request,
-            request_body_required=True,
-            request_has_path_params=False,
+            request_body_required=False,
+            request_has_path_params=True,
             request_has_query_params=True,
             user_agent_header="user-agent",
             accept_header_value="application/json",
             http_headers=http_headers,
             security=self.sdk_configuration.security,
-            get_serialized_body=lambda: utils.serialize_request_body(
-                request, False, False, "json", models.FileImport
-            ),
             allow_empty_value=None,
             timeout_ms=timeout_ms,
         )
@@ -2036,8 +1077,8 @@ class Files(BaseSDK):
             hook_ctx=HookContext(
                 config=self.sdk_configuration,
                 base_url=base_url or "",
-                operation_id="importFile",
-                oauth2_scopes=["file:write"],
+                operation_id="getFileById",
+                oauth2_scopes=["file:read"],
                 security_source=self.sdk_configuration.security,
             ),
             request=req,
@@ -2057,11 +1098,8 @@ class Files(BaseSDK):
         )
 
         response_data: Any = None
-        if utils.match_response(http_res, "202", "application/json"):
-            return models.ImportFileResponse(
-                result=unmarshal_json_response(models.FileImportResponse, http_res),
-                headers=utils.get_response_headers(http_res.headers),
-            )
+        if utils.match_response(http_res, "200", "application/json"):
+            return unmarshal_json_response(models.File, http_res)
         if utils.match_response(
             http_res, ["400", "401", "403", "404", "409", "429"], "application/json"
         ):
@@ -2079,22 +1117,21 @@ class Files(BaseSDK):
 
         raise errors.SDKError("Unexpected response received", http_res)
 
-    async def import_file_async(
+    async def get_file_by_id_async(
         self,
         *,
-        request: Union[models.FileImport, models.FileImportTypedDict],
+        file_id: str,
         retries: OptionalNullable[utils.RetryConfig] = UNSET,
         server_url: Optional[str] = None,
         timeout_ms: Optional[int] = None,
         http_headers: Optional[Mapping[str, str]] = None,
-    ) -> models.ImportFileResponse:
-        r"""Initiate a file import
+    ) -> models.File:
+        r"""Retrieve a single file
 
-        Import a file for conversion to a Workiva equivalent. This is a long running operation.
-        Response includes an `uploadUrl` which indicates where to upload the file for import. To upload the file, perform a PUT against the `uploadUrl` with the same authentication credentials and flow as the import request. For more details, see [Authentication documentation](ref:authentication).
+        Retrieves a [file](ref:files#file) given its ID
 
 
-        :param request: The request object to send.
+        :param file_id: The unique identifier of the file
         :param retries: Override the default retry configuration for this method
         :param server_url: Override the default server URL for this method
         :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
@@ -2110,26 +1147,23 @@ class Files(BaseSDK):
         else:
             base_url = self._get_url(base_url, url_variables)
 
-        if not isinstance(request, BaseModel):
-            request = utils.unmarshal(request, models.FileImport)
-        request = cast(models.FileImport, request)
+        request = models.GetFileByIDRequest(
+            file_id=file_id,
+        )
 
         req = self._build_request_async(
-            method="POST",
-            path="/files/import",
+            method="GET",
+            path="/files/{fileId}",
             base_url=base_url,
             url_variables=url_variables,
             request=request,
-            request_body_required=True,
-            request_has_path_params=False,
+            request_body_required=False,
+            request_has_path_params=True,
             request_has_query_params=True,
             user_agent_header="user-agent",
             accept_header_value="application/json",
             http_headers=http_headers,
             security=self.sdk_configuration.security,
-            get_serialized_body=lambda: utils.serialize_request_body(
-                request, False, False, "json", models.FileImport
-            ),
             allow_empty_value=None,
             timeout_ms=timeout_ms,
         )
@@ -2146,8 +1180,8 @@ class Files(BaseSDK):
             hook_ctx=HookContext(
                 config=self.sdk_configuration,
                 base_url=base_url or "",
-                operation_id="importFile",
-                oauth2_scopes=["file:write"],
+                operation_id="getFileById",
+                oauth2_scopes=["file:read"],
                 security_source=self.sdk_configuration.security,
             ),
             request=req,
@@ -2167,11 +1201,8 @@ class Files(BaseSDK):
         )
 
         response_data: Any = None
-        if utils.match_response(http_res, "202", "application/json"):
-            return models.ImportFileResponse(
-                result=unmarshal_json_response(models.FileImportResponse, http_res),
-                headers=utils.get_response_headers(http_res.headers),
-            )
+        if utils.match_response(http_res, "200", "application/json"):
+            return unmarshal_json_response(models.File, http_res)
         if utils.match_response(
             http_res, ["400", "401", "403", "404", "409", "429"], "application/json"
         ):
@@ -2418,6 +1449,460 @@ class Files(BaseSDK):
         response_data: Any = None
         if utils.match_response(http_res, "200", "application/json"):
             return unmarshal_json_response(models.File, http_res)
+        if utils.match_response(
+            http_res, ["400", "401", "403", "404", "409", "429"], "application/json"
+        ):
+            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
+            raise errors.ErrorResponse(response_data, http_res)
+        if utils.match_response(http_res, ["500", "503"], "application/json"):
+            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
+            raise errors.ErrorResponse(response_data, http_res)
+        if utils.match_response(http_res, "4XX", "*"):
+            http_res_text = await utils.stream_to_text_async(http_res)
+            raise errors.SDKError("API error occurred", http_res, http_res_text)
+        if utils.match_response(http_res, "5XX", "*"):
+            http_res_text = await utils.stream_to_text_async(http_res)
+            raise errors.SDKError("API error occurred", http_res, http_res_text)
+
+        raise errors.SDKError("Unexpected response received", http_res)
+
+    def copy_file(
+        self,
+        *,
+        file_id: str,
+        file_copy: Union[models.FileCopy, models.FileCopyTypedDict],
+        retries: OptionalNullable[utils.RetryConfig] = UNSET,
+        server_url: Optional[str] = None,
+        timeout_ms: Optional[int] = None,
+        http_headers: Optional[Mapping[str, str]] = None,
+    ) -> models.CopyFileResponse:
+        r"""Initiate a file copy
+
+        Copy a file to a new location. This is a long running operation. Responses include a `Location` header, which indicates where to poll for copy results. For more details on long-running job polling, see [Operations endpoint](ref:getoperationbyid).
+        Once the operation is completed, the `resourceUrl` field will be populated with a link to the   [Retrieve copy file results for a single operation endpoint](ref:getcopyfileresults)  to see the results of the File Copy Request.
+
+
+        :param file_id: The unique identifier of the file
+        :param file_copy: The details of the file copy
+        :param retries: Override the default retry configuration for this method
+        :param server_url: Override the default server URL for this method
+        :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
+        :param http_headers: Additional headers to set or replace on requests.
+        """
+        base_url = None
+        url_variables = None
+        if timeout_ms is None:
+            timeout_ms = self.sdk_configuration.timeout_ms
+
+        if server_url is not None:
+            base_url = server_url
+        else:
+            base_url = self._get_url(base_url, url_variables)
+
+        request = models.CopyFileRequest(
+            file_id=file_id,
+            file_copy=utils.get_pydantic_model(file_copy, models.FileCopy),
+        )
+
+        req = self._build_request(
+            method="POST",
+            path="/files/{fileId}/copy",
+            base_url=base_url,
+            url_variables=url_variables,
+            request=request,
+            request_body_required=True,
+            request_has_path_params=True,
+            request_has_query_params=True,
+            user_agent_header="user-agent",
+            accept_header_value="application/json",
+            http_headers=http_headers,
+            security=self.sdk_configuration.security,
+            get_serialized_body=lambda: utils.serialize_request_body(
+                request.file_copy, False, False, "json", models.FileCopy
+            ),
+            allow_empty_value=None,
+            timeout_ms=timeout_ms,
+        )
+
+        if retries == UNSET:
+            if self.sdk_configuration.retry_config is not UNSET:
+                retries = self.sdk_configuration.retry_config
+
+        retry_config = None
+        if isinstance(retries, utils.RetryConfig):
+            retry_config = (retries, ["429", "500", "502", "503", "504"])
+
+        http_res = self.do_request(
+            hook_ctx=HookContext(
+                config=self.sdk_configuration,
+                base_url=base_url or "",
+                operation_id="copyFile",
+                oauth2_scopes=["file:write"],
+                security_source=self.sdk_configuration.security,
+            ),
+            request=req,
+            error_status_codes=[
+                "400",
+                "401",
+                "403",
+                "404",
+                "409",
+                "429",
+                "4XX",
+                "500",
+                "503",
+                "5XX",
+            ],
+            retry_config=retry_config,
+        )
+
+        response_data: Any = None
+        if utils.match_response(http_res, "202", "*"):
+            return models.CopyFileResponse(
+                headers=utils.get_response_headers(http_res.headers)
+            )
+        if utils.match_response(
+            http_res, ["400", "401", "403", "404", "409", "429"], "application/json"
+        ):
+            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
+            raise errors.ErrorResponse(response_data, http_res)
+        if utils.match_response(http_res, ["500", "503"], "application/json"):
+            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
+            raise errors.ErrorResponse(response_data, http_res)
+        if utils.match_response(http_res, "4XX", "*"):
+            http_res_text = utils.stream_to_text(http_res)
+            raise errors.SDKError("API error occurred", http_res, http_res_text)
+        if utils.match_response(http_res, "5XX", "*"):
+            http_res_text = utils.stream_to_text(http_res)
+            raise errors.SDKError("API error occurred", http_res, http_res_text)
+
+        raise errors.SDKError("Unexpected response received", http_res)
+
+    async def copy_file_async(
+        self,
+        *,
+        file_id: str,
+        file_copy: Union[models.FileCopy, models.FileCopyTypedDict],
+        retries: OptionalNullable[utils.RetryConfig] = UNSET,
+        server_url: Optional[str] = None,
+        timeout_ms: Optional[int] = None,
+        http_headers: Optional[Mapping[str, str]] = None,
+    ) -> models.CopyFileResponse:
+        r"""Initiate a file copy
+
+        Copy a file to a new location. This is a long running operation. Responses include a `Location` header, which indicates where to poll for copy results. For more details on long-running job polling, see [Operations endpoint](ref:getoperationbyid).
+        Once the operation is completed, the `resourceUrl` field will be populated with a link to the   [Retrieve copy file results for a single operation endpoint](ref:getcopyfileresults)  to see the results of the File Copy Request.
+
+
+        :param file_id: The unique identifier of the file
+        :param file_copy: The details of the file copy
+        :param retries: Override the default retry configuration for this method
+        :param server_url: Override the default server URL for this method
+        :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
+        :param http_headers: Additional headers to set or replace on requests.
+        """
+        base_url = None
+        url_variables = None
+        if timeout_ms is None:
+            timeout_ms = self.sdk_configuration.timeout_ms
+
+        if server_url is not None:
+            base_url = server_url
+        else:
+            base_url = self._get_url(base_url, url_variables)
+
+        request = models.CopyFileRequest(
+            file_id=file_id,
+            file_copy=utils.get_pydantic_model(file_copy, models.FileCopy),
+        )
+
+        req = self._build_request_async(
+            method="POST",
+            path="/files/{fileId}/copy",
+            base_url=base_url,
+            url_variables=url_variables,
+            request=request,
+            request_body_required=True,
+            request_has_path_params=True,
+            request_has_query_params=True,
+            user_agent_header="user-agent",
+            accept_header_value="application/json",
+            http_headers=http_headers,
+            security=self.sdk_configuration.security,
+            get_serialized_body=lambda: utils.serialize_request_body(
+                request.file_copy, False, False, "json", models.FileCopy
+            ),
+            allow_empty_value=None,
+            timeout_ms=timeout_ms,
+        )
+
+        if retries == UNSET:
+            if self.sdk_configuration.retry_config is not UNSET:
+                retries = self.sdk_configuration.retry_config
+
+        retry_config = None
+        if isinstance(retries, utils.RetryConfig):
+            retry_config = (retries, ["429", "500", "502", "503", "504"])
+
+        http_res = await self.do_request_async(
+            hook_ctx=HookContext(
+                config=self.sdk_configuration,
+                base_url=base_url or "",
+                operation_id="copyFile",
+                oauth2_scopes=["file:write"],
+                security_source=self.sdk_configuration.security,
+            ),
+            request=req,
+            error_status_codes=[
+                "400",
+                "401",
+                "403",
+                "404",
+                "409",
+                "429",
+                "4XX",
+                "500",
+                "503",
+                "5XX",
+            ],
+            retry_config=retry_config,
+        )
+
+        response_data: Any = None
+        if utils.match_response(http_res, "202", "*"):
+            return models.CopyFileResponse(
+                headers=utils.get_response_headers(http_res.headers)
+            )
+        if utils.match_response(
+            http_res, ["400", "401", "403", "404", "409", "429"], "application/json"
+        ):
+            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
+            raise errors.ErrorResponse(response_data, http_res)
+        if utils.match_response(http_res, ["500", "503"], "application/json"):
+            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
+            raise errors.ErrorResponse(response_data, http_res)
+        if utils.match_response(http_res, "4XX", "*"):
+            http_res_text = await utils.stream_to_text_async(http_res)
+            raise errors.SDKError("API error occurred", http_res, http_res_text)
+        if utils.match_response(http_res, "5XX", "*"):
+            http_res_text = await utils.stream_to_text_async(http_res)
+            raise errors.SDKError("API error occurred", http_res, http_res_text)
+
+        raise errors.SDKError("Unexpected response received", http_res)
+
+    def export_file_by_id(
+        self,
+        *,
+        file_id: str,
+        file_export_by_id: Union[models.FileExportByID, models.FileExportByIDTypedDict],
+        retries: OptionalNullable[utils.RetryConfig] = UNSET,
+        server_url: Optional[str] = None,
+        timeout_ms: Optional[int] = None,
+        http_headers: Optional[Mapping[str, str]] = None,
+    ) -> models.ExportFileByIDResponse:
+        r"""Initiate a file export by ID
+
+        Export a file by its unique ID. This is a long running operation. Responses include a `Location` header, which indicates where to poll for export results. For  more details on long-running job polling, see [Operations endpoint](ref:getoperationbyid).
+        When the export process is complete, the status of the Operation  will change to completed. The `resourceUrl` field of the operation will contain  the download url of the exported file. To download the file, perform a GET against  the `resourceUrl` with the same authentication credentials and flow as the export request.  For more details, see Authentication documentation.
+        For more on Document, Spreadsheet, and Presentation export options, see the following: [Documents](https://developers.workiva.com/2026-01-01/platform-documentexport), [Spreadsheets](https://developers.workiva.com/2026-01-01/platform-spreadsheetexport), and [Presentations](https://developers.workiva.com/2026-01-01/platform-presentationexport).
+
+
+        :param file_id: The unique identifier of the file
+        :param file_export_by_id: The details of the file export.
+        :param retries: Override the default retry configuration for this method
+        :param server_url: Override the default server URL for this method
+        :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
+        :param http_headers: Additional headers to set or replace on requests.
+        """
+        base_url = None
+        url_variables = None
+        if timeout_ms is None:
+            timeout_ms = self.sdk_configuration.timeout_ms
+
+        if server_url is not None:
+            base_url = server_url
+        else:
+            base_url = self._get_url(base_url, url_variables)
+
+        request = models.ExportFileByIDRequest(
+            file_id=file_id,
+            file_export_by_id=utils.get_pydantic_model(
+                file_export_by_id, models.FileExportByID
+            ),
+        )
+
+        req = self._build_request(
+            method="POST",
+            path="/files/{fileId}/export",
+            base_url=base_url,
+            url_variables=url_variables,
+            request=request,
+            request_body_required=True,
+            request_has_path_params=True,
+            request_has_query_params=True,
+            user_agent_header="user-agent",
+            accept_header_value="application/json",
+            http_headers=http_headers,
+            security=self.sdk_configuration.security,
+            get_serialized_body=lambda: utils.serialize_request_body(
+                request.file_export_by_id, False, False, "json", models.FileExportByID
+            ),
+            allow_empty_value=None,
+            timeout_ms=timeout_ms,
+        )
+
+        if retries == UNSET:
+            if self.sdk_configuration.retry_config is not UNSET:
+                retries = self.sdk_configuration.retry_config
+
+        retry_config = None
+        if isinstance(retries, utils.RetryConfig):
+            retry_config = (retries, ["429", "500", "502", "503", "504"])
+
+        http_res = self.do_request(
+            hook_ctx=HookContext(
+                config=self.sdk_configuration,
+                base_url=base_url or "",
+                operation_id="exportFileById",
+                oauth2_scopes=["file:write"],
+                security_source=self.sdk_configuration.security,
+            ),
+            request=req,
+            error_status_codes=[
+                "400",
+                "401",
+                "403",
+                "404",
+                "409",
+                "429",
+                "4XX",
+                "500",
+                "503",
+                "5XX",
+            ],
+            retry_config=retry_config,
+        )
+
+        response_data: Any = None
+        if utils.match_response(http_res, "202", "*"):
+            return models.ExportFileByIDResponse(
+                headers=utils.get_response_headers(http_res.headers)
+            )
+        if utils.match_response(
+            http_res, ["400", "401", "403", "404", "409", "429"], "application/json"
+        ):
+            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
+            raise errors.ErrorResponse(response_data, http_res)
+        if utils.match_response(http_res, ["500", "503"], "application/json"):
+            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
+            raise errors.ErrorResponse(response_data, http_res)
+        if utils.match_response(http_res, "4XX", "*"):
+            http_res_text = utils.stream_to_text(http_res)
+            raise errors.SDKError("API error occurred", http_res, http_res_text)
+        if utils.match_response(http_res, "5XX", "*"):
+            http_res_text = utils.stream_to_text(http_res)
+            raise errors.SDKError("API error occurred", http_res, http_res_text)
+
+        raise errors.SDKError("Unexpected response received", http_res)
+
+    async def export_file_by_id_async(
+        self,
+        *,
+        file_id: str,
+        file_export_by_id: Union[models.FileExportByID, models.FileExportByIDTypedDict],
+        retries: OptionalNullable[utils.RetryConfig] = UNSET,
+        server_url: Optional[str] = None,
+        timeout_ms: Optional[int] = None,
+        http_headers: Optional[Mapping[str, str]] = None,
+    ) -> models.ExportFileByIDResponse:
+        r"""Initiate a file export by ID
+
+        Export a file by its unique ID. This is a long running operation. Responses include a `Location` header, which indicates where to poll for export results. For  more details on long-running job polling, see [Operations endpoint](ref:getoperationbyid).
+        When the export process is complete, the status of the Operation  will change to completed. The `resourceUrl` field of the operation will contain  the download url of the exported file. To download the file, perform a GET against  the `resourceUrl` with the same authentication credentials and flow as the export request.  For more details, see Authentication documentation.
+        For more on Document, Spreadsheet, and Presentation export options, see the following: [Documents](https://developers.workiva.com/2026-01-01/platform-documentexport), [Spreadsheets](https://developers.workiva.com/2026-01-01/platform-spreadsheetexport), and [Presentations](https://developers.workiva.com/2026-01-01/platform-presentationexport).
+
+
+        :param file_id: The unique identifier of the file
+        :param file_export_by_id: The details of the file export.
+        :param retries: Override the default retry configuration for this method
+        :param server_url: Override the default server URL for this method
+        :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
+        :param http_headers: Additional headers to set or replace on requests.
+        """
+        base_url = None
+        url_variables = None
+        if timeout_ms is None:
+            timeout_ms = self.sdk_configuration.timeout_ms
+
+        if server_url is not None:
+            base_url = server_url
+        else:
+            base_url = self._get_url(base_url, url_variables)
+
+        request = models.ExportFileByIDRequest(
+            file_id=file_id,
+            file_export_by_id=utils.get_pydantic_model(
+                file_export_by_id, models.FileExportByID
+            ),
+        )
+
+        req = self._build_request_async(
+            method="POST",
+            path="/files/{fileId}/export",
+            base_url=base_url,
+            url_variables=url_variables,
+            request=request,
+            request_body_required=True,
+            request_has_path_params=True,
+            request_has_query_params=True,
+            user_agent_header="user-agent",
+            accept_header_value="application/json",
+            http_headers=http_headers,
+            security=self.sdk_configuration.security,
+            get_serialized_body=lambda: utils.serialize_request_body(
+                request.file_export_by_id, False, False, "json", models.FileExportByID
+            ),
+            allow_empty_value=None,
+            timeout_ms=timeout_ms,
+        )
+
+        if retries == UNSET:
+            if self.sdk_configuration.retry_config is not UNSET:
+                retries = self.sdk_configuration.retry_config
+
+        retry_config = None
+        if isinstance(retries, utils.RetryConfig):
+            retry_config = (retries, ["429", "500", "502", "503", "504"])
+
+        http_res = await self.do_request_async(
+            hook_ctx=HookContext(
+                config=self.sdk_configuration,
+                base_url=base_url or "",
+                operation_id="exportFileById",
+                oauth2_scopes=["file:write"],
+                security_source=self.sdk_configuration.security,
+            ),
+            request=req,
+            error_status_codes=[
+                "400",
+                "401",
+                "403",
+                "404",
+                "409",
+                "429",
+                "4XX",
+                "500",
+                "503",
+                "5XX",
+            ],
+            retry_config=retry_config,
+        )
+
+        response_data: Any = None
+        if utils.match_response(http_res, "202", "*"):
+            return models.ExportFileByIDResponse(
+                headers=utils.get_response_headers(http_res.headers)
+            )
         if utils.match_response(
             http_res, ["400", "401", "403", "404", "409", "429"], "application/json"
         ):
@@ -2890,6 +2375,521 @@ class Files(BaseSDK):
             return models.TrashFileByIDResponse(
                 headers=utils.get_response_headers(http_res.headers)
             )
+        if utils.match_response(
+            http_res, ["400", "401", "403", "404", "409", "429"], "application/json"
+        ):
+            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
+            raise errors.ErrorResponse(response_data, http_res)
+        if utils.match_response(http_res, ["500", "503"], "application/json"):
+            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
+            raise errors.ErrorResponse(response_data, http_res)
+        if utils.match_response(http_res, "4XX", "*"):
+            http_res_text = await utils.stream_to_text_async(http_res)
+            raise errors.SDKError("API error occurred", http_res, http_res_text)
+        if utils.match_response(http_res, "5XX", "*"):
+            http_res_text = await utils.stream_to_text_async(http_res)
+            raise errors.SDKError("API error occurred", http_res, http_res_text)
+
+        raise errors.SDKError("Unexpected response received", http_res)
+
+    def get_file_permissions(
+        self,
+        *,
+        file_id: str,
+        dollar_filter: Optional[str] = None,
+        dollar_maxpagesize: Optional[int] = 1000,
+        dollar_next: Optional[str] = None,
+        retries: OptionalNullable[utils.RetryConfig] = UNSET,
+        server_url: Optional[str] = None,
+        timeout_ms: Optional[int] = None,
+        http_headers: Optional[Mapping[str, str]] = None,
+    ) -> Optional[models.GetFilePermissionsResponse]:
+        r"""Retrieve permissions for a file
+
+        Retrieves a paginated list of permissions for a given file
+
+
+        :param file_id: The unique identifier of the file
+        :param dollar_filter: The properties to filter the results by.
+        :param dollar_maxpagesize: The maximum number of results to retrieve
+        :param dollar_next: Pagination cursor for next set of results.
+        :param retries: Override the default retry configuration for this method
+        :param server_url: Override the default server URL for this method
+        :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
+        :param http_headers: Additional headers to set or replace on requests.
+        """
+        base_url = None
+        url_variables = None
+        if timeout_ms is None:
+            timeout_ms = self.sdk_configuration.timeout_ms
+
+        if server_url is not None:
+            base_url = server_url
+        else:
+            base_url = self._get_url(base_url, url_variables)
+
+        request = models.GetFilePermissionsRequest(
+            file_id=file_id,
+            dollar_filter=dollar_filter,
+            dollar_maxpagesize=dollar_maxpagesize,
+            dollar_next=dollar_next,
+        )
+
+        req = self._build_request(
+            method="GET",
+            path="/files/{fileId}/permissions",
+            base_url=base_url,
+            url_variables=url_variables,
+            request=request,
+            request_body_required=False,
+            request_has_path_params=True,
+            request_has_query_params=True,
+            user_agent_header="user-agent",
+            accept_header_value="application/json",
+            http_headers=http_headers,
+            security=self.sdk_configuration.security,
+            allow_empty_value=None,
+            timeout_ms=timeout_ms,
+        )
+
+        if retries == UNSET:
+            if self.sdk_configuration.retry_config is not UNSET:
+                retries = self.sdk_configuration.retry_config
+
+        retry_config = None
+        if isinstance(retries, utils.RetryConfig):
+            retry_config = (retries, ["429", "500", "502", "503", "504"])
+
+        http_res = self.do_request(
+            hook_ctx=HookContext(
+                config=self.sdk_configuration,
+                base_url=base_url or "",
+                operation_id="getFilePermissions",
+                oauth2_scopes=["file:read"],
+                security_source=self.sdk_configuration.security,
+            ),
+            request=req,
+            error_status_codes=[
+                "400",
+                "401",
+                "403",
+                "404",
+                "409",
+                "429",
+                "4XX",
+                "500",
+                "503",
+                "5XX",
+            ],
+            retry_config=retry_config,
+        )
+
+        def next_func() -> Optional[models.GetFilePermissionsResponse]:
+            body = utils.unmarshal_json(http_res.text, Union[Dict[Any, Any], List[Any]])
+
+            next_cursor = JSONPath("$['@nextLink']").parse(body)
+
+            if len(next_cursor) == 0:
+                return None
+
+            next_cursor = next_cursor[0]
+            if next_cursor is None or str(next_cursor).strip() == "":
+                return None
+
+            return self.get_file_permissions(
+                file_id=file_id,
+                dollar_filter=dollar_filter,
+                dollar_maxpagesize=dollar_maxpagesize,
+                dollar_next=next_cursor,
+                retries=retries,
+            )
+
+        response_data: Any = None
+        if utils.match_response(http_res, "200", "application/json"):
+            return models.GetFilePermissionsResponse(
+                result=unmarshal_json_response(
+                    models.ResourcePermissionsListResult, http_res
+                ),
+                next=next_func,
+            )
+        if utils.match_response(
+            http_res, ["400", "401", "403", "404", "409", "429"], "application/json"
+        ):
+            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
+            raise errors.ErrorResponse(response_data, http_res)
+        if utils.match_response(http_res, ["500", "503"], "application/json"):
+            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
+            raise errors.ErrorResponse(response_data, http_res)
+        if utils.match_response(http_res, "4XX", "*"):
+            http_res_text = utils.stream_to_text(http_res)
+            raise errors.SDKError("API error occurred", http_res, http_res_text)
+        if utils.match_response(http_res, "5XX", "*"):
+            http_res_text = utils.stream_to_text(http_res)
+            raise errors.SDKError("API error occurred", http_res, http_res_text)
+
+        raise errors.SDKError("Unexpected response received", http_res)
+
+    async def get_file_permissions_async(
+        self,
+        *,
+        file_id: str,
+        dollar_filter: Optional[str] = None,
+        dollar_maxpagesize: Optional[int] = 1000,
+        dollar_next: Optional[str] = None,
+        retries: OptionalNullable[utils.RetryConfig] = UNSET,
+        server_url: Optional[str] = None,
+        timeout_ms: Optional[int] = None,
+        http_headers: Optional[Mapping[str, str]] = None,
+    ) -> Optional[models.GetFilePermissionsResponse]:
+        r"""Retrieve permissions for a file
+
+        Retrieves a paginated list of permissions for a given file
+
+
+        :param file_id: The unique identifier of the file
+        :param dollar_filter: The properties to filter the results by.
+        :param dollar_maxpagesize: The maximum number of results to retrieve
+        :param dollar_next: Pagination cursor for next set of results.
+        :param retries: Override the default retry configuration for this method
+        :param server_url: Override the default server URL for this method
+        :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
+        :param http_headers: Additional headers to set or replace on requests.
+        """
+        base_url = None
+        url_variables = None
+        if timeout_ms is None:
+            timeout_ms = self.sdk_configuration.timeout_ms
+
+        if server_url is not None:
+            base_url = server_url
+        else:
+            base_url = self._get_url(base_url, url_variables)
+
+        request = models.GetFilePermissionsRequest(
+            file_id=file_id,
+            dollar_filter=dollar_filter,
+            dollar_maxpagesize=dollar_maxpagesize,
+            dollar_next=dollar_next,
+        )
+
+        req = self._build_request_async(
+            method="GET",
+            path="/files/{fileId}/permissions",
+            base_url=base_url,
+            url_variables=url_variables,
+            request=request,
+            request_body_required=False,
+            request_has_path_params=True,
+            request_has_query_params=True,
+            user_agent_header="user-agent",
+            accept_header_value="application/json",
+            http_headers=http_headers,
+            security=self.sdk_configuration.security,
+            allow_empty_value=None,
+            timeout_ms=timeout_ms,
+        )
+
+        if retries == UNSET:
+            if self.sdk_configuration.retry_config is not UNSET:
+                retries = self.sdk_configuration.retry_config
+
+        retry_config = None
+        if isinstance(retries, utils.RetryConfig):
+            retry_config = (retries, ["429", "500", "502", "503", "504"])
+
+        http_res = await self.do_request_async(
+            hook_ctx=HookContext(
+                config=self.sdk_configuration,
+                base_url=base_url or "",
+                operation_id="getFilePermissions",
+                oauth2_scopes=["file:read"],
+                security_source=self.sdk_configuration.security,
+            ),
+            request=req,
+            error_status_codes=[
+                "400",
+                "401",
+                "403",
+                "404",
+                "409",
+                "429",
+                "4XX",
+                "500",
+                "503",
+                "5XX",
+            ],
+            retry_config=retry_config,
+        )
+
+        def next_func() -> Awaitable[Optional[models.GetFilePermissionsResponse]]:
+            body = utils.unmarshal_json(http_res.text, Union[Dict[Any, Any], List[Any]])
+
+            async def empty_result():
+                return None
+
+            next_cursor = JSONPath("$['@nextLink']").parse(body)
+
+            if len(next_cursor) == 0:
+                return empty_result()
+
+            next_cursor = next_cursor[0]
+            if next_cursor is None or str(next_cursor).strip() == "":
+                return empty_result()
+
+            return self.get_file_permissions_async(
+                file_id=file_id,
+                dollar_filter=dollar_filter,
+                dollar_maxpagesize=dollar_maxpagesize,
+                dollar_next=next_cursor,
+                retries=retries,
+            )
+
+        response_data: Any = None
+        if utils.match_response(http_res, "200", "application/json"):
+            return models.GetFilePermissionsResponse(
+                result=unmarshal_json_response(
+                    models.ResourcePermissionsListResult, http_res
+                ),
+                next=next_func,
+            )
+        if utils.match_response(
+            http_res, ["400", "401", "403", "404", "409", "429"], "application/json"
+        ):
+            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
+            raise errors.ErrorResponse(response_data, http_res)
+        if utils.match_response(http_res, ["500", "503"], "application/json"):
+            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
+            raise errors.ErrorResponse(response_data, http_res)
+        if utils.match_response(http_res, "4XX", "*"):
+            http_res_text = await utils.stream_to_text_async(http_res)
+            raise errors.SDKError("API error occurred", http_res, http_res_text)
+        if utils.match_response(http_res, "5XX", "*"):
+            http_res_text = await utils.stream_to_text_async(http_res)
+            raise errors.SDKError("API error occurred", http_res, http_res_text)
+
+        raise errors.SDKError("Unexpected response received", http_res)
+
+    def file_permissions_modification(
+        self,
+        *,
+        file_id: str,
+        resource_permissions_modification: Union[
+            models.ResourcePermissionsModification,
+            models.ResourcePermissionsModificationTypedDict,
+        ],
+        retries: OptionalNullable[utils.RetryConfig] = UNSET,
+        server_url: Optional[str] = None,
+        timeout_ms: Optional[int] = None,
+        http_headers: Optional[Mapping[str, str]] = None,
+    ):
+        r"""Modify permissions on a file
+
+        Assign and/or revoke permissions on a file. If any modification in a request fails, all modifications on that request fail. <br /><br /> _To modify an existing permission, the existing permission must first be  explicitly revoked. Then, the new permission needs to be assigned. This  can be done in a single request by sending `toAssign` and `toRevoke` in  the request body._
+
+
+        :param file_id: The unique identifier of the file
+        :param resource_permissions_modification: Details about the file permissions modification.
+        :param retries: Override the default retry configuration for this method
+        :param server_url: Override the default server URL for this method
+        :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
+        :param http_headers: Additional headers to set or replace on requests.
+        """
+        base_url = None
+        url_variables = None
+        if timeout_ms is None:
+            timeout_ms = self.sdk_configuration.timeout_ms
+
+        if server_url is not None:
+            base_url = server_url
+        else:
+            base_url = self._get_url(base_url, url_variables)
+
+        request = models.FilePermissionsModificationRequest(
+            file_id=file_id,
+            resource_permissions_modification=utils.get_pydantic_model(
+                resource_permissions_modification,
+                models.ResourcePermissionsModification,
+            ),
+        )
+
+        req = self._build_request(
+            method="POST",
+            path="/files/{fileId}/permissions/modification",
+            base_url=base_url,
+            url_variables=url_variables,
+            request=request,
+            request_body_required=True,
+            request_has_path_params=True,
+            request_has_query_params=True,
+            user_agent_header="user-agent",
+            accept_header_value="application/json",
+            http_headers=http_headers,
+            security=self.sdk_configuration.security,
+            get_serialized_body=lambda: utils.serialize_request_body(
+                request.resource_permissions_modification,
+                False,
+                False,
+                "json",
+                models.ResourcePermissionsModification,
+            ),
+            allow_empty_value=None,
+            timeout_ms=timeout_ms,
+        )
+
+        if retries == UNSET:
+            if self.sdk_configuration.retry_config is not UNSET:
+                retries = self.sdk_configuration.retry_config
+
+        retry_config = None
+        if isinstance(retries, utils.RetryConfig):
+            retry_config = (retries, ["429", "500", "502", "503", "504"])
+
+        http_res = self.do_request(
+            hook_ctx=HookContext(
+                config=self.sdk_configuration,
+                base_url=base_url or "",
+                operation_id="filePermissionsModification",
+                oauth2_scopes=["file:write"],
+                security_source=self.sdk_configuration.security,
+            ),
+            request=req,
+            error_status_codes=[
+                "400",
+                "401",
+                "403",
+                "404",
+                "409",
+                "429",
+                "4XX",
+                "500",
+                "503",
+                "5XX",
+            ],
+            retry_config=retry_config,
+        )
+
+        response_data: Any = None
+        if utils.match_response(http_res, "204", "*"):
+            return
+        if utils.match_response(
+            http_res, ["400", "401", "403", "404", "409", "429"], "application/json"
+        ):
+            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
+            raise errors.ErrorResponse(response_data, http_res)
+        if utils.match_response(http_res, ["500", "503"], "application/json"):
+            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
+            raise errors.ErrorResponse(response_data, http_res)
+        if utils.match_response(http_res, "4XX", "*"):
+            http_res_text = utils.stream_to_text(http_res)
+            raise errors.SDKError("API error occurred", http_res, http_res_text)
+        if utils.match_response(http_res, "5XX", "*"):
+            http_res_text = utils.stream_to_text(http_res)
+            raise errors.SDKError("API error occurred", http_res, http_res_text)
+
+        raise errors.SDKError("Unexpected response received", http_res)
+
+    async def file_permissions_modification_async(
+        self,
+        *,
+        file_id: str,
+        resource_permissions_modification: Union[
+            models.ResourcePermissionsModification,
+            models.ResourcePermissionsModificationTypedDict,
+        ],
+        retries: OptionalNullable[utils.RetryConfig] = UNSET,
+        server_url: Optional[str] = None,
+        timeout_ms: Optional[int] = None,
+        http_headers: Optional[Mapping[str, str]] = None,
+    ):
+        r"""Modify permissions on a file
+
+        Assign and/or revoke permissions on a file. If any modification in a request fails, all modifications on that request fail. <br /><br /> _To modify an existing permission, the existing permission must first be  explicitly revoked. Then, the new permission needs to be assigned. This  can be done in a single request by sending `toAssign` and `toRevoke` in  the request body._
+
+
+        :param file_id: The unique identifier of the file
+        :param resource_permissions_modification: Details about the file permissions modification.
+        :param retries: Override the default retry configuration for this method
+        :param server_url: Override the default server URL for this method
+        :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
+        :param http_headers: Additional headers to set or replace on requests.
+        """
+        base_url = None
+        url_variables = None
+        if timeout_ms is None:
+            timeout_ms = self.sdk_configuration.timeout_ms
+
+        if server_url is not None:
+            base_url = server_url
+        else:
+            base_url = self._get_url(base_url, url_variables)
+
+        request = models.FilePermissionsModificationRequest(
+            file_id=file_id,
+            resource_permissions_modification=utils.get_pydantic_model(
+                resource_permissions_modification,
+                models.ResourcePermissionsModification,
+            ),
+        )
+
+        req = self._build_request_async(
+            method="POST",
+            path="/files/{fileId}/permissions/modification",
+            base_url=base_url,
+            url_variables=url_variables,
+            request=request,
+            request_body_required=True,
+            request_has_path_params=True,
+            request_has_query_params=True,
+            user_agent_header="user-agent",
+            accept_header_value="application/json",
+            http_headers=http_headers,
+            security=self.sdk_configuration.security,
+            get_serialized_body=lambda: utils.serialize_request_body(
+                request.resource_permissions_modification,
+                False,
+                False,
+                "json",
+                models.ResourcePermissionsModification,
+            ),
+            allow_empty_value=None,
+            timeout_ms=timeout_ms,
+        )
+
+        if retries == UNSET:
+            if self.sdk_configuration.retry_config is not UNSET:
+                retries = self.sdk_configuration.retry_config
+
+        retry_config = None
+        if isinstance(retries, utils.RetryConfig):
+            retry_config = (retries, ["429", "500", "502", "503", "504"])
+
+        http_res = await self.do_request_async(
+            hook_ctx=HookContext(
+                config=self.sdk_configuration,
+                base_url=base_url or "",
+                operation_id="filePermissionsModification",
+                oauth2_scopes=["file:write"],
+                security_source=self.sdk_configuration.security,
+            ),
+            request=req,
+            error_status_codes=[
+                "400",
+                "401",
+                "403",
+                "404",
+                "409",
+                "429",
+                "4XX",
+                "500",
+                "503",
+                "5XX",
+            ],
+            retry_config=retry_config,
+        )
+
+        response_data: Any = None
+        if utils.match_response(http_res, "204", "*"):
+            return
         if utils.match_response(
             http_res, ["400", "401", "403", "404", "409", "429"], "application/json"
         ):

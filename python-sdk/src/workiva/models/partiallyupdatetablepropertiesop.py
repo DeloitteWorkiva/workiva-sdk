@@ -10,25 +10,25 @@ from workiva.utils import FieldMetadata, PathParamMetadata, RequestMetadata
 
 
 class PartiallyUpdateTablePropertiesRequestTypedDict(TypedDict):
-    request_body: List[JSONPatchOperationTypedDict]
-    r"""Patch document representing the changes to be made to the table's properties"""
     table_id: str
     r"""The unique identifier for the table"""
+    request_body: List[JSONPatchOperationTypedDict]
+    r"""Patch document representing the changes to be made to the table's properties"""
 
 
 class PartiallyUpdateTablePropertiesRequest(BaseModel):
-    request_body: Annotated[
-        List[JSONPatchOperation],
-        FieldMetadata(request=RequestMetadata(media_type="application/json")),
-    ]
-    r"""Patch document representing the changes to be made to the table's properties"""
-
     table_id: Annotated[
         str,
         pydantic.Field(alias="tableId"),
         FieldMetadata(path=PathParamMetadata(style="simple", explode=False)),
     ]
     r"""The unique identifier for the table"""
+
+    request_body: Annotated[
+        List[JSONPatchOperation],
+        FieldMetadata(request=RequestMetadata(media_type="application/json")),
+    ]
+    r"""Patch document representing the changes to be made to the table's properties"""
 
 
 class PartiallyUpdateTablePropertiesResponseTypedDict(TypedDict):

@@ -10,739 +10,6 @@ from workiva.utils.unmarshal_json_response import unmarshal_json_response
 
 
 class Chains(BaseSDK):
-    def chain_filter_search(
-        self,
-        *,
-        request: Union[
-            models.ChainsChainFilterSearchRequest,
-            models.ChainsChainFilterSearchRequestTypedDict,
-        ] = models.ChainsChainFilterSearchRequest(),
-        retries: OptionalNullable[utils.RetryConfig] = UNSET,
-        server_url: Optional[str] = None,
-        timeout_ms: Optional[int] = None,
-        http_headers: Optional[Mapping[str, str]] = None,
-    ) -> Optional[models.ChainsChainFilterSearchResponse]:
-        r"""Search previous chain runs
-
-        Returns a list of all previous chain runs that match the provided criteria. The environment IDs specify which environments should be searched for the chain run. The chain IDs specify which specific chains should be returned. The state specified returns only those chains that are in that state (e.g. \"completed\"). If a cursor is provided, the corresponding page will be returned.
-
-
-        :param request: The request object to send.
-        :param retries: Override the default retry configuration for this method
-        :param server_url: Override the default server URL for this method
-        :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
-        :param http_headers: Additional headers to set or replace on requests.
-        """
-        base_url = None
-        url_variables = None
-        if timeout_ms is None:
-            timeout_ms = self.sdk_configuration.timeout_ms
-
-        if server_url is not None:
-            base_url = server_url
-        else:
-            base_url = models.CHAINS_CHAIN_FILTER_SEARCH_OP_SERVERS[0]
-
-        if not isinstance(request, BaseModel):
-            request = utils.unmarshal(request, models.ChainsChainFilterSearchRequest)
-        request = cast(models.ChainsChainFilterSearchRequest, request)
-
-        req = self._build_request(
-            method="GET",
-            path="/v1/execute/chain_run/search",
-            base_url=base_url,
-            url_variables=url_variables,
-            request=request,
-            request_body_required=False,
-            request_has_path_params=False,
-            request_has_query_params=True,
-            user_agent_header="user-agent",
-            accept_header_value="application/json",
-            http_headers=http_headers,
-            security=self.sdk_configuration.security,
-            allow_empty_value=None,
-            timeout_ms=timeout_ms,
-        )
-
-        if retries == UNSET:
-            if self.sdk_configuration.retry_config is not UNSET:
-                retries = self.sdk_configuration.retry_config
-
-        retry_config = None
-        if isinstance(retries, utils.RetryConfig):
-            retry_config = (retries, ["429", "500", "502", "503", "504"])
-
-        http_res = self.do_request(
-            hook_ctx=HookContext(
-                config=self.sdk_configuration,
-                base_url=base_url or "",
-                operation_id="chains_chainFilterSearch",
-                oauth2_scopes=[],
-                security_source=self.sdk_configuration.security,
-            ),
-            request=req,
-            error_status_codes=["401", "404", "422", "4XX", "5XX"],
-            retry_config=retry_config,
-        )
-
-        def next_func() -> Optional[models.ChainsChainFilterSearchResponse]:
-            body = utils.unmarshal_json(http_res.text, Union[Dict[Any, Any], List[Any]])
-
-            next_cursor = JSONPath("$.data.cursor").parse(body)
-
-            if len(next_cursor) == 0:
-                return None
-
-            next_cursor = next_cursor[0]
-            if next_cursor is None or str(next_cursor).strip() == "":
-                return None
-
-            return self.chain_filter_search(
-                request=models.ChainsChainFilterSearchRequest(
-                    chain_id=request.chain_id,
-                    cursor=next_cursor,
-                    end_date=request.end_date,
-                    environment_id=request.environment_id,
-                    sort=request.sort,
-                    start_date=request.start_date,
-                    state=request.state,
-                ),
-                retries=retries,
-                server_url=server_url,
-            )
-
-        response_data: Any = None
-        if utils.match_response(http_res, "200", "application/json"):
-            return models.ChainsChainFilterSearchResponse(
-                result=unmarshal_json_response(models.ChainRunPageResponse, http_res),
-                next=next_func,
-            )
-        if utils.match_response(http_res, ["401", "404", "422"], "application/json"):
-            response_data = unmarshal_json_response(
-                errors.ChainSingleErrorData, http_res
-            )
-            raise errors.ChainSingleError(response_data, http_res)
-        if utils.match_response(http_res, "4XX", "*"):
-            http_res_text = utils.stream_to_text(http_res)
-            raise errors.SDKError("API error occurred", http_res, http_res_text)
-        if utils.match_response(http_res, "5XX", "*"):
-            http_res_text = utils.stream_to_text(http_res)
-            raise errors.SDKError("API error occurred", http_res, http_res_text)
-
-        raise errors.SDKError("Unexpected response received", http_res)
-
-    async def chain_filter_search_async(
-        self,
-        *,
-        request: Union[
-            models.ChainsChainFilterSearchRequest,
-            models.ChainsChainFilterSearchRequestTypedDict,
-        ] = models.ChainsChainFilterSearchRequest(),
-        retries: OptionalNullable[utils.RetryConfig] = UNSET,
-        server_url: Optional[str] = None,
-        timeout_ms: Optional[int] = None,
-        http_headers: Optional[Mapping[str, str]] = None,
-    ) -> Optional[models.ChainsChainFilterSearchResponse]:
-        r"""Search previous chain runs
-
-        Returns a list of all previous chain runs that match the provided criteria. The environment IDs specify which environments should be searched for the chain run. The chain IDs specify which specific chains should be returned. The state specified returns only those chains that are in that state (e.g. \"completed\"). If a cursor is provided, the corresponding page will be returned.
-
-
-        :param request: The request object to send.
-        :param retries: Override the default retry configuration for this method
-        :param server_url: Override the default server URL for this method
-        :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
-        :param http_headers: Additional headers to set or replace on requests.
-        """
-        base_url = None
-        url_variables = None
-        if timeout_ms is None:
-            timeout_ms = self.sdk_configuration.timeout_ms
-
-        if server_url is not None:
-            base_url = server_url
-        else:
-            base_url = models.CHAINS_CHAIN_FILTER_SEARCH_OP_SERVERS[0]
-
-        if not isinstance(request, BaseModel):
-            request = utils.unmarshal(request, models.ChainsChainFilterSearchRequest)
-        request = cast(models.ChainsChainFilterSearchRequest, request)
-
-        req = self._build_request_async(
-            method="GET",
-            path="/v1/execute/chain_run/search",
-            base_url=base_url,
-            url_variables=url_variables,
-            request=request,
-            request_body_required=False,
-            request_has_path_params=False,
-            request_has_query_params=True,
-            user_agent_header="user-agent",
-            accept_header_value="application/json",
-            http_headers=http_headers,
-            security=self.sdk_configuration.security,
-            allow_empty_value=None,
-            timeout_ms=timeout_ms,
-        )
-
-        if retries == UNSET:
-            if self.sdk_configuration.retry_config is not UNSET:
-                retries = self.sdk_configuration.retry_config
-
-        retry_config = None
-        if isinstance(retries, utils.RetryConfig):
-            retry_config = (retries, ["429", "500", "502", "503", "504"])
-
-        http_res = await self.do_request_async(
-            hook_ctx=HookContext(
-                config=self.sdk_configuration,
-                base_url=base_url or "",
-                operation_id="chains_chainFilterSearch",
-                oauth2_scopes=[],
-                security_source=self.sdk_configuration.security,
-            ),
-            request=req,
-            error_status_codes=["401", "404", "422", "4XX", "5XX"],
-            retry_config=retry_config,
-        )
-
-        def next_func() -> Awaitable[Optional[models.ChainsChainFilterSearchResponse]]:
-            body = utils.unmarshal_json(http_res.text, Union[Dict[Any, Any], List[Any]])
-
-            async def empty_result():
-                return None
-
-            next_cursor = JSONPath("$.data.cursor").parse(body)
-
-            if len(next_cursor) == 0:
-                return empty_result()
-
-            next_cursor = next_cursor[0]
-            if next_cursor is None or str(next_cursor).strip() == "":
-                return empty_result()
-
-            return self.chain_filter_search_async(
-                request=models.ChainsChainFilterSearchRequest(
-                    chain_id=request.chain_id,
-                    cursor=next_cursor,
-                    end_date=request.end_date,
-                    environment_id=request.environment_id,
-                    sort=request.sort,
-                    start_date=request.start_date,
-                    state=request.state,
-                ),
-                retries=retries,
-                server_url=server_url,
-            )
-
-        response_data: Any = None
-        if utils.match_response(http_res, "200", "application/json"):
-            return models.ChainsChainFilterSearchResponse(
-                result=unmarshal_json_response(models.ChainRunPageResponse, http_res),
-                next=next_func,
-            )
-        if utils.match_response(http_res, ["401", "404", "422"], "application/json"):
-            response_data = unmarshal_json_response(
-                errors.ChainSingleErrorData, http_res
-            )
-            raise errors.ChainSingleError(response_data, http_res)
-        if utils.match_response(http_res, "4XX", "*"):
-            http_res_text = await utils.stream_to_text_async(http_res)
-            raise errors.SDKError("API error occurred", http_res, http_res_text)
-        if utils.match_response(http_res, "5XX", "*"):
-            http_res_text = await utils.stream_to_text_async(http_res)
-            raise errors.SDKError("API error occurred", http_res, http_res_text)
-
-        raise errors.SDKError("Unexpected response received", http_res)
-
-    def chain_inputs_search(
-        self,
-        *,
-        environment_id: str,
-        search_text: str,
-        cursor: Optional[str] = None,
-        limit: Optional[str] = None,
-        retries: OptionalNullable[utils.RetryConfig] = UNSET,
-        server_url: Optional[str] = None,
-        timeout_ms: Optional[int] = None,
-        http_headers: Optional[Mapping[str, str]] = None,
-    ) -> Optional[models.ChainsChainInputsSearchResponse]:
-        r"""Search previous chain runs for an input value
-
-        Returns a list of all chain runs whose inputs match the provided search criteria. The search text is fuzzy matched; it matches any input value that contains the provided string. For example, a command that takes a File ID of \"my_file_id\" as an input can be searched using \"my_file_id\" as the search text input. The environment ID specifies which environment should be searched for chain run input parameters. The limit and cursor help determine the page size and which page to return.
-
-
-        :param environment_id: The ID of the environment to search for chains run inputs.
-        :param search_text: The fuzzy input value to search for.
-        :param cursor: Cursor value returned from the API, indicating page information.
-        :param limit: Limit number of chainExecutors returned (Max 50).
-        :param retries: Override the default retry configuration for this method
-        :param server_url: Override the default server URL for this method
-        :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
-        :param http_headers: Additional headers to set or replace on requests.
-        """
-        base_url = None
-        url_variables = None
-        if timeout_ms is None:
-            timeout_ms = self.sdk_configuration.timeout_ms
-
-        if server_url is not None:
-            base_url = server_url
-        else:
-            base_url = models.CHAINS_CHAIN_INPUTS_SEARCH_OP_SERVERS[0]
-
-        request = models.ChainsChainInputsSearchRequest(
-            cursor=cursor,
-            environment_id=environment_id,
-            limit=limit,
-            search_text=search_text,
-        )
-
-        req = self._build_request(
-            method="GET",
-            path="/v1/execute/environment/{environment_id}/chain/inputs_search",
-            base_url=base_url,
-            url_variables=url_variables,
-            request=request,
-            request_body_required=False,
-            request_has_path_params=True,
-            request_has_query_params=True,
-            user_agent_header="user-agent",
-            accept_header_value="application/json",
-            http_headers=http_headers,
-            security=self.sdk_configuration.security,
-            allow_empty_value=None,
-            timeout_ms=timeout_ms,
-        )
-
-        if retries == UNSET:
-            if self.sdk_configuration.retry_config is not UNSET:
-                retries = self.sdk_configuration.retry_config
-
-        retry_config = None
-        if isinstance(retries, utils.RetryConfig):
-            retry_config = (retries, ["429", "500", "502", "503", "504"])
-
-        http_res = self.do_request(
-            hook_ctx=HookContext(
-                config=self.sdk_configuration,
-                base_url=base_url or "",
-                operation_id="chains_chainInputsSearch",
-                oauth2_scopes=[],
-                security_source=self.sdk_configuration.security,
-            ),
-            request=req,
-            error_status_codes=["401", "404", "422", "4XX", "5XX"],
-            retry_config=retry_config,
-        )
-
-        def next_func() -> Optional[models.ChainsChainInputsSearchResponse]:
-            body = utils.unmarshal_json(http_res.text, Union[Dict[Any, Any], List[Any]])
-
-            next_cursor = JSONPath("$.data.cursor").parse(body)
-
-            if len(next_cursor) == 0:
-                return None
-
-            next_cursor = next_cursor[0]
-            if next_cursor is None or str(next_cursor).strip() == "":
-                return None
-
-            return self.chain_inputs_search(
-                environment_id=environment_id,
-                search_text=search_text,
-                cursor=next_cursor,
-                limit=limit,
-                retries=retries,
-                server_url=server_url,
-            )
-
-        response_data: Any = None
-        if utils.match_response(http_res, "200", "application/json"):
-            return models.ChainsChainInputsSearchResponse(
-                result=unmarshal_json_response(models.ChainRunPageResponse, http_res),
-                next=next_func,
-            )
-        if utils.match_response(http_res, ["401", "404", "422"], "application/json"):
-            response_data = unmarshal_json_response(
-                errors.ChainSingleErrorData, http_res
-            )
-            raise errors.ChainSingleError(response_data, http_res)
-        if utils.match_response(http_res, "4XX", "*"):
-            http_res_text = utils.stream_to_text(http_res)
-            raise errors.SDKError("API error occurred", http_res, http_res_text)
-        if utils.match_response(http_res, "5XX", "*"):
-            http_res_text = utils.stream_to_text(http_res)
-            raise errors.SDKError("API error occurred", http_res, http_res_text)
-
-        raise errors.SDKError("Unexpected response received", http_res)
-
-    async def chain_inputs_search_async(
-        self,
-        *,
-        environment_id: str,
-        search_text: str,
-        cursor: Optional[str] = None,
-        limit: Optional[str] = None,
-        retries: OptionalNullable[utils.RetryConfig] = UNSET,
-        server_url: Optional[str] = None,
-        timeout_ms: Optional[int] = None,
-        http_headers: Optional[Mapping[str, str]] = None,
-    ) -> Optional[models.ChainsChainInputsSearchResponse]:
-        r"""Search previous chain runs for an input value
-
-        Returns a list of all chain runs whose inputs match the provided search criteria. The search text is fuzzy matched; it matches any input value that contains the provided string. For example, a command that takes a File ID of \"my_file_id\" as an input can be searched using \"my_file_id\" as the search text input. The environment ID specifies which environment should be searched for chain run input parameters. The limit and cursor help determine the page size and which page to return.
-
-
-        :param environment_id: The ID of the environment to search for chains run inputs.
-        :param search_text: The fuzzy input value to search for.
-        :param cursor: Cursor value returned from the API, indicating page information.
-        :param limit: Limit number of chainExecutors returned (Max 50).
-        :param retries: Override the default retry configuration for this method
-        :param server_url: Override the default server URL for this method
-        :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
-        :param http_headers: Additional headers to set or replace on requests.
-        """
-        base_url = None
-        url_variables = None
-        if timeout_ms is None:
-            timeout_ms = self.sdk_configuration.timeout_ms
-
-        if server_url is not None:
-            base_url = server_url
-        else:
-            base_url = models.CHAINS_CHAIN_INPUTS_SEARCH_OP_SERVERS[0]
-
-        request = models.ChainsChainInputsSearchRequest(
-            cursor=cursor,
-            environment_id=environment_id,
-            limit=limit,
-            search_text=search_text,
-        )
-
-        req = self._build_request_async(
-            method="GET",
-            path="/v1/execute/environment/{environment_id}/chain/inputs_search",
-            base_url=base_url,
-            url_variables=url_variables,
-            request=request,
-            request_body_required=False,
-            request_has_path_params=True,
-            request_has_query_params=True,
-            user_agent_header="user-agent",
-            accept_header_value="application/json",
-            http_headers=http_headers,
-            security=self.sdk_configuration.security,
-            allow_empty_value=None,
-            timeout_ms=timeout_ms,
-        )
-
-        if retries == UNSET:
-            if self.sdk_configuration.retry_config is not UNSET:
-                retries = self.sdk_configuration.retry_config
-
-        retry_config = None
-        if isinstance(retries, utils.RetryConfig):
-            retry_config = (retries, ["429", "500", "502", "503", "504"])
-
-        http_res = await self.do_request_async(
-            hook_ctx=HookContext(
-                config=self.sdk_configuration,
-                base_url=base_url or "",
-                operation_id="chains_chainInputsSearch",
-                oauth2_scopes=[],
-                security_source=self.sdk_configuration.security,
-            ),
-            request=req,
-            error_status_codes=["401", "404", "422", "4XX", "5XX"],
-            retry_config=retry_config,
-        )
-
-        def next_func() -> Awaitable[Optional[models.ChainsChainInputsSearchResponse]]:
-            body = utils.unmarshal_json(http_res.text, Union[Dict[Any, Any], List[Any]])
-
-            async def empty_result():
-                return None
-
-            next_cursor = JSONPath("$.data.cursor").parse(body)
-
-            if len(next_cursor) == 0:
-                return empty_result()
-
-            next_cursor = next_cursor[0]
-            if next_cursor is None or str(next_cursor).strip() == "":
-                return empty_result()
-
-            return self.chain_inputs_search_async(
-                environment_id=environment_id,
-                search_text=search_text,
-                cursor=next_cursor,
-                limit=limit,
-                retries=retries,
-                server_url=server_url,
-            )
-
-        response_data: Any = None
-        if utils.match_response(http_res, "200", "application/json"):
-            return models.ChainsChainInputsSearchResponse(
-                result=unmarshal_json_response(models.ChainRunPageResponse, http_res),
-                next=next_func,
-            )
-        if utils.match_response(http_res, ["401", "404", "422"], "application/json"):
-            response_data = unmarshal_json_response(
-                errors.ChainSingleErrorData, http_res
-            )
-            raise errors.ChainSingleError(response_data, http_res)
-        if utils.match_response(http_res, "4XX", "*"):
-            http_res_text = await utils.stream_to_text_async(http_res)
-            raise errors.SDKError("API error occurred", http_res, http_res_text)
-        if utils.match_response(http_res, "5XX", "*"):
-            http_res_text = await utils.stream_to_text_async(http_res)
-            raise errors.SDKError("API error occurred", http_res, http_res_text)
-
-        raise errors.SDKError("Unexpected response received", http_res)
-
-    def chain_run_history(
-        self,
-        *,
-        request: Union[
-            models.ChainsChainRunHistoryRequest,
-            models.ChainsChainRunHistoryRequestTypedDict,
-        ],
-        retries: OptionalNullable[utils.RetryConfig] = UNSET,
-        server_url: Optional[str] = None,
-        timeout_ms: Optional[int] = None,
-        http_headers: Optional[Mapping[str, str]] = None,
-    ) -> Optional[models.ChainsChainRunHistoryResponse]:
-        r"""Return run history for a chain
-
-        Retrieves a list of run history for a chain.
-
-        :param request: The request object to send.
-        :param retries: Override the default retry configuration for this method
-        :param server_url: Override the default server URL for this method
-        :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
-        :param http_headers: Additional headers to set or replace on requests.
-        """
-        base_url = None
-        url_variables = None
-        if timeout_ms is None:
-            timeout_ms = self.sdk_configuration.timeout_ms
-
-        if server_url is not None:
-            base_url = server_url
-        else:
-            base_url = models.CHAINS_CHAIN_RUN_HISTORY_OP_SERVERS[0]
-
-        if not isinstance(request, BaseModel):
-            request = utils.unmarshal(request, models.ChainsChainRunHistoryRequest)
-        request = cast(models.ChainsChainRunHistoryRequest, request)
-
-        req = self._build_request(
-            method="GET",
-            path="/v1/execute/environment/{environment_id}/chain/{chain_id}/history",
-            base_url=base_url,
-            url_variables=url_variables,
-            request=request,
-            request_body_required=False,
-            request_has_path_params=True,
-            request_has_query_params=True,
-            user_agent_header="user-agent",
-            accept_header_value="application/json",
-            http_headers=http_headers,
-            security=self.sdk_configuration.security,
-            allow_empty_value=None,
-            timeout_ms=timeout_ms,
-        )
-
-        if retries == UNSET:
-            if self.sdk_configuration.retry_config is not UNSET:
-                retries = self.sdk_configuration.retry_config
-
-        retry_config = None
-        if isinstance(retries, utils.RetryConfig):
-            retry_config = (retries, ["429", "500", "502", "503", "504"])
-
-        http_res = self.do_request(
-            hook_ctx=HookContext(
-                config=self.sdk_configuration,
-                base_url=base_url or "",
-                operation_id="chains_chainRunHistory",
-                oauth2_scopes=[],
-                security_source=self.sdk_configuration.security,
-            ),
-            request=req,
-            error_status_codes=["401", "404", "4XX", "5XX"],
-            retry_config=retry_config,
-        )
-
-        def next_func() -> Optional[models.ChainsChainRunHistoryResponse]:
-            body = utils.unmarshal_json(http_res.text, Union[Dict[Any, Any], List[Any]])
-
-            next_cursor = JSONPath("$.data.cursor").parse(body)
-
-            if len(next_cursor) == 0:
-                return None
-
-            next_cursor = next_cursor[0]
-            if next_cursor is None or str(next_cursor).strip() == "":
-                return None
-
-            return self.chain_run_history(
-                request=models.ChainsChainRunHistoryRequest(
-                    chain_id=request.chain_id,
-                    environment_id=request.environment_id,
-                    cursor=next_cursor,
-                    end_date=request.end_date,
-                    limit=request.limit,
-                    start_date=request.start_date,
-                ),
-                retries=retries,
-                server_url=server_url,
-            )
-
-        response_data: Any = None
-        if utils.match_response(http_res, "200", "application/json"):
-            return models.ChainsChainRunHistoryResponse(
-                result=unmarshal_json_response(models.ChainRunPageResponse, http_res),
-                next=next_func,
-            )
-        if utils.match_response(http_res, ["401", "404"], "application/json"):
-            response_data = unmarshal_json_response(
-                errors.ChainSingleErrorData, http_res
-            )
-            raise errors.ChainSingleError(response_data, http_res)
-        if utils.match_response(http_res, "4XX", "*"):
-            http_res_text = utils.stream_to_text(http_res)
-            raise errors.SDKError("API error occurred", http_res, http_res_text)
-        if utils.match_response(http_res, "5XX", "*"):
-            http_res_text = utils.stream_to_text(http_res)
-            raise errors.SDKError("API error occurred", http_res, http_res_text)
-
-        raise errors.SDKError("Unexpected response received", http_res)
-
-    async def chain_run_history_async(
-        self,
-        *,
-        request: Union[
-            models.ChainsChainRunHistoryRequest,
-            models.ChainsChainRunHistoryRequestTypedDict,
-        ],
-        retries: OptionalNullable[utils.RetryConfig] = UNSET,
-        server_url: Optional[str] = None,
-        timeout_ms: Optional[int] = None,
-        http_headers: Optional[Mapping[str, str]] = None,
-    ) -> Optional[models.ChainsChainRunHistoryResponse]:
-        r"""Return run history for a chain
-
-        Retrieves a list of run history for a chain.
-
-        :param request: The request object to send.
-        :param retries: Override the default retry configuration for this method
-        :param server_url: Override the default server URL for this method
-        :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
-        :param http_headers: Additional headers to set or replace on requests.
-        """
-        base_url = None
-        url_variables = None
-        if timeout_ms is None:
-            timeout_ms = self.sdk_configuration.timeout_ms
-
-        if server_url is not None:
-            base_url = server_url
-        else:
-            base_url = models.CHAINS_CHAIN_RUN_HISTORY_OP_SERVERS[0]
-
-        if not isinstance(request, BaseModel):
-            request = utils.unmarshal(request, models.ChainsChainRunHistoryRequest)
-        request = cast(models.ChainsChainRunHistoryRequest, request)
-
-        req = self._build_request_async(
-            method="GET",
-            path="/v1/execute/environment/{environment_id}/chain/{chain_id}/history",
-            base_url=base_url,
-            url_variables=url_variables,
-            request=request,
-            request_body_required=False,
-            request_has_path_params=True,
-            request_has_query_params=True,
-            user_agent_header="user-agent",
-            accept_header_value="application/json",
-            http_headers=http_headers,
-            security=self.sdk_configuration.security,
-            allow_empty_value=None,
-            timeout_ms=timeout_ms,
-        )
-
-        if retries == UNSET:
-            if self.sdk_configuration.retry_config is not UNSET:
-                retries = self.sdk_configuration.retry_config
-
-        retry_config = None
-        if isinstance(retries, utils.RetryConfig):
-            retry_config = (retries, ["429", "500", "502", "503", "504"])
-
-        http_res = await self.do_request_async(
-            hook_ctx=HookContext(
-                config=self.sdk_configuration,
-                base_url=base_url or "",
-                operation_id="chains_chainRunHistory",
-                oauth2_scopes=[],
-                security_source=self.sdk_configuration.security,
-            ),
-            request=req,
-            error_status_codes=["401", "404", "4XX", "5XX"],
-            retry_config=retry_config,
-        )
-
-        def next_func() -> Awaitable[Optional[models.ChainsChainRunHistoryResponse]]:
-            body = utils.unmarshal_json(http_res.text, Union[Dict[Any, Any], List[Any]])
-
-            async def empty_result():
-                return None
-
-            next_cursor = JSONPath("$.data.cursor").parse(body)
-
-            if len(next_cursor) == 0:
-                return empty_result()
-
-            next_cursor = next_cursor[0]
-            if next_cursor is None or str(next_cursor).strip() == "":
-                return empty_result()
-
-            return self.chain_run_history_async(
-                request=models.ChainsChainRunHistoryRequest(
-                    chain_id=request.chain_id,
-                    environment_id=request.environment_id,
-                    cursor=next_cursor,
-                    end_date=request.end_date,
-                    limit=request.limit,
-                    start_date=request.start_date,
-                ),
-                retries=retries,
-                server_url=server_url,
-            )
-
-        response_data: Any = None
-        if utils.match_response(http_res, "200", "application/json"):
-            return models.ChainsChainRunHistoryResponse(
-                result=unmarshal_json_response(models.ChainRunPageResponse, http_res),
-                next=next_func,
-            )
-        if utils.match_response(http_res, ["401", "404"], "application/json"):
-            response_data = unmarshal_json_response(
-                errors.ChainSingleErrorData, http_res
-            )
-            raise errors.ChainSingleError(response_data, http_res)
-        if utils.match_response(http_res, "4XX", "*"):
-            http_res_text = await utils.stream_to_text_async(http_res)
-            raise errors.SDKError("API error occurred", http_res, http_res_text)
-        if utils.match_response(http_res, "5XX", "*"):
-            http_res_text = await utils.stream_to_text_async(http_res)
-            raise errors.SDKError("API error occurred", http_res, http_res_text)
-
-        raise errors.SDKError("Unexpected response received", http_res)
-
     def export_chain(
         self,
         *,
@@ -941,22 +208,27 @@ class Chains(BaseSDK):
         http_res_text = await utils.stream_to_text_async(http_res)
         raise errors.SDKError("Unexpected response received", http_res, http_res_text)
 
-    def get_authorizations_activity(
+    def publish_chain(
         self,
         *,
-        page: Optional[int] = None,
-        page_size: Optional[int] = None,
+        chain_id: str,
+        request_body: Optional[
+            Union[
+                models.ChainsPublishChainRequestBody,
+                models.ChainsPublishChainRequestBodyTypedDict,
+            ]
+        ] = None,
         retries: OptionalNullable[utils.RetryConfig] = UNSET,
         server_url: Optional[str] = None,
         timeout_ms: Optional[int] = None,
         http_headers: Optional[Mapping[str, str]] = None,
-    ) -> Optional[models.ChainsGetAuthorizationsActivityResponse]:
-        r"""Return a list of authorization activities
+    ) -> models.ChainsPublishChainResponse:
+        r"""Publish a chain
 
-        Returns a list of recent authorization activity events.
+        Publishes the chain specified by the chain_id.
 
-        :param page: Page number to retrieve in the paginated results (0-based index).
-        :param page_size: Limit number of results returned (Max 100).
+        :param chain_id: The ID of the Chain.
+        :param request_body:
         :param retries: Override the default retry configuration for this method
         :param server_url: Override the default server URL for this method
         :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
@@ -970,16 +242,864 @@ class Chains(BaseSDK):
         if server_url is not None:
             base_url = server_url
         else:
-            base_url = models.CHAINS_GET_AUTHORIZATIONS_ACTIVITY_OP_SERVERS[0]
+            base_url = models.CHAINS_PUBLISH_CHAIN_OP_SERVERS[0]
 
-        request = models.ChainsGetAuthorizationsActivityRequest(
-            page=page,
-            page_size=page_size,
+        request = models.ChainsPublishChainRequest(
+            chain_id=chain_id,
+            request_body=utils.get_pydantic_model(
+                request_body, Optional[models.ChainsPublishChainRequestBody]
+            ),
         )
 
         req = self._build_request(
+            method="POST",
+            path="/v1/chains/{chain_id}/publish",
+            base_url=base_url,
+            url_variables=url_variables,
+            request=request,
+            request_body_required=False,
+            request_has_path_params=True,
+            request_has_query_params=True,
+            user_agent_header="user-agent",
+            accept_header_value="application/json",
+            http_headers=http_headers,
+            security=self.sdk_configuration.security,
+            get_serialized_body=lambda: utils.serialize_request_body(
+                request.request_body,
+                False,
+                True,
+                "json",
+                Optional[models.ChainsPublishChainRequestBody],
+            ),
+            allow_empty_value=None,
+            timeout_ms=timeout_ms,
+        )
+
+        if retries == UNSET:
+            if self.sdk_configuration.retry_config is not UNSET:
+                retries = self.sdk_configuration.retry_config
+
+        retry_config = None
+        if isinstance(retries, utils.RetryConfig):
+            retry_config = (retries, ["429", "500", "502", "503", "504"])
+
+        http_res = self.do_request(
+            hook_ctx=HookContext(
+                config=self.sdk_configuration,
+                base_url=base_url or "",
+                operation_id="chains_publishChain",
+                oauth2_scopes=[],
+                security_source=self.sdk_configuration.security,
+            ),
+            request=req,
+            error_status_codes=["400", "401", "403", "4XX", "5XX"],
+            retry_config=retry_config,
+        )
+
+        response_data: Any = None
+        if utils.match_response(http_res, "200", "application/json"):
+            return models.ChainsPublishChainResponse(
+                result=unmarshal_json_response(models.ChainResponse, http_res),
+                headers={},
+            )
+        if utils.match_response(http_res, "201", "application/json"):
+            return models.ChainsPublishChainResponse(
+                result=unmarshal_json_response(models.ChainResponse, http_res),
+                headers=utils.get_response_headers(http_res.headers),
+            )
+        if utils.match_response(http_res, ["400", "401", "403"], "application/json"):
+            response_data = unmarshal_json_response(
+                errors.ChainSingleErrorData, http_res
+            )
+            raise errors.ChainSingleError(response_data, http_res)
+        if utils.match_response(http_res, "4XX", "*"):
+            http_res_text = utils.stream_to_text(http_res)
+            raise errors.SDKError("API error occurred", http_res, http_res_text)
+        if utils.match_response(http_res, "5XX", "*"):
+            http_res_text = utils.stream_to_text(http_res)
+            raise errors.SDKError("API error occurred", http_res, http_res_text)
+
+        raise errors.SDKError("Unexpected response received", http_res)
+
+    async def publish_chain_async(
+        self,
+        *,
+        chain_id: str,
+        request_body: Optional[
+            Union[
+                models.ChainsPublishChainRequestBody,
+                models.ChainsPublishChainRequestBodyTypedDict,
+            ]
+        ] = None,
+        retries: OptionalNullable[utils.RetryConfig] = UNSET,
+        server_url: Optional[str] = None,
+        timeout_ms: Optional[int] = None,
+        http_headers: Optional[Mapping[str, str]] = None,
+    ) -> models.ChainsPublishChainResponse:
+        r"""Publish a chain
+
+        Publishes the chain specified by the chain_id.
+
+        :param chain_id: The ID of the Chain.
+        :param request_body:
+        :param retries: Override the default retry configuration for this method
+        :param server_url: Override the default server URL for this method
+        :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
+        :param http_headers: Additional headers to set or replace on requests.
+        """
+        base_url = None
+        url_variables = None
+        if timeout_ms is None:
+            timeout_ms = self.sdk_configuration.timeout_ms
+
+        if server_url is not None:
+            base_url = server_url
+        else:
+            base_url = models.CHAINS_PUBLISH_CHAIN_OP_SERVERS[0]
+
+        request = models.ChainsPublishChainRequest(
+            chain_id=chain_id,
+            request_body=utils.get_pydantic_model(
+                request_body, Optional[models.ChainsPublishChainRequestBody]
+            ),
+        )
+
+        req = self._build_request_async(
+            method="POST",
+            path="/v1/chains/{chain_id}/publish",
+            base_url=base_url,
+            url_variables=url_variables,
+            request=request,
+            request_body_required=False,
+            request_has_path_params=True,
+            request_has_query_params=True,
+            user_agent_header="user-agent",
+            accept_header_value="application/json",
+            http_headers=http_headers,
+            security=self.sdk_configuration.security,
+            get_serialized_body=lambda: utils.serialize_request_body(
+                request.request_body,
+                False,
+                True,
+                "json",
+                Optional[models.ChainsPublishChainRequestBody],
+            ),
+            allow_empty_value=None,
+            timeout_ms=timeout_ms,
+        )
+
+        if retries == UNSET:
+            if self.sdk_configuration.retry_config is not UNSET:
+                retries = self.sdk_configuration.retry_config
+
+        retry_config = None
+        if isinstance(retries, utils.RetryConfig):
+            retry_config = (retries, ["429", "500", "502", "503", "504"])
+
+        http_res = await self.do_request_async(
+            hook_ctx=HookContext(
+                config=self.sdk_configuration,
+                base_url=base_url or "",
+                operation_id="chains_publishChain",
+                oauth2_scopes=[],
+                security_source=self.sdk_configuration.security,
+            ),
+            request=req,
+            error_status_codes=["400", "401", "403", "4XX", "5XX"],
+            retry_config=retry_config,
+        )
+
+        response_data: Any = None
+        if utils.match_response(http_res, "200", "application/json"):
+            return models.ChainsPublishChainResponse(
+                result=unmarshal_json_response(models.ChainResponse, http_res),
+                headers={},
+            )
+        if utils.match_response(http_res, "201", "application/json"):
+            return models.ChainsPublishChainResponse(
+                result=unmarshal_json_response(models.ChainResponse, http_res),
+                headers=utils.get_response_headers(http_res.headers),
+            )
+        if utils.match_response(http_res, ["400", "401", "403"], "application/json"):
+            response_data = unmarshal_json_response(
+                errors.ChainSingleErrorData, http_res
+            )
+            raise errors.ChainSingleError(response_data, http_res)
+        if utils.match_response(http_res, "4XX", "*"):
+            http_res_text = await utils.stream_to_text_async(http_res)
+            raise errors.SDKError("API error occurred", http_res, http_res_text)
+        if utils.match_response(http_res, "5XX", "*"):
+            http_res_text = await utils.stream_to_text_async(http_res)
+            raise errors.SDKError("API error occurred", http_res, http_res_text)
+
+        raise errors.SDKError("Unexpected response received", http_res)
+
+    def publish(
+        self,
+        *,
+        mapping_group_guid: str,
+        retries: OptionalNullable[utils.RetryConfig] = UNSET,
+        server_url: Optional[str] = None,
+        timeout_ms: Optional[int] = None,
+        http_headers: Optional[Mapping[str, str]] = None,
+    ) -> models.ChainsPublishResponseBody:
+        r"""Publish draft version of a mapping group
+
+        Publish a draft version of a mapping group, specified by the mapping group GUID.
+
+        :param mapping_group_guid: The GUID of the Mapping Group.
+        :param retries: Override the default retry configuration for this method
+        :param server_url: Override the default server URL for this method
+        :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
+        :param http_headers: Additional headers to set or replace on requests.
+        """
+        base_url = None
+        url_variables = None
+        if timeout_ms is None:
+            timeout_ms = self.sdk_configuration.timeout_ms
+
+        if server_url is not None:
+            base_url = server_url
+        else:
+            base_url = models.CHAINS_PUBLISH_OP_SERVERS[0]
+
+        request = models.ChainsPublishRequest(
+            mapping_group_guid=mapping_group_guid,
+        )
+
+        req = self._build_request(
+            method="POST",
+            path="/v1/dataprep/mapping_groups/{mappingGroupGuid}/publish",
+            base_url=base_url,
+            url_variables=url_variables,
+            request=request,
+            request_body_required=False,
+            request_has_path_params=True,
+            request_has_query_params=True,
+            user_agent_header="user-agent",
+            accept_header_value="application/json",
+            http_headers=http_headers,
+            security=self.sdk_configuration.security,
+            allow_empty_value=None,
+            timeout_ms=timeout_ms,
+        )
+
+        if retries == UNSET:
+            if self.sdk_configuration.retry_config is not UNSET:
+                retries = self.sdk_configuration.retry_config
+
+        retry_config = None
+        if isinstance(retries, utils.RetryConfig):
+            retry_config = (retries, ["429", "500", "502", "503", "504"])
+
+        http_res = self.do_request(
+            hook_ctx=HookContext(
+                config=self.sdk_configuration,
+                base_url=base_url or "",
+                operation_id="chains_publish",
+                oauth2_scopes=[],
+                security_source=self.sdk_configuration.security,
+            ),
+            request=req,
+            error_status_codes=["400", "401", "4XX", "5XX"],
+            retry_config=retry_config,
+        )
+
+        response_data: Any = None
+        if utils.match_response(http_res, "200", "application/json"):
+            return unmarshal_json_response(models.ChainsPublishResponseBody, http_res)
+        if utils.match_response(http_res, "400", "application/json"):
+            response_data = unmarshal_json_response(
+                errors.ErrorWithoutLineNumberData, http_res
+            )
+            raise errors.ErrorWithoutLineNumber(response_data, http_res)
+        if utils.match_response(http_res, ["401", "4XX"], "*"):
+            http_res_text = utils.stream_to_text(http_res)
+            raise errors.SDKError("API error occurred", http_res, http_res_text)
+        if utils.match_response(http_res, "5XX", "*"):
+            http_res_text = utils.stream_to_text(http_res)
+            raise errors.SDKError("API error occurred", http_res, http_res_text)
+
+        raise errors.SDKError("Unexpected response received", http_res)
+
+    async def publish_async(
+        self,
+        *,
+        mapping_group_guid: str,
+        retries: OptionalNullable[utils.RetryConfig] = UNSET,
+        server_url: Optional[str] = None,
+        timeout_ms: Optional[int] = None,
+        http_headers: Optional[Mapping[str, str]] = None,
+    ) -> models.ChainsPublishResponseBody:
+        r"""Publish draft version of a mapping group
+
+        Publish a draft version of a mapping group, specified by the mapping group GUID.
+
+        :param mapping_group_guid: The GUID of the Mapping Group.
+        :param retries: Override the default retry configuration for this method
+        :param server_url: Override the default server URL for this method
+        :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
+        :param http_headers: Additional headers to set or replace on requests.
+        """
+        base_url = None
+        url_variables = None
+        if timeout_ms is None:
+            timeout_ms = self.sdk_configuration.timeout_ms
+
+        if server_url is not None:
+            base_url = server_url
+        else:
+            base_url = models.CHAINS_PUBLISH_OP_SERVERS[0]
+
+        request = models.ChainsPublishRequest(
+            mapping_group_guid=mapping_group_guid,
+        )
+
+        req = self._build_request_async(
+            method="POST",
+            path="/v1/dataprep/mapping_groups/{mappingGroupGuid}/publish",
+            base_url=base_url,
+            url_variables=url_variables,
+            request=request,
+            request_body_required=False,
+            request_has_path_params=True,
+            request_has_query_params=True,
+            user_agent_header="user-agent",
+            accept_header_value="application/json",
+            http_headers=http_headers,
+            security=self.sdk_configuration.security,
+            allow_empty_value=None,
+            timeout_ms=timeout_ms,
+        )
+
+        if retries == UNSET:
+            if self.sdk_configuration.retry_config is not UNSET:
+                retries = self.sdk_configuration.retry_config
+
+        retry_config = None
+        if isinstance(retries, utils.RetryConfig):
+            retry_config = (retries, ["429", "500", "502", "503", "504"])
+
+        http_res = await self.do_request_async(
+            hook_ctx=HookContext(
+                config=self.sdk_configuration,
+                base_url=base_url or "",
+                operation_id="chains_publish",
+                oauth2_scopes=[],
+                security_source=self.sdk_configuration.security,
+            ),
+            request=req,
+            error_status_codes=["400", "401", "4XX", "5XX"],
+            retry_config=retry_config,
+        )
+
+        response_data: Any = None
+        if utils.match_response(http_res, "200", "application/json"):
+            return unmarshal_json_response(models.ChainsPublishResponseBody, http_res)
+        if utils.match_response(http_res, "400", "application/json"):
+            response_data = unmarshal_json_response(
+                errors.ErrorWithoutLineNumberData, http_res
+            )
+            raise errors.ErrorWithoutLineNumber(response_data, http_res)
+        if utils.match_response(http_res, ["401", "4XX"], "*"):
+            http_res_text = await utils.stream_to_text_async(http_res)
+            raise errors.SDKError("API error occurred", http_res, http_res_text)
+        if utils.match_response(http_res, "5XX", "*"):
+            http_res_text = await utils.stream_to_text_async(http_res)
+            raise errors.SDKError("API error occurred", http_res, http_res_text)
+
+        raise errors.SDKError("Unexpected response received", http_res)
+
+    def update_rules(
+        self,
+        *,
+        mapping_group_guid: str,
+        request_body: Union[
+            models.ChainsUpdateRulesRequestBody,
+            models.ChainsUpdateRulesRequestBodyTypedDict,
+        ],
+        retries: OptionalNullable[utils.RetryConfig] = UNSET,
+        server_url: Optional[str] = None,
+        timeout_ms: Optional[int] = None,
+        http_headers: Optional[Mapping[str, str]] = None,
+    ) -> models.MappingRuleUploadResult:
+        r"""Update mapping group rules
+
+        Update a mapping group ruleset, specified by the mapping group GUID.
+
+        :param mapping_group_guid: The GUID of the Mapping Group.
+        :param request_body:
+        :param retries: Override the default retry configuration for this method
+        :param server_url: Override the default server URL for this method
+        :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
+        :param http_headers: Additional headers to set or replace on requests.
+        """
+        base_url = None
+        url_variables = None
+        if timeout_ms is None:
+            timeout_ms = self.sdk_configuration.timeout_ms
+
+        if server_url is not None:
+            base_url = server_url
+        else:
+            base_url = models.CHAINS_UPDATE_RULES_OP_SERVERS[0]
+
+        request = models.ChainsUpdateRulesRequest(
+            mapping_group_guid=mapping_group_guid,
+            request_body=utils.get_pydantic_model(
+                request_body, models.ChainsUpdateRulesRequestBody
+            ),
+        )
+
+        req = self._build_request(
+            method="POST",
+            path="/v1/dataprep/mapping_groups/{mappingGroupGuid}/update_rules",
+            base_url=base_url,
+            url_variables=url_variables,
+            request=request,
+            request_body_required=True,
+            request_has_path_params=True,
+            request_has_query_params=True,
+            user_agent_header="user-agent",
+            accept_header_value="application/json",
+            http_headers=http_headers,
+            security=self.sdk_configuration.security,
+            get_serialized_body=lambda: utils.serialize_request_body(
+                request.request_body,
+                False,
+                False,
+                "multipart",
+                models.ChainsUpdateRulesRequestBody,
+            ),
+            allow_empty_value=None,
+            timeout_ms=timeout_ms,
+        )
+
+        if retries == UNSET:
+            if self.sdk_configuration.retry_config is not UNSET:
+                retries = self.sdk_configuration.retry_config
+
+        retry_config = None
+        if isinstance(retries, utils.RetryConfig):
+            retry_config = (retries, ["429", "500", "502", "503", "504"])
+
+        http_res = self.do_request(
+            hook_ctx=HookContext(
+                config=self.sdk_configuration,
+                base_url=base_url or "",
+                operation_id="chains_updateRules",
+                oauth2_scopes=[],
+                security_source=self.sdk_configuration.security,
+            ),
+            request=req,
+            error_status_codes=["400", "401", "4XX", "5XX"],
+            retry_config=retry_config,
+        )
+
+        response_data: Any = None
+        if utils.match_response(http_res, "200", "application/json"):
+            return unmarshal_json_response(models.MappingRuleUploadResult, http_res)
+        if utils.match_response(http_res, "400", "application/json"):
+            response_data = unmarshal_json_response(
+                errors.MappingRuleUploadResultData, http_res
+            )
+            raise errors.MappingRuleUploadResult(response_data, http_res)
+        if utils.match_response(http_res, "401", "application/json"):
+            response_data = unmarshal_json_response(
+                errors.ChainsUpdateRulesResponseBodyData, http_res
+            )
+            raise errors.ChainsUpdateRulesResponseBody(response_data, http_res)
+        if utils.match_response(http_res, "4XX", "*"):
+            http_res_text = utils.stream_to_text(http_res)
+            raise errors.SDKError("API error occurred", http_res, http_res_text)
+        if utils.match_response(http_res, "5XX", "*"):
+            http_res_text = utils.stream_to_text(http_res)
+            raise errors.SDKError("API error occurred", http_res, http_res_text)
+
+        raise errors.SDKError("Unexpected response received", http_res)
+
+    async def update_rules_async(
+        self,
+        *,
+        mapping_group_guid: str,
+        request_body: Union[
+            models.ChainsUpdateRulesRequestBody,
+            models.ChainsUpdateRulesRequestBodyTypedDict,
+        ],
+        retries: OptionalNullable[utils.RetryConfig] = UNSET,
+        server_url: Optional[str] = None,
+        timeout_ms: Optional[int] = None,
+        http_headers: Optional[Mapping[str, str]] = None,
+    ) -> models.MappingRuleUploadResult:
+        r"""Update mapping group rules
+
+        Update a mapping group ruleset, specified by the mapping group GUID.
+
+        :param mapping_group_guid: The GUID of the Mapping Group.
+        :param request_body:
+        :param retries: Override the default retry configuration for this method
+        :param server_url: Override the default server URL for this method
+        :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
+        :param http_headers: Additional headers to set or replace on requests.
+        """
+        base_url = None
+        url_variables = None
+        if timeout_ms is None:
+            timeout_ms = self.sdk_configuration.timeout_ms
+
+        if server_url is not None:
+            base_url = server_url
+        else:
+            base_url = models.CHAINS_UPDATE_RULES_OP_SERVERS[0]
+
+        request = models.ChainsUpdateRulesRequest(
+            mapping_group_guid=mapping_group_guid,
+            request_body=utils.get_pydantic_model(
+                request_body, models.ChainsUpdateRulesRequestBody
+            ),
+        )
+
+        req = self._build_request_async(
+            method="POST",
+            path="/v1/dataprep/mapping_groups/{mappingGroupGuid}/update_rules",
+            base_url=base_url,
+            url_variables=url_variables,
+            request=request,
+            request_body_required=True,
+            request_has_path_params=True,
+            request_has_query_params=True,
+            user_agent_header="user-agent",
+            accept_header_value="application/json",
+            http_headers=http_headers,
+            security=self.sdk_configuration.security,
+            get_serialized_body=lambda: utils.serialize_request_body(
+                request.request_body,
+                False,
+                False,
+                "multipart",
+                models.ChainsUpdateRulesRequestBody,
+            ),
+            allow_empty_value=None,
+            timeout_ms=timeout_ms,
+        )
+
+        if retries == UNSET:
+            if self.sdk_configuration.retry_config is not UNSET:
+                retries = self.sdk_configuration.retry_config
+
+        retry_config = None
+        if isinstance(retries, utils.RetryConfig):
+            retry_config = (retries, ["429", "500", "502", "503", "504"])
+
+        http_res = await self.do_request_async(
+            hook_ctx=HookContext(
+                config=self.sdk_configuration,
+                base_url=base_url or "",
+                operation_id="chains_updateRules",
+                oauth2_scopes=[],
+                security_source=self.sdk_configuration.security,
+            ),
+            request=req,
+            error_status_codes=["400", "401", "4XX", "5XX"],
+            retry_config=retry_config,
+        )
+
+        response_data: Any = None
+        if utils.match_response(http_res, "200", "application/json"):
+            return unmarshal_json_response(models.MappingRuleUploadResult, http_res)
+        if utils.match_response(http_res, "400", "application/json"):
+            response_data = unmarshal_json_response(
+                errors.MappingRuleUploadResultData, http_res
+            )
+            raise errors.MappingRuleUploadResult(response_data, http_res)
+        if utils.match_response(http_res, "401", "application/json"):
+            response_data = unmarshal_json_response(
+                errors.ChainsUpdateRulesResponseBodyData, http_res
+            )
+            raise errors.ChainsUpdateRulesResponseBody(response_data, http_res)
+        if utils.match_response(http_res, "4XX", "*"):
+            http_res_text = await utils.stream_to_text_async(http_res)
+            raise errors.SDKError("API error occurred", http_res, http_res_text)
+        if utils.match_response(http_res, "5XX", "*"):
+            http_res_text = await utils.stream_to_text_async(http_res)
+            raise errors.SDKError("API error occurred", http_res, http_res_text)
+
+        raise errors.SDKError("Unexpected response received", http_res)
+
+    def import_chain(
+        self,
+        *,
+        environment_id: str,
+        request_body: Union[
+            models.ChainsImportChainRequestBody,
+            models.ChainsImportChainRequestBodyTypedDict,
+        ],
+        wk_target_workspace: Optional[str] = None,
+        retries: OptionalNullable[utils.RetryConfig] = UNSET,
+        server_url: Optional[str] = None,
+        timeout_ms: Optional[int] = None,
+        http_headers: Optional[Mapping[str, str]] = None,
+    ) -> models.ChainsImportChainResponse:
+        r"""Import a chain
+
+        Takes a .chain file and imports it into the provided environment. Returns chain metadata for the imported chain.
+        > **Note:** .chain export files will automatically expire and become unusable after 14 days.  Expired .chain files remain on the exported system until removed manually.
+
+
+        :param environment_id: The ID of the Environment.
+        :param request_body: The .chain file to import.
+        :param wk_target_workspace: The `wk-target-workspace` header is only required for requests made by a service provider application. This does not apply to the majority of Workiva Chains API users. This header specifies the ID of the target workspace on which the service provider application wishes to take action. This workspace must be managed by the service provider.
+
+        :param retries: Override the default retry configuration for this method
+        :param server_url: Override the default server URL for this method
+        :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
+        :param http_headers: Additional headers to set or replace on requests.
+        """
+        base_url = None
+        url_variables = None
+        if timeout_ms is None:
+            timeout_ms = self.sdk_configuration.timeout_ms
+
+        if server_url is not None:
+            base_url = server_url
+        else:
+            base_url = models.CHAINS_IMPORT_CHAIN_OP_SERVERS[0]
+
+        request = models.ChainsImportChainRequest(
+            environment_id=environment_id,
+            wk_target_workspace=wk_target_workspace,
+            request_body=utils.get_pydantic_model(
+                request_body, models.ChainsImportChainRequestBody
+            ),
+        )
+
+        req = self._build_request(
+            method="POST",
+            path="/v1/environments/{environment_id}/import_chain",
+            base_url=base_url,
+            url_variables=url_variables,
+            request=request,
+            request_body_required=True,
+            request_has_path_params=True,
+            request_has_query_params=True,
+            user_agent_header="user-agent",
+            accept_header_value="application/json",
+            http_headers=http_headers,
+            security=self.sdk_configuration.security,
+            get_serialized_body=lambda: utils.serialize_request_body(
+                request.request_body,
+                False,
+                False,
+                "multipart",
+                models.ChainsImportChainRequestBody,
+            ),
+            allow_empty_value=None,
+            timeout_ms=timeout_ms,
+        )
+
+        if retries == UNSET:
+            if self.sdk_configuration.retry_config is not UNSET:
+                retries = self.sdk_configuration.retry_config
+
+        retry_config = None
+        if isinstance(retries, utils.RetryConfig):
+            retry_config = (retries, ["429", "500", "502", "503", "504"])
+
+        http_res = self.do_request(
+            hook_ctx=HookContext(
+                config=self.sdk_configuration,
+                base_url=base_url or "",
+                operation_id="chains_importChain",
+                oauth2_scopes=[],
+                security_source=self.sdk_configuration.security,
+            ),
+            request=req,
+            error_status_codes=["400", "401", "403", "4XX", "5XX"],
+            retry_config=retry_config,
+        )
+
+        response_data: Any = None
+        if utils.match_response(http_res, "200", "application/json"):
+            return models.ChainsImportChainResponse(
+                result=unmarshal_json_response(models.ChainResponse, http_res),
+                headers={},
+            )
+        if utils.match_response(http_res, "201", "application/json"):
+            return models.ChainsImportChainResponse(
+                result=unmarshal_json_response(models.ChainResponse, http_res),
+                headers=utils.get_response_headers(http_res.headers),
+            )
+        if utils.match_response(http_res, ["400", "401", "403"], "application/json"):
+            response_data = unmarshal_json_response(
+                errors.ChainSingleErrorData, http_res
+            )
+            raise errors.ChainSingleError(response_data, http_res)
+        if utils.match_response(http_res, "4XX", "*"):
+            http_res_text = utils.stream_to_text(http_res)
+            raise errors.SDKError("API error occurred", http_res, http_res_text)
+        if utils.match_response(http_res, "5XX", "*"):
+            http_res_text = utils.stream_to_text(http_res)
+            raise errors.SDKError("API error occurred", http_res, http_res_text)
+
+        raise errors.SDKError("Unexpected response received", http_res)
+
+    async def import_chain_async(
+        self,
+        *,
+        environment_id: str,
+        request_body: Union[
+            models.ChainsImportChainRequestBody,
+            models.ChainsImportChainRequestBodyTypedDict,
+        ],
+        wk_target_workspace: Optional[str] = None,
+        retries: OptionalNullable[utils.RetryConfig] = UNSET,
+        server_url: Optional[str] = None,
+        timeout_ms: Optional[int] = None,
+        http_headers: Optional[Mapping[str, str]] = None,
+    ) -> models.ChainsImportChainResponse:
+        r"""Import a chain
+
+        Takes a .chain file and imports it into the provided environment. Returns chain metadata for the imported chain.
+        > **Note:** .chain export files will automatically expire and become unusable after 14 days.  Expired .chain files remain on the exported system until removed manually.
+
+
+        :param environment_id: The ID of the Environment.
+        :param request_body: The .chain file to import.
+        :param wk_target_workspace: The `wk-target-workspace` header is only required for requests made by a service provider application. This does not apply to the majority of Workiva Chains API users. This header specifies the ID of the target workspace on which the service provider application wishes to take action. This workspace must be managed by the service provider.
+
+        :param retries: Override the default retry configuration for this method
+        :param server_url: Override the default server URL for this method
+        :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
+        :param http_headers: Additional headers to set or replace on requests.
+        """
+        base_url = None
+        url_variables = None
+        if timeout_ms is None:
+            timeout_ms = self.sdk_configuration.timeout_ms
+
+        if server_url is not None:
+            base_url = server_url
+        else:
+            base_url = models.CHAINS_IMPORT_CHAIN_OP_SERVERS[0]
+
+        request = models.ChainsImportChainRequest(
+            environment_id=environment_id,
+            wk_target_workspace=wk_target_workspace,
+            request_body=utils.get_pydantic_model(
+                request_body, models.ChainsImportChainRequestBody
+            ),
+        )
+
+        req = self._build_request_async(
+            method="POST",
+            path="/v1/environments/{environment_id}/import_chain",
+            base_url=base_url,
+            url_variables=url_variables,
+            request=request,
+            request_body_required=True,
+            request_has_path_params=True,
+            request_has_query_params=True,
+            user_agent_header="user-agent",
+            accept_header_value="application/json",
+            http_headers=http_headers,
+            security=self.sdk_configuration.security,
+            get_serialized_body=lambda: utils.serialize_request_body(
+                request.request_body,
+                False,
+                False,
+                "multipart",
+                models.ChainsImportChainRequestBody,
+            ),
+            allow_empty_value=None,
+            timeout_ms=timeout_ms,
+        )
+
+        if retries == UNSET:
+            if self.sdk_configuration.retry_config is not UNSET:
+                retries = self.sdk_configuration.retry_config
+
+        retry_config = None
+        if isinstance(retries, utils.RetryConfig):
+            retry_config = (retries, ["429", "500", "502", "503", "504"])
+
+        http_res = await self.do_request_async(
+            hook_ctx=HookContext(
+                config=self.sdk_configuration,
+                base_url=base_url or "",
+                operation_id="chains_importChain",
+                oauth2_scopes=[],
+                security_source=self.sdk_configuration.security,
+            ),
+            request=req,
+            error_status_codes=["400", "401", "403", "4XX", "5XX"],
+            retry_config=retry_config,
+        )
+
+        response_data: Any = None
+        if utils.match_response(http_res, "200", "application/json"):
+            return models.ChainsImportChainResponse(
+                result=unmarshal_json_response(models.ChainResponse, http_res),
+                headers={},
+            )
+        if utils.match_response(http_res, "201", "application/json"):
+            return models.ChainsImportChainResponse(
+                result=unmarshal_json_response(models.ChainResponse, http_res),
+                headers=utils.get_response_headers(http_res.headers),
+            )
+        if utils.match_response(http_res, ["400", "401", "403"], "application/json"):
+            response_data = unmarshal_json_response(
+                errors.ChainSingleErrorData, http_res
+            )
+            raise errors.ChainSingleError(response_data, http_res)
+        if utils.match_response(http_res, "4XX", "*"):
+            http_res_text = await utils.stream_to_text_async(http_res)
+            raise errors.SDKError("API error occurred", http_res, http_res_text)
+        if utils.match_response(http_res, "5XX", "*"):
+            http_res_text = await utils.stream_to_text_async(http_res)
+            raise errors.SDKError("API error occurred", http_res, http_res_text)
+
+        raise errors.SDKError("Unexpected response received", http_res)
+
+    def chain_filter_search(
+        self,
+        *,
+        request: Union[
+            models.ChainsChainFilterSearchRequest,
+            models.ChainsChainFilterSearchRequestTypedDict,
+        ] = models.ChainsChainFilterSearchRequest(),
+        retries: OptionalNullable[utils.RetryConfig] = UNSET,
+        server_url: Optional[str] = None,
+        timeout_ms: Optional[int] = None,
+        http_headers: Optional[Mapping[str, str]] = None,
+    ) -> Optional[models.ChainsChainFilterSearchResponse]:
+        r"""Search previous chain runs
+
+        Returns a list of all previous chain runs that match the provided criteria. The environment IDs specify which environments should be searched for the chain run. The chain IDs specify which specific chains should be returned. The state specified returns only those chains that are in that state (e.g. \"completed\"). If a cursor is provided, the corresponding page will be returned.
+
+
+        :param request: The request object to send.
+        :param retries: Override the default retry configuration for this method
+        :param server_url: Override the default server URL for this method
+        :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
+        :param http_headers: Additional headers to set or replace on requests.
+        """
+        base_url = None
+        url_variables = None
+        if timeout_ms is None:
+            timeout_ms = self.sdk_configuration.timeout_ms
+
+        if server_url is not None:
+            base_url = server_url
+        else:
+            base_url = models.CHAINS_CHAIN_FILTER_SEARCH_OP_SERVERS[0]
+
+        if not isinstance(request, BaseModel):
+            request = utils.unmarshal(request, models.ChainsChainFilterSearchRequest)
+        request = cast(models.ChainsChainFilterSearchRequest, request)
+
+        req = self._build_request(
             method="GET",
-            path="/v1/security/authorizations_activity",
+            path="/v1/execute/chain_run/search",
             base_url=base_url,
             url_variables=url_variables,
             request=request,
@@ -1006,41 +1126,48 @@ class Chains(BaseSDK):
             hook_ctx=HookContext(
                 config=self.sdk_configuration,
                 base_url=base_url or "",
-                operation_id="chains_getAuthorizationsActivity",
+                operation_id="chains_chainFilterSearch",
                 oauth2_scopes=[],
                 security_source=self.sdk_configuration.security,
             ),
             request=req,
-            error_status_codes=["401", "4XX", "5XX"],
+            error_status_codes=["401", "404", "422", "4XX", "5XX"],
             retry_config=retry_config,
         )
 
-        def next_func() -> Optional[models.ChainsGetAuthorizationsActivityResponse]:
+        def next_func() -> Optional[models.ChainsChainFilterSearchResponse]:
             body = utils.unmarshal_json(http_res.text, Union[Dict[Any, Any], List[Any]])
 
-            page = request.page if not request.page is None else 1
-            next_page = page + 1
+            next_cursor = JSONPath("$.data.cursor").parse(body)
 
-            if not http_res.text:
-                return None
-            results = JSONPath("$.data").parse(body)
-            if len(results) == 0 or len(results[0]) == 0:
+            if len(next_cursor) == 0:
                 return None
 
-            return self.get_authorizations_activity(
-                page=next_page,
-                page_size=page_size,
+            next_cursor = next_cursor[0]
+            if next_cursor is None or str(next_cursor).strip() == "":
+                return None
+
+            return self.chain_filter_search(
+                request=models.ChainsChainFilterSearchRequest(
+                    environment_id=request.environment_id,
+                    chain_id=request.chain_id,
+                    start_date=request.start_date,
+                    end_date=request.end_date,
+                    state=request.state,
+                    sort=request.sort,
+                    cursor=next_cursor,
+                ),
                 retries=retries,
                 server_url=server_url,
             )
 
         response_data: Any = None
         if utils.match_response(http_res, "200", "application/json"):
-            return models.ChainsGetAuthorizationsActivityResponse(
-                result=unmarshal_json_response(models.ActivityResponse, http_res),
+            return models.ChainsChainFilterSearchResponse(
+                result=unmarshal_json_response(models.ChainRunPageResponse, http_res),
                 next=next_func,
             )
-        if utils.match_response(http_res, "401", "application/json"):
+        if utils.match_response(http_res, ["401", "404", "422"], "application/json"):
             response_data = unmarshal_json_response(
                 errors.ChainSingleErrorData, http_res
             )
@@ -1054,22 +1181,24 @@ class Chains(BaseSDK):
 
         raise errors.SDKError("Unexpected response received", http_res)
 
-    async def get_authorizations_activity_async(
+    async def chain_filter_search_async(
         self,
         *,
-        page: Optional[int] = None,
-        page_size: Optional[int] = None,
+        request: Union[
+            models.ChainsChainFilterSearchRequest,
+            models.ChainsChainFilterSearchRequestTypedDict,
+        ] = models.ChainsChainFilterSearchRequest(),
         retries: OptionalNullable[utils.RetryConfig] = UNSET,
         server_url: Optional[str] = None,
         timeout_ms: Optional[int] = None,
         http_headers: Optional[Mapping[str, str]] = None,
-    ) -> Optional[models.ChainsGetAuthorizationsActivityResponse]:
-        r"""Return a list of authorization activities
+    ) -> Optional[models.ChainsChainFilterSearchResponse]:
+        r"""Search previous chain runs
 
-        Returns a list of recent authorization activity events.
+        Returns a list of all previous chain runs that match the provided criteria. The environment IDs specify which environments should be searched for the chain run. The chain IDs specify which specific chains should be returned. The state specified returns only those chains that are in that state (e.g. \"completed\"). If a cursor is provided, the corresponding page will be returned.
 
-        :param page: Page number to retrieve in the paginated results (0-based index).
-        :param page_size: Limit number of results returned (Max 100).
+
+        :param request: The request object to send.
         :param retries: Override the default retry configuration for this method
         :param server_url: Override the default server URL for this method
         :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
@@ -1083,16 +1212,15 @@ class Chains(BaseSDK):
         if server_url is not None:
             base_url = server_url
         else:
-            base_url = models.CHAINS_GET_AUTHORIZATIONS_ACTIVITY_OP_SERVERS[0]
+            base_url = models.CHAINS_CHAIN_FILTER_SEARCH_OP_SERVERS[0]
 
-        request = models.ChainsGetAuthorizationsActivityRequest(
-            page=page,
-            page_size=page_size,
-        )
+        if not isinstance(request, BaseModel):
+            request = utils.unmarshal(request, models.ChainsChainFilterSearchRequest)
+        request = cast(models.ChainsChainFilterSearchRequest, request)
 
         req = self._build_request_async(
             method="GET",
-            path="/v1/security/authorizations_activity",
+            path="/v1/execute/chain_run/search",
             base_url=base_url,
             url_variables=url_variables,
             request=request,
@@ -1119,228 +1247,51 @@ class Chains(BaseSDK):
             hook_ctx=HookContext(
                 config=self.sdk_configuration,
                 base_url=base_url or "",
-                operation_id="chains_getAuthorizationsActivity",
+                operation_id="chains_chainFilterSearch",
                 oauth2_scopes=[],
                 security_source=self.sdk_configuration.security,
             ),
             request=req,
-            error_status_codes=["401", "4XX", "5XX"],
+            error_status_codes=["401", "404", "422", "4XX", "5XX"],
             retry_config=retry_config,
         )
 
-        def next_func() -> (
-            Awaitable[Optional[models.ChainsGetAuthorizationsActivityResponse]]
-        ):
+        def next_func() -> Awaitable[Optional[models.ChainsChainFilterSearchResponse]]:
             body = utils.unmarshal_json(http_res.text, Union[Dict[Any, Any], List[Any]])
 
             async def empty_result():
                 return None
 
-            page = request.page if not request.page is None else 1
-            next_page = page + 1
+            next_cursor = JSONPath("$.data.cursor").parse(body)
 
-            if not http_res.text:
-                return empty_result()
-            results = JSONPath("$.data").parse(body)
-            if len(results) == 0 or len(results[0]) == 0:
+            if len(next_cursor) == 0:
                 return empty_result()
 
-            return self.get_authorizations_activity_async(
-                page=next_page,
-                page_size=page_size,
+            next_cursor = next_cursor[0]
+            if next_cursor is None or str(next_cursor).strip() == "":
+                return empty_result()
+
+            return self.chain_filter_search_async(
+                request=models.ChainsChainFilterSearchRequest(
+                    environment_id=request.environment_id,
+                    chain_id=request.chain_id,
+                    start_date=request.start_date,
+                    end_date=request.end_date,
+                    state=request.state,
+                    sort=request.sort,
+                    cursor=next_cursor,
+                ),
                 retries=retries,
                 server_url=server_url,
             )
 
         response_data: Any = None
         if utils.match_response(http_res, "200", "application/json"):
-            return models.ChainsGetAuthorizationsActivityResponse(
-                result=unmarshal_json_response(models.ActivityResponse, http_res),
+            return models.ChainsChainFilterSearchResponse(
+                result=unmarshal_json_response(models.ChainRunPageResponse, http_res),
                 next=next_func,
             )
-        if utils.match_response(http_res, "401", "application/json"):
-            response_data = unmarshal_json_response(
-                errors.ChainSingleErrorData, http_res
-            )
-            raise errors.ChainSingleError(response_data, http_res)
-        if utils.match_response(http_res, "4XX", "*"):
-            http_res_text = await utils.stream_to_text_async(http_res)
-            raise errors.SDKError("API error occurred", http_res, http_res_text)
-        if utils.match_response(http_res, "5XX", "*"):
-            http_res_text = await utils.stream_to_text_async(http_res)
-            raise errors.SDKError("API error occurred", http_res, http_res_text)
-
-        raise errors.SDKError("Unexpected response received", http_res)
-
-    def get_chain(
-        self,
-        *,
-        chain_id: str,
-        environment_id: str,
-        retries: OptionalNullable[utils.RetryConfig] = UNSET,
-        server_url: Optional[str] = None,
-        timeout_ms: Optional[int] = None,
-        http_headers: Optional[Mapping[str, str]] = None,
-    ) -> models.ChainResponse:
-        r"""Return chain properties
-
-        Returns properties for a chain with the provided ID, or a 404 if no such chain is found.
-
-        :param chain_id: The ID of the Chain.
-        :param environment_id: The ID of the Environment.
-        :param retries: Override the default retry configuration for this method
-        :param server_url: Override the default server URL for this method
-        :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
-        :param http_headers: Additional headers to set or replace on requests.
-        """
-        base_url = None
-        url_variables = None
-        if timeout_ms is None:
-            timeout_ms = self.sdk_configuration.timeout_ms
-
-        if server_url is not None:
-            base_url = server_url
-        else:
-            base_url = models.CHAINS_GET_CHAIN_OP_SERVERS[0]
-
-        request = models.ChainsGetChainRequest(
-            chain_id=chain_id,
-            environment_id=environment_id,
-        )
-
-        req = self._build_request(
-            method="GET",
-            path="/v1/metadata/environment/{environment_id}/chain/{chain_id}",
-            base_url=base_url,
-            url_variables=url_variables,
-            request=request,
-            request_body_required=False,
-            request_has_path_params=True,
-            request_has_query_params=True,
-            user_agent_header="user-agent",
-            accept_header_value="application/json",
-            http_headers=http_headers,
-            security=self.sdk_configuration.security,
-            allow_empty_value=None,
-            timeout_ms=timeout_ms,
-        )
-
-        if retries == UNSET:
-            if self.sdk_configuration.retry_config is not UNSET:
-                retries = self.sdk_configuration.retry_config
-
-        retry_config = None
-        if isinstance(retries, utils.RetryConfig):
-            retry_config = (retries, ["429", "500", "502", "503", "504"])
-
-        http_res = self.do_request(
-            hook_ctx=HookContext(
-                config=self.sdk_configuration,
-                base_url=base_url or "",
-                operation_id="chains_getChain",
-                oauth2_scopes=[],
-                security_source=self.sdk_configuration.security,
-            ),
-            request=req,
-            error_status_codes=["401", "404", "4XX", "5XX"],
-            retry_config=retry_config,
-        )
-
-        response_data: Any = None
-        if utils.match_response(http_res, "200", "application/json"):
-            return unmarshal_json_response(models.ChainResponse, http_res)
-        if utils.match_response(http_res, ["401", "404"], "application/json"):
-            response_data = unmarshal_json_response(
-                errors.ChainSingleErrorData, http_res
-            )
-            raise errors.ChainSingleError(response_data, http_res)
-        if utils.match_response(http_res, "4XX", "*"):
-            http_res_text = utils.stream_to_text(http_res)
-            raise errors.SDKError("API error occurred", http_res, http_res_text)
-        if utils.match_response(http_res, "5XX", "*"):
-            http_res_text = utils.stream_to_text(http_res)
-            raise errors.SDKError("API error occurred", http_res, http_res_text)
-
-        raise errors.SDKError("Unexpected response received", http_res)
-
-    async def get_chain_async(
-        self,
-        *,
-        chain_id: str,
-        environment_id: str,
-        retries: OptionalNullable[utils.RetryConfig] = UNSET,
-        server_url: Optional[str] = None,
-        timeout_ms: Optional[int] = None,
-        http_headers: Optional[Mapping[str, str]] = None,
-    ) -> models.ChainResponse:
-        r"""Return chain properties
-
-        Returns properties for a chain with the provided ID, or a 404 if no such chain is found.
-
-        :param chain_id: The ID of the Chain.
-        :param environment_id: The ID of the Environment.
-        :param retries: Override the default retry configuration for this method
-        :param server_url: Override the default server URL for this method
-        :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
-        :param http_headers: Additional headers to set or replace on requests.
-        """
-        base_url = None
-        url_variables = None
-        if timeout_ms is None:
-            timeout_ms = self.sdk_configuration.timeout_ms
-
-        if server_url is not None:
-            base_url = server_url
-        else:
-            base_url = models.CHAINS_GET_CHAIN_OP_SERVERS[0]
-
-        request = models.ChainsGetChainRequest(
-            chain_id=chain_id,
-            environment_id=environment_id,
-        )
-
-        req = self._build_request_async(
-            method="GET",
-            path="/v1/metadata/environment/{environment_id}/chain/{chain_id}",
-            base_url=base_url,
-            url_variables=url_variables,
-            request=request,
-            request_body_required=False,
-            request_has_path_params=True,
-            request_has_query_params=True,
-            user_agent_header="user-agent",
-            accept_header_value="application/json",
-            http_headers=http_headers,
-            security=self.sdk_configuration.security,
-            allow_empty_value=None,
-            timeout_ms=timeout_ms,
-        )
-
-        if retries == UNSET:
-            if self.sdk_configuration.retry_config is not UNSET:
-                retries = self.sdk_configuration.retry_config
-
-        retry_config = None
-        if isinstance(retries, utils.RetryConfig):
-            retry_config = (retries, ["429", "500", "502", "503", "504"])
-
-        http_res = await self.do_request_async(
-            hook_ctx=HookContext(
-                config=self.sdk_configuration,
-                base_url=base_url or "",
-                operation_id="chains_getChain",
-                oauth2_scopes=[],
-                security_source=self.sdk_configuration.security,
-            ),
-            request=req,
-            error_status_codes=["401", "404", "4XX", "5XX"],
-            retry_config=retry_config,
-        )
-
-        response_data: Any = None
-        if utils.match_response(http_res, "200", "application/json"):
-            return unmarshal_json_response(models.ChainResponse, http_res)
-        if utils.match_response(http_res, ["401", "404"], "application/json"):
+        if utils.match_response(http_res, ["401", "404", "422"], "application/json"):
             response_data = unmarshal_json_response(
                 errors.ChainSingleErrorData, http_res
             )
@@ -1706,20 +1657,20 @@ class Chains(BaseSDK):
 
         raise errors.SDKError("Unexpected response received", http_res)
 
-    def get_chains(
+    def stop_chain(
         self,
         *,
-        environment_id: str,
+        chain_run_id: str,
         retries: OptionalNullable[utils.RetryConfig] = UNSET,
         server_url: Optional[str] = None,
         timeout_ms: Optional[int] = None,
         http_headers: Optional[Mapping[str, str]] = None,
-    ) -> models.ChainsEnvironmentResponse:
-        r"""Return a list of chains for an environment
+    ) -> models.ChainRunResponse:
+        r"""Stop a running chain
 
-        Retrieves a list of chains for an environment.
+        Stop a chain run with the specified ID.
 
-        :param environment_id: The ID of the Environment.
+        :param chain_run_id: The ID of the Chain Run.
         :param retries: Override the default retry configuration for this method
         :param server_url: Override the default server URL for this method
         :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
@@ -1733,15 +1684,15 @@ class Chains(BaseSDK):
         if server_url is not None:
             base_url = server_url
         else:
-            base_url = models.CHAINS_GET_CHAINS_OP_SERVERS[0]
+            base_url = models.CHAINS_STOP_CHAIN_OP_SERVERS[0]
 
-        request = models.ChainsGetChainsRequest(
-            environment_id=environment_id,
+        request = models.ChainsStopChainRequest(
+            chain_run_id=chain_run_id,
         )
 
         req = self._build_request(
-            method="GET",
-            path="/v1/metadata/environment/{environment_id}/chain",
+            method="POST",
+            path="/v1/execute/chain_run/{chain_run_id}/stop",
             base_url=base_url,
             url_variables=url_variables,
             request=request,
@@ -1768,19 +1719,19 @@ class Chains(BaseSDK):
             hook_ctx=HookContext(
                 config=self.sdk_configuration,
                 base_url=base_url or "",
-                operation_id="chains_getChains",
+                operation_id="chains_stopChain",
                 oauth2_scopes=[],
                 security_source=self.sdk_configuration.security,
             ),
             request=req,
-            error_status_codes=["401", "404", "4XX", "5XX"],
+            error_status_codes=["401", "404", "422", "4XX", "5XX"],
             retry_config=retry_config,
         )
 
         response_data: Any = None
         if utils.match_response(http_res, "200", "application/json"):
-            return unmarshal_json_response(models.ChainsEnvironmentResponse, http_res)
-        if utils.match_response(http_res, ["401", "404"], "application/json"):
+            return unmarshal_json_response(models.ChainRunResponse, http_res)
+        if utils.match_response(http_res, ["401", "404", "422"], "application/json"):
             response_data = unmarshal_json_response(
                 errors.ChainSingleErrorData, http_res
             )
@@ -1794,20 +1745,20 @@ class Chains(BaseSDK):
 
         raise errors.SDKError("Unexpected response received", http_res)
 
-    async def get_chains_async(
+    async def stop_chain_async(
         self,
         *,
-        environment_id: str,
+        chain_run_id: str,
         retries: OptionalNullable[utils.RetryConfig] = UNSET,
         server_url: Optional[str] = None,
         timeout_ms: Optional[int] = None,
         http_headers: Optional[Mapping[str, str]] = None,
-    ) -> models.ChainsEnvironmentResponse:
-        r"""Return a list of chains for an environment
+    ) -> models.ChainRunResponse:
+        r"""Stop a running chain
 
-        Retrieves a list of chains for an environment.
+        Stop a chain run with the specified ID.
 
-        :param environment_id: The ID of the Environment.
+        :param chain_run_id: The ID of the Chain Run.
         :param retries: Override the default retry configuration for this method
         :param server_url: Override the default server URL for this method
         :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
@@ -1821,15 +1772,15 @@ class Chains(BaseSDK):
         if server_url is not None:
             base_url = server_url
         else:
-            base_url = models.CHAINS_GET_CHAINS_OP_SERVERS[0]
+            base_url = models.CHAINS_STOP_CHAIN_OP_SERVERS[0]
 
-        request = models.ChainsGetChainsRequest(
-            environment_id=environment_id,
+        request = models.ChainsStopChainRequest(
+            chain_run_id=chain_run_id,
         )
 
         req = self._build_request_async(
-            method="GET",
-            path="/v1/metadata/environment/{environment_id}/chain",
+            method="POST",
+            path="/v1/execute/chain_run/{chain_run_id}/stop",
             base_url=base_url,
             url_variables=url_variables,
             request=request,
@@ -1856,19 +1807,19 @@ class Chains(BaseSDK):
             hook_ctx=HookContext(
                 config=self.sdk_configuration,
                 base_url=base_url or "",
-                operation_id="chains_getChains",
+                operation_id="chains_stopChain",
                 oauth2_scopes=[],
                 security_source=self.sdk_configuration.security,
             ),
             request=req,
-            error_status_codes=["401", "404", "4XX", "5XX"],
+            error_status_codes=["401", "404", "422", "4XX", "5XX"],
             retry_config=retry_config,
         )
 
         response_data: Any = None
         if utils.match_response(http_res, "200", "application/json"):
-            return unmarshal_json_response(models.ChainsEnvironmentResponse, http_res)
-        if utils.match_response(http_res, ["401", "404"], "application/json"):
+            return unmarshal_json_response(models.ChainRunResponse, http_res)
+        if utils.match_response(http_res, ["401", "404", "422"], "application/json"):
             response_data = unmarshal_json_response(
                 errors.ChainSingleErrorData, http_res
             )
@@ -1882,22 +1833,27 @@ class Chains(BaseSDK):
 
         raise errors.SDKError("Unexpected response received", http_res)
 
-    def get_commands(
+    def chain_inputs_search(
         self,
         *,
-        chain_id: str,
         environment_id: str,
+        search_text: str,
+        limit: Optional[str] = None,
+        cursor: Optional[str] = None,
         retries: OptionalNullable[utils.RetryConfig] = UNSET,
         server_url: Optional[str] = None,
         timeout_ms: Optional[int] = None,
         http_headers: Optional[Mapping[str, str]] = None,
-    ) -> models.CommandsResponse:
-        r"""Return command properties
+    ) -> Optional[models.ChainsChainInputsSearchResponse]:
+        r"""Search previous chain runs for an input value
 
-        Returns properties for a command with the provided ID, or a 404 if no such command is found.
+        Returns a list of all chain runs whose inputs match the provided search criteria. The search text is fuzzy matched; it matches any input value that contains the provided string. For example, a command that takes a File ID of \"my_file_id\" as an input can be searched using \"my_file_id\" as the search text input. The environment ID specifies which environment should be searched for chain run input parameters. The limit and cursor help determine the page size and which page to return.
 
-        :param chain_id: The ID of the Chain.
-        :param environment_id: The ID of the Environment.
+
+        :param environment_id: The ID of the environment to search for chains run inputs.
+        :param search_text: The fuzzy input value to search for.
+        :param limit: Limit number of chainExecutors returned (Max 50).
+        :param cursor: Cursor value returned from the API, indicating page information.
         :param retries: Override the default retry configuration for this method
         :param server_url: Override the default server URL for this method
         :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
@@ -1911,16 +1867,18 @@ class Chains(BaseSDK):
         if server_url is not None:
             base_url = server_url
         else:
-            base_url = models.CHAINS_GET_COMMANDS_OP_SERVERS[0]
+            base_url = models.CHAINS_CHAIN_INPUTS_SEARCH_OP_SERVERS[0]
 
-        request = models.ChainsGetCommandsRequest(
-            chain_id=chain_id,
+        request = models.ChainsChainInputsSearchRequest(
             environment_id=environment_id,
+            search_text=search_text,
+            limit=limit,
+            cursor=cursor,
         )
 
         req = self._build_request(
             method="GET",
-            path="/v1/metadata/environment/{environment_id}/chain/{chain_id}/command",
+            path="/v1/execute/environment/{environment_id}/chain/inputs_search",
             base_url=base_url,
             url_variables=url_variables,
             request=request,
@@ -1947,581 +1905,43 @@ class Chains(BaseSDK):
             hook_ctx=HookContext(
                 config=self.sdk_configuration,
                 base_url=base_url or "",
-                operation_id="chains_getCommands",
+                operation_id="chains_chainInputsSearch",
                 oauth2_scopes=[],
                 security_source=self.sdk_configuration.security,
             ),
             request=req,
-            error_status_codes=["401", "404", "4XX", "5XX"],
+            error_status_codes=["401", "404", "422", "4XX", "5XX"],
             retry_config=retry_config,
         )
 
-        response_data: Any = None
-        if utils.match_response(http_res, "200", "application/json"):
-            return unmarshal_json_response(models.CommandsResponse, http_res)
-        if utils.match_response(http_res, ["401", "404"], "application/json"):
-            response_data = unmarshal_json_response(
-                errors.ChainSingleErrorData, http_res
-            )
-            raise errors.ChainSingleError(response_data, http_res)
-        if utils.match_response(http_res, "4XX", "*"):
-            http_res_text = utils.stream_to_text(http_res)
-            raise errors.SDKError("API error occurred", http_res, http_res_text)
-        if utils.match_response(http_res, "5XX", "*"):
-            http_res_text = utils.stream_to_text(http_res)
-            raise errors.SDKError("API error occurred", http_res, http_res_text)
-
-        raise errors.SDKError("Unexpected response received", http_res)
-
-    async def get_commands_async(
-        self,
-        *,
-        chain_id: str,
-        environment_id: str,
-        retries: OptionalNullable[utils.RetryConfig] = UNSET,
-        server_url: Optional[str] = None,
-        timeout_ms: Optional[int] = None,
-        http_headers: Optional[Mapping[str, str]] = None,
-    ) -> models.CommandsResponse:
-        r"""Return command properties
-
-        Returns properties for a command with the provided ID, or a 404 if no such command is found.
-
-        :param chain_id: The ID of the Chain.
-        :param environment_id: The ID of the Environment.
-        :param retries: Override the default retry configuration for this method
-        :param server_url: Override the default server URL for this method
-        :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
-        :param http_headers: Additional headers to set or replace on requests.
-        """
-        base_url = None
-        url_variables = None
-        if timeout_ms is None:
-            timeout_ms = self.sdk_configuration.timeout_ms
-
-        if server_url is not None:
-            base_url = server_url
-        else:
-            base_url = models.CHAINS_GET_COMMANDS_OP_SERVERS[0]
-
-        request = models.ChainsGetCommandsRequest(
-            chain_id=chain_id,
-            environment_id=environment_id,
-        )
-
-        req = self._build_request_async(
-            method="GET",
-            path="/v1/metadata/environment/{environment_id}/chain/{chain_id}/command",
-            base_url=base_url,
-            url_variables=url_variables,
-            request=request,
-            request_body_required=False,
-            request_has_path_params=True,
-            request_has_query_params=True,
-            user_agent_header="user-agent",
-            accept_header_value="application/json",
-            http_headers=http_headers,
-            security=self.sdk_configuration.security,
-            allow_empty_value=None,
-            timeout_ms=timeout_ms,
-        )
-
-        if retries == UNSET:
-            if self.sdk_configuration.retry_config is not UNSET:
-                retries = self.sdk_configuration.retry_config
-
-        retry_config = None
-        if isinstance(retries, utils.RetryConfig):
-            retry_config = (retries, ["429", "500", "502", "503", "504"])
-
-        http_res = await self.do_request_async(
-            hook_ctx=HookContext(
-                config=self.sdk_configuration,
-                base_url=base_url or "",
-                operation_id="chains_getCommands",
-                oauth2_scopes=[],
-                security_source=self.sdk_configuration.security,
-            ),
-            request=req,
-            error_status_codes=["401", "404", "4XX", "5XX"],
-            retry_config=retry_config,
-        )
-
-        response_data: Any = None
-        if utils.match_response(http_res, "200", "application/json"):
-            return unmarshal_json_response(models.CommandsResponse, http_res)
-        if utils.match_response(http_res, ["401", "404"], "application/json"):
-            response_data = unmarshal_json_response(
-                errors.ChainSingleErrorData, http_res
-            )
-            raise errors.ChainSingleError(response_data, http_res)
-        if utils.match_response(http_res, "4XX", "*"):
-            http_res_text = await utils.stream_to_text_async(http_res)
-            raise errors.SDKError("API error occurred", http_res, http_res_text)
-        if utils.match_response(http_res, "5XX", "*"):
-            http_res_text = await utils.stream_to_text_async(http_res)
-            raise errors.SDKError("API error occurred", http_res, http_res_text)
-
-        raise errors.SDKError("Unexpected response received", http_res)
-
-    def get_environment(
-        self,
-        *,
-        environment_id: str,
-        workspace_id: str,
-        retries: OptionalNullable[utils.RetryConfig] = UNSET,
-        server_url: Optional[str] = None,
-        timeout_ms: Optional[int] = None,
-        http_headers: Optional[Mapping[str, str]] = None,
-    ) -> models.EnvironmentResponse:
-        r"""Return environment properties
-
-        Return properties for an environment in a workspace with the provided IDs, or a 404 if no such workspace is found.
-
-        :param environment_id: The ID of the Environment.
-        :param workspace_id: The ID of the Workspace.
-        :param retries: Override the default retry configuration for this method
-        :param server_url: Override the default server URL for this method
-        :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
-        :param http_headers: Additional headers to set or replace on requests.
-        """
-        base_url = None
-        url_variables = None
-        if timeout_ms is None:
-            timeout_ms = self.sdk_configuration.timeout_ms
-
-        if server_url is not None:
-            base_url = server_url
-        else:
-            base_url = models.CHAINS_GET_ENVIRONMENT_OP_SERVERS[0]
-
-        request = models.ChainsGetEnvironmentRequest(
-            environment_id=environment_id,
-            workspace_id=workspace_id,
-        )
-
-        req = self._build_request(
-            method="GET",
-            path="/v1/metadata/workspace/{workspace_id}/environment/{environment_id}",
-            base_url=base_url,
-            url_variables=url_variables,
-            request=request,
-            request_body_required=False,
-            request_has_path_params=True,
-            request_has_query_params=True,
-            user_agent_header="user-agent",
-            accept_header_value="application/json",
-            http_headers=http_headers,
-            security=self.sdk_configuration.security,
-            allow_empty_value=None,
-            timeout_ms=timeout_ms,
-        )
-
-        if retries == UNSET:
-            if self.sdk_configuration.retry_config is not UNSET:
-                retries = self.sdk_configuration.retry_config
-
-        retry_config = None
-        if isinstance(retries, utils.RetryConfig):
-            retry_config = (retries, ["429", "500", "502", "503", "504"])
-
-        http_res = self.do_request(
-            hook_ctx=HookContext(
-                config=self.sdk_configuration,
-                base_url=base_url or "",
-                operation_id="chains_getEnvironment",
-                oauth2_scopes=[],
-                security_source=self.sdk_configuration.security,
-            ),
-            request=req,
-            error_status_codes=["401", "404", "4XX", "5XX"],
-            retry_config=retry_config,
-        )
-
-        response_data: Any = None
-        if utils.match_response(http_res, "200", "application/json"):
-            return unmarshal_json_response(models.EnvironmentResponse, http_res)
-        if utils.match_response(http_res, ["401", "404"], "application/json"):
-            response_data = unmarshal_json_response(
-                errors.ChainSingleErrorData, http_res
-            )
-            raise errors.ChainSingleError(response_data, http_res)
-        if utils.match_response(http_res, "4XX", "*"):
-            http_res_text = utils.stream_to_text(http_res)
-            raise errors.SDKError("API error occurred", http_res, http_res_text)
-        if utils.match_response(http_res, "5XX", "*"):
-            http_res_text = utils.stream_to_text(http_res)
-            raise errors.SDKError("API error occurred", http_res, http_res_text)
-
-        raise errors.SDKError("Unexpected response received", http_res)
-
-    async def get_environment_async(
-        self,
-        *,
-        environment_id: str,
-        workspace_id: str,
-        retries: OptionalNullable[utils.RetryConfig] = UNSET,
-        server_url: Optional[str] = None,
-        timeout_ms: Optional[int] = None,
-        http_headers: Optional[Mapping[str, str]] = None,
-    ) -> models.EnvironmentResponse:
-        r"""Return environment properties
-
-        Return properties for an environment in a workspace with the provided IDs, or a 404 if no such workspace is found.
-
-        :param environment_id: The ID of the Environment.
-        :param workspace_id: The ID of the Workspace.
-        :param retries: Override the default retry configuration for this method
-        :param server_url: Override the default server URL for this method
-        :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
-        :param http_headers: Additional headers to set or replace on requests.
-        """
-        base_url = None
-        url_variables = None
-        if timeout_ms is None:
-            timeout_ms = self.sdk_configuration.timeout_ms
-
-        if server_url is not None:
-            base_url = server_url
-        else:
-            base_url = models.CHAINS_GET_ENVIRONMENT_OP_SERVERS[0]
-
-        request = models.ChainsGetEnvironmentRequest(
-            environment_id=environment_id,
-            workspace_id=workspace_id,
-        )
-
-        req = self._build_request_async(
-            method="GET",
-            path="/v1/metadata/workspace/{workspace_id}/environment/{environment_id}",
-            base_url=base_url,
-            url_variables=url_variables,
-            request=request,
-            request_body_required=False,
-            request_has_path_params=True,
-            request_has_query_params=True,
-            user_agent_header="user-agent",
-            accept_header_value="application/json",
-            http_headers=http_headers,
-            security=self.sdk_configuration.security,
-            allow_empty_value=None,
-            timeout_ms=timeout_ms,
-        )
-
-        if retries == UNSET:
-            if self.sdk_configuration.retry_config is not UNSET:
-                retries = self.sdk_configuration.retry_config
-
-        retry_config = None
-        if isinstance(retries, utils.RetryConfig):
-            retry_config = (retries, ["429", "500", "502", "503", "504"])
-
-        http_res = await self.do_request_async(
-            hook_ctx=HookContext(
-                config=self.sdk_configuration,
-                base_url=base_url or "",
-                operation_id="chains_getEnvironment",
-                oauth2_scopes=[],
-                security_source=self.sdk_configuration.security,
-            ),
-            request=req,
-            error_status_codes=["401", "404", "4XX", "5XX"],
-            retry_config=retry_config,
-        )
-
-        response_data: Any = None
-        if utils.match_response(http_res, "200", "application/json"):
-            return unmarshal_json_response(models.EnvironmentResponse, http_res)
-        if utils.match_response(http_res, ["401", "404"], "application/json"):
-            response_data = unmarshal_json_response(
-                errors.ChainSingleErrorData, http_res
-            )
-            raise errors.ChainSingleError(response_data, http_res)
-        if utils.match_response(http_res, "4XX", "*"):
-            http_res_text = await utils.stream_to_text_async(http_res)
-            raise errors.SDKError("API error occurred", http_res, http_res_text)
-        if utils.match_response(http_res, "5XX", "*"):
-            http_res_text = await utils.stream_to_text_async(http_res)
-            raise errors.SDKError("API error occurred", http_res, http_res_text)
-
-        raise errors.SDKError("Unexpected response received", http_res)
-
-    def get_environments(
-        self,
-        *,
-        workspace_id: str,
-        retries: OptionalNullable[utils.RetryConfig] = UNSET,
-        server_url: Optional[str] = None,
-        timeout_ms: Optional[int] = None,
-        http_headers: Optional[Mapping[str, str]] = None,
-    ) -> models.EnvironmentsResponse:
-        r"""Return a list of environments for a workspace
-
-        Return a list of environments for a workspace.
-
-        :param workspace_id: The ID of the Workspace.
-        :param retries: Override the default retry configuration for this method
-        :param server_url: Override the default server URL for this method
-        :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
-        :param http_headers: Additional headers to set or replace on requests.
-        """
-        base_url = None
-        url_variables = None
-        if timeout_ms is None:
-            timeout_ms = self.sdk_configuration.timeout_ms
-
-        if server_url is not None:
-            base_url = server_url
-        else:
-            base_url = models.CHAINS_GET_ENVIRONMENTS_OP_SERVERS[0]
-
-        request = models.ChainsGetEnvironmentsRequest(
-            workspace_id=workspace_id,
-        )
-
-        req = self._build_request(
-            method="GET",
-            path="/v1/metadata/workspace/{workspace_id}/environment",
-            base_url=base_url,
-            url_variables=url_variables,
-            request=request,
-            request_body_required=False,
-            request_has_path_params=True,
-            request_has_query_params=True,
-            user_agent_header="user-agent",
-            accept_header_value="application/json",
-            http_headers=http_headers,
-            security=self.sdk_configuration.security,
-            allow_empty_value=None,
-            timeout_ms=timeout_ms,
-        )
-
-        if retries == UNSET:
-            if self.sdk_configuration.retry_config is not UNSET:
-                retries = self.sdk_configuration.retry_config
-
-        retry_config = None
-        if isinstance(retries, utils.RetryConfig):
-            retry_config = (retries, ["429", "500", "502", "503", "504"])
-
-        http_res = self.do_request(
-            hook_ctx=HookContext(
-                config=self.sdk_configuration,
-                base_url=base_url or "",
-                operation_id="chains_getEnvironments",
-                oauth2_scopes=[],
-                security_source=self.sdk_configuration.security,
-            ),
-            request=req,
-            error_status_codes=["401", "404", "4XX", "5XX"],
-            retry_config=retry_config,
-        )
-
-        response_data: Any = None
-        if utils.match_response(http_res, "200", "application/json"):
-            return unmarshal_json_response(models.EnvironmentsResponse, http_res)
-        if utils.match_response(http_res, ["401", "404"], "application/json"):
-            response_data = unmarshal_json_response(
-                errors.ChainSingleErrorData, http_res
-            )
-            raise errors.ChainSingleError(response_data, http_res)
-        if utils.match_response(http_res, "4XX", "*"):
-            http_res_text = utils.stream_to_text(http_res)
-            raise errors.SDKError("API error occurred", http_res, http_res_text)
-        if utils.match_response(http_res, "5XX", "*"):
-            http_res_text = utils.stream_to_text(http_res)
-            raise errors.SDKError("API error occurred", http_res, http_res_text)
-
-        raise errors.SDKError("Unexpected response received", http_res)
-
-    async def get_environments_async(
-        self,
-        *,
-        workspace_id: str,
-        retries: OptionalNullable[utils.RetryConfig] = UNSET,
-        server_url: Optional[str] = None,
-        timeout_ms: Optional[int] = None,
-        http_headers: Optional[Mapping[str, str]] = None,
-    ) -> models.EnvironmentsResponse:
-        r"""Return a list of environments for a workspace
-
-        Return a list of environments for a workspace.
-
-        :param workspace_id: The ID of the Workspace.
-        :param retries: Override the default retry configuration for this method
-        :param server_url: Override the default server URL for this method
-        :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
-        :param http_headers: Additional headers to set or replace on requests.
-        """
-        base_url = None
-        url_variables = None
-        if timeout_ms is None:
-            timeout_ms = self.sdk_configuration.timeout_ms
-
-        if server_url is not None:
-            base_url = server_url
-        else:
-            base_url = models.CHAINS_GET_ENVIRONMENTS_OP_SERVERS[0]
-
-        request = models.ChainsGetEnvironmentsRequest(
-            workspace_id=workspace_id,
-        )
-
-        req = self._build_request_async(
-            method="GET",
-            path="/v1/metadata/workspace/{workspace_id}/environment",
-            base_url=base_url,
-            url_variables=url_variables,
-            request=request,
-            request_body_required=False,
-            request_has_path_params=True,
-            request_has_query_params=True,
-            user_agent_header="user-agent",
-            accept_header_value="application/json",
-            http_headers=http_headers,
-            security=self.sdk_configuration.security,
-            allow_empty_value=None,
-            timeout_ms=timeout_ms,
-        )
-
-        if retries == UNSET:
-            if self.sdk_configuration.retry_config is not UNSET:
-                retries = self.sdk_configuration.retry_config
-
-        retry_config = None
-        if isinstance(retries, utils.RetryConfig):
-            retry_config = (retries, ["429", "500", "502", "503", "504"])
-
-        http_res = await self.do_request_async(
-            hook_ctx=HookContext(
-                config=self.sdk_configuration,
-                base_url=base_url or "",
-                operation_id="chains_getEnvironments",
-                oauth2_scopes=[],
-                security_source=self.sdk_configuration.security,
-            ),
-            request=req,
-            error_status_codes=["401", "404", "4XX", "5XX"],
-            retry_config=retry_config,
-        )
-
-        response_data: Any = None
-        if utils.match_response(http_res, "200", "application/json"):
-            return unmarshal_json_response(models.EnvironmentsResponse, http_res)
-        if utils.match_response(http_res, ["401", "404"], "application/json"):
-            response_data = unmarshal_json_response(
-                errors.ChainSingleErrorData, http_res
-            )
-            raise errors.ChainSingleError(response_data, http_res)
-        if utils.match_response(http_res, "4XX", "*"):
-            http_res_text = await utils.stream_to_text_async(http_res)
-            raise errors.SDKError("API error occurred", http_res, http_res_text)
-        if utils.match_response(http_res, "5XX", "*"):
-            http_res_text = await utils.stream_to_text_async(http_res)
-            raise errors.SDKError("API error occurred", http_res, http_res_text)
-
-        raise errors.SDKError("Unexpected response received", http_res)
-
-    def get_login_activity(
-        self,
-        *,
-        page: Optional[int] = None,
-        page_size: Optional[int] = None,
-        retries: OptionalNullable[utils.RetryConfig] = UNSET,
-        server_url: Optional[str] = None,
-        timeout_ms: Optional[int] = None,
-        http_headers: Optional[Mapping[str, str]] = None,
-    ) -> Optional[models.ChainsGetLoginActivityResponse]:
-        r"""Return a list of login activity events
-
-        Returns a list of recent login activity events.
-
-        :param page: Page number to retrieve in the paginated results (0-based index).
-        :param page_size: Limit number of results returned (Max 100).
-        :param retries: Override the default retry configuration for this method
-        :param server_url: Override the default server URL for this method
-        :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
-        :param http_headers: Additional headers to set or replace on requests.
-        """
-        base_url = None
-        url_variables = None
-        if timeout_ms is None:
-            timeout_ms = self.sdk_configuration.timeout_ms
-
-        if server_url is not None:
-            base_url = server_url
-        else:
-            base_url = models.CHAINS_GET_LOGIN_ACTIVITY_OP_SERVERS[0]
-
-        request = models.ChainsGetLoginActivityRequest(
-            page=page,
-            page_size=page_size,
-        )
-
-        req = self._build_request(
-            method="GET",
-            path="/v1/security/login_activity",
-            base_url=base_url,
-            url_variables=url_variables,
-            request=request,
-            request_body_required=False,
-            request_has_path_params=False,
-            request_has_query_params=True,
-            user_agent_header="user-agent",
-            accept_header_value="application/json",
-            http_headers=http_headers,
-            security=self.sdk_configuration.security,
-            allow_empty_value=None,
-            timeout_ms=timeout_ms,
-        )
-
-        if retries == UNSET:
-            if self.sdk_configuration.retry_config is not UNSET:
-                retries = self.sdk_configuration.retry_config
-
-        retry_config = None
-        if isinstance(retries, utils.RetryConfig):
-            retry_config = (retries, ["429", "500", "502", "503", "504"])
-
-        http_res = self.do_request(
-            hook_ctx=HookContext(
-                config=self.sdk_configuration,
-                base_url=base_url or "",
-                operation_id="chains_getLoginActivity",
-                oauth2_scopes=[],
-                security_source=self.sdk_configuration.security,
-            ),
-            request=req,
-            error_status_codes=["401", "4XX", "5XX"],
-            retry_config=retry_config,
-        )
-
-        def next_func() -> Optional[models.ChainsGetLoginActivityResponse]:
+        def next_func() -> Optional[models.ChainsChainInputsSearchResponse]:
             body = utils.unmarshal_json(http_res.text, Union[Dict[Any, Any], List[Any]])
 
-            page = request.page if not request.page is None else 1
-            next_page = page + 1
+            next_cursor = JSONPath("$.data.cursor").parse(body)
 
-            if not http_res.text:
-                return None
-            results = JSONPath("$.data").parse(body)
-            if len(results) == 0 or len(results[0]) == 0:
+            if len(next_cursor) == 0:
                 return None
 
-            return self.get_login_activity(
-                page=next_page,
-                page_size=page_size,
+            next_cursor = next_cursor[0]
+            if next_cursor is None or str(next_cursor).strip() == "":
+                return None
+
+            return self.chain_inputs_search(
+                environment_id=environment_id,
+                search_text=search_text,
+                limit=limit,
+                cursor=next_cursor,
                 retries=retries,
                 server_url=server_url,
             )
 
         response_data: Any = None
         if utils.match_response(http_res, "200", "application/json"):
-            return models.ChainsGetLoginActivityResponse(
-                result=unmarshal_json_response(models.LoginActivityResponse, http_res),
+            return models.ChainsChainInputsSearchResponse(
+                result=unmarshal_json_response(models.ChainRunPageResponse, http_res),
                 next=next_func,
             )
-        if utils.match_response(http_res, "401", "application/json"):
+        if utils.match_response(http_res, ["401", "404", "422"], "application/json"):
             response_data = unmarshal_json_response(
                 errors.ChainSingleErrorData, http_res
             )
@@ -2535,22 +1955,27 @@ class Chains(BaseSDK):
 
         raise errors.SDKError("Unexpected response received", http_res)
 
-    async def get_login_activity_async(
+    async def chain_inputs_search_async(
         self,
         *,
-        page: Optional[int] = None,
-        page_size: Optional[int] = None,
+        environment_id: str,
+        search_text: str,
+        limit: Optional[str] = None,
+        cursor: Optional[str] = None,
         retries: OptionalNullable[utils.RetryConfig] = UNSET,
         server_url: Optional[str] = None,
         timeout_ms: Optional[int] = None,
         http_headers: Optional[Mapping[str, str]] = None,
-    ) -> Optional[models.ChainsGetLoginActivityResponse]:
-        r"""Return a list of login activity events
+    ) -> Optional[models.ChainsChainInputsSearchResponse]:
+        r"""Search previous chain runs for an input value
 
-        Returns a list of recent login activity events.
+        Returns a list of all chain runs whose inputs match the provided search criteria. The search text is fuzzy matched; it matches any input value that contains the provided string. For example, a command that takes a File ID of \"my_file_id\" as an input can be searched using \"my_file_id\" as the search text input. The environment ID specifies which environment should be searched for chain run input parameters. The limit and cursor help determine the page size and which page to return.
 
-        :param page: Page number to retrieve in the paginated results (0-based index).
-        :param page_size: Limit number of results returned (Max 100).
+
+        :param environment_id: The ID of the environment to search for chains run inputs.
+        :param search_text: The fuzzy input value to search for.
+        :param limit: Limit number of chainExecutors returned (Max 50).
+        :param cursor: Cursor value returned from the API, indicating page information.
         :param retries: Override the default retry configuration for this method
         :param server_url: Override the default server URL for this method
         :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
@@ -2564,21 +1989,23 @@ class Chains(BaseSDK):
         if server_url is not None:
             base_url = server_url
         else:
-            base_url = models.CHAINS_GET_LOGIN_ACTIVITY_OP_SERVERS[0]
+            base_url = models.CHAINS_CHAIN_INPUTS_SEARCH_OP_SERVERS[0]
 
-        request = models.ChainsGetLoginActivityRequest(
-            page=page,
-            page_size=page_size,
+        request = models.ChainsChainInputsSearchRequest(
+            environment_id=environment_id,
+            search_text=search_text,
+            limit=limit,
+            cursor=cursor,
         )
 
         req = self._build_request_async(
             method="GET",
-            path="/v1/security/login_activity",
+            path="/v1/execute/environment/{environment_id}/chain/inputs_search",
             base_url=base_url,
             url_variables=url_variables,
             request=request,
             request_body_required=False,
-            request_has_path_params=False,
+            request_has_path_params=True,
             request_has_query_params=True,
             user_agent_header="user-agent",
             accept_header_value="application/json",
@@ -2600,44 +2027,46 @@ class Chains(BaseSDK):
             hook_ctx=HookContext(
                 config=self.sdk_configuration,
                 base_url=base_url or "",
-                operation_id="chains_getLoginActivity",
+                operation_id="chains_chainInputsSearch",
                 oauth2_scopes=[],
                 security_source=self.sdk_configuration.security,
             ),
             request=req,
-            error_status_codes=["401", "4XX", "5XX"],
+            error_status_codes=["401", "404", "422", "4XX", "5XX"],
             retry_config=retry_config,
         )
 
-        def next_func() -> Awaitable[Optional[models.ChainsGetLoginActivityResponse]]:
+        def next_func() -> Awaitable[Optional[models.ChainsChainInputsSearchResponse]]:
             body = utils.unmarshal_json(http_res.text, Union[Dict[Any, Any], List[Any]])
 
             async def empty_result():
                 return None
 
-            page = request.page if not request.page is None else 1
-            next_page = page + 1
+            next_cursor = JSONPath("$.data.cursor").parse(body)
 
-            if not http_res.text:
-                return empty_result()
-            results = JSONPath("$.data").parse(body)
-            if len(results) == 0 or len(results[0]) == 0:
+            if len(next_cursor) == 0:
                 return empty_result()
 
-            return self.get_login_activity_async(
-                page=next_page,
-                page_size=page_size,
+            next_cursor = next_cursor[0]
+            if next_cursor is None or str(next_cursor).strip() == "":
+                return empty_result()
+
+            return self.chain_inputs_search_async(
+                environment_id=environment_id,
+                search_text=search_text,
+                limit=limit,
+                cursor=next_cursor,
                 retries=retries,
                 server_url=server_url,
             )
 
         response_data: Any = None
         if utils.match_response(http_res, "200", "application/json"):
-            return models.ChainsGetLoginActivityResponse(
-                result=unmarshal_json_response(models.LoginActivityResponse, http_res),
+            return models.ChainsChainInputsSearchResponse(
+                result=unmarshal_json_response(models.ChainRunPageResponse, http_res),
                 next=next_func,
             )
-        if utils.match_response(http_res, "401", "application/json"):
+        if utils.match_response(http_res, ["401", "404", "422"], "application/json"):
             response_data = unmarshal_json_response(
                 errors.ChainSingleErrorData, http_res
             )
@@ -2651,1883 +2080,23 @@ class Chains(BaseSDK):
 
         raise errors.SDKError("Unexpected response received", http_res)
 
-    def get_permissions(
+    def chain_run_history(
         self,
         *,
-        page: Optional[int] = None,
-        page_size: Optional[int] = None,
-        retries: OptionalNullable[utils.RetryConfig] = UNSET,
-        server_url: Optional[str] = None,
-        timeout_ms: Optional[int] = None,
-        http_headers: Optional[Mapping[str, str]] = None,
-    ) -> Optional[models.ChainsGetPermissionsResponse]:
-        r"""Return a list of all permissions for a company
-
-        Returns a list of all permissions for a company.
-
-        :param page: Page number to retrieve in the paginated results (0-based index).
-        :param page_size: Limit number of results returned (Max 100).
-        :param retries: Override the default retry configuration for this method
-        :param server_url: Override the default server URL for this method
-        :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
-        :param http_headers: Additional headers to set or replace on requests.
-        """
-        base_url = None
-        url_variables = None
-        if timeout_ms is None:
-            timeout_ms = self.sdk_configuration.timeout_ms
-
-        if server_url is not None:
-            base_url = server_url
-        else:
-            base_url = models.CHAINS_GET_PERMISSIONS_OP_SERVERS[0]
-
-        request = models.ChainsGetPermissionsRequest(
-            page=page,
-            page_size=page_size,
-        )
-
-        req = self._build_request(
-            method="GET",
-            path="/v1/security/permissions",
-            base_url=base_url,
-            url_variables=url_variables,
-            request=request,
-            request_body_required=False,
-            request_has_path_params=False,
-            request_has_query_params=True,
-            user_agent_header="user-agent",
-            accept_header_value="application/json",
-            http_headers=http_headers,
-            security=self.sdk_configuration.security,
-            allow_empty_value=None,
-            timeout_ms=timeout_ms,
-        )
-
-        if retries == UNSET:
-            if self.sdk_configuration.retry_config is not UNSET:
-                retries = self.sdk_configuration.retry_config
-
-        retry_config = None
-        if isinstance(retries, utils.RetryConfig):
-            retry_config = (retries, ["429", "500", "502", "503", "504"])
-
-        http_res = self.do_request(
-            hook_ctx=HookContext(
-                config=self.sdk_configuration,
-                base_url=base_url or "",
-                operation_id="chains_getPermissions",
-                oauth2_scopes=[],
-                security_source=self.sdk_configuration.security,
-            ),
-            request=req,
-            error_status_codes=["401", "4XX", "5XX"],
-            retry_config=retry_config,
-        )
-
-        def next_func() -> Optional[models.ChainsGetPermissionsResponse]:
-            body = utils.unmarshal_json(http_res.text, Union[Dict[Any, Any], List[Any]])
-
-            page = request.page if not request.page is None else 1
-            next_page = page + 1
-
-            if not http_res.text:
-                return None
-            results = JSONPath("$.data").parse(body)
-            if len(results) == 0 or len(results[0]) == 0:
-                return None
-
-            return self.get_permissions(
-                page=next_page,
-                page_size=page_size,
-                retries=retries,
-                server_url=server_url,
-            )
-
-        response_data: Any = None
-        if utils.match_response(http_res, "200", "application/json"):
-            return models.ChainsGetPermissionsResponse(
-                result=unmarshal_json_response(models.PermissionsResponse, http_res),
-                next=next_func,
-            )
-        if utils.match_response(http_res, "401", "application/json"):
-            response_data = unmarshal_json_response(
-                errors.ChainSingleErrorData, http_res
-            )
-            raise errors.ChainSingleError(response_data, http_res)
-        if utils.match_response(http_res, "4XX", "*"):
-            http_res_text = utils.stream_to_text(http_res)
-            raise errors.SDKError("API error occurred", http_res, http_res_text)
-        if utils.match_response(http_res, "5XX", "*"):
-            http_res_text = utils.stream_to_text(http_res)
-            raise errors.SDKError("API error occurred", http_res, http_res_text)
-
-        raise errors.SDKError("Unexpected response received", http_res)
-
-    async def get_permissions_async(
-        self,
-        *,
-        page: Optional[int] = None,
-        page_size: Optional[int] = None,
-        retries: OptionalNullable[utils.RetryConfig] = UNSET,
-        server_url: Optional[str] = None,
-        timeout_ms: Optional[int] = None,
-        http_headers: Optional[Mapping[str, str]] = None,
-    ) -> Optional[models.ChainsGetPermissionsResponse]:
-        r"""Return a list of all permissions for a company
-
-        Returns a list of all permissions for a company.
-
-        :param page: Page number to retrieve in the paginated results (0-based index).
-        :param page_size: Limit number of results returned (Max 100).
-        :param retries: Override the default retry configuration for this method
-        :param server_url: Override the default server URL for this method
-        :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
-        :param http_headers: Additional headers to set or replace on requests.
-        """
-        base_url = None
-        url_variables = None
-        if timeout_ms is None:
-            timeout_ms = self.sdk_configuration.timeout_ms
-
-        if server_url is not None:
-            base_url = server_url
-        else:
-            base_url = models.CHAINS_GET_PERMISSIONS_OP_SERVERS[0]
-
-        request = models.ChainsGetPermissionsRequest(
-            page=page,
-            page_size=page_size,
-        )
-
-        req = self._build_request_async(
-            method="GET",
-            path="/v1/security/permissions",
-            base_url=base_url,
-            url_variables=url_variables,
-            request=request,
-            request_body_required=False,
-            request_has_path_params=False,
-            request_has_query_params=True,
-            user_agent_header="user-agent",
-            accept_header_value="application/json",
-            http_headers=http_headers,
-            security=self.sdk_configuration.security,
-            allow_empty_value=None,
-            timeout_ms=timeout_ms,
-        )
-
-        if retries == UNSET:
-            if self.sdk_configuration.retry_config is not UNSET:
-                retries = self.sdk_configuration.retry_config
-
-        retry_config = None
-        if isinstance(retries, utils.RetryConfig):
-            retry_config = (retries, ["429", "500", "502", "503", "504"])
-
-        http_res = await self.do_request_async(
-            hook_ctx=HookContext(
-                config=self.sdk_configuration,
-                base_url=base_url or "",
-                operation_id="chains_getPermissions",
-                oauth2_scopes=[],
-                security_source=self.sdk_configuration.security,
-            ),
-            request=req,
-            error_status_codes=["401", "4XX", "5XX"],
-            retry_config=retry_config,
-        )
-
-        def next_func() -> Awaitable[Optional[models.ChainsGetPermissionsResponse]]:
-            body = utils.unmarshal_json(http_res.text, Union[Dict[Any, Any], List[Any]])
-
-            async def empty_result():
-                return None
-
-            page = request.page if not request.page is None else 1
-            next_page = page + 1
-
-            if not http_res.text:
-                return empty_result()
-            results = JSONPath("$.data").parse(body)
-            if len(results) == 0 or len(results[0]) == 0:
-                return empty_result()
-
-            return self.get_permissions_async(
-                page=next_page,
-                page_size=page_size,
-                retries=retries,
-                server_url=server_url,
-            )
-
-        response_data: Any = None
-        if utils.match_response(http_res, "200", "application/json"):
-            return models.ChainsGetPermissionsResponse(
-                result=unmarshal_json_response(models.PermissionsResponse, http_res),
-                next=next_func,
-            )
-        if utils.match_response(http_res, "401", "application/json"):
-            response_data = unmarshal_json_response(
-                errors.ChainSingleErrorData, http_res
-            )
-            raise errors.ChainSingleError(response_data, http_res)
-        if utils.match_response(http_res, "4XX", "*"):
-            http_res_text = await utils.stream_to_text_async(http_res)
-            raise errors.SDKError("API error occurred", http_res, http_res_text)
-        if utils.match_response(http_res, "5XX", "*"):
-            http_res_text = await utils.stream_to_text_async(http_res)
-            raise errors.SDKError("API error occurred", http_res, http_res_text)
-
-        raise errors.SDKError("Unexpected response received", http_res)
-
-    def get_user(
-        self,
-        *,
-        user_id: str,
-        retries: OptionalNullable[utils.RetryConfig] = UNSET,
-        server_url: Optional[str] = None,
-        timeout_ms: Optional[int] = None,
-        http_headers: Optional[Mapping[str, str]] = None,
-    ) -> models.UserResponse:
-        r"""Return user properties
-
-        Returns properties for a user with the provided ID, or a 404 if no such user is found.
-
-        :param user_id: The ID of the User.
-        :param retries: Override the default retry configuration for this method
-        :param server_url: Override the default server URL for this method
-        :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
-        :param http_headers: Additional headers to set or replace on requests.
-        """
-        base_url = None
-        url_variables = None
-        if timeout_ms is None:
-            timeout_ms = self.sdk_configuration.timeout_ms
-
-        if server_url is not None:
-            base_url = server_url
-        else:
-            base_url = models.CHAINS_GET_USER_OP_SERVERS[0]
-
-        request = models.ChainsGetUserRequest(
-            user_id=user_id,
-        )
-
-        req = self._build_request(
-            method="GET",
-            path="/v1/security/users/{userId}",
-            base_url=base_url,
-            url_variables=url_variables,
-            request=request,
-            request_body_required=False,
-            request_has_path_params=True,
-            request_has_query_params=True,
-            user_agent_header="user-agent",
-            accept_header_value="application/json",
-            http_headers=http_headers,
-            security=self.sdk_configuration.security,
-            allow_empty_value=None,
-            timeout_ms=timeout_ms,
-        )
-
-        if retries == UNSET:
-            if self.sdk_configuration.retry_config is not UNSET:
-                retries = self.sdk_configuration.retry_config
-
-        retry_config = None
-        if isinstance(retries, utils.RetryConfig):
-            retry_config = (retries, ["429", "500", "502", "503", "504"])
-
-        http_res = self.do_request(
-            hook_ctx=HookContext(
-                config=self.sdk_configuration,
-                base_url=base_url or "",
-                operation_id="chains_getUser",
-                oauth2_scopes=[],
-                security_source=self.sdk_configuration.security,
-            ),
-            request=req,
-            error_status_codes=["401", "4XX", "5XX"],
-            retry_config=retry_config,
-        )
-
-        response_data: Any = None
-        if utils.match_response(http_res, "200", "application/json"):
-            return unmarshal_json_response(models.UserResponse, http_res)
-        if utils.match_response(http_res, "401", "application/json"):
-            response_data = unmarshal_json_response(
-                errors.ChainSingleErrorData, http_res
-            )
-            raise errors.ChainSingleError(response_data, http_res)
-        if utils.match_response(http_res, "4XX", "*"):
-            http_res_text = utils.stream_to_text(http_res)
-            raise errors.SDKError("API error occurred", http_res, http_res_text)
-        if utils.match_response(http_res, "5XX", "*"):
-            http_res_text = utils.stream_to_text(http_res)
-            raise errors.SDKError("API error occurred", http_res, http_res_text)
-
-        raise errors.SDKError("Unexpected response received", http_res)
-
-    async def get_user_async(
-        self,
-        *,
-        user_id: str,
-        retries: OptionalNullable[utils.RetryConfig] = UNSET,
-        server_url: Optional[str] = None,
-        timeout_ms: Optional[int] = None,
-        http_headers: Optional[Mapping[str, str]] = None,
-    ) -> models.UserResponse:
-        r"""Return user properties
-
-        Returns properties for a user with the provided ID, or a 404 if no such user is found.
-
-        :param user_id: The ID of the User.
-        :param retries: Override the default retry configuration for this method
-        :param server_url: Override the default server URL for this method
-        :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
-        :param http_headers: Additional headers to set or replace on requests.
-        """
-        base_url = None
-        url_variables = None
-        if timeout_ms is None:
-            timeout_ms = self.sdk_configuration.timeout_ms
-
-        if server_url is not None:
-            base_url = server_url
-        else:
-            base_url = models.CHAINS_GET_USER_OP_SERVERS[0]
-
-        request = models.ChainsGetUserRequest(
-            user_id=user_id,
-        )
-
-        req = self._build_request_async(
-            method="GET",
-            path="/v1/security/users/{userId}",
-            base_url=base_url,
-            url_variables=url_variables,
-            request=request,
-            request_body_required=False,
-            request_has_path_params=True,
-            request_has_query_params=True,
-            user_agent_header="user-agent",
-            accept_header_value="application/json",
-            http_headers=http_headers,
-            security=self.sdk_configuration.security,
-            allow_empty_value=None,
-            timeout_ms=timeout_ms,
-        )
-
-        if retries == UNSET:
-            if self.sdk_configuration.retry_config is not UNSET:
-                retries = self.sdk_configuration.retry_config
-
-        retry_config = None
-        if isinstance(retries, utils.RetryConfig):
-            retry_config = (retries, ["429", "500", "502", "503", "504"])
-
-        http_res = await self.do_request_async(
-            hook_ctx=HookContext(
-                config=self.sdk_configuration,
-                base_url=base_url or "",
-                operation_id="chains_getUser",
-                oauth2_scopes=[],
-                security_source=self.sdk_configuration.security,
-            ),
-            request=req,
-            error_status_codes=["401", "4XX", "5XX"],
-            retry_config=retry_config,
-        )
-
-        response_data: Any = None
-        if utils.match_response(http_res, "200", "application/json"):
-            return unmarshal_json_response(models.UserResponse, http_res)
-        if utils.match_response(http_res, "401", "application/json"):
-            response_data = unmarshal_json_response(
-                errors.ChainSingleErrorData, http_res
-            )
-            raise errors.ChainSingleError(response_data, http_res)
-        if utils.match_response(http_res, "4XX", "*"):
-            http_res_text = await utils.stream_to_text_async(http_res)
-            raise errors.SDKError("API error occurred", http_res, http_res_text)
-        if utils.match_response(http_res, "5XX", "*"):
-            http_res_text = await utils.stream_to_text_async(http_res)
-            raise errors.SDKError("API error occurred", http_res, http_res_text)
-
-        raise errors.SDKError("Unexpected response received", http_res)
-
-    def get_user_group(
-        self,
-        *,
-        user_group_id: str,
-        retries: OptionalNullable[utils.RetryConfig] = UNSET,
-        server_url: Optional[str] = None,
-        timeout_ms: Optional[int] = None,
-        http_headers: Optional[Mapping[str, str]] = None,
-    ) -> models.UserGroupResponse:
-        r"""Return user group properties
-
-        Return properties for a user group with the provided ID, or a 404 if no such user group is found.
-
-        :param user_group_id: The ID of the User Group.
-        :param retries: Override the default retry configuration for this method
-        :param server_url: Override the default server URL for this method
-        :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
-        :param http_headers: Additional headers to set or replace on requests.
-        """
-        base_url = None
-        url_variables = None
-        if timeout_ms is None:
-            timeout_ms = self.sdk_configuration.timeout_ms
-
-        if server_url is not None:
-            base_url = server_url
-        else:
-            base_url = models.CHAINS_GET_USER_GROUP_OP_SERVERS[0]
-
-        request = models.ChainsGetUserGroupRequest(
-            user_group_id=user_group_id,
-        )
-
-        req = self._build_request(
-            method="GET",
-            path="/v1/security/user_groups/{userGroupId}",
-            base_url=base_url,
-            url_variables=url_variables,
-            request=request,
-            request_body_required=False,
-            request_has_path_params=True,
-            request_has_query_params=True,
-            user_agent_header="user-agent",
-            accept_header_value="application/json",
-            http_headers=http_headers,
-            security=self.sdk_configuration.security,
-            allow_empty_value=None,
-            timeout_ms=timeout_ms,
-        )
-
-        if retries == UNSET:
-            if self.sdk_configuration.retry_config is not UNSET:
-                retries = self.sdk_configuration.retry_config
-
-        retry_config = None
-        if isinstance(retries, utils.RetryConfig):
-            retry_config = (retries, ["429", "500", "502", "503", "504"])
-
-        http_res = self.do_request(
-            hook_ctx=HookContext(
-                config=self.sdk_configuration,
-                base_url=base_url or "",
-                operation_id="chains_getUserGroup",
-                oauth2_scopes=[],
-                security_source=self.sdk_configuration.security,
-            ),
-            request=req,
-            error_status_codes=["401", "4XX", "5XX"],
-            retry_config=retry_config,
-        )
-
-        response_data: Any = None
-        if utils.match_response(http_res, "200", "application/json"):
-            return unmarshal_json_response(models.UserGroupResponse, http_res)
-        if utils.match_response(http_res, "401", "application/json"):
-            response_data = unmarshal_json_response(
-                errors.ChainSingleErrorData, http_res
-            )
-            raise errors.ChainSingleError(response_data, http_res)
-        if utils.match_response(http_res, "4XX", "*"):
-            http_res_text = utils.stream_to_text(http_res)
-            raise errors.SDKError("API error occurred", http_res, http_res_text)
-        if utils.match_response(http_res, "5XX", "*"):
-            http_res_text = utils.stream_to_text(http_res)
-            raise errors.SDKError("API error occurred", http_res, http_res_text)
-
-        raise errors.SDKError("Unexpected response received", http_res)
-
-    async def get_user_group_async(
-        self,
-        *,
-        user_group_id: str,
-        retries: OptionalNullable[utils.RetryConfig] = UNSET,
-        server_url: Optional[str] = None,
-        timeout_ms: Optional[int] = None,
-        http_headers: Optional[Mapping[str, str]] = None,
-    ) -> models.UserGroupResponse:
-        r"""Return user group properties
-
-        Return properties for a user group with the provided ID, or a 404 if no such user group is found.
-
-        :param user_group_id: The ID of the User Group.
-        :param retries: Override the default retry configuration for this method
-        :param server_url: Override the default server URL for this method
-        :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
-        :param http_headers: Additional headers to set or replace on requests.
-        """
-        base_url = None
-        url_variables = None
-        if timeout_ms is None:
-            timeout_ms = self.sdk_configuration.timeout_ms
-
-        if server_url is not None:
-            base_url = server_url
-        else:
-            base_url = models.CHAINS_GET_USER_GROUP_OP_SERVERS[0]
-
-        request = models.ChainsGetUserGroupRequest(
-            user_group_id=user_group_id,
-        )
-
-        req = self._build_request_async(
-            method="GET",
-            path="/v1/security/user_groups/{userGroupId}",
-            base_url=base_url,
-            url_variables=url_variables,
-            request=request,
-            request_body_required=False,
-            request_has_path_params=True,
-            request_has_query_params=True,
-            user_agent_header="user-agent",
-            accept_header_value="application/json",
-            http_headers=http_headers,
-            security=self.sdk_configuration.security,
-            allow_empty_value=None,
-            timeout_ms=timeout_ms,
-        )
-
-        if retries == UNSET:
-            if self.sdk_configuration.retry_config is not UNSET:
-                retries = self.sdk_configuration.retry_config
-
-        retry_config = None
-        if isinstance(retries, utils.RetryConfig):
-            retry_config = (retries, ["429", "500", "502", "503", "504"])
-
-        http_res = await self.do_request_async(
-            hook_ctx=HookContext(
-                config=self.sdk_configuration,
-                base_url=base_url or "",
-                operation_id="chains_getUserGroup",
-                oauth2_scopes=[],
-                security_source=self.sdk_configuration.security,
-            ),
-            request=req,
-            error_status_codes=["401", "4XX", "5XX"],
-            retry_config=retry_config,
-        )
-
-        response_data: Any = None
-        if utils.match_response(http_res, "200", "application/json"):
-            return unmarshal_json_response(models.UserGroupResponse, http_res)
-        if utils.match_response(http_res, "401", "application/json"):
-            response_data = unmarshal_json_response(
-                errors.ChainSingleErrorData, http_res
-            )
-            raise errors.ChainSingleError(response_data, http_res)
-        if utils.match_response(http_res, "4XX", "*"):
-            http_res_text = await utils.stream_to_text_async(http_res)
-            raise errors.SDKError("API error occurred", http_res, http_res_text)
-        if utils.match_response(http_res, "5XX", "*"):
-            http_res_text = await utils.stream_to_text_async(http_res)
-            raise errors.SDKError("API error occurred", http_res, http_res_text)
-
-        raise errors.SDKError("Unexpected response received", http_res)
-
-    def get_user_group_permissions(
-        self,
-        *,
-        user_group_id: str,
-        page: Optional[int] = None,
-        page_size: Optional[int] = None,
-        retries: OptionalNullable[utils.RetryConfig] = UNSET,
-        server_url: Optional[str] = None,
-        timeout_ms: Optional[int] = None,
-        http_headers: Optional[Mapping[str, str]] = None,
-    ) -> Optional[models.ChainsGetUserGroupPermissionsResponse]:
-        r"""Return a list of permissions for a user group
-
-        Returns properties for a user group with the provided ID, or a 404 if no such user group is found.
-
-        :param user_group_id: The ID of the User Group.
-        :param page: Page number to retrieve in the paginated results (0-based index).
-        :param page_size: Limit number of results returned (Max 100).
-        :param retries: Override the default retry configuration for this method
-        :param server_url: Override the default server URL for this method
-        :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
-        :param http_headers: Additional headers to set or replace on requests.
-        """
-        base_url = None
-        url_variables = None
-        if timeout_ms is None:
-            timeout_ms = self.sdk_configuration.timeout_ms
-
-        if server_url is not None:
-            base_url = server_url
-        else:
-            base_url = models.CHAINS_GET_USER_GROUP_PERMISSIONS_OP_SERVERS[0]
-
-        request = models.ChainsGetUserGroupPermissionsRequest(
-            page=page,
-            page_size=page_size,
-            user_group_id=user_group_id,
-        )
-
-        req = self._build_request(
-            method="GET",
-            path="/v1/security/user_groups/{userGroupId}/permissions",
-            base_url=base_url,
-            url_variables=url_variables,
-            request=request,
-            request_body_required=False,
-            request_has_path_params=True,
-            request_has_query_params=True,
-            user_agent_header="user-agent",
-            accept_header_value="application/json",
-            http_headers=http_headers,
-            security=self.sdk_configuration.security,
-            allow_empty_value=None,
-            timeout_ms=timeout_ms,
-        )
-
-        if retries == UNSET:
-            if self.sdk_configuration.retry_config is not UNSET:
-                retries = self.sdk_configuration.retry_config
-
-        retry_config = None
-        if isinstance(retries, utils.RetryConfig):
-            retry_config = (retries, ["429", "500", "502", "503", "504"])
-
-        http_res = self.do_request(
-            hook_ctx=HookContext(
-                config=self.sdk_configuration,
-                base_url=base_url or "",
-                operation_id="chains_getUserGroupPermissions",
-                oauth2_scopes=[],
-                security_source=self.sdk_configuration.security,
-            ),
-            request=req,
-            error_status_codes=["401", "4XX", "5XX"],
-            retry_config=retry_config,
-        )
-
-        def next_func() -> Optional[models.ChainsGetUserGroupPermissionsResponse]:
-            body = utils.unmarshal_json(http_res.text, Union[Dict[Any, Any], List[Any]])
-
-            page = request.page if not request.page is None else 1
-            next_page = page + 1
-
-            if not http_res.text:
-                return None
-            results = JSONPath("$.data").parse(body)
-            if len(results) == 0 or len(results[0]) == 0:
-                return None
-
-            return self.get_user_group_permissions(
-                user_group_id=user_group_id,
-                page=next_page,
-                page_size=page_size,
-                retries=retries,
-                server_url=server_url,
-            )
-
-        response_data: Any = None
-        if utils.match_response(http_res, "200", "application/json"):
-            return models.ChainsGetUserGroupPermissionsResponse(
-                result=unmarshal_json_response(models.PermissionsResponse, http_res),
-                next=next_func,
-            )
-        if utils.match_response(http_res, "401", "application/json"):
-            response_data = unmarshal_json_response(
-                errors.ChainSingleErrorData, http_res
-            )
-            raise errors.ChainSingleError(response_data, http_res)
-        if utils.match_response(http_res, "4XX", "*"):
-            http_res_text = utils.stream_to_text(http_res)
-            raise errors.SDKError("API error occurred", http_res, http_res_text)
-        if utils.match_response(http_res, "5XX", "*"):
-            http_res_text = utils.stream_to_text(http_res)
-            raise errors.SDKError("API error occurred", http_res, http_res_text)
-
-        raise errors.SDKError("Unexpected response received", http_res)
-
-    async def get_user_group_permissions_async(
-        self,
-        *,
-        user_group_id: str,
-        page: Optional[int] = None,
-        page_size: Optional[int] = None,
-        retries: OptionalNullable[utils.RetryConfig] = UNSET,
-        server_url: Optional[str] = None,
-        timeout_ms: Optional[int] = None,
-        http_headers: Optional[Mapping[str, str]] = None,
-    ) -> Optional[models.ChainsGetUserGroupPermissionsResponse]:
-        r"""Return a list of permissions for a user group
-
-        Returns properties for a user group with the provided ID, or a 404 if no such user group is found.
-
-        :param user_group_id: The ID of the User Group.
-        :param page: Page number to retrieve in the paginated results (0-based index).
-        :param page_size: Limit number of results returned (Max 100).
-        :param retries: Override the default retry configuration for this method
-        :param server_url: Override the default server URL for this method
-        :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
-        :param http_headers: Additional headers to set or replace on requests.
-        """
-        base_url = None
-        url_variables = None
-        if timeout_ms is None:
-            timeout_ms = self.sdk_configuration.timeout_ms
-
-        if server_url is not None:
-            base_url = server_url
-        else:
-            base_url = models.CHAINS_GET_USER_GROUP_PERMISSIONS_OP_SERVERS[0]
-
-        request = models.ChainsGetUserGroupPermissionsRequest(
-            page=page,
-            page_size=page_size,
-            user_group_id=user_group_id,
-        )
-
-        req = self._build_request_async(
-            method="GET",
-            path="/v1/security/user_groups/{userGroupId}/permissions",
-            base_url=base_url,
-            url_variables=url_variables,
-            request=request,
-            request_body_required=False,
-            request_has_path_params=True,
-            request_has_query_params=True,
-            user_agent_header="user-agent",
-            accept_header_value="application/json",
-            http_headers=http_headers,
-            security=self.sdk_configuration.security,
-            allow_empty_value=None,
-            timeout_ms=timeout_ms,
-        )
-
-        if retries == UNSET:
-            if self.sdk_configuration.retry_config is not UNSET:
-                retries = self.sdk_configuration.retry_config
-
-        retry_config = None
-        if isinstance(retries, utils.RetryConfig):
-            retry_config = (retries, ["429", "500", "502", "503", "504"])
-
-        http_res = await self.do_request_async(
-            hook_ctx=HookContext(
-                config=self.sdk_configuration,
-                base_url=base_url or "",
-                operation_id="chains_getUserGroupPermissions",
-                oauth2_scopes=[],
-                security_source=self.sdk_configuration.security,
-            ),
-            request=req,
-            error_status_codes=["401", "4XX", "5XX"],
-            retry_config=retry_config,
-        )
-
-        def next_func() -> (
-            Awaitable[Optional[models.ChainsGetUserGroupPermissionsResponse]]
-        ):
-            body = utils.unmarshal_json(http_res.text, Union[Dict[Any, Any], List[Any]])
-
-            async def empty_result():
-                return None
-
-            page = request.page if not request.page is None else 1
-            next_page = page + 1
-
-            if not http_res.text:
-                return empty_result()
-            results = JSONPath("$.data").parse(body)
-            if len(results) == 0 or len(results[0]) == 0:
-                return empty_result()
-
-            return self.get_user_group_permissions_async(
-                user_group_id=user_group_id,
-                page=next_page,
-                page_size=page_size,
-                retries=retries,
-                server_url=server_url,
-            )
-
-        response_data: Any = None
-        if utils.match_response(http_res, "200", "application/json"):
-            return models.ChainsGetUserGroupPermissionsResponse(
-                result=unmarshal_json_response(models.PermissionsResponse, http_res),
-                next=next_func,
-            )
-        if utils.match_response(http_res, "401", "application/json"):
-            response_data = unmarshal_json_response(
-                errors.ChainSingleErrorData, http_res
-            )
-            raise errors.ChainSingleError(response_data, http_res)
-        if utils.match_response(http_res, "4XX", "*"):
-            http_res_text = await utils.stream_to_text_async(http_res)
-            raise errors.SDKError("API error occurred", http_res, http_res_text)
-        if utils.match_response(http_res, "5XX", "*"):
-            http_res_text = await utils.stream_to_text_async(http_res)
-            raise errors.SDKError("API error occurred", http_res, http_res_text)
-
-        raise errors.SDKError("Unexpected response received", http_res)
-
-    def get_user_groups(
-        self,
-        *,
-        page: Optional[int] = None,
-        page_size: Optional[int] = None,
-        retries: OptionalNullable[utils.RetryConfig] = UNSET,
-        server_url: Optional[str] = None,
-        timeout_ms: Optional[int] = None,
-        http_headers: Optional[Mapping[str, str]] = None,
-    ) -> Optional[models.ChainsGetUserGroupsResponse]:
-        r"""Return a list of all user groups
-
-        Returns a list of all user groups in a company.
-
-        :param page: Page number to retrieve in the paginated results (0-based index).
-        :param page_size: Limit number of results returned (Max 100).
-        :param retries: Override the default retry configuration for this method
-        :param server_url: Override the default server URL for this method
-        :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
-        :param http_headers: Additional headers to set or replace on requests.
-        """
-        base_url = None
-        url_variables = None
-        if timeout_ms is None:
-            timeout_ms = self.sdk_configuration.timeout_ms
-
-        if server_url is not None:
-            base_url = server_url
-        else:
-            base_url = models.CHAINS_GET_USER_GROUPS_OP_SERVERS[0]
-
-        request = models.ChainsGetUserGroupsRequest(
-            page=page,
-            page_size=page_size,
-        )
-
-        req = self._build_request(
-            method="GET",
-            path="/v1/security/user_groups",
-            base_url=base_url,
-            url_variables=url_variables,
-            request=request,
-            request_body_required=False,
-            request_has_path_params=False,
-            request_has_query_params=True,
-            user_agent_header="user-agent",
-            accept_header_value="application/json",
-            http_headers=http_headers,
-            security=self.sdk_configuration.security,
-            allow_empty_value=None,
-            timeout_ms=timeout_ms,
-        )
-
-        if retries == UNSET:
-            if self.sdk_configuration.retry_config is not UNSET:
-                retries = self.sdk_configuration.retry_config
-
-        retry_config = None
-        if isinstance(retries, utils.RetryConfig):
-            retry_config = (retries, ["429", "500", "502", "503", "504"])
-
-        http_res = self.do_request(
-            hook_ctx=HookContext(
-                config=self.sdk_configuration,
-                base_url=base_url or "",
-                operation_id="chains_getUserGroups",
-                oauth2_scopes=[],
-                security_source=self.sdk_configuration.security,
-            ),
-            request=req,
-            error_status_codes=["401", "4XX", "5XX"],
-            retry_config=retry_config,
-        )
-
-        def next_func() -> Optional[models.ChainsGetUserGroupsResponse]:
-            body = utils.unmarshal_json(http_res.text, Union[Dict[Any, Any], List[Any]])
-
-            page = request.page if not request.page is None else 1
-            next_page = page + 1
-
-            if not http_res.text:
-                return None
-            results = JSONPath("$.data").parse(body)
-            if len(results) == 0 or len(results[0]) == 0:
-                return None
-
-            return self.get_user_groups(
-                page=next_page,
-                page_size=page_size,
-                retries=retries,
-                server_url=server_url,
-            )
-
-        response_data: Any = None
-        if utils.match_response(http_res, "200", "application/json"):
-            return models.ChainsGetUserGroupsResponse(
-                result=unmarshal_json_response(models.UserGroupsResponse, http_res),
-                next=next_func,
-            )
-        if utils.match_response(http_res, "401", "application/json"):
-            response_data = unmarshal_json_response(
-                errors.ChainSingleErrorData, http_res
-            )
-            raise errors.ChainSingleError(response_data, http_res)
-        if utils.match_response(http_res, "4XX", "*"):
-            http_res_text = utils.stream_to_text(http_res)
-            raise errors.SDKError("API error occurred", http_res, http_res_text)
-        if utils.match_response(http_res, "5XX", "*"):
-            http_res_text = utils.stream_to_text(http_res)
-            raise errors.SDKError("API error occurred", http_res, http_res_text)
-
-        raise errors.SDKError("Unexpected response received", http_res)
-
-    async def get_user_groups_async(
-        self,
-        *,
-        page: Optional[int] = None,
-        page_size: Optional[int] = None,
-        retries: OptionalNullable[utils.RetryConfig] = UNSET,
-        server_url: Optional[str] = None,
-        timeout_ms: Optional[int] = None,
-        http_headers: Optional[Mapping[str, str]] = None,
-    ) -> Optional[models.ChainsGetUserGroupsResponse]:
-        r"""Return a list of all user groups
-
-        Returns a list of all user groups in a company.
-
-        :param page: Page number to retrieve in the paginated results (0-based index).
-        :param page_size: Limit number of results returned (Max 100).
-        :param retries: Override the default retry configuration for this method
-        :param server_url: Override the default server URL for this method
-        :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
-        :param http_headers: Additional headers to set or replace on requests.
-        """
-        base_url = None
-        url_variables = None
-        if timeout_ms is None:
-            timeout_ms = self.sdk_configuration.timeout_ms
-
-        if server_url is not None:
-            base_url = server_url
-        else:
-            base_url = models.CHAINS_GET_USER_GROUPS_OP_SERVERS[0]
-
-        request = models.ChainsGetUserGroupsRequest(
-            page=page,
-            page_size=page_size,
-        )
-
-        req = self._build_request_async(
-            method="GET",
-            path="/v1/security/user_groups",
-            base_url=base_url,
-            url_variables=url_variables,
-            request=request,
-            request_body_required=False,
-            request_has_path_params=False,
-            request_has_query_params=True,
-            user_agent_header="user-agent",
-            accept_header_value="application/json",
-            http_headers=http_headers,
-            security=self.sdk_configuration.security,
-            allow_empty_value=None,
-            timeout_ms=timeout_ms,
-        )
-
-        if retries == UNSET:
-            if self.sdk_configuration.retry_config is not UNSET:
-                retries = self.sdk_configuration.retry_config
-
-        retry_config = None
-        if isinstance(retries, utils.RetryConfig):
-            retry_config = (retries, ["429", "500", "502", "503", "504"])
-
-        http_res = await self.do_request_async(
-            hook_ctx=HookContext(
-                config=self.sdk_configuration,
-                base_url=base_url or "",
-                operation_id="chains_getUserGroups",
-                oauth2_scopes=[],
-                security_source=self.sdk_configuration.security,
-            ),
-            request=req,
-            error_status_codes=["401", "4XX", "5XX"],
-            retry_config=retry_config,
-        )
-
-        def next_func() -> Awaitable[Optional[models.ChainsGetUserGroupsResponse]]:
-            body = utils.unmarshal_json(http_res.text, Union[Dict[Any, Any], List[Any]])
-
-            async def empty_result():
-                return None
-
-            page = request.page if not request.page is None else 1
-            next_page = page + 1
-
-            if not http_res.text:
-                return empty_result()
-            results = JSONPath("$.data").parse(body)
-            if len(results) == 0 or len(results[0]) == 0:
-                return empty_result()
-
-            return self.get_user_groups_async(
-                page=next_page,
-                page_size=page_size,
-                retries=retries,
-                server_url=server_url,
-            )
-
-        response_data: Any = None
-        if utils.match_response(http_res, "200", "application/json"):
-            return models.ChainsGetUserGroupsResponse(
-                result=unmarshal_json_response(models.UserGroupsResponse, http_res),
-                next=next_func,
-            )
-        if utils.match_response(http_res, "401", "application/json"):
-            response_data = unmarshal_json_response(
-                errors.ChainSingleErrorData, http_res
-            )
-            raise errors.ChainSingleError(response_data, http_res)
-        if utils.match_response(http_res, "4XX", "*"):
-            http_res_text = await utils.stream_to_text_async(http_res)
-            raise errors.SDKError("API error occurred", http_res, http_res_text)
-        if utils.match_response(http_res, "5XX", "*"):
-            http_res_text = await utils.stream_to_text_async(http_res)
-            raise errors.SDKError("API error occurred", http_res, http_res_text)
-
-        raise errors.SDKError("Unexpected response received", http_res)
-
-    def get_user_user_groups(
-        self,
-        *,
-        user_id: str,
-        page: Optional[int] = None,
-        page_size: Optional[int] = None,
-        retries: OptionalNullable[utils.RetryConfig] = UNSET,
-        server_url: Optional[str] = None,
-        timeout_ms: Optional[int] = None,
-        http_headers: Optional[Mapping[str, str]] = None,
-    ) -> Optional[models.ChainsGetUserUserGroupsResponse]:
-        r"""Return a list of user groups
-
-        Returns a list of all groups that a user is a part of in a particular company.
-
-        :param user_id: The ID of the User.
-        :param page: Page number to retrieve in the paginated results (0-based index).
-        :param page_size: Limit number of results returned (Max 100).
-        :param retries: Override the default retry configuration for this method
-        :param server_url: Override the default server URL for this method
-        :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
-        :param http_headers: Additional headers to set or replace on requests.
-        """
-        base_url = None
-        url_variables = None
-        if timeout_ms is None:
-            timeout_ms = self.sdk_configuration.timeout_ms
-
-        if server_url is not None:
-            base_url = server_url
-        else:
-            base_url = models.CHAINS_GET_USER_USER_GROUPS_OP_SERVERS[0]
-
-        request = models.ChainsGetUserUserGroupsRequest(
-            page=page,
-            page_size=page_size,
-            user_id=user_id,
-        )
-
-        req = self._build_request(
-            method="GET",
-            path="/v1/security/users/{userId}/groups",
-            base_url=base_url,
-            url_variables=url_variables,
-            request=request,
-            request_body_required=False,
-            request_has_path_params=True,
-            request_has_query_params=True,
-            user_agent_header="user-agent",
-            accept_header_value="application/json",
-            http_headers=http_headers,
-            security=self.sdk_configuration.security,
-            allow_empty_value=None,
-            timeout_ms=timeout_ms,
-        )
-
-        if retries == UNSET:
-            if self.sdk_configuration.retry_config is not UNSET:
-                retries = self.sdk_configuration.retry_config
-
-        retry_config = None
-        if isinstance(retries, utils.RetryConfig):
-            retry_config = (retries, ["429", "500", "502", "503", "504"])
-
-        http_res = self.do_request(
-            hook_ctx=HookContext(
-                config=self.sdk_configuration,
-                base_url=base_url or "",
-                operation_id="chains_getUserUserGroups",
-                oauth2_scopes=[],
-                security_source=self.sdk_configuration.security,
-            ),
-            request=req,
-            error_status_codes=["401", "4XX", "5XX"],
-            retry_config=retry_config,
-        )
-
-        def next_func() -> Optional[models.ChainsGetUserUserGroupsResponse]:
-            body = utils.unmarshal_json(http_res.text, Union[Dict[Any, Any], List[Any]])
-
-            page = request.page if not request.page is None else 1
-            next_page = page + 1
-
-            if not http_res.text:
-                return None
-            results = JSONPath("$.data").parse(body)
-            if len(results) == 0 or len(results[0]) == 0:
-                return None
-
-            return self.get_user_user_groups(
-                user_id=user_id,
-                page=next_page,
-                page_size=page_size,
-                retries=retries,
-                server_url=server_url,
-            )
-
-        response_data: Any = None
-        if utils.match_response(http_res, "200", "application/json"):
-            return models.ChainsGetUserUserGroupsResponse(
-                result=unmarshal_json_response(models.UserGroupsResponse, http_res),
-                next=next_func,
-            )
-        if utils.match_response(http_res, "401", "application/json"):
-            response_data = unmarshal_json_response(
-                errors.ChainSingleErrorData, http_res
-            )
-            raise errors.ChainSingleError(response_data, http_res)
-        if utils.match_response(http_res, "4XX", "*"):
-            http_res_text = utils.stream_to_text(http_res)
-            raise errors.SDKError("API error occurred", http_res, http_res_text)
-        if utils.match_response(http_res, "5XX", "*"):
-            http_res_text = utils.stream_to_text(http_res)
-            raise errors.SDKError("API error occurred", http_res, http_res_text)
-
-        raise errors.SDKError("Unexpected response received", http_res)
-
-    async def get_user_user_groups_async(
-        self,
-        *,
-        user_id: str,
-        page: Optional[int] = None,
-        page_size: Optional[int] = None,
-        retries: OptionalNullable[utils.RetryConfig] = UNSET,
-        server_url: Optional[str] = None,
-        timeout_ms: Optional[int] = None,
-        http_headers: Optional[Mapping[str, str]] = None,
-    ) -> Optional[models.ChainsGetUserUserGroupsResponse]:
-        r"""Return a list of user groups
-
-        Returns a list of all groups that a user is a part of in a particular company.
-
-        :param user_id: The ID of the User.
-        :param page: Page number to retrieve in the paginated results (0-based index).
-        :param page_size: Limit number of results returned (Max 100).
-        :param retries: Override the default retry configuration for this method
-        :param server_url: Override the default server URL for this method
-        :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
-        :param http_headers: Additional headers to set or replace on requests.
-        """
-        base_url = None
-        url_variables = None
-        if timeout_ms is None:
-            timeout_ms = self.sdk_configuration.timeout_ms
-
-        if server_url is not None:
-            base_url = server_url
-        else:
-            base_url = models.CHAINS_GET_USER_USER_GROUPS_OP_SERVERS[0]
-
-        request = models.ChainsGetUserUserGroupsRequest(
-            page=page,
-            page_size=page_size,
-            user_id=user_id,
-        )
-
-        req = self._build_request_async(
-            method="GET",
-            path="/v1/security/users/{userId}/groups",
-            base_url=base_url,
-            url_variables=url_variables,
-            request=request,
-            request_body_required=False,
-            request_has_path_params=True,
-            request_has_query_params=True,
-            user_agent_header="user-agent",
-            accept_header_value="application/json",
-            http_headers=http_headers,
-            security=self.sdk_configuration.security,
-            allow_empty_value=None,
-            timeout_ms=timeout_ms,
-        )
-
-        if retries == UNSET:
-            if self.sdk_configuration.retry_config is not UNSET:
-                retries = self.sdk_configuration.retry_config
-
-        retry_config = None
-        if isinstance(retries, utils.RetryConfig):
-            retry_config = (retries, ["429", "500", "502", "503", "504"])
-
-        http_res = await self.do_request_async(
-            hook_ctx=HookContext(
-                config=self.sdk_configuration,
-                base_url=base_url or "",
-                operation_id="chains_getUserUserGroups",
-                oauth2_scopes=[],
-                security_source=self.sdk_configuration.security,
-            ),
-            request=req,
-            error_status_codes=["401", "4XX", "5XX"],
-            retry_config=retry_config,
-        )
-
-        def next_func() -> Awaitable[Optional[models.ChainsGetUserUserGroupsResponse]]:
-            body = utils.unmarshal_json(http_res.text, Union[Dict[Any, Any], List[Any]])
-
-            async def empty_result():
-                return None
-
-            page = request.page if not request.page is None else 1
-            next_page = page + 1
-
-            if not http_res.text:
-                return empty_result()
-            results = JSONPath("$.data").parse(body)
-            if len(results) == 0 or len(results[0]) == 0:
-                return empty_result()
-
-            return self.get_user_user_groups_async(
-                user_id=user_id,
-                page=next_page,
-                page_size=page_size,
-                retries=retries,
-                server_url=server_url,
-            )
-
-        response_data: Any = None
-        if utils.match_response(http_res, "200", "application/json"):
-            return models.ChainsGetUserUserGroupsResponse(
-                result=unmarshal_json_response(models.UserGroupsResponse, http_res),
-                next=next_func,
-            )
-        if utils.match_response(http_res, "401", "application/json"):
-            response_data = unmarshal_json_response(
-                errors.ChainSingleErrorData, http_res
-            )
-            raise errors.ChainSingleError(response_data, http_res)
-        if utils.match_response(http_res, "4XX", "*"):
-            http_res_text = await utils.stream_to_text_async(http_res)
-            raise errors.SDKError("API error occurred", http_res, http_res_text)
-        if utils.match_response(http_res, "5XX", "*"):
-            http_res_text = await utils.stream_to_text_async(http_res)
-            raise errors.SDKError("API error occurred", http_res, http_res_text)
-
-        raise errors.SDKError("Unexpected response received", http_res)
-
-    def get_users(
-        self,
-        *,
-        page: Optional[int] = None,
-        page_size: Optional[int] = None,
-        retries: OptionalNullable[utils.RetryConfig] = UNSET,
-        server_url: Optional[str] = None,
-        timeout_ms: Optional[int] = None,
-        http_headers: Optional[Mapping[str, str]] = None,
-    ) -> Optional[models.ChainsGetUsersResponse]:
-        r"""Return a list of users
-
-        Returns a list of all users in a particular company.
-
-        :param page: Page number to retrieve in the paginated results (0-based index).
-        :param page_size: Limit number of results returned (Max 100).
-        :param retries: Override the default retry configuration for this method
-        :param server_url: Override the default server URL for this method
-        :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
-        :param http_headers: Additional headers to set or replace on requests.
-        """
-        base_url = None
-        url_variables = None
-        if timeout_ms is None:
-            timeout_ms = self.sdk_configuration.timeout_ms
-
-        if server_url is not None:
-            base_url = server_url
-        else:
-            base_url = models.CHAINS_GET_USERS_OP_SERVERS[0]
-
-        request = models.ChainsGetUsersRequest(
-            page=page,
-            page_size=page_size,
-        )
-
-        req = self._build_request(
-            method="GET",
-            path="/v1/security/users",
-            base_url=base_url,
-            url_variables=url_variables,
-            request=request,
-            request_body_required=False,
-            request_has_path_params=False,
-            request_has_query_params=True,
-            user_agent_header="user-agent",
-            accept_header_value="application/json",
-            http_headers=http_headers,
-            security=self.sdk_configuration.security,
-            allow_empty_value=None,
-            timeout_ms=timeout_ms,
-        )
-
-        if retries == UNSET:
-            if self.sdk_configuration.retry_config is not UNSET:
-                retries = self.sdk_configuration.retry_config
-
-        retry_config = None
-        if isinstance(retries, utils.RetryConfig):
-            retry_config = (retries, ["429", "500", "502", "503", "504"])
-
-        http_res = self.do_request(
-            hook_ctx=HookContext(
-                config=self.sdk_configuration,
-                base_url=base_url or "",
-                operation_id="chains_getUsers",
-                oauth2_scopes=[],
-                security_source=self.sdk_configuration.security,
-            ),
-            request=req,
-            error_status_codes=["401", "4XX", "5XX"],
-            retry_config=retry_config,
-        )
-
-        def next_func() -> Optional[models.ChainsGetUsersResponse]:
-            body = utils.unmarshal_json(http_res.text, Union[Dict[Any, Any], List[Any]])
-
-            page = request.page if not request.page is None else 1
-            next_page = page + 1
-
-            if not http_res.text:
-                return None
-            results = JSONPath("$.data").parse(body)
-            if len(results) == 0 or len(results[0]) == 0:
-                return None
-
-            return self.get_users(
-                page=next_page,
-                page_size=page_size,
-                retries=retries,
-                server_url=server_url,
-            )
-
-        response_data: Any = None
-        if utils.match_response(http_res, "200", "application/json"):
-            return models.ChainsGetUsersResponse(
-                result=unmarshal_json_response(models.UsersResponse, http_res),
-                next=next_func,
-            )
-        if utils.match_response(http_res, "401", "application/json"):
-            response_data = unmarshal_json_response(
-                errors.ChainSingleErrorData, http_res
-            )
-            raise errors.ChainSingleError(response_data, http_res)
-        if utils.match_response(http_res, "4XX", "*"):
-            http_res_text = utils.stream_to_text(http_res)
-            raise errors.SDKError("API error occurred", http_res, http_res_text)
-        if utils.match_response(http_res, "5XX", "*"):
-            http_res_text = utils.stream_to_text(http_res)
-            raise errors.SDKError("API error occurred", http_res, http_res_text)
-
-        raise errors.SDKError("Unexpected response received", http_res)
-
-    async def get_users_async(
-        self,
-        *,
-        page: Optional[int] = None,
-        page_size: Optional[int] = None,
-        retries: OptionalNullable[utils.RetryConfig] = UNSET,
-        server_url: Optional[str] = None,
-        timeout_ms: Optional[int] = None,
-        http_headers: Optional[Mapping[str, str]] = None,
-    ) -> Optional[models.ChainsGetUsersResponse]:
-        r"""Return a list of users
-
-        Returns a list of all users in a particular company.
-
-        :param page: Page number to retrieve in the paginated results (0-based index).
-        :param page_size: Limit number of results returned (Max 100).
-        :param retries: Override the default retry configuration for this method
-        :param server_url: Override the default server URL for this method
-        :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
-        :param http_headers: Additional headers to set or replace on requests.
-        """
-        base_url = None
-        url_variables = None
-        if timeout_ms is None:
-            timeout_ms = self.sdk_configuration.timeout_ms
-
-        if server_url is not None:
-            base_url = server_url
-        else:
-            base_url = models.CHAINS_GET_USERS_OP_SERVERS[0]
-
-        request = models.ChainsGetUsersRequest(
-            page=page,
-            page_size=page_size,
-        )
-
-        req = self._build_request_async(
-            method="GET",
-            path="/v1/security/users",
-            base_url=base_url,
-            url_variables=url_variables,
-            request=request,
-            request_body_required=False,
-            request_has_path_params=False,
-            request_has_query_params=True,
-            user_agent_header="user-agent",
-            accept_header_value="application/json",
-            http_headers=http_headers,
-            security=self.sdk_configuration.security,
-            allow_empty_value=None,
-            timeout_ms=timeout_ms,
-        )
-
-        if retries == UNSET:
-            if self.sdk_configuration.retry_config is not UNSET:
-                retries = self.sdk_configuration.retry_config
-
-        retry_config = None
-        if isinstance(retries, utils.RetryConfig):
-            retry_config = (retries, ["429", "500", "502", "503", "504"])
-
-        http_res = await self.do_request_async(
-            hook_ctx=HookContext(
-                config=self.sdk_configuration,
-                base_url=base_url or "",
-                operation_id="chains_getUsers",
-                oauth2_scopes=[],
-                security_source=self.sdk_configuration.security,
-            ),
-            request=req,
-            error_status_codes=["401", "4XX", "5XX"],
-            retry_config=retry_config,
-        )
-
-        def next_func() -> Awaitable[Optional[models.ChainsGetUsersResponse]]:
-            body = utils.unmarshal_json(http_res.text, Union[Dict[Any, Any], List[Any]])
-
-            async def empty_result():
-                return None
-
-            page = request.page if not request.page is None else 1
-            next_page = page + 1
-
-            if not http_res.text:
-                return empty_result()
-            results = JSONPath("$.data").parse(body)
-            if len(results) == 0 or len(results[0]) == 0:
-                return empty_result()
-
-            return self.get_users_async(
-                page=next_page,
-                page_size=page_size,
-                retries=retries,
-                server_url=server_url,
-            )
-
-        response_data: Any = None
-        if utils.match_response(http_res, "200", "application/json"):
-            return models.ChainsGetUsersResponse(
-                result=unmarshal_json_response(models.UsersResponse, http_res),
-                next=next_func,
-            )
-        if utils.match_response(http_res, "401", "application/json"):
-            response_data = unmarshal_json_response(
-                errors.ChainSingleErrorData, http_res
-            )
-            raise errors.ChainSingleError(response_data, http_res)
-        if utils.match_response(http_res, "4XX", "*"):
-            http_res_text = await utils.stream_to_text_async(http_res)
-            raise errors.SDKError("API error occurred", http_res, http_res_text)
-        if utils.match_response(http_res, "5XX", "*"):
-            http_res_text = await utils.stream_to_text_async(http_res)
-            raise errors.SDKError("API error occurred", http_res, http_res_text)
-
-        raise errors.SDKError("Unexpected response received", http_res)
-
-    def get_workspace(
-        self,
-        *,
-        workspace_id: str,
-        retries: OptionalNullable[utils.RetryConfig] = UNSET,
-        server_url: Optional[str] = None,
-        timeout_ms: Optional[int] = None,
-        http_headers: Optional[Mapping[str, str]] = None,
-    ) -> models.WorkspaceResponse:
-        r"""Return workspace properties
-
-        Returns properties for a workspace with the provided ID, or a 404 if no such workspace is found.
-
-        :param workspace_id: The ID of the Workspace.
-        :param retries: Override the default retry configuration for this method
-        :param server_url: Override the default server URL for this method
-        :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
-        :param http_headers: Additional headers to set or replace on requests.
-        """
-        base_url = None
-        url_variables = None
-        if timeout_ms is None:
-            timeout_ms = self.sdk_configuration.timeout_ms
-
-        if server_url is not None:
-            base_url = server_url
-        else:
-            base_url = models.CHAINS_GET_WORKSPACE_OP_SERVERS[0]
-
-        request = models.ChainsGetWorkspaceRequest(
-            workspace_id=workspace_id,
-        )
-
-        req = self._build_request(
-            method="GET",
-            path="/v1/metadata/workspace/{workspace_id}",
-            base_url=base_url,
-            url_variables=url_variables,
-            request=request,
-            request_body_required=False,
-            request_has_path_params=True,
-            request_has_query_params=True,
-            user_agent_header="user-agent",
-            accept_header_value="application/json",
-            http_headers=http_headers,
-            security=self.sdk_configuration.security,
-            allow_empty_value=None,
-            timeout_ms=timeout_ms,
-        )
-
-        if retries == UNSET:
-            if self.sdk_configuration.retry_config is not UNSET:
-                retries = self.sdk_configuration.retry_config
-
-        retry_config = None
-        if isinstance(retries, utils.RetryConfig):
-            retry_config = (retries, ["429", "500", "502", "503", "504"])
-
-        http_res = self.do_request(
-            hook_ctx=HookContext(
-                config=self.sdk_configuration,
-                base_url=base_url or "",
-                operation_id="chains_getWorkspace",
-                oauth2_scopes=[],
-                security_source=self.sdk_configuration.security,
-            ),
-            request=req,
-            error_status_codes=["401", "404", "4XX", "5XX"],
-            retry_config=retry_config,
-        )
-
-        response_data: Any = None
-        if utils.match_response(http_res, "200", "application/json"):
-            return unmarshal_json_response(models.WorkspaceResponse, http_res)
-        if utils.match_response(http_res, ["401", "404"], "application/json"):
-            response_data = unmarshal_json_response(
-                errors.ChainSingleErrorData, http_res
-            )
-            raise errors.ChainSingleError(response_data, http_res)
-        if utils.match_response(http_res, "4XX", "*"):
-            http_res_text = utils.stream_to_text(http_res)
-            raise errors.SDKError("API error occurred", http_res, http_res_text)
-        if utils.match_response(http_res, "5XX", "*"):
-            http_res_text = utils.stream_to_text(http_res)
-            raise errors.SDKError("API error occurred", http_res, http_res_text)
-
-        raise errors.SDKError("Unexpected response received", http_res)
-
-    async def get_workspace_async(
-        self,
-        *,
-        workspace_id: str,
-        retries: OptionalNullable[utils.RetryConfig] = UNSET,
-        server_url: Optional[str] = None,
-        timeout_ms: Optional[int] = None,
-        http_headers: Optional[Mapping[str, str]] = None,
-    ) -> models.WorkspaceResponse:
-        r"""Return workspace properties
-
-        Returns properties for a workspace with the provided ID, or a 404 if no such workspace is found.
-
-        :param workspace_id: The ID of the Workspace.
-        :param retries: Override the default retry configuration for this method
-        :param server_url: Override the default server URL for this method
-        :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
-        :param http_headers: Additional headers to set or replace on requests.
-        """
-        base_url = None
-        url_variables = None
-        if timeout_ms is None:
-            timeout_ms = self.sdk_configuration.timeout_ms
-
-        if server_url is not None:
-            base_url = server_url
-        else:
-            base_url = models.CHAINS_GET_WORKSPACE_OP_SERVERS[0]
-
-        request = models.ChainsGetWorkspaceRequest(
-            workspace_id=workspace_id,
-        )
-
-        req = self._build_request_async(
-            method="GET",
-            path="/v1/metadata/workspace/{workspace_id}",
-            base_url=base_url,
-            url_variables=url_variables,
-            request=request,
-            request_body_required=False,
-            request_has_path_params=True,
-            request_has_query_params=True,
-            user_agent_header="user-agent",
-            accept_header_value="application/json",
-            http_headers=http_headers,
-            security=self.sdk_configuration.security,
-            allow_empty_value=None,
-            timeout_ms=timeout_ms,
-        )
-
-        if retries == UNSET:
-            if self.sdk_configuration.retry_config is not UNSET:
-                retries = self.sdk_configuration.retry_config
-
-        retry_config = None
-        if isinstance(retries, utils.RetryConfig):
-            retry_config = (retries, ["429", "500", "502", "503", "504"])
-
-        http_res = await self.do_request_async(
-            hook_ctx=HookContext(
-                config=self.sdk_configuration,
-                base_url=base_url or "",
-                operation_id="chains_getWorkspace",
-                oauth2_scopes=[],
-                security_source=self.sdk_configuration.security,
-            ),
-            request=req,
-            error_status_codes=["401", "404", "4XX", "5XX"],
-            retry_config=retry_config,
-        )
-
-        response_data: Any = None
-        if utils.match_response(http_res, "200", "application/json"):
-            return unmarshal_json_response(models.WorkspaceResponse, http_res)
-        if utils.match_response(http_res, ["401", "404"], "application/json"):
-            response_data = unmarshal_json_response(
-                errors.ChainSingleErrorData, http_res
-            )
-            raise errors.ChainSingleError(response_data, http_res)
-        if utils.match_response(http_res, "4XX", "*"):
-            http_res_text = await utils.stream_to_text_async(http_res)
-            raise errors.SDKError("API error occurred", http_res, http_res_text)
-        if utils.match_response(http_res, "5XX", "*"):
-            http_res_text = await utils.stream_to_text_async(http_res)
-            raise errors.SDKError("API error occurred", http_res, http_res_text)
-
-        raise errors.SDKError("Unexpected response received", http_res)
-
-    def get_workspaces(
-        self,
-        *,
-        retries: OptionalNullable[utils.RetryConfig] = UNSET,
-        server_url: Optional[str] = None,
-        timeout_ms: Optional[int] = None,
-        http_headers: Optional[Mapping[str, str]] = None,
-    ) -> models.WorkspacesResponse:
-        r"""Return a list of workspaces
-
-        Retrieves a list of workspaces for a company.
-
-        :param retries: Override the default retry configuration for this method
-        :param server_url: Override the default server URL for this method
-        :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
-        :param http_headers: Additional headers to set or replace on requests.
-        """
-        base_url = None
-        url_variables = None
-        if timeout_ms is None:
-            timeout_ms = self.sdk_configuration.timeout_ms
-
-        if server_url is not None:
-            base_url = server_url
-        else:
-            base_url = models.CHAINS_GET_WORKSPACES_OP_SERVERS[0]
-        req = self._build_request(
-            method="GET",
-            path="/v1/metadata/workspace",
-            base_url=base_url,
-            url_variables=url_variables,
-            request=None,
-            request_body_required=False,
-            request_has_path_params=False,
-            request_has_query_params=True,
-            user_agent_header="user-agent",
-            accept_header_value="application/json",
-            http_headers=http_headers,
-            security=self.sdk_configuration.security,
-            allow_empty_value=None,
-            timeout_ms=timeout_ms,
-        )
-
-        if retries == UNSET:
-            if self.sdk_configuration.retry_config is not UNSET:
-                retries = self.sdk_configuration.retry_config
-
-        retry_config = None
-        if isinstance(retries, utils.RetryConfig):
-            retry_config = (retries, ["429", "500", "502", "503", "504"])
-
-        http_res = self.do_request(
-            hook_ctx=HookContext(
-                config=self.sdk_configuration,
-                base_url=base_url or "",
-                operation_id="chains_getWorkspaces",
-                oauth2_scopes=[],
-                security_source=self.sdk_configuration.security,
-            ),
-            request=req,
-            error_status_codes=["401", "4XX", "5XX"],
-            retry_config=retry_config,
-        )
-
-        response_data: Any = None
-        if utils.match_response(http_res, "200", "application/json"):
-            return unmarshal_json_response(models.WorkspacesResponse, http_res)
-        if utils.match_response(http_res, "401", "application/json"):
-            response_data = unmarshal_json_response(
-                errors.ChainSingleErrorData, http_res
-            )
-            raise errors.ChainSingleError(response_data, http_res)
-        if utils.match_response(http_res, "4XX", "*"):
-            http_res_text = utils.stream_to_text(http_res)
-            raise errors.SDKError("API error occurred", http_res, http_res_text)
-        if utils.match_response(http_res, "5XX", "*"):
-            http_res_text = utils.stream_to_text(http_res)
-            raise errors.SDKError("API error occurred", http_res, http_res_text)
-
-        raise errors.SDKError("Unexpected response received", http_res)
-
-    async def get_workspaces_async(
-        self,
-        *,
-        retries: OptionalNullable[utils.RetryConfig] = UNSET,
-        server_url: Optional[str] = None,
-        timeout_ms: Optional[int] = None,
-        http_headers: Optional[Mapping[str, str]] = None,
-    ) -> models.WorkspacesResponse:
-        r"""Return a list of workspaces
-
-        Retrieves a list of workspaces for a company.
-
-        :param retries: Override the default retry configuration for this method
-        :param server_url: Override the default server URL for this method
-        :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
-        :param http_headers: Additional headers to set or replace on requests.
-        """
-        base_url = None
-        url_variables = None
-        if timeout_ms is None:
-            timeout_ms = self.sdk_configuration.timeout_ms
-
-        if server_url is not None:
-            base_url = server_url
-        else:
-            base_url = models.CHAINS_GET_WORKSPACES_OP_SERVERS[0]
-        req = self._build_request_async(
-            method="GET",
-            path="/v1/metadata/workspace",
-            base_url=base_url,
-            url_variables=url_variables,
-            request=None,
-            request_body_required=False,
-            request_has_path_params=False,
-            request_has_query_params=True,
-            user_agent_header="user-agent",
-            accept_header_value="application/json",
-            http_headers=http_headers,
-            security=self.sdk_configuration.security,
-            allow_empty_value=None,
-            timeout_ms=timeout_ms,
-        )
-
-        if retries == UNSET:
-            if self.sdk_configuration.retry_config is not UNSET:
-                retries = self.sdk_configuration.retry_config
-
-        retry_config = None
-        if isinstance(retries, utils.RetryConfig):
-            retry_config = (retries, ["429", "500", "502", "503", "504"])
-
-        http_res = await self.do_request_async(
-            hook_ctx=HookContext(
-                config=self.sdk_configuration,
-                base_url=base_url or "",
-                operation_id="chains_getWorkspaces",
-                oauth2_scopes=[],
-                security_source=self.sdk_configuration.security,
-            ),
-            request=req,
-            error_status_codes=["401", "4XX", "5XX"],
-            retry_config=retry_config,
-        )
-
-        response_data: Any = None
-        if utils.match_response(http_res, "200", "application/json"):
-            return unmarshal_json_response(models.WorkspacesResponse, http_res)
-        if utils.match_response(http_res, "401", "application/json"):
-            response_data = unmarshal_json_response(
-                errors.ChainSingleErrorData, http_res
-            )
-            raise errors.ChainSingleError(response_data, http_res)
-        if utils.match_response(http_res, "4XX", "*"):
-            http_res_text = await utils.stream_to_text_async(http_res)
-            raise errors.SDKError("API error occurred", http_res, http_res_text)
-        if utils.match_response(http_res, "5XX", "*"):
-            http_res_text = await utils.stream_to_text_async(http_res)
-            raise errors.SDKError("API error occurred", http_res, http_res_text)
-
-        raise errors.SDKError("Unexpected response received", http_res)
-
-    def import_chain(
-        self,
-        *,
-        environment_id: str,
-        request_body: Union[
-            models.ChainsImportChainRequestBody,
-            models.ChainsImportChainRequestBodyTypedDict,
+        request: Union[
+            models.ChainsChainRunHistoryRequest,
+            models.ChainsChainRunHistoryRequestTypedDict,
         ],
-        wk_target_workspace: Optional[str] = None,
         retries: OptionalNullable[utils.RetryConfig] = UNSET,
         server_url: Optional[str] = None,
         timeout_ms: Optional[int] = None,
         http_headers: Optional[Mapping[str, str]] = None,
-    ) -> models.ChainsImportChainResponse:
-        r"""Import a chain
+    ) -> Optional[models.ChainsChainRunHistoryResponse]:
+        r"""Return run history for a chain
 
-        Takes a .chain file and imports it into the provided environment. Returns chain metadata for the imported chain.
-        > **Note:** .chain export files will automatically expire and become unusable after 14 days.  Expired .chain files remain on the exported system until removed manually.
+        Retrieves a list of run history for a chain.
 
-
-        :param environment_id: The ID of the Environment.
-        :param request_body: The .chain file to import.
-        :param wk_target_workspace: The `wk-target-workspace` header is only required for requests made by a service provider application. This does not apply to the majority of Workiva Chains API users. This header specifies the ID of the target workspace on which the service provider application wishes to take action. This workspace must be managed by the service provider.
-
+        :param request: The request object to send.
         :param retries: Override the default retry configuration for this method
         :param server_url: Override the default server URL for this method
         :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
@@ -4541,19 +2110,264 @@ class Chains(BaseSDK):
         if server_url is not None:
             base_url = server_url
         else:
-            base_url = models.CHAINS_IMPORT_CHAIN_OP_SERVERS[0]
+            base_url = models.CHAINS_CHAIN_RUN_HISTORY_OP_SERVERS[0]
 
-        request = models.ChainsImportChainRequest(
+        if not isinstance(request, BaseModel):
+            request = utils.unmarshal(request, models.ChainsChainRunHistoryRequest)
+        request = cast(models.ChainsChainRunHistoryRequest, request)
+
+        req = self._build_request(
+            method="GET",
+            path="/v1/execute/environment/{environment_id}/chain/{chain_id}/history",
+            base_url=base_url,
+            url_variables=url_variables,
+            request=request,
+            request_body_required=False,
+            request_has_path_params=True,
+            request_has_query_params=True,
+            user_agent_header="user-agent",
+            accept_header_value="application/json",
+            http_headers=http_headers,
+            security=self.sdk_configuration.security,
+            allow_empty_value=None,
+            timeout_ms=timeout_ms,
+        )
+
+        if retries == UNSET:
+            if self.sdk_configuration.retry_config is not UNSET:
+                retries = self.sdk_configuration.retry_config
+
+        retry_config = None
+        if isinstance(retries, utils.RetryConfig):
+            retry_config = (retries, ["429", "500", "502", "503", "504"])
+
+        http_res = self.do_request(
+            hook_ctx=HookContext(
+                config=self.sdk_configuration,
+                base_url=base_url or "",
+                operation_id="chains_chainRunHistory",
+                oauth2_scopes=[],
+                security_source=self.sdk_configuration.security,
+            ),
+            request=req,
+            error_status_codes=["401", "404", "4XX", "5XX"],
+            retry_config=retry_config,
+        )
+
+        def next_func() -> Optional[models.ChainsChainRunHistoryResponse]:
+            body = utils.unmarshal_json(http_res.text, Union[Dict[Any, Any], List[Any]])
+
+            next_cursor = JSONPath("$.data.cursor").parse(body)
+
+            if len(next_cursor) == 0:
+                return None
+
+            next_cursor = next_cursor[0]
+            if next_cursor is None or str(next_cursor).strip() == "":
+                return None
+
+            return self.chain_run_history(
+                request=models.ChainsChainRunHistoryRequest(
+                    environment_id=request.environment_id,
+                    chain_id=request.chain_id,
+                    limit=request.limit,
+                    cursor=next_cursor,
+                    start_date=request.start_date,
+                    end_date=request.end_date,
+                ),
+                retries=retries,
+                server_url=server_url,
+            )
+
+        response_data: Any = None
+        if utils.match_response(http_res, "200", "application/json"):
+            return models.ChainsChainRunHistoryResponse(
+                result=unmarshal_json_response(models.ChainRunPageResponse, http_res),
+                next=next_func,
+            )
+        if utils.match_response(http_res, ["401", "404"], "application/json"):
+            response_data = unmarshal_json_response(
+                errors.ChainSingleErrorData, http_res
+            )
+            raise errors.ChainSingleError(response_data, http_res)
+        if utils.match_response(http_res, "4XX", "*"):
+            http_res_text = utils.stream_to_text(http_res)
+            raise errors.SDKError("API error occurred", http_res, http_res_text)
+        if utils.match_response(http_res, "5XX", "*"):
+            http_res_text = utils.stream_to_text(http_res)
+            raise errors.SDKError("API error occurred", http_res, http_res_text)
+
+        raise errors.SDKError("Unexpected response received", http_res)
+
+    async def chain_run_history_async(
+        self,
+        *,
+        request: Union[
+            models.ChainsChainRunHistoryRequest,
+            models.ChainsChainRunHistoryRequestTypedDict,
+        ],
+        retries: OptionalNullable[utils.RetryConfig] = UNSET,
+        server_url: Optional[str] = None,
+        timeout_ms: Optional[int] = None,
+        http_headers: Optional[Mapping[str, str]] = None,
+    ) -> Optional[models.ChainsChainRunHistoryResponse]:
+        r"""Return run history for a chain
+
+        Retrieves a list of run history for a chain.
+
+        :param request: The request object to send.
+        :param retries: Override the default retry configuration for this method
+        :param server_url: Override the default server URL for this method
+        :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
+        :param http_headers: Additional headers to set or replace on requests.
+        """
+        base_url = None
+        url_variables = None
+        if timeout_ms is None:
+            timeout_ms = self.sdk_configuration.timeout_ms
+
+        if server_url is not None:
+            base_url = server_url
+        else:
+            base_url = models.CHAINS_CHAIN_RUN_HISTORY_OP_SERVERS[0]
+
+        if not isinstance(request, BaseModel):
+            request = utils.unmarshal(request, models.ChainsChainRunHistoryRequest)
+        request = cast(models.ChainsChainRunHistoryRequest, request)
+
+        req = self._build_request_async(
+            method="GET",
+            path="/v1/execute/environment/{environment_id}/chain/{chain_id}/history",
+            base_url=base_url,
+            url_variables=url_variables,
+            request=request,
+            request_body_required=False,
+            request_has_path_params=True,
+            request_has_query_params=True,
+            user_agent_header="user-agent",
+            accept_header_value="application/json",
+            http_headers=http_headers,
+            security=self.sdk_configuration.security,
+            allow_empty_value=None,
+            timeout_ms=timeout_ms,
+        )
+
+        if retries == UNSET:
+            if self.sdk_configuration.retry_config is not UNSET:
+                retries = self.sdk_configuration.retry_config
+
+        retry_config = None
+        if isinstance(retries, utils.RetryConfig):
+            retry_config = (retries, ["429", "500", "502", "503", "504"])
+
+        http_res = await self.do_request_async(
+            hook_ctx=HookContext(
+                config=self.sdk_configuration,
+                base_url=base_url or "",
+                operation_id="chains_chainRunHistory",
+                oauth2_scopes=[],
+                security_source=self.sdk_configuration.security,
+            ),
+            request=req,
+            error_status_codes=["401", "404", "4XX", "5XX"],
+            retry_config=retry_config,
+        )
+
+        def next_func() -> Awaitable[Optional[models.ChainsChainRunHistoryResponse]]:
+            body = utils.unmarshal_json(http_res.text, Union[Dict[Any, Any], List[Any]])
+
+            async def empty_result():
+                return None
+
+            next_cursor = JSONPath("$.data.cursor").parse(body)
+
+            if len(next_cursor) == 0:
+                return empty_result()
+
+            next_cursor = next_cursor[0]
+            if next_cursor is None or str(next_cursor).strip() == "":
+                return empty_result()
+
+            return self.chain_run_history_async(
+                request=models.ChainsChainRunHistoryRequest(
+                    environment_id=request.environment_id,
+                    chain_id=request.chain_id,
+                    limit=request.limit,
+                    cursor=next_cursor,
+                    start_date=request.start_date,
+                    end_date=request.end_date,
+                ),
+                retries=retries,
+                server_url=server_url,
+            )
+
+        response_data: Any = None
+        if utils.match_response(http_res, "200", "application/json"):
+            return models.ChainsChainRunHistoryResponse(
+                result=unmarshal_json_response(models.ChainRunPageResponse, http_res),
+                next=next_func,
+            )
+        if utils.match_response(http_res, ["401", "404"], "application/json"):
+            response_data = unmarshal_json_response(
+                errors.ChainSingleErrorData, http_res
+            )
+            raise errors.ChainSingleError(response_data, http_res)
+        if utils.match_response(http_res, "4XX", "*"):
+            http_res_text = await utils.stream_to_text_async(http_res)
+            raise errors.SDKError("API error occurred", http_res, http_res_text)
+        if utils.match_response(http_res, "5XX", "*"):
+            http_res_text = await utils.stream_to_text_async(http_res)
+            raise errors.SDKError("API error occurred", http_res, http_res_text)
+
+        raise errors.SDKError("Unexpected response received", http_res)
+
+    def start_chain(
+        self,
+        *,
+        environment_id: str,
+        chain_id: str,
+        request_body: Union[
+            models.ChainsStartChainRequestBody,
+            models.ChainsStartChainRequestBodyTypedDict,
+        ],
+        retries: OptionalNullable[utils.RetryConfig] = UNSET,
+        server_url: Optional[str] = None,
+        timeout_ms: Optional[int] = None,
+        http_headers: Optional[Mapping[str, str]] = None,
+    ) -> models.ChainRunResponse:
+        r"""Execute a chain
+
+        Starts a chain run for a specific chain in an environment, specified by the Chain and Environment ID.
+
+        :param environment_id: The ID of the Environment.
+        :param chain_id: The ID of the Chain.
+        :param request_body: The runtime variables that have been pre-defined for a Chain.
+        :param retries: Override the default retry configuration for this method
+        :param server_url: Override the default server URL for this method
+        :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
+        :param http_headers: Additional headers to set or replace on requests.
+        """
+        base_url = None
+        url_variables = None
+        if timeout_ms is None:
+            timeout_ms = self.sdk_configuration.timeout_ms
+
+        if server_url is not None:
+            base_url = server_url
+        else:
+            base_url = models.CHAINS_START_CHAIN_OP_SERVERS[0]
+
+        request = models.ChainsStartChainRequest(
             environment_id=environment_id,
-            wk_target_workspace=wk_target_workspace,
+            chain_id=chain_id,
             request_body=utils.get_pydantic_model(
-                request_body, models.ChainsImportChainRequestBody
+                request_body, models.ChainsStartChainRequestBody
             ),
         )
 
         req = self._build_request(
             method="POST",
-            path="/v1/environments/{environment_id}/import_chain",
+            path="/v1/execute/environment/{environment_id}/chain/{chain_id}/start",
             base_url=base_url,
             url_variables=url_variables,
             request=request,
@@ -4568,8 +2382,8 @@ class Chains(BaseSDK):
                 request.request_body,
                 False,
                 False,
-                "multipart",
-                models.ChainsImportChainRequestBody,
+                "json",
+                models.ChainsStartChainRequestBody,
             ),
             allow_empty_value=None,
             timeout_ms=timeout_ms,
@@ -4587,27 +2401,19 @@ class Chains(BaseSDK):
             hook_ctx=HookContext(
                 config=self.sdk_configuration,
                 base_url=base_url or "",
-                operation_id="chains_importChain",
+                operation_id="chains_startChain",
                 oauth2_scopes=[],
                 security_source=self.sdk_configuration.security,
             ),
             request=req,
-            error_status_codes=["400", "401", "403", "4XX", "5XX"],
+            error_status_codes=["401", "404", "422", "4XX", "5XX"],
             retry_config=retry_config,
         )
 
         response_data: Any = None
         if utils.match_response(http_res, "200", "application/json"):
-            return models.ChainsImportChainResponse(
-                result=unmarshal_json_response(models.ChainResponse, http_res),
-                headers={},
-            )
-        if utils.match_response(http_res, "201", "application/json"):
-            return models.ChainsImportChainResponse(
-                result=unmarshal_json_response(models.ChainResponse, http_res),
-                headers=utils.get_response_headers(http_res.headers),
-            )
-        if utils.match_response(http_res, ["400", "401", "403"], "application/json"):
+            return unmarshal_json_response(models.ChainRunResponse, http_res)
+        if utils.match_response(http_res, ["401", "404", "422"], "application/json"):
             response_data = unmarshal_json_response(
                 errors.ChainSingleErrorData, http_res
             )
@@ -4621,30 +2427,27 @@ class Chains(BaseSDK):
 
         raise errors.SDKError("Unexpected response received", http_res)
 
-    async def import_chain_async(
+    async def start_chain_async(
         self,
         *,
         environment_id: str,
+        chain_id: str,
         request_body: Union[
-            models.ChainsImportChainRequestBody,
-            models.ChainsImportChainRequestBodyTypedDict,
+            models.ChainsStartChainRequestBody,
+            models.ChainsStartChainRequestBodyTypedDict,
         ],
-        wk_target_workspace: Optional[str] = None,
         retries: OptionalNullable[utils.RetryConfig] = UNSET,
         server_url: Optional[str] = None,
         timeout_ms: Optional[int] = None,
         http_headers: Optional[Mapping[str, str]] = None,
-    ) -> models.ChainsImportChainResponse:
-        r"""Import a chain
+    ) -> models.ChainRunResponse:
+        r"""Execute a chain
 
-        Takes a .chain file and imports it into the provided environment. Returns chain metadata for the imported chain.
-        > **Note:** .chain export files will automatically expire and become unusable after 14 days.  Expired .chain files remain on the exported system until removed manually.
-
+        Starts a chain run for a specific chain in an environment, specified by the Chain and Environment ID.
 
         :param environment_id: The ID of the Environment.
-        :param request_body: The .chain file to import.
-        :param wk_target_workspace: The `wk-target-workspace` header is only required for requests made by a service provider application. This does not apply to the majority of Workiva Chains API users. This header specifies the ID of the target workspace on which the service provider application wishes to take action. This workspace must be managed by the service provider.
-
+        :param chain_id: The ID of the Chain.
+        :param request_body: The runtime variables that have been pre-defined for a Chain.
         :param retries: Override the default retry configuration for this method
         :param server_url: Override the default server URL for this method
         :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
@@ -4658,19 +2461,19 @@ class Chains(BaseSDK):
         if server_url is not None:
             base_url = server_url
         else:
-            base_url = models.CHAINS_IMPORT_CHAIN_OP_SERVERS[0]
+            base_url = models.CHAINS_START_CHAIN_OP_SERVERS[0]
 
-        request = models.ChainsImportChainRequest(
+        request = models.ChainsStartChainRequest(
             environment_id=environment_id,
-            wk_target_workspace=wk_target_workspace,
+            chain_id=chain_id,
             request_body=utils.get_pydantic_model(
-                request_body, models.ChainsImportChainRequestBody
+                request_body, models.ChainsStartChainRequestBody
             ),
         )
 
         req = self._build_request_async(
             method="POST",
-            path="/v1/environments/{environment_id}/import_chain",
+            path="/v1/execute/environment/{environment_id}/chain/{chain_id}/start",
             base_url=base_url,
             url_variables=url_variables,
             request=request,
@@ -4685,410 +2488,8 @@ class Chains(BaseSDK):
                 request.request_body,
                 False,
                 False,
-                "multipart",
-                models.ChainsImportChainRequestBody,
-            ),
-            allow_empty_value=None,
-            timeout_ms=timeout_ms,
-        )
-
-        if retries == UNSET:
-            if self.sdk_configuration.retry_config is not UNSET:
-                retries = self.sdk_configuration.retry_config
-
-        retry_config = None
-        if isinstance(retries, utils.RetryConfig):
-            retry_config = (retries, ["429", "500", "502", "503", "504"])
-
-        http_res = await self.do_request_async(
-            hook_ctx=HookContext(
-                config=self.sdk_configuration,
-                base_url=base_url or "",
-                operation_id="chains_importChain",
-                oauth2_scopes=[],
-                security_source=self.sdk_configuration.security,
-            ),
-            request=req,
-            error_status_codes=["400", "401", "403", "4XX", "5XX"],
-            retry_config=retry_config,
-        )
-
-        response_data: Any = None
-        if utils.match_response(http_res, "200", "application/json"):
-            return models.ChainsImportChainResponse(
-                result=unmarshal_json_response(models.ChainResponse, http_res),
-                headers={},
-            )
-        if utils.match_response(http_res, "201", "application/json"):
-            return models.ChainsImportChainResponse(
-                result=unmarshal_json_response(models.ChainResponse, http_res),
-                headers=utils.get_response_headers(http_res.headers),
-            )
-        if utils.match_response(http_res, ["400", "401", "403"], "application/json"):
-            response_data = unmarshal_json_response(
-                errors.ChainSingleErrorData, http_res
-            )
-            raise errors.ChainSingleError(response_data, http_res)
-        if utils.match_response(http_res, "4XX", "*"):
-            http_res_text = await utils.stream_to_text_async(http_res)
-            raise errors.SDKError("API error occurred", http_res, http_res_text)
-        if utils.match_response(http_res, "5XX", "*"):
-            http_res_text = await utils.stream_to_text_async(http_res)
-            raise errors.SDKError("API error occurred", http_res, http_res_text)
-
-        raise errors.SDKError("Unexpected response received", http_res)
-
-    def publish(
-        self,
-        *,
-        mapping_group_guid: str,
-        retries: OptionalNullable[utils.RetryConfig] = UNSET,
-        server_url: Optional[str] = None,
-        timeout_ms: Optional[int] = None,
-        http_headers: Optional[Mapping[str, str]] = None,
-    ) -> models.ChainsPublishResponseBody:
-        r"""Publish draft version of a mapping group
-
-        Publish a draft version of a mapping group, specified by the mapping group GUID.
-
-        :param mapping_group_guid: The GUID of the Mapping Group.
-        :param retries: Override the default retry configuration for this method
-        :param server_url: Override the default server URL for this method
-        :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
-        :param http_headers: Additional headers to set or replace on requests.
-        """
-        base_url = None
-        url_variables = None
-        if timeout_ms is None:
-            timeout_ms = self.sdk_configuration.timeout_ms
-
-        if server_url is not None:
-            base_url = server_url
-        else:
-            base_url = models.CHAINS_PUBLISH_OP_SERVERS[0]
-
-        request = models.ChainsPublishRequest(
-            mapping_group_guid=mapping_group_guid,
-        )
-
-        req = self._build_request(
-            method="POST",
-            path="/v1/dataprep/mapping_groups/{mappingGroupGuid}/publish",
-            base_url=base_url,
-            url_variables=url_variables,
-            request=request,
-            request_body_required=False,
-            request_has_path_params=True,
-            request_has_query_params=True,
-            user_agent_header="user-agent",
-            accept_header_value="application/json",
-            http_headers=http_headers,
-            security=self.sdk_configuration.security,
-            allow_empty_value=None,
-            timeout_ms=timeout_ms,
-        )
-
-        if retries == UNSET:
-            if self.sdk_configuration.retry_config is not UNSET:
-                retries = self.sdk_configuration.retry_config
-
-        retry_config = None
-        if isinstance(retries, utils.RetryConfig):
-            retry_config = (retries, ["429", "500", "502", "503", "504"])
-
-        http_res = self.do_request(
-            hook_ctx=HookContext(
-                config=self.sdk_configuration,
-                base_url=base_url or "",
-                operation_id="chains_publish",
-                oauth2_scopes=["activity:read"],
-                security_source=self.sdk_configuration.security,
-            ),
-            request=req,
-            error_status_codes=["400", "401", "4XX", "5XX"],
-            retry_config=retry_config,
-        )
-
-        response_data: Any = None
-        if utils.match_response(http_res, "200", "application/json"):
-            return unmarshal_json_response(models.ChainsPublishResponseBody, http_res)
-        if utils.match_response(http_res, "400", "application/json"):
-            response_data = unmarshal_json_response(
-                errors.ErrorWithoutLineNumberData, http_res
-            )
-            raise errors.ErrorWithoutLineNumber(response_data, http_res)
-        if utils.match_response(http_res, ["401", "4XX"], "*"):
-            http_res_text = utils.stream_to_text(http_res)
-            raise errors.SDKError("API error occurred", http_res, http_res_text)
-        if utils.match_response(http_res, "5XX", "*"):
-            http_res_text = utils.stream_to_text(http_res)
-            raise errors.SDKError("API error occurred", http_res, http_res_text)
-
-        raise errors.SDKError("Unexpected response received", http_res)
-
-    async def publish_async(
-        self,
-        *,
-        mapping_group_guid: str,
-        retries: OptionalNullable[utils.RetryConfig] = UNSET,
-        server_url: Optional[str] = None,
-        timeout_ms: Optional[int] = None,
-        http_headers: Optional[Mapping[str, str]] = None,
-    ) -> models.ChainsPublishResponseBody:
-        r"""Publish draft version of a mapping group
-
-        Publish a draft version of a mapping group, specified by the mapping group GUID.
-
-        :param mapping_group_guid: The GUID of the Mapping Group.
-        :param retries: Override the default retry configuration for this method
-        :param server_url: Override the default server URL for this method
-        :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
-        :param http_headers: Additional headers to set or replace on requests.
-        """
-        base_url = None
-        url_variables = None
-        if timeout_ms is None:
-            timeout_ms = self.sdk_configuration.timeout_ms
-
-        if server_url is not None:
-            base_url = server_url
-        else:
-            base_url = models.CHAINS_PUBLISH_OP_SERVERS[0]
-
-        request = models.ChainsPublishRequest(
-            mapping_group_guid=mapping_group_guid,
-        )
-
-        req = self._build_request_async(
-            method="POST",
-            path="/v1/dataprep/mapping_groups/{mappingGroupGuid}/publish",
-            base_url=base_url,
-            url_variables=url_variables,
-            request=request,
-            request_body_required=False,
-            request_has_path_params=True,
-            request_has_query_params=True,
-            user_agent_header="user-agent",
-            accept_header_value="application/json",
-            http_headers=http_headers,
-            security=self.sdk_configuration.security,
-            allow_empty_value=None,
-            timeout_ms=timeout_ms,
-        )
-
-        if retries == UNSET:
-            if self.sdk_configuration.retry_config is not UNSET:
-                retries = self.sdk_configuration.retry_config
-
-        retry_config = None
-        if isinstance(retries, utils.RetryConfig):
-            retry_config = (retries, ["429", "500", "502", "503", "504"])
-
-        http_res = await self.do_request_async(
-            hook_ctx=HookContext(
-                config=self.sdk_configuration,
-                base_url=base_url or "",
-                operation_id="chains_publish",
-                oauth2_scopes=["activity:read"],
-                security_source=self.sdk_configuration.security,
-            ),
-            request=req,
-            error_status_codes=["400", "401", "4XX", "5XX"],
-            retry_config=retry_config,
-        )
-
-        response_data: Any = None
-        if utils.match_response(http_res, "200", "application/json"):
-            return unmarshal_json_response(models.ChainsPublishResponseBody, http_res)
-        if utils.match_response(http_res, "400", "application/json"):
-            response_data = unmarshal_json_response(
-                errors.ErrorWithoutLineNumberData, http_res
-            )
-            raise errors.ErrorWithoutLineNumber(response_data, http_res)
-        if utils.match_response(http_res, ["401", "4XX"], "*"):
-            http_res_text = await utils.stream_to_text_async(http_res)
-            raise errors.SDKError("API error occurred", http_res, http_res_text)
-        if utils.match_response(http_res, "5XX", "*"):
-            http_res_text = await utils.stream_to_text_async(http_res)
-            raise errors.SDKError("API error occurred", http_res, http_res_text)
-
-        raise errors.SDKError("Unexpected response received", http_res)
-
-    def publish_chain(
-        self,
-        *,
-        chain_id: str,
-        request_body: Optional[
-            Union[
-                models.ChainsPublishChainRequestBody,
-                models.ChainsPublishChainRequestBodyTypedDict,
-            ]
-        ] = None,
-        retries: OptionalNullable[utils.RetryConfig] = UNSET,
-        server_url: Optional[str] = None,
-        timeout_ms: Optional[int] = None,
-        http_headers: Optional[Mapping[str, str]] = None,
-    ) -> models.ChainsPublishChainResponse:
-        r"""Publish a chain
-
-        Publishes the chain specified by the chain_id.
-
-        :param chain_id: The ID of the Chain.
-        :param request_body:
-        :param retries: Override the default retry configuration for this method
-        :param server_url: Override the default server URL for this method
-        :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
-        :param http_headers: Additional headers to set or replace on requests.
-        """
-        base_url = None
-        url_variables = None
-        if timeout_ms is None:
-            timeout_ms = self.sdk_configuration.timeout_ms
-
-        if server_url is not None:
-            base_url = server_url
-        else:
-            base_url = models.CHAINS_PUBLISH_CHAIN_OP_SERVERS[0]
-
-        request = models.ChainsPublishChainRequest(
-            chain_id=chain_id,
-            request_body=utils.get_pydantic_model(
-                request_body, Optional[models.ChainsPublishChainRequestBody]
-            ),
-        )
-
-        req = self._build_request(
-            method="POST",
-            path="/v1/chains/{chain_id}/publish",
-            base_url=base_url,
-            url_variables=url_variables,
-            request=request,
-            request_body_required=False,
-            request_has_path_params=True,
-            request_has_query_params=True,
-            user_agent_header="user-agent",
-            accept_header_value="application/json",
-            http_headers=http_headers,
-            security=self.sdk_configuration.security,
-            get_serialized_body=lambda: utils.serialize_request_body(
-                request.request_body,
-                False,
-                True,
                 "json",
-                Optional[models.ChainsPublishChainRequestBody],
-            ),
-            allow_empty_value=None,
-            timeout_ms=timeout_ms,
-        )
-
-        if retries == UNSET:
-            if self.sdk_configuration.retry_config is not UNSET:
-                retries = self.sdk_configuration.retry_config
-
-        retry_config = None
-        if isinstance(retries, utils.RetryConfig):
-            retry_config = (retries, ["429", "500", "502", "503", "504"])
-
-        http_res = self.do_request(
-            hook_ctx=HookContext(
-                config=self.sdk_configuration,
-                base_url=base_url or "",
-                operation_id="chains_publishChain",
-                oauth2_scopes=[],
-                security_source=self.sdk_configuration.security,
-            ),
-            request=req,
-            error_status_codes=["400", "401", "403", "4XX", "5XX"],
-            retry_config=retry_config,
-        )
-
-        response_data: Any = None
-        if utils.match_response(http_res, "200", "application/json"):
-            return models.ChainsPublishChainResponse(
-                result=unmarshal_json_response(models.ChainResponse, http_res),
-                headers={},
-            )
-        if utils.match_response(http_res, "201", "application/json"):
-            return models.ChainsPublishChainResponse(
-                result=unmarshal_json_response(models.ChainResponse, http_res),
-                headers=utils.get_response_headers(http_res.headers),
-            )
-        if utils.match_response(http_res, ["400", "401", "403"], "application/json"):
-            response_data = unmarshal_json_response(
-                errors.ChainSingleErrorData, http_res
-            )
-            raise errors.ChainSingleError(response_data, http_res)
-        if utils.match_response(http_res, "4XX", "*"):
-            http_res_text = utils.stream_to_text(http_res)
-            raise errors.SDKError("API error occurred", http_res, http_res_text)
-        if utils.match_response(http_res, "5XX", "*"):
-            http_res_text = utils.stream_to_text(http_res)
-            raise errors.SDKError("API error occurred", http_res, http_res_text)
-
-        raise errors.SDKError("Unexpected response received", http_res)
-
-    async def publish_chain_async(
-        self,
-        *,
-        chain_id: str,
-        request_body: Optional[
-            Union[
-                models.ChainsPublishChainRequestBody,
-                models.ChainsPublishChainRequestBodyTypedDict,
-            ]
-        ] = None,
-        retries: OptionalNullable[utils.RetryConfig] = UNSET,
-        server_url: Optional[str] = None,
-        timeout_ms: Optional[int] = None,
-        http_headers: Optional[Mapping[str, str]] = None,
-    ) -> models.ChainsPublishChainResponse:
-        r"""Publish a chain
-
-        Publishes the chain specified by the chain_id.
-
-        :param chain_id: The ID of the Chain.
-        :param request_body:
-        :param retries: Override the default retry configuration for this method
-        :param server_url: Override the default server URL for this method
-        :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
-        :param http_headers: Additional headers to set or replace on requests.
-        """
-        base_url = None
-        url_variables = None
-        if timeout_ms is None:
-            timeout_ms = self.sdk_configuration.timeout_ms
-
-        if server_url is not None:
-            base_url = server_url
-        else:
-            base_url = models.CHAINS_PUBLISH_CHAIN_OP_SERVERS[0]
-
-        request = models.ChainsPublishChainRequest(
-            chain_id=chain_id,
-            request_body=utils.get_pydantic_model(
-                request_body, Optional[models.ChainsPublishChainRequestBody]
-            ),
-        )
-
-        req = self._build_request_async(
-            method="POST",
-            path="/v1/chains/{chain_id}/publish",
-            base_url=base_url,
-            url_variables=url_variables,
-            request=request,
-            request_body_required=False,
-            request_has_path_params=True,
-            request_has_query_params=True,
-            user_agent_header="user-agent",
-            accept_header_value="application/json",
-            http_headers=http_headers,
-            security=self.sdk_configuration.security,
-            get_serialized_body=lambda: utils.serialize_request_body(
-                request.request_body,
-                False,
-                True,
-                "json",
-                Optional[models.ChainsPublishChainRequestBody],
+                models.ChainsStartChainRequestBody,
             ),
             allow_empty_value=None,
             timeout_ms=timeout_ms,
@@ -5106,27 +2507,19 @@ class Chains(BaseSDK):
             hook_ctx=HookContext(
                 config=self.sdk_configuration,
                 base_url=base_url or "",
-                operation_id="chains_publishChain",
+                operation_id="chains_startChain",
                 oauth2_scopes=[],
                 security_source=self.sdk_configuration.security,
             ),
             request=req,
-            error_status_codes=["400", "401", "403", "4XX", "5XX"],
+            error_status_codes=["401", "404", "422", "4XX", "5XX"],
             retry_config=retry_config,
         )
 
         response_data: Any = None
         if utils.match_response(http_res, "200", "application/json"):
-            return models.ChainsPublishChainResponse(
-                result=unmarshal_json_response(models.ChainResponse, http_res),
-                headers={},
-            )
-        if utils.match_response(http_res, "201", "application/json"):
-            return models.ChainsPublishChainResponse(
-                result=unmarshal_json_response(models.ChainResponse, http_res),
-                headers=utils.get_response_headers(http_res.headers),
-            )
-        if utils.match_response(http_res, ["400", "401", "403"], "application/json"):
+            return unmarshal_json_response(models.ChainRunResponse, http_res)
+        if utils.match_response(http_res, ["401", "404", "422"], "application/json"):
             response_data = unmarshal_json_response(
                 errors.ChainSingleErrorData, http_res
             )
@@ -5322,27 +2715,20 @@ class Chains(BaseSDK):
 
         raise errors.SDKError("Unexpected response received", http_res)
 
-    def start_chain(
+    def get_chains(
         self,
         *,
-        chain_id: str,
         environment_id: str,
-        request_body: Union[
-            models.ChainsStartChainRequestBody,
-            models.ChainsStartChainRequestBodyTypedDict,
-        ],
         retries: OptionalNullable[utils.RetryConfig] = UNSET,
         server_url: Optional[str] = None,
         timeout_ms: Optional[int] = None,
         http_headers: Optional[Mapping[str, str]] = None,
-    ) -> models.ChainRunResponse:
-        r"""Execute a chain
+    ) -> models.ChainsEnvironmentResponse:
+        r"""Return a list of chains for an environment
 
-        Starts a chain run for a specific chain in an environment, specified by the Chain and Environment ID.
+        Retrieves a list of chains for an environment.
 
-        :param chain_id: The ID of the Chain.
         :param environment_id: The ID of the Environment.
-        :param request_body: The runtime variables that have been pre-defined for a Chain.
         :param retries: Override the default retry configuration for this method
         :param server_url: Override the default server URL for this method
         :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
@@ -5356,220 +2742,15 @@ class Chains(BaseSDK):
         if server_url is not None:
             base_url = server_url
         else:
-            base_url = models.CHAINS_START_CHAIN_OP_SERVERS[0]
+            base_url = models.CHAINS_GET_CHAINS_OP_SERVERS[0]
 
-        request = models.ChainsStartChainRequest(
-            chain_id=chain_id,
+        request = models.ChainsGetChainsRequest(
             environment_id=environment_id,
-            request_body=utils.get_pydantic_model(
-                request_body, models.ChainsStartChainRequestBody
-            ),
         )
 
         req = self._build_request(
-            method="POST",
-            path="/v1/execute/environment/{environment_id}/chain/{chain_id}/start",
-            base_url=base_url,
-            url_variables=url_variables,
-            request=request,
-            request_body_required=True,
-            request_has_path_params=True,
-            request_has_query_params=True,
-            user_agent_header="user-agent",
-            accept_header_value="application/json",
-            http_headers=http_headers,
-            security=self.sdk_configuration.security,
-            get_serialized_body=lambda: utils.serialize_request_body(
-                request.request_body,
-                False,
-                False,
-                "json",
-                models.ChainsStartChainRequestBody,
-            ),
-            allow_empty_value=None,
-            timeout_ms=timeout_ms,
-        )
-
-        if retries == UNSET:
-            if self.sdk_configuration.retry_config is not UNSET:
-                retries = self.sdk_configuration.retry_config
-
-        retry_config = None
-        if isinstance(retries, utils.RetryConfig):
-            retry_config = (retries, ["429", "500", "502", "503", "504"])
-
-        http_res = self.do_request(
-            hook_ctx=HookContext(
-                config=self.sdk_configuration,
-                base_url=base_url or "",
-                operation_id="chains_startChain",
-                oauth2_scopes=[],
-                security_source=self.sdk_configuration.security,
-            ),
-            request=req,
-            error_status_codes=["401", "404", "422", "4XX", "5XX"],
-            retry_config=retry_config,
-        )
-
-        response_data: Any = None
-        if utils.match_response(http_res, "200", "application/json"):
-            return unmarshal_json_response(models.ChainRunResponse, http_res)
-        if utils.match_response(http_res, ["401", "404", "422"], "application/json"):
-            response_data = unmarshal_json_response(
-                errors.ChainSingleErrorData, http_res
-            )
-            raise errors.ChainSingleError(response_data, http_res)
-        if utils.match_response(http_res, "4XX", "*"):
-            http_res_text = utils.stream_to_text(http_res)
-            raise errors.SDKError("API error occurred", http_res, http_res_text)
-        if utils.match_response(http_res, "5XX", "*"):
-            http_res_text = utils.stream_to_text(http_res)
-            raise errors.SDKError("API error occurred", http_res, http_res_text)
-
-        raise errors.SDKError("Unexpected response received", http_res)
-
-    async def start_chain_async(
-        self,
-        *,
-        chain_id: str,
-        environment_id: str,
-        request_body: Union[
-            models.ChainsStartChainRequestBody,
-            models.ChainsStartChainRequestBodyTypedDict,
-        ],
-        retries: OptionalNullable[utils.RetryConfig] = UNSET,
-        server_url: Optional[str] = None,
-        timeout_ms: Optional[int] = None,
-        http_headers: Optional[Mapping[str, str]] = None,
-    ) -> models.ChainRunResponse:
-        r"""Execute a chain
-
-        Starts a chain run for a specific chain in an environment, specified by the Chain and Environment ID.
-
-        :param chain_id: The ID of the Chain.
-        :param environment_id: The ID of the Environment.
-        :param request_body: The runtime variables that have been pre-defined for a Chain.
-        :param retries: Override the default retry configuration for this method
-        :param server_url: Override the default server URL for this method
-        :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
-        :param http_headers: Additional headers to set or replace on requests.
-        """
-        base_url = None
-        url_variables = None
-        if timeout_ms is None:
-            timeout_ms = self.sdk_configuration.timeout_ms
-
-        if server_url is not None:
-            base_url = server_url
-        else:
-            base_url = models.CHAINS_START_CHAIN_OP_SERVERS[0]
-
-        request = models.ChainsStartChainRequest(
-            chain_id=chain_id,
-            environment_id=environment_id,
-            request_body=utils.get_pydantic_model(
-                request_body, models.ChainsStartChainRequestBody
-            ),
-        )
-
-        req = self._build_request_async(
-            method="POST",
-            path="/v1/execute/environment/{environment_id}/chain/{chain_id}/start",
-            base_url=base_url,
-            url_variables=url_variables,
-            request=request,
-            request_body_required=True,
-            request_has_path_params=True,
-            request_has_query_params=True,
-            user_agent_header="user-agent",
-            accept_header_value="application/json",
-            http_headers=http_headers,
-            security=self.sdk_configuration.security,
-            get_serialized_body=lambda: utils.serialize_request_body(
-                request.request_body,
-                False,
-                False,
-                "json",
-                models.ChainsStartChainRequestBody,
-            ),
-            allow_empty_value=None,
-            timeout_ms=timeout_ms,
-        )
-
-        if retries == UNSET:
-            if self.sdk_configuration.retry_config is not UNSET:
-                retries = self.sdk_configuration.retry_config
-
-        retry_config = None
-        if isinstance(retries, utils.RetryConfig):
-            retry_config = (retries, ["429", "500", "502", "503", "504"])
-
-        http_res = await self.do_request_async(
-            hook_ctx=HookContext(
-                config=self.sdk_configuration,
-                base_url=base_url or "",
-                operation_id="chains_startChain",
-                oauth2_scopes=[],
-                security_source=self.sdk_configuration.security,
-            ),
-            request=req,
-            error_status_codes=["401", "404", "422", "4XX", "5XX"],
-            retry_config=retry_config,
-        )
-
-        response_data: Any = None
-        if utils.match_response(http_res, "200", "application/json"):
-            return unmarshal_json_response(models.ChainRunResponse, http_res)
-        if utils.match_response(http_res, ["401", "404", "422"], "application/json"):
-            response_data = unmarshal_json_response(
-                errors.ChainSingleErrorData, http_res
-            )
-            raise errors.ChainSingleError(response_data, http_res)
-        if utils.match_response(http_res, "4XX", "*"):
-            http_res_text = await utils.stream_to_text_async(http_res)
-            raise errors.SDKError("API error occurred", http_res, http_res_text)
-        if utils.match_response(http_res, "5XX", "*"):
-            http_res_text = await utils.stream_to_text_async(http_res)
-            raise errors.SDKError("API error occurred", http_res, http_res_text)
-
-        raise errors.SDKError("Unexpected response received", http_res)
-
-    def stop_chain(
-        self,
-        *,
-        chain_run_id: str,
-        retries: OptionalNullable[utils.RetryConfig] = UNSET,
-        server_url: Optional[str] = None,
-        timeout_ms: Optional[int] = None,
-        http_headers: Optional[Mapping[str, str]] = None,
-    ) -> models.ChainRunResponse:
-        r"""Stop a running chain
-
-        Stop a chain run with the specified ID.
-
-        :param chain_run_id: The ID of the Chain Run.
-        :param retries: Override the default retry configuration for this method
-        :param server_url: Override the default server URL for this method
-        :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
-        :param http_headers: Additional headers to set or replace on requests.
-        """
-        base_url = None
-        url_variables = None
-        if timeout_ms is None:
-            timeout_ms = self.sdk_configuration.timeout_ms
-
-        if server_url is not None:
-            base_url = server_url
-        else:
-            base_url = models.CHAINS_STOP_CHAIN_OP_SERVERS[0]
-
-        request = models.ChainsStopChainRequest(
-            chain_run_id=chain_run_id,
-        )
-
-        req = self._build_request(
-            method="POST",
-            path="/v1/execute/chain_run/{chain_run_id}/stop",
+            method="GET",
+            path="/v1/metadata/environment/{environment_id}/chain",
             base_url=base_url,
             url_variables=url_variables,
             request=request,
@@ -5596,19 +2777,19 @@ class Chains(BaseSDK):
             hook_ctx=HookContext(
                 config=self.sdk_configuration,
                 base_url=base_url or "",
-                operation_id="chains_stopChain",
+                operation_id="chains_getChains",
                 oauth2_scopes=[],
                 security_source=self.sdk_configuration.security,
             ),
             request=req,
-            error_status_codes=["401", "404", "422", "4XX", "5XX"],
+            error_status_codes=["401", "404", "4XX", "5XX"],
             retry_config=retry_config,
         )
 
         response_data: Any = None
         if utils.match_response(http_res, "200", "application/json"):
-            return unmarshal_json_response(models.ChainRunResponse, http_res)
-        if utils.match_response(http_res, ["401", "404", "422"], "application/json"):
+            return unmarshal_json_response(models.ChainsEnvironmentResponse, http_res)
+        if utils.match_response(http_res, ["401", "404"], "application/json"):
             response_data = unmarshal_json_response(
                 errors.ChainSingleErrorData, http_res
             )
@@ -5622,20 +2803,20 @@ class Chains(BaseSDK):
 
         raise errors.SDKError("Unexpected response received", http_res)
 
-    async def stop_chain_async(
+    async def get_chains_async(
         self,
         *,
-        chain_run_id: str,
+        environment_id: str,
         retries: OptionalNullable[utils.RetryConfig] = UNSET,
         server_url: Optional[str] = None,
         timeout_ms: Optional[int] = None,
         http_headers: Optional[Mapping[str, str]] = None,
-    ) -> models.ChainRunResponse:
-        r"""Stop a running chain
+    ) -> models.ChainsEnvironmentResponse:
+        r"""Return a list of chains for an environment
 
-        Stop a chain run with the specified ID.
+        Retrieves a list of chains for an environment.
 
-        :param chain_run_id: The ID of the Chain Run.
+        :param environment_id: The ID of the Environment.
         :param retries: Override the default retry configuration for this method
         :param server_url: Override the default server URL for this method
         :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
@@ -5649,15 +2830,15 @@ class Chains(BaseSDK):
         if server_url is not None:
             base_url = server_url
         else:
-            base_url = models.CHAINS_STOP_CHAIN_OP_SERVERS[0]
+            base_url = models.CHAINS_GET_CHAINS_OP_SERVERS[0]
 
-        request = models.ChainsStopChainRequest(
-            chain_run_id=chain_run_id,
+        request = models.ChainsGetChainsRequest(
+            environment_id=environment_id,
         )
 
         req = self._build_request_async(
-            method="POST",
-            path="/v1/execute/chain_run/{chain_run_id}/stop",
+            method="GET",
+            path="/v1/metadata/environment/{environment_id}/chain",
             base_url=base_url,
             url_variables=url_variables,
             request=request,
@@ -5684,19 +2865,19 @@ class Chains(BaseSDK):
             hook_ctx=HookContext(
                 config=self.sdk_configuration,
                 base_url=base_url or "",
-                operation_id="chains_stopChain",
+                operation_id="chains_getChains",
                 oauth2_scopes=[],
                 security_source=self.sdk_configuration.security,
             ),
             request=req,
-            error_status_codes=["401", "404", "422", "4XX", "5XX"],
+            error_status_codes=["401", "404", "4XX", "5XX"],
             retry_config=retry_config,
         )
 
         response_data: Any = None
         if utils.match_response(http_res, "200", "application/json"):
-            return unmarshal_json_response(models.ChainRunResponse, http_res)
-        if utils.match_response(http_res, ["401", "404", "422"], "application/json"):
+            return unmarshal_json_response(models.ChainsEnvironmentResponse, http_res)
+        if utils.match_response(http_res, ["401", "404"], "application/json"):
             response_data = unmarshal_json_response(
                 errors.ChainSingleErrorData, http_res
             )
@@ -5710,25 +2891,22 @@ class Chains(BaseSDK):
 
         raise errors.SDKError("Unexpected response received", http_res)
 
-    def update_rules(
+    def get_chain(
         self,
         *,
-        mapping_group_guid: str,
-        request_body: Union[
-            models.ChainsUpdateRulesRequestBody,
-            models.ChainsUpdateRulesRequestBodyTypedDict,
-        ],
+        environment_id: str,
+        chain_id: str,
         retries: OptionalNullable[utils.RetryConfig] = UNSET,
         server_url: Optional[str] = None,
         timeout_ms: Optional[int] = None,
         http_headers: Optional[Mapping[str, str]] = None,
-    ) -> models.MappingRuleUploadResult:
-        r"""Update mapping group rules
+    ) -> models.ChainResponse:
+        r"""Return chain properties
 
-        Update a mapping group ruleset, specified by the mapping group GUID.
+        Returns properties for a chain with the provided ID, or a 404 if no such chain is found.
 
-        :param mapping_group_guid: The GUID of the Mapping Group.
-        :param request_body:
+        :param environment_id: The ID of the Environment.
+        :param chain_id: The ID of the Chain.
         :param retries: Override the default retry configuration for this method
         :param server_url: Override the default server URL for this method
         :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
@@ -5742,35 +2920,26 @@ class Chains(BaseSDK):
         if server_url is not None:
             base_url = server_url
         else:
-            base_url = models.CHAINS_UPDATE_RULES_OP_SERVERS[0]
+            base_url = models.CHAINS_GET_CHAIN_OP_SERVERS[0]
 
-        request = models.ChainsUpdateRulesRequest(
-            mapping_group_guid=mapping_group_guid,
-            request_body=utils.get_pydantic_model(
-                request_body, models.ChainsUpdateRulesRequestBody
-            ),
+        request = models.ChainsGetChainRequest(
+            environment_id=environment_id,
+            chain_id=chain_id,
         )
 
         req = self._build_request(
-            method="POST",
-            path="/v1/dataprep/mapping_groups/{mappingGroupGuid}/update_rules",
+            method="GET",
+            path="/v1/metadata/environment/{environment_id}/chain/{chain_id}",
             base_url=base_url,
             url_variables=url_variables,
             request=request,
-            request_body_required=True,
+            request_body_required=False,
             request_has_path_params=True,
             request_has_query_params=True,
             user_agent_header="user-agent",
             accept_header_value="application/json",
             http_headers=http_headers,
             security=self.sdk_configuration.security,
-            get_serialized_body=lambda: utils.serialize_request_body(
-                request.request_body,
-                False,
-                False,
-                "multipart",
-                models.ChainsUpdateRulesRequestBody,
-            ),
             allow_empty_value=None,
             timeout_ms=timeout_ms,
         )
@@ -5787,28 +2956,23 @@ class Chains(BaseSDK):
             hook_ctx=HookContext(
                 config=self.sdk_configuration,
                 base_url=base_url or "",
-                operation_id="chains_updateRules",
-                oauth2_scopes=["activity:read"],
+                operation_id="chains_getChain",
+                oauth2_scopes=[],
                 security_source=self.sdk_configuration.security,
             ),
             request=req,
-            error_status_codes=["400", "401", "4XX", "5XX"],
+            error_status_codes=["401", "404", "4XX", "5XX"],
             retry_config=retry_config,
         )
 
         response_data: Any = None
         if utils.match_response(http_res, "200", "application/json"):
-            return unmarshal_json_response(models.MappingRuleUploadResult, http_res)
-        if utils.match_response(http_res, "400", "application/json"):
+            return unmarshal_json_response(models.ChainResponse, http_res)
+        if utils.match_response(http_res, ["401", "404"], "application/json"):
             response_data = unmarshal_json_response(
-                errors.MappingRuleUploadResultData, http_res
+                errors.ChainSingleErrorData, http_res
             )
-            raise errors.MappingRuleUploadResult(response_data, http_res)
-        if utils.match_response(http_res, "401", "application/json"):
-            response_data = unmarshal_json_response(
-                errors.ChainsUpdateRulesResponseBodyData, http_res
-            )
-            raise errors.ChainsUpdateRulesResponseBody(response_data, http_res)
+            raise errors.ChainSingleError(response_data, http_res)
         if utils.match_response(http_res, "4XX", "*"):
             http_res_text = utils.stream_to_text(http_res)
             raise errors.SDKError("API error occurred", http_res, http_res_text)
@@ -5818,25 +2982,22 @@ class Chains(BaseSDK):
 
         raise errors.SDKError("Unexpected response received", http_res)
 
-    async def update_rules_async(
+    async def get_chain_async(
         self,
         *,
-        mapping_group_guid: str,
-        request_body: Union[
-            models.ChainsUpdateRulesRequestBody,
-            models.ChainsUpdateRulesRequestBodyTypedDict,
-        ],
+        environment_id: str,
+        chain_id: str,
         retries: OptionalNullable[utils.RetryConfig] = UNSET,
         server_url: Optional[str] = None,
         timeout_ms: Optional[int] = None,
         http_headers: Optional[Mapping[str, str]] = None,
-    ) -> models.MappingRuleUploadResult:
-        r"""Update mapping group rules
+    ) -> models.ChainResponse:
+        r"""Return chain properties
 
-        Update a mapping group ruleset, specified by the mapping group GUID.
+        Returns properties for a chain with the provided ID, or a 404 if no such chain is found.
 
-        :param mapping_group_guid: The GUID of the Mapping Group.
-        :param request_body:
+        :param environment_id: The ID of the Environment.
+        :param chain_id: The ID of the Chain.
         :param retries: Override the default retry configuration for this method
         :param server_url: Override the default server URL for this method
         :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
@@ -5850,35 +3011,26 @@ class Chains(BaseSDK):
         if server_url is not None:
             base_url = server_url
         else:
-            base_url = models.CHAINS_UPDATE_RULES_OP_SERVERS[0]
+            base_url = models.CHAINS_GET_CHAIN_OP_SERVERS[0]
 
-        request = models.ChainsUpdateRulesRequest(
-            mapping_group_guid=mapping_group_guid,
-            request_body=utils.get_pydantic_model(
-                request_body, models.ChainsUpdateRulesRequestBody
-            ),
+        request = models.ChainsGetChainRequest(
+            environment_id=environment_id,
+            chain_id=chain_id,
         )
 
         req = self._build_request_async(
-            method="POST",
-            path="/v1/dataprep/mapping_groups/{mappingGroupGuid}/update_rules",
+            method="GET",
+            path="/v1/metadata/environment/{environment_id}/chain/{chain_id}",
             base_url=base_url,
             url_variables=url_variables,
             request=request,
-            request_body_required=True,
+            request_body_required=False,
             request_has_path_params=True,
             request_has_query_params=True,
             user_agent_header="user-agent",
             accept_header_value="application/json",
             http_headers=http_headers,
             security=self.sdk_configuration.security,
-            get_serialized_body=lambda: utils.serialize_request_body(
-                request.request_body,
-                False,
-                False,
-                "multipart",
-                models.ChainsUpdateRulesRequestBody,
-            ),
             allow_empty_value=None,
             timeout_ms=timeout_ms,
         )
@@ -5895,28 +3047,2876 @@ class Chains(BaseSDK):
             hook_ctx=HookContext(
                 config=self.sdk_configuration,
                 base_url=base_url or "",
-                operation_id="chains_updateRules",
-                oauth2_scopes=["activity:read"],
+                operation_id="chains_getChain",
+                oauth2_scopes=[],
                 security_source=self.sdk_configuration.security,
             ),
             request=req,
-            error_status_codes=["400", "401", "4XX", "5XX"],
+            error_status_codes=["401", "404", "4XX", "5XX"],
             retry_config=retry_config,
         )
 
         response_data: Any = None
         if utils.match_response(http_res, "200", "application/json"):
-            return unmarshal_json_response(models.MappingRuleUploadResult, http_res)
-        if utils.match_response(http_res, "400", "application/json"):
+            return unmarshal_json_response(models.ChainResponse, http_res)
+        if utils.match_response(http_res, ["401", "404"], "application/json"):
             response_data = unmarshal_json_response(
-                errors.MappingRuleUploadResultData, http_res
+                errors.ChainSingleErrorData, http_res
             )
-            raise errors.MappingRuleUploadResult(response_data, http_res)
+            raise errors.ChainSingleError(response_data, http_res)
+        if utils.match_response(http_res, "4XX", "*"):
+            http_res_text = await utils.stream_to_text_async(http_res)
+            raise errors.SDKError("API error occurred", http_res, http_res_text)
+        if utils.match_response(http_res, "5XX", "*"):
+            http_res_text = await utils.stream_to_text_async(http_res)
+            raise errors.SDKError("API error occurred", http_res, http_res_text)
+
+        raise errors.SDKError("Unexpected response received", http_res)
+
+    def get_commands(
+        self,
+        *,
+        environment_id: str,
+        chain_id: str,
+        retries: OptionalNullable[utils.RetryConfig] = UNSET,
+        server_url: Optional[str] = None,
+        timeout_ms: Optional[int] = None,
+        http_headers: Optional[Mapping[str, str]] = None,
+    ) -> models.CommandsResponse:
+        r"""Return command properties
+
+        Returns properties for a command with the provided ID, or a 404 if no such command is found.
+
+        :param environment_id: The ID of the Environment.
+        :param chain_id: The ID of the Chain.
+        :param retries: Override the default retry configuration for this method
+        :param server_url: Override the default server URL for this method
+        :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
+        :param http_headers: Additional headers to set or replace on requests.
+        """
+        base_url = None
+        url_variables = None
+        if timeout_ms is None:
+            timeout_ms = self.sdk_configuration.timeout_ms
+
+        if server_url is not None:
+            base_url = server_url
+        else:
+            base_url = models.CHAINS_GET_COMMANDS_OP_SERVERS[0]
+
+        request = models.ChainsGetCommandsRequest(
+            environment_id=environment_id,
+            chain_id=chain_id,
+        )
+
+        req = self._build_request(
+            method="GET",
+            path="/v1/metadata/environment/{environment_id}/chain/{chain_id}/command",
+            base_url=base_url,
+            url_variables=url_variables,
+            request=request,
+            request_body_required=False,
+            request_has_path_params=True,
+            request_has_query_params=True,
+            user_agent_header="user-agent",
+            accept_header_value="application/json",
+            http_headers=http_headers,
+            security=self.sdk_configuration.security,
+            allow_empty_value=None,
+            timeout_ms=timeout_ms,
+        )
+
+        if retries == UNSET:
+            if self.sdk_configuration.retry_config is not UNSET:
+                retries = self.sdk_configuration.retry_config
+
+        retry_config = None
+        if isinstance(retries, utils.RetryConfig):
+            retry_config = (retries, ["429", "500", "502", "503", "504"])
+
+        http_res = self.do_request(
+            hook_ctx=HookContext(
+                config=self.sdk_configuration,
+                base_url=base_url or "",
+                operation_id="chains_getCommands",
+                oauth2_scopes=[],
+                security_source=self.sdk_configuration.security,
+            ),
+            request=req,
+            error_status_codes=["401", "404", "4XX", "5XX"],
+            retry_config=retry_config,
+        )
+
+        response_data: Any = None
+        if utils.match_response(http_res, "200", "application/json"):
+            return unmarshal_json_response(models.CommandsResponse, http_res)
+        if utils.match_response(http_res, ["401", "404"], "application/json"):
+            response_data = unmarshal_json_response(
+                errors.ChainSingleErrorData, http_res
+            )
+            raise errors.ChainSingleError(response_data, http_res)
+        if utils.match_response(http_res, "4XX", "*"):
+            http_res_text = utils.stream_to_text(http_res)
+            raise errors.SDKError("API error occurred", http_res, http_res_text)
+        if utils.match_response(http_res, "5XX", "*"):
+            http_res_text = utils.stream_to_text(http_res)
+            raise errors.SDKError("API error occurred", http_res, http_res_text)
+
+        raise errors.SDKError("Unexpected response received", http_res)
+
+    async def get_commands_async(
+        self,
+        *,
+        environment_id: str,
+        chain_id: str,
+        retries: OptionalNullable[utils.RetryConfig] = UNSET,
+        server_url: Optional[str] = None,
+        timeout_ms: Optional[int] = None,
+        http_headers: Optional[Mapping[str, str]] = None,
+    ) -> models.CommandsResponse:
+        r"""Return command properties
+
+        Returns properties for a command with the provided ID, or a 404 if no such command is found.
+
+        :param environment_id: The ID of the Environment.
+        :param chain_id: The ID of the Chain.
+        :param retries: Override the default retry configuration for this method
+        :param server_url: Override the default server URL for this method
+        :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
+        :param http_headers: Additional headers to set or replace on requests.
+        """
+        base_url = None
+        url_variables = None
+        if timeout_ms is None:
+            timeout_ms = self.sdk_configuration.timeout_ms
+
+        if server_url is not None:
+            base_url = server_url
+        else:
+            base_url = models.CHAINS_GET_COMMANDS_OP_SERVERS[0]
+
+        request = models.ChainsGetCommandsRequest(
+            environment_id=environment_id,
+            chain_id=chain_id,
+        )
+
+        req = self._build_request_async(
+            method="GET",
+            path="/v1/metadata/environment/{environment_id}/chain/{chain_id}/command",
+            base_url=base_url,
+            url_variables=url_variables,
+            request=request,
+            request_body_required=False,
+            request_has_path_params=True,
+            request_has_query_params=True,
+            user_agent_header="user-agent",
+            accept_header_value="application/json",
+            http_headers=http_headers,
+            security=self.sdk_configuration.security,
+            allow_empty_value=None,
+            timeout_ms=timeout_ms,
+        )
+
+        if retries == UNSET:
+            if self.sdk_configuration.retry_config is not UNSET:
+                retries = self.sdk_configuration.retry_config
+
+        retry_config = None
+        if isinstance(retries, utils.RetryConfig):
+            retry_config = (retries, ["429", "500", "502", "503", "504"])
+
+        http_res = await self.do_request_async(
+            hook_ctx=HookContext(
+                config=self.sdk_configuration,
+                base_url=base_url or "",
+                operation_id="chains_getCommands",
+                oauth2_scopes=[],
+                security_source=self.sdk_configuration.security,
+            ),
+            request=req,
+            error_status_codes=["401", "404", "4XX", "5XX"],
+            retry_config=retry_config,
+        )
+
+        response_data: Any = None
+        if utils.match_response(http_res, "200", "application/json"):
+            return unmarshal_json_response(models.CommandsResponse, http_res)
+        if utils.match_response(http_res, ["401", "404"], "application/json"):
+            response_data = unmarshal_json_response(
+                errors.ChainSingleErrorData, http_res
+            )
+            raise errors.ChainSingleError(response_data, http_res)
+        if utils.match_response(http_res, "4XX", "*"):
+            http_res_text = await utils.stream_to_text_async(http_res)
+            raise errors.SDKError("API error occurred", http_res, http_res_text)
+        if utils.match_response(http_res, "5XX", "*"):
+            http_res_text = await utils.stream_to_text_async(http_res)
+            raise errors.SDKError("API error occurred", http_res, http_res_text)
+
+        raise errors.SDKError("Unexpected response received", http_res)
+
+    def get_workspaces(
+        self,
+        *,
+        retries: OptionalNullable[utils.RetryConfig] = UNSET,
+        server_url: Optional[str] = None,
+        timeout_ms: Optional[int] = None,
+        http_headers: Optional[Mapping[str, str]] = None,
+    ) -> models.WorkspacesResponse:
+        r"""Return a list of workspaces
+
+        Retrieves a list of workspaces for a company.
+
+        :param retries: Override the default retry configuration for this method
+        :param server_url: Override the default server URL for this method
+        :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
+        :param http_headers: Additional headers to set or replace on requests.
+        """
+        base_url = None
+        url_variables = None
+        if timeout_ms is None:
+            timeout_ms = self.sdk_configuration.timeout_ms
+
+        if server_url is not None:
+            base_url = server_url
+        else:
+            base_url = models.CHAINS_GET_WORKSPACES_OP_SERVERS[0]
+        req = self._build_request(
+            method="GET",
+            path="/v1/metadata/workspace",
+            base_url=base_url,
+            url_variables=url_variables,
+            request=None,
+            request_body_required=False,
+            request_has_path_params=False,
+            request_has_query_params=True,
+            user_agent_header="user-agent",
+            accept_header_value="application/json",
+            http_headers=http_headers,
+            security=self.sdk_configuration.security,
+            allow_empty_value=None,
+            timeout_ms=timeout_ms,
+        )
+
+        if retries == UNSET:
+            if self.sdk_configuration.retry_config is not UNSET:
+                retries = self.sdk_configuration.retry_config
+
+        retry_config = None
+        if isinstance(retries, utils.RetryConfig):
+            retry_config = (retries, ["429", "500", "502", "503", "504"])
+
+        http_res = self.do_request(
+            hook_ctx=HookContext(
+                config=self.sdk_configuration,
+                base_url=base_url or "",
+                operation_id="chains_getWorkspaces",
+                oauth2_scopes=[],
+                security_source=self.sdk_configuration.security,
+            ),
+            request=req,
+            error_status_codes=["401", "4XX", "5XX"],
+            retry_config=retry_config,
+        )
+
+        response_data: Any = None
+        if utils.match_response(http_res, "200", "application/json"):
+            return unmarshal_json_response(models.WorkspacesResponse, http_res)
         if utils.match_response(http_res, "401", "application/json"):
             response_data = unmarshal_json_response(
-                errors.ChainsUpdateRulesResponseBodyData, http_res
+                errors.ChainSingleErrorData, http_res
             )
-            raise errors.ChainsUpdateRulesResponseBody(response_data, http_res)
+            raise errors.ChainSingleError(response_data, http_res)
+        if utils.match_response(http_res, "4XX", "*"):
+            http_res_text = utils.stream_to_text(http_res)
+            raise errors.SDKError("API error occurred", http_res, http_res_text)
+        if utils.match_response(http_res, "5XX", "*"):
+            http_res_text = utils.stream_to_text(http_res)
+            raise errors.SDKError("API error occurred", http_res, http_res_text)
+
+        raise errors.SDKError("Unexpected response received", http_res)
+
+    async def get_workspaces_async(
+        self,
+        *,
+        retries: OptionalNullable[utils.RetryConfig] = UNSET,
+        server_url: Optional[str] = None,
+        timeout_ms: Optional[int] = None,
+        http_headers: Optional[Mapping[str, str]] = None,
+    ) -> models.WorkspacesResponse:
+        r"""Return a list of workspaces
+
+        Retrieves a list of workspaces for a company.
+
+        :param retries: Override the default retry configuration for this method
+        :param server_url: Override the default server URL for this method
+        :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
+        :param http_headers: Additional headers to set or replace on requests.
+        """
+        base_url = None
+        url_variables = None
+        if timeout_ms is None:
+            timeout_ms = self.sdk_configuration.timeout_ms
+
+        if server_url is not None:
+            base_url = server_url
+        else:
+            base_url = models.CHAINS_GET_WORKSPACES_OP_SERVERS[0]
+        req = self._build_request_async(
+            method="GET",
+            path="/v1/metadata/workspace",
+            base_url=base_url,
+            url_variables=url_variables,
+            request=None,
+            request_body_required=False,
+            request_has_path_params=False,
+            request_has_query_params=True,
+            user_agent_header="user-agent",
+            accept_header_value="application/json",
+            http_headers=http_headers,
+            security=self.sdk_configuration.security,
+            allow_empty_value=None,
+            timeout_ms=timeout_ms,
+        )
+
+        if retries == UNSET:
+            if self.sdk_configuration.retry_config is not UNSET:
+                retries = self.sdk_configuration.retry_config
+
+        retry_config = None
+        if isinstance(retries, utils.RetryConfig):
+            retry_config = (retries, ["429", "500", "502", "503", "504"])
+
+        http_res = await self.do_request_async(
+            hook_ctx=HookContext(
+                config=self.sdk_configuration,
+                base_url=base_url or "",
+                operation_id="chains_getWorkspaces",
+                oauth2_scopes=[],
+                security_source=self.sdk_configuration.security,
+            ),
+            request=req,
+            error_status_codes=["401", "4XX", "5XX"],
+            retry_config=retry_config,
+        )
+
+        response_data: Any = None
+        if utils.match_response(http_res, "200", "application/json"):
+            return unmarshal_json_response(models.WorkspacesResponse, http_res)
+        if utils.match_response(http_res, "401", "application/json"):
+            response_data = unmarshal_json_response(
+                errors.ChainSingleErrorData, http_res
+            )
+            raise errors.ChainSingleError(response_data, http_res)
+        if utils.match_response(http_res, "4XX", "*"):
+            http_res_text = await utils.stream_to_text_async(http_res)
+            raise errors.SDKError("API error occurred", http_res, http_res_text)
+        if utils.match_response(http_res, "5XX", "*"):
+            http_res_text = await utils.stream_to_text_async(http_res)
+            raise errors.SDKError("API error occurred", http_res, http_res_text)
+
+        raise errors.SDKError("Unexpected response received", http_res)
+
+    def get_workspace(
+        self,
+        *,
+        workspace_id: str,
+        retries: OptionalNullable[utils.RetryConfig] = UNSET,
+        server_url: Optional[str] = None,
+        timeout_ms: Optional[int] = None,
+        http_headers: Optional[Mapping[str, str]] = None,
+    ) -> models.WorkspaceResponse:
+        r"""Return workspace properties
+
+        Returns properties for a workspace with the provided ID, or a 404 if no such workspace is found.
+
+        :param workspace_id: The ID of the Workspace.
+        :param retries: Override the default retry configuration for this method
+        :param server_url: Override the default server URL for this method
+        :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
+        :param http_headers: Additional headers to set or replace on requests.
+        """
+        base_url = None
+        url_variables = None
+        if timeout_ms is None:
+            timeout_ms = self.sdk_configuration.timeout_ms
+
+        if server_url is not None:
+            base_url = server_url
+        else:
+            base_url = models.CHAINS_GET_WORKSPACE_OP_SERVERS[0]
+
+        request = models.ChainsGetWorkspaceRequest(
+            workspace_id=workspace_id,
+        )
+
+        req = self._build_request(
+            method="GET",
+            path="/v1/metadata/workspace/{workspace_id}",
+            base_url=base_url,
+            url_variables=url_variables,
+            request=request,
+            request_body_required=False,
+            request_has_path_params=True,
+            request_has_query_params=True,
+            user_agent_header="user-agent",
+            accept_header_value="application/json",
+            http_headers=http_headers,
+            security=self.sdk_configuration.security,
+            allow_empty_value=None,
+            timeout_ms=timeout_ms,
+        )
+
+        if retries == UNSET:
+            if self.sdk_configuration.retry_config is not UNSET:
+                retries = self.sdk_configuration.retry_config
+
+        retry_config = None
+        if isinstance(retries, utils.RetryConfig):
+            retry_config = (retries, ["429", "500", "502", "503", "504"])
+
+        http_res = self.do_request(
+            hook_ctx=HookContext(
+                config=self.sdk_configuration,
+                base_url=base_url or "",
+                operation_id="chains_getWorkspace",
+                oauth2_scopes=[],
+                security_source=self.sdk_configuration.security,
+            ),
+            request=req,
+            error_status_codes=["401", "404", "4XX", "5XX"],
+            retry_config=retry_config,
+        )
+
+        response_data: Any = None
+        if utils.match_response(http_res, "200", "application/json"):
+            return unmarshal_json_response(models.WorkspaceResponse, http_res)
+        if utils.match_response(http_res, ["401", "404"], "application/json"):
+            response_data = unmarshal_json_response(
+                errors.ChainSingleErrorData, http_res
+            )
+            raise errors.ChainSingleError(response_data, http_res)
+        if utils.match_response(http_res, "4XX", "*"):
+            http_res_text = utils.stream_to_text(http_res)
+            raise errors.SDKError("API error occurred", http_res, http_res_text)
+        if utils.match_response(http_res, "5XX", "*"):
+            http_res_text = utils.stream_to_text(http_res)
+            raise errors.SDKError("API error occurred", http_res, http_res_text)
+
+        raise errors.SDKError("Unexpected response received", http_res)
+
+    async def get_workspace_async(
+        self,
+        *,
+        workspace_id: str,
+        retries: OptionalNullable[utils.RetryConfig] = UNSET,
+        server_url: Optional[str] = None,
+        timeout_ms: Optional[int] = None,
+        http_headers: Optional[Mapping[str, str]] = None,
+    ) -> models.WorkspaceResponse:
+        r"""Return workspace properties
+
+        Returns properties for a workspace with the provided ID, or a 404 if no such workspace is found.
+
+        :param workspace_id: The ID of the Workspace.
+        :param retries: Override the default retry configuration for this method
+        :param server_url: Override the default server URL for this method
+        :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
+        :param http_headers: Additional headers to set or replace on requests.
+        """
+        base_url = None
+        url_variables = None
+        if timeout_ms is None:
+            timeout_ms = self.sdk_configuration.timeout_ms
+
+        if server_url is not None:
+            base_url = server_url
+        else:
+            base_url = models.CHAINS_GET_WORKSPACE_OP_SERVERS[0]
+
+        request = models.ChainsGetWorkspaceRequest(
+            workspace_id=workspace_id,
+        )
+
+        req = self._build_request_async(
+            method="GET",
+            path="/v1/metadata/workspace/{workspace_id}",
+            base_url=base_url,
+            url_variables=url_variables,
+            request=request,
+            request_body_required=False,
+            request_has_path_params=True,
+            request_has_query_params=True,
+            user_agent_header="user-agent",
+            accept_header_value="application/json",
+            http_headers=http_headers,
+            security=self.sdk_configuration.security,
+            allow_empty_value=None,
+            timeout_ms=timeout_ms,
+        )
+
+        if retries == UNSET:
+            if self.sdk_configuration.retry_config is not UNSET:
+                retries = self.sdk_configuration.retry_config
+
+        retry_config = None
+        if isinstance(retries, utils.RetryConfig):
+            retry_config = (retries, ["429", "500", "502", "503", "504"])
+
+        http_res = await self.do_request_async(
+            hook_ctx=HookContext(
+                config=self.sdk_configuration,
+                base_url=base_url or "",
+                operation_id="chains_getWorkspace",
+                oauth2_scopes=[],
+                security_source=self.sdk_configuration.security,
+            ),
+            request=req,
+            error_status_codes=["401", "404", "4XX", "5XX"],
+            retry_config=retry_config,
+        )
+
+        response_data: Any = None
+        if utils.match_response(http_res, "200", "application/json"):
+            return unmarshal_json_response(models.WorkspaceResponse, http_res)
+        if utils.match_response(http_res, ["401", "404"], "application/json"):
+            response_data = unmarshal_json_response(
+                errors.ChainSingleErrorData, http_res
+            )
+            raise errors.ChainSingleError(response_data, http_res)
+        if utils.match_response(http_res, "4XX", "*"):
+            http_res_text = await utils.stream_to_text_async(http_res)
+            raise errors.SDKError("API error occurred", http_res, http_res_text)
+        if utils.match_response(http_res, "5XX", "*"):
+            http_res_text = await utils.stream_to_text_async(http_res)
+            raise errors.SDKError("API error occurred", http_res, http_res_text)
+
+        raise errors.SDKError("Unexpected response received", http_res)
+
+    def get_environments(
+        self,
+        *,
+        workspace_id: str,
+        retries: OptionalNullable[utils.RetryConfig] = UNSET,
+        server_url: Optional[str] = None,
+        timeout_ms: Optional[int] = None,
+        http_headers: Optional[Mapping[str, str]] = None,
+    ) -> models.EnvironmentsResponse:
+        r"""Return a list of environments for a workspace
+
+        Return a list of environments for a workspace.
+
+        :param workspace_id: The ID of the Workspace.
+        :param retries: Override the default retry configuration for this method
+        :param server_url: Override the default server URL for this method
+        :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
+        :param http_headers: Additional headers to set or replace on requests.
+        """
+        base_url = None
+        url_variables = None
+        if timeout_ms is None:
+            timeout_ms = self.sdk_configuration.timeout_ms
+
+        if server_url is not None:
+            base_url = server_url
+        else:
+            base_url = models.CHAINS_GET_ENVIRONMENTS_OP_SERVERS[0]
+
+        request = models.ChainsGetEnvironmentsRequest(
+            workspace_id=workspace_id,
+        )
+
+        req = self._build_request(
+            method="GET",
+            path="/v1/metadata/workspace/{workspace_id}/environment",
+            base_url=base_url,
+            url_variables=url_variables,
+            request=request,
+            request_body_required=False,
+            request_has_path_params=True,
+            request_has_query_params=True,
+            user_agent_header="user-agent",
+            accept_header_value="application/json",
+            http_headers=http_headers,
+            security=self.sdk_configuration.security,
+            allow_empty_value=None,
+            timeout_ms=timeout_ms,
+        )
+
+        if retries == UNSET:
+            if self.sdk_configuration.retry_config is not UNSET:
+                retries = self.sdk_configuration.retry_config
+
+        retry_config = None
+        if isinstance(retries, utils.RetryConfig):
+            retry_config = (retries, ["429", "500", "502", "503", "504"])
+
+        http_res = self.do_request(
+            hook_ctx=HookContext(
+                config=self.sdk_configuration,
+                base_url=base_url or "",
+                operation_id="chains_getEnvironments",
+                oauth2_scopes=[],
+                security_source=self.sdk_configuration.security,
+            ),
+            request=req,
+            error_status_codes=["401", "404", "4XX", "5XX"],
+            retry_config=retry_config,
+        )
+
+        response_data: Any = None
+        if utils.match_response(http_res, "200", "application/json"):
+            return unmarshal_json_response(models.EnvironmentsResponse, http_res)
+        if utils.match_response(http_res, ["401", "404"], "application/json"):
+            response_data = unmarshal_json_response(
+                errors.ChainSingleErrorData, http_res
+            )
+            raise errors.ChainSingleError(response_data, http_res)
+        if utils.match_response(http_res, "4XX", "*"):
+            http_res_text = utils.stream_to_text(http_res)
+            raise errors.SDKError("API error occurred", http_res, http_res_text)
+        if utils.match_response(http_res, "5XX", "*"):
+            http_res_text = utils.stream_to_text(http_res)
+            raise errors.SDKError("API error occurred", http_res, http_res_text)
+
+        raise errors.SDKError("Unexpected response received", http_res)
+
+    async def get_environments_async(
+        self,
+        *,
+        workspace_id: str,
+        retries: OptionalNullable[utils.RetryConfig] = UNSET,
+        server_url: Optional[str] = None,
+        timeout_ms: Optional[int] = None,
+        http_headers: Optional[Mapping[str, str]] = None,
+    ) -> models.EnvironmentsResponse:
+        r"""Return a list of environments for a workspace
+
+        Return a list of environments for a workspace.
+
+        :param workspace_id: The ID of the Workspace.
+        :param retries: Override the default retry configuration for this method
+        :param server_url: Override the default server URL for this method
+        :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
+        :param http_headers: Additional headers to set or replace on requests.
+        """
+        base_url = None
+        url_variables = None
+        if timeout_ms is None:
+            timeout_ms = self.sdk_configuration.timeout_ms
+
+        if server_url is not None:
+            base_url = server_url
+        else:
+            base_url = models.CHAINS_GET_ENVIRONMENTS_OP_SERVERS[0]
+
+        request = models.ChainsGetEnvironmentsRequest(
+            workspace_id=workspace_id,
+        )
+
+        req = self._build_request_async(
+            method="GET",
+            path="/v1/metadata/workspace/{workspace_id}/environment",
+            base_url=base_url,
+            url_variables=url_variables,
+            request=request,
+            request_body_required=False,
+            request_has_path_params=True,
+            request_has_query_params=True,
+            user_agent_header="user-agent",
+            accept_header_value="application/json",
+            http_headers=http_headers,
+            security=self.sdk_configuration.security,
+            allow_empty_value=None,
+            timeout_ms=timeout_ms,
+        )
+
+        if retries == UNSET:
+            if self.sdk_configuration.retry_config is not UNSET:
+                retries = self.sdk_configuration.retry_config
+
+        retry_config = None
+        if isinstance(retries, utils.RetryConfig):
+            retry_config = (retries, ["429", "500", "502", "503", "504"])
+
+        http_res = await self.do_request_async(
+            hook_ctx=HookContext(
+                config=self.sdk_configuration,
+                base_url=base_url or "",
+                operation_id="chains_getEnvironments",
+                oauth2_scopes=[],
+                security_source=self.sdk_configuration.security,
+            ),
+            request=req,
+            error_status_codes=["401", "404", "4XX", "5XX"],
+            retry_config=retry_config,
+        )
+
+        response_data: Any = None
+        if utils.match_response(http_res, "200", "application/json"):
+            return unmarshal_json_response(models.EnvironmentsResponse, http_res)
+        if utils.match_response(http_res, ["401", "404"], "application/json"):
+            response_data = unmarshal_json_response(
+                errors.ChainSingleErrorData, http_res
+            )
+            raise errors.ChainSingleError(response_data, http_res)
+        if utils.match_response(http_res, "4XX", "*"):
+            http_res_text = await utils.stream_to_text_async(http_res)
+            raise errors.SDKError("API error occurred", http_res, http_res_text)
+        if utils.match_response(http_res, "5XX", "*"):
+            http_res_text = await utils.stream_to_text_async(http_res)
+            raise errors.SDKError("API error occurred", http_res, http_res_text)
+
+        raise errors.SDKError("Unexpected response received", http_res)
+
+    def get_environment(
+        self,
+        *,
+        workspace_id: str,
+        environment_id: str,
+        retries: OptionalNullable[utils.RetryConfig] = UNSET,
+        server_url: Optional[str] = None,
+        timeout_ms: Optional[int] = None,
+        http_headers: Optional[Mapping[str, str]] = None,
+    ) -> models.EnvironmentResponse:
+        r"""Return environment properties
+
+        Return properties for an environment in a workspace with the provided IDs, or a 404 if no such workspace is found.
+
+        :param workspace_id: The ID of the Workspace.
+        :param environment_id: The ID of the Environment.
+        :param retries: Override the default retry configuration for this method
+        :param server_url: Override the default server URL for this method
+        :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
+        :param http_headers: Additional headers to set or replace on requests.
+        """
+        base_url = None
+        url_variables = None
+        if timeout_ms is None:
+            timeout_ms = self.sdk_configuration.timeout_ms
+
+        if server_url is not None:
+            base_url = server_url
+        else:
+            base_url = models.CHAINS_GET_ENVIRONMENT_OP_SERVERS[0]
+
+        request = models.ChainsGetEnvironmentRequest(
+            workspace_id=workspace_id,
+            environment_id=environment_id,
+        )
+
+        req = self._build_request(
+            method="GET",
+            path="/v1/metadata/workspace/{workspace_id}/environment/{environment_id}",
+            base_url=base_url,
+            url_variables=url_variables,
+            request=request,
+            request_body_required=False,
+            request_has_path_params=True,
+            request_has_query_params=True,
+            user_agent_header="user-agent",
+            accept_header_value="application/json",
+            http_headers=http_headers,
+            security=self.sdk_configuration.security,
+            allow_empty_value=None,
+            timeout_ms=timeout_ms,
+        )
+
+        if retries == UNSET:
+            if self.sdk_configuration.retry_config is not UNSET:
+                retries = self.sdk_configuration.retry_config
+
+        retry_config = None
+        if isinstance(retries, utils.RetryConfig):
+            retry_config = (retries, ["429", "500", "502", "503", "504"])
+
+        http_res = self.do_request(
+            hook_ctx=HookContext(
+                config=self.sdk_configuration,
+                base_url=base_url or "",
+                operation_id="chains_getEnvironment",
+                oauth2_scopes=[],
+                security_source=self.sdk_configuration.security,
+            ),
+            request=req,
+            error_status_codes=["401", "404", "4XX", "5XX"],
+            retry_config=retry_config,
+        )
+
+        response_data: Any = None
+        if utils.match_response(http_res, "200", "application/json"):
+            return unmarshal_json_response(models.EnvironmentResponse, http_res)
+        if utils.match_response(http_res, ["401", "404"], "application/json"):
+            response_data = unmarshal_json_response(
+                errors.ChainSingleErrorData, http_res
+            )
+            raise errors.ChainSingleError(response_data, http_res)
+        if utils.match_response(http_res, "4XX", "*"):
+            http_res_text = utils.stream_to_text(http_res)
+            raise errors.SDKError("API error occurred", http_res, http_res_text)
+        if utils.match_response(http_res, "5XX", "*"):
+            http_res_text = utils.stream_to_text(http_res)
+            raise errors.SDKError("API error occurred", http_res, http_res_text)
+
+        raise errors.SDKError("Unexpected response received", http_res)
+
+    async def get_environment_async(
+        self,
+        *,
+        workspace_id: str,
+        environment_id: str,
+        retries: OptionalNullable[utils.RetryConfig] = UNSET,
+        server_url: Optional[str] = None,
+        timeout_ms: Optional[int] = None,
+        http_headers: Optional[Mapping[str, str]] = None,
+    ) -> models.EnvironmentResponse:
+        r"""Return environment properties
+
+        Return properties for an environment in a workspace with the provided IDs, or a 404 if no such workspace is found.
+
+        :param workspace_id: The ID of the Workspace.
+        :param environment_id: The ID of the Environment.
+        :param retries: Override the default retry configuration for this method
+        :param server_url: Override the default server URL for this method
+        :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
+        :param http_headers: Additional headers to set or replace on requests.
+        """
+        base_url = None
+        url_variables = None
+        if timeout_ms is None:
+            timeout_ms = self.sdk_configuration.timeout_ms
+
+        if server_url is not None:
+            base_url = server_url
+        else:
+            base_url = models.CHAINS_GET_ENVIRONMENT_OP_SERVERS[0]
+
+        request = models.ChainsGetEnvironmentRequest(
+            workspace_id=workspace_id,
+            environment_id=environment_id,
+        )
+
+        req = self._build_request_async(
+            method="GET",
+            path="/v1/metadata/workspace/{workspace_id}/environment/{environment_id}",
+            base_url=base_url,
+            url_variables=url_variables,
+            request=request,
+            request_body_required=False,
+            request_has_path_params=True,
+            request_has_query_params=True,
+            user_agent_header="user-agent",
+            accept_header_value="application/json",
+            http_headers=http_headers,
+            security=self.sdk_configuration.security,
+            allow_empty_value=None,
+            timeout_ms=timeout_ms,
+        )
+
+        if retries == UNSET:
+            if self.sdk_configuration.retry_config is not UNSET:
+                retries = self.sdk_configuration.retry_config
+
+        retry_config = None
+        if isinstance(retries, utils.RetryConfig):
+            retry_config = (retries, ["429", "500", "502", "503", "504"])
+
+        http_res = await self.do_request_async(
+            hook_ctx=HookContext(
+                config=self.sdk_configuration,
+                base_url=base_url or "",
+                operation_id="chains_getEnvironment",
+                oauth2_scopes=[],
+                security_source=self.sdk_configuration.security,
+            ),
+            request=req,
+            error_status_codes=["401", "404", "4XX", "5XX"],
+            retry_config=retry_config,
+        )
+
+        response_data: Any = None
+        if utils.match_response(http_res, "200", "application/json"):
+            return unmarshal_json_response(models.EnvironmentResponse, http_res)
+        if utils.match_response(http_res, ["401", "404"], "application/json"):
+            response_data = unmarshal_json_response(
+                errors.ChainSingleErrorData, http_res
+            )
+            raise errors.ChainSingleError(response_data, http_res)
+        if utils.match_response(http_res, "4XX", "*"):
+            http_res_text = await utils.stream_to_text_async(http_res)
+            raise errors.SDKError("API error occurred", http_res, http_res_text)
+        if utils.match_response(http_res, "5XX", "*"):
+            http_res_text = await utils.stream_to_text_async(http_res)
+            raise errors.SDKError("API error occurred", http_res, http_res_text)
+
+        raise errors.SDKError("Unexpected response received", http_res)
+
+    def get_authorizations_activity(
+        self,
+        *,
+        page_size: Optional[int] = None,
+        page: Optional[int] = None,
+        retries: OptionalNullable[utils.RetryConfig] = UNSET,
+        server_url: Optional[str] = None,
+        timeout_ms: Optional[int] = None,
+        http_headers: Optional[Mapping[str, str]] = None,
+    ) -> Optional[models.ChainsGetAuthorizationsActivityResponse]:
+        r"""Return a list of authorization activities
+
+        Returns a list of recent authorization activity events.
+
+        :param page_size: Limit number of results returned (Max 100).
+        :param page: Page number to retrieve in the paginated results (0-based index).
+        :param retries: Override the default retry configuration for this method
+        :param server_url: Override the default server URL for this method
+        :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
+        :param http_headers: Additional headers to set or replace on requests.
+        """
+        base_url = None
+        url_variables = None
+        if timeout_ms is None:
+            timeout_ms = self.sdk_configuration.timeout_ms
+
+        if server_url is not None:
+            base_url = server_url
+        else:
+            base_url = models.CHAINS_GET_AUTHORIZATIONS_ACTIVITY_OP_SERVERS[0]
+
+        request = models.ChainsGetAuthorizationsActivityRequest(
+            page_size=page_size,
+            page=page,
+        )
+
+        req = self._build_request(
+            method="GET",
+            path="/v1/security/authorizations_activity",
+            base_url=base_url,
+            url_variables=url_variables,
+            request=request,
+            request_body_required=False,
+            request_has_path_params=False,
+            request_has_query_params=True,
+            user_agent_header="user-agent",
+            accept_header_value="application/json",
+            http_headers=http_headers,
+            security=self.sdk_configuration.security,
+            allow_empty_value=None,
+            timeout_ms=timeout_ms,
+        )
+
+        if retries == UNSET:
+            if self.sdk_configuration.retry_config is not UNSET:
+                retries = self.sdk_configuration.retry_config
+
+        retry_config = None
+        if isinstance(retries, utils.RetryConfig):
+            retry_config = (retries, ["429", "500", "502", "503", "504"])
+
+        http_res = self.do_request(
+            hook_ctx=HookContext(
+                config=self.sdk_configuration,
+                base_url=base_url or "",
+                operation_id="chains_getAuthorizationsActivity",
+                oauth2_scopes=[],
+                security_source=self.sdk_configuration.security,
+            ),
+            request=req,
+            error_status_codes=["401", "4XX", "5XX"],
+            retry_config=retry_config,
+        )
+
+        def next_func() -> Optional[models.ChainsGetAuthorizationsActivityResponse]:
+            body = utils.unmarshal_json(http_res.text, Union[Dict[Any, Any], List[Any]])
+
+            page = request.page if not request.page is None else 1
+            next_page = page + 1
+
+            if not http_res.text:
+                return None
+            results = JSONPath("$.data").parse(body)
+            if len(results) == 0 or len(results[0]) == 0:
+                return None
+
+            return self.get_authorizations_activity(
+                page_size=page_size,
+                page=next_page,
+                retries=retries,
+                server_url=server_url,
+            )
+
+        response_data: Any = None
+        if utils.match_response(http_res, "200", "application/json"):
+            return models.ChainsGetAuthorizationsActivityResponse(
+                result=unmarshal_json_response(models.ActivityResponse, http_res),
+                next=next_func,
+            )
+        if utils.match_response(http_res, "401", "application/json"):
+            response_data = unmarshal_json_response(
+                errors.ChainSingleErrorData, http_res
+            )
+            raise errors.ChainSingleError(response_data, http_res)
+        if utils.match_response(http_res, "4XX", "*"):
+            http_res_text = utils.stream_to_text(http_res)
+            raise errors.SDKError("API error occurred", http_res, http_res_text)
+        if utils.match_response(http_res, "5XX", "*"):
+            http_res_text = utils.stream_to_text(http_res)
+            raise errors.SDKError("API error occurred", http_res, http_res_text)
+
+        raise errors.SDKError("Unexpected response received", http_res)
+
+    async def get_authorizations_activity_async(
+        self,
+        *,
+        page_size: Optional[int] = None,
+        page: Optional[int] = None,
+        retries: OptionalNullable[utils.RetryConfig] = UNSET,
+        server_url: Optional[str] = None,
+        timeout_ms: Optional[int] = None,
+        http_headers: Optional[Mapping[str, str]] = None,
+    ) -> Optional[models.ChainsGetAuthorizationsActivityResponse]:
+        r"""Return a list of authorization activities
+
+        Returns a list of recent authorization activity events.
+
+        :param page_size: Limit number of results returned (Max 100).
+        :param page: Page number to retrieve in the paginated results (0-based index).
+        :param retries: Override the default retry configuration for this method
+        :param server_url: Override the default server URL for this method
+        :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
+        :param http_headers: Additional headers to set or replace on requests.
+        """
+        base_url = None
+        url_variables = None
+        if timeout_ms is None:
+            timeout_ms = self.sdk_configuration.timeout_ms
+
+        if server_url is not None:
+            base_url = server_url
+        else:
+            base_url = models.CHAINS_GET_AUTHORIZATIONS_ACTIVITY_OP_SERVERS[0]
+
+        request = models.ChainsGetAuthorizationsActivityRequest(
+            page_size=page_size,
+            page=page,
+        )
+
+        req = self._build_request_async(
+            method="GET",
+            path="/v1/security/authorizations_activity",
+            base_url=base_url,
+            url_variables=url_variables,
+            request=request,
+            request_body_required=False,
+            request_has_path_params=False,
+            request_has_query_params=True,
+            user_agent_header="user-agent",
+            accept_header_value="application/json",
+            http_headers=http_headers,
+            security=self.sdk_configuration.security,
+            allow_empty_value=None,
+            timeout_ms=timeout_ms,
+        )
+
+        if retries == UNSET:
+            if self.sdk_configuration.retry_config is not UNSET:
+                retries = self.sdk_configuration.retry_config
+
+        retry_config = None
+        if isinstance(retries, utils.RetryConfig):
+            retry_config = (retries, ["429", "500", "502", "503", "504"])
+
+        http_res = await self.do_request_async(
+            hook_ctx=HookContext(
+                config=self.sdk_configuration,
+                base_url=base_url or "",
+                operation_id="chains_getAuthorizationsActivity",
+                oauth2_scopes=[],
+                security_source=self.sdk_configuration.security,
+            ),
+            request=req,
+            error_status_codes=["401", "4XX", "5XX"],
+            retry_config=retry_config,
+        )
+
+        def next_func() -> (
+            Awaitable[Optional[models.ChainsGetAuthorizationsActivityResponse]]
+        ):
+            body = utils.unmarshal_json(http_res.text, Union[Dict[Any, Any], List[Any]])
+
+            async def empty_result():
+                return None
+
+            page = request.page if not request.page is None else 1
+            next_page = page + 1
+
+            if not http_res.text:
+                return empty_result()
+            results = JSONPath("$.data").parse(body)
+            if len(results) == 0 or len(results[0]) == 0:
+                return empty_result()
+
+            return self.get_authorizations_activity_async(
+                page_size=page_size,
+                page=next_page,
+                retries=retries,
+                server_url=server_url,
+            )
+
+        response_data: Any = None
+        if utils.match_response(http_res, "200", "application/json"):
+            return models.ChainsGetAuthorizationsActivityResponse(
+                result=unmarshal_json_response(models.ActivityResponse, http_res),
+                next=next_func,
+            )
+        if utils.match_response(http_res, "401", "application/json"):
+            response_data = unmarshal_json_response(
+                errors.ChainSingleErrorData, http_res
+            )
+            raise errors.ChainSingleError(response_data, http_res)
+        if utils.match_response(http_res, "4XX", "*"):
+            http_res_text = await utils.stream_to_text_async(http_res)
+            raise errors.SDKError("API error occurred", http_res, http_res_text)
+        if utils.match_response(http_res, "5XX", "*"):
+            http_res_text = await utils.stream_to_text_async(http_res)
+            raise errors.SDKError("API error occurred", http_res, http_res_text)
+
+        raise errors.SDKError("Unexpected response received", http_res)
+
+    def get_login_activity(
+        self,
+        *,
+        page_size: Optional[int] = None,
+        page: Optional[int] = None,
+        retries: OptionalNullable[utils.RetryConfig] = UNSET,
+        server_url: Optional[str] = None,
+        timeout_ms: Optional[int] = None,
+        http_headers: Optional[Mapping[str, str]] = None,
+    ) -> Optional[models.ChainsGetLoginActivityResponse]:
+        r"""Return a list of login activity events
+
+        Returns a list of recent login activity events.
+
+        :param page_size: Limit number of results returned (Max 100).
+        :param page: Page number to retrieve in the paginated results (0-based index).
+        :param retries: Override the default retry configuration for this method
+        :param server_url: Override the default server URL for this method
+        :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
+        :param http_headers: Additional headers to set or replace on requests.
+        """
+        base_url = None
+        url_variables = None
+        if timeout_ms is None:
+            timeout_ms = self.sdk_configuration.timeout_ms
+
+        if server_url is not None:
+            base_url = server_url
+        else:
+            base_url = models.CHAINS_GET_LOGIN_ACTIVITY_OP_SERVERS[0]
+
+        request = models.ChainsGetLoginActivityRequest(
+            page_size=page_size,
+            page=page,
+        )
+
+        req = self._build_request(
+            method="GET",
+            path="/v1/security/login_activity",
+            base_url=base_url,
+            url_variables=url_variables,
+            request=request,
+            request_body_required=False,
+            request_has_path_params=False,
+            request_has_query_params=True,
+            user_agent_header="user-agent",
+            accept_header_value="application/json",
+            http_headers=http_headers,
+            security=self.sdk_configuration.security,
+            allow_empty_value=None,
+            timeout_ms=timeout_ms,
+        )
+
+        if retries == UNSET:
+            if self.sdk_configuration.retry_config is not UNSET:
+                retries = self.sdk_configuration.retry_config
+
+        retry_config = None
+        if isinstance(retries, utils.RetryConfig):
+            retry_config = (retries, ["429", "500", "502", "503", "504"])
+
+        http_res = self.do_request(
+            hook_ctx=HookContext(
+                config=self.sdk_configuration,
+                base_url=base_url or "",
+                operation_id="chains_getLoginActivity",
+                oauth2_scopes=[],
+                security_source=self.sdk_configuration.security,
+            ),
+            request=req,
+            error_status_codes=["401", "4XX", "5XX"],
+            retry_config=retry_config,
+        )
+
+        def next_func() -> Optional[models.ChainsGetLoginActivityResponse]:
+            body = utils.unmarshal_json(http_res.text, Union[Dict[Any, Any], List[Any]])
+
+            page = request.page if not request.page is None else 1
+            next_page = page + 1
+
+            if not http_res.text:
+                return None
+            results = JSONPath("$.data").parse(body)
+            if len(results) == 0 or len(results[0]) == 0:
+                return None
+
+            return self.get_login_activity(
+                page_size=page_size,
+                page=next_page,
+                retries=retries,
+                server_url=server_url,
+            )
+
+        response_data: Any = None
+        if utils.match_response(http_res, "200", "application/json"):
+            return models.ChainsGetLoginActivityResponse(
+                result=unmarshal_json_response(models.LoginActivityResponse, http_res),
+                next=next_func,
+            )
+        if utils.match_response(http_res, "401", "application/json"):
+            response_data = unmarshal_json_response(
+                errors.ChainSingleErrorData, http_res
+            )
+            raise errors.ChainSingleError(response_data, http_res)
+        if utils.match_response(http_res, "4XX", "*"):
+            http_res_text = utils.stream_to_text(http_res)
+            raise errors.SDKError("API error occurred", http_res, http_res_text)
+        if utils.match_response(http_res, "5XX", "*"):
+            http_res_text = utils.stream_to_text(http_res)
+            raise errors.SDKError("API error occurred", http_res, http_res_text)
+
+        raise errors.SDKError("Unexpected response received", http_res)
+
+    async def get_login_activity_async(
+        self,
+        *,
+        page_size: Optional[int] = None,
+        page: Optional[int] = None,
+        retries: OptionalNullable[utils.RetryConfig] = UNSET,
+        server_url: Optional[str] = None,
+        timeout_ms: Optional[int] = None,
+        http_headers: Optional[Mapping[str, str]] = None,
+    ) -> Optional[models.ChainsGetLoginActivityResponse]:
+        r"""Return a list of login activity events
+
+        Returns a list of recent login activity events.
+
+        :param page_size: Limit number of results returned (Max 100).
+        :param page: Page number to retrieve in the paginated results (0-based index).
+        :param retries: Override the default retry configuration for this method
+        :param server_url: Override the default server URL for this method
+        :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
+        :param http_headers: Additional headers to set or replace on requests.
+        """
+        base_url = None
+        url_variables = None
+        if timeout_ms is None:
+            timeout_ms = self.sdk_configuration.timeout_ms
+
+        if server_url is not None:
+            base_url = server_url
+        else:
+            base_url = models.CHAINS_GET_LOGIN_ACTIVITY_OP_SERVERS[0]
+
+        request = models.ChainsGetLoginActivityRequest(
+            page_size=page_size,
+            page=page,
+        )
+
+        req = self._build_request_async(
+            method="GET",
+            path="/v1/security/login_activity",
+            base_url=base_url,
+            url_variables=url_variables,
+            request=request,
+            request_body_required=False,
+            request_has_path_params=False,
+            request_has_query_params=True,
+            user_agent_header="user-agent",
+            accept_header_value="application/json",
+            http_headers=http_headers,
+            security=self.sdk_configuration.security,
+            allow_empty_value=None,
+            timeout_ms=timeout_ms,
+        )
+
+        if retries == UNSET:
+            if self.sdk_configuration.retry_config is not UNSET:
+                retries = self.sdk_configuration.retry_config
+
+        retry_config = None
+        if isinstance(retries, utils.RetryConfig):
+            retry_config = (retries, ["429", "500", "502", "503", "504"])
+
+        http_res = await self.do_request_async(
+            hook_ctx=HookContext(
+                config=self.sdk_configuration,
+                base_url=base_url or "",
+                operation_id="chains_getLoginActivity",
+                oauth2_scopes=[],
+                security_source=self.sdk_configuration.security,
+            ),
+            request=req,
+            error_status_codes=["401", "4XX", "5XX"],
+            retry_config=retry_config,
+        )
+
+        def next_func() -> Awaitable[Optional[models.ChainsGetLoginActivityResponse]]:
+            body = utils.unmarshal_json(http_res.text, Union[Dict[Any, Any], List[Any]])
+
+            async def empty_result():
+                return None
+
+            page = request.page if not request.page is None else 1
+            next_page = page + 1
+
+            if not http_res.text:
+                return empty_result()
+            results = JSONPath("$.data").parse(body)
+            if len(results) == 0 or len(results[0]) == 0:
+                return empty_result()
+
+            return self.get_login_activity_async(
+                page_size=page_size,
+                page=next_page,
+                retries=retries,
+                server_url=server_url,
+            )
+
+        response_data: Any = None
+        if utils.match_response(http_res, "200", "application/json"):
+            return models.ChainsGetLoginActivityResponse(
+                result=unmarshal_json_response(models.LoginActivityResponse, http_res),
+                next=next_func,
+            )
+        if utils.match_response(http_res, "401", "application/json"):
+            response_data = unmarshal_json_response(
+                errors.ChainSingleErrorData, http_res
+            )
+            raise errors.ChainSingleError(response_data, http_res)
+        if utils.match_response(http_res, "4XX", "*"):
+            http_res_text = await utils.stream_to_text_async(http_res)
+            raise errors.SDKError("API error occurred", http_res, http_res_text)
+        if utils.match_response(http_res, "5XX", "*"):
+            http_res_text = await utils.stream_to_text_async(http_res)
+            raise errors.SDKError("API error occurred", http_res, http_res_text)
+
+        raise errors.SDKError("Unexpected response received", http_res)
+
+    def get_permissions(
+        self,
+        *,
+        page_size: Optional[int] = None,
+        page: Optional[int] = None,
+        retries: OptionalNullable[utils.RetryConfig] = UNSET,
+        server_url: Optional[str] = None,
+        timeout_ms: Optional[int] = None,
+        http_headers: Optional[Mapping[str, str]] = None,
+    ) -> Optional[models.ChainsGetPermissionsResponse]:
+        r"""Return a list of all permissions for a company
+
+        Returns a list of all permissions for a company.
+
+        :param page_size: Limit number of results returned (Max 100).
+        :param page: Page number to retrieve in the paginated results (0-based index).
+        :param retries: Override the default retry configuration for this method
+        :param server_url: Override the default server URL for this method
+        :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
+        :param http_headers: Additional headers to set or replace on requests.
+        """
+        base_url = None
+        url_variables = None
+        if timeout_ms is None:
+            timeout_ms = self.sdk_configuration.timeout_ms
+
+        if server_url is not None:
+            base_url = server_url
+        else:
+            base_url = models.CHAINS_GET_PERMISSIONS_OP_SERVERS[0]
+
+        request = models.ChainsGetPermissionsRequest(
+            page_size=page_size,
+            page=page,
+        )
+
+        req = self._build_request(
+            method="GET",
+            path="/v1/security/permissions",
+            base_url=base_url,
+            url_variables=url_variables,
+            request=request,
+            request_body_required=False,
+            request_has_path_params=False,
+            request_has_query_params=True,
+            user_agent_header="user-agent",
+            accept_header_value="application/json",
+            http_headers=http_headers,
+            security=self.sdk_configuration.security,
+            allow_empty_value=None,
+            timeout_ms=timeout_ms,
+        )
+
+        if retries == UNSET:
+            if self.sdk_configuration.retry_config is not UNSET:
+                retries = self.sdk_configuration.retry_config
+
+        retry_config = None
+        if isinstance(retries, utils.RetryConfig):
+            retry_config = (retries, ["429", "500", "502", "503", "504"])
+
+        http_res = self.do_request(
+            hook_ctx=HookContext(
+                config=self.sdk_configuration,
+                base_url=base_url or "",
+                operation_id="chains_getPermissions",
+                oauth2_scopes=[],
+                security_source=self.sdk_configuration.security,
+            ),
+            request=req,
+            error_status_codes=["401", "4XX", "5XX"],
+            retry_config=retry_config,
+        )
+
+        def next_func() -> Optional[models.ChainsGetPermissionsResponse]:
+            body = utils.unmarshal_json(http_res.text, Union[Dict[Any, Any], List[Any]])
+
+            page = request.page if not request.page is None else 1
+            next_page = page + 1
+
+            if not http_res.text:
+                return None
+            results = JSONPath("$.data").parse(body)
+            if len(results) == 0 or len(results[0]) == 0:
+                return None
+
+            return self.get_permissions(
+                page_size=page_size,
+                page=next_page,
+                retries=retries,
+                server_url=server_url,
+            )
+
+        response_data: Any = None
+        if utils.match_response(http_res, "200", "application/json"):
+            return models.ChainsGetPermissionsResponse(
+                result=unmarshal_json_response(models.PermissionsResponse, http_res),
+                next=next_func,
+            )
+        if utils.match_response(http_res, "401", "application/json"):
+            response_data = unmarshal_json_response(
+                errors.ChainSingleErrorData, http_res
+            )
+            raise errors.ChainSingleError(response_data, http_res)
+        if utils.match_response(http_res, "4XX", "*"):
+            http_res_text = utils.stream_to_text(http_res)
+            raise errors.SDKError("API error occurred", http_res, http_res_text)
+        if utils.match_response(http_res, "5XX", "*"):
+            http_res_text = utils.stream_to_text(http_res)
+            raise errors.SDKError("API error occurred", http_res, http_res_text)
+
+        raise errors.SDKError("Unexpected response received", http_res)
+
+    async def get_permissions_async(
+        self,
+        *,
+        page_size: Optional[int] = None,
+        page: Optional[int] = None,
+        retries: OptionalNullable[utils.RetryConfig] = UNSET,
+        server_url: Optional[str] = None,
+        timeout_ms: Optional[int] = None,
+        http_headers: Optional[Mapping[str, str]] = None,
+    ) -> Optional[models.ChainsGetPermissionsResponse]:
+        r"""Return a list of all permissions for a company
+
+        Returns a list of all permissions for a company.
+
+        :param page_size: Limit number of results returned (Max 100).
+        :param page: Page number to retrieve in the paginated results (0-based index).
+        :param retries: Override the default retry configuration for this method
+        :param server_url: Override the default server URL for this method
+        :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
+        :param http_headers: Additional headers to set or replace on requests.
+        """
+        base_url = None
+        url_variables = None
+        if timeout_ms is None:
+            timeout_ms = self.sdk_configuration.timeout_ms
+
+        if server_url is not None:
+            base_url = server_url
+        else:
+            base_url = models.CHAINS_GET_PERMISSIONS_OP_SERVERS[0]
+
+        request = models.ChainsGetPermissionsRequest(
+            page_size=page_size,
+            page=page,
+        )
+
+        req = self._build_request_async(
+            method="GET",
+            path="/v1/security/permissions",
+            base_url=base_url,
+            url_variables=url_variables,
+            request=request,
+            request_body_required=False,
+            request_has_path_params=False,
+            request_has_query_params=True,
+            user_agent_header="user-agent",
+            accept_header_value="application/json",
+            http_headers=http_headers,
+            security=self.sdk_configuration.security,
+            allow_empty_value=None,
+            timeout_ms=timeout_ms,
+        )
+
+        if retries == UNSET:
+            if self.sdk_configuration.retry_config is not UNSET:
+                retries = self.sdk_configuration.retry_config
+
+        retry_config = None
+        if isinstance(retries, utils.RetryConfig):
+            retry_config = (retries, ["429", "500", "502", "503", "504"])
+
+        http_res = await self.do_request_async(
+            hook_ctx=HookContext(
+                config=self.sdk_configuration,
+                base_url=base_url or "",
+                operation_id="chains_getPermissions",
+                oauth2_scopes=[],
+                security_source=self.sdk_configuration.security,
+            ),
+            request=req,
+            error_status_codes=["401", "4XX", "5XX"],
+            retry_config=retry_config,
+        )
+
+        def next_func() -> Awaitable[Optional[models.ChainsGetPermissionsResponse]]:
+            body = utils.unmarshal_json(http_res.text, Union[Dict[Any, Any], List[Any]])
+
+            async def empty_result():
+                return None
+
+            page = request.page if not request.page is None else 1
+            next_page = page + 1
+
+            if not http_res.text:
+                return empty_result()
+            results = JSONPath("$.data").parse(body)
+            if len(results) == 0 or len(results[0]) == 0:
+                return empty_result()
+
+            return self.get_permissions_async(
+                page_size=page_size,
+                page=next_page,
+                retries=retries,
+                server_url=server_url,
+            )
+
+        response_data: Any = None
+        if utils.match_response(http_res, "200", "application/json"):
+            return models.ChainsGetPermissionsResponse(
+                result=unmarshal_json_response(models.PermissionsResponse, http_res),
+                next=next_func,
+            )
+        if utils.match_response(http_res, "401", "application/json"):
+            response_data = unmarshal_json_response(
+                errors.ChainSingleErrorData, http_res
+            )
+            raise errors.ChainSingleError(response_data, http_res)
+        if utils.match_response(http_res, "4XX", "*"):
+            http_res_text = await utils.stream_to_text_async(http_res)
+            raise errors.SDKError("API error occurred", http_res, http_res_text)
+        if utils.match_response(http_res, "5XX", "*"):
+            http_res_text = await utils.stream_to_text_async(http_res)
+            raise errors.SDKError("API error occurred", http_res, http_res_text)
+
+        raise errors.SDKError("Unexpected response received", http_res)
+
+    def get_user_groups(
+        self,
+        *,
+        page_size: Optional[int] = None,
+        page: Optional[int] = None,
+        retries: OptionalNullable[utils.RetryConfig] = UNSET,
+        server_url: Optional[str] = None,
+        timeout_ms: Optional[int] = None,
+        http_headers: Optional[Mapping[str, str]] = None,
+    ) -> Optional[models.ChainsGetUserGroupsResponse]:
+        r"""Return a list of all user groups
+
+        Returns a list of all user groups in a company.
+
+        :param page_size: Limit number of results returned (Max 100).
+        :param page: Page number to retrieve in the paginated results (0-based index).
+        :param retries: Override the default retry configuration for this method
+        :param server_url: Override the default server URL for this method
+        :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
+        :param http_headers: Additional headers to set or replace on requests.
+        """
+        base_url = None
+        url_variables = None
+        if timeout_ms is None:
+            timeout_ms = self.sdk_configuration.timeout_ms
+
+        if server_url is not None:
+            base_url = server_url
+        else:
+            base_url = models.CHAINS_GET_USER_GROUPS_OP_SERVERS[0]
+
+        request = models.ChainsGetUserGroupsRequest(
+            page_size=page_size,
+            page=page,
+        )
+
+        req = self._build_request(
+            method="GET",
+            path="/v1/security/user_groups",
+            base_url=base_url,
+            url_variables=url_variables,
+            request=request,
+            request_body_required=False,
+            request_has_path_params=False,
+            request_has_query_params=True,
+            user_agent_header="user-agent",
+            accept_header_value="application/json",
+            http_headers=http_headers,
+            security=self.sdk_configuration.security,
+            allow_empty_value=None,
+            timeout_ms=timeout_ms,
+        )
+
+        if retries == UNSET:
+            if self.sdk_configuration.retry_config is not UNSET:
+                retries = self.sdk_configuration.retry_config
+
+        retry_config = None
+        if isinstance(retries, utils.RetryConfig):
+            retry_config = (retries, ["429", "500", "502", "503", "504"])
+
+        http_res = self.do_request(
+            hook_ctx=HookContext(
+                config=self.sdk_configuration,
+                base_url=base_url or "",
+                operation_id="chains_getUserGroups",
+                oauth2_scopes=[],
+                security_source=self.sdk_configuration.security,
+            ),
+            request=req,
+            error_status_codes=["401", "4XX", "5XX"],
+            retry_config=retry_config,
+        )
+
+        def next_func() -> Optional[models.ChainsGetUserGroupsResponse]:
+            body = utils.unmarshal_json(http_res.text, Union[Dict[Any, Any], List[Any]])
+
+            page = request.page if not request.page is None else 1
+            next_page = page + 1
+
+            if not http_res.text:
+                return None
+            results = JSONPath("$.data").parse(body)
+            if len(results) == 0 or len(results[0]) == 0:
+                return None
+
+            return self.get_user_groups(
+                page_size=page_size,
+                page=next_page,
+                retries=retries,
+                server_url=server_url,
+            )
+
+        response_data: Any = None
+        if utils.match_response(http_res, "200", "application/json"):
+            return models.ChainsGetUserGroupsResponse(
+                result=unmarshal_json_response(models.UserGroupsResponse, http_res),
+                next=next_func,
+            )
+        if utils.match_response(http_res, "401", "application/json"):
+            response_data = unmarshal_json_response(
+                errors.ChainSingleErrorData, http_res
+            )
+            raise errors.ChainSingleError(response_data, http_res)
+        if utils.match_response(http_res, "4XX", "*"):
+            http_res_text = utils.stream_to_text(http_res)
+            raise errors.SDKError("API error occurred", http_res, http_res_text)
+        if utils.match_response(http_res, "5XX", "*"):
+            http_res_text = utils.stream_to_text(http_res)
+            raise errors.SDKError("API error occurred", http_res, http_res_text)
+
+        raise errors.SDKError("Unexpected response received", http_res)
+
+    async def get_user_groups_async(
+        self,
+        *,
+        page_size: Optional[int] = None,
+        page: Optional[int] = None,
+        retries: OptionalNullable[utils.RetryConfig] = UNSET,
+        server_url: Optional[str] = None,
+        timeout_ms: Optional[int] = None,
+        http_headers: Optional[Mapping[str, str]] = None,
+    ) -> Optional[models.ChainsGetUserGroupsResponse]:
+        r"""Return a list of all user groups
+
+        Returns a list of all user groups in a company.
+
+        :param page_size: Limit number of results returned (Max 100).
+        :param page: Page number to retrieve in the paginated results (0-based index).
+        :param retries: Override the default retry configuration for this method
+        :param server_url: Override the default server URL for this method
+        :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
+        :param http_headers: Additional headers to set or replace on requests.
+        """
+        base_url = None
+        url_variables = None
+        if timeout_ms is None:
+            timeout_ms = self.sdk_configuration.timeout_ms
+
+        if server_url is not None:
+            base_url = server_url
+        else:
+            base_url = models.CHAINS_GET_USER_GROUPS_OP_SERVERS[0]
+
+        request = models.ChainsGetUserGroupsRequest(
+            page_size=page_size,
+            page=page,
+        )
+
+        req = self._build_request_async(
+            method="GET",
+            path="/v1/security/user_groups",
+            base_url=base_url,
+            url_variables=url_variables,
+            request=request,
+            request_body_required=False,
+            request_has_path_params=False,
+            request_has_query_params=True,
+            user_agent_header="user-agent",
+            accept_header_value="application/json",
+            http_headers=http_headers,
+            security=self.sdk_configuration.security,
+            allow_empty_value=None,
+            timeout_ms=timeout_ms,
+        )
+
+        if retries == UNSET:
+            if self.sdk_configuration.retry_config is not UNSET:
+                retries = self.sdk_configuration.retry_config
+
+        retry_config = None
+        if isinstance(retries, utils.RetryConfig):
+            retry_config = (retries, ["429", "500", "502", "503", "504"])
+
+        http_res = await self.do_request_async(
+            hook_ctx=HookContext(
+                config=self.sdk_configuration,
+                base_url=base_url or "",
+                operation_id="chains_getUserGroups",
+                oauth2_scopes=[],
+                security_source=self.sdk_configuration.security,
+            ),
+            request=req,
+            error_status_codes=["401", "4XX", "5XX"],
+            retry_config=retry_config,
+        )
+
+        def next_func() -> Awaitable[Optional[models.ChainsGetUserGroupsResponse]]:
+            body = utils.unmarshal_json(http_res.text, Union[Dict[Any, Any], List[Any]])
+
+            async def empty_result():
+                return None
+
+            page = request.page if not request.page is None else 1
+            next_page = page + 1
+
+            if not http_res.text:
+                return empty_result()
+            results = JSONPath("$.data").parse(body)
+            if len(results) == 0 or len(results[0]) == 0:
+                return empty_result()
+
+            return self.get_user_groups_async(
+                page_size=page_size,
+                page=next_page,
+                retries=retries,
+                server_url=server_url,
+            )
+
+        response_data: Any = None
+        if utils.match_response(http_res, "200", "application/json"):
+            return models.ChainsGetUserGroupsResponse(
+                result=unmarshal_json_response(models.UserGroupsResponse, http_res),
+                next=next_func,
+            )
+        if utils.match_response(http_res, "401", "application/json"):
+            response_data = unmarshal_json_response(
+                errors.ChainSingleErrorData, http_res
+            )
+            raise errors.ChainSingleError(response_data, http_res)
+        if utils.match_response(http_res, "4XX", "*"):
+            http_res_text = await utils.stream_to_text_async(http_res)
+            raise errors.SDKError("API error occurred", http_res, http_res_text)
+        if utils.match_response(http_res, "5XX", "*"):
+            http_res_text = await utils.stream_to_text_async(http_res)
+            raise errors.SDKError("API error occurred", http_res, http_res_text)
+
+        raise errors.SDKError("Unexpected response received", http_res)
+
+    def get_user_group(
+        self,
+        *,
+        user_group_id: str,
+        retries: OptionalNullable[utils.RetryConfig] = UNSET,
+        server_url: Optional[str] = None,
+        timeout_ms: Optional[int] = None,
+        http_headers: Optional[Mapping[str, str]] = None,
+    ) -> models.UserGroupResponse:
+        r"""Return user group properties
+
+        Return properties for a user group with the provided ID, or a 404 if no such user group is found.
+
+        :param user_group_id: The ID of the User Group.
+        :param retries: Override the default retry configuration for this method
+        :param server_url: Override the default server URL for this method
+        :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
+        :param http_headers: Additional headers to set or replace on requests.
+        """
+        base_url = None
+        url_variables = None
+        if timeout_ms is None:
+            timeout_ms = self.sdk_configuration.timeout_ms
+
+        if server_url is not None:
+            base_url = server_url
+        else:
+            base_url = models.CHAINS_GET_USER_GROUP_OP_SERVERS[0]
+
+        request = models.ChainsGetUserGroupRequest(
+            user_group_id=user_group_id,
+        )
+
+        req = self._build_request(
+            method="GET",
+            path="/v1/security/user_groups/{userGroupId}",
+            base_url=base_url,
+            url_variables=url_variables,
+            request=request,
+            request_body_required=False,
+            request_has_path_params=True,
+            request_has_query_params=True,
+            user_agent_header="user-agent",
+            accept_header_value="application/json",
+            http_headers=http_headers,
+            security=self.sdk_configuration.security,
+            allow_empty_value=None,
+            timeout_ms=timeout_ms,
+        )
+
+        if retries == UNSET:
+            if self.sdk_configuration.retry_config is not UNSET:
+                retries = self.sdk_configuration.retry_config
+
+        retry_config = None
+        if isinstance(retries, utils.RetryConfig):
+            retry_config = (retries, ["429", "500", "502", "503", "504"])
+
+        http_res = self.do_request(
+            hook_ctx=HookContext(
+                config=self.sdk_configuration,
+                base_url=base_url or "",
+                operation_id="chains_getUserGroup",
+                oauth2_scopes=[],
+                security_source=self.sdk_configuration.security,
+            ),
+            request=req,
+            error_status_codes=["401", "4XX", "5XX"],
+            retry_config=retry_config,
+        )
+
+        response_data: Any = None
+        if utils.match_response(http_res, "200", "application/json"):
+            return unmarshal_json_response(models.UserGroupResponse, http_res)
+        if utils.match_response(http_res, "401", "application/json"):
+            response_data = unmarshal_json_response(
+                errors.ChainSingleErrorData, http_res
+            )
+            raise errors.ChainSingleError(response_data, http_res)
+        if utils.match_response(http_res, "4XX", "*"):
+            http_res_text = utils.stream_to_text(http_res)
+            raise errors.SDKError("API error occurred", http_res, http_res_text)
+        if utils.match_response(http_res, "5XX", "*"):
+            http_res_text = utils.stream_to_text(http_res)
+            raise errors.SDKError("API error occurred", http_res, http_res_text)
+
+        raise errors.SDKError("Unexpected response received", http_res)
+
+    async def get_user_group_async(
+        self,
+        *,
+        user_group_id: str,
+        retries: OptionalNullable[utils.RetryConfig] = UNSET,
+        server_url: Optional[str] = None,
+        timeout_ms: Optional[int] = None,
+        http_headers: Optional[Mapping[str, str]] = None,
+    ) -> models.UserGroupResponse:
+        r"""Return user group properties
+
+        Return properties for a user group with the provided ID, or a 404 if no such user group is found.
+
+        :param user_group_id: The ID of the User Group.
+        :param retries: Override the default retry configuration for this method
+        :param server_url: Override the default server URL for this method
+        :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
+        :param http_headers: Additional headers to set or replace on requests.
+        """
+        base_url = None
+        url_variables = None
+        if timeout_ms is None:
+            timeout_ms = self.sdk_configuration.timeout_ms
+
+        if server_url is not None:
+            base_url = server_url
+        else:
+            base_url = models.CHAINS_GET_USER_GROUP_OP_SERVERS[0]
+
+        request = models.ChainsGetUserGroupRequest(
+            user_group_id=user_group_id,
+        )
+
+        req = self._build_request_async(
+            method="GET",
+            path="/v1/security/user_groups/{userGroupId}",
+            base_url=base_url,
+            url_variables=url_variables,
+            request=request,
+            request_body_required=False,
+            request_has_path_params=True,
+            request_has_query_params=True,
+            user_agent_header="user-agent",
+            accept_header_value="application/json",
+            http_headers=http_headers,
+            security=self.sdk_configuration.security,
+            allow_empty_value=None,
+            timeout_ms=timeout_ms,
+        )
+
+        if retries == UNSET:
+            if self.sdk_configuration.retry_config is not UNSET:
+                retries = self.sdk_configuration.retry_config
+
+        retry_config = None
+        if isinstance(retries, utils.RetryConfig):
+            retry_config = (retries, ["429", "500", "502", "503", "504"])
+
+        http_res = await self.do_request_async(
+            hook_ctx=HookContext(
+                config=self.sdk_configuration,
+                base_url=base_url or "",
+                operation_id="chains_getUserGroup",
+                oauth2_scopes=[],
+                security_source=self.sdk_configuration.security,
+            ),
+            request=req,
+            error_status_codes=["401", "4XX", "5XX"],
+            retry_config=retry_config,
+        )
+
+        response_data: Any = None
+        if utils.match_response(http_res, "200", "application/json"):
+            return unmarshal_json_response(models.UserGroupResponse, http_res)
+        if utils.match_response(http_res, "401", "application/json"):
+            response_data = unmarshal_json_response(
+                errors.ChainSingleErrorData, http_res
+            )
+            raise errors.ChainSingleError(response_data, http_res)
+        if utils.match_response(http_res, "4XX", "*"):
+            http_res_text = await utils.stream_to_text_async(http_res)
+            raise errors.SDKError("API error occurred", http_res, http_res_text)
+        if utils.match_response(http_res, "5XX", "*"):
+            http_res_text = await utils.stream_to_text_async(http_res)
+            raise errors.SDKError("API error occurred", http_res, http_res_text)
+
+        raise errors.SDKError("Unexpected response received", http_res)
+
+    def get_user_group_permissions(
+        self,
+        *,
+        user_group_id: str,
+        page_size: Optional[int] = None,
+        page: Optional[int] = None,
+        retries: OptionalNullable[utils.RetryConfig] = UNSET,
+        server_url: Optional[str] = None,
+        timeout_ms: Optional[int] = None,
+        http_headers: Optional[Mapping[str, str]] = None,
+    ) -> Optional[models.ChainsGetUserGroupPermissionsResponse]:
+        r"""Return a list of permissions for a user group
+
+        Returns properties for a user group with the provided ID, or a 404 if no such user group is found.
+
+        :param user_group_id: The ID of the User Group.
+        :param page_size: Limit number of results returned (Max 100).
+        :param page: Page number to retrieve in the paginated results (0-based index).
+        :param retries: Override the default retry configuration for this method
+        :param server_url: Override the default server URL for this method
+        :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
+        :param http_headers: Additional headers to set or replace on requests.
+        """
+        base_url = None
+        url_variables = None
+        if timeout_ms is None:
+            timeout_ms = self.sdk_configuration.timeout_ms
+
+        if server_url is not None:
+            base_url = server_url
+        else:
+            base_url = models.CHAINS_GET_USER_GROUP_PERMISSIONS_OP_SERVERS[0]
+
+        request = models.ChainsGetUserGroupPermissionsRequest(
+            user_group_id=user_group_id,
+            page_size=page_size,
+            page=page,
+        )
+
+        req = self._build_request(
+            method="GET",
+            path="/v1/security/user_groups/{userGroupId}/permissions",
+            base_url=base_url,
+            url_variables=url_variables,
+            request=request,
+            request_body_required=False,
+            request_has_path_params=True,
+            request_has_query_params=True,
+            user_agent_header="user-agent",
+            accept_header_value="application/json",
+            http_headers=http_headers,
+            security=self.sdk_configuration.security,
+            allow_empty_value=None,
+            timeout_ms=timeout_ms,
+        )
+
+        if retries == UNSET:
+            if self.sdk_configuration.retry_config is not UNSET:
+                retries = self.sdk_configuration.retry_config
+
+        retry_config = None
+        if isinstance(retries, utils.RetryConfig):
+            retry_config = (retries, ["429", "500", "502", "503", "504"])
+
+        http_res = self.do_request(
+            hook_ctx=HookContext(
+                config=self.sdk_configuration,
+                base_url=base_url or "",
+                operation_id="chains_getUserGroupPermissions",
+                oauth2_scopes=[],
+                security_source=self.sdk_configuration.security,
+            ),
+            request=req,
+            error_status_codes=["401", "4XX", "5XX"],
+            retry_config=retry_config,
+        )
+
+        def next_func() -> Optional[models.ChainsGetUserGroupPermissionsResponse]:
+            body = utils.unmarshal_json(http_res.text, Union[Dict[Any, Any], List[Any]])
+
+            page = request.page if not request.page is None else 1
+            next_page = page + 1
+
+            if not http_res.text:
+                return None
+            results = JSONPath("$.data").parse(body)
+            if len(results) == 0 or len(results[0]) == 0:
+                return None
+
+            return self.get_user_group_permissions(
+                user_group_id=user_group_id,
+                page_size=page_size,
+                page=next_page,
+                retries=retries,
+                server_url=server_url,
+            )
+
+        response_data: Any = None
+        if utils.match_response(http_res, "200", "application/json"):
+            return models.ChainsGetUserGroupPermissionsResponse(
+                result=unmarshal_json_response(models.PermissionsResponse, http_res),
+                next=next_func,
+            )
+        if utils.match_response(http_res, "401", "application/json"):
+            response_data = unmarshal_json_response(
+                errors.ChainSingleErrorData, http_res
+            )
+            raise errors.ChainSingleError(response_data, http_res)
+        if utils.match_response(http_res, "4XX", "*"):
+            http_res_text = utils.stream_to_text(http_res)
+            raise errors.SDKError("API error occurred", http_res, http_res_text)
+        if utils.match_response(http_res, "5XX", "*"):
+            http_res_text = utils.stream_to_text(http_res)
+            raise errors.SDKError("API error occurred", http_res, http_res_text)
+
+        raise errors.SDKError("Unexpected response received", http_res)
+
+    async def get_user_group_permissions_async(
+        self,
+        *,
+        user_group_id: str,
+        page_size: Optional[int] = None,
+        page: Optional[int] = None,
+        retries: OptionalNullable[utils.RetryConfig] = UNSET,
+        server_url: Optional[str] = None,
+        timeout_ms: Optional[int] = None,
+        http_headers: Optional[Mapping[str, str]] = None,
+    ) -> Optional[models.ChainsGetUserGroupPermissionsResponse]:
+        r"""Return a list of permissions for a user group
+
+        Returns properties for a user group with the provided ID, or a 404 if no such user group is found.
+
+        :param user_group_id: The ID of the User Group.
+        :param page_size: Limit number of results returned (Max 100).
+        :param page: Page number to retrieve in the paginated results (0-based index).
+        :param retries: Override the default retry configuration for this method
+        :param server_url: Override the default server URL for this method
+        :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
+        :param http_headers: Additional headers to set or replace on requests.
+        """
+        base_url = None
+        url_variables = None
+        if timeout_ms is None:
+            timeout_ms = self.sdk_configuration.timeout_ms
+
+        if server_url is not None:
+            base_url = server_url
+        else:
+            base_url = models.CHAINS_GET_USER_GROUP_PERMISSIONS_OP_SERVERS[0]
+
+        request = models.ChainsGetUserGroupPermissionsRequest(
+            user_group_id=user_group_id,
+            page_size=page_size,
+            page=page,
+        )
+
+        req = self._build_request_async(
+            method="GET",
+            path="/v1/security/user_groups/{userGroupId}/permissions",
+            base_url=base_url,
+            url_variables=url_variables,
+            request=request,
+            request_body_required=False,
+            request_has_path_params=True,
+            request_has_query_params=True,
+            user_agent_header="user-agent",
+            accept_header_value="application/json",
+            http_headers=http_headers,
+            security=self.sdk_configuration.security,
+            allow_empty_value=None,
+            timeout_ms=timeout_ms,
+        )
+
+        if retries == UNSET:
+            if self.sdk_configuration.retry_config is not UNSET:
+                retries = self.sdk_configuration.retry_config
+
+        retry_config = None
+        if isinstance(retries, utils.RetryConfig):
+            retry_config = (retries, ["429", "500", "502", "503", "504"])
+
+        http_res = await self.do_request_async(
+            hook_ctx=HookContext(
+                config=self.sdk_configuration,
+                base_url=base_url or "",
+                operation_id="chains_getUserGroupPermissions",
+                oauth2_scopes=[],
+                security_source=self.sdk_configuration.security,
+            ),
+            request=req,
+            error_status_codes=["401", "4XX", "5XX"],
+            retry_config=retry_config,
+        )
+
+        def next_func() -> (
+            Awaitable[Optional[models.ChainsGetUserGroupPermissionsResponse]]
+        ):
+            body = utils.unmarshal_json(http_res.text, Union[Dict[Any, Any], List[Any]])
+
+            async def empty_result():
+                return None
+
+            page = request.page if not request.page is None else 1
+            next_page = page + 1
+
+            if not http_res.text:
+                return empty_result()
+            results = JSONPath("$.data").parse(body)
+            if len(results) == 0 or len(results[0]) == 0:
+                return empty_result()
+
+            return self.get_user_group_permissions_async(
+                user_group_id=user_group_id,
+                page_size=page_size,
+                page=next_page,
+                retries=retries,
+                server_url=server_url,
+            )
+
+        response_data: Any = None
+        if utils.match_response(http_res, "200", "application/json"):
+            return models.ChainsGetUserGroupPermissionsResponse(
+                result=unmarshal_json_response(models.PermissionsResponse, http_res),
+                next=next_func,
+            )
+        if utils.match_response(http_res, "401", "application/json"):
+            response_data = unmarshal_json_response(
+                errors.ChainSingleErrorData, http_res
+            )
+            raise errors.ChainSingleError(response_data, http_res)
+        if utils.match_response(http_res, "4XX", "*"):
+            http_res_text = await utils.stream_to_text_async(http_res)
+            raise errors.SDKError("API error occurred", http_res, http_res_text)
+        if utils.match_response(http_res, "5XX", "*"):
+            http_res_text = await utils.stream_to_text_async(http_res)
+            raise errors.SDKError("API error occurred", http_res, http_res_text)
+
+        raise errors.SDKError("Unexpected response received", http_res)
+
+    def get_users(
+        self,
+        *,
+        page_size: Optional[int] = None,
+        page: Optional[int] = None,
+        retries: OptionalNullable[utils.RetryConfig] = UNSET,
+        server_url: Optional[str] = None,
+        timeout_ms: Optional[int] = None,
+        http_headers: Optional[Mapping[str, str]] = None,
+    ) -> Optional[models.ChainsGetUsersResponse]:
+        r"""Return a list of users
+
+        Returns a list of all users in a particular company.
+
+        :param page_size: Limit number of results returned (Max 100).
+        :param page: Page number to retrieve in the paginated results (0-based index).
+        :param retries: Override the default retry configuration for this method
+        :param server_url: Override the default server URL for this method
+        :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
+        :param http_headers: Additional headers to set or replace on requests.
+        """
+        base_url = None
+        url_variables = None
+        if timeout_ms is None:
+            timeout_ms = self.sdk_configuration.timeout_ms
+
+        if server_url is not None:
+            base_url = server_url
+        else:
+            base_url = models.CHAINS_GET_USERS_OP_SERVERS[0]
+
+        request = models.ChainsGetUsersRequest(
+            page_size=page_size,
+            page=page,
+        )
+
+        req = self._build_request(
+            method="GET",
+            path="/v1/security/users",
+            base_url=base_url,
+            url_variables=url_variables,
+            request=request,
+            request_body_required=False,
+            request_has_path_params=False,
+            request_has_query_params=True,
+            user_agent_header="user-agent",
+            accept_header_value="application/json",
+            http_headers=http_headers,
+            security=self.sdk_configuration.security,
+            allow_empty_value=None,
+            timeout_ms=timeout_ms,
+        )
+
+        if retries == UNSET:
+            if self.sdk_configuration.retry_config is not UNSET:
+                retries = self.sdk_configuration.retry_config
+
+        retry_config = None
+        if isinstance(retries, utils.RetryConfig):
+            retry_config = (retries, ["429", "500", "502", "503", "504"])
+
+        http_res = self.do_request(
+            hook_ctx=HookContext(
+                config=self.sdk_configuration,
+                base_url=base_url or "",
+                operation_id="chains_getUsers",
+                oauth2_scopes=[],
+                security_source=self.sdk_configuration.security,
+            ),
+            request=req,
+            error_status_codes=["401", "4XX", "5XX"],
+            retry_config=retry_config,
+        )
+
+        def next_func() -> Optional[models.ChainsGetUsersResponse]:
+            body = utils.unmarshal_json(http_res.text, Union[Dict[Any, Any], List[Any]])
+
+            page = request.page if not request.page is None else 1
+            next_page = page + 1
+
+            if not http_res.text:
+                return None
+            results = JSONPath("$.data").parse(body)
+            if len(results) == 0 or len(results[0]) == 0:
+                return None
+
+            return self.get_users(
+                page_size=page_size,
+                page=next_page,
+                retries=retries,
+                server_url=server_url,
+            )
+
+        response_data: Any = None
+        if utils.match_response(http_res, "200", "application/json"):
+            return models.ChainsGetUsersResponse(
+                result=unmarshal_json_response(models.UsersResponse, http_res),
+                next=next_func,
+            )
+        if utils.match_response(http_res, "401", "application/json"):
+            response_data = unmarshal_json_response(
+                errors.ChainSingleErrorData, http_res
+            )
+            raise errors.ChainSingleError(response_data, http_res)
+        if utils.match_response(http_res, "4XX", "*"):
+            http_res_text = utils.stream_to_text(http_res)
+            raise errors.SDKError("API error occurred", http_res, http_res_text)
+        if utils.match_response(http_res, "5XX", "*"):
+            http_res_text = utils.stream_to_text(http_res)
+            raise errors.SDKError("API error occurred", http_res, http_res_text)
+
+        raise errors.SDKError("Unexpected response received", http_res)
+
+    async def get_users_async(
+        self,
+        *,
+        page_size: Optional[int] = None,
+        page: Optional[int] = None,
+        retries: OptionalNullable[utils.RetryConfig] = UNSET,
+        server_url: Optional[str] = None,
+        timeout_ms: Optional[int] = None,
+        http_headers: Optional[Mapping[str, str]] = None,
+    ) -> Optional[models.ChainsGetUsersResponse]:
+        r"""Return a list of users
+
+        Returns a list of all users in a particular company.
+
+        :param page_size: Limit number of results returned (Max 100).
+        :param page: Page number to retrieve in the paginated results (0-based index).
+        :param retries: Override the default retry configuration for this method
+        :param server_url: Override the default server URL for this method
+        :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
+        :param http_headers: Additional headers to set or replace on requests.
+        """
+        base_url = None
+        url_variables = None
+        if timeout_ms is None:
+            timeout_ms = self.sdk_configuration.timeout_ms
+
+        if server_url is not None:
+            base_url = server_url
+        else:
+            base_url = models.CHAINS_GET_USERS_OP_SERVERS[0]
+
+        request = models.ChainsGetUsersRequest(
+            page_size=page_size,
+            page=page,
+        )
+
+        req = self._build_request_async(
+            method="GET",
+            path="/v1/security/users",
+            base_url=base_url,
+            url_variables=url_variables,
+            request=request,
+            request_body_required=False,
+            request_has_path_params=False,
+            request_has_query_params=True,
+            user_agent_header="user-agent",
+            accept_header_value="application/json",
+            http_headers=http_headers,
+            security=self.sdk_configuration.security,
+            allow_empty_value=None,
+            timeout_ms=timeout_ms,
+        )
+
+        if retries == UNSET:
+            if self.sdk_configuration.retry_config is not UNSET:
+                retries = self.sdk_configuration.retry_config
+
+        retry_config = None
+        if isinstance(retries, utils.RetryConfig):
+            retry_config = (retries, ["429", "500", "502", "503", "504"])
+
+        http_res = await self.do_request_async(
+            hook_ctx=HookContext(
+                config=self.sdk_configuration,
+                base_url=base_url or "",
+                operation_id="chains_getUsers",
+                oauth2_scopes=[],
+                security_source=self.sdk_configuration.security,
+            ),
+            request=req,
+            error_status_codes=["401", "4XX", "5XX"],
+            retry_config=retry_config,
+        )
+
+        def next_func() -> Awaitable[Optional[models.ChainsGetUsersResponse]]:
+            body = utils.unmarshal_json(http_res.text, Union[Dict[Any, Any], List[Any]])
+
+            async def empty_result():
+                return None
+
+            page = request.page if not request.page is None else 1
+            next_page = page + 1
+
+            if not http_res.text:
+                return empty_result()
+            results = JSONPath("$.data").parse(body)
+            if len(results) == 0 or len(results[0]) == 0:
+                return empty_result()
+
+            return self.get_users_async(
+                page_size=page_size,
+                page=next_page,
+                retries=retries,
+                server_url=server_url,
+            )
+
+        response_data: Any = None
+        if utils.match_response(http_res, "200", "application/json"):
+            return models.ChainsGetUsersResponse(
+                result=unmarshal_json_response(models.UsersResponse, http_res),
+                next=next_func,
+            )
+        if utils.match_response(http_res, "401", "application/json"):
+            response_data = unmarshal_json_response(
+                errors.ChainSingleErrorData, http_res
+            )
+            raise errors.ChainSingleError(response_data, http_res)
+        if utils.match_response(http_res, "4XX", "*"):
+            http_res_text = await utils.stream_to_text_async(http_res)
+            raise errors.SDKError("API error occurred", http_res, http_res_text)
+        if utils.match_response(http_res, "5XX", "*"):
+            http_res_text = await utils.stream_to_text_async(http_res)
+            raise errors.SDKError("API error occurred", http_res, http_res_text)
+
+        raise errors.SDKError("Unexpected response received", http_res)
+
+    def get_user(
+        self,
+        *,
+        user_id: str,
+        retries: OptionalNullable[utils.RetryConfig] = UNSET,
+        server_url: Optional[str] = None,
+        timeout_ms: Optional[int] = None,
+        http_headers: Optional[Mapping[str, str]] = None,
+    ) -> models.UserResponse:
+        r"""Return user properties
+
+        Returns properties for a user with the provided ID, or a 404 if no such user is found.
+
+        :param user_id: The ID of the User.
+        :param retries: Override the default retry configuration for this method
+        :param server_url: Override the default server URL for this method
+        :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
+        :param http_headers: Additional headers to set or replace on requests.
+        """
+        base_url = None
+        url_variables = None
+        if timeout_ms is None:
+            timeout_ms = self.sdk_configuration.timeout_ms
+
+        if server_url is not None:
+            base_url = server_url
+        else:
+            base_url = models.CHAINS_GET_USER_OP_SERVERS[0]
+
+        request = models.ChainsGetUserRequest(
+            user_id=user_id,
+        )
+
+        req = self._build_request(
+            method="GET",
+            path="/v1/security/users/{userId}",
+            base_url=base_url,
+            url_variables=url_variables,
+            request=request,
+            request_body_required=False,
+            request_has_path_params=True,
+            request_has_query_params=True,
+            user_agent_header="user-agent",
+            accept_header_value="application/json",
+            http_headers=http_headers,
+            security=self.sdk_configuration.security,
+            allow_empty_value=None,
+            timeout_ms=timeout_ms,
+        )
+
+        if retries == UNSET:
+            if self.sdk_configuration.retry_config is not UNSET:
+                retries = self.sdk_configuration.retry_config
+
+        retry_config = None
+        if isinstance(retries, utils.RetryConfig):
+            retry_config = (retries, ["429", "500", "502", "503", "504"])
+
+        http_res = self.do_request(
+            hook_ctx=HookContext(
+                config=self.sdk_configuration,
+                base_url=base_url or "",
+                operation_id="chains_getUser",
+                oauth2_scopes=[],
+                security_source=self.sdk_configuration.security,
+            ),
+            request=req,
+            error_status_codes=["401", "4XX", "5XX"],
+            retry_config=retry_config,
+        )
+
+        response_data: Any = None
+        if utils.match_response(http_res, "200", "application/json"):
+            return unmarshal_json_response(models.UserResponse, http_res)
+        if utils.match_response(http_res, "401", "application/json"):
+            response_data = unmarshal_json_response(
+                errors.ChainSingleErrorData, http_res
+            )
+            raise errors.ChainSingleError(response_data, http_res)
+        if utils.match_response(http_res, "4XX", "*"):
+            http_res_text = utils.stream_to_text(http_res)
+            raise errors.SDKError("API error occurred", http_res, http_res_text)
+        if utils.match_response(http_res, "5XX", "*"):
+            http_res_text = utils.stream_to_text(http_res)
+            raise errors.SDKError("API error occurred", http_res, http_res_text)
+
+        raise errors.SDKError("Unexpected response received", http_res)
+
+    async def get_user_async(
+        self,
+        *,
+        user_id: str,
+        retries: OptionalNullable[utils.RetryConfig] = UNSET,
+        server_url: Optional[str] = None,
+        timeout_ms: Optional[int] = None,
+        http_headers: Optional[Mapping[str, str]] = None,
+    ) -> models.UserResponse:
+        r"""Return user properties
+
+        Returns properties for a user with the provided ID, or a 404 if no such user is found.
+
+        :param user_id: The ID of the User.
+        :param retries: Override the default retry configuration for this method
+        :param server_url: Override the default server URL for this method
+        :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
+        :param http_headers: Additional headers to set or replace on requests.
+        """
+        base_url = None
+        url_variables = None
+        if timeout_ms is None:
+            timeout_ms = self.sdk_configuration.timeout_ms
+
+        if server_url is not None:
+            base_url = server_url
+        else:
+            base_url = models.CHAINS_GET_USER_OP_SERVERS[0]
+
+        request = models.ChainsGetUserRequest(
+            user_id=user_id,
+        )
+
+        req = self._build_request_async(
+            method="GET",
+            path="/v1/security/users/{userId}",
+            base_url=base_url,
+            url_variables=url_variables,
+            request=request,
+            request_body_required=False,
+            request_has_path_params=True,
+            request_has_query_params=True,
+            user_agent_header="user-agent",
+            accept_header_value="application/json",
+            http_headers=http_headers,
+            security=self.sdk_configuration.security,
+            allow_empty_value=None,
+            timeout_ms=timeout_ms,
+        )
+
+        if retries == UNSET:
+            if self.sdk_configuration.retry_config is not UNSET:
+                retries = self.sdk_configuration.retry_config
+
+        retry_config = None
+        if isinstance(retries, utils.RetryConfig):
+            retry_config = (retries, ["429", "500", "502", "503", "504"])
+
+        http_res = await self.do_request_async(
+            hook_ctx=HookContext(
+                config=self.sdk_configuration,
+                base_url=base_url or "",
+                operation_id="chains_getUser",
+                oauth2_scopes=[],
+                security_source=self.sdk_configuration.security,
+            ),
+            request=req,
+            error_status_codes=["401", "4XX", "5XX"],
+            retry_config=retry_config,
+        )
+
+        response_data: Any = None
+        if utils.match_response(http_res, "200", "application/json"):
+            return unmarshal_json_response(models.UserResponse, http_res)
+        if utils.match_response(http_res, "401", "application/json"):
+            response_data = unmarshal_json_response(
+                errors.ChainSingleErrorData, http_res
+            )
+            raise errors.ChainSingleError(response_data, http_res)
+        if utils.match_response(http_res, "4XX", "*"):
+            http_res_text = await utils.stream_to_text_async(http_res)
+            raise errors.SDKError("API error occurred", http_res, http_res_text)
+        if utils.match_response(http_res, "5XX", "*"):
+            http_res_text = await utils.stream_to_text_async(http_res)
+            raise errors.SDKError("API error occurred", http_res, http_res_text)
+
+        raise errors.SDKError("Unexpected response received", http_res)
+
+    def get_user_user_groups(
+        self,
+        *,
+        user_id: str,
+        page_size: Optional[int] = None,
+        page: Optional[int] = None,
+        retries: OptionalNullable[utils.RetryConfig] = UNSET,
+        server_url: Optional[str] = None,
+        timeout_ms: Optional[int] = None,
+        http_headers: Optional[Mapping[str, str]] = None,
+    ) -> Optional[models.ChainsGetUserUserGroupsResponse]:
+        r"""Return a list of user groups
+
+        Returns a list of all groups that a user is a part of in a particular company.
+
+        :param user_id: The ID of the User.
+        :param page_size: Limit number of results returned (Max 100).
+        :param page: Page number to retrieve in the paginated results (0-based index).
+        :param retries: Override the default retry configuration for this method
+        :param server_url: Override the default server URL for this method
+        :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
+        :param http_headers: Additional headers to set or replace on requests.
+        """
+        base_url = None
+        url_variables = None
+        if timeout_ms is None:
+            timeout_ms = self.sdk_configuration.timeout_ms
+
+        if server_url is not None:
+            base_url = server_url
+        else:
+            base_url = models.CHAINS_GET_USER_USER_GROUPS_OP_SERVERS[0]
+
+        request = models.ChainsGetUserUserGroupsRequest(
+            user_id=user_id,
+            page_size=page_size,
+            page=page,
+        )
+
+        req = self._build_request(
+            method="GET",
+            path="/v1/security/users/{userId}/groups",
+            base_url=base_url,
+            url_variables=url_variables,
+            request=request,
+            request_body_required=False,
+            request_has_path_params=True,
+            request_has_query_params=True,
+            user_agent_header="user-agent",
+            accept_header_value="application/json",
+            http_headers=http_headers,
+            security=self.sdk_configuration.security,
+            allow_empty_value=None,
+            timeout_ms=timeout_ms,
+        )
+
+        if retries == UNSET:
+            if self.sdk_configuration.retry_config is not UNSET:
+                retries = self.sdk_configuration.retry_config
+
+        retry_config = None
+        if isinstance(retries, utils.RetryConfig):
+            retry_config = (retries, ["429", "500", "502", "503", "504"])
+
+        http_res = self.do_request(
+            hook_ctx=HookContext(
+                config=self.sdk_configuration,
+                base_url=base_url or "",
+                operation_id="chains_getUserUserGroups",
+                oauth2_scopes=[],
+                security_source=self.sdk_configuration.security,
+            ),
+            request=req,
+            error_status_codes=["401", "4XX", "5XX"],
+            retry_config=retry_config,
+        )
+
+        def next_func() -> Optional[models.ChainsGetUserUserGroupsResponse]:
+            body = utils.unmarshal_json(http_res.text, Union[Dict[Any, Any], List[Any]])
+
+            page = request.page if not request.page is None else 1
+            next_page = page + 1
+
+            if not http_res.text:
+                return None
+            results = JSONPath("$.data").parse(body)
+            if len(results) == 0 or len(results[0]) == 0:
+                return None
+
+            return self.get_user_user_groups(
+                user_id=user_id,
+                page_size=page_size,
+                page=next_page,
+                retries=retries,
+                server_url=server_url,
+            )
+
+        response_data: Any = None
+        if utils.match_response(http_res, "200", "application/json"):
+            return models.ChainsGetUserUserGroupsResponse(
+                result=unmarshal_json_response(models.UserGroupsResponse, http_res),
+                next=next_func,
+            )
+        if utils.match_response(http_res, "401", "application/json"):
+            response_data = unmarshal_json_response(
+                errors.ChainSingleErrorData, http_res
+            )
+            raise errors.ChainSingleError(response_data, http_res)
+        if utils.match_response(http_res, "4XX", "*"):
+            http_res_text = utils.stream_to_text(http_res)
+            raise errors.SDKError("API error occurred", http_res, http_res_text)
+        if utils.match_response(http_res, "5XX", "*"):
+            http_res_text = utils.stream_to_text(http_res)
+            raise errors.SDKError("API error occurred", http_res, http_res_text)
+
+        raise errors.SDKError("Unexpected response received", http_res)
+
+    async def get_user_user_groups_async(
+        self,
+        *,
+        user_id: str,
+        page_size: Optional[int] = None,
+        page: Optional[int] = None,
+        retries: OptionalNullable[utils.RetryConfig] = UNSET,
+        server_url: Optional[str] = None,
+        timeout_ms: Optional[int] = None,
+        http_headers: Optional[Mapping[str, str]] = None,
+    ) -> Optional[models.ChainsGetUserUserGroupsResponse]:
+        r"""Return a list of user groups
+
+        Returns a list of all groups that a user is a part of in a particular company.
+
+        :param user_id: The ID of the User.
+        :param page_size: Limit number of results returned (Max 100).
+        :param page: Page number to retrieve in the paginated results (0-based index).
+        :param retries: Override the default retry configuration for this method
+        :param server_url: Override the default server URL for this method
+        :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
+        :param http_headers: Additional headers to set or replace on requests.
+        """
+        base_url = None
+        url_variables = None
+        if timeout_ms is None:
+            timeout_ms = self.sdk_configuration.timeout_ms
+
+        if server_url is not None:
+            base_url = server_url
+        else:
+            base_url = models.CHAINS_GET_USER_USER_GROUPS_OP_SERVERS[0]
+
+        request = models.ChainsGetUserUserGroupsRequest(
+            user_id=user_id,
+            page_size=page_size,
+            page=page,
+        )
+
+        req = self._build_request_async(
+            method="GET",
+            path="/v1/security/users/{userId}/groups",
+            base_url=base_url,
+            url_variables=url_variables,
+            request=request,
+            request_body_required=False,
+            request_has_path_params=True,
+            request_has_query_params=True,
+            user_agent_header="user-agent",
+            accept_header_value="application/json",
+            http_headers=http_headers,
+            security=self.sdk_configuration.security,
+            allow_empty_value=None,
+            timeout_ms=timeout_ms,
+        )
+
+        if retries == UNSET:
+            if self.sdk_configuration.retry_config is not UNSET:
+                retries = self.sdk_configuration.retry_config
+
+        retry_config = None
+        if isinstance(retries, utils.RetryConfig):
+            retry_config = (retries, ["429", "500", "502", "503", "504"])
+
+        http_res = await self.do_request_async(
+            hook_ctx=HookContext(
+                config=self.sdk_configuration,
+                base_url=base_url or "",
+                operation_id="chains_getUserUserGroups",
+                oauth2_scopes=[],
+                security_source=self.sdk_configuration.security,
+            ),
+            request=req,
+            error_status_codes=["401", "4XX", "5XX"],
+            retry_config=retry_config,
+        )
+
+        def next_func() -> Awaitable[Optional[models.ChainsGetUserUserGroupsResponse]]:
+            body = utils.unmarshal_json(http_res.text, Union[Dict[Any, Any], List[Any]])
+
+            async def empty_result():
+                return None
+
+            page = request.page if not request.page is None else 1
+            next_page = page + 1
+
+            if not http_res.text:
+                return empty_result()
+            results = JSONPath("$.data").parse(body)
+            if len(results) == 0 or len(results[0]) == 0:
+                return empty_result()
+
+            return self.get_user_user_groups_async(
+                user_id=user_id,
+                page_size=page_size,
+                page=next_page,
+                retries=retries,
+                server_url=server_url,
+            )
+
+        response_data: Any = None
+        if utils.match_response(http_res, "200", "application/json"):
+            return models.ChainsGetUserUserGroupsResponse(
+                result=unmarshal_json_response(models.UserGroupsResponse, http_res),
+                next=next_func,
+            )
+        if utils.match_response(http_res, "401", "application/json"):
+            response_data = unmarshal_json_response(
+                errors.ChainSingleErrorData, http_res
+            )
+            raise errors.ChainSingleError(response_data, http_res)
         if utils.match_response(http_res, "4XX", "*"):
             http_res_text = await utils.stream_to_text_async(http_res)
             raise errors.SDKError("API error occurred", http_res, http_res_text)

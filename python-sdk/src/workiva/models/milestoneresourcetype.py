@@ -2,9 +2,10 @@
 
 from __future__ import annotations
 from enum import Enum
+from workiva import utils
 
 
-class MilestoneResourceType(str, Enum):
+class MilestoneResourceType(str, Enum, metaclass=utils.OpenEnumMeta):
     r"""The type of content associated with a milestone."""
 
     DOCUMENT = "document"

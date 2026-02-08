@@ -24,23 +24,6 @@ WDATA_LIST_CONNECTIONS_OP_SERVERS = [
 ]
 
 
-class QueryParamDestinationType(str, Enum):
-    r"""The type of file or item the connection sends data to"""
-
-    DOCUMENT = "document"
-    DOCUMENT_CHART = "document_chart"
-    DOCUMENT_EMBEDDED_TABLE = "document_embedded_table"
-    PRESENTATION = "presentation"
-    PRESENTATION_CHART = "presentation_chart"
-    PRESENTATION_EMBEDDED_TABLE = "presentation_embedded_table"
-    REPORT = "report"
-    SPREADSHEET = "spreadsheet"
-    SPREADSHEET_SECTION = "spreadsheet_section"
-    WDATA_QUERY = "wdata_query"
-    WDATA_TABLE = "wdata_table"
-    WDATA_TABLE_DATASET = "wdata_table_dataset"
-
-
 class QueryParamSourceType(str, Enum):
     r"""The type of file or item the connection pulls data from"""
 
@@ -59,29 +42,61 @@ class QueryParamSourceType(str, Enum):
     WDATA_TABLE_DATASET = "wdata_table_dataset"
 
 
+class QueryParamDestinationType(str, Enum):
+    r"""The type of file or item the connection sends data to"""
+
+    DOCUMENT = "document"
+    DOCUMENT_CHART = "document_chart"
+    DOCUMENT_EMBEDDED_TABLE = "document_embedded_table"
+    PRESENTATION = "presentation"
+    PRESENTATION_CHART = "presentation_chart"
+    PRESENTATION_EMBEDDED_TABLE = "presentation_embedded_table"
+    REPORT = "report"
+    SPREADSHEET = "spreadsheet"
+    SPREADSHEET_SECTION = "spreadsheet_section"
+    WDATA_QUERY = "wdata_query"
+    WDATA_TABLE = "wdata_table"
+    WDATA_TABLE_DATASET = "wdata_table_dataset"
+
+
 class WdataListConnectionsRequestTypedDict(TypedDict):
-    cursor: NotRequired[str]
-    r"""A paging cursor; if included, `limit` is ignored"""
-    destination_id: NotRequired[str]
-    r"""The ID of the file or item the connection sends data to"""
+    source_type: NotRequired[QueryParamSourceType]
+    r"""The type of file or item the connection pulls data from"""
     destination_type: NotRequired[QueryParamDestinationType]
     r"""The type of file or item the connection sends data to"""
+    source_id: NotRequired[str]
+    r"""The ID of the file or item the connection pulls data from"""
+    destination_id: NotRequired[str]
+    r"""The ID of the file or item the connection sends data to"""
+    cursor: NotRequired[str]
+    r"""A paging cursor; if included, `limit` is ignored"""
     limit: NotRequired[int]
     r"""The number of connections to return, from 1 to 1000; by default, 1000"""
     offset: NotRequired[int]
     r"""The item to start with on the page, greater than or equal to 0; by default, 0"""
-    source_id: NotRequired[str]
-    r"""The ID of the file or item the connection pulls data from"""
-    source_type: NotRequired[QueryParamSourceType]
-    r"""The type of file or item the connection pulls data from"""
 
 
 class WdataListConnectionsRequest(BaseModel):
-    cursor: Annotated[
-        Optional[str],
+    source_type: Annotated[
+        Optional[QueryParamSourceType],
+        pydantic.Field(alias="sourceType"),
         FieldMetadata(query=QueryParamMetadata(style="form", explode=True)),
     ] = None
-    r"""A paging cursor; if included, `limit` is ignored"""
+    r"""The type of file or item the connection pulls data from"""
+
+    destination_type: Annotated[
+        Optional[QueryParamDestinationType],
+        pydantic.Field(alias="destinationType"),
+        FieldMetadata(query=QueryParamMetadata(style="form", explode=True)),
+    ] = None
+    r"""The type of file or item the connection sends data to"""
+
+    source_id: Annotated[
+        Optional[str],
+        pydantic.Field(alias="sourceId"),
+        FieldMetadata(query=QueryParamMetadata(style="form", explode=True)),
+    ] = None
+    r"""The ID of the file or item the connection pulls data from"""
 
     destination_id: Annotated[
         Optional[str],
@@ -90,12 +105,11 @@ class WdataListConnectionsRequest(BaseModel):
     ] = None
     r"""The ID of the file or item the connection sends data to"""
 
-    destination_type: Annotated[
-        Optional[QueryParamDestinationType],
-        pydantic.Field(alias="destinationType"),
+    cursor: Annotated[
+        Optional[str],
         FieldMetadata(query=QueryParamMetadata(style="form", explode=True)),
     ] = None
-    r"""The type of file or item the connection sends data to"""
+    r"""A paging cursor; if included, `limit` is ignored"""
 
     limit: Annotated[
         Optional[int],
@@ -109,31 +123,17 @@ class WdataListConnectionsRequest(BaseModel):
     ] = None
     r"""The item to start with on the page, greater than or equal to 0; by default, 0"""
 
-    source_id: Annotated[
-        Optional[str],
-        pydantic.Field(alias="sourceId"),
-        FieldMetadata(query=QueryParamMetadata(style="form", explode=True)),
-    ] = None
-    r"""The ID of the file or item the connection pulls data from"""
-
-    source_type: Annotated[
-        Optional[QueryParamSourceType],
-        pydantic.Field(alias="sourceType"),
-        FieldMetadata(query=QueryParamMetadata(style="form", explode=True)),
-    ] = None
-    r"""The type of file or item the connection pulls data from"""
-
     @model_serializer(mode="wrap")
     def serialize_model(self, handler):
         optional_fields = set(
             [
-                "cursor",
-                "destinationId",
+                "sourceType",
                 "destinationType",
+                "sourceId",
+                "destinationId",
+                "cursor",
                 "limit",
                 "offset",
-                "sourceId",
-                "sourceType",
             ]
         )
         serialized = handler(self)

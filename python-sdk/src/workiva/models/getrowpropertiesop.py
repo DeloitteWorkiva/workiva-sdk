@@ -16,12 +16,12 @@ from workiva.utils import FieldMetadata, PathParamMetadata, QueryParamMetadata
 class GetRowPropertiesRequestTypedDict(TypedDict):
     table_id: str
     r"""The unique identifier for the table"""
+    dollar_revision: NotRequired[str]
+    r"""Returns resources at a specific revision"""
     dollar_maxpagesize: NotRequired[int]
     r"""The maximum number of results to retrieve"""
     dollar_next: NotRequired[str]
     r"""Pagination cursor for next set of results."""
-    dollar_revision: NotRequired[str]
-    r"""Returns resources at a specific revision"""
     start_row: NotRequired[int]
     r"""The inclusive start row of the range of cells to retrieve. If this parameter is omitted, then the range will be unbounded in this direction."""
     stop_row: NotRequired[int]
@@ -36,6 +36,13 @@ class GetRowPropertiesRequest(BaseModel):
     ]
     r"""The unique identifier for the table"""
 
+    dollar_revision: Annotated[
+        Optional[str],
+        pydantic.Field(alias="$revision"),
+        FieldMetadata(query=QueryParamMetadata(style="form", explode=True)),
+    ] = None
+    r"""Returns resources at a specific revision"""
+
     dollar_maxpagesize: Annotated[
         Optional[int],
         pydantic.Field(alias="$maxpagesize"),
@@ -49,13 +56,6 @@ class GetRowPropertiesRequest(BaseModel):
         FieldMetadata(query=QueryParamMetadata(style="form", explode=True)),
     ] = None
     r"""Pagination cursor for next set of results."""
-
-    dollar_revision: Annotated[
-        Optional[str],
-        pydantic.Field(alias="$revision"),
-        FieldMetadata(query=QueryParamMetadata(style="form", explode=True)),
-    ] = None
-    r"""Returns resources at a specific revision"""
 
     start_row: Annotated[
         Optional[int],
@@ -74,7 +74,7 @@ class GetRowPropertiesRequest(BaseModel):
     @model_serializer(mode="wrap")
     def serialize_model(self, handler):
         optional_fields = set(
-            ["$maxpagesize", "$next", "$revision", "startRow", "stopRow"]
+            ["$revision", "$maxpagesize", "$next", "startRow", "stopRow"]
         )
         serialized = handler(self)
         m = {}

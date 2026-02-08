@@ -4,9 +4,10 @@ from __future__ import annotations
 from datetime import datetime
 from enum import Enum
 import pydantic
-from pydantic import model_serializer
+from pydantic import field_serializer, model_serializer
 from typing import Any, List, Optional
 from typing_extensions import Annotated, NotRequired, TypedDict
+from workiva import models, utils
 from workiva.types import BaseModel, Nullable, OptionalNullable, UNSET, UNSET_SENTINEL
 
 
@@ -40,7 +41,7 @@ class DocumentUser(BaseModel):
         return m
 
 
-class CreatedTypedDict(TypedDict):
+class DocumentCreatedTypedDict(TypedDict):
     r"""When the action was performed, and details about the user who did it"""
 
     date_time: NotRequired[datetime]
@@ -48,7 +49,7 @@ class CreatedTypedDict(TypedDict):
     user: NotRequired[Nullable[DocumentUserTypedDict]]
 
 
-class Created(BaseModel):
+class DocumentCreated(BaseModel):
     r"""When the action was performed, and details about the user who did it"""
 
     date_time: Annotated[Optional[datetime], pydantic.Field(alias="dateTime")] = None
@@ -82,14 +83,20 @@ class Created(BaseModel):
         return m
 
 
-class AllLinks(str, Enum):
+class Lock(str, Enum):
+    r"""The type of lock applied to this document, if any. Note this property is not tied to revision and will always reflect the document's current lock state."""
+
+    LOCKED = "locked"
+
+
+class AllLinks(str, Enum, metaclass=utils.OpenEnumMeta):
     r"""Indicates the status of all links."""
 
     PUBLISHED = "published"
     UNPUBLISHED = "unpublished"
 
 
-class OwnLinks(str, Enum):
+class OwnLinks(str, Enum, metaclass=utils.OpenEnumMeta):
     r"""Indicates the status of links one has last edited."""
 
     PUBLISHED = "published"
@@ -114,11 +121,23 @@ class LinksStatus(BaseModel):
     own_links: Annotated[OwnLinks, pydantic.Field(alias="ownLinks")]
     r"""Indicates the status of links one has last edited."""
 
+    @field_serializer("all_links")
+    def serialize_all_links(self, value):
+        if isinstance(value, str):
+            try:
+                return models.AllLinks(value)
+            except ValueError:
+                return value
+        return value
 
-class Lock(str, Enum):
-    r"""The type of lock applied to this document, if any. Note this property is not tied to revision and will always reflect the document's current lock state."""
-
-    LOCKED = "locked"
+    @field_serializer("own_links")
+    def serialize_own_links(self, value):
+        if isinstance(value, str):
+            try:
+                return models.OwnLinks(value)
+            except ValueError:
+                return value
+        return value
 
 
 class DocumentSchemasUserTypedDict(TypedDict):
@@ -151,7 +170,7 @@ class DocumentSchemasUser(BaseModel):
         return m
 
 
-class ModifiedTypedDict(TypedDict):
+class DocumentModifiedTypedDict(TypedDict):
     r"""When the action was performed, and details about the user who did it"""
 
     date_time: NotRequired[datetime]
@@ -159,7 +178,7 @@ class ModifiedTypedDict(TypedDict):
     user: NotRequired[Nullable[DocumentSchemasUserTypedDict]]
 
 
-class Modified(BaseModel):
+class DocumentModified(BaseModel):
     r"""When the action was performed, and details about the user who did it"""
 
     date_time: Annotated[Optional[datetime], pydantic.Field(alias="dateTime")] = None
@@ -196,7 +215,7 @@ class Modified(BaseModel):
 class DocumentTypedDict(TypedDict):
     r"""Details about the document, including its ID and name"""
 
-    created: NotRequired[CreatedTypedDict]
+    created: NotRequired[DocumentCreatedTypedDict]
     custom_field_groups: NotRequired[List[str]]
     r"""An array of Custom Field Group IDs applied to the document.
 
@@ -207,10 +226,10 @@ class DocumentTypedDict(TypedDict):
     """
     id: NotRequired[str]
     r"""The unique identifier of the document"""
-    links_status: NotRequired[LinksStatusTypedDict]
     lock: NotRequired[Nullable[Lock]]
     r"""The type of lock applied to this document, if any. Note this property is not tied to revision and will always reflect the document's current lock state."""
-    modified: NotRequired[ModifiedTypedDict]
+    links_status: NotRequired[LinksStatusTypedDict]
+    modified: NotRequired[DocumentModifiedTypedDict]
     name: NotRequired[str]
     r"""Name of the document"""
     revision: NotRequired[Nullable[str]]
@@ -226,7 +245,7 @@ class DocumentTypedDict(TypedDict):
 class Document(BaseModel):
     r"""Details about the document, including its ID and name"""
 
-    created: Optional[Created] = None
+    created: Optional[DocumentCreated] = None
 
     custom_field_groups: Annotated[
         Optional[List[str]], pydantic.Field(alias="customFieldGroups")
@@ -243,14 +262,14 @@ class Document(BaseModel):
     id: Optional[str] = None
     r"""The unique identifier of the document"""
 
+    lock: OptionalNullable[Lock] = UNSET
+    r"""The type of lock applied to this document, if any. Note this property is not tied to revision and will always reflect the document's current lock state."""
+
     links_status: Annotated[
         Optional[LinksStatus], pydantic.Field(alias="linksStatus")
     ] = None
 
-    lock: OptionalNullable[Lock] = UNSET
-    r"""The type of lock applied to this document, if any. Note this property is not tied to revision and will always reflect the document's current lock state."""
-
-    modified: Optional[Modified] = None
+    modified: Optional[DocumentModified] = None
 
     name: Optional[str] = None
     r"""Name of the document"""
@@ -276,8 +295,8 @@ class Document(BaseModel):
                 "customFieldGroups",
                 "customFields",
                 "id",
-                "linksStatus",
                 "lock",
+                "linksStatus",
                 "modified",
                 "name",
                 "revision",

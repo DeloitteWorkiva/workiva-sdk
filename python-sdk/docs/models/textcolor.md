@@ -1,6 +1,6 @@
 # TextColor
 
-Represents a color.
+The text color in RGB format
 
 
 ## Fields

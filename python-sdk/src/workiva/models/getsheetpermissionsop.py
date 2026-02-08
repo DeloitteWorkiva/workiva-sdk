@@ -14,10 +14,10 @@ from workiva.utils import FieldMetadata, PathParamMetadata, QueryParamMetadata
 
 
 class GetSheetPermissionsRequestTypedDict(TypedDict):
-    sheet_id: str
-    r"""The unique identifier of the sheet"""
     spreadsheet_id: str
     r"""The unique identifier of the spreadsheet"""
+    sheet_id: str
+    r"""The unique identifier of the sheet"""
     dollar_filter: NotRequired[str]
     r"""The properties to filter the results by."""
     dollar_maxpagesize: NotRequired[int]
@@ -27,19 +27,19 @@ class GetSheetPermissionsRequestTypedDict(TypedDict):
 
 
 class GetSheetPermissionsRequest(BaseModel):
-    sheet_id: Annotated[
-        str,
-        pydantic.Field(alias="sheetId"),
-        FieldMetadata(path=PathParamMetadata(style="simple", explode=False)),
-    ]
-    r"""The unique identifier of the sheet"""
-
     spreadsheet_id: Annotated[
         str,
         pydantic.Field(alias="spreadsheetId"),
         FieldMetadata(path=PathParamMetadata(style="simple", explode=False)),
     ]
     r"""The unique identifier of the spreadsheet"""
+
+    sheet_id: Annotated[
+        str,
+        pydantic.Field(alias="sheetId"),
+        FieldMetadata(path=PathParamMetadata(style="simple", explode=False)),
+    ]
+    r"""The unique identifier of the sheet"""
 
     dollar_filter: Annotated[
         Optional[str],

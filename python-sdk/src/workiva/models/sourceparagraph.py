@@ -7,9 +7,10 @@ from .richtextbaselineshift import RichTextBaselineShift
 from .sourcetextelement import SourceTextElement, SourceTextElementTypedDict
 from .styleref import StyleRef, StyleRefTypedDict
 import pydantic
-from pydantic import model_serializer
+from pydantic import field_serializer, model_serializer
 from typing import List, Optional
 from typing_extensions import Annotated, NotRequired, TypedDict
+from workiva import models
 from workiva.types import BaseModel, Nullable, OptionalNullable, UNSET, UNSET_SENTINEL
 
 
@@ -61,7 +62,7 @@ class SourceParagraphTextColor(BaseModel):
     r"""The red component of the color."""
 
 
-class SourceParagraphFormatTypedDict(TypedDict):
+class FormatTypedDict(TypedDict):
     r"""The formatting options applied to rich text elements."""
 
     background_color: NotRequired[Nullable[SourceParagraphBackgroundColorTypedDict]]
@@ -88,7 +89,7 @@ class SourceParagraphFormatTypedDict(TypedDict):
     r"""Whether or not the text is underlined"""
 
 
-class SourceParagraphFormat(BaseModel):
+class Format(BaseModel):
     r"""The formatting options applied to rich text elements."""
 
     background_color: Annotated[
@@ -131,6 +132,15 @@ class SourceParagraphFormat(BaseModel):
 
     underline: OptionalNullable[bool] = UNSET
     r"""Whether or not the text is underlined"""
+
+    @field_serializer("baseline_shift")
+    def serialize_baseline_shift(self, value):
+        if isinstance(value, str):
+            try:
+                return models.RichTextBaselineShift(value)
+            except ValueError:
+                return value
+        return value
 
     @model_serializer(mode="wrap")
     def serialize_model(self, handler):
@@ -323,6 +333,15 @@ class SourceParagraphProperties(BaseModel):
 
     """
 
+    @field_serializer("alignment")
+    def serialize_alignment(self, value):
+        if isinstance(value, str):
+            try:
+                return models.ParagraphPropertiesAlignment(value)
+            except ValueError:
+                return value
+        return value
+
     @model_serializer(mode="wrap")
     def serialize_model(self, handler):
         optional_fields = set(
@@ -375,7 +394,7 @@ class SourceParagraphTypedDict(TypedDict):
 
     elements: List[SourceTextElementTypedDict]
     r"""Elements contained in this paragraph."""
-    format_: Nullable[SourceParagraphFormatTypedDict]
+    format_: Nullable[FormatTypedDict]
     properties: Nullable[SourceParagraphPropertiesTypedDict]
     style: StyleRefTypedDict
     r"""A reference to a style."""
@@ -388,7 +407,7 @@ class SourceParagraph(BaseModel):
     elements: List[SourceTextElement]
     r"""Elements contained in this paragraph."""
 
-    format_: Annotated[Nullable[SourceParagraphFormat], pydantic.Field(alias="format")]
+    format_: Annotated[Nullable[Format], pydantic.Field(alias="format")]
 
     properties: Nullable[SourceParagraphProperties]
 

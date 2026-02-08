@@ -4,9 +4,10 @@ from __future__ import annotations
 from .textstyleformats import TextStyleFormats, TextStyleFormatsTypedDict
 from .textstyletype import TextStyleType
 import pydantic
-from pydantic import model_serializer
+from pydantic import field_serializer, model_serializer
 from typing import Optional
 from typing_extensions import Annotated, NotRequired, TypedDict
+from workiva import models
 from workiva.types import BaseModel, UNSET_SENTINEL
 
 
@@ -54,6 +55,15 @@ class TextStyle(BaseModel):
 
     type: Optional[TextStyleType] = TextStyleType.PARAGRAPH_STYLE
     r"""The type of the text style."""
+
+    @field_serializer("type")
+    def serialize_type(self, value):
+        if isinstance(value, str):
+            try:
+                return models.TextStyleType(value)
+            except ValueError:
+                return value
+        return value
 
     @model_serializer(mode="wrap")
     def serialize_model(self, handler):

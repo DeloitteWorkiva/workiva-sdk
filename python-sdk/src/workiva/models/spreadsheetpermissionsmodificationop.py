@@ -12,22 +12,22 @@ from workiva.utils import FieldMetadata, PathParamMetadata, RequestMetadata
 
 
 class SpreadsheetPermissionsModificationRequestTypedDict(TypedDict):
-    resource_permissions_modification: ResourcePermissionsModificationTypedDict
-    r"""Details about the spreadsheet permissions modification."""
     spreadsheet_id: str
     r"""The unique identifier of the spreadsheet"""
+    resource_permissions_modification: ResourcePermissionsModificationTypedDict
+    r"""Details about the spreadsheet permissions modification."""
 
 
 class SpreadsheetPermissionsModificationRequest(BaseModel):
-    resource_permissions_modification: Annotated[
-        ResourcePermissionsModification,
-        FieldMetadata(request=RequestMetadata(media_type="application/json")),
-    ]
-    r"""Details about the spreadsheet permissions modification."""
-
     spreadsheet_id: Annotated[
         str,
         pydantic.Field(alias="spreadsheetId"),
         FieldMetadata(path=PathParamMetadata(style="simple", explode=False)),
     ]
     r"""The unique identifier of the spreadsheet"""
+
+    resource_permissions_modification: Annotated[
+        ResourcePermissionsModification,
+        FieldMetadata(request=RequestMetadata(media_type="application/json")),
+    ]
+    r"""Details about the spreadsheet permissions modification."""

@@ -17,19 +17,19 @@ CHAINS_GET_ENVIRONMENT_OP_SERVERS = [
 
 
 class ChainsGetEnvironmentRequestTypedDict(TypedDict):
-    environment_id: str
-    r"""The ID of the Environment."""
     workspace_id: str
     r"""The ID of the Workspace."""
+    environment_id: str
+    r"""The ID of the Environment."""
 
 
 class ChainsGetEnvironmentRequest(BaseModel):
-    environment_id: Annotated[
-        str, FieldMetadata(path=PathParamMetadata(style="simple", explode=False))
-    ]
-    r"""The ID of the Environment."""
-
     workspace_id: Annotated[
         str, FieldMetadata(path=PathParamMetadata(style="simple", explode=False))
     ]
     r"""The ID of the Workspace."""
+
+    environment_id: Annotated[
+        str, FieldMetadata(path=PathParamMetadata(style="simple", explode=False))
+    ]
+    r"""The ID of the Environment."""

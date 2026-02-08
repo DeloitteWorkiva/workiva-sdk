@@ -12,18 +12,18 @@ from workiva.utils.unmarshal_json_response import unmarshal_json_response
 class Activities(BaseSDK):
     r"""Activities enable you to retrieve a list of actions performed in the organization or a specific workspace, such as: <ul> <li>User logins</li> <li>Added users</li> <li>Changes to roles</li> <li>Changes to organization or workspace settings</li> </ul> These activities are also available in the Workiva platform and can be exported from Organization Admin or Workspace Settings. <br /><br /> To access activities through this API or in Workiva, a user must have a valid admin role: <ul> <li>Org User Admin</li> <li>Org Workspace Admin</li> <li>Org Security Admin, for organization activities</li> <li>Workspace Owner, for workspace activities</li> </ul> Learn more about these roles [here](https://support.workiva.com/hc/en-us/articles/360036006051-Organization-roles) and Workiva activities [here](https://support.workiva.com/hc/en-us/articles/360035646392-View-organization-activities)."""
 
-    def get_activity_action_by_id(
+    def get_activity_by_id(
         self,
         *,
-        activity_action_id: str,
+        activity_id: str,
         retries: OptionalNullable[utils.RetryConfig] = UNSET,
         server_url: Optional[str] = None,
         timeout_ms: Optional[int] = None,
         http_headers: Optional[Mapping[str, str]] = None,
-    ) -> models.ActivityAction:
-        r"""Retrieve a single activity action
+    ) -> models.Activity:
+        r"""Retrieve a single activity
 
-        Returns an action performed, given its ID
+        Retrieves an activity given its ID.
 
         :::{admonition} Attention
         :class: danger
@@ -31,7 +31,7 @@ class Activities(BaseSDK):
         :::
 
 
-        :param activity_action_id: The unique identifier of the activity action
+        :param activity_id: The unique identifier of the activity
         :param retries: Override the default retry configuration for this method
         :param server_url: Override the default server URL for this method
         :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
@@ -47,13 +47,13 @@ class Activities(BaseSDK):
         else:
             base_url = self._get_url(base_url, url_variables)
 
-        request = models.GetActivityActionByIDRequest(
-            activity_action_id=activity_action_id,
+        request = models.GetActivityByIDRequest(
+            activity_id=activity_id,
         )
 
         req = self._build_request(
             method="GET",
-            path="/activityActions/{activityActionId}",
+            path="/activities/{activityId}",
             base_url=base_url,
             url_variables=url_variables,
             request=request,
@@ -80,7 +80,7 @@ class Activities(BaseSDK):
             hook_ctx=HookContext(
                 config=self.sdk_configuration,
                 base_url=base_url or "",
-                operation_id="getActivityActionById",
+                operation_id="getActivityById",
                 oauth2_scopes=["activity:read"],
                 security_source=self.sdk_configuration.security,
             ),
@@ -102,7 +102,7 @@ class Activities(BaseSDK):
 
         response_data: Any = None
         if utils.match_response(http_res, "200", "application/json"):
-            return unmarshal_json_response(models.ActivityAction, http_res)
+            return unmarshal_json_response(models.Activity, http_res)
         if utils.match_response(
             http_res, ["400", "401", "403", "404", "409", "429"], "application/json"
         ):
@@ -120,18 +120,18 @@ class Activities(BaseSDK):
 
         raise errors.SDKError("Unexpected response received", http_res)
 
-    async def get_activity_action_by_id_async(
+    async def get_activity_by_id_async(
         self,
         *,
-        activity_action_id: str,
+        activity_id: str,
         retries: OptionalNullable[utils.RetryConfig] = UNSET,
         server_url: Optional[str] = None,
         timeout_ms: Optional[int] = None,
         http_headers: Optional[Mapping[str, str]] = None,
-    ) -> models.ActivityAction:
-        r"""Retrieve a single activity action
+    ) -> models.Activity:
+        r"""Retrieve a single activity
 
-        Returns an action performed, given its ID
+        Retrieves an activity given its ID.
 
         :::{admonition} Attention
         :class: danger
@@ -139,7 +139,7 @@ class Activities(BaseSDK):
         :::
 
 
-        :param activity_action_id: The unique identifier of the activity action
+        :param activity_id: The unique identifier of the activity
         :param retries: Override the default retry configuration for this method
         :param server_url: Override the default server URL for this method
         :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
@@ -155,13 +155,13 @@ class Activities(BaseSDK):
         else:
             base_url = self._get_url(base_url, url_variables)
 
-        request = models.GetActivityActionByIDRequest(
-            activity_action_id=activity_action_id,
+        request = models.GetActivityByIDRequest(
+            activity_id=activity_id,
         )
 
         req = self._build_request_async(
             method="GET",
-            path="/activityActions/{activityActionId}",
+            path="/activities/{activityId}",
             base_url=base_url,
             url_variables=url_variables,
             request=request,
@@ -188,7 +188,7 @@ class Activities(BaseSDK):
             hook_ctx=HookContext(
                 config=self.sdk_configuration,
                 base_url=base_url or "",
-                operation_id="getActivityActionById",
+                operation_id="getActivityById",
                 oauth2_scopes=["activity:read"],
                 security_source=self.sdk_configuration.security,
             ),
@@ -210,7 +210,7 @@ class Activities(BaseSDK):
 
         response_data: Any = None
         if utils.match_response(http_res, "200", "application/json"):
-            return unmarshal_json_response(models.ActivityAction, http_res)
+            return unmarshal_json_response(models.Activity, http_res)
         if utils.match_response(
             http_res, ["400", "401", "403", "404", "409", "429"], "application/json"
         ):
@@ -507,18 +507,18 @@ class Activities(BaseSDK):
 
         raise errors.SDKError("Unexpected response received", http_res)
 
-    def get_activity_by_id(
+    def get_activity_action_by_id(
         self,
         *,
-        activity_id: str,
+        activity_action_id: str,
         retries: OptionalNullable[utils.RetryConfig] = UNSET,
         server_url: Optional[str] = None,
         timeout_ms: Optional[int] = None,
         http_headers: Optional[Mapping[str, str]] = None,
-    ) -> models.Activity:
-        r"""Retrieve a single activity
+    ) -> models.ActivityAction:
+        r"""Retrieve a single activity action
 
-        Retrieves an activity given its ID.
+        Returns an action performed, given its ID
 
         :::{admonition} Attention
         :class: danger
@@ -526,7 +526,7 @@ class Activities(BaseSDK):
         :::
 
 
-        :param activity_id: The unique identifier of the activity
+        :param activity_action_id: The unique identifier of the activity action
         :param retries: Override the default retry configuration for this method
         :param server_url: Override the default server URL for this method
         :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
@@ -542,13 +542,13 @@ class Activities(BaseSDK):
         else:
             base_url = self._get_url(base_url, url_variables)
 
-        request = models.GetActivityByIDRequest(
-            activity_id=activity_id,
+        request = models.GetActivityActionByIDRequest(
+            activity_action_id=activity_action_id,
         )
 
         req = self._build_request(
             method="GET",
-            path="/activities/{activityId}",
+            path="/activityActions/{activityActionId}",
             base_url=base_url,
             url_variables=url_variables,
             request=request,
@@ -575,7 +575,7 @@ class Activities(BaseSDK):
             hook_ctx=HookContext(
                 config=self.sdk_configuration,
                 base_url=base_url or "",
-                operation_id="getActivityById",
+                operation_id="getActivityActionById",
                 oauth2_scopes=["activity:read"],
                 security_source=self.sdk_configuration.security,
             ),
@@ -597,7 +597,7 @@ class Activities(BaseSDK):
 
         response_data: Any = None
         if utils.match_response(http_res, "200", "application/json"):
-            return unmarshal_json_response(models.Activity, http_res)
+            return unmarshal_json_response(models.ActivityAction, http_res)
         if utils.match_response(
             http_res, ["400", "401", "403", "404", "409", "429"], "application/json"
         ):
@@ -615,18 +615,18 @@ class Activities(BaseSDK):
 
         raise errors.SDKError("Unexpected response received", http_res)
 
-    async def get_activity_by_id_async(
+    async def get_activity_action_by_id_async(
         self,
         *,
-        activity_id: str,
+        activity_action_id: str,
         retries: OptionalNullable[utils.RetryConfig] = UNSET,
         server_url: Optional[str] = None,
         timeout_ms: Optional[int] = None,
         http_headers: Optional[Mapping[str, str]] = None,
-    ) -> models.Activity:
-        r"""Retrieve a single activity
+    ) -> models.ActivityAction:
+        r"""Retrieve a single activity action
 
-        Retrieves an activity given its ID.
+        Returns an action performed, given its ID
 
         :::{admonition} Attention
         :class: danger
@@ -634,7 +634,7 @@ class Activities(BaseSDK):
         :::
 
 
-        :param activity_id: The unique identifier of the activity
+        :param activity_action_id: The unique identifier of the activity action
         :param retries: Override the default retry configuration for this method
         :param server_url: Override the default server URL for this method
         :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
@@ -650,13 +650,13 @@ class Activities(BaseSDK):
         else:
             base_url = self._get_url(base_url, url_variables)
 
-        request = models.GetActivityByIDRequest(
-            activity_id=activity_id,
+        request = models.GetActivityActionByIDRequest(
+            activity_action_id=activity_action_id,
         )
 
         req = self._build_request_async(
             method="GET",
-            path="/activities/{activityId}",
+            path="/activityActions/{activityActionId}",
             base_url=base_url,
             url_variables=url_variables,
             request=request,
@@ -683,7 +683,7 @@ class Activities(BaseSDK):
             hook_ctx=HookContext(
                 config=self.sdk_configuration,
                 base_url=base_url or "",
-                operation_id="getActivityById",
+                operation_id="getActivityActionById",
                 oauth2_scopes=["activity:read"],
                 security_source=self.sdk_configuration.security,
             ),
@@ -705,7 +705,7 @@ class Activities(BaseSDK):
 
         response_data: Any = None
         if utils.match_response(http_res, "200", "application/json"):
-            return unmarshal_json_response(models.Activity, http_res)
+            return unmarshal_json_response(models.ActivityAction, http_res)
         if utils.match_response(
             http_res, ["400", "401", "403", "404", "409", "429"], "application/json"
         ):

@@ -2,9 +2,10 @@
 
 from __future__ import annotations
 from enum import Enum
+from workiva import utils
 
 
-class LineCapSize(str, Enum):
+class LineCapSize(str, Enum, metaclass=utils.OpenEnumMeta):
     r"""The size of a cap at a line terminator."""
 
     SMALL = "small"

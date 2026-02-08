@@ -6,8 +6,9 @@ from .linerelativetype import LineRelativeType
 from .paragraphrelative import ParagraphRelative, ParagraphRelativeTypedDict
 from .sliderelative import SlideRelative, SlideRelativeTypedDict
 import pydantic
-from pydantic import model_serializer
+from pydantic import field_serializer, model_serializer
 from typing_extensions import Annotated, NotRequired, TypedDict
+from workiva import models
 from workiva.types import BaseModel, Nullable, OptionalNullable, UNSET, UNSET_SENTINEL
 
 
@@ -44,6 +45,15 @@ class LineRelativePosition(BaseModel):
         OptionalNullable[SlideRelative], pydantic.Field(alias="slideRelative")
     ] = UNSET
     r"""Represents the position of a drawing relative to the top-left corner a slide."""
+
+    @field_serializer("type")
+    def serialize_type(self, value):
+        if isinstance(value, str):
+            try:
+                return models.LineRelativeType(value)
+            except ValueError:
+                return value
+        return value
 
     @model_serializer(mode="wrap")
     def serialize_model(self, handler):

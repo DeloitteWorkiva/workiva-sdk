@@ -2,9 +2,12 @@
 
 from __future__ import annotations
 from enum import Enum
+from workiva import utils
 
 
-class DrawingRichTextSelectionAnchorAttachmentPointType(str, Enum):
+class DrawingRichTextSelectionAnchorAttachmentPointType(
+    str, Enum, metaclass=utils.OpenEnumMeta
+):
     r"""The type of attachment point."""
 
     COMMENT = "comment"
