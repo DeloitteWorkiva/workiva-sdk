@@ -16,6 +16,8 @@ Tres OpenAPI specs, un solo paquete tipado con autenticación automática, polli
 
 </div>
 
+> **Aviso legal:** Este software es propiedad de Deloitte. Todos los derechos reservados. El acceso público al repositorio no constituye una licencia de uso. Consulta el archivo [LICENSE](LICENSE) para más información.
+
 ---
 
 ## Instalación
