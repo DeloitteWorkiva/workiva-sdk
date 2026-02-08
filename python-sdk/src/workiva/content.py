@@ -238,7 +238,7 @@ class Content(BaseSDK):
         self,
         *,
         anchor_id: str,
-        dollar_revision: Optional[str] = None,
+        revision: Optional[str] = None,
         retries: OptionalNullable[utils.RetryConfig] = UNSET,
         server_url: Optional[str] = None,
         timeout_ms: Optional[int] = None,
@@ -249,7 +249,7 @@ class Content(BaseSDK):
         Returns an [`Anchor`](ref:content#anchor) given its id.
 
         :param anchor_id: The unique identifier of the anchor
-        :param dollar_revision: Returns resources at a specific revision
+        :param revision: Returns resources at a specific revision
         :param retries: Override the default retry configuration for this method
         :param server_url: Override the default server URL for this method
         :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
@@ -266,8 +266,8 @@ class Content(BaseSDK):
             base_url = self._get_url(base_url, url_variables)
 
         request = models.GetAnchorByIDRequest(
-            dollar_revision=dollar_revision,
             anchor_id=anchor_id,
+            revision=revision,
         )
 
         req = self._build_request(
@@ -343,7 +343,7 @@ class Content(BaseSDK):
         self,
         *,
         anchor_id: str,
-        dollar_revision: Optional[str] = None,
+        revision: Optional[str] = None,
         retries: OptionalNullable[utils.RetryConfig] = UNSET,
         server_url: Optional[str] = None,
         timeout_ms: Optional[int] = None,
@@ -354,7 +354,7 @@ class Content(BaseSDK):
         Returns an [`Anchor`](ref:content#anchor) given its id.
 
         :param anchor_id: The unique identifier of the anchor
-        :param dollar_revision: Returns resources at a specific revision
+        :param revision: Returns resources at a specific revision
         :param retries: Override the default retry configuration for this method
         :param server_url: Override the default server URL for this method
         :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
@@ -371,8 +371,8 @@ class Content(BaseSDK):
             base_url = self._get_url(base_url, url_variables)
 
         request = models.GetAnchorByIDRequest(
-            dollar_revision=dollar_revision,
             anchor_id=anchor_id,
+            revision=revision,
         )
 
         req = self._build_request_async(
@@ -545,9 +545,9 @@ class Content(BaseSDK):
             return self.get_column_properties(
                 request=models.GetColumnPropertiesRequest(
                     table_id=request.table_id,
-                    dollar_maxpagesize=request.dollar_maxpagesize,
-                    dollar_next=next_cursor,
-                    dollar_revision=request.dollar_revision,
+                    maxpagesize=request.maxpagesize,
+                    next=request.next,
+                    revision=request.revision,
                     start_column=request.start_column,
                     stop_column=request.stop_column,
                 ),
@@ -683,9 +683,9 @@ class Content(BaseSDK):
             return self.get_column_properties_async(
                 request=models.GetColumnPropertiesRequest(
                     table_id=request.table_id,
-                    dollar_maxpagesize=request.dollar_maxpagesize,
-                    dollar_next=next_cursor,
-                    dollar_revision=request.dollar_revision,
+                    maxpagesize=request.maxpagesize,
+                    next=request.next,
+                    revision=request.revision,
                     start_column=request.start_column,
                     stop_column=request.stop_column,
                 ),
@@ -721,7 +721,7 @@ class Content(BaseSDK):
         self,
         *,
         destination_link_id: str,
-        dollar_revision: Optional[str] = None,
+        revision: Optional[str] = None,
         retries: OptionalNullable[utils.RetryConfig] = UNSET,
         server_url: Optional[str] = None,
         timeout_ms: Optional[int] = None,
@@ -732,7 +732,7 @@ class Content(BaseSDK):
         Returns a [`DestinationLink`](ref:content#destinationlink) given its id
 
         :param destination_link_id: The unique identifier of the destination link
-        :param dollar_revision: Returns resources at a specific revision
+        :param revision: Returns resources at a specific revision
         :param retries: Override the default retry configuration for this method
         :param server_url: Override the default server URL for this method
         :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
@@ -749,8 +749,8 @@ class Content(BaseSDK):
             base_url = self._get_url(base_url, url_variables)
 
         request = models.GetDestinationLinkByIDRequest(
-            dollar_revision=dollar_revision,
             destination_link_id=destination_link_id,
+            revision=revision,
         )
 
         req = self._build_request(
@@ -826,7 +826,7 @@ class Content(BaseSDK):
         self,
         *,
         destination_link_id: str,
-        dollar_revision: Optional[str] = None,
+        revision: Optional[str] = None,
         retries: OptionalNullable[utils.RetryConfig] = UNSET,
         server_url: Optional[str] = None,
         timeout_ms: Optional[int] = None,
@@ -837,7 +837,7 @@ class Content(BaseSDK):
         Returns a [`DestinationLink`](ref:content#destinationlink) given its id
 
         :param destination_link_id: The unique identifier of the destination link
-        :param dollar_revision: Returns resources at a specific revision
+        :param revision: Returns resources at a specific revision
         :param retries: Override the default retry configuration for this method
         :param server_url: Override the default server URL for this method
         :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
@@ -854,8 +854,8 @@ class Content(BaseSDK):
             base_url = self._get_url(base_url, url_variables)
 
         request = models.GetDestinationLinkByIDRequest(
-            dollar_revision=dollar_revision,
             destination_link_id=destination_link_id,
+            revision=revision,
         )
 
         req = self._build_request_async(
@@ -932,7 +932,7 @@ class Content(BaseSDK):
         *,
         anchor_id: str,
         drawing_id: str,
-        dollar_revision: Optional[str] = None,
+        revision: Optional[str] = None,
         retries: OptionalNullable[utils.RetryConfig] = UNSET,
         server_url: Optional[str] = None,
         timeout_ms: Optional[int] = None,
@@ -944,7 +944,7 @@ class Content(BaseSDK):
 
         :param anchor_id: The unique identifier of the anchor
         :param drawing_id: The unique identifier of a drawing
-        :param dollar_revision: Returns resources at a specific revision
+        :param revision: Returns resources at a specific revision
         :param retries: Override the default retry configuration for this method
         :param server_url: Override the default server URL for this method
         :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
@@ -961,9 +961,9 @@ class Content(BaseSDK):
             base_url = self._get_url(base_url, url_variables)
 
         request = models.GetDrawingAnchorByIDRequest(
-            dollar_revision=dollar_revision,
             anchor_id=anchor_id,
             drawing_id=drawing_id,
+            revision=revision,
         )
 
         req = self._build_request(
@@ -1040,7 +1040,7 @@ class Content(BaseSDK):
         *,
         anchor_id: str,
         drawing_id: str,
-        dollar_revision: Optional[str] = None,
+        revision: Optional[str] = None,
         retries: OptionalNullable[utils.RetryConfig] = UNSET,
         server_url: Optional[str] = None,
         timeout_ms: Optional[int] = None,
@@ -1052,7 +1052,7 @@ class Content(BaseSDK):
 
         :param anchor_id: The unique identifier of the anchor
         :param drawing_id: The unique identifier of a drawing
-        :param dollar_revision: Returns resources at a specific revision
+        :param revision: Returns resources at a specific revision
         :param retries: Override the default retry configuration for this method
         :param server_url: Override the default server URL for this method
         :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
@@ -1069,9 +1069,9 @@ class Content(BaseSDK):
             base_url = self._get_url(base_url, url_variables)
 
         request = models.GetDrawingAnchorByIDRequest(
-            dollar_revision=dollar_revision,
             anchor_id=anchor_id,
             drawing_id=drawing_id,
+            revision=revision,
         )
 
         req = self._build_request_async(
@@ -1244,9 +1244,9 @@ class Content(BaseSDK):
                 request=models.GetDrawingAnchorExtensionsRequest(
                     anchor_id=request.anchor_id,
                     drawing_id=request.drawing_id,
-                    dollar_maxpagesize=request.dollar_maxpagesize,
-                    dollar_next=next_cursor,
-                    dollar_revision=request.dollar_revision,
+                    maxpagesize=request.maxpagesize,
+                    next=request.next,
+                    revision=request.revision,
                 ),
                 retries=retries,
             )
@@ -1382,9 +1382,9 @@ class Content(BaseSDK):
                 request=models.GetDrawingAnchorExtensionsRequest(
                     anchor_id=request.anchor_id,
                     drawing_id=request.drawing_id,
-                    dollar_maxpagesize=request.dollar_maxpagesize,
-                    dollar_next=next_cursor,
-                    dollar_revision=request.dollar_revision,
+                    maxpagesize=request.maxpagesize,
+                    next=request.next,
+                    revision=request.revision,
                 ),
                 retries=retries,
             )
@@ -1418,9 +1418,9 @@ class Content(BaseSDK):
         self,
         *,
         drawing_id: str,
-        dollar_maxpagesize: Optional[int] = 1000,
-        dollar_next: Optional[str] = None,
-        dollar_revision: Optional[str] = None,
+        maxpagesize: Optional[int] = 1000,
+        next: Optional[str] = None,
+        revision: Optional[str] = None,
         retries: OptionalNullable[utils.RetryConfig] = UNSET,
         server_url: Optional[str] = None,
         timeout_ms: Optional[int] = None,
@@ -1431,9 +1431,9 @@ class Content(BaseSDK):
         Returns an [`AnchorsListResult`](ref:content#anchorslistresult) for a given drawingId.
 
         :param drawing_id: The unique identifier of a drawing
-        :param dollar_maxpagesize: The maximum number of results to retrieve
-        :param dollar_next: Pagination cursor for next set of results.
-        :param dollar_revision: Returns resources at a specific revision
+        :param maxpagesize: The maximum number of results to retrieve
+        :param next: Pagination cursor for next set of results.
+        :param revision: Returns resources at a specific revision
         :param retries: Override the default retry configuration for this method
         :param server_url: Override the default server URL for this method
         :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
@@ -1450,10 +1450,10 @@ class Content(BaseSDK):
             base_url = self._get_url(base_url, url_variables)
 
         request = models.GetDrawingAnchorsRequest(
-            dollar_maxpagesize=dollar_maxpagesize,
-            dollar_next=dollar_next,
-            dollar_revision=dollar_revision,
             drawing_id=drawing_id,
+            maxpagesize=maxpagesize,
+            next=next,
+            revision=revision,
         )
 
         req = self._build_request(
@@ -1519,9 +1519,9 @@ class Content(BaseSDK):
 
             return self.get_drawing_anchors(
                 drawing_id=drawing_id,
-                dollar_maxpagesize=dollar_maxpagesize,
-                dollar_next=next_cursor,
-                dollar_revision=dollar_revision,
+                maxpagesize=maxpagesize,
+                next=next,
+                revision=revision,
                 retries=retries,
             )
 
@@ -1552,9 +1552,9 @@ class Content(BaseSDK):
         self,
         *,
         drawing_id: str,
-        dollar_maxpagesize: Optional[int] = 1000,
-        dollar_next: Optional[str] = None,
-        dollar_revision: Optional[str] = None,
+        maxpagesize: Optional[int] = 1000,
+        next: Optional[str] = None,
+        revision: Optional[str] = None,
         retries: OptionalNullable[utils.RetryConfig] = UNSET,
         server_url: Optional[str] = None,
         timeout_ms: Optional[int] = None,
@@ -1565,9 +1565,9 @@ class Content(BaseSDK):
         Returns an [`AnchorsListResult`](ref:content#anchorslistresult) for a given drawingId.
 
         :param drawing_id: The unique identifier of a drawing
-        :param dollar_maxpagesize: The maximum number of results to retrieve
-        :param dollar_next: Pagination cursor for next set of results.
-        :param dollar_revision: Returns resources at a specific revision
+        :param maxpagesize: The maximum number of results to retrieve
+        :param next: Pagination cursor for next set of results.
+        :param revision: Returns resources at a specific revision
         :param retries: Override the default retry configuration for this method
         :param server_url: Override the default server URL for this method
         :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
@@ -1584,10 +1584,10 @@ class Content(BaseSDK):
             base_url = self._get_url(base_url, url_variables)
 
         request = models.GetDrawingAnchorsRequest(
-            dollar_maxpagesize=dollar_maxpagesize,
-            dollar_next=dollar_next,
-            dollar_revision=dollar_revision,
             drawing_id=drawing_id,
+            maxpagesize=maxpagesize,
+            next=next,
+            revision=revision,
         )
 
         req = self._build_request_async(
@@ -1656,9 +1656,9 @@ class Content(BaseSDK):
 
             return self.get_drawing_anchors_async(
                 drawing_id=drawing_id,
-                dollar_maxpagesize=dollar_maxpagesize,
-                dollar_next=next_cursor,
-                dollar_revision=dollar_revision,
+                maxpagesize=maxpagesize,
+                next=next,
+                revision=revision,
                 retries=retries,
             )
 
@@ -1689,9 +1689,9 @@ class Content(BaseSDK):
         self,
         *,
         drawing_id: str,
-        dollar_maxpagesize: Optional[int] = 1000,
-        dollar_next: Optional[str] = None,
-        dollar_revision: Optional[str] = None,
+        maxpagesize: Optional[int] = 1000,
+        next: Optional[str] = None,
+        revision: Optional[str] = None,
         retries: OptionalNullable[utils.RetryConfig] = UNSET,
         server_url: Optional[str] = None,
         timeout_ms: Optional[int] = None,
@@ -1702,9 +1702,9 @@ class Content(BaseSDK):
         Returns a [`DrawingElementListResult`](ref:content#drawingelementlistresult) given its id
 
         :param drawing_id: The unique identifier of a drawing
-        :param dollar_maxpagesize: The maximum number of results to retrieve
-        :param dollar_next: Pagination cursor for next set of results.
-        :param dollar_revision: Returns resources at a specific revision
+        :param maxpagesize: The maximum number of results to retrieve
+        :param next: Pagination cursor for next set of results.
+        :param revision: Returns resources at a specific revision
         :param retries: Override the default retry configuration for this method
         :param server_url: Override the default server URL for this method
         :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
@@ -1721,10 +1721,10 @@ class Content(BaseSDK):
             base_url = self._get_url(base_url, url_variables)
 
         request = models.GetDrawingElementsByIDRequest(
-            dollar_maxpagesize=dollar_maxpagesize,
-            dollar_next=dollar_next,
-            dollar_revision=dollar_revision,
             drawing_id=drawing_id,
+            maxpagesize=maxpagesize,
+            next=next,
+            revision=revision,
         )
 
         req = self._build_request(
@@ -1790,9 +1790,9 @@ class Content(BaseSDK):
 
             return self.get_drawing_elements_by_id(
                 drawing_id=drawing_id,
-                dollar_maxpagesize=dollar_maxpagesize,
-                dollar_next=next_cursor,
-                dollar_revision=dollar_revision,
+                maxpagesize=maxpagesize,
+                next=next,
+                revision=revision,
                 retries=retries,
             )
 
@@ -1825,9 +1825,9 @@ class Content(BaseSDK):
         self,
         *,
         drawing_id: str,
-        dollar_maxpagesize: Optional[int] = 1000,
-        dollar_next: Optional[str] = None,
-        dollar_revision: Optional[str] = None,
+        maxpagesize: Optional[int] = 1000,
+        next: Optional[str] = None,
+        revision: Optional[str] = None,
         retries: OptionalNullable[utils.RetryConfig] = UNSET,
         server_url: Optional[str] = None,
         timeout_ms: Optional[int] = None,
@@ -1838,9 +1838,9 @@ class Content(BaseSDK):
         Returns a [`DrawingElementListResult`](ref:content#drawingelementlistresult) given its id
 
         :param drawing_id: The unique identifier of a drawing
-        :param dollar_maxpagesize: The maximum number of results to retrieve
-        :param dollar_next: Pagination cursor for next set of results.
-        :param dollar_revision: Returns resources at a specific revision
+        :param maxpagesize: The maximum number of results to retrieve
+        :param next: Pagination cursor for next set of results.
+        :param revision: Returns resources at a specific revision
         :param retries: Override the default retry configuration for this method
         :param server_url: Override the default server URL for this method
         :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
@@ -1857,10 +1857,10 @@ class Content(BaseSDK):
             base_url = self._get_url(base_url, url_variables)
 
         request = models.GetDrawingElementsByIDRequest(
-            dollar_maxpagesize=dollar_maxpagesize,
-            dollar_next=dollar_next,
-            dollar_revision=dollar_revision,
             drawing_id=drawing_id,
+            maxpagesize=maxpagesize,
+            next=next,
+            revision=revision,
         )
 
         req = self._build_request_async(
@@ -1929,9 +1929,9 @@ class Content(BaseSDK):
 
             return self.get_drawing_elements_by_id_async(
                 drawing_id=drawing_id,
-                dollar_maxpagesize=dollar_maxpagesize,
-                dollar_next=next_cursor,
-                dollar_revision=dollar_revision,
+                maxpagesize=maxpagesize,
+                next=next,
+                revision=revision,
                 retries=retries,
             )
 
@@ -2169,7 +2169,7 @@ class Content(BaseSDK):
         *,
         range_link_id: str,
         table_id: str,
-        dollar_revision: Optional[str] = None,
+        revision: Optional[str] = None,
         retries: OptionalNullable[utils.RetryConfig] = UNSET,
         server_url: Optional[str] = None,
         timeout_ms: Optional[int] = None,
@@ -2181,7 +2181,7 @@ class Content(BaseSDK):
 
         :param range_link_id: The unique identifier of a range link.
         :param table_id: The unique identifier for the table
-        :param dollar_revision: Returns resources at a specific revision
+        :param revision: Returns resources at a specific revision
         :param retries: Override the default retry configuration for this method
         :param server_url: Override the default server URL for this method
         :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
@@ -2198,8 +2198,8 @@ class Content(BaseSDK):
             base_url = self._get_url(base_url, url_variables)
 
         request = models.GetRangeLinkByIDRequest(
-            dollar_revision=dollar_revision,
             range_link_id=range_link_id,
+            revision=revision,
             table_id=table_id,
         )
 
@@ -2276,7 +2276,7 @@ class Content(BaseSDK):
         *,
         range_link_id: str,
         table_id: str,
-        dollar_revision: Optional[str] = None,
+        revision: Optional[str] = None,
         retries: OptionalNullable[utils.RetryConfig] = UNSET,
         server_url: Optional[str] = None,
         timeout_ms: Optional[int] = None,
@@ -2288,7 +2288,7 @@ class Content(BaseSDK):
 
         :param range_link_id: The unique identifier of a range link.
         :param table_id: The unique identifier for the table
-        :param dollar_revision: Returns resources at a specific revision
+        :param revision: Returns resources at a specific revision
         :param retries: Override the default retry configuration for this method
         :param server_url: Override the default server URL for this method
         :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
@@ -2305,8 +2305,8 @@ class Content(BaseSDK):
             base_url = self._get_url(base_url, url_variables)
 
         request = models.GetRangeLinkByIDRequest(
-            dollar_revision=dollar_revision,
             range_link_id=range_link_id,
+            revision=revision,
             table_id=table_id,
         )
 
@@ -2478,9 +2478,9 @@ class Content(BaseSDK):
                 request=models.GetRangeLinkDestinationsRequest(
                     range_link_id=request.range_link_id,
                     table_id=request.table_id,
-                    dollar_maxpagesize=request.dollar_maxpagesize,
-                    dollar_next=next_cursor,
-                    dollar_revision=request.dollar_revision,
+                    maxpagesize=request.maxpagesize,
+                    next=request.next,
+                    revision=request.revision,
                 ),
                 retries=retries,
             )
@@ -2611,9 +2611,9 @@ class Content(BaseSDK):
                 request=models.GetRangeLinkDestinationsRequest(
                     range_link_id=request.range_link_id,
                     table_id=request.table_id,
-                    dollar_maxpagesize=request.dollar_maxpagesize,
-                    dollar_next=next_cursor,
-                    dollar_revision=request.dollar_revision,
+                    maxpagesize=request.maxpagesize,
+                    next=request.next,
+                    revision=request.revision,
                 ),
                 retries=retries,
             )
@@ -2645,9 +2645,9 @@ class Content(BaseSDK):
         self,
         *,
         table_id: str,
-        dollar_maxpagesize: Optional[int] = 1000,
-        dollar_next: Optional[str] = None,
-        dollar_revision: Optional[str] = None,
+        maxpagesize: Optional[int] = 1000,
+        next: Optional[str] = None,
+        revision: Optional[str] = None,
         retries: OptionalNullable[utils.RetryConfig] = UNSET,
         server_url: Optional[str] = None,
         timeout_ms: Optional[int] = None,
@@ -2658,9 +2658,9 @@ class Content(BaseSDK):
         Returns a [`RangeLinkListResult`](ref:content#rangelinklistresult) for a given tableId.
 
         :param table_id: The unique identifier for the table
-        :param dollar_maxpagesize: The maximum number of results to retrieve
-        :param dollar_next: Pagination cursor for next set of results.
-        :param dollar_revision: Returns resources at a specific revision
+        :param maxpagesize: The maximum number of results to retrieve
+        :param next: Pagination cursor for next set of results.
+        :param revision: Returns resources at a specific revision
         :param retries: Override the default retry configuration for this method
         :param server_url: Override the default server URL for this method
         :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
@@ -2677,9 +2677,9 @@ class Content(BaseSDK):
             base_url = self._get_url(base_url, url_variables)
 
         request = models.GetRangeLinksRequest(
-            dollar_maxpagesize=dollar_maxpagesize,
-            dollar_next=dollar_next,
-            dollar_revision=dollar_revision,
+            maxpagesize=maxpagesize,
+            next=next,
+            revision=revision,
             table_id=table_id,
         )
 
@@ -2745,9 +2745,9 @@ class Content(BaseSDK):
 
             return self.get_range_links(
                 table_id=table_id,
-                dollar_maxpagesize=dollar_maxpagesize,
-                dollar_next=next_cursor,
-                dollar_revision=dollar_revision,
+                maxpagesize=maxpagesize,
+                next=next,
+                revision=revision,
                 retries=retries,
             )
 
@@ -2778,9 +2778,9 @@ class Content(BaseSDK):
         self,
         *,
         table_id: str,
-        dollar_maxpagesize: Optional[int] = 1000,
-        dollar_next: Optional[str] = None,
-        dollar_revision: Optional[str] = None,
+        maxpagesize: Optional[int] = 1000,
+        next: Optional[str] = None,
+        revision: Optional[str] = None,
         retries: OptionalNullable[utils.RetryConfig] = UNSET,
         server_url: Optional[str] = None,
         timeout_ms: Optional[int] = None,
@@ -2791,9 +2791,9 @@ class Content(BaseSDK):
         Returns a [`RangeLinkListResult`](ref:content#rangelinklistresult) for a given tableId.
 
         :param table_id: The unique identifier for the table
-        :param dollar_maxpagesize: The maximum number of results to retrieve
-        :param dollar_next: Pagination cursor for next set of results.
-        :param dollar_revision: Returns resources at a specific revision
+        :param maxpagesize: The maximum number of results to retrieve
+        :param next: Pagination cursor for next set of results.
+        :param revision: Returns resources at a specific revision
         :param retries: Override the default retry configuration for this method
         :param server_url: Override the default server URL for this method
         :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
@@ -2810,9 +2810,9 @@ class Content(BaseSDK):
             base_url = self._get_url(base_url, url_variables)
 
         request = models.GetRangeLinksRequest(
-            dollar_maxpagesize=dollar_maxpagesize,
-            dollar_next=dollar_next,
-            dollar_revision=dollar_revision,
+            maxpagesize=maxpagesize,
+            next=next,
+            revision=revision,
             table_id=table_id,
         )
 
@@ -2881,9 +2881,9 @@ class Content(BaseSDK):
 
             return self.get_range_links_async(
                 table_id=table_id,
-                dollar_maxpagesize=dollar_maxpagesize,
-                dollar_next=next_cursor,
-                dollar_revision=dollar_revision,
+                maxpagesize=maxpagesize,
+                next=next,
+                revision=revision,
                 retries=retries,
             )
 
@@ -2915,7 +2915,7 @@ class Content(BaseSDK):
         *,
         anchor_id: str,
         rich_text_id: str,
-        dollar_revision: Optional[str] = None,
+        revision: Optional[str] = None,
         retries: OptionalNullable[utils.RetryConfig] = UNSET,
         server_url: Optional[str] = None,
         timeout_ms: Optional[int] = None,
@@ -2927,7 +2927,7 @@ class Content(BaseSDK):
 
         :param anchor_id: The unique identifier of the anchor
         :param rich_text_id: The unique identifier of the rich text content
-        :param dollar_revision: Returns resources at a specific revision
+        :param revision: Returns resources at a specific revision
         :param retries: Override the default retry configuration for this method
         :param server_url: Override the default server URL for this method
         :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
@@ -2944,8 +2944,8 @@ class Content(BaseSDK):
             base_url = self._get_url(base_url, url_variables)
 
         request = models.GetRichTextAnchorByIDRequest(
-            dollar_revision=dollar_revision,
             anchor_id=anchor_id,
+            revision=revision,
             rich_text_id=rich_text_id,
         )
 
@@ -3023,7 +3023,7 @@ class Content(BaseSDK):
         *,
         anchor_id: str,
         rich_text_id: str,
-        dollar_revision: Optional[str] = None,
+        revision: Optional[str] = None,
         retries: OptionalNullable[utils.RetryConfig] = UNSET,
         server_url: Optional[str] = None,
         timeout_ms: Optional[int] = None,
@@ -3035,7 +3035,7 @@ class Content(BaseSDK):
 
         :param anchor_id: The unique identifier of the anchor
         :param rich_text_id: The unique identifier of the rich text content
-        :param dollar_revision: Returns resources at a specific revision
+        :param revision: Returns resources at a specific revision
         :param retries: Override the default retry configuration for this method
         :param server_url: Override the default server URL for this method
         :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
@@ -3052,8 +3052,8 @@ class Content(BaseSDK):
             base_url = self._get_url(base_url, url_variables)
 
         request = models.GetRichTextAnchorByIDRequest(
-            dollar_revision=dollar_revision,
             anchor_id=anchor_id,
+            revision=revision,
             rich_text_id=rich_text_id,
         )
 
@@ -3229,9 +3229,9 @@ class Content(BaseSDK):
                 request=models.GetRichTextAnchorExtensionsRequest(
                     anchor_id=request.anchor_id,
                     rich_text_id=request.rich_text_id,
-                    dollar_maxpagesize=request.dollar_maxpagesize,
-                    dollar_next=next_cursor,
-                    dollar_revision=request.dollar_revision,
+                    maxpagesize=request.maxpagesize,
+                    next=request.next,
+                    revision=request.revision,
                 ),
                 retries=retries,
             )
@@ -3369,9 +3369,9 @@ class Content(BaseSDK):
                 request=models.GetRichTextAnchorExtensionsRequest(
                     anchor_id=request.anchor_id,
                     rich_text_id=request.rich_text_id,
-                    dollar_maxpagesize=request.dollar_maxpagesize,
-                    dollar_next=next_cursor,
-                    dollar_revision=request.dollar_revision,
+                    maxpagesize=request.maxpagesize,
+                    next=request.next,
+                    revision=request.revision,
                 ),
                 retries=retries,
             )
@@ -3405,9 +3405,9 @@ class Content(BaseSDK):
         self,
         *,
         rich_text_id: str,
-        dollar_maxpagesize: Optional[int] = 1000,
-        dollar_next: Optional[str] = None,
-        dollar_revision: Optional[str] = None,
+        maxpagesize: Optional[int] = 1000,
+        next: Optional[str] = None,
+        revision: Optional[str] = None,
         retries: OptionalNullable[utils.RetryConfig] = UNSET,
         server_url: Optional[str] = None,
         timeout_ms: Optional[int] = None,
@@ -3418,9 +3418,9 @@ class Content(BaseSDK):
         Returns an [`AnchorsListResult`](ref:content#anchorslistresult) for a given richTextId.
 
         :param rich_text_id: The unique identifier of the rich text content
-        :param dollar_maxpagesize: The maximum number of results to retrieve
-        :param dollar_next: Pagination cursor for next set of results.
-        :param dollar_revision: Returns resources at a specific revision
+        :param maxpagesize: The maximum number of results to retrieve
+        :param next: Pagination cursor for next set of results.
+        :param revision: Returns resources at a specific revision
         :param retries: Override the default retry configuration for this method
         :param server_url: Override the default server URL for this method
         :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
@@ -3437,9 +3437,9 @@ class Content(BaseSDK):
             base_url = self._get_url(base_url, url_variables)
 
         request = models.GetRichTextAnchorsRequest(
-            dollar_maxpagesize=dollar_maxpagesize,
-            dollar_next=dollar_next,
-            dollar_revision=dollar_revision,
+            maxpagesize=maxpagesize,
+            next=next,
+            revision=revision,
             rich_text_id=rich_text_id,
         )
 
@@ -3506,9 +3506,9 @@ class Content(BaseSDK):
 
             return self.get_rich_text_anchors(
                 rich_text_id=rich_text_id,
-                dollar_maxpagesize=dollar_maxpagesize,
-                dollar_next=next_cursor,
-                dollar_revision=dollar_revision,
+                maxpagesize=maxpagesize,
+                next=next,
+                revision=revision,
                 retries=retries,
             )
 
@@ -3539,9 +3539,9 @@ class Content(BaseSDK):
         self,
         *,
         rich_text_id: str,
-        dollar_maxpagesize: Optional[int] = 1000,
-        dollar_next: Optional[str] = None,
-        dollar_revision: Optional[str] = None,
+        maxpagesize: Optional[int] = 1000,
+        next: Optional[str] = None,
+        revision: Optional[str] = None,
         retries: OptionalNullable[utils.RetryConfig] = UNSET,
         server_url: Optional[str] = None,
         timeout_ms: Optional[int] = None,
@@ -3552,9 +3552,9 @@ class Content(BaseSDK):
         Returns an [`AnchorsListResult`](ref:content#anchorslistresult) for a given richTextId.
 
         :param rich_text_id: The unique identifier of the rich text content
-        :param dollar_maxpagesize: The maximum number of results to retrieve
-        :param dollar_next: Pagination cursor for next set of results.
-        :param dollar_revision: Returns resources at a specific revision
+        :param maxpagesize: The maximum number of results to retrieve
+        :param next: Pagination cursor for next set of results.
+        :param revision: Returns resources at a specific revision
         :param retries: Override the default retry configuration for this method
         :param server_url: Override the default server URL for this method
         :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
@@ -3571,9 +3571,9 @@ class Content(BaseSDK):
             base_url = self._get_url(base_url, url_variables)
 
         request = models.GetRichTextAnchorsRequest(
-            dollar_maxpagesize=dollar_maxpagesize,
-            dollar_next=dollar_next,
-            dollar_revision=dollar_revision,
+            maxpagesize=maxpagesize,
+            next=next,
+            revision=revision,
             rich_text_id=rich_text_id,
         )
 
@@ -3643,9 +3643,9 @@ class Content(BaseSDK):
 
             return self.get_rich_text_anchors_async(
                 rich_text_id=rich_text_id,
-                dollar_maxpagesize=dollar_maxpagesize,
-                dollar_next=next_cursor,
-                dollar_revision=dollar_revision,
+                maxpagesize=maxpagesize,
+                next=next,
+                revision=revision,
                 retries=retries,
             )
 
@@ -3676,9 +3676,9 @@ class Content(BaseSDK):
         self,
         *,
         rich_text_id: str,
-        dollar_maxpagesize: Optional[int] = 1000,
-        dollar_next: Optional[str] = None,
-        dollar_revision: Optional[str] = None,
+        maxpagesize: Optional[int] = 1000,
+        next: Optional[str] = None,
+        revision: Optional[str] = None,
         retries: OptionalNullable[utils.RetryConfig] = UNSET,
         server_url: Optional[str] = None,
         timeout_ms: Optional[int] = None,
@@ -3689,9 +3689,9 @@ class Content(BaseSDK):
         Returns a [`ParagraphsListResult`](ref:content#paragraphslistresult) for a rich text object, given its id.
 
         :param rich_text_id: The unique identifier of the rich text content
-        :param dollar_maxpagesize: The maximum number of results to retrieve
-        :param dollar_next: Pagination cursor for next set of results.
-        :param dollar_revision: Returns resources at a specific revision
+        :param maxpagesize: The maximum number of results to retrieve
+        :param next: Pagination cursor for next set of results.
+        :param revision: Returns resources at a specific revision
         :param retries: Override the default retry configuration for this method
         :param server_url: Override the default server URL for this method
         :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
@@ -3708,9 +3708,9 @@ class Content(BaseSDK):
             base_url = self._get_url(base_url, url_variables)
 
         request = models.GetRichTextParagraphsRequest(
-            dollar_maxpagesize=dollar_maxpagesize,
-            dollar_next=dollar_next,
-            dollar_revision=dollar_revision,
+            maxpagesize=maxpagesize,
+            next=next,
+            revision=revision,
             rich_text_id=rich_text_id,
         )
 
@@ -3777,9 +3777,9 @@ class Content(BaseSDK):
 
             return self.get_rich_text_paragraphs(
                 rich_text_id=rich_text_id,
-                dollar_maxpagesize=dollar_maxpagesize,
-                dollar_next=next_cursor,
-                dollar_revision=dollar_revision,
+                maxpagesize=maxpagesize,
+                next=next,
+                revision=revision,
                 retries=retries,
             )
 
@@ -3810,9 +3810,9 @@ class Content(BaseSDK):
         self,
         *,
         rich_text_id: str,
-        dollar_maxpagesize: Optional[int] = 1000,
-        dollar_next: Optional[str] = None,
-        dollar_revision: Optional[str] = None,
+        maxpagesize: Optional[int] = 1000,
+        next: Optional[str] = None,
+        revision: Optional[str] = None,
         retries: OptionalNullable[utils.RetryConfig] = UNSET,
         server_url: Optional[str] = None,
         timeout_ms: Optional[int] = None,
@@ -3823,9 +3823,9 @@ class Content(BaseSDK):
         Returns a [`ParagraphsListResult`](ref:content#paragraphslistresult) for a rich text object, given its id.
 
         :param rich_text_id: The unique identifier of the rich text content
-        :param dollar_maxpagesize: The maximum number of results to retrieve
-        :param dollar_next: Pagination cursor for next set of results.
-        :param dollar_revision: Returns resources at a specific revision
+        :param maxpagesize: The maximum number of results to retrieve
+        :param next: Pagination cursor for next set of results.
+        :param revision: Returns resources at a specific revision
         :param retries: Override the default retry configuration for this method
         :param server_url: Override the default server URL for this method
         :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
@@ -3842,9 +3842,9 @@ class Content(BaseSDK):
             base_url = self._get_url(base_url, url_variables)
 
         request = models.GetRichTextParagraphsRequest(
-            dollar_maxpagesize=dollar_maxpagesize,
-            dollar_next=dollar_next,
-            dollar_revision=dollar_revision,
+            maxpagesize=maxpagesize,
+            next=next,
+            revision=revision,
             rich_text_id=rich_text_id,
         )
 
@@ -3914,9 +3914,9 @@ class Content(BaseSDK):
 
             return self.get_rich_text_paragraphs_async(
                 rich_text_id=rich_text_id,
-                dollar_maxpagesize=dollar_maxpagesize,
-                dollar_next=next_cursor,
-                dollar_revision=dollar_revision,
+                maxpagesize=maxpagesize,
+                next=next,
+                revision=revision,
                 retries=retries,
             )
 
@@ -4043,9 +4043,9 @@ class Content(BaseSDK):
             return self.get_row_properties(
                 request=models.GetRowPropertiesRequest(
                     table_id=request.table_id,
-                    dollar_maxpagesize=request.dollar_maxpagesize,
-                    dollar_next=next_cursor,
-                    dollar_revision=request.dollar_revision,
+                    maxpagesize=request.maxpagesize,
+                    next=request.next,
+                    revision=request.revision,
                     start_row=request.start_row,
                     stop_row=request.stop_row,
                 ),
@@ -4180,9 +4180,9 @@ class Content(BaseSDK):
             return self.get_row_properties_async(
                 request=models.GetRowPropertiesRequest(
                     table_id=request.table_id,
-                    dollar_maxpagesize=request.dollar_maxpagesize,
-                    dollar_next=next_cursor,
-                    dollar_revision=request.dollar_revision,
+                    maxpagesize=request.maxpagesize,
+                    next=request.next,
+                    revision=request.revision,
                     start_row=request.start_row,
                     stop_row=request.stop_row,
                 ),
@@ -4218,7 +4218,7 @@ class Content(BaseSDK):
         self,
         *,
         style_guide_id: str,
-        dollar_revision: Optional[str] = None,
+        revision: Optional[str] = None,
         retries: OptionalNullable[utils.RetryConfig] = UNSET,
         server_url: Optional[str] = None,
         timeout_ms: Optional[int] = None,
@@ -4230,7 +4230,7 @@ class Content(BaseSDK):
 
 
         :param style_guide_id: The unique identifier of the style guide
-        :param dollar_revision: Returns resources at a specific revision
+        :param revision: Returns resources at a specific revision
         :param retries: Override the default retry configuration for this method
         :param server_url: Override the default server URL for this method
         :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
@@ -4247,7 +4247,7 @@ class Content(BaseSDK):
             base_url = self._get_url(base_url, url_variables)
 
         request = models.GetStyleGuideByIDRequest(
-            dollar_revision=dollar_revision,
+            revision=revision,
             style_guide_id=style_guide_id,
         )
 
@@ -4324,7 +4324,7 @@ class Content(BaseSDK):
         self,
         *,
         style_guide_id: str,
-        dollar_revision: Optional[str] = None,
+        revision: Optional[str] = None,
         retries: OptionalNullable[utils.RetryConfig] = UNSET,
         server_url: Optional[str] = None,
         timeout_ms: Optional[int] = None,
@@ -4336,7 +4336,7 @@ class Content(BaseSDK):
 
 
         :param style_guide_id: The unique identifier of the style guide
-        :param dollar_revision: Returns resources at a specific revision
+        :param revision: Returns resources at a specific revision
         :param retries: Override the default retry configuration for this method
         :param server_url: Override the default server URL for this method
         :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
@@ -4353,7 +4353,7 @@ class Content(BaseSDK):
             base_url = self._get_url(base_url, url_variables)
 
         request = models.GetStyleGuideByIDRequest(
-            dollar_revision=dollar_revision,
+            revision=revision,
             style_guide_id=style_guide_id,
         )
 
@@ -4431,7 +4431,7 @@ class Content(BaseSDK):
         *,
         anchor_id: str,
         table_id: str,
-        dollar_revision: Optional[str] = None,
+        revision: Optional[str] = None,
         retries: OptionalNullable[utils.RetryConfig] = UNSET,
         server_url: Optional[str] = None,
         timeout_ms: Optional[int] = None,
@@ -4443,7 +4443,7 @@ class Content(BaseSDK):
 
         :param anchor_id: The unique identifier of the anchor
         :param table_id: The unique identifier for the table
-        :param dollar_revision: Returns resources at a specific revision
+        :param revision: Returns resources at a specific revision
         :param retries: Override the default retry configuration for this method
         :param server_url: Override the default server URL for this method
         :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
@@ -4460,8 +4460,8 @@ class Content(BaseSDK):
             base_url = self._get_url(base_url, url_variables)
 
         request = models.GetTableAnchorByIDRequest(
-            dollar_revision=dollar_revision,
             anchor_id=anchor_id,
+            revision=revision,
             table_id=table_id,
         )
 
@@ -4539,7 +4539,7 @@ class Content(BaseSDK):
         *,
         anchor_id: str,
         table_id: str,
-        dollar_revision: Optional[str] = None,
+        revision: Optional[str] = None,
         retries: OptionalNullable[utils.RetryConfig] = UNSET,
         server_url: Optional[str] = None,
         timeout_ms: Optional[int] = None,
@@ -4551,7 +4551,7 @@ class Content(BaseSDK):
 
         :param anchor_id: The unique identifier of the anchor
         :param table_id: The unique identifier for the table
-        :param dollar_revision: Returns resources at a specific revision
+        :param revision: Returns resources at a specific revision
         :param retries: Override the default retry configuration for this method
         :param server_url: Override the default server URL for this method
         :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
@@ -4568,8 +4568,8 @@ class Content(BaseSDK):
             base_url = self._get_url(base_url, url_variables)
 
         request = models.GetTableAnchorByIDRequest(
-            dollar_revision=dollar_revision,
             anchor_id=anchor_id,
+            revision=revision,
             table_id=table_id,
         )
 
@@ -4743,9 +4743,9 @@ class Content(BaseSDK):
                 request=models.GetTableAnchorExtensionsRequest(
                     anchor_id=request.anchor_id,
                     table_id=request.table_id,
-                    dollar_maxpagesize=request.dollar_maxpagesize,
-                    dollar_next=next_cursor,
-                    dollar_revision=request.dollar_revision,
+                    maxpagesize=request.maxpagesize,
+                    next=request.next,
+                    revision=request.revision,
                 ),
                 retries=retries,
             )
@@ -4879,9 +4879,9 @@ class Content(BaseSDK):
                 request=models.GetTableAnchorExtensionsRequest(
                     anchor_id=request.anchor_id,
                     table_id=request.table_id,
-                    dollar_maxpagesize=request.dollar_maxpagesize,
-                    dollar_next=next_cursor,
-                    dollar_revision=request.dollar_revision,
+                    maxpagesize=request.maxpagesize,
+                    next=request.next,
+                    revision=request.revision,
                 ),
                 retries=retries,
             )
@@ -4915,9 +4915,9 @@ class Content(BaseSDK):
         self,
         *,
         table_id: str,
-        dollar_maxpagesize: Optional[int] = 1000,
-        dollar_next: Optional[str] = None,
-        dollar_revision: Optional[str] = None,
+        maxpagesize: Optional[int] = 1000,
+        next: Optional[str] = None,
+        revision: Optional[str] = None,
         retries: OptionalNullable[utils.RetryConfig] = UNSET,
         server_url: Optional[str] = None,
         timeout_ms: Optional[int] = None,
@@ -4928,9 +4928,9 @@ class Content(BaseSDK):
         Returns an [`AnchorsListResult`](ref:content#anchorslistresult) given tableId.
 
         :param table_id: The unique identifier for the table
-        :param dollar_maxpagesize: The maximum number of results to retrieve
-        :param dollar_next: Pagination cursor for next set of results.
-        :param dollar_revision: Returns resources at a specific revision
+        :param maxpagesize: The maximum number of results to retrieve
+        :param next: Pagination cursor for next set of results.
+        :param revision: Returns resources at a specific revision
         :param retries: Override the default retry configuration for this method
         :param server_url: Override the default server URL for this method
         :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
@@ -4947,9 +4947,9 @@ class Content(BaseSDK):
             base_url = self._get_url(base_url, url_variables)
 
         request = models.GetTableAnchorsRequest(
-            dollar_maxpagesize=dollar_maxpagesize,
-            dollar_next=dollar_next,
-            dollar_revision=dollar_revision,
+            maxpagesize=maxpagesize,
+            next=next,
+            revision=revision,
             table_id=table_id,
         )
 
@@ -5016,9 +5016,9 @@ class Content(BaseSDK):
 
             return self.get_table_anchors(
                 table_id=table_id,
-                dollar_maxpagesize=dollar_maxpagesize,
-                dollar_next=next_cursor,
-                dollar_revision=dollar_revision,
+                maxpagesize=maxpagesize,
+                next=next,
+                revision=revision,
                 retries=retries,
             )
 
@@ -5049,9 +5049,9 @@ class Content(BaseSDK):
         self,
         *,
         table_id: str,
-        dollar_maxpagesize: Optional[int] = 1000,
-        dollar_next: Optional[str] = None,
-        dollar_revision: Optional[str] = None,
+        maxpagesize: Optional[int] = 1000,
+        next: Optional[str] = None,
+        revision: Optional[str] = None,
         retries: OptionalNullable[utils.RetryConfig] = UNSET,
         server_url: Optional[str] = None,
         timeout_ms: Optional[int] = None,
@@ -5062,9 +5062,9 @@ class Content(BaseSDK):
         Returns an [`AnchorsListResult`](ref:content#anchorslistresult) given tableId.
 
         :param table_id: The unique identifier for the table
-        :param dollar_maxpagesize: The maximum number of results to retrieve
-        :param dollar_next: Pagination cursor for next set of results.
-        :param dollar_revision: Returns resources at a specific revision
+        :param maxpagesize: The maximum number of results to retrieve
+        :param next: Pagination cursor for next set of results.
+        :param revision: Returns resources at a specific revision
         :param retries: Override the default retry configuration for this method
         :param server_url: Override the default server URL for this method
         :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
@@ -5081,9 +5081,9 @@ class Content(BaseSDK):
             base_url = self._get_url(base_url, url_variables)
 
         request = models.GetTableAnchorsRequest(
-            dollar_maxpagesize=dollar_maxpagesize,
-            dollar_next=dollar_next,
-            dollar_revision=dollar_revision,
+            maxpagesize=maxpagesize,
+            next=next,
+            revision=revision,
             table_id=table_id,
         )
 
@@ -5153,9 +5153,9 @@ class Content(BaseSDK):
 
             return self.get_table_anchors_async(
                 table_id=table_id,
-                dollar_maxpagesize=dollar_maxpagesize,
-                dollar_next=next_cursor,
-                dollar_revision=dollar_revision,
+                maxpagesize=maxpagesize,
+                next=next,
+                revision=revision,
                 retries=retries,
             )
 
@@ -5281,9 +5281,9 @@ class Content(BaseSDK):
             return self.get_table_cells(
                 request=models.GetTableCellsRequest(
                     table_id=request.table_id,
-                    dollar_maxcellsperpage=request.dollar_maxcellsperpage,
-                    dollar_next=next_cursor,
-                    dollar_revision=request.dollar_revision,
+                    maxcellsperpage=request.maxcellsperpage,
+                    next=request.next,
+                    revision=request.revision,
                     start_column=request.start_column,
                     start_row=request.start_row,
                     stop_column=request.stop_column,
@@ -5417,9 +5417,9 @@ class Content(BaseSDK):
             return self.get_table_cells_async(
                 request=models.GetTableCellsRequest(
                     table_id=request.table_id,
-                    dollar_maxcellsperpage=request.dollar_maxcellsperpage,
-                    dollar_next=next_cursor,
-                    dollar_revision=request.dollar_revision,
+                    maxcellsperpage=request.maxcellsperpage,
+                    next=request.next,
+                    revision=request.revision,
                     start_column=request.start_column,
                     start_row=request.start_row,
                     stop_column=request.stop_column,
@@ -5455,7 +5455,7 @@ class Content(BaseSDK):
         self,
         *,
         table_id: str,
-        dollar_revision: Optional[str] = None,
+        revision: Optional[str] = None,
         retries: OptionalNullable[utils.RetryConfig] = UNSET,
         server_url: Optional[str] = None,
         timeout_ms: Optional[int] = None,
@@ -5467,7 +5467,7 @@ class Content(BaseSDK):
 
 
         :param table_id: The unique identifier for the table
-        :param dollar_revision: Returns resources at a specific revision
+        :param revision: Returns resources at a specific revision
         :param retries: Override the default retry configuration for this method
         :param server_url: Override the default server URL for this method
         :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
@@ -5484,7 +5484,7 @@ class Content(BaseSDK):
             base_url = self._get_url(base_url, url_variables)
 
         request = models.GetTablePropertiesRequest(
-            dollar_revision=dollar_revision,
+            revision=revision,
             table_id=table_id,
         )
 
@@ -5561,7 +5561,7 @@ class Content(BaseSDK):
         self,
         *,
         table_id: str,
-        dollar_revision: Optional[str] = None,
+        revision: Optional[str] = None,
         retries: OptionalNullable[utils.RetryConfig] = UNSET,
         server_url: Optional[str] = None,
         timeout_ms: Optional[int] = None,
@@ -5573,7 +5573,7 @@ class Content(BaseSDK):
 
 
         :param table_id: The unique identifier for the table
-        :param dollar_revision: Returns resources at a specific revision
+        :param revision: Returns resources at a specific revision
         :param retries: Override the default retry configuration for this method
         :param server_url: Override the default server URL for this method
         :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
@@ -5590,7 +5590,7 @@ class Content(BaseSDK):
             base_url = self._get_url(base_url, url_variables)
 
         request = models.GetTablePropertiesRequest(
-            dollar_revision=dollar_revision,
+            revision=revision,
             table_id=table_id,
         )
 

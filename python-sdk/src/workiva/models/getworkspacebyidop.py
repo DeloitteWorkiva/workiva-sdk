@@ -14,7 +14,7 @@ class GetWorkspaceByIDRequestTypedDict(TypedDict):
     r"""The unique identifier of the organization"""
     workspace_id: str
     r"""The unique identifier of the workspace"""
-    dollar_expand: NotRequired[str]
+    expand: NotRequired[str]
     r"""Returns related resources inline with the main resource"""
 
 
@@ -33,7 +33,7 @@ class GetWorkspaceByIDRequest(BaseModel):
     ]
     r"""The unique identifier of the workspace"""
 
-    dollar_expand: Annotated[
+    expand: Annotated[
         Optional[str],
         pydantic.Field(alias="$expand"),
         FieldMetadata(query=QueryParamMetadata(style="form", explode=True)),
@@ -42,7 +42,7 @@ class GetWorkspaceByIDRequest(BaseModel):
 
     @model_serializer(mode="wrap")
     def serialize_model(self, handler):
-        optional_fields = set(["$expand"])
+        optional_fields = set(["expand"])
         serialized = handler(self)
         m = {}
 

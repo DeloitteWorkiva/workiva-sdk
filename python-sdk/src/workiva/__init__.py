@@ -17,6 +17,8 @@ SPEAKEASY_GENERATOR_VERSION = __gen_version__
 USER_AGENT = __user_agent__
 
 # --- Custom exports (added by scripts/patch_sdk.py) ---
-from workiva._hooks.client import Workiva
-from workiva._hooks.polling import OperationPoller
-from workiva._hooks.exceptions import OperationFailed, OperationCancelled, OperationTimeout
+from workiva._hooks.client import Workiva as Workiva
+from workiva._hooks.polling import OperationPoller as OperationPoller
+from workiva._hooks.exceptions import OperationFailed as OperationFailed
+from workiva._hooks.exceptions import OperationCancelled as OperationCancelled
+from workiva._hooks.exceptions import OperationTimeout as OperationTimeout

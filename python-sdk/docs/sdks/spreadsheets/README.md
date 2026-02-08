@@ -153,7 +153,7 @@ with SDK(
     ),
 ) as sdk:
 
-    res = sdk.spreadsheets.delete_dataset_by_sheet_id(sheet_id="<id>", spreadsheet_id="<id>", dollar_deletevalues=False)
+    res = sdk.spreadsheets.delete_dataset_by_sheet_id(sheet_id="<id>", spreadsheet_id="<id>", deletevalues=False)
 
     # Handle response
     print(res)
@@ -166,7 +166,7 @@ with SDK(
 | ------------------------------------------------------------------- | ------------------------------------------------------------------- | ------------------------------------------------------------------- | ------------------------------------------------------------------- | ------------------------------------------------------------------- |
 | `sheet_id`                                                          | *str*                                                               | :heavy_check_mark:                                                  | The unique identifier of the sheet                                  |                                                                     |
 | `spreadsheet_id`                                                    | *str*                                                               | :heavy_check_mark:                                                  | The unique identifier of the spreadsheet                            |                                                                     |
-| `dollar_deletevalues`                                               | *Optional[bool]*                                                    | :heavy_minus_sign:                                                  | Indicates whether values should be deleted along with the dataset   | false                                                               |
+| `deletevalues`                                                      | *Optional[bool]*                                                    | :heavy_minus_sign:                                                  | Indicates whether values should be deleted along with the dataset   | false                                                               |
 | `retries`                                                           | [Optional[utils.RetryConfig]](../../models/utils/retryconfig.md)    | :heavy_minus_sign:                                                  | Configuration to override the default retry behavior of the client. |                                                                     |
 
 ### Response
@@ -285,7 +285,7 @@ with SDK(
     ),
 ) as sdk:
 
-    res = sdk.spreadsheets.get_sheet_by_id(sheet_id="<id>", spreadsheet_id="<id>", dollar_revision="1A2B3C4D")
+    res = sdk.spreadsheets.get_sheet_by_id(sheet_id="<id>", spreadsheet_id="<id>", revision="1A2B3C4D")
 
     # Handle response
     print(res)
@@ -298,7 +298,7 @@ with SDK(
 | ------------------------------------------------------------------- | ------------------------------------------------------------------- | ------------------------------------------------------------------- | ------------------------------------------------------------------- | ------------------------------------------------------------------- |
 | `sheet_id`                                                          | *str*                                                               | :heavy_check_mark:                                                  | The unique identifier of the sheet                                  |                                                                     |
 | `spreadsheet_id`                                                    | *str*                                                               | :heavy_check_mark:                                                  | The unique identifier of the spreadsheet                            |                                                                     |
-| `dollar_revision`                                                   | *Optional[str]*                                                     | :heavy_minus_sign:                                                  | Returns resources at a specific revision                            | 1A2B3C4D                                                            |
+| `revision`                                                          | *Optional[str]*                                                     | :heavy_minus_sign:                                                  | Returns resources at a specific revision                            | 1A2B3C4D                                                            |
 | `retries`                                                           | [Optional[utils.RetryConfig]](../../models/utils/retryconfig.md)    | :heavy_minus_sign:                                                  | Configuration to override the default retry behavior of the client. |                                                                     |
 
 ### Response
@@ -334,8 +334,8 @@ with SDK(
 ) as sdk:
 
     res = sdk.spreadsheets.get_sheet_data(request={
-        "dollar_cellrange": "A2:B",
-        "dollar_next": "JTI0bGltaXQ9MTAwJiUyNG9mZnNldD0xMDA",
+        "cellrange": "A2:B",
+        "next": "JTI0bGltaXQ9MTAwJiUyNG9mZnNldD0xMDA",
         "sheet_id": "<id>",
         "spreadsheet_id": "<id>",
     })
@@ -386,7 +386,7 @@ with SDK(
 ) as sdk:
 
     res = sdk.spreadsheets.get_sheet_permissions(request={
-        "dollar_next": "JTI0bGltaXQ9MTAwJiUyNG9mZnNldD0xMDA",
+        "next": "JTI0bGltaXQ9MTAwJiUyNG9mZnNldD0xMDA",
         "sheet_id": "<id>",
         "spreadsheet_id": "<id>",
     })
@@ -435,7 +435,7 @@ with SDK(
     ),
 ) as sdk:
 
-    res = sdk.spreadsheets.get_sheets(spreadsheet_id="<id>", dollar_maxpagesize=1000, dollar_next="JTI0bGltaXQ9MTAwJiUyNG9mZnNldD0xMDA", dollar_revision="1A2B3C4D")
+    res = sdk.spreadsheets.get_sheets(spreadsheet_id="<id>", maxpagesize=1000, next="JTI0bGltaXQ9MTAwJiUyNG9mZnNldD0xMDA", revision="1A2B3C4D")
 
     while res is not None:
         # Handle items
@@ -449,9 +449,9 @@ with SDK(
 | Parameter                                                           | Type                                                                | Required                                                            | Description                                                         | Example                                                             |
 | ------------------------------------------------------------------- | ------------------------------------------------------------------- | ------------------------------------------------------------------- | ------------------------------------------------------------------- | ------------------------------------------------------------------- |
 | `spreadsheet_id`                                                    | *str*                                                               | :heavy_check_mark:                                                  | The unique identifier of the spreadsheet                            |                                                                     |
-| `dollar_maxpagesize`                                                | *Optional[int]*                                                     | :heavy_minus_sign:                                                  | The maximum number of results to retrieve                           |                                                                     |
-| `dollar_next`                                                       | *Optional[str]*                                                     | :heavy_minus_sign:                                                  | Pagination cursor for next set of results.                          | JTI0bGltaXQ9MTAwJiUyNG9mZnNldD0xMDA                                 |
-| `dollar_revision`                                                   | *Optional[str]*                                                     | :heavy_minus_sign:                                                  | Returns resources at a specific revision                            | 1A2B3C4D                                                            |
+| `maxpagesize`                                                       | *Optional[int]*                                                     | :heavy_minus_sign:                                                  | The maximum number of results to retrieve                           |                                                                     |
+| `next`                                                              | *Optional[str]*                                                     | :heavy_minus_sign:                                                  | Pagination cursor for next set of results.                          | JTI0bGltaXQ9MTAwJiUyNG9mZnNldD0xMDA                                 |
+| `revision`                                                          | *Optional[str]*                                                     | :heavy_minus_sign:                                                  | Returns resources at a specific revision                            | 1A2B3C4D                                                            |
 | `retries`                                                           | [Optional[utils.RetryConfig]](../../models/utils/retryconfig.md)    | :heavy_minus_sign:                                                  | Configuration to override the default retry behavior of the client. |                                                                     |
 
 ### Response
@@ -485,7 +485,7 @@ with SDK(
     ),
 ) as sdk:
 
-    res = sdk.spreadsheets.get_spreadsheet_by_id(spreadsheet_id="<id>", dollar_revision="1A2B3C4D")
+    res = sdk.spreadsheets.get_spreadsheet_by_id(spreadsheet_id="<id>", revision="1A2B3C4D")
 
     # Handle response
     print(res)
@@ -497,7 +497,7 @@ with SDK(
 | Parameter                                                           | Type                                                                | Required                                                            | Description                                                         | Example                                                             |
 | ------------------------------------------------------------------- | ------------------------------------------------------------------- | ------------------------------------------------------------------- | ------------------------------------------------------------------- | ------------------------------------------------------------------- |
 | `spreadsheet_id`                                                    | *str*                                                               | :heavy_check_mark:                                                  | The unique identifier of the spreadsheet                            |                                                                     |
-| `dollar_revision`                                                   | *Optional[str]*                                                     | :heavy_minus_sign:                                                  | Returns resources at a specific revision                            | 1A2B3C4D                                                            |
+| `revision`                                                          | *Optional[str]*                                                     | :heavy_minus_sign:                                                  | Returns resources at a specific revision                            | 1A2B3C4D                                                            |
 | `retries`                                                           | [Optional[utils.RetryConfig]](../../models/utils/retryconfig.md)    | :heavy_minus_sign:                                                  | Configuration to override the default retry behavior of the client. |                                                                     |
 
 ### Response
@@ -530,7 +530,7 @@ with SDK(
     ),
 ) as sdk:
 
-    res = sdk.spreadsheets.get_spreadsheet_milestones(spreadsheet_id="<id>", dollar_next="JTI0bGltaXQ9MTAwJiUyNG9mZnNldD0xMDA")
+    res = sdk.spreadsheets.get_spreadsheet_milestones(spreadsheet_id="<id>", next="JTI0bGltaXQ9MTAwJiUyNG9mZnNldD0xMDA")
 
     while res is not None:
         # Handle items
@@ -544,7 +544,7 @@ with SDK(
 | Parameter                                                           | Type                                                                | Required                                                            | Description                                                         | Example                                                             |
 | ------------------------------------------------------------------- | ------------------------------------------------------------------- | ------------------------------------------------------------------- | ------------------------------------------------------------------- | ------------------------------------------------------------------- |
 | `spreadsheet_id`                                                    | *str*                                                               | :heavy_check_mark:                                                  | The unique identifier of the spreadsheet                            |                                                                     |
-| `dollar_next`                                                       | *Optional[str]*                                                     | :heavy_minus_sign:                                                  | Pagination cursor for next set of results.                          | JTI0bGltaXQ9MTAwJiUyNG9mZnNldD0xMDA                                 |
+| `next`                                                              | *Optional[str]*                                                     | :heavy_minus_sign:                                                  | Pagination cursor for next set of results.                          | JTI0bGltaXQ9MTAwJiUyNG9mZnNldD0xMDA                                 |
 | `retries`                                                           | [Optional[utils.RetryConfig]](../../models/utils/retryconfig.md)    | :heavy_minus_sign:                                                  | Configuration to override the default retry behavior of the client. |                                                                     |
 
 ### Response
@@ -578,7 +578,7 @@ with SDK(
     ),
 ) as sdk:
 
-    res = sdk.spreadsheets.get_spreadsheet_permissions(spreadsheet_id="<id>", dollar_maxpagesize=1000, dollar_next="JTI0bGltaXQ9MTAwJiUyNG9mZnNldD0xMDA")
+    res = sdk.spreadsheets.get_spreadsheet_permissions(spreadsheet_id="<id>", maxpagesize=1000, next="JTI0bGltaXQ9MTAwJiUyNG9mZnNldD0xMDA")
 
     while res is not None:
         # Handle items
@@ -592,9 +592,9 @@ with SDK(
 | Parameter                                                           | Type                                                                | Required                                                            | Description                                                         | Example                                                             |
 | ------------------------------------------------------------------- | ------------------------------------------------------------------- | ------------------------------------------------------------------- | ------------------------------------------------------------------- | ------------------------------------------------------------------- |
 | `spreadsheet_id`                                                    | *str*                                                               | :heavy_check_mark:                                                  | The unique identifier of the spreadsheet                            |                                                                     |
-| `dollar_filter`                                                     | *Optional[str]*                                                     | :heavy_minus_sign:                                                  | The properties to filter the results by.                            |                                                                     |
-| `dollar_maxpagesize`                                                | *Optional[int]*                                                     | :heavy_minus_sign:                                                  | The maximum number of results to retrieve                           |                                                                     |
-| `dollar_next`                                                       | *Optional[str]*                                                     | :heavy_minus_sign:                                                  | Pagination cursor for next set of results.                          | JTI0bGltaXQ9MTAwJiUyNG9mZnNldD0xMDA                                 |
+| `filter_`                                                           | *Optional[str]*                                                     | :heavy_minus_sign:                                                  | The properties to filter the results by.                            |                                                                     |
+| `maxpagesize`                                                       | *Optional[int]*                                                     | :heavy_minus_sign:                                                  | The maximum number of results to retrieve                           |                                                                     |
+| `next`                                                              | *Optional[str]*                                                     | :heavy_minus_sign:                                                  | Pagination cursor for next set of results.                          | JTI0bGltaXQ9MTAwJiUyNG9mZnNldD0xMDA                                 |
 | `retries`                                                           | [Optional[utils.RetryConfig]](../../models/utils/retryconfig.md)    | :heavy_minus_sign:                                                  | Configuration to override the default retry behavior of the client. |                                                                     |
 
 ### Response
@@ -628,7 +628,7 @@ with SDK(
     ),
 ) as sdk:
 
-    res = sdk.spreadsheets.get_spreadsheets(dollar_maxpagesize=1000, dollar_next="JTI0bGltaXQ9MTAwJiUyNG9mZnNldD0xMDA")
+    res = sdk.spreadsheets.get_spreadsheets(maxpagesize=1000, next="JTI0bGltaXQ9MTAwJiUyNG9mZnNldD0xMDA")
 
     while res is not None:
         # Handle items
@@ -641,10 +641,10 @@ with SDK(
 
 | Parameter                                                                                   | Type                                                                                        | Required                                                                                    | Description                                                                                 | Example                                                                                     |
 | ------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------- |
-| `dollar_filter`                                                                             | *Optional[str]*                                                                             | :heavy_minus_sign:                                                                          | The properties to filter the results by.                                                    |                                                                                             |
-| `dollar_maxpagesize`                                                                        | *Optional[int]*                                                                             | :heavy_minus_sign:                                                                          | The maximum number of results to retrieve                                                   |                                                                                             |
-| `dollar_next`                                                                               | *Optional[str]*                                                                             | :heavy_minus_sign:                                                                          | Pagination cursor for next set of results.                                                  | JTI0bGltaXQ9MTAwJiUyNG9mZnNldD0xMDA                                                         |
-| `dollar_order_by`                                                                           | *Optional[str]*                                                                             | :heavy_minus_sign:                                                                          | One or more comma-separated expressions to indicate the order in which to sort the results. |                                                                                             |
+| `filter_`                                                                                   | *Optional[str]*                                                                             | :heavy_minus_sign:                                                                          | The properties to filter the results by.                                                    |                                                                                             |
+| `maxpagesize`                                                                               | *Optional[int]*                                                                             | :heavy_minus_sign:                                                                          | The maximum number of results to retrieve                                                   |                                                                                             |
+| `next`                                                                                      | *Optional[str]*                                                                             | :heavy_minus_sign:                                                                          | Pagination cursor for next set of results.                                                  | JTI0bGltaXQ9MTAwJiUyNG9mZnNldD0xMDA                                                         |
+| `order_by`                                                                                  | *Optional[str]*                                                                             | :heavy_minus_sign:                                                                          | One or more comma-separated expressions to indicate the order in which to sort the results. |                                                                                             |
 | `retries`                                                                                   | [Optional[utils.RetryConfig]](../../models/utils/retryconfig.md)                            | :heavy_minus_sign:                                                                          | Configuration to override the default retry behavior of the client.                         |                                                                                             |
 
 ### Response
@@ -679,11 +679,11 @@ with SDK(
 ) as sdk:
 
     res = sdk.spreadsheets.get_values_by_range(request={
-        "dollar_next": "JTI0bGltaXQ9MTAwJiUyNG9mZnNldD0xMDA",
-        "dollar_valuestyle": models.ValueStyle.RAW,
+        "next": "JTI0bGltaXQ9MTAwJiUyNG9mZnNldD0xMDA",
         "range": None,
         "sheet_id": "<id>",
         "spreadsheet_id": "<id>",
+        "valuestyle": models.ValueStyle.RAW,
     })
 
     while res is not None:

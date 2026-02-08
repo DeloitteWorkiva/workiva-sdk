@@ -766,7 +766,7 @@ with SDK(
     ),
 ) as sdk:
 
-    res = sdk.admin.get_organization_users(organization_id="d6e178fd-4dd5-47e5-9457-68dd64b03655", dollar_maxpagesize=1000, dollar_next="JTI0bGltaXQ9MTAwJiUyNG9mZnNldD0xMDA")
+    res = sdk.admin.get_organization_users(organization_id="d6e178fd-4dd5-47e5-9457-68dd64b03655", maxpagesize=1000, next="JTI0bGltaXQ9MTAwJiUyNG9mZnNldD0xMDA")
 
     while res is not None:
         # Handle items
@@ -780,9 +780,9 @@ with SDK(
 | Parameter                                                           | Type                                                                | Required                                                            | Description                                                         | Example                                                             |
 | ------------------------------------------------------------------- | ------------------------------------------------------------------- | ------------------------------------------------------------------- | ------------------------------------------------------------------- | ------------------------------------------------------------------- |
 | `organization_id`                                                   | *str*                                                               | :heavy_check_mark:                                                  | The unique identifier of the organization                           | d6e178fd-4dd5-47e5-9457-68dd64b03655                                |
-| `dollar_filter`                                                     | *Optional[str]*                                                     | :heavy_minus_sign:                                                  | The properties to filter the results by.                            |                                                                     |
-| `dollar_maxpagesize`                                                | *Optional[int]*                                                     | :heavy_minus_sign:                                                  | The maximum number of results to retrieve                           |                                                                     |
-| `dollar_next`                                                       | *Optional[str]*                                                     | :heavy_minus_sign:                                                  | Pagination cursor for next set of results.                          | JTI0bGltaXQ9MTAwJiUyNG9mZnNldD0xMDA                                 |
+| `filter_`                                                           | *Optional[str]*                                                     | :heavy_minus_sign:                                                  | The properties to filter the results by.                            |                                                                     |
+| `maxpagesize`                                                       | *Optional[int]*                                                     | :heavy_minus_sign:                                                  | The maximum number of results to retrieve                           |                                                                     |
+| `next`                                                              | *Optional[str]*                                                     | :heavy_minus_sign:                                                  | Pagination cursor for next set of results.                          | JTI0bGltaXQ9MTAwJiUyNG9mZnNldD0xMDA                                 |
 | `retries`                                                           | [Optional[utils.RetryConfig]](../../models/utils/retryconfig.md)    | :heavy_minus_sign:                                                  | Configuration to override the default retry behavior of the client. |                                                                     |
 
 ### Response
@@ -906,8 +906,8 @@ from workiva import SDK
 with SDK() as sdk:
 
     res = sdk.admin.get_organizations(request={
-        "dollar_next": "JTI0bGltaXQ9MTAwJiUyNG9mZnNldD0xMDA",
         "wk_service_provider": "<value>",
+        "next": "JTI0bGltaXQ9MTAwJiUyNG9mZnNldD0xMDA",
     })
 
     while res is not None:
@@ -955,7 +955,7 @@ with SDK(
     ),
 ) as sdk:
 
-    res = sdk.admin.get_workspace_by_id(organization_id="d6e178fd-4dd5-47e5-9457-68dd64b03655", workspace_id="<id>", dollar_expand="?$expand=relationships\n")
+    res = sdk.admin.get_workspace_by_id(organization_id="d6e178fd-4dd5-47e5-9457-68dd64b03655", workspace_id="<id>", expand="?$expand=relationships\n")
 
     # Handle response
     print(res)
@@ -968,7 +968,7 @@ with SDK(
 | ------------------------------------------------------------------- | ------------------------------------------------------------------- | ------------------------------------------------------------------- | ------------------------------------------------------------------- | ------------------------------------------------------------------- |
 | `organization_id`                                                   | *str*                                                               | :heavy_check_mark:                                                  | The unique identifier of the organization                           | d6e178fd-4dd5-47e5-9457-68dd64b03655                                |
 | `workspace_id`                                                      | *str*                                                               | :heavy_check_mark:                                                  | The unique identifier of the workspace                              |                                                                     |
-| `dollar_expand`                                                     | *Optional[str]*                                                     | :heavy_minus_sign:                                                  | Returns related resources inline with the main resource             | ?$expand=relationships<br/>                                         |
+| `expand`                                                            | *Optional[str]*                                                     | :heavy_minus_sign:                                                  | Returns related resources inline with the main resource             | ?$expand=relationships<br/>                                         |
 | `retries`                                                           | [Optional[utils.RetryConfig]](../../models/utils/retryconfig.md)    | :heavy_minus_sign:                                                  | Configuration to override the default retry behavior of the client. |                                                                     |
 
 ### Response
@@ -1002,7 +1002,7 @@ with SDK(
     ),
 ) as sdk:
 
-    res = sdk.admin.get_workspace_group_by_id(group_id="V0ZHcm91cB5XRkdyb3VwOkFMTF9VU0VSUznxMjD1NTVyNDg3", organization_id="d6e178fd-4dd5-47e5-9457-68dd64b03655", workspace_id="<id>", dollar_expand="?$expand=relationships\n")
+    res = sdk.admin.get_workspace_group_by_id(group_id="V0ZHcm91cB5XRkdyb3VwOkFMTF9VU0VSUznxMjD1NTVyNDg3", organization_id="d6e178fd-4dd5-47e5-9457-68dd64b03655", workspace_id="<id>", expand="?$expand=relationships\n")
 
     # Handle response
     print(res)
@@ -1016,7 +1016,7 @@ with SDK(
 | `group_id`                                                          | *str*                                                               | :heavy_check_mark:                                                  | The unique identifier of the group                                  | V0ZHcm91cB5XRkdyb3VwOkFMTF9VU0VSUznxMjD1NTVyNDg3                    |
 | `organization_id`                                                   | *str*                                                               | :heavy_check_mark:                                                  | The unique identifier of the organization                           | d6e178fd-4dd5-47e5-9457-68dd64b03655                                |
 | `workspace_id`                                                      | *str*                                                               | :heavy_check_mark:                                                  | The unique identifier of the workspace                              |                                                                     |
-| `dollar_expand`                                                     | *Optional[str]*                                                     | :heavy_minus_sign:                                                  | Returns related resources inline with the main resource             | ?$expand=relationships<br/>                                         |
+| `expand`                                                            | *Optional[str]*                                                     | :heavy_minus_sign:                                                  | Returns related resources inline with the main resource             | ?$expand=relationships<br/>                                         |
 | `retries`                                                           | [Optional[utils.RetryConfig]](../../models/utils/retryconfig.md)    | :heavy_minus_sign:                                                  | Configuration to override the default retry behavior of the client. |                                                                     |
 
 ### Response
@@ -1050,8 +1050,8 @@ with SDK(
 ) as sdk:
 
     res = sdk.admin.get_workspace_group_members(request={
-        "dollar_next": "JTI0bGltaXQ9MTAwJiUyNG9mZnNldD0xMDA",
         "group_id": "V0ZHcm91cB5XRkdyb3VwOkFMTF9VU0VSUznxMjD1NTVyNDg3",
+        "next": "JTI0bGltaXQ9MTAwJiUyNG9mZnNldD0xMDA",
         "organization_id": "d6e178fd-4dd5-47e5-9457-68dd64b03655",
         "workspace_id": "<id>",
     })
@@ -1101,7 +1101,7 @@ with SDK(
 ) as sdk:
 
     res = sdk.admin.get_workspace_groups(request={
-        "dollar_next": "JTI0bGltaXQ9MTAwJiUyNG9mZnNldD0xMDA",
+        "next": "JTI0bGltaXQ9MTAwJiUyNG9mZnNldD0xMDA",
         "organization_id": "d6e178fd-4dd5-47e5-9457-68dd64b03655",
         "workspace_id": "<id>",
     })
@@ -1198,7 +1198,7 @@ with SDK(
 ) as sdk:
 
     res = sdk.admin.get_workspace_memberships(request={
-        "dollar_next": "JTI0bGltaXQ9MTAwJiUyNG9mZnNldD0xMDA",
+        "next": "JTI0bGltaXQ9MTAwJiUyNG9mZnNldD0xMDA",
         "organization_id": "d6e178fd-4dd5-47e5-9457-68dd64b03655",
         "workspace_id": "<id>",
     })
@@ -1340,7 +1340,7 @@ with SDK(
     ),
 ) as sdk:
 
-    res = sdk.admin.get_workspaces(organization_id="d6e178fd-4dd5-47e5-9457-68dd64b03655", dollar_expand="?$expand=relationships\n", dollar_maxpagesize=1000, dollar_next="JTI0bGltaXQ9MTAwJiUyNG9mZnNldD0xMDA")
+    res = sdk.admin.get_workspaces(organization_id="d6e178fd-4dd5-47e5-9457-68dd64b03655", expand="?$expand=relationships\n", maxpagesize=1000, next="JTI0bGltaXQ9MTAwJiUyNG9mZnNldD0xMDA")
 
     while res is not None:
         # Handle items
@@ -1354,9 +1354,9 @@ with SDK(
 | Parameter                                                           | Type                                                                | Required                                                            | Description                                                         | Example                                                             |
 | ------------------------------------------------------------------- | ------------------------------------------------------------------- | ------------------------------------------------------------------- | ------------------------------------------------------------------- | ------------------------------------------------------------------- |
 | `organization_id`                                                   | *str*                                                               | :heavy_check_mark:                                                  | The unique identifier of the organization                           | d6e178fd-4dd5-47e5-9457-68dd64b03655                                |
-| `dollar_expand`                                                     | *Optional[str]*                                                     | :heavy_minus_sign:                                                  | Returns related resources inline with the main resource             | ?$expand=relationships<br/>                                         |
-| `dollar_maxpagesize`                                                | *Optional[int]*                                                     | :heavy_minus_sign:                                                  | The maximum number of results to retrieve                           |                                                                     |
-| `dollar_next`                                                       | *Optional[str]*                                                     | :heavy_minus_sign:                                                  | Pagination cursor for next set of results.                          | JTI0bGltaXQ9MTAwJiUyNG9mZnNldD0xMDA                                 |
+| `expand`                                                            | *Optional[str]*                                                     | :heavy_minus_sign:                                                  | Returns related resources inline with the main resource             | ?$expand=relationships<br/>                                         |
+| `maxpagesize`                                                       | *Optional[int]*                                                     | :heavy_minus_sign:                                                  | The maximum number of results to retrieve                           |                                                                     |
+| `next`                                                              | *Optional[str]*                                                     | :heavy_minus_sign:                                                  | Pagination cursor for next set of results.                          | JTI0bGltaXQ9MTAwJiUyNG9mZnNldD0xMDA                                 |
 | `retries`                                                           | [Optional[utils.RetryConfig]](../../models/utils/retryconfig.md)    | :heavy_minus_sign:                                                  | Configuration to override the default retry behavior of the client. |                                                                     |
 
 ### Response

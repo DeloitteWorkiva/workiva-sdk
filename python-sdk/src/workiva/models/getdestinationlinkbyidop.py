@@ -12,7 +12,7 @@ from workiva.utils import FieldMetadata, PathParamMetadata, QueryParamMetadata
 class GetDestinationLinkByIDRequestTypedDict(TypedDict):
     destination_link_id: str
     r"""The unique identifier of the destination link"""
-    dollar_revision: NotRequired[str]
+    revision: NotRequired[str]
     r"""Returns resources at a specific revision"""
 
 
@@ -24,7 +24,7 @@ class GetDestinationLinkByIDRequest(BaseModel):
     ]
     r"""The unique identifier of the destination link"""
 
-    dollar_revision: Annotated[
+    revision: Annotated[
         Optional[str],
         pydantic.Field(alias="$revision"),
         FieldMetadata(query=QueryParamMetadata(style="form", explode=True)),
@@ -33,7 +33,7 @@ class GetDestinationLinkByIDRequest(BaseModel):
 
     @model_serializer(mode="wrap")
     def serialize_model(self, handler):
-        optional_fields = set(["$revision"])
+        optional_fields = set(["revision"])
         serialized = handler(self)
         m = {}
 

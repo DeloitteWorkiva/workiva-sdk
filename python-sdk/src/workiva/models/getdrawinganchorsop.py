@@ -13,11 +13,11 @@ from workiva.utils import FieldMetadata, PathParamMetadata, QueryParamMetadata
 class GetDrawingAnchorsRequestTypedDict(TypedDict):
     drawing_id: str
     r"""The unique identifier of a drawing"""
-    dollar_maxpagesize: NotRequired[int]
+    maxpagesize: NotRequired[int]
     r"""The maximum number of results to retrieve"""
-    dollar_next: NotRequired[str]
+    next: NotRequired[str]
     r"""Pagination cursor for next set of results."""
-    dollar_revision: NotRequired[str]
+    revision: NotRequired[str]
     r"""Returns resources at a specific revision"""
 
 
@@ -29,21 +29,21 @@ class GetDrawingAnchorsRequest(BaseModel):
     ]
     r"""The unique identifier of a drawing"""
 
-    dollar_maxpagesize: Annotated[
+    maxpagesize: Annotated[
         Optional[int],
         pydantic.Field(alias="$maxpagesize"),
         FieldMetadata(query=QueryParamMetadata(style="form", explode=True)),
     ] = 1000
     r"""The maximum number of results to retrieve"""
 
-    dollar_next: Annotated[
+    next: Annotated[
         Optional[str],
         pydantic.Field(alias="$next"),
         FieldMetadata(query=QueryParamMetadata(style="form", explode=True)),
     ] = None
     r"""Pagination cursor for next set of results."""
 
-    dollar_revision: Annotated[
+    revision: Annotated[
         Optional[str],
         pydantic.Field(alias="$revision"),
         FieldMetadata(query=QueryParamMetadata(style="form", explode=True)),
@@ -52,7 +52,7 @@ class GetDrawingAnchorsRequest(BaseModel):
 
     @model_serializer(mode="wrap")
     def serialize_model(self, handler):
-        optional_fields = set(["$maxpagesize", "$next", "$revision"])
+        optional_fields = set(["maxpagesize", "next", "revision"])
         serialized = handler(self)
         m = {}
 

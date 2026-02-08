@@ -87,7 +87,7 @@ with SDK(
     ),
 ) as sdk:
 
-    res = sdk.activities.get_activity_actions(dollar_maxpagesize=1000, dollar_next="JTI0bGltaXQ9MTAwJiUyNG9mZnNldD0xMDA")
+    res = sdk.activities.get_activity_actions(maxpagesize=1000, next="JTI0bGltaXQ9MTAwJiUyNG9mZnNldD0xMDA")
 
     while res is not None:
         # Handle items
@@ -100,9 +100,9 @@ with SDK(
 
 | Parameter                                                                                   | Type                                                                                        | Required                                                                                    | Description                                                                                 | Example                                                                                     |
 | ------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------- |
-| `dollar_maxpagesize`                                                                        | *Optional[int]*                                                                             | :heavy_minus_sign:                                                                          | The maximum number of results to retrieve                                                   |                                                                                             |
-| `dollar_next`                                                                               | *Optional[str]*                                                                             | :heavy_minus_sign:                                                                          | Pagination cursor for next set of results.                                                  | JTI0bGltaXQ9MTAwJiUyNG9mZnNldD0xMDA                                                         |
-| `dollar_order_by`                                                                           | *Optional[str]*                                                                             | :heavy_minus_sign:                                                                          | One or more comma-separated expressions to indicate the order in which to sort the results. |                                                                                             |
+| `maxpagesize`                                                                               | *Optional[int]*                                                                             | :heavy_minus_sign:                                                                          | The maximum number of results to retrieve                                                   |                                                                                             |
+| `next`                                                                                      | *Optional[str]*                                                                             | :heavy_minus_sign:                                                                          | Pagination cursor for next set of results.                                                  | JTI0bGltaXQ9MTAwJiUyNG9mZnNldD0xMDA                                                         |
+| `order_by`                                                                                  | *Optional[str]*                                                                             | :heavy_minus_sign:                                                                          | One or more comma-separated expressions to indicate the order in which to sort the results. |                                                                                             |
 | `retries`                                                                                   | [Optional[utils.RetryConfig]](../../models/utils/retryconfig.md)                            | :heavy_minus_sign:                                                                          | Configuration to override the default retry behavior of the client.                         |                                                                                             |
 
 ### Response
@@ -192,7 +192,7 @@ with SDK(
 ) as sdk:
 
     res = sdk.activities.get_organization_activities(request={
-        "dollar_next": "JTI0bGltaXQ9MTAwJiUyNG9mZnNldD0xMDA",
+        "next": "JTI0bGltaXQ9MTAwJiUyNG9mZnNldD0xMDA",
         "organization_id": "d6e178fd-4dd5-47e5-9457-68dd64b03655",
     })
 
@@ -247,7 +247,7 @@ with SDK(
 ) as sdk:
 
     res = sdk.activities.get_organization_workspace_activities(request={
-        "dollar_next": "JTI0bGltaXQ9MTAwJiUyNG9mZnNldD0xMDA",
+        "next": "JTI0bGltaXQ9MTAwJiUyNG9mZnNldD0xMDA",
         "organization_id": "d6e178fd-4dd5-47e5-9457-68dd64b03655",
         "workspace_id": "<id>",
     })

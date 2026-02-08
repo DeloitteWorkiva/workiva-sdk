@@ -14,7 +14,7 @@ class GetRichTextAnchorByIDRequestTypedDict(TypedDict):
     r"""The unique identifier of the anchor"""
     rich_text_id: str
     r"""The unique identifier of the rich text content"""
-    dollar_revision: NotRequired[str]
+    revision: NotRequired[str]
     r"""Returns resources at a specific revision"""
 
 
@@ -33,7 +33,7 @@ class GetRichTextAnchorByIDRequest(BaseModel):
     ]
     r"""The unique identifier of the rich text content"""
 
-    dollar_revision: Annotated[
+    revision: Annotated[
         Optional[str],
         pydantic.Field(alias="$revision"),
         FieldMetadata(query=QueryParamMetadata(style="form", explode=True)),
@@ -42,7 +42,7 @@ class GetRichTextAnchorByIDRequest(BaseModel):
 
     @model_serializer(mode="wrap")
     def serialize_model(self, handler):
-        optional_fields = set(["$revision"])
+        optional_fields = set(["revision"])
         serialized = handler(self)
         m = {}
 

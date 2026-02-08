@@ -13,7 +13,7 @@ from workiva.utils import FieldMetadata, PathParamMetadata, QueryParamMetadata
 class GetSpreadsheetMilestonesRequestTypedDict(TypedDict):
     spreadsheet_id: str
     r"""The unique identifier of the spreadsheet"""
-    dollar_next: NotRequired[str]
+    next: NotRequired[str]
     r"""Pagination cursor for next set of results."""
 
 
@@ -25,7 +25,7 @@ class GetSpreadsheetMilestonesRequest(BaseModel):
     ]
     r"""The unique identifier of the spreadsheet"""
 
-    dollar_next: Annotated[
+    next: Annotated[
         Optional[str],
         pydantic.Field(alias="$next"),
         FieldMetadata(query=QueryParamMetadata(style="form", explode=True)),
@@ -34,7 +34,7 @@ class GetSpreadsheetMilestonesRequest(BaseModel):
 
     @model_serializer(mode="wrap")
     def serialize_model(self, handler):
-        optional_fields = set(["$next"])
+        optional_fields = set(["next"])
         serialized = handler(self)
         m = {}
 

@@ -14,7 +14,7 @@ class DeleteDatasetBySheetIDRequestTypedDict(TypedDict):
     r"""The unique identifier of the sheet"""
     spreadsheet_id: str
     r"""The unique identifier of the spreadsheet"""
-    dollar_deletevalues: NotRequired[bool]
+    deletevalues: NotRequired[bool]
     r"""Indicates whether values should be deleted along with the dataset"""
 
 
@@ -33,7 +33,7 @@ class DeleteDatasetBySheetIDRequest(BaseModel):
     ]
     r"""The unique identifier of the spreadsheet"""
 
-    dollar_deletevalues: Annotated[
+    deletevalues: Annotated[
         Optional[bool],
         pydantic.Field(alias="$deletevalues"),
         FieldMetadata(query=QueryParamMetadata(style="form", explode=True)),
@@ -42,7 +42,7 @@ class DeleteDatasetBySheetIDRequest(BaseModel):
 
     @model_serializer(mode="wrap")
     def serialize_model(self, handler):
-        optional_fields = set(["$deletevalues"])
+        optional_fields = set(["deletevalues"])
         serialized = handler(self)
         m = {}
 

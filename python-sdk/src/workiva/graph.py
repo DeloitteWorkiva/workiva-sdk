@@ -227,7 +227,7 @@ class Graph(BaseSDK):
         self,
         *,
         record_id: str,
-        dollar_expand: Optional[str] = None,
+        expand: Optional[str] = None,
         retries: OptionalNullable[utils.RetryConfig] = UNSET,
         server_url: Optional[str] = None,
         timeout_ms: Optional[int] = None,
@@ -238,7 +238,7 @@ class Graph(BaseSDK):
         Retrieves a [record](ref:graph#record) given its ID. The unique identifier is typically a UUID, but it may be a different unique string in some cases.
 
         :param record_id: The unique identifier of the record
-        :param dollar_expand: Returns related resources inline with the main resource
+        :param expand: Returns related resources inline with the main resource
         :param retries: Override the default retry configuration for this method
         :param server_url: Override the default server URL for this method
         :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
@@ -255,7 +255,7 @@ class Graph(BaseSDK):
             base_url = self._get_url(base_url, url_variables)
 
         request = models.GetRecordByIDRequest(
-            dollar_expand=dollar_expand,
+            expand=expand,
             record_id=record_id,
         )
 
@@ -332,7 +332,7 @@ class Graph(BaseSDK):
         self,
         *,
         record_id: str,
-        dollar_expand: Optional[str] = None,
+        expand: Optional[str] = None,
         retries: OptionalNullable[utils.RetryConfig] = UNSET,
         server_url: Optional[str] = None,
         timeout_ms: Optional[int] = None,
@@ -343,7 +343,7 @@ class Graph(BaseSDK):
         Retrieves a [record](ref:graph#record) given its ID. The unique identifier is typically a UUID, but it may be a different unique string in some cases.
 
         :param record_id: The unique identifier of the record
-        :param dollar_expand: Returns related resources inline with the main resource
+        :param expand: Returns related resources inline with the main resource
         :param retries: Override the default retry configuration for this method
         :param server_url: Override the default server URL for this method
         :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
@@ -360,7 +360,7 @@ class Graph(BaseSDK):
             base_url = self._get_url(base_url, url_variables)
 
         request = models.GetRecordByIDRequest(
-            dollar_expand=dollar_expand,
+            expand=expand,
             record_id=record_id,
         )
 
@@ -436,8 +436,8 @@ class Graph(BaseSDK):
     def get_records(
         self,
         *,
-        dollar_expand: Optional[str] = None,
-        dollar_filter: Optional[str] = None,
+        expand: Optional[str] = None,
+        filter_: Optional[str] = None,
         retries: OptionalNullable[utils.RetryConfig] = UNSET,
         server_url: Optional[str] = None,
         timeout_ms: Optional[int] = None,
@@ -447,8 +447,8 @@ class Graph(BaseSDK):
 
         Returns a list of [records](ref:graph#record) matching the provided filters. At least one filter is required. If no filter is provided an error will be returned.
 
-        :param dollar_expand: Returns related resources inline with the main resource
-        :param dollar_filter: The properties to filter the results by.
+        :param expand: Returns related resources inline with the main resource
+        :param filter_: The properties to filter the results by.
         :param retries: Override the default retry configuration for this method
         :param server_url: Override the default server URL for this method
         :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
@@ -465,8 +465,8 @@ class Graph(BaseSDK):
             base_url = self._get_url(base_url, url_variables)
 
         request = models.GetRecordsRequest(
-            dollar_expand=dollar_expand,
-            dollar_filter=dollar_filter,
+            expand=expand,
+            filter_=filter_,
         )
 
         req = self._build_request(
@@ -541,8 +541,8 @@ class Graph(BaseSDK):
     async def get_records_async(
         self,
         *,
-        dollar_expand: Optional[str] = None,
-        dollar_filter: Optional[str] = None,
+        expand: Optional[str] = None,
+        filter_: Optional[str] = None,
         retries: OptionalNullable[utils.RetryConfig] = UNSET,
         server_url: Optional[str] = None,
         timeout_ms: Optional[int] = None,
@@ -552,8 +552,8 @@ class Graph(BaseSDK):
 
         Returns a list of [records](ref:graph#record) matching the provided filters. At least one filter is required. If no filter is provided an error will be returned.
 
-        :param dollar_expand: Returns related resources inline with the main resource
-        :param dollar_filter: The properties to filter the results by.
+        :param expand: Returns related resources inline with the main resource
+        :param filter_: The properties to filter the results by.
         :param retries: Override the default retry configuration for this method
         :param server_url: Override the default server URL for this method
         :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
@@ -570,8 +570,8 @@ class Graph(BaseSDK):
             base_url = self._get_url(base_url, url_variables)
 
         request = models.GetRecordsRequest(
-            dollar_expand=dollar_expand,
-            dollar_filter=dollar_filter,
+            expand=expand,
+            filter_=filter_,
         )
 
         req = self._build_request_async(
@@ -647,7 +647,7 @@ class Graph(BaseSDK):
         self,
         *,
         type_id: str,
-        dollar_expand: Optional[str] = None,
+        expand: Optional[str] = None,
         retries: OptionalNullable[utils.RetryConfig] = UNSET,
         server_url: Optional[str] = None,
         timeout_ms: Optional[int] = None,
@@ -659,7 +659,7 @@ class Graph(BaseSDK):
 
 
         :param type_id: The unique identifier of the type
-        :param dollar_expand: Returns related resources inline with the main resource
+        :param expand: Returns related resources inline with the main resource
         :param retries: Override the default retry configuration for this method
         :param server_url: Override the default server URL for this method
         :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
@@ -676,7 +676,7 @@ class Graph(BaseSDK):
             base_url = self._get_url(base_url, url_variables)
 
         request = models.GetTypeByIDRequest(
-            dollar_expand=dollar_expand,
+            expand=expand,
             type_id=type_id,
         )
 
@@ -753,7 +753,7 @@ class Graph(BaseSDK):
         self,
         *,
         type_id: str,
-        dollar_expand: Optional[str] = None,
+        expand: Optional[str] = None,
         retries: OptionalNullable[utils.RetryConfig] = UNSET,
         server_url: Optional[str] = None,
         timeout_ms: Optional[int] = None,
@@ -765,7 +765,7 @@ class Graph(BaseSDK):
 
 
         :param type_id: The unique identifier of the type
-        :param dollar_expand: Returns related resources inline with the main resource
+        :param expand: Returns related resources inline with the main resource
         :param retries: Override the default retry configuration for this method
         :param server_url: Override the default server URL for this method
         :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
@@ -782,7 +782,7 @@ class Graph(BaseSDK):
             base_url = self._get_url(base_url, url_variables)
 
         request = models.GetTypeByIDRequest(
-            dollar_expand=dollar_expand,
+            expand=expand,
             type_id=type_id,
         )
 
@@ -858,7 +858,7 @@ class Graph(BaseSDK):
     def get_types(
         self,
         *,
-        dollar_expand: Optional[str] = None,
+        expand: Optional[str] = None,
         retries: OptionalNullable[utils.RetryConfig] = UNSET,
         server_url: Optional[str] = None,
         timeout_ms: Optional[int] = None,
@@ -869,7 +869,7 @@ class Graph(BaseSDK):
         The Types endpoint is used to discover what [types](ref:graph#type) of records exist and their attributes. This endpoint lets you know what to expect from the Records endpoints.
 
 
-        :param dollar_expand: Returns related resources inline with the main resource
+        :param expand: Returns related resources inline with the main resource
         :param retries: Override the default retry configuration for this method
         :param server_url: Override the default server URL for this method
         :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
@@ -886,7 +886,7 @@ class Graph(BaseSDK):
             base_url = self._get_url(base_url, url_variables)
 
         request = models.GetTypesRequest(
-            dollar_expand=dollar_expand,
+            expand=expand,
         )
 
         req = self._build_request(
@@ -961,7 +961,7 @@ class Graph(BaseSDK):
     async def get_types_async(
         self,
         *,
-        dollar_expand: Optional[str] = None,
+        expand: Optional[str] = None,
         retries: OptionalNullable[utils.RetryConfig] = UNSET,
         server_url: Optional[str] = None,
         timeout_ms: Optional[int] = None,
@@ -972,7 +972,7 @@ class Graph(BaseSDK):
         The Types endpoint is used to discover what [types](ref:graph#type) of records exist and their attributes. This endpoint lets you know what to expect from the Records endpoints.
 
 
-        :param dollar_expand: Returns related resources inline with the main resource
+        :param expand: Returns related resources inline with the main resource
         :param retries: Override the default retry configuration for this method
         :param server_url: Override the default server URL for this method
         :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
@@ -989,7 +989,7 @@ class Graph(BaseSDK):
             base_url = self._get_url(base_url, url_variables)
 
         request = models.GetTypesRequest(
-            dollar_expand=dollar_expand,
+            expand=expand,
         )
 
         req = self._build_request_async(

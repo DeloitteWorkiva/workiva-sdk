@@ -118,7 +118,7 @@ with SDK(
     ),
 ) as sdk:
 
-    res = sdk.graph.get_record_by_id(record_id="<id>", dollar_expand="?$expand=relationships\n")
+    res = sdk.graph.get_record_by_id(record_id="<id>", expand="?$expand=relationships\n")
 
     # Handle response
     print(res)
@@ -130,7 +130,7 @@ with SDK(
 | Parameter                                                           | Type                                                                | Required                                                            | Description                                                         | Example                                                             |
 | ------------------------------------------------------------------- | ------------------------------------------------------------------- | ------------------------------------------------------------------- | ------------------------------------------------------------------- | ------------------------------------------------------------------- |
 | `record_id`                                                         | *str*                                                               | :heavy_check_mark:                                                  | The unique identifier of the record                                 |                                                                     |
-| `dollar_expand`                                                     | *Optional[str]*                                                     | :heavy_minus_sign:                                                  | Returns related resources inline with the main resource             | ?$expand=relationships<br/>                                         |
+| `expand`                                                            | *Optional[str]*                                                     | :heavy_minus_sign:                                                  | Returns related resources inline with the main resource             | ?$expand=relationships<br/>                                         |
 | `retries`                                                           | [Optional[utils.RetryConfig]](../../models/utils/retryconfig.md)    | :heavy_minus_sign:                                                  | Configuration to override the default retry behavior of the client. |                                                                     |
 
 ### Response
@@ -163,7 +163,7 @@ with SDK(
     ),
 ) as sdk:
 
-    res = sdk.graph.get_records(dollar_expand="?$expand=relationships\n")
+    res = sdk.graph.get_records(expand="?$expand=relationships\n")
 
     # Handle response
     print(res)
@@ -174,8 +174,8 @@ with SDK(
 
 | Parameter                                                           | Type                                                                | Required                                                            | Description                                                         | Example                                                             |
 | ------------------------------------------------------------------- | ------------------------------------------------------------------- | ------------------------------------------------------------------- | ------------------------------------------------------------------- | ------------------------------------------------------------------- |
-| `dollar_expand`                                                     | *Optional[str]*                                                     | :heavy_minus_sign:                                                  | Returns related resources inline with the main resource             | ?$expand=relationships<br/>                                         |
-| `dollar_filter`                                                     | *Optional[str]*                                                     | :heavy_minus_sign:                                                  | The properties to filter the results by.                            |                                                                     |
+| `expand`                                                            | *Optional[str]*                                                     | :heavy_minus_sign:                                                  | Returns related resources inline with the main resource             | ?$expand=relationships<br/>                                         |
+| `filter_`                                                           | *Optional[str]*                                                     | :heavy_minus_sign:                                                  | The properties to filter the results by.                            |                                                                     |
 | `retries`                                                           | [Optional[utils.RetryConfig]](../../models/utils/retryconfig.md)    | :heavy_minus_sign:                                                  | Configuration to override the default retry behavior of the client. |                                                                     |
 
 ### Response
@@ -209,7 +209,7 @@ with SDK(
     ),
 ) as sdk:
 
-    res = sdk.graph.get_type_by_id(type_id="<id>", dollar_expand="?$expand=relationships\n")
+    res = sdk.graph.get_type_by_id(type_id="<id>", expand="?$expand=relationships\n")
 
     # Handle response
     print(res)
@@ -221,7 +221,7 @@ with SDK(
 | Parameter                                                           | Type                                                                | Required                                                            | Description                                                         | Example                                                             |
 | ------------------------------------------------------------------- | ------------------------------------------------------------------- | ------------------------------------------------------------------- | ------------------------------------------------------------------- | ------------------------------------------------------------------- |
 | `type_id`                                                           | *str*                                                               | :heavy_check_mark:                                                  | The unique identifier of the type                                   |                                                                     |
-| `dollar_expand`                                                     | *Optional[str]*                                                     | :heavy_minus_sign:                                                  | Returns related resources inline with the main resource             | ?$expand=relationships<br/>                                         |
+| `expand`                                                            | *Optional[str]*                                                     | :heavy_minus_sign:                                                  | Returns related resources inline with the main resource             | ?$expand=relationships<br/>                                         |
 | `retries`                                                           | [Optional[utils.RetryConfig]](../../models/utils/retryconfig.md)    | :heavy_minus_sign:                                                  | Configuration to override the default retry behavior of the client. |                                                                     |
 
 ### Response
@@ -255,7 +255,7 @@ with SDK(
     ),
 ) as sdk:
 
-    res = sdk.graph.get_types(dollar_expand="?$expand=relationships\n")
+    res = sdk.graph.get_types(expand="?$expand=relationships\n")
 
     # Handle response
     print(res)
@@ -266,7 +266,7 @@ with SDK(
 
 | Parameter                                                           | Type                                                                | Required                                                            | Description                                                         | Example                                                             |
 | ------------------------------------------------------------------- | ------------------------------------------------------------------- | ------------------------------------------------------------------- | ------------------------------------------------------------------- | ------------------------------------------------------------------- |
-| `dollar_expand`                                                     | *Optional[str]*                                                     | :heavy_minus_sign:                                                  | Returns related resources inline with the main resource             | ?$expand=relationships<br/>                                         |
+| `expand`                                                            | *Optional[str]*                                                     | :heavy_minus_sign:                                                  | Returns related resources inline with the main resource             | ?$expand=relationships<br/>                                         |
 | `retries`                                                           | [Optional[utils.RetryConfig]](../../models/utils/retryconfig.md)    | :heavy_minus_sign:                                                  | Configuration to override the default retry behavior of the client. |                                                                     |
 
 ### Response

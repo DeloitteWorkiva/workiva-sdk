@@ -16,8 +16,8 @@ class Operations(BaseSDK):
         self,
         *,
         operation_id: str,
-        dollar_maxpagesize: Optional[int] = 1000,
-        dollar_next: Optional[str] = None,
+        maxpagesize: Optional[int] = 1000,
+        next: Optional[str] = None,
         retries: OptionalNullable[utils.RetryConfig] = UNSET,
         server_url: Optional[str] = None,
         timeout_ms: Optional[int] = None,
@@ -29,8 +29,8 @@ class Operations(BaseSDK):
 
 
         :param operation_id: The unique identifier of the operation
-        :param dollar_maxpagesize: The maximum number of results to retrieve
-        :param dollar_next: Pagination cursor for next set of results.
+        :param maxpagesize: The maximum number of results to retrieve
+        :param next: Pagination cursor for next set of results.
         :param retries: Override the default retry configuration for this method
         :param server_url: Override the default server URL for this method
         :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
@@ -47,8 +47,8 @@ class Operations(BaseSDK):
             base_url = self._get_url(base_url, url_variables)
 
         request = models.GetBatchUpsertionMetricValuesResultsRequest(
-            dollar_maxpagesize=dollar_maxpagesize,
-            dollar_next=dollar_next,
+            maxpagesize=maxpagesize,
+            next=next,
             operation_id=operation_id,
         )
 
@@ -117,8 +117,8 @@ class Operations(BaseSDK):
 
             return self.get_batch_upsertion_metric_values_results(
                 operation_id=operation_id,
-                dollar_maxpagesize=dollar_maxpagesize,
-                dollar_next=next_cursor,
+                maxpagesize=maxpagesize,
+                next=next,
                 retries=retries,
             )
 
@@ -150,8 +150,8 @@ class Operations(BaseSDK):
         self,
         *,
         operation_id: str,
-        dollar_maxpagesize: Optional[int] = 1000,
-        dollar_next: Optional[str] = None,
+        maxpagesize: Optional[int] = 1000,
+        next: Optional[str] = None,
         retries: OptionalNullable[utils.RetryConfig] = UNSET,
         server_url: Optional[str] = None,
         timeout_ms: Optional[int] = None,
@@ -163,8 +163,8 @@ class Operations(BaseSDK):
 
 
         :param operation_id: The unique identifier of the operation
-        :param dollar_maxpagesize: The maximum number of results to retrieve
-        :param dollar_next: Pagination cursor for next set of results.
+        :param maxpagesize: The maximum number of results to retrieve
+        :param next: Pagination cursor for next set of results.
         :param retries: Override the default retry configuration for this method
         :param server_url: Override the default server URL for this method
         :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
@@ -181,8 +181,8 @@ class Operations(BaseSDK):
             base_url = self._get_url(base_url, url_variables)
 
         request = models.GetBatchUpsertionMetricValuesResultsRequest(
-            dollar_maxpagesize=dollar_maxpagesize,
-            dollar_next=dollar_next,
+            maxpagesize=maxpagesize,
+            next=next,
             operation_id=operation_id,
         )
 
@@ -254,8 +254,8 @@ class Operations(BaseSDK):
 
             return self.get_batch_upsertion_metric_values_results_async(
                 operation_id=operation_id,
-                dollar_maxpagesize=dollar_maxpagesize,
-                dollar_next=next_cursor,
+                maxpagesize=maxpagesize,
+                next=next,
                 retries=retries,
             )
 
@@ -287,8 +287,8 @@ class Operations(BaseSDK):
         self,
         *,
         operation_id: str,
-        dollar_maxpagesize: Optional[int] = 1000,
-        dollar_next: Optional[str] = None,
+        maxpagesize: Optional[int] = 1000,
+        next: Optional[str] = None,
         retries: OptionalNullable[utils.RetryConfig] = UNSET,
         server_url: Optional[str] = None,
         timeout_ms: Optional[int] = None,
@@ -300,8 +300,8 @@ class Operations(BaseSDK):
 
 
         :param operation_id: The unique identifier of the operation
-        :param dollar_maxpagesize: The maximum number of results to retrieve
-        :param dollar_next: Pagination cursor for next set of results.
+        :param maxpagesize: The maximum number of results to retrieve
+        :param next: Pagination cursor for next set of results.
         :param retries: Override the default retry configuration for this method
         :param server_url: Override the default server URL for this method
         :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
@@ -318,8 +318,8 @@ class Operations(BaseSDK):
             base_url = self._get_url(base_url, url_variables)
 
         request = models.GetCopyFileResultsRequest(
-            dollar_maxpagesize=dollar_maxpagesize,
-            dollar_next=dollar_next,
+            maxpagesize=maxpagesize,
+            next=next,
             operation_id=operation_id,
         )
 
@@ -386,8 +386,8 @@ class Operations(BaseSDK):
 
             return self.get_copy_file_results(
                 operation_id=operation_id,
-                dollar_maxpagesize=dollar_maxpagesize,
-                dollar_next=next_cursor,
+                maxpagesize=maxpagesize,
+                next=next,
                 retries=retries,
             )
 
@@ -419,8 +419,8 @@ class Operations(BaseSDK):
         self,
         *,
         operation_id: str,
-        dollar_maxpagesize: Optional[int] = 1000,
-        dollar_next: Optional[str] = None,
+        maxpagesize: Optional[int] = 1000,
+        next: Optional[str] = None,
         retries: OptionalNullable[utils.RetryConfig] = UNSET,
         server_url: Optional[str] = None,
         timeout_ms: Optional[int] = None,
@@ -432,8 +432,8 @@ class Operations(BaseSDK):
 
 
         :param operation_id: The unique identifier of the operation
-        :param dollar_maxpagesize: The maximum number of results to retrieve
-        :param dollar_next: Pagination cursor for next set of results.
+        :param maxpagesize: The maximum number of results to retrieve
+        :param next: Pagination cursor for next set of results.
         :param retries: Override the default retry configuration for this method
         :param server_url: Override the default server URL for this method
         :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
@@ -450,8 +450,8 @@ class Operations(BaseSDK):
             base_url = self._get_url(base_url, url_variables)
 
         request = models.GetCopyFileResultsRequest(
-            dollar_maxpagesize=dollar_maxpagesize,
-            dollar_next=dollar_next,
+            maxpagesize=maxpagesize,
+            next=next,
             operation_id=operation_id,
         )
 
@@ -521,8 +521,8 @@ class Operations(BaseSDK):
 
             return self.get_copy_file_results_async(
                 operation_id=operation_id,
-                dollar_maxpagesize=dollar_maxpagesize,
-                dollar_next=next_cursor,
+                maxpagesize=maxpagesize,
+                next=next,
                 retries=retries,
             )
 
@@ -554,8 +554,8 @@ class Operations(BaseSDK):
         self,
         *,
         operation_id: str,
-        dollar_maxpagesize: Optional[int] = 1000,
-        dollar_next: Optional[str] = None,
+        maxpagesize: Optional[int] = 1000,
+        next: Optional[str] = None,
         retries: OptionalNullable[utils.RetryConfig] = UNSET,
         server_url: Optional[str] = None,
         timeout_ms: Optional[int] = None,
@@ -568,8 +568,8 @@ class Operations(BaseSDK):
 
 
         :param operation_id: The unique identifier of the operation
-        :param dollar_maxpagesize: The maximum number of results to retrieve
-        :param dollar_next: Pagination cursor for next set of results.
+        :param maxpagesize: The maximum number of results to retrieve
+        :param next: Pagination cursor for next set of results.
         :param retries: Override the default retry configuration for this method
         :param server_url: Override the default server URL for this method
         :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
@@ -586,8 +586,8 @@ class Operations(BaseSDK):
             base_url = self._get_url(base_url, url_variables)
 
         request = models.GetDestinationLinkSourceConversionResultsRequest(
-            dollar_maxpagesize=dollar_maxpagesize,
-            dollar_next=dollar_next,
+            maxpagesize=maxpagesize,
+            next=next,
             operation_id=operation_id,
         )
 
@@ -656,8 +656,8 @@ class Operations(BaseSDK):
 
             return self.get_destination_link_source_conversion_results(
                 operation_id=operation_id,
-                dollar_maxpagesize=dollar_maxpagesize,
-                dollar_next=next_cursor,
+                maxpagesize=maxpagesize,
+                next=next,
                 retries=retries,
             )
 
@@ -690,8 +690,8 @@ class Operations(BaseSDK):
         self,
         *,
         operation_id: str,
-        dollar_maxpagesize: Optional[int] = 1000,
-        dollar_next: Optional[str] = None,
+        maxpagesize: Optional[int] = 1000,
+        next: Optional[str] = None,
         retries: OptionalNullable[utils.RetryConfig] = UNSET,
         server_url: Optional[str] = None,
         timeout_ms: Optional[int] = None,
@@ -704,8 +704,8 @@ class Operations(BaseSDK):
 
 
         :param operation_id: The unique identifier of the operation
-        :param dollar_maxpagesize: The maximum number of results to retrieve
-        :param dollar_next: Pagination cursor for next set of results.
+        :param maxpagesize: The maximum number of results to retrieve
+        :param next: Pagination cursor for next set of results.
         :param retries: Override the default retry configuration for this method
         :param server_url: Override the default server URL for this method
         :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
@@ -722,8 +722,8 @@ class Operations(BaseSDK):
             base_url = self._get_url(base_url, url_variables)
 
         request = models.GetDestinationLinkSourceConversionResultsRequest(
-            dollar_maxpagesize=dollar_maxpagesize,
-            dollar_next=dollar_next,
+            maxpagesize=maxpagesize,
+            next=next,
             operation_id=operation_id,
         )
 
@@ -797,8 +797,8 @@ class Operations(BaseSDK):
 
             return self.get_destination_link_source_conversion_results_async(
                 operation_id=operation_id,
-                dollar_maxpagesize=dollar_maxpagesize,
-                dollar_next=next_cursor,
+                maxpagesize=maxpagesize,
+                next=next,
                 retries=retries,
             )
 
@@ -831,8 +831,8 @@ class Operations(BaseSDK):
         self,
         *,
         operation_id: str,
-        dollar_maxpagesize: Optional[int] = 1000,
-        dollar_next: Optional[str] = None,
+        maxpagesize: Optional[int] = 1000,
+        next: Optional[str] = None,
         retries: OptionalNullable[utils.RetryConfig] = UNSET,
         server_url: Optional[str] = None,
         timeout_ms: Optional[int] = None,
@@ -843,8 +843,8 @@ class Operations(BaseSDK):
         Returns a [`ImageUploadResultCollection`](ref:operations#imageuploadresultcollection) describing the results of a image upload.
 
         :param operation_id: The unique identifier of the operation
-        :param dollar_maxpagesize: The maximum number of results to retrieve
-        :param dollar_next: Pagination cursor for next set of results.
+        :param maxpagesize: The maximum number of results to retrieve
+        :param next: Pagination cursor for next set of results.
         :param retries: Override the default retry configuration for this method
         :param server_url: Override the default server URL for this method
         :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
@@ -861,8 +861,8 @@ class Operations(BaseSDK):
             base_url = self._get_url(base_url, url_variables)
 
         request = models.GetImageUploadCreationResultsRequest(
-            dollar_maxpagesize=dollar_maxpagesize,
-            dollar_next=dollar_next,
+            maxpagesize=maxpagesize,
+            next=next,
             operation_id=operation_id,
         )
 
@@ -929,8 +929,8 @@ class Operations(BaseSDK):
 
             return self.get_image_upload_creation_results(
                 operation_id=operation_id,
-                dollar_maxpagesize=dollar_maxpagesize,
-                dollar_next=next_cursor,
+                maxpagesize=maxpagesize,
+                next=next,
                 retries=retries,
             )
 
@@ -963,8 +963,8 @@ class Operations(BaseSDK):
         self,
         *,
         operation_id: str,
-        dollar_maxpagesize: Optional[int] = 1000,
-        dollar_next: Optional[str] = None,
+        maxpagesize: Optional[int] = 1000,
+        next: Optional[str] = None,
         retries: OptionalNullable[utils.RetryConfig] = UNSET,
         server_url: Optional[str] = None,
         timeout_ms: Optional[int] = None,
@@ -975,8 +975,8 @@ class Operations(BaseSDK):
         Returns a [`ImageUploadResultCollection`](ref:operations#imageuploadresultcollection) describing the results of a image upload.
 
         :param operation_id: The unique identifier of the operation
-        :param dollar_maxpagesize: The maximum number of results to retrieve
-        :param dollar_next: Pagination cursor for next set of results.
+        :param maxpagesize: The maximum number of results to retrieve
+        :param next: Pagination cursor for next set of results.
         :param retries: Override the default retry configuration for this method
         :param server_url: Override the default server URL for this method
         :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
@@ -993,8 +993,8 @@ class Operations(BaseSDK):
             base_url = self._get_url(base_url, url_variables)
 
         request = models.GetImageUploadCreationResultsRequest(
-            dollar_maxpagesize=dollar_maxpagesize,
-            dollar_next=dollar_next,
+            maxpagesize=maxpagesize,
+            next=next,
             operation_id=operation_id,
         )
 
@@ -1066,8 +1066,8 @@ class Operations(BaseSDK):
 
             return self.get_image_upload_creation_results_async(
                 operation_id=operation_id,
-                dollar_maxpagesize=dollar_maxpagesize,
-                dollar_next=next_cursor,
+                maxpagesize=maxpagesize,
+                next=next,
                 retries=retries,
             )
 
@@ -1100,8 +1100,8 @@ class Operations(BaseSDK):
         self,
         *,
         operation_id: str,
-        dollar_maxpagesize: Optional[int] = 1000,
-        dollar_next: Optional[str] = None,
+        maxpagesize: Optional[int] = 1000,
+        next: Optional[str] = None,
         retries: OptionalNullable[utils.RetryConfig] = UNSET,
         server_url: Optional[str] = None,
         timeout_ms: Optional[int] = None,
@@ -1113,8 +1113,8 @@ class Operations(BaseSDK):
 
 
         :param operation_id: The unique identifier of the operation
-        :param dollar_maxpagesize: The maximum number of results to retrieve
-        :param dollar_next: Pagination cursor for next set of results.
+        :param maxpagesize: The maximum number of results to retrieve
+        :param next: Pagination cursor for next set of results.
         :param retries: Override the default retry configuration for this method
         :param server_url: Override the default server URL for this method
         :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
@@ -1131,8 +1131,8 @@ class Operations(BaseSDK):
             base_url = self._get_url(base_url, url_variables)
 
         request = models.GetImportFileResultsRequest(
-            dollar_maxpagesize=dollar_maxpagesize,
-            dollar_next=dollar_next,
+            maxpagesize=maxpagesize,
+            next=next,
             operation_id=operation_id,
         )
 
@@ -1199,8 +1199,8 @@ class Operations(BaseSDK):
 
             return self.get_import_file_results(
                 operation_id=operation_id,
-                dollar_maxpagesize=dollar_maxpagesize,
-                dollar_next=next_cursor,
+                maxpagesize=maxpagesize,
+                next=next,
                 retries=retries,
             )
 
@@ -1232,8 +1232,8 @@ class Operations(BaseSDK):
         self,
         *,
         operation_id: str,
-        dollar_maxpagesize: Optional[int] = 1000,
-        dollar_next: Optional[str] = None,
+        maxpagesize: Optional[int] = 1000,
+        next: Optional[str] = None,
         retries: OptionalNullable[utils.RetryConfig] = UNSET,
         server_url: Optional[str] = None,
         timeout_ms: Optional[int] = None,
@@ -1245,8 +1245,8 @@ class Operations(BaseSDK):
 
 
         :param operation_id: The unique identifier of the operation
-        :param dollar_maxpagesize: The maximum number of results to retrieve
-        :param dollar_next: Pagination cursor for next set of results.
+        :param maxpagesize: The maximum number of results to retrieve
+        :param next: Pagination cursor for next set of results.
         :param retries: Override the default retry configuration for this method
         :param server_url: Override the default server URL for this method
         :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
@@ -1263,8 +1263,8 @@ class Operations(BaseSDK):
             base_url = self._get_url(base_url, url_variables)
 
         request = models.GetImportFileResultsRequest(
-            dollar_maxpagesize=dollar_maxpagesize,
-            dollar_next=dollar_next,
+            maxpagesize=maxpagesize,
+            next=next,
             operation_id=operation_id,
         )
 
@@ -1334,8 +1334,8 @@ class Operations(BaseSDK):
 
             return self.get_import_file_results_async(
                 operation_id=operation_id,
-                dollar_maxpagesize=dollar_maxpagesize,
-                dollar_next=next_cursor,
+                maxpagesize=maxpagesize,
+                next=next,
                 retries=retries,
             )
 
@@ -1367,8 +1367,8 @@ class Operations(BaseSDK):
         self,
         *,
         operation_id: str,
-        dollar_maxpagesize: Optional[int] = 1000,
-        dollar_next: Optional[str] = None,
+        maxpagesize: Optional[int] = 1000,
+        next: Optional[str] = None,
         retries: OptionalNullable[utils.RetryConfig] = UNSET,
         server_url: Optional[str] = None,
         timeout_ms: Optional[int] = None,
@@ -1379,8 +1379,8 @@ class Operations(BaseSDK):
         Returns a [`MilestoneCreationListResult`](ref:operations#milestonecreationlistresult) describing the results of a milestone creation.
 
         :param operation_id: The unique identifier of the operation
-        :param dollar_maxpagesize: The maximum number of results to retrieve
-        :param dollar_next: Pagination cursor for next set of results.
+        :param maxpagesize: The maximum number of results to retrieve
+        :param next: Pagination cursor for next set of results.
         :param retries: Override the default retry configuration for this method
         :param server_url: Override the default server URL for this method
         :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
@@ -1397,8 +1397,8 @@ class Operations(BaseSDK):
             base_url = self._get_url(base_url, url_variables)
 
         request = models.GetMilestoneCreationResultsRequest(
-            dollar_maxpagesize=dollar_maxpagesize,
-            dollar_next=dollar_next,
+            maxpagesize=maxpagesize,
+            next=next,
             operation_id=operation_id,
         )
 
@@ -1454,8 +1454,8 @@ class Operations(BaseSDK):
 
             return self.get_milestone_creation_results(
                 operation_id=operation_id,
-                dollar_maxpagesize=dollar_maxpagesize,
-                dollar_next=next_cursor,
+                maxpagesize=maxpagesize,
+                next=next,
                 retries=retries,
             )
 
@@ -1488,8 +1488,8 @@ class Operations(BaseSDK):
         self,
         *,
         operation_id: str,
-        dollar_maxpagesize: Optional[int] = 1000,
-        dollar_next: Optional[str] = None,
+        maxpagesize: Optional[int] = 1000,
+        next: Optional[str] = None,
         retries: OptionalNullable[utils.RetryConfig] = UNSET,
         server_url: Optional[str] = None,
         timeout_ms: Optional[int] = None,
@@ -1500,8 +1500,8 @@ class Operations(BaseSDK):
         Returns a [`MilestoneCreationListResult`](ref:operations#milestonecreationlistresult) describing the results of a milestone creation.
 
         :param operation_id: The unique identifier of the operation
-        :param dollar_maxpagesize: The maximum number of results to retrieve
-        :param dollar_next: Pagination cursor for next set of results.
+        :param maxpagesize: The maximum number of results to retrieve
+        :param next: Pagination cursor for next set of results.
         :param retries: Override the default retry configuration for this method
         :param server_url: Override the default server URL for this method
         :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
@@ -1518,8 +1518,8 @@ class Operations(BaseSDK):
             base_url = self._get_url(base_url, url_variables)
 
         request = models.GetMilestoneCreationResultsRequest(
-            dollar_maxpagesize=dollar_maxpagesize,
-            dollar_next=dollar_next,
+            maxpagesize=maxpagesize,
+            next=next,
             operation_id=operation_id,
         )
 
@@ -1580,8 +1580,8 @@ class Operations(BaseSDK):
 
             return self.get_milestone_creation_results_async(
                 operation_id=operation_id,
-                dollar_maxpagesize=dollar_maxpagesize,
-                dollar_next=next_cursor,
+                maxpagesize=maxpagesize,
+                next=next,
                 retries=retries,
             )
 
@@ -3462,8 +3462,8 @@ class Operations(BaseSDK):
         self,
         *,
         operation_id: str,
-        dollar_maxpagesize: Optional[int] = 1000,
-        dollar_next: Optional[str] = None,
+        maxpagesize: Optional[int] = 1000,
+        next: Optional[str] = None,
         retries: OptionalNullable[utils.RetryConfig] = UNSET,
         server_url: Optional[str] = None,
         timeout_ms: Optional[int] = None,
@@ -3474,8 +3474,8 @@ class Operations(BaseSDK):
         Returns a [`RangeLinkEditResultCollection`](ref:operations#rangelinkeditresultcollection) describing the results of a range link edit.
 
         :param operation_id: The unique identifier of the operation
-        :param dollar_maxpagesize: The maximum number of results to retrieve
-        :param dollar_next: Pagination cursor for next set of results.
+        :param maxpagesize: The maximum number of results to retrieve
+        :param next: Pagination cursor for next set of results.
         :param retries: Override the default retry configuration for this method
         :param server_url: Override the default server URL for this method
         :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
@@ -3492,8 +3492,8 @@ class Operations(BaseSDK):
             base_url = self._get_url(base_url, url_variables)
 
         request = models.GetRangeLinkEditResultsRequest(
-            dollar_maxpagesize=dollar_maxpagesize,
-            dollar_next=dollar_next,
+            maxpagesize=maxpagesize,
+            next=next,
             operation_id=operation_id,
         )
 
@@ -3560,8 +3560,8 @@ class Operations(BaseSDK):
 
             return self.get_range_link_edit_results(
                 operation_id=operation_id,
-                dollar_maxpagesize=dollar_maxpagesize,
-                dollar_next=next_cursor,
+                maxpagesize=maxpagesize,
+                next=next,
                 retries=retries,
             )
 
@@ -3595,8 +3595,8 @@ class Operations(BaseSDK):
         self,
         *,
         operation_id: str,
-        dollar_maxpagesize: Optional[int] = 1000,
-        dollar_next: Optional[str] = None,
+        maxpagesize: Optional[int] = 1000,
+        next: Optional[str] = None,
         retries: OptionalNullable[utils.RetryConfig] = UNSET,
         server_url: Optional[str] = None,
         timeout_ms: Optional[int] = None,
@@ -3607,8 +3607,8 @@ class Operations(BaseSDK):
         Returns a [`RangeLinkEditResultCollection`](ref:operations#rangelinkeditresultcollection) describing the results of a range link edit.
 
         :param operation_id: The unique identifier of the operation
-        :param dollar_maxpagesize: The maximum number of results to retrieve
-        :param dollar_next: Pagination cursor for next set of results.
+        :param maxpagesize: The maximum number of results to retrieve
+        :param next: Pagination cursor for next set of results.
         :param retries: Override the default retry configuration for this method
         :param server_url: Override the default server URL for this method
         :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
@@ -3625,8 +3625,8 @@ class Operations(BaseSDK):
             base_url = self._get_url(base_url, url_variables)
 
         request = models.GetRangeLinkEditResultsRequest(
-            dollar_maxpagesize=dollar_maxpagesize,
-            dollar_next=dollar_next,
+            maxpagesize=maxpagesize,
+            next=next,
             operation_id=operation_id,
         )
 
@@ -3696,8 +3696,8 @@ class Operations(BaseSDK):
 
             return self.get_range_link_edit_results_async(
                 operation_id=operation_id,
-                dollar_maxpagesize=dollar_maxpagesize,
-                dollar_next=next_cursor,
+                maxpagesize=maxpagesize,
+                next=next,
                 retries=retries,
             )
 
@@ -3731,8 +3731,8 @@ class Operations(BaseSDK):
         self,
         *,
         operation_id: str,
-        dollar_maxpagesize: Optional[int] = 1000,
-        dollar_next: Optional[str] = None,
+        maxpagesize: Optional[int] = 1000,
+        next: Optional[str] = None,
         retries: OptionalNullable[utils.RetryConfig] = UNSET,
         server_url: Optional[str] = None,
         timeout_ms: Optional[int] = None,
@@ -3743,8 +3743,8 @@ class Operations(BaseSDK):
         Returns a [`RichTextAnchorCreationResultCollection`](ref:operations#richtextanchorcreationresultcollection) describing the results of a rich text anchor creation.
 
         :param operation_id: The unique identifier of the operation
-        :param dollar_maxpagesize: The maximum number of results to retrieve
-        :param dollar_next: Pagination cursor for next set of results.
+        :param maxpagesize: The maximum number of results to retrieve
+        :param next: Pagination cursor for next set of results.
         :param retries: Override the default retry configuration for this method
         :param server_url: Override the default server URL for this method
         :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
@@ -3761,8 +3761,8 @@ class Operations(BaseSDK):
             base_url = self._get_url(base_url, url_variables)
 
         request = models.GetRichTextAnchorCreationResultsRequest(
-            dollar_maxpagesize=dollar_maxpagesize,
-            dollar_next=dollar_next,
+            maxpagesize=maxpagesize,
+            next=next,
             operation_id=operation_id,
         )
 
@@ -3829,8 +3829,8 @@ class Operations(BaseSDK):
 
             return self.get_rich_text_anchor_creation_results(
                 operation_id=operation_id,
-                dollar_maxpagesize=dollar_maxpagesize,
-                dollar_next=next_cursor,
+                maxpagesize=maxpagesize,
+                next=next,
                 retries=retries,
             )
 
@@ -3863,8 +3863,8 @@ class Operations(BaseSDK):
         self,
         *,
         operation_id: str,
-        dollar_maxpagesize: Optional[int] = 1000,
-        dollar_next: Optional[str] = None,
+        maxpagesize: Optional[int] = 1000,
+        next: Optional[str] = None,
         retries: OptionalNullable[utils.RetryConfig] = UNSET,
         server_url: Optional[str] = None,
         timeout_ms: Optional[int] = None,
@@ -3875,8 +3875,8 @@ class Operations(BaseSDK):
         Returns a [`RichTextAnchorCreationResultCollection`](ref:operations#richtextanchorcreationresultcollection) describing the results of a rich text anchor creation.
 
         :param operation_id: The unique identifier of the operation
-        :param dollar_maxpagesize: The maximum number of results to retrieve
-        :param dollar_next: Pagination cursor for next set of results.
+        :param maxpagesize: The maximum number of results to retrieve
+        :param next: Pagination cursor for next set of results.
         :param retries: Override the default retry configuration for this method
         :param server_url: Override the default server URL for this method
         :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
@@ -3893,8 +3893,8 @@ class Operations(BaseSDK):
             base_url = self._get_url(base_url, url_variables)
 
         request = models.GetRichTextAnchorCreationResultsRequest(
-            dollar_maxpagesize=dollar_maxpagesize,
-            dollar_next=dollar_next,
+            maxpagesize=maxpagesize,
+            next=next,
             operation_id=operation_id,
         )
 
@@ -3966,8 +3966,8 @@ class Operations(BaseSDK):
 
             return self.get_rich_text_anchor_creation_results_async(
                 operation_id=operation_id,
-                dollar_maxpagesize=dollar_maxpagesize,
-                dollar_next=next_cursor,
+                maxpagesize=maxpagesize,
+                next=next,
                 retries=retries,
             )
 
@@ -4000,8 +4000,8 @@ class Operations(BaseSDK):
         self,
         *,
         operation_id: str,
-        dollar_maxpagesize: Optional[int] = 1000,
-        dollar_next: Optional[str] = None,
+        maxpagesize: Optional[int] = 1000,
+        next: Optional[str] = None,
         retries: OptionalNullable[utils.RetryConfig] = UNSET,
         server_url: Optional[str] = None,
         timeout_ms: Optional[int] = None,
@@ -4012,8 +4012,8 @@ class Operations(BaseSDK):
         Returns a [`RichTextEditListResult`](ref:operations#richtexteditlistresult) describing the results of a rich text batch edit.
 
         :param operation_id: The unique identifier of the operation
-        :param dollar_maxpagesize: The maximum number of results to retrieve
-        :param dollar_next: Pagination cursor for next set of results.
+        :param maxpagesize: The maximum number of results to retrieve
+        :param next: Pagination cursor for next set of results.
         :param retries: Override the default retry configuration for this method
         :param server_url: Override the default server URL for this method
         :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
@@ -4030,8 +4030,8 @@ class Operations(BaseSDK):
             base_url = self._get_url(base_url, url_variables)
 
         request = models.GetRichTextBatchEditResultsRequest(
-            dollar_maxpagesize=dollar_maxpagesize,
-            dollar_next=dollar_next,
+            maxpagesize=maxpagesize,
+            next=next,
             operation_id=operation_id,
         )
 
@@ -4098,8 +4098,8 @@ class Operations(BaseSDK):
 
             return self.get_rich_text_batch_edit_results(
                 operation_id=operation_id,
-                dollar_maxpagesize=dollar_maxpagesize,
-                dollar_next=next_cursor,
+                maxpagesize=maxpagesize,
+                next=next,
                 retries=retries,
             )
 
@@ -4130,8 +4130,8 @@ class Operations(BaseSDK):
         self,
         *,
         operation_id: str,
-        dollar_maxpagesize: Optional[int] = 1000,
-        dollar_next: Optional[str] = None,
+        maxpagesize: Optional[int] = 1000,
+        next: Optional[str] = None,
         retries: OptionalNullable[utils.RetryConfig] = UNSET,
         server_url: Optional[str] = None,
         timeout_ms: Optional[int] = None,
@@ -4142,8 +4142,8 @@ class Operations(BaseSDK):
         Returns a [`RichTextEditListResult`](ref:operations#richtexteditlistresult) describing the results of a rich text batch edit.
 
         :param operation_id: The unique identifier of the operation
-        :param dollar_maxpagesize: The maximum number of results to retrieve
-        :param dollar_next: Pagination cursor for next set of results.
+        :param maxpagesize: The maximum number of results to retrieve
+        :param next: Pagination cursor for next set of results.
         :param retries: Override the default retry configuration for this method
         :param server_url: Override the default server URL for this method
         :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
@@ -4160,8 +4160,8 @@ class Operations(BaseSDK):
             base_url = self._get_url(base_url, url_variables)
 
         request = models.GetRichTextBatchEditResultsRequest(
-            dollar_maxpagesize=dollar_maxpagesize,
-            dollar_next=dollar_next,
+            maxpagesize=maxpagesize,
+            next=next,
             operation_id=operation_id,
         )
 
@@ -4233,8 +4233,8 @@ class Operations(BaseSDK):
 
             return self.get_rich_text_batch_edit_results_async(
                 operation_id=operation_id,
-                dollar_maxpagesize=dollar_maxpagesize,
-                dollar_next=next_cursor,
+                maxpagesize=maxpagesize,
+                next=next,
                 retries=retries,
             )
 
@@ -4265,8 +4265,8 @@ class Operations(BaseSDK):
         self,
         *,
         operation_id: str,
-        dollar_maxpagesize: Optional[int] = 1000,
-        dollar_next: Optional[str] = None,
+        maxpagesize: Optional[int] = 1000,
+        next: Optional[str] = None,
         retries: OptionalNullable[utils.RetryConfig] = UNSET,
         server_url: Optional[str] = None,
         timeout_ms: Optional[int] = None,
@@ -4277,8 +4277,8 @@ class Operations(BaseSDK):
         Returns a [`RichTextDuplicationEditListResult`](ref:operations#richtextduplicationeditlistresult) describing the results of a rich text duplication edit.
 
         :param operation_id: The unique identifier of the operation
-        :param dollar_maxpagesize: The maximum number of results to retrieve
-        :param dollar_next: Pagination cursor for next set of results.
+        :param maxpagesize: The maximum number of results to retrieve
+        :param next: Pagination cursor for next set of results.
         :param retries: Override the default retry configuration for this method
         :param server_url: Override the default server URL for this method
         :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
@@ -4295,8 +4295,8 @@ class Operations(BaseSDK):
             base_url = self._get_url(base_url, url_variables)
 
         request = models.GetRichTextDuplicationEditResultsRequest(
-            dollar_maxpagesize=dollar_maxpagesize,
-            dollar_next=dollar_next,
+            maxpagesize=maxpagesize,
+            next=next,
             operation_id=operation_id,
         )
 
@@ -4363,8 +4363,8 @@ class Operations(BaseSDK):
 
             return self.get_rich_text_duplication_edit_results(
                 operation_id=operation_id,
-                dollar_maxpagesize=dollar_maxpagesize,
-                dollar_next=next_cursor,
+                maxpagesize=maxpagesize,
+                next=next,
                 retries=retries,
             )
 
@@ -4397,8 +4397,8 @@ class Operations(BaseSDK):
         self,
         *,
         operation_id: str,
-        dollar_maxpagesize: Optional[int] = 1000,
-        dollar_next: Optional[str] = None,
+        maxpagesize: Optional[int] = 1000,
+        next: Optional[str] = None,
         retries: OptionalNullable[utils.RetryConfig] = UNSET,
         server_url: Optional[str] = None,
         timeout_ms: Optional[int] = None,
@@ -4409,8 +4409,8 @@ class Operations(BaseSDK):
         Returns a [`RichTextDuplicationEditListResult`](ref:operations#richtextduplicationeditlistresult) describing the results of a rich text duplication edit.
 
         :param operation_id: The unique identifier of the operation
-        :param dollar_maxpagesize: The maximum number of results to retrieve
-        :param dollar_next: Pagination cursor for next set of results.
+        :param maxpagesize: The maximum number of results to retrieve
+        :param next: Pagination cursor for next set of results.
         :param retries: Override the default retry configuration for this method
         :param server_url: Override the default server URL for this method
         :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
@@ -4427,8 +4427,8 @@ class Operations(BaseSDK):
             base_url = self._get_url(base_url, url_variables)
 
         request = models.GetRichTextDuplicationEditResultsRequest(
-            dollar_maxpagesize=dollar_maxpagesize,
-            dollar_next=dollar_next,
+            maxpagesize=maxpagesize,
+            next=next,
             operation_id=operation_id,
         )
 
@@ -4500,8 +4500,8 @@ class Operations(BaseSDK):
 
             return self.get_rich_text_duplication_edit_results_async(
                 operation_id=operation_id,
-                dollar_maxpagesize=dollar_maxpagesize,
-                dollar_next=next_cursor,
+                maxpagesize=maxpagesize,
+                next=next,
                 retries=retries,
             )
 
@@ -4534,8 +4534,8 @@ class Operations(BaseSDK):
         self,
         *,
         operation_id: str,
-        dollar_maxpagesize: Optional[int] = 1000,
-        dollar_next: Optional[str] = None,
+        maxpagesize: Optional[int] = 1000,
+        next: Optional[str] = None,
         retries: OptionalNullable[utils.RetryConfig] = UNSET,
         server_url: Optional[str] = None,
         timeout_ms: Optional[int] = None,
@@ -4546,8 +4546,8 @@ class Operations(BaseSDK):
         Returns a [`RichTextLinksEditListResult`](ref:operations#richtextlinkseditlistresult) describing the results of a rich text batch edit.
 
         :param operation_id: The unique identifier of the operation
-        :param dollar_maxpagesize: The maximum number of results to retrieve
-        :param dollar_next: Pagination cursor for next set of results.
+        :param maxpagesize: The maximum number of results to retrieve
+        :param next: Pagination cursor for next set of results.
         :param retries: Override the default retry configuration for this method
         :param server_url: Override the default server URL for this method
         :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
@@ -4564,8 +4564,8 @@ class Operations(BaseSDK):
             base_url = self._get_url(base_url, url_variables)
 
         request = models.GetRichTextLinksBatchEditResultsRequest(
-            dollar_maxpagesize=dollar_maxpagesize,
-            dollar_next=dollar_next,
+            maxpagesize=maxpagesize,
+            next=next,
             operation_id=operation_id,
         )
 
@@ -4632,8 +4632,8 @@ class Operations(BaseSDK):
 
             return self.get_rich_text_links_batch_edit_results(
                 operation_id=operation_id,
-                dollar_maxpagesize=dollar_maxpagesize,
-                dollar_next=next_cursor,
+                maxpagesize=maxpagesize,
+                next=next,
                 retries=retries,
             )
 
@@ -4666,8 +4666,8 @@ class Operations(BaseSDK):
         self,
         *,
         operation_id: str,
-        dollar_maxpagesize: Optional[int] = 1000,
-        dollar_next: Optional[str] = None,
+        maxpagesize: Optional[int] = 1000,
+        next: Optional[str] = None,
         retries: OptionalNullable[utils.RetryConfig] = UNSET,
         server_url: Optional[str] = None,
         timeout_ms: Optional[int] = None,
@@ -4678,8 +4678,8 @@ class Operations(BaseSDK):
         Returns a [`RichTextLinksEditListResult`](ref:operations#richtextlinkseditlistresult) describing the results of a rich text batch edit.
 
         :param operation_id: The unique identifier of the operation
-        :param dollar_maxpagesize: The maximum number of results to retrieve
-        :param dollar_next: Pagination cursor for next set of results.
+        :param maxpagesize: The maximum number of results to retrieve
+        :param next: Pagination cursor for next set of results.
         :param retries: Override the default retry configuration for this method
         :param server_url: Override the default server URL for this method
         :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
@@ -4696,8 +4696,8 @@ class Operations(BaseSDK):
             base_url = self._get_url(base_url, url_variables)
 
         request = models.GetRichTextLinksBatchEditResultsRequest(
-            dollar_maxpagesize=dollar_maxpagesize,
-            dollar_next=dollar_next,
+            maxpagesize=maxpagesize,
+            next=next,
             operation_id=operation_id,
         )
 
@@ -4769,8 +4769,8 @@ class Operations(BaseSDK):
 
             return self.get_rich_text_links_batch_edit_results_async(
                 operation_id=operation_id,
-                dollar_maxpagesize=dollar_maxpagesize,
-                dollar_next=next_cursor,
+                maxpagesize=maxpagesize,
+                next=next,
                 retries=retries,
             )
 
@@ -4803,8 +4803,8 @@ class Operations(BaseSDK):
         self,
         *,
         operation_id: str,
-        dollar_maxpagesize: Optional[int] = 1000,
-        dollar_next: Optional[str] = None,
+        maxpagesize: Optional[int] = 1000,
+        next: Optional[str] = None,
         retries: OptionalNullable[utils.RetryConfig] = UNSET,
         server_url: Optional[str] = None,
         timeout_ms: Optional[int] = None,
@@ -4815,8 +4815,8 @@ class Operations(BaseSDK):
         Returns a [`TableAnchorCreationResultCollection`](ref:operations#tableanchorcreationresultcollection) describing the results of a table anchor creation.
 
         :param operation_id: The unique identifier of the operation
-        :param dollar_maxpagesize: The maximum number of results to retrieve
-        :param dollar_next: Pagination cursor for next set of results.
+        :param maxpagesize: The maximum number of results to retrieve
+        :param next: Pagination cursor for next set of results.
         :param retries: Override the default retry configuration for this method
         :param server_url: Override the default server URL for this method
         :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
@@ -4833,8 +4833,8 @@ class Operations(BaseSDK):
             base_url = self._get_url(base_url, url_variables)
 
         request = models.GetTableAnchorCreationResultsRequest(
-            dollar_maxpagesize=dollar_maxpagesize,
-            dollar_next=dollar_next,
+            maxpagesize=maxpagesize,
+            next=next,
             operation_id=operation_id,
         )
 
@@ -4901,8 +4901,8 @@ class Operations(BaseSDK):
 
             return self.get_table_anchor_creation_results(
                 operation_id=operation_id,
-                dollar_maxpagesize=dollar_maxpagesize,
-                dollar_next=next_cursor,
+                maxpagesize=maxpagesize,
+                next=next,
                 retries=retries,
             )
 
@@ -4935,8 +4935,8 @@ class Operations(BaseSDK):
         self,
         *,
         operation_id: str,
-        dollar_maxpagesize: Optional[int] = 1000,
-        dollar_next: Optional[str] = None,
+        maxpagesize: Optional[int] = 1000,
+        next: Optional[str] = None,
         retries: OptionalNullable[utils.RetryConfig] = UNSET,
         server_url: Optional[str] = None,
         timeout_ms: Optional[int] = None,
@@ -4947,8 +4947,8 @@ class Operations(BaseSDK):
         Returns a [`TableAnchorCreationResultCollection`](ref:operations#tableanchorcreationresultcollection) describing the results of a table anchor creation.
 
         :param operation_id: The unique identifier of the operation
-        :param dollar_maxpagesize: The maximum number of results to retrieve
-        :param dollar_next: Pagination cursor for next set of results.
+        :param maxpagesize: The maximum number of results to retrieve
+        :param next: Pagination cursor for next set of results.
         :param retries: Override the default retry configuration for this method
         :param server_url: Override the default server URL for this method
         :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
@@ -4965,8 +4965,8 @@ class Operations(BaseSDK):
             base_url = self._get_url(base_url, url_variables)
 
         request = models.GetTableAnchorCreationResultsRequest(
-            dollar_maxpagesize=dollar_maxpagesize,
-            dollar_next=dollar_next,
+            maxpagesize=maxpagesize,
+            next=next,
             operation_id=operation_id,
         )
 
@@ -5038,8 +5038,8 @@ class Operations(BaseSDK):
 
             return self.get_table_anchor_creation_results_async(
                 operation_id=operation_id,
-                dollar_maxpagesize=dollar_maxpagesize,
-                dollar_next=next_cursor,
+                maxpagesize=maxpagesize,
+                next=next,
                 retries=retries,
             )
 
@@ -5480,8 +5480,8 @@ class Operations(BaseSDK):
         self,
         *,
         operation_id: str,
-        dollar_maxpagesize: Optional[int] = 1000,
-        dollar_next: Optional[str] = None,
+        maxpagesize: Optional[int] = 1000,
+        next: Optional[str] = None,
         retries: OptionalNullable[utils.RetryConfig] = UNSET,
         server_url: Optional[str] = None,
         timeout_ms: Optional[int] = None,
@@ -5492,8 +5492,8 @@ class Operations(BaseSDK):
         Returns a [`TableLinksEditListResult`](ref:operations#tablelinkseditlistresult) describing the results of a table links edit.
 
         :param operation_id: The unique identifier of the operation
-        :param dollar_maxpagesize: The maximum number of results to retrieve
-        :param dollar_next: Pagination cursor for next set of results.
+        :param maxpagesize: The maximum number of results to retrieve
+        :param next: Pagination cursor for next set of results.
         :param retries: Override the default retry configuration for this method
         :param server_url: Override the default server URL for this method
         :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
@@ -5510,8 +5510,8 @@ class Operations(BaseSDK):
             base_url = self._get_url(base_url, url_variables)
 
         request = models.GetTableLinksEditResultsRequest(
-            dollar_maxpagesize=dollar_maxpagesize,
-            dollar_next=dollar_next,
+            maxpagesize=maxpagesize,
+            next=next,
             operation_id=operation_id,
         )
 
@@ -5578,8 +5578,8 @@ class Operations(BaseSDK):
 
             return self.get_table_links_edit_results(
                 operation_id=operation_id,
-                dollar_maxpagesize=dollar_maxpagesize,
-                dollar_next=next_cursor,
+                maxpagesize=maxpagesize,
+                next=next,
                 retries=retries,
             )
 
@@ -5612,8 +5612,8 @@ class Operations(BaseSDK):
         self,
         *,
         operation_id: str,
-        dollar_maxpagesize: Optional[int] = 1000,
-        dollar_next: Optional[str] = None,
+        maxpagesize: Optional[int] = 1000,
+        next: Optional[str] = None,
         retries: OptionalNullable[utils.RetryConfig] = UNSET,
         server_url: Optional[str] = None,
         timeout_ms: Optional[int] = None,
@@ -5624,8 +5624,8 @@ class Operations(BaseSDK):
         Returns a [`TableLinksEditListResult`](ref:operations#tablelinkseditlistresult) describing the results of a table links edit.
 
         :param operation_id: The unique identifier of the operation
-        :param dollar_maxpagesize: The maximum number of results to retrieve
-        :param dollar_next: Pagination cursor for next set of results.
+        :param maxpagesize: The maximum number of results to retrieve
+        :param next: Pagination cursor for next set of results.
         :param retries: Override the default retry configuration for this method
         :param server_url: Override the default server URL for this method
         :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
@@ -5642,8 +5642,8 @@ class Operations(BaseSDK):
             base_url = self._get_url(base_url, url_variables)
 
         request = models.GetTableLinksEditResultsRequest(
-            dollar_maxpagesize=dollar_maxpagesize,
-            dollar_next=dollar_next,
+            maxpagesize=maxpagesize,
+            next=next,
             operation_id=operation_id,
         )
 
@@ -5713,8 +5713,8 @@ class Operations(BaseSDK):
 
             return self.get_table_links_edit_results_async(
                 operation_id=operation_id,
-                dollar_maxpagesize=dollar_maxpagesize,
-                dollar_next=next_cursor,
+                maxpagesize=maxpagesize,
+                next=next,
                 retries=retries,
             )
 

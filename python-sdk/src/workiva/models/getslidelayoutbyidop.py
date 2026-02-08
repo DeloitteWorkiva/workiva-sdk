@@ -14,7 +14,7 @@ class GetSlideLayoutByIDRequestTypedDict(TypedDict):
     r"""The unique identifier of the presentation"""
     slide_layout_id: str
     r"""The unique identifier of the slide layout"""
-    dollar_revision: NotRequired[str]
+    revision: NotRequired[str]
     r"""Returns resources at a specific revision"""
 
 
@@ -33,7 +33,7 @@ class GetSlideLayoutByIDRequest(BaseModel):
     ]
     r"""The unique identifier of the slide layout"""
 
-    dollar_revision: Annotated[
+    revision: Annotated[
         Optional[str],
         pydantic.Field(alias="$revision"),
         FieldMetadata(query=QueryParamMetadata(style="form", explode=True)),
@@ -42,7 +42,7 @@ class GetSlideLayoutByIDRequest(BaseModel):
 
     @model_serializer(mode="wrap")
     def serialize_model(self, handler):
-        optional_fields = set(["$revision"])
+        optional_fields = set(["revision"])
         serialized = handler(self)
         m = {}
 

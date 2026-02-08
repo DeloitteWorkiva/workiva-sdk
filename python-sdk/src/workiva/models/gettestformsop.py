@@ -10,12 +10,12 @@ from workiva.utils import FieldMetadata, QueryParamMetadata
 
 
 class GetTestFormsRequestTypedDict(TypedDict):
-    dollar_expand: NotRequired[str]
+    expand: NotRequired[str]
     r"""Returns related resources inline with the main resource"""
 
 
 class GetTestFormsRequest(BaseModel):
-    dollar_expand: Annotated[
+    expand: Annotated[
         Optional[str],
         pydantic.Field(alias="$expand"),
         FieldMetadata(query=QueryParamMetadata(style="form", explode=True)),
@@ -24,7 +24,7 @@ class GetTestFormsRequest(BaseModel):
 
     @model_serializer(mode="wrap")
     def serialize_model(self, handler):
-        optional_fields = set(["$expand"])
+        optional_fields = set(["expand"])
         serialized = handler(self)
         m = {}
 

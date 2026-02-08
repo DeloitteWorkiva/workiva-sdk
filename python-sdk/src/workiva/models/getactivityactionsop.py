@@ -14,30 +14,30 @@ from workiva.utils import FieldMetadata, QueryParamMetadata
 
 
 class GetActivityActionsRequestTypedDict(TypedDict):
-    dollar_maxpagesize: NotRequired[int]
+    maxpagesize: NotRequired[int]
     r"""The maximum number of results to retrieve"""
-    dollar_next: NotRequired[str]
+    next: NotRequired[str]
     r"""Pagination cursor for next set of results."""
-    dollar_order_by: NotRequired[str]
+    order_by: NotRequired[str]
     r"""One or more comma-separated expressions to indicate the order in which to sort the results."""
 
 
 class GetActivityActionsRequest(BaseModel):
-    dollar_maxpagesize: Annotated[
+    maxpagesize: Annotated[
         Optional[int],
         pydantic.Field(alias="$maxpagesize"),
         FieldMetadata(query=QueryParamMetadata(style="form", explode=True)),
     ] = 1000
     r"""The maximum number of results to retrieve"""
 
-    dollar_next: Annotated[
+    next: Annotated[
         Optional[str],
         pydantic.Field(alias="$next"),
         FieldMetadata(query=QueryParamMetadata(style="form", explode=True)),
     ] = None
     r"""Pagination cursor for next set of results."""
 
-    dollar_order_by: Annotated[
+    order_by: Annotated[
         Optional[str],
         pydantic.Field(alias="$orderBy"),
         FieldMetadata(query=QueryParamMetadata(style="form", explode=True)),
@@ -46,7 +46,7 @@ class GetActivityActionsRequest(BaseModel):
 
     @model_serializer(mode="wrap")
     def serialize_model(self, handler):
-        optional_fields = set(["$maxpagesize", "$next", "$orderBy"])
+        optional_fields = set(["maxpagesize", "next", "orderBy"])
         serialized = handler(self)
         m = {}
 

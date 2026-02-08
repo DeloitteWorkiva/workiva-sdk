@@ -11,21 +11,21 @@ from workiva.utils import FieldMetadata, QueryParamMetadata
 
 
 class GetTrashedFilesRequestTypedDict(TypedDict):
-    dollar_maxpagesize: NotRequired[int]
+    maxpagesize: NotRequired[int]
     r"""The maximum number of results to retrieve"""
-    dollar_next: NotRequired[str]
+    next: NotRequired[str]
     r"""Pagination cursor for next set of results."""
 
 
 class GetTrashedFilesRequest(BaseModel):
-    dollar_maxpagesize: Annotated[
+    maxpagesize: Annotated[
         Optional[int],
         pydantic.Field(alias="$maxpagesize"),
         FieldMetadata(query=QueryParamMetadata(style="form", explode=True)),
     ] = 1000
     r"""The maximum number of results to retrieve"""
 
-    dollar_next: Annotated[
+    next: Annotated[
         Optional[str],
         pydantic.Field(alias="$next"),
         FieldMetadata(query=QueryParamMetadata(style="form", explode=True)),
@@ -34,7 +34,7 @@ class GetTrashedFilesRequest(BaseModel):
 
     @model_serializer(mode="wrap")
     def serialize_model(self, handler):
-        optional_fields = set(["$maxpagesize", "$next"])
+        optional_fields = set(["maxpagesize", "next"])
         serialized = handler(self)
         m = {}
 

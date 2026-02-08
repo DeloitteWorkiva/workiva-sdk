@@ -16,13 +16,13 @@ from workiva.utils import FieldMetadata, HeaderMetadata, QueryParamMetadata
 class GetOrganizationsRequestTypedDict(TypedDict):
     wk_service_provider: str
     r"""The unique identifier of the service provider"""
-    dollar_filter: NotRequired[str]
+    filter_: NotRequired[str]
     r"""The properties to filter the results by."""
-    dollar_maxpagesize: NotRequired[int]
+    maxpagesize: NotRequired[int]
     r"""The maximum number of results to retrieve"""
-    dollar_next: NotRequired[str]
+    next: NotRequired[str]
     r"""Pagination cursor for next set of results."""
-    dollar_order_by: NotRequired[str]
+    order_by: NotRequired[str]
     r"""One or more comma-separated expressions to indicate the order in which to sort the results."""
 
 
@@ -34,28 +34,28 @@ class GetOrganizationsRequest(BaseModel):
     ]
     r"""The unique identifier of the service provider"""
 
-    dollar_filter: Annotated[
+    filter_: Annotated[
         Optional[str],
         pydantic.Field(alias="$filter"),
         FieldMetadata(query=QueryParamMetadata(style="form", explode=True)),
     ] = None
     r"""The properties to filter the results by."""
 
-    dollar_maxpagesize: Annotated[
+    maxpagesize: Annotated[
         Optional[int],
         pydantic.Field(alias="$maxpagesize"),
         FieldMetadata(query=QueryParamMetadata(style="form", explode=True)),
     ] = 1000
     r"""The maximum number of results to retrieve"""
 
-    dollar_next: Annotated[
+    next: Annotated[
         Optional[str],
         pydantic.Field(alias="$next"),
         FieldMetadata(query=QueryParamMetadata(style="form", explode=True)),
     ] = None
     r"""Pagination cursor for next set of results."""
 
-    dollar_order_by: Annotated[
+    order_by: Annotated[
         Optional[str],
         pydantic.Field(alias="$orderBy"),
         FieldMetadata(query=QueryParamMetadata(style="form", explode=True)),
@@ -64,7 +64,7 @@ class GetOrganizationsRequest(BaseModel):
 
     @model_serializer(mode="wrap")
     def serialize_model(self, handler):
-        optional_fields = set(["$filter", "$maxpagesize", "$next", "$orderBy"])
+        optional_fields = set(["filter", "maxpagesize", "next", "orderBy"])
         serialized = handler(self)
         m = {}
 

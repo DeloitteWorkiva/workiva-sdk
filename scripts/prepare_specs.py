@@ -332,6 +332,28 @@ def update_token_url(spec, old_url, new_url):
     return updated
 
 
+def rename_dollar_params(spec):
+    """Add x-speakeasy-name-override to $-prefixed query params so SDK uses clean names."""
+    renamed = []
+    # components/parameters (shared refs)
+    for param_name, param in spec.get("components", {}).get("parameters", {}).items():
+        name = param.get("name", "")
+        if name.startswith("$"):
+            param["x-speakeasy-name-override"] = name[1:]
+            renamed.append(name)
+    # Inline parameters in operations
+    for path_item in spec.get("paths", {}).values():
+        for method in HTTP_METHODS:
+            if method not in path_item:
+                continue
+            for param in path_item[method].get("parameters", []):
+                name = param.get("name", "")
+                if name.startswith("$") and "x-speakeasy-name-override" not in param:
+                    param["x-speakeasy-name-override"] = name[1:]
+                    renamed.append(name)
+    return renamed
+
+
 def process_platform(base_dir):
     input_path = base_dir / "platform.yaml"
     output_path = base_dir / "platform_processed.yaml"
@@ -356,6 +378,9 @@ def process_platform(base_dir):
             s for s in servers if s.get("description") not in ("EU", "US")
         ]
 
+    # Rename $-prefixed params to clean names (e.g. $maxpagesize → maxpagesize)
+    dollar_params = rename_dollar_params(spec)
+
     # Add pagination extensions (platform has no prefix)
     pag_count = add_pagination_extensions(spec, resolve_platform_pagination)
 
@@ -366,6 +391,7 @@ def process_platform(base_dir):
     print(f"     Fixed recursive parent in: {fixed}")
     print(f"     Removed contextless-oauth scheme")
     print(f"     Updated tokenUrl: {updated_flows}")
+    print(f"     Renamed $params: {len(dollar_params)}")
     print(f"     Pagination extensions: {pag_count} operations")
 
 

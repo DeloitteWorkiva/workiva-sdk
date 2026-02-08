@@ -469,7 +469,7 @@ class Spreadsheets(BaseSDK):
         *,
         sheet_id: str,
         spreadsheet_id: str,
-        dollar_deletevalues: Optional[bool] = False,
+        deletevalues: Optional[bool] = False,
         retries: OptionalNullable[utils.RetryConfig] = UNSET,
         server_url: Optional[str] = None,
         timeout_ms: Optional[int] = None,
@@ -481,7 +481,7 @@ class Spreadsheets(BaseSDK):
 
         :param sheet_id: The unique identifier of the sheet
         :param spreadsheet_id: The unique identifier of the spreadsheet
-        :param dollar_deletevalues: Indicates whether values should be deleted along with the dataset
+        :param deletevalues: Indicates whether values should be deleted along with the dataset
         :param retries: Override the default retry configuration for this method
         :param server_url: Override the default server URL for this method
         :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
@@ -498,7 +498,7 @@ class Spreadsheets(BaseSDK):
             base_url = self._get_url(base_url, url_variables)
 
         request = models.DeleteDatasetBySheetIDRequest(
-            dollar_deletevalues=dollar_deletevalues,
+            deletevalues=deletevalues,
             sheet_id=sheet_id,
             spreadsheet_id=spreadsheet_id,
         )
@@ -579,7 +579,7 @@ class Spreadsheets(BaseSDK):
         *,
         sheet_id: str,
         spreadsheet_id: str,
-        dollar_deletevalues: Optional[bool] = False,
+        deletevalues: Optional[bool] = False,
         retries: OptionalNullable[utils.RetryConfig] = UNSET,
         server_url: Optional[str] = None,
         timeout_ms: Optional[int] = None,
@@ -591,7 +591,7 @@ class Spreadsheets(BaseSDK):
 
         :param sheet_id: The unique identifier of the sheet
         :param spreadsheet_id: The unique identifier of the spreadsheet
-        :param dollar_deletevalues: Indicates whether values should be deleted along with the dataset
+        :param deletevalues: Indicates whether values should be deleted along with the dataset
         :param retries: Override the default retry configuration for this method
         :param server_url: Override the default server URL for this method
         :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
@@ -608,7 +608,7 @@ class Spreadsheets(BaseSDK):
             base_url = self._get_url(base_url, url_variables)
 
         request = models.DeleteDatasetBySheetIDRequest(
-            dollar_deletevalues=dollar_deletevalues,
+            deletevalues=deletevalues,
             sheet_id=sheet_id,
             spreadsheet_id=spreadsheet_id,
         )
@@ -1105,7 +1105,7 @@ class Spreadsheets(BaseSDK):
         *,
         sheet_id: str,
         spreadsheet_id: str,
-        dollar_revision: Optional[str] = None,
+        revision: Optional[str] = None,
         retries: OptionalNullable[utils.RetryConfig] = UNSET,
         server_url: Optional[str] = None,
         timeout_ms: Optional[int] = None,
@@ -1118,7 +1118,7 @@ class Spreadsheets(BaseSDK):
 
         :param sheet_id: The unique identifier of the sheet
         :param spreadsheet_id: The unique identifier of the spreadsheet
-        :param dollar_revision: Returns resources at a specific revision
+        :param revision: Returns resources at a specific revision
         :param retries: Override the default retry configuration for this method
         :param server_url: Override the default server URL for this method
         :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
@@ -1135,7 +1135,7 @@ class Spreadsheets(BaseSDK):
             base_url = self._get_url(base_url, url_variables)
 
         request = models.GetSheetByIDRequest(
-            dollar_revision=dollar_revision,
+            revision=revision,
             sheet_id=sheet_id,
             spreadsheet_id=spreadsheet_id,
         )
@@ -1214,7 +1214,7 @@ class Spreadsheets(BaseSDK):
         *,
         sheet_id: str,
         spreadsheet_id: str,
-        dollar_revision: Optional[str] = None,
+        revision: Optional[str] = None,
         retries: OptionalNullable[utils.RetryConfig] = UNSET,
         server_url: Optional[str] = None,
         timeout_ms: Optional[int] = None,
@@ -1227,7 +1227,7 @@ class Spreadsheets(BaseSDK):
 
         :param sheet_id: The unique identifier of the sheet
         :param spreadsheet_id: The unique identifier of the spreadsheet
-        :param dollar_revision: Returns resources at a specific revision
+        :param revision: Returns resources at a specific revision
         :param retries: Override the default retry configuration for this method
         :param server_url: Override the default server URL for this method
         :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
@@ -1244,7 +1244,7 @@ class Spreadsheets(BaseSDK):
             base_url = self._get_url(base_url, url_variables)
 
         request = models.GetSheetByIDRequest(
-            dollar_revision=dollar_revision,
+            revision=revision,
             sheet_id=sheet_id,
             spreadsheet_id=spreadsheet_id,
         )
@@ -1418,10 +1418,10 @@ class Spreadsheets(BaseSDK):
                 request=models.GetSheetDataRequest(
                     sheet_id=request.sheet_id,
                     spreadsheet_id=request.spreadsheet_id,
-                    dollar_cellrange=request.dollar_cellrange,
-                    dollar_fields=request.dollar_fields,
-                    dollar_maxcellsperpage=request.dollar_maxcellsperpage,
-                    dollar_next=next_cursor,
+                    cellrange=request.cellrange,
+                    fields=request.fields,
+                    maxcellsperpage=request.maxcellsperpage,
+                    next=request.next,
                 ),
                 retries=retries,
             )
@@ -1552,10 +1552,10 @@ class Spreadsheets(BaseSDK):
                 request=models.GetSheetDataRequest(
                     sheet_id=request.sheet_id,
                     spreadsheet_id=request.spreadsheet_id,
-                    dollar_cellrange=request.dollar_cellrange,
-                    dollar_fields=request.dollar_fields,
-                    dollar_maxcellsperpage=request.dollar_maxcellsperpage,
-                    dollar_next=next_cursor,
+                    cellrange=request.cellrange,
+                    fields=request.fields,
+                    maxcellsperpage=request.maxcellsperpage,
+                    next=request.next,
                 ),
                 retries=retries,
             )
@@ -1685,9 +1685,9 @@ class Spreadsheets(BaseSDK):
                 request=models.GetSheetPermissionsRequest(
                     sheet_id=request.sheet_id,
                     spreadsheet_id=request.spreadsheet_id,
-                    dollar_filter=request.dollar_filter,
-                    dollar_maxpagesize=request.dollar_maxpagesize,
-                    dollar_next=next_cursor,
+                    filter_=request.filter_,
+                    maxpagesize=request.maxpagesize,
+                    next=request.next,
                 ),
                 retries=retries,
             )
@@ -1822,9 +1822,9 @@ class Spreadsheets(BaseSDK):
                 request=models.GetSheetPermissionsRequest(
                     sheet_id=request.sheet_id,
                     spreadsheet_id=request.spreadsheet_id,
-                    dollar_filter=request.dollar_filter,
-                    dollar_maxpagesize=request.dollar_maxpagesize,
-                    dollar_next=next_cursor,
+                    filter_=request.filter_,
+                    maxpagesize=request.maxpagesize,
+                    next=request.next,
                 ),
                 retries=retries,
             )
@@ -1858,9 +1858,9 @@ class Spreadsheets(BaseSDK):
         self,
         *,
         spreadsheet_id: str,
-        dollar_maxpagesize: Optional[int] = 1000,
-        dollar_next: Optional[str] = None,
-        dollar_revision: Optional[str] = None,
+        maxpagesize: Optional[int] = 1000,
+        next: Optional[str] = None,
+        revision: Optional[str] = None,
         retries: OptionalNullable[utils.RetryConfig] = UNSET,
         server_url: Optional[str] = None,
         timeout_ms: Optional[int] = None,
@@ -1871,9 +1871,9 @@ class Spreadsheets(BaseSDK):
         Returns a list of [sheets](ref:spreadsheets#sheet).
 
         :param spreadsheet_id: The unique identifier of the spreadsheet
-        :param dollar_maxpagesize: The maximum number of results to retrieve
-        :param dollar_next: Pagination cursor for next set of results.
-        :param dollar_revision: Returns resources at a specific revision
+        :param maxpagesize: The maximum number of results to retrieve
+        :param next: Pagination cursor for next set of results.
+        :param revision: Returns resources at a specific revision
         :param retries: Override the default retry configuration for this method
         :param server_url: Override the default server URL for this method
         :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
@@ -1890,9 +1890,9 @@ class Spreadsheets(BaseSDK):
             base_url = self._get_url(base_url, url_variables)
 
         request = models.GetSheetsRequest(
-            dollar_maxpagesize=dollar_maxpagesize,
-            dollar_next=dollar_next,
-            dollar_revision=dollar_revision,
+            maxpagesize=maxpagesize,
+            next=next,
+            revision=revision,
             spreadsheet_id=spreadsheet_id,
         )
 
@@ -1959,9 +1959,9 @@ class Spreadsheets(BaseSDK):
 
             return self.get_sheets(
                 spreadsheet_id=spreadsheet_id,
-                dollar_maxpagesize=dollar_maxpagesize,
-                dollar_next=next_cursor,
-                dollar_revision=dollar_revision,
+                maxpagesize=maxpagesize,
+                next=next,
+                revision=revision,
                 retries=retries,
             )
 
@@ -1992,9 +1992,9 @@ class Spreadsheets(BaseSDK):
         self,
         *,
         spreadsheet_id: str,
-        dollar_maxpagesize: Optional[int] = 1000,
-        dollar_next: Optional[str] = None,
-        dollar_revision: Optional[str] = None,
+        maxpagesize: Optional[int] = 1000,
+        next: Optional[str] = None,
+        revision: Optional[str] = None,
         retries: OptionalNullable[utils.RetryConfig] = UNSET,
         server_url: Optional[str] = None,
         timeout_ms: Optional[int] = None,
@@ -2005,9 +2005,9 @@ class Spreadsheets(BaseSDK):
         Returns a list of [sheets](ref:spreadsheets#sheet).
 
         :param spreadsheet_id: The unique identifier of the spreadsheet
-        :param dollar_maxpagesize: The maximum number of results to retrieve
-        :param dollar_next: Pagination cursor for next set of results.
-        :param dollar_revision: Returns resources at a specific revision
+        :param maxpagesize: The maximum number of results to retrieve
+        :param next: Pagination cursor for next set of results.
+        :param revision: Returns resources at a specific revision
         :param retries: Override the default retry configuration for this method
         :param server_url: Override the default server URL for this method
         :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
@@ -2024,9 +2024,9 @@ class Spreadsheets(BaseSDK):
             base_url = self._get_url(base_url, url_variables)
 
         request = models.GetSheetsRequest(
-            dollar_maxpagesize=dollar_maxpagesize,
-            dollar_next=dollar_next,
-            dollar_revision=dollar_revision,
+            maxpagesize=maxpagesize,
+            next=next,
+            revision=revision,
             spreadsheet_id=spreadsheet_id,
         )
 
@@ -2096,9 +2096,9 @@ class Spreadsheets(BaseSDK):
 
             return self.get_sheets_async(
                 spreadsheet_id=spreadsheet_id,
-                dollar_maxpagesize=dollar_maxpagesize,
-                dollar_next=next_cursor,
-                dollar_revision=dollar_revision,
+                maxpagesize=maxpagesize,
+                next=next,
+                revision=revision,
                 retries=retries,
             )
 
@@ -2129,7 +2129,7 @@ class Spreadsheets(BaseSDK):
         self,
         *,
         spreadsheet_id: str,
-        dollar_revision: Optional[str] = None,
+        revision: Optional[str] = None,
         retries: OptionalNullable[utils.RetryConfig] = UNSET,
         server_url: Optional[str] = None,
         timeout_ms: Optional[int] = None,
@@ -2141,7 +2141,7 @@ class Spreadsheets(BaseSDK):
 
 
         :param spreadsheet_id: The unique identifier of the spreadsheet
-        :param dollar_revision: Returns resources at a specific revision
+        :param revision: Returns resources at a specific revision
         :param retries: Override the default retry configuration for this method
         :param server_url: Override the default server URL for this method
         :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
@@ -2158,7 +2158,7 @@ class Spreadsheets(BaseSDK):
             base_url = self._get_url(base_url, url_variables)
 
         request = models.GetSpreadsheetByIDRequest(
-            dollar_revision=dollar_revision,
+            revision=revision,
             spreadsheet_id=spreadsheet_id,
         )
 
@@ -2235,7 +2235,7 @@ class Spreadsheets(BaseSDK):
         self,
         *,
         spreadsheet_id: str,
-        dollar_revision: Optional[str] = None,
+        revision: Optional[str] = None,
         retries: OptionalNullable[utils.RetryConfig] = UNSET,
         server_url: Optional[str] = None,
         timeout_ms: Optional[int] = None,
@@ -2247,7 +2247,7 @@ class Spreadsheets(BaseSDK):
 
 
         :param spreadsheet_id: The unique identifier of the spreadsheet
-        :param dollar_revision: Returns resources at a specific revision
+        :param revision: Returns resources at a specific revision
         :param retries: Override the default retry configuration for this method
         :param server_url: Override the default server URL for this method
         :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
@@ -2264,7 +2264,7 @@ class Spreadsheets(BaseSDK):
             base_url = self._get_url(base_url, url_variables)
 
         request = models.GetSpreadsheetByIDRequest(
-            dollar_revision=dollar_revision,
+            revision=revision,
             spreadsheet_id=spreadsheet_id,
         )
 
@@ -2341,7 +2341,7 @@ class Spreadsheets(BaseSDK):
         self,
         *,
         spreadsheet_id: str,
-        dollar_next: Optional[str] = None,
+        next: Optional[str] = None,
         retries: OptionalNullable[utils.RetryConfig] = UNSET,
         server_url: Optional[str] = None,
         timeout_ms: Optional[int] = None,
@@ -2352,7 +2352,7 @@ class Spreadsheets(BaseSDK):
         Returns [MilestoneListResult](ref:milestones#milestonelistresult).
 
         :param spreadsheet_id: The unique identifier of the spreadsheet
-        :param dollar_next: Pagination cursor for next set of results.
+        :param next: Pagination cursor for next set of results.
         :param retries: Override the default retry configuration for this method
         :param server_url: Override the default server URL for this method
         :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
@@ -2369,7 +2369,7 @@ class Spreadsheets(BaseSDK):
             base_url = self._get_url(base_url, url_variables)
 
         request = models.GetSpreadsheetMilestonesRequest(
-            dollar_next=dollar_next,
+            next=next,
             spreadsheet_id=spreadsheet_id,
         )
 
@@ -2436,7 +2436,7 @@ class Spreadsheets(BaseSDK):
 
             return self.get_spreadsheet_milestones(
                 spreadsheet_id=spreadsheet_id,
-                dollar_next=next_cursor,
+                next=next,
                 retries=retries,
             )
 
@@ -2467,7 +2467,7 @@ class Spreadsheets(BaseSDK):
         self,
         *,
         spreadsheet_id: str,
-        dollar_next: Optional[str] = None,
+        next: Optional[str] = None,
         retries: OptionalNullable[utils.RetryConfig] = UNSET,
         server_url: Optional[str] = None,
         timeout_ms: Optional[int] = None,
@@ -2478,7 +2478,7 @@ class Spreadsheets(BaseSDK):
         Returns [MilestoneListResult](ref:milestones#milestonelistresult).
 
         :param spreadsheet_id: The unique identifier of the spreadsheet
-        :param dollar_next: Pagination cursor for next set of results.
+        :param next: Pagination cursor for next set of results.
         :param retries: Override the default retry configuration for this method
         :param server_url: Override the default server URL for this method
         :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
@@ -2495,7 +2495,7 @@ class Spreadsheets(BaseSDK):
             base_url = self._get_url(base_url, url_variables)
 
         request = models.GetSpreadsheetMilestonesRequest(
-            dollar_next=dollar_next,
+            next=next,
             spreadsheet_id=spreadsheet_id,
         )
 
@@ -2565,7 +2565,7 @@ class Spreadsheets(BaseSDK):
 
             return self.get_spreadsheet_milestones_async(
                 spreadsheet_id=spreadsheet_id,
-                dollar_next=next_cursor,
+                next=next,
                 retries=retries,
             )
 
@@ -2596,9 +2596,9 @@ class Spreadsheets(BaseSDK):
         self,
         *,
         spreadsheet_id: str,
-        dollar_filter: Optional[str] = None,
-        dollar_maxpagesize: Optional[int] = 1000,
-        dollar_next: Optional[str] = None,
+        filter_: Optional[str] = None,
+        maxpagesize: Optional[int] = 1000,
+        next: Optional[str] = None,
         retries: OptionalNullable[utils.RetryConfig] = UNSET,
         server_url: Optional[str] = None,
         timeout_ms: Optional[int] = None,
@@ -2610,9 +2610,9 @@ class Spreadsheets(BaseSDK):
 
 
         :param spreadsheet_id: The unique identifier of the spreadsheet
-        :param dollar_filter: The properties to filter the results by.
-        :param dollar_maxpagesize: The maximum number of results to retrieve
-        :param dollar_next: Pagination cursor for next set of results.
+        :param filter_: The properties to filter the results by.
+        :param maxpagesize: The maximum number of results to retrieve
+        :param next: Pagination cursor for next set of results.
         :param retries: Override the default retry configuration for this method
         :param server_url: Override the default server URL for this method
         :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
@@ -2629,9 +2629,9 @@ class Spreadsheets(BaseSDK):
             base_url = self._get_url(base_url, url_variables)
 
         request = models.GetSpreadsheetPermissionsRequest(
-            dollar_filter=dollar_filter,
-            dollar_maxpagesize=dollar_maxpagesize,
-            dollar_next=dollar_next,
+            filter_=filter_,
+            maxpagesize=maxpagesize,
+            next=next,
             spreadsheet_id=spreadsheet_id,
         )
 
@@ -2698,9 +2698,9 @@ class Spreadsheets(BaseSDK):
 
             return self.get_spreadsheet_permissions(
                 spreadsheet_id=spreadsheet_id,
-                dollar_filter=dollar_filter,
-                dollar_maxpagesize=dollar_maxpagesize,
-                dollar_next=next_cursor,
+                filter_=filter_,
+                maxpagesize=maxpagesize,
+                next=next,
                 retries=retries,
             )
 
@@ -2733,9 +2733,9 @@ class Spreadsheets(BaseSDK):
         self,
         *,
         spreadsheet_id: str,
-        dollar_filter: Optional[str] = None,
-        dollar_maxpagesize: Optional[int] = 1000,
-        dollar_next: Optional[str] = None,
+        filter_: Optional[str] = None,
+        maxpagesize: Optional[int] = 1000,
+        next: Optional[str] = None,
         retries: OptionalNullable[utils.RetryConfig] = UNSET,
         server_url: Optional[str] = None,
         timeout_ms: Optional[int] = None,
@@ -2747,9 +2747,9 @@ class Spreadsheets(BaseSDK):
 
 
         :param spreadsheet_id: The unique identifier of the spreadsheet
-        :param dollar_filter: The properties to filter the results by.
-        :param dollar_maxpagesize: The maximum number of results to retrieve
-        :param dollar_next: Pagination cursor for next set of results.
+        :param filter_: The properties to filter the results by.
+        :param maxpagesize: The maximum number of results to retrieve
+        :param next: Pagination cursor for next set of results.
         :param retries: Override the default retry configuration for this method
         :param server_url: Override the default server URL for this method
         :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
@@ -2766,9 +2766,9 @@ class Spreadsheets(BaseSDK):
             base_url = self._get_url(base_url, url_variables)
 
         request = models.GetSpreadsheetPermissionsRequest(
-            dollar_filter=dollar_filter,
-            dollar_maxpagesize=dollar_maxpagesize,
-            dollar_next=dollar_next,
+            filter_=filter_,
+            maxpagesize=maxpagesize,
+            next=next,
             spreadsheet_id=spreadsheet_id,
         )
 
@@ -2840,9 +2840,9 @@ class Spreadsheets(BaseSDK):
 
             return self.get_spreadsheet_permissions_async(
                 spreadsheet_id=spreadsheet_id,
-                dollar_filter=dollar_filter,
-                dollar_maxpagesize=dollar_maxpagesize,
-                dollar_next=next_cursor,
+                filter_=filter_,
+                maxpagesize=maxpagesize,
+                next=next,
                 retries=retries,
             )
 
@@ -2874,10 +2874,10 @@ class Spreadsheets(BaseSDK):
     def get_spreadsheets(
         self,
         *,
-        dollar_filter: Optional[str] = None,
-        dollar_maxpagesize: Optional[int] = 1000,
-        dollar_next: Optional[str] = None,
-        dollar_order_by: Optional[str] = None,
+        filter_: Optional[str] = None,
+        maxpagesize: Optional[int] = 1000,
+        next: Optional[str] = None,
+        order_by: Optional[str] = None,
         retries: OptionalNullable[utils.RetryConfig] = UNSET,
         server_url: Optional[str] = None,
         timeout_ms: Optional[int] = None,
@@ -2888,10 +2888,10 @@ class Spreadsheets(BaseSDK):
         Returns a paginated list of [spreadsheets](ref:spreadsheets#spreadsheet).
 
 
-        :param dollar_filter: The properties to filter the results by.
-        :param dollar_maxpagesize: The maximum number of results to retrieve
-        :param dollar_next: Pagination cursor for next set of results.
-        :param dollar_order_by: One or more comma-separated expressions to indicate the order in which to sort the results.
+        :param filter_: The properties to filter the results by.
+        :param maxpagesize: The maximum number of results to retrieve
+        :param next: Pagination cursor for next set of results.
+        :param order_by: One or more comma-separated expressions to indicate the order in which to sort the results.
         :param retries: Override the default retry configuration for this method
         :param server_url: Override the default server URL for this method
         :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
@@ -2908,10 +2908,10 @@ class Spreadsheets(BaseSDK):
             base_url = self._get_url(base_url, url_variables)
 
         request = models.GetSpreadsheetsRequest(
-            dollar_filter=dollar_filter,
-            dollar_maxpagesize=dollar_maxpagesize,
-            dollar_next=dollar_next,
-            dollar_order_by=dollar_order_by,
+            filter_=filter_,
+            maxpagesize=maxpagesize,
+            next=next,
+            order_by=order_by,
         )
 
         req = self._build_request(
@@ -2976,10 +2976,10 @@ class Spreadsheets(BaseSDK):
                 return None
 
             return self.get_spreadsheets(
-                dollar_filter=dollar_filter,
-                dollar_maxpagesize=dollar_maxpagesize,
-                dollar_next=next_cursor,
-                dollar_order_by=dollar_order_by,
+                filter_=filter_,
+                maxpagesize=maxpagesize,
+                next=next,
+                order_by=order_by,
                 retries=retries,
             )
 
@@ -3009,10 +3009,10 @@ class Spreadsheets(BaseSDK):
     async def get_spreadsheets_async(
         self,
         *,
-        dollar_filter: Optional[str] = None,
-        dollar_maxpagesize: Optional[int] = 1000,
-        dollar_next: Optional[str] = None,
-        dollar_order_by: Optional[str] = None,
+        filter_: Optional[str] = None,
+        maxpagesize: Optional[int] = 1000,
+        next: Optional[str] = None,
+        order_by: Optional[str] = None,
         retries: OptionalNullable[utils.RetryConfig] = UNSET,
         server_url: Optional[str] = None,
         timeout_ms: Optional[int] = None,
@@ -3023,10 +3023,10 @@ class Spreadsheets(BaseSDK):
         Returns a paginated list of [spreadsheets](ref:spreadsheets#spreadsheet).
 
 
-        :param dollar_filter: The properties to filter the results by.
-        :param dollar_maxpagesize: The maximum number of results to retrieve
-        :param dollar_next: Pagination cursor for next set of results.
-        :param dollar_order_by: One or more comma-separated expressions to indicate the order in which to sort the results.
+        :param filter_: The properties to filter the results by.
+        :param maxpagesize: The maximum number of results to retrieve
+        :param next: Pagination cursor for next set of results.
+        :param order_by: One or more comma-separated expressions to indicate the order in which to sort the results.
         :param retries: Override the default retry configuration for this method
         :param server_url: Override the default server URL for this method
         :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
@@ -3043,10 +3043,10 @@ class Spreadsheets(BaseSDK):
             base_url = self._get_url(base_url, url_variables)
 
         request = models.GetSpreadsheetsRequest(
-            dollar_filter=dollar_filter,
-            dollar_maxpagesize=dollar_maxpagesize,
-            dollar_next=dollar_next,
-            dollar_order_by=dollar_order_by,
+            filter_=filter_,
+            maxpagesize=maxpagesize,
+            next=next,
+            order_by=order_by,
         )
 
         req = self._build_request_async(
@@ -3114,10 +3114,10 @@ class Spreadsheets(BaseSDK):
                 return empty_result()
 
             return self.get_spreadsheets_async(
-                dollar_filter=dollar_filter,
-                dollar_maxpagesize=dollar_maxpagesize,
-                dollar_next=next_cursor,
-                dollar_order_by=dollar_order_by,
+                filter_=filter_,
+                maxpagesize=maxpagesize,
+                next=next,
+                order_by=order_by,
                 retries=retries,
             )
 
@@ -3246,9 +3246,9 @@ class Spreadsheets(BaseSDK):
                     range=request.range,
                     sheet_id=request.sheet_id,
                     spreadsheet_id=request.spreadsheet_id,
-                    dollar_maxcellsperpage=request.dollar_maxcellsperpage,
-                    dollar_next=next_cursor,
-                    dollar_valuestyle=request.dollar_valuestyle,
+                    maxcellsperpage=request.maxcellsperpage,
+                    next=request.next,
+                    valuestyle=request.valuestyle,
                 ),
                 retries=retries,
             )
@@ -3381,9 +3381,9 @@ class Spreadsheets(BaseSDK):
                     range=request.range,
                     sheet_id=request.sheet_id,
                     spreadsheet_id=request.spreadsheet_id,
-                    dollar_maxcellsperpage=request.dollar_maxcellsperpage,
-                    dollar_next=next_cursor,
-                    dollar_valuestyle=request.dollar_valuestyle,
+                    maxcellsperpage=request.maxcellsperpage,
+                    next=request.next,
+                    valuestyle=request.valuestyle,
                 ),
                 retries=retries,
             )

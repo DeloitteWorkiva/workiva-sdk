@@ -15,16 +15,16 @@ class GetSheetDataRequestTypedDict(TypedDict):
     r"""The unique identifier of the sheet"""
     spreadsheet_id: str
     r"""The unique identifier of the spreadsheet"""
-    dollar_cellrange: NotRequired[str]
+    cellrange: NotRequired[str]
     r"""The range to query. If not provided, the entire sheet will be queried.
     A1 style representation of a cell or range. A range my be unbounded in any/all directions by leaving off the corresponding column or row.
 
     """
-    dollar_fields: NotRequired[str]
+    fields: NotRequired[str]
     r"""A restricted set of fields for a given resource."""
-    dollar_maxcellsperpage: NotRequired[int]
+    maxcellsperpage: NotRequired[int]
     r"""The maximum number of cells to retrieve. The default is 50000. The maximum allowed value is 50000."""
-    dollar_next: NotRequired[str]
+    next: NotRequired[str]
     r"""Pagination cursor for next set of results."""
 
 
@@ -43,7 +43,7 @@ class GetSheetDataRequest(BaseModel):
     ]
     r"""The unique identifier of the spreadsheet"""
 
-    dollar_cellrange: Annotated[
+    cellrange: Annotated[
         Optional[str],
         pydantic.Field(alias="$cellrange"),
         FieldMetadata(query=QueryParamMetadata(style="form", explode=True)),
@@ -53,21 +53,21 @@ class GetSheetDataRequest(BaseModel):
 
     """
 
-    dollar_fields: Annotated[
+    fields: Annotated[
         Optional[str],
         pydantic.Field(alias="$fields"),
         FieldMetadata(query=QueryParamMetadata(style="form", explode=True)),
     ] = None
     r"""A restricted set of fields for a given resource."""
 
-    dollar_maxcellsperpage: Annotated[
+    maxcellsperpage: Annotated[
         Optional[int],
         pydantic.Field(alias="$maxcellsperpage"),
         FieldMetadata(query=QueryParamMetadata(style="form", explode=True)),
     ] = 50000
     r"""The maximum number of cells to retrieve. The default is 50000. The maximum allowed value is 50000."""
 
-    dollar_next: Annotated[
+    next: Annotated[
         Optional[str],
         pydantic.Field(alias="$next"),
         FieldMetadata(query=QueryParamMetadata(style="form", explode=True)),
@@ -76,7 +76,7 @@ class GetSheetDataRequest(BaseModel):
 
     @model_serializer(mode="wrap")
     def serialize_model(self, handler):
-        optional_fields = set(["$cellrange", "$fields", "$maxcellsperpage", "$next"])
+        optional_fields = set(["cellrange", "fields", "maxcellsperpage", "next"])
         serialized = handler(self)
         m = {}
 

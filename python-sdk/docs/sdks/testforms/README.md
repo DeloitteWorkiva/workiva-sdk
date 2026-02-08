@@ -186,7 +186,7 @@ with SDK(
     ),
 ) as sdk:
 
-    res = sdk.test_forms.get_matrices(test_form_id="<id>", test_phase_id="<id>", dollar_expand="?$expand=relationships\n")
+    res = sdk.test_forms.get_matrices(test_form_id="<id>", test_phase_id="<id>", expand="?$expand=relationships\n")
 
     # Handle response
     print(res)
@@ -199,7 +199,7 @@ with SDK(
 | ------------------------------------------------------------------- | ------------------------------------------------------------------- | ------------------------------------------------------------------- | ------------------------------------------------------------------- | ------------------------------------------------------------------- |
 | `test_form_id`                                                      | *str*                                                               | :heavy_check_mark:                                                  | The unique identifier of the test form                              |                                                                     |
 | `test_phase_id`                                                     | *str*                                                               | :heavy_check_mark:                                                  | The unique identifier of the test phase                             |                                                                     |
-| `dollar_expand`                                                     | *Optional[str]*                                                     | :heavy_minus_sign:                                                  | Returns related resources inline with the main resource             | ?$expand=relationships<br/>                                         |
+| `expand`                                                            | *Optional[str]*                                                     | :heavy_minus_sign:                                                  | Returns related resources inline with the main resource             | ?$expand=relationships<br/>                                         |
 | `retries`                                                           | [Optional[utils.RetryConfig]](../../models/utils/retryconfig.md)    | :heavy_minus_sign:                                                  | Configuration to override the default retry behavior of the client. |                                                                     |
 
 ### Response
@@ -328,7 +328,7 @@ with SDK(
     ),
 ) as sdk:
 
-    res = sdk.test_forms.get_matrix_by_id(matrix_id="<id>", test_form_id="<id>", test_phase_id="<id>", dollar_expand="?$expand=relationships\n")
+    res = sdk.test_forms.get_matrix_by_id(matrix_id="<id>", test_form_id="<id>", test_phase_id="<id>", expand="?$expand=relationships\n")
 
     # Handle response
     print(res)
@@ -342,7 +342,7 @@ with SDK(
 | `matrix_id`                                                         | *str*                                                               | :heavy_check_mark:                                                  | The unique identifier of the matrix                                 |                                                                     |
 | `test_form_id`                                                      | *str*                                                               | :heavy_check_mark:                                                  | The unique identifier of the test form                              |                                                                     |
 | `test_phase_id`                                                     | *str*                                                               | :heavy_check_mark:                                                  | The unique identifier of the test phase                             |                                                                     |
-| `dollar_expand`                                                     | *Optional[str]*                                                     | :heavy_minus_sign:                                                  | Returns related resources inline with the main resource             | ?$expand=relationships<br/>                                         |
+| `expand`                                                            | *Optional[str]*                                                     | :heavy_minus_sign:                                                  | Returns related resources inline with the main resource             | ?$expand=relationships<br/>                                         |
 | `retries`                                                           | [Optional[utils.RetryConfig]](../../models/utils/retryconfig.md)    | :heavy_minus_sign:                                                  | Configuration to override the default retry behavior of the client. |                                                                     |
 
 ### Response
@@ -476,7 +476,7 @@ with SDK(
 ) as sdk:
 
     res = sdk.test_forms.get_sample_by_id(request={
-        "dollar_expand": "?$expand=relationships\n",
+        "expand": "?$expand=relationships\n",
         "matrix_id": "<id>",
         "sample_id": "<id>",
         "test_form_id": "<id>",
@@ -526,7 +526,7 @@ with SDK(
     ),
 ) as sdk:
 
-    res = sdk.test_forms.get_samples(matrix_id="<id>", test_form_id="<id>", test_phase_id="<id>", dollar_expand="?$expand=relationships\n")
+    res = sdk.test_forms.get_samples(matrix_id="<id>", test_form_id="<id>", test_phase_id="<id>", expand="?$expand=relationships\n")
 
     # Handle response
     print(res)
@@ -540,7 +540,7 @@ with SDK(
 | `matrix_id`                                                         | *str*                                                               | :heavy_check_mark:                                                  | The unique identifier of the matrix                                 |                                                                     |
 | `test_form_id`                                                      | *str*                                                               | :heavy_check_mark:                                                  | The unique identifier of the test form                              |                                                                     |
 | `test_phase_id`                                                     | *str*                                                               | :heavy_check_mark:                                                  | The unique identifier of the test phase                             |                                                                     |
-| `dollar_expand`                                                     | *Optional[str]*                                                     | :heavy_minus_sign:                                                  | Returns related resources inline with the main resource             | ?$expand=relationships<br/>                                         |
+| `expand`                                                            | *Optional[str]*                                                     | :heavy_minus_sign:                                                  | Returns related resources inline with the main resource             | ?$expand=relationships<br/>                                         |
 | `retries`                                                           | [Optional[utils.RetryConfig]](../../models/utils/retryconfig.md)    | :heavy_minus_sign:                                                  | Configuration to override the default retry behavior of the client. |                                                                     |
 
 ### Response
@@ -574,7 +574,7 @@ with SDK(
     ),
 ) as sdk:
 
-    res = sdk.test_forms.get_test_form_by_id(test_form_id="<id>", dollar_expand="?$expand=relationships\n")
+    res = sdk.test_forms.get_test_form_by_id(test_form_id="<id>", expand="?$expand=relationships\n")
 
     # Handle response
     print(res)
@@ -586,7 +586,7 @@ with SDK(
 | Parameter                                                           | Type                                                                | Required                                                            | Description                                                         | Example                                                             |
 | ------------------------------------------------------------------- | ------------------------------------------------------------------- | ------------------------------------------------------------------- | ------------------------------------------------------------------- | ------------------------------------------------------------------- |
 | `test_form_id`                                                      | *str*                                                               | :heavy_check_mark:                                                  | The unique identifier of the test form                              |                                                                     |
-| `dollar_expand`                                                     | *Optional[str]*                                                     | :heavy_minus_sign:                                                  | Returns related resources inline with the main resource             | ?$expand=relationships<br/>                                         |
+| `expand`                                                            | *Optional[str]*                                                     | :heavy_minus_sign:                                                  | Returns related resources inline with the main resource             | ?$expand=relationships<br/>                                         |
 | `retries`                                                           | [Optional[utils.RetryConfig]](../../models/utils/retryconfig.md)    | :heavy_minus_sign:                                                  | Configuration to override the default retry behavior of the client. |                                                                     |
 
 ### Response
@@ -620,7 +620,7 @@ with SDK(
     ),
 ) as sdk:
 
-    res = sdk.test_forms.get_test_forms(dollar_expand="?$expand=relationships\n")
+    res = sdk.test_forms.get_test_forms(expand="?$expand=relationships\n")
 
     # Handle response
     print(res)
@@ -631,7 +631,7 @@ with SDK(
 
 | Parameter                                                           | Type                                                                | Required                                                            | Description                                                         | Example                                                             |
 | ------------------------------------------------------------------- | ------------------------------------------------------------------- | ------------------------------------------------------------------- | ------------------------------------------------------------------- | ------------------------------------------------------------------- |
-| `dollar_expand`                                                     | *Optional[str]*                                                     | :heavy_minus_sign:                                                  | Returns related resources inline with the main resource             | ?$expand=relationships<br/>                                         |
+| `expand`                                                            | *Optional[str]*                                                     | :heavy_minus_sign:                                                  | Returns related resources inline with the main resource             | ?$expand=relationships<br/>                                         |
 | `retries`                                                           | [Optional[utils.RetryConfig]](../../models/utils/retryconfig.md)    | :heavy_minus_sign:                                                  | Configuration to override the default retry behavior of the client. |                                                                     |
 
 ### Response
@@ -758,7 +758,7 @@ with SDK(
     ),
 ) as sdk:
 
-    res = sdk.test_forms.get_test_phase_by_id(test_form_id="<id>", test_phase_id="<id>", dollar_expand="?$expand=relationships\n")
+    res = sdk.test_forms.get_test_phase_by_id(test_form_id="<id>", test_phase_id="<id>", expand="?$expand=relationships\n")
 
     # Handle response
     print(res)
@@ -771,7 +771,7 @@ with SDK(
 | ------------------------------------------------------------------- | ------------------------------------------------------------------- | ------------------------------------------------------------------- | ------------------------------------------------------------------- | ------------------------------------------------------------------- |
 | `test_form_id`                                                      | *str*                                                               | :heavy_check_mark:                                                  | The unique identifier of the test form                              |                                                                     |
 | `test_phase_id`                                                     | *str*                                                               | :heavy_check_mark:                                                  | The unique identifier of the test phase                             |                                                                     |
-| `dollar_expand`                                                     | *Optional[str]*                                                     | :heavy_minus_sign:                                                  | Returns related resources inline with the main resource             | ?$expand=relationships<br/>                                         |
+| `expand`                                                            | *Optional[str]*                                                     | :heavy_minus_sign:                                                  | Returns related resources inline with the main resource             | ?$expand=relationships<br/>                                         |
 | `retries`                                                           | [Optional[utils.RetryConfig]](../../models/utils/retryconfig.md)    | :heavy_minus_sign:                                                  | Configuration to override the default retry behavior of the client. |                                                                     |
 
 ### Response
@@ -805,7 +805,7 @@ with SDK(
     ),
 ) as sdk:
 
-    res = sdk.test_forms.get_test_phases(test_form_id="<id>", dollar_expand="?$expand=relationships\n")
+    res = sdk.test_forms.get_test_phases(test_form_id="<id>", expand="?$expand=relationships\n")
 
     # Handle response
     print(res)
@@ -817,7 +817,7 @@ with SDK(
 | Parameter                                                           | Type                                                                | Required                                                            | Description                                                         | Example                                                             |
 | ------------------------------------------------------------------- | ------------------------------------------------------------------- | ------------------------------------------------------------------- | ------------------------------------------------------------------- | ------------------------------------------------------------------- |
 | `test_form_id`                                                      | *str*                                                               | :heavy_check_mark:                                                  | The unique identifier of the test form                              |                                                                     |
-| `dollar_expand`                                                     | *Optional[str]*                                                     | :heavy_minus_sign:                                                  | Returns related resources inline with the main resource             | ?$expand=relationships<br/>                                         |
+| `expand`                                                            | *Optional[str]*                                                     | :heavy_minus_sign:                                                  | Returns related resources inline with the main resource             | ?$expand=relationships<br/>                                         |
 | `retries`                                                           | [Optional[utils.RetryConfig]](../../models/utils/retryconfig.md)    | :heavy_minus_sign:                                                  | Configuration to override the default retry behavior of the client. |                                                                     |
 
 ### Response

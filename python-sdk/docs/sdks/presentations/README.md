@@ -38,7 +38,7 @@ with SDK(
     ),
 ) as sdk:
 
-    res = sdk.presentations.get_presentation_by_id(presentation_id="<id>", dollar_revision="1A2B3C4D")
+    res = sdk.presentations.get_presentation_by_id(presentation_id="<id>", revision="1A2B3C4D")
 
     # Handle response
     print(res)
@@ -50,7 +50,7 @@ with SDK(
 | Parameter                                                           | Type                                                                | Required                                                            | Description                                                         | Example                                                             |
 | ------------------------------------------------------------------- | ------------------------------------------------------------------- | ------------------------------------------------------------------- | ------------------------------------------------------------------- | ------------------------------------------------------------------- |
 | `presentation_id`                                                   | *str*                                                               | :heavy_check_mark:                                                  | The unique identifier of the presentation                           |                                                                     |
-| `dollar_revision`                                                   | *Optional[str]*                                                     | :heavy_minus_sign:                                                  | Returns resources at a specific revision                            | 1A2B3C4D                                                            |
+| `revision`                                                          | *Optional[str]*                                                     | :heavy_minus_sign:                                                  | Returns resources at a specific revision                            | 1A2B3C4D                                                            |
 | `retries`                                                           | [Optional[utils.RetryConfig]](../../models/utils/retryconfig.md)    | :heavy_minus_sign:                                                  | Configuration to override the default retry behavior of the client. |                                                                     |
 
 ### Response
@@ -83,7 +83,7 @@ with SDK(
     ),
 ) as sdk:
 
-    res = sdk.presentations.get_presentation_milestones(presentation_id="<id>", dollar_next="JTI0bGltaXQ9MTAwJiUyNG9mZnNldD0xMDA")
+    res = sdk.presentations.get_presentation_milestones(presentation_id="<id>", next="JTI0bGltaXQ9MTAwJiUyNG9mZnNldD0xMDA")
 
     while res is not None:
         # Handle items
@@ -97,7 +97,7 @@ with SDK(
 | Parameter                                                           | Type                                                                | Required                                                            | Description                                                         | Example                                                             |
 | ------------------------------------------------------------------- | ------------------------------------------------------------------- | ------------------------------------------------------------------- | ------------------------------------------------------------------- | ------------------------------------------------------------------- |
 | `presentation_id`                                                   | *str*                                                               | :heavy_check_mark:                                                  | The unique identifier of the presentation                           |                                                                     |
-| `dollar_next`                                                       | *Optional[str]*                                                     | :heavy_minus_sign:                                                  | Pagination cursor for next set of results.                          | JTI0bGltaXQ9MTAwJiUyNG9mZnNldD0xMDA                                 |
+| `next`                                                              | *Optional[str]*                                                     | :heavy_minus_sign:                                                  | Pagination cursor for next set of results.                          | JTI0bGltaXQ9MTAwJiUyNG9mZnNldD0xMDA                                 |
 | `retries`                                                           | [Optional[utils.RetryConfig]](../../models/utils/retryconfig.md)    | :heavy_minus_sign:                                                  | Configuration to override the default retry behavior of the client. |                                                                     |
 
 ### Response
@@ -131,7 +131,7 @@ with SDK(
     ),
 ) as sdk:
 
-    res = sdk.presentations.get_slide_by_id(presentation_id="<id>", slide_id="<id>", dollar_revision="1A2B3C4D")
+    res = sdk.presentations.get_slide_by_id(presentation_id="<id>", slide_id="<id>", revision="1A2B3C4D")
 
     # Handle response
     print(res)
@@ -144,7 +144,7 @@ with SDK(
 | ------------------------------------------------------------------- | ------------------------------------------------------------------- | ------------------------------------------------------------------- | ------------------------------------------------------------------- | ------------------------------------------------------------------- |
 | `presentation_id`                                                   | *str*                                                               | :heavy_check_mark:                                                  | The unique identifier of the presentation                           |                                                                     |
 | `slide_id`                                                          | *str*                                                               | :heavy_check_mark:                                                  | The unique identifier of the slide                                  |                                                                     |
-| `dollar_revision`                                                   | *Optional[str]*                                                     | :heavy_minus_sign:                                                  | Returns resources at a specific revision                            | 1A2B3C4D                                                            |
+| `revision`                                                          | *Optional[str]*                                                     | :heavy_minus_sign:                                                  | Returns resources at a specific revision                            | 1A2B3C4D                                                            |
 | `retries`                                                           | [Optional[utils.RetryConfig]](../../models/utils/retryconfig.md)    | :heavy_minus_sign:                                                  | Configuration to override the default retry behavior of the client. |                                                                     |
 
 ### Response
@@ -178,7 +178,7 @@ with SDK(
     ),
 ) as sdk:
 
-    res = sdk.presentations.get_slide_layout_by_id(presentation_id="<id>", slide_layout_id="<id>", dollar_revision="1A2B3C4D")
+    res = sdk.presentations.get_slide_layout_by_id(presentation_id="<id>", slide_layout_id="<id>", revision="1A2B3C4D")
 
     # Handle response
     print(res)
@@ -191,7 +191,7 @@ with SDK(
 | ------------------------------------------------------------------- | ------------------------------------------------------------------- | ------------------------------------------------------------------- | ------------------------------------------------------------------- | ------------------------------------------------------------------- |
 | `presentation_id`                                                   | *str*                                                               | :heavy_check_mark:                                                  | The unique identifier of the presentation                           |                                                                     |
 | `slide_layout_id`                                                   | *str*                                                               | :heavy_check_mark:                                                  | The unique identifier of the slide layout                           |                                                                     |
-| `dollar_revision`                                                   | *Optional[str]*                                                     | :heavy_minus_sign:                                                  | Returns resources at a specific revision                            | 1A2B3C4D                                                            |
+| `revision`                                                          | *Optional[str]*                                                     | :heavy_minus_sign:                                                  | Returns resources at a specific revision                            | 1A2B3C4D                                                            |
 | `retries`                                                           | [Optional[utils.RetryConfig]](../../models/utils/retryconfig.md)    | :heavy_minus_sign:                                                  | Configuration to override the default retry behavior of the client. |                                                                     |
 
 ### Response
@@ -224,7 +224,7 @@ with SDK(
     ),
 ) as sdk:
 
-    res = sdk.presentations.get_slide_layouts(presentation_id="<id>", dollar_maxpagesize=1000, dollar_next="JTI0bGltaXQ9MTAwJiUyNG9mZnNldD0xMDA", dollar_revision="1A2B3C4D")
+    res = sdk.presentations.get_slide_layouts(presentation_id="<id>", maxpagesize=1000, next="JTI0bGltaXQ9MTAwJiUyNG9mZnNldD0xMDA", revision="1A2B3C4D")
 
     while res is not None:
         # Handle items
@@ -238,9 +238,9 @@ with SDK(
 | Parameter                                                           | Type                                                                | Required                                                            | Description                                                         | Example                                                             |
 | ------------------------------------------------------------------- | ------------------------------------------------------------------- | ------------------------------------------------------------------- | ------------------------------------------------------------------- | ------------------------------------------------------------------- |
 | `presentation_id`                                                   | *str*                                                               | :heavy_check_mark:                                                  | The unique identifier of the presentation                           |                                                                     |
-| `dollar_maxpagesize`                                                | *Optional[int]*                                                     | :heavy_minus_sign:                                                  | The maximum number of results to retrieve                           |                                                                     |
-| `dollar_next`                                                       | *Optional[str]*                                                     | :heavy_minus_sign:                                                  | Pagination cursor for next set of results.                          | JTI0bGltaXQ9MTAwJiUyNG9mZnNldD0xMDA                                 |
-| `dollar_revision`                                                   | *Optional[str]*                                                     | :heavy_minus_sign:                                                  | Returns resources at a specific revision                            | 1A2B3C4D                                                            |
+| `maxpagesize`                                                       | *Optional[int]*                                                     | :heavy_minus_sign:                                                  | The maximum number of results to retrieve                           |                                                                     |
+| `next`                                                              | *Optional[str]*                                                     | :heavy_minus_sign:                                                  | Pagination cursor for next set of results.                          | JTI0bGltaXQ9MTAwJiUyNG9mZnNldD0xMDA                                 |
+| `revision`                                                          | *Optional[str]*                                                     | :heavy_minus_sign:                                                  | Returns resources at a specific revision                            | 1A2B3C4D                                                            |
 | `retries`                                                           | [Optional[utils.RetryConfig]](../../models/utils/retryconfig.md)    | :heavy_minus_sign:                                                  | Configuration to override the default retry behavior of the client. |                                                                     |
 
 ### Response
@@ -273,7 +273,7 @@ with SDK(
     ),
 ) as sdk:
 
-    res = sdk.presentations.get_slides(presentation_id="<id>", dollar_maxpagesize=1000, dollar_next="JTI0bGltaXQ9MTAwJiUyNG9mZnNldD0xMDA", dollar_revision="1A2B3C4D")
+    res = sdk.presentations.get_slides(presentation_id="<id>", maxpagesize=1000, next="JTI0bGltaXQ9MTAwJiUyNG9mZnNldD0xMDA", revision="1A2B3C4D")
 
     while res is not None:
         # Handle items
@@ -287,9 +287,9 @@ with SDK(
 | Parameter                                                           | Type                                                                | Required                                                            | Description                                                         | Example                                                             |
 | ------------------------------------------------------------------- | ------------------------------------------------------------------- | ------------------------------------------------------------------- | ------------------------------------------------------------------- | ------------------------------------------------------------------- |
 | `presentation_id`                                                   | *str*                                                               | :heavy_check_mark:                                                  | The unique identifier of the presentation                           |                                                                     |
-| `dollar_maxpagesize`                                                | *Optional[int]*                                                     | :heavy_minus_sign:                                                  | The maximum number of results to retrieve                           |                                                                     |
-| `dollar_next`                                                       | *Optional[str]*                                                     | :heavy_minus_sign:                                                  | Pagination cursor for next set of results.                          | JTI0bGltaXQ9MTAwJiUyNG9mZnNldD0xMDA                                 |
-| `dollar_revision`                                                   | *Optional[str]*                                                     | :heavy_minus_sign:                                                  | Returns resources at a specific revision                            | 1A2B3C4D                                                            |
+| `maxpagesize`                                                       | *Optional[int]*                                                     | :heavy_minus_sign:                                                  | The maximum number of results to retrieve                           |                                                                     |
+| `next`                                                              | *Optional[str]*                                                     | :heavy_minus_sign:                                                  | Pagination cursor for next set of results.                          | JTI0bGltaXQ9MTAwJiUyNG9mZnNldD0xMDA                                 |
+| `revision`                                                          | *Optional[str]*                                                     | :heavy_minus_sign:                                                  | Returns resources at a specific revision                            | 1A2B3C4D                                                            |
 | `retries`                                                           | [Optional[utils.RetryConfig]](../../models/utils/retryconfig.md)    | :heavy_minus_sign:                                                  | Configuration to override the default retry behavior of the client. |                                                                     |
 
 ### Response

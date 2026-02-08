@@ -1862,7 +1862,7 @@ class Documents(BaseSDK):
         self,
         *,
         document_id: str,
-        dollar_expand: Optional[str] = None,
+        expand: Optional[str] = None,
         retries: OptionalNullable[utils.RetryConfig] = UNSET,
         server_url: Optional[str] = None,
         timeout_ms: Optional[int] = None,
@@ -1874,7 +1874,7 @@ class Documents(BaseSDK):
 
 
         :param document_id: The unique identifier of the document
-        :param dollar_expand: Returns related resources inline with the main resource
+        :param expand: Returns related resources inline with the main resource
         :param retries: Override the default retry configuration for this method
         :param server_url: Override the default server URL for this method
         :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
@@ -1891,8 +1891,8 @@ class Documents(BaseSDK):
             base_url = self._get_url(base_url, url_variables)
 
         request = models.GetDocumentByIDRequest(
-            dollar_expand=dollar_expand,
             document_id=document_id,
+            expand=expand,
         )
 
         req = self._build_request(
@@ -1968,7 +1968,7 @@ class Documents(BaseSDK):
         self,
         *,
         document_id: str,
-        dollar_expand: Optional[str] = None,
+        expand: Optional[str] = None,
         retries: OptionalNullable[utils.RetryConfig] = UNSET,
         server_url: Optional[str] = None,
         timeout_ms: Optional[int] = None,
@@ -1980,7 +1980,7 @@ class Documents(BaseSDK):
 
 
         :param document_id: The unique identifier of the document
-        :param dollar_expand: Returns related resources inline with the main resource
+        :param expand: Returns related resources inline with the main resource
         :param retries: Override the default retry configuration for this method
         :param server_url: Override the default server URL for this method
         :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
@@ -1997,8 +1997,8 @@ class Documents(BaseSDK):
             base_url = self._get_url(base_url, url_variables)
 
         request = models.GetDocumentByIDRequest(
-            dollar_expand=dollar_expand,
             document_id=document_id,
+            expand=expand,
         )
 
         req = self._build_request_async(
@@ -2074,7 +2074,7 @@ class Documents(BaseSDK):
         self,
         *,
         document_id: str,
-        dollar_next: Optional[str] = None,
+        next: Optional[str] = None,
         retries: OptionalNullable[utils.RetryConfig] = UNSET,
         server_url: Optional[str] = None,
         timeout_ms: Optional[int] = None,
@@ -2085,7 +2085,7 @@ class Documents(BaseSDK):
         Returns [MilestoneListResult](ref:milestones#milestonelistresult).
 
         :param document_id: The unique identifier of the document
-        :param dollar_next: Pagination cursor for next set of results.
+        :param next: Pagination cursor for next set of results.
         :param retries: Override the default retry configuration for this method
         :param server_url: Override the default server URL for this method
         :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
@@ -2102,8 +2102,8 @@ class Documents(BaseSDK):
             base_url = self._get_url(base_url, url_variables)
 
         request = models.GetDocumentMilestonesRequest(
-            dollar_next=dollar_next,
             document_id=document_id,
+            next=next,
         )
 
         req = self._build_request(
@@ -2169,7 +2169,7 @@ class Documents(BaseSDK):
 
             return self.get_document_milestones(
                 document_id=document_id,
-                dollar_next=next_cursor,
+                next=next,
                 retries=retries,
             )
 
@@ -2200,7 +2200,7 @@ class Documents(BaseSDK):
         self,
         *,
         document_id: str,
-        dollar_next: Optional[str] = None,
+        next: Optional[str] = None,
         retries: OptionalNullable[utils.RetryConfig] = UNSET,
         server_url: Optional[str] = None,
         timeout_ms: Optional[int] = None,
@@ -2211,7 +2211,7 @@ class Documents(BaseSDK):
         Returns [MilestoneListResult](ref:milestones#milestonelistresult).
 
         :param document_id: The unique identifier of the document
-        :param dollar_next: Pagination cursor for next set of results.
+        :param next: Pagination cursor for next set of results.
         :param retries: Override the default retry configuration for this method
         :param server_url: Override the default server URL for this method
         :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
@@ -2228,8 +2228,8 @@ class Documents(BaseSDK):
             base_url = self._get_url(base_url, url_variables)
 
         request = models.GetDocumentMilestonesRequest(
-            dollar_next=dollar_next,
             document_id=document_id,
+            next=next,
         )
 
         req = self._build_request_async(
@@ -2298,7 +2298,7 @@ class Documents(BaseSDK):
 
             return self.get_document_milestones_async(
                 document_id=document_id,
-                dollar_next=next_cursor,
+                next=next,
                 retries=retries,
             )
 
@@ -2329,9 +2329,9 @@ class Documents(BaseSDK):
         self,
         *,
         document_id: str,
-        dollar_filter: Optional[str] = None,
-        dollar_maxpagesize: Optional[int] = 1000,
-        dollar_next: Optional[str] = None,
+        filter_: Optional[str] = None,
+        maxpagesize: Optional[int] = 1000,
+        next: Optional[str] = None,
         retries: OptionalNullable[utils.RetryConfig] = UNSET,
         server_url: Optional[str] = None,
         timeout_ms: Optional[int] = None,
@@ -2343,9 +2343,9 @@ class Documents(BaseSDK):
 
 
         :param document_id: The unique identifier of the document
-        :param dollar_filter: The properties to filter the results by.
-        :param dollar_maxpagesize: The maximum number of results to retrieve
-        :param dollar_next: Pagination cursor for next set of results.
+        :param filter_: The properties to filter the results by.
+        :param maxpagesize: The maximum number of results to retrieve
+        :param next: Pagination cursor for next set of results.
         :param retries: Override the default retry configuration for this method
         :param server_url: Override the default server URL for this method
         :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
@@ -2362,10 +2362,10 @@ class Documents(BaseSDK):
             base_url = self._get_url(base_url, url_variables)
 
         request = models.GetDocumentPermissionsRequest(
-            dollar_filter=dollar_filter,
-            dollar_maxpagesize=dollar_maxpagesize,
-            dollar_next=dollar_next,
             document_id=document_id,
+            filter_=filter_,
+            maxpagesize=maxpagesize,
+            next=next,
         )
 
         req = self._build_request(
@@ -2431,9 +2431,9 @@ class Documents(BaseSDK):
 
             return self.get_document_permissions(
                 document_id=document_id,
-                dollar_filter=dollar_filter,
-                dollar_maxpagesize=dollar_maxpagesize,
-                dollar_next=next_cursor,
+                filter_=filter_,
+                maxpagesize=maxpagesize,
+                next=next,
                 retries=retries,
             )
 
@@ -2466,9 +2466,9 @@ class Documents(BaseSDK):
         self,
         *,
         document_id: str,
-        dollar_filter: Optional[str] = None,
-        dollar_maxpagesize: Optional[int] = 1000,
-        dollar_next: Optional[str] = None,
+        filter_: Optional[str] = None,
+        maxpagesize: Optional[int] = 1000,
+        next: Optional[str] = None,
         retries: OptionalNullable[utils.RetryConfig] = UNSET,
         server_url: Optional[str] = None,
         timeout_ms: Optional[int] = None,
@@ -2480,9 +2480,9 @@ class Documents(BaseSDK):
 
 
         :param document_id: The unique identifier of the document
-        :param dollar_filter: The properties to filter the results by.
-        :param dollar_maxpagesize: The maximum number of results to retrieve
-        :param dollar_next: Pagination cursor for next set of results.
+        :param filter_: The properties to filter the results by.
+        :param maxpagesize: The maximum number of results to retrieve
+        :param next: Pagination cursor for next set of results.
         :param retries: Override the default retry configuration for this method
         :param server_url: Override the default server URL for this method
         :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
@@ -2499,10 +2499,10 @@ class Documents(BaseSDK):
             base_url = self._get_url(base_url, url_variables)
 
         request = models.GetDocumentPermissionsRequest(
-            dollar_filter=dollar_filter,
-            dollar_maxpagesize=dollar_maxpagesize,
-            dollar_next=dollar_next,
             document_id=document_id,
+            filter_=filter_,
+            maxpagesize=maxpagesize,
+            next=next,
         )
 
         req = self._build_request_async(
@@ -2571,9 +2571,9 @@ class Documents(BaseSDK):
 
             return self.get_document_permissions_async(
                 document_id=document_id,
-                dollar_filter=dollar_filter,
-                dollar_maxpagesize=dollar_maxpagesize,
-                dollar_next=next_cursor,
+                filter_=filter_,
+                maxpagesize=maxpagesize,
+                next=next,
                 retries=retries,
             )
 
@@ -2605,10 +2605,10 @@ class Documents(BaseSDK):
     def get_documents(
         self,
         *,
-        dollar_filter: Optional[str] = None,
-        dollar_maxpagesize: Optional[int] = 1000,
-        dollar_next: Optional[str] = None,
-        dollar_order_by: Optional[str] = None,
+        filter_: Optional[str] = None,
+        maxpagesize: Optional[int] = 1000,
+        next: Optional[str] = None,
+        order_by: Optional[str] = None,
         retries: OptionalNullable[utils.RetryConfig] = UNSET,
         server_url: Optional[str] = None,
         timeout_ms: Optional[int] = None,
@@ -2618,10 +2618,10 @@ class Documents(BaseSDK):
 
         Returns a paginated list of [documents](ref:documents#document).
 
-        :param dollar_filter: The properties to filter the results by.
-        :param dollar_maxpagesize: The maximum number of results to retrieve
-        :param dollar_next: Pagination cursor for next set of results.
-        :param dollar_order_by: One or more comma-separated expressions to indicate the order in which to sort the results.
+        :param filter_: The properties to filter the results by.
+        :param maxpagesize: The maximum number of results to retrieve
+        :param next: Pagination cursor for next set of results.
+        :param order_by: One or more comma-separated expressions to indicate the order in which to sort the results.
         :param retries: Override the default retry configuration for this method
         :param server_url: Override the default server URL for this method
         :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
@@ -2638,10 +2638,10 @@ class Documents(BaseSDK):
             base_url = self._get_url(base_url, url_variables)
 
         request = models.GetDocumentsRequest(
-            dollar_filter=dollar_filter,
-            dollar_maxpagesize=dollar_maxpagesize,
-            dollar_next=dollar_next,
-            dollar_order_by=dollar_order_by,
+            filter_=filter_,
+            maxpagesize=maxpagesize,
+            next=next,
+            order_by=order_by,
         )
 
         req = self._build_request(
@@ -2706,10 +2706,10 @@ class Documents(BaseSDK):
                 return None
 
             return self.get_documents(
-                dollar_filter=dollar_filter,
-                dollar_maxpagesize=dollar_maxpagesize,
-                dollar_next=next_cursor,
-                dollar_order_by=dollar_order_by,
+                filter_=filter_,
+                maxpagesize=maxpagesize,
+                next=next,
+                order_by=order_by,
                 retries=retries,
             )
 
@@ -2739,10 +2739,10 @@ class Documents(BaseSDK):
     async def get_documents_async(
         self,
         *,
-        dollar_filter: Optional[str] = None,
-        dollar_maxpagesize: Optional[int] = 1000,
-        dollar_next: Optional[str] = None,
-        dollar_order_by: Optional[str] = None,
+        filter_: Optional[str] = None,
+        maxpagesize: Optional[int] = 1000,
+        next: Optional[str] = None,
+        order_by: Optional[str] = None,
         retries: OptionalNullable[utils.RetryConfig] = UNSET,
         server_url: Optional[str] = None,
         timeout_ms: Optional[int] = None,
@@ -2752,10 +2752,10 @@ class Documents(BaseSDK):
 
         Returns a paginated list of [documents](ref:documents#document).
 
-        :param dollar_filter: The properties to filter the results by.
-        :param dollar_maxpagesize: The maximum number of results to retrieve
-        :param dollar_next: Pagination cursor for next set of results.
-        :param dollar_order_by: One or more comma-separated expressions to indicate the order in which to sort the results.
+        :param filter_: The properties to filter the results by.
+        :param maxpagesize: The maximum number of results to retrieve
+        :param next: Pagination cursor for next set of results.
+        :param order_by: One or more comma-separated expressions to indicate the order in which to sort the results.
         :param retries: Override the default retry configuration for this method
         :param server_url: Override the default server URL for this method
         :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
@@ -2772,10 +2772,10 @@ class Documents(BaseSDK):
             base_url = self._get_url(base_url, url_variables)
 
         request = models.GetDocumentsRequest(
-            dollar_filter=dollar_filter,
-            dollar_maxpagesize=dollar_maxpagesize,
-            dollar_next=dollar_next,
-            dollar_order_by=dollar_order_by,
+            filter_=filter_,
+            maxpagesize=maxpagesize,
+            next=next,
+            order_by=order_by,
         )
 
         req = self._build_request_async(
@@ -2843,10 +2843,10 @@ class Documents(BaseSDK):
                 return empty_result()
 
             return self.get_documents_async(
-                dollar_filter=dollar_filter,
-                dollar_maxpagesize=dollar_maxpagesize,
-                dollar_next=next_cursor,
-                dollar_order_by=dollar_order_by,
+                filter_=filter_,
+                maxpagesize=maxpagesize,
+                next=next,
+                order_by=order_by,
                 retries=retries,
             )
 
@@ -2878,8 +2878,8 @@ class Documents(BaseSDK):
         *,
         document_id: str,
         section_id: str,
-        dollar_expand: Optional[str] = None,
-        dollar_revision: Optional[str] = None,
+        expand: Optional[str] = None,
+        revision: Optional[str] = None,
         retries: OptionalNullable[utils.RetryConfig] = UNSET,
         server_url: Optional[str] = None,
         timeout_ms: Optional[int] = None,
@@ -2892,8 +2892,8 @@ class Documents(BaseSDK):
 
         :param document_id: The unique identifier of the document
         :param section_id: The unique identifier of the section
-        :param dollar_expand: Returns related resources inline with the main resource
-        :param dollar_revision: Returns resources at a specific revision
+        :param expand: Returns related resources inline with the main resource
+        :param revision: Returns resources at a specific revision
         :param retries: Override the default retry configuration for this method
         :param server_url: Override the default server URL for this method
         :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
@@ -2910,9 +2910,9 @@ class Documents(BaseSDK):
             base_url = self._get_url(base_url, url_variables)
 
         request = models.GetSectionByIDRequest(
-            dollar_expand=dollar_expand,
-            dollar_revision=dollar_revision,
             document_id=document_id,
+            expand=expand,
+            revision=revision,
             section_id=section_id,
         )
 
@@ -2990,8 +2990,8 @@ class Documents(BaseSDK):
         *,
         document_id: str,
         section_id: str,
-        dollar_expand: Optional[str] = None,
-        dollar_revision: Optional[str] = None,
+        expand: Optional[str] = None,
+        revision: Optional[str] = None,
         retries: OptionalNullable[utils.RetryConfig] = UNSET,
         server_url: Optional[str] = None,
         timeout_ms: Optional[int] = None,
@@ -3004,8 +3004,8 @@ class Documents(BaseSDK):
 
         :param document_id: The unique identifier of the document
         :param section_id: The unique identifier of the section
-        :param dollar_expand: Returns related resources inline with the main resource
-        :param dollar_revision: Returns resources at a specific revision
+        :param expand: Returns related resources inline with the main resource
+        :param revision: Returns resources at a specific revision
         :param retries: Override the default retry configuration for this method
         :param server_url: Override the default server URL for this method
         :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
@@ -3022,9 +3022,9 @@ class Documents(BaseSDK):
             base_url = self._get_url(base_url, url_variables)
 
         request = models.GetSectionByIDRequest(
-            dollar_expand=dollar_expand,
-            dollar_revision=dollar_revision,
             document_id=document_id,
+            expand=expand,
+            revision=revision,
             section_id=section_id,
         )
 
@@ -3199,9 +3199,9 @@ class Documents(BaseSDK):
                 request=models.GetSectionPermissionsRequest(
                     document_id=request.document_id,
                     section_id=request.section_id,
-                    dollar_filter=request.dollar_filter,
-                    dollar_maxpagesize=request.dollar_maxpagesize,
-                    dollar_next=next_cursor,
+                    filter_=request.filter_,
+                    maxpagesize=request.maxpagesize,
+                    next=request.next,
                 ),
                 retries=retries,
             )
@@ -3336,9 +3336,9 @@ class Documents(BaseSDK):
                 request=models.GetSectionPermissionsRequest(
                     document_id=request.document_id,
                     section_id=request.section_id,
-                    dollar_filter=request.dollar_filter,
-                    dollar_maxpagesize=request.dollar_maxpagesize,
-                    dollar_next=next_cursor,
+                    filter_=request.filter_,
+                    maxpagesize=request.maxpagesize,
+                    next=request.next,
                 ),
                 retries=retries,
             )
@@ -3372,9 +3372,9 @@ class Documents(BaseSDK):
         self,
         *,
         document_id: str,
-        dollar_maxpagesize: Optional[int] = 1000,
-        dollar_next: Optional[str] = None,
-        dollar_revision: Optional[str] = None,
+        maxpagesize: Optional[int] = 1000,
+        next: Optional[str] = None,
+        revision: Optional[str] = None,
         retries: OptionalNullable[utils.RetryConfig] = UNSET,
         server_url: Optional[str] = None,
         timeout_ms: Optional[int] = None,
@@ -3386,9 +3386,9 @@ class Documents(BaseSDK):
 
 
         :param document_id: The unique identifier of the document
-        :param dollar_maxpagesize: The maximum number of results to retrieve
-        :param dollar_next: Pagination cursor for next set of results.
-        :param dollar_revision: Returns resources at a specific revision
+        :param maxpagesize: The maximum number of results to retrieve
+        :param next: Pagination cursor for next set of results.
+        :param revision: Returns resources at a specific revision
         :param retries: Override the default retry configuration for this method
         :param server_url: Override the default server URL for this method
         :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
@@ -3405,10 +3405,10 @@ class Documents(BaseSDK):
             base_url = self._get_url(base_url, url_variables)
 
         request = models.GetSectionsRequest(
-            dollar_maxpagesize=dollar_maxpagesize,
-            dollar_next=dollar_next,
-            dollar_revision=dollar_revision,
             document_id=document_id,
+            maxpagesize=maxpagesize,
+            next=next,
+            revision=revision,
         )
 
         req = self._build_request(
@@ -3474,9 +3474,9 @@ class Documents(BaseSDK):
 
             return self.get_sections(
                 document_id=document_id,
-                dollar_maxpagesize=dollar_maxpagesize,
-                dollar_next=next_cursor,
-                dollar_revision=dollar_revision,
+                maxpagesize=maxpagesize,
+                next=next,
+                revision=revision,
                 retries=retries,
             )
 
@@ -3507,9 +3507,9 @@ class Documents(BaseSDK):
         self,
         *,
         document_id: str,
-        dollar_maxpagesize: Optional[int] = 1000,
-        dollar_next: Optional[str] = None,
-        dollar_revision: Optional[str] = None,
+        maxpagesize: Optional[int] = 1000,
+        next: Optional[str] = None,
+        revision: Optional[str] = None,
         retries: OptionalNullable[utils.RetryConfig] = UNSET,
         server_url: Optional[str] = None,
         timeout_ms: Optional[int] = None,
@@ -3521,9 +3521,9 @@ class Documents(BaseSDK):
 
 
         :param document_id: The unique identifier of the document
-        :param dollar_maxpagesize: The maximum number of results to retrieve
-        :param dollar_next: Pagination cursor for next set of results.
-        :param dollar_revision: Returns resources at a specific revision
+        :param maxpagesize: The maximum number of results to retrieve
+        :param next: Pagination cursor for next set of results.
+        :param revision: Returns resources at a specific revision
         :param retries: Override the default retry configuration for this method
         :param server_url: Override the default server URL for this method
         :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
@@ -3540,10 +3540,10 @@ class Documents(BaseSDK):
             base_url = self._get_url(base_url, url_variables)
 
         request = models.GetSectionsRequest(
-            dollar_maxpagesize=dollar_maxpagesize,
-            dollar_next=dollar_next,
-            dollar_revision=dollar_revision,
             document_id=document_id,
+            maxpagesize=maxpagesize,
+            next=next,
+            revision=revision,
         )
 
         req = self._build_request_async(
@@ -3612,9 +3612,9 @@ class Documents(BaseSDK):
 
             return self.get_sections_async(
                 document_id=document_id,
-                dollar_maxpagesize=dollar_maxpagesize,
-                dollar_next=next_cursor,
-                dollar_revision=dollar_revision,
+                maxpagesize=maxpagesize,
+                next=next,
+                revision=revision,
                 retries=retries,
             )
 

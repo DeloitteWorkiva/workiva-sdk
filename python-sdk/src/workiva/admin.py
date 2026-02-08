@@ -3338,9 +3338,9 @@ class Admin(BaseSDK):
         self,
         *,
         organization_id: str,
-        dollar_filter: Optional[str] = None,
-        dollar_maxpagesize: Optional[int] = 1000,
-        dollar_next: Optional[str] = None,
+        filter_: Optional[str] = None,
+        maxpagesize: Optional[int] = 1000,
+        next: Optional[str] = None,
         retries: OptionalNullable[utils.RetryConfig] = UNSET,
         server_url: Optional[str] = None,
         timeout_ms: Optional[int] = None,
@@ -3351,9 +3351,9 @@ class Admin(BaseSDK):
         Retrieve users in an organization.
 
         :param organization_id: The unique identifier of the organization
-        :param dollar_filter: The properties to filter the results by.
-        :param dollar_maxpagesize: The maximum number of results to retrieve
-        :param dollar_next: Pagination cursor for next set of results.
+        :param filter_: The properties to filter the results by.
+        :param maxpagesize: The maximum number of results to retrieve
+        :param next: Pagination cursor for next set of results.
         :param retries: Override the default retry configuration for this method
         :param server_url: Override the default server URL for this method
         :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
@@ -3370,9 +3370,9 @@ class Admin(BaseSDK):
             base_url = self._get_url(base_url, url_variables)
 
         request = models.GetOrganizationUsersRequest(
-            dollar_filter=dollar_filter,
-            dollar_maxpagesize=dollar_maxpagesize,
-            dollar_next=dollar_next,
+            filter_=filter_,
+            maxpagesize=maxpagesize,
+            next=next,
             organization_id=organization_id,
         )
 
@@ -3439,9 +3439,9 @@ class Admin(BaseSDK):
 
             return self.get_organization_users(
                 organization_id=organization_id,
-                dollar_filter=dollar_filter,
-                dollar_maxpagesize=dollar_maxpagesize,
-                dollar_next=next_cursor,
+                filter_=filter_,
+                maxpagesize=maxpagesize,
+                next=next,
                 retries=retries,
             )
 
@@ -3474,9 +3474,9 @@ class Admin(BaseSDK):
         self,
         *,
         organization_id: str,
-        dollar_filter: Optional[str] = None,
-        dollar_maxpagesize: Optional[int] = 1000,
-        dollar_next: Optional[str] = None,
+        filter_: Optional[str] = None,
+        maxpagesize: Optional[int] = 1000,
+        next: Optional[str] = None,
         retries: OptionalNullable[utils.RetryConfig] = UNSET,
         server_url: Optional[str] = None,
         timeout_ms: Optional[int] = None,
@@ -3487,9 +3487,9 @@ class Admin(BaseSDK):
         Retrieve users in an organization.
 
         :param organization_id: The unique identifier of the organization
-        :param dollar_filter: The properties to filter the results by.
-        :param dollar_maxpagesize: The maximum number of results to retrieve
-        :param dollar_next: Pagination cursor for next set of results.
+        :param filter_: The properties to filter the results by.
+        :param maxpagesize: The maximum number of results to retrieve
+        :param next: Pagination cursor for next set of results.
         :param retries: Override the default retry configuration for this method
         :param server_url: Override the default server URL for this method
         :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
@@ -3506,9 +3506,9 @@ class Admin(BaseSDK):
             base_url = self._get_url(base_url, url_variables)
 
         request = models.GetOrganizationUsersRequest(
-            dollar_filter=dollar_filter,
-            dollar_maxpagesize=dollar_maxpagesize,
-            dollar_next=dollar_next,
+            filter_=filter_,
+            maxpagesize=maxpagesize,
+            next=next,
             organization_id=organization_id,
         )
 
@@ -3578,9 +3578,9 @@ class Admin(BaseSDK):
 
             return self.get_organization_users_async(
                 organization_id=organization_id,
-                dollar_filter=dollar_filter,
-                dollar_maxpagesize=dollar_maxpagesize,
-                dollar_next=next_cursor,
+                filter_=filter_,
+                maxpagesize=maxpagesize,
+                next=next,
                 retries=retries,
             )
 
@@ -4143,10 +4143,10 @@ class Admin(BaseSDK):
             return self.get_organizations(
                 request=models.GetOrganizationsRequest(
                     wk_service_provider=request.wk_service_provider,
-                    dollar_filter=request.dollar_filter,
-                    dollar_maxpagesize=request.dollar_maxpagesize,
-                    dollar_next=next_cursor,
-                    dollar_order_by=request.dollar_order_by,
+                    filter_=request.filter_,
+                    maxpagesize=request.maxpagesize,
+                    next=request.next,
+                    order_by=request.order_by,
                 ),
                 retries=retries,
             )
@@ -4279,10 +4279,10 @@ class Admin(BaseSDK):
             return self.get_organizations_async(
                 request=models.GetOrganizationsRequest(
                     wk_service_provider=request.wk_service_provider,
-                    dollar_filter=request.dollar_filter,
-                    dollar_maxpagesize=request.dollar_maxpagesize,
-                    dollar_next=next_cursor,
-                    dollar_order_by=request.dollar_order_by,
+                    filter_=request.filter_,
+                    maxpagesize=request.maxpagesize,
+                    next=request.next,
+                    order_by=request.order_by,
                 ),
                 retries=retries,
             )
@@ -4317,7 +4317,7 @@ class Admin(BaseSDK):
         *,
         organization_id: str,
         workspace_id: str,
-        dollar_expand: Optional[str] = None,
+        expand: Optional[str] = None,
         retries: OptionalNullable[utils.RetryConfig] = UNSET,
         server_url: Optional[str] = None,
         timeout_ms: Optional[int] = None,
@@ -4330,7 +4330,7 @@ class Admin(BaseSDK):
 
         :param organization_id: The unique identifier of the organization
         :param workspace_id: The unique identifier of the workspace
-        :param dollar_expand: Returns related resources inline with the main resource
+        :param expand: Returns related resources inline with the main resource
         :param retries: Override the default retry configuration for this method
         :param server_url: Override the default server URL for this method
         :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
@@ -4347,7 +4347,7 @@ class Admin(BaseSDK):
             base_url = self._get_url(base_url, url_variables)
 
         request = models.GetWorkspaceByIDRequest(
-            dollar_expand=dollar_expand,
+            expand=expand,
             organization_id=organization_id,
             workspace_id=workspace_id,
         )
@@ -4426,7 +4426,7 @@ class Admin(BaseSDK):
         *,
         organization_id: str,
         workspace_id: str,
-        dollar_expand: Optional[str] = None,
+        expand: Optional[str] = None,
         retries: OptionalNullable[utils.RetryConfig] = UNSET,
         server_url: Optional[str] = None,
         timeout_ms: Optional[int] = None,
@@ -4439,7 +4439,7 @@ class Admin(BaseSDK):
 
         :param organization_id: The unique identifier of the organization
         :param workspace_id: The unique identifier of the workspace
-        :param dollar_expand: Returns related resources inline with the main resource
+        :param expand: Returns related resources inline with the main resource
         :param retries: Override the default retry configuration for this method
         :param server_url: Override the default server URL for this method
         :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
@@ -4456,7 +4456,7 @@ class Admin(BaseSDK):
             base_url = self._get_url(base_url, url_variables)
 
         request = models.GetWorkspaceByIDRequest(
-            dollar_expand=dollar_expand,
+            expand=expand,
             organization_id=organization_id,
             workspace_id=workspace_id,
         )
@@ -4536,7 +4536,7 @@ class Admin(BaseSDK):
         group_id: str,
         organization_id: str,
         workspace_id: str,
-        dollar_expand: Optional[str] = None,
+        expand: Optional[str] = None,
         retries: OptionalNullable[utils.RetryConfig] = UNSET,
         server_url: Optional[str] = None,
         timeout_ms: Optional[int] = None,
@@ -4550,7 +4550,7 @@ class Admin(BaseSDK):
         :param group_id: The unique identifier of the group
         :param organization_id: The unique identifier of the organization
         :param workspace_id: The unique identifier of the workspace
-        :param dollar_expand: Returns related resources inline with the main resource
+        :param expand: Returns related resources inline with the main resource
         :param retries: Override the default retry configuration for this method
         :param server_url: Override the default server URL for this method
         :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
@@ -4567,7 +4567,7 @@ class Admin(BaseSDK):
             base_url = self._get_url(base_url, url_variables)
 
         request = models.GetWorkspaceGroupByIDRequest(
-            dollar_expand=dollar_expand,
+            expand=expand,
             group_id=group_id,
             organization_id=organization_id,
             workspace_id=workspace_id,
@@ -4648,7 +4648,7 @@ class Admin(BaseSDK):
         group_id: str,
         organization_id: str,
         workspace_id: str,
-        dollar_expand: Optional[str] = None,
+        expand: Optional[str] = None,
         retries: OptionalNullable[utils.RetryConfig] = UNSET,
         server_url: Optional[str] = None,
         timeout_ms: Optional[int] = None,
@@ -4662,7 +4662,7 @@ class Admin(BaseSDK):
         :param group_id: The unique identifier of the group
         :param organization_id: The unique identifier of the organization
         :param workspace_id: The unique identifier of the workspace
-        :param dollar_expand: Returns related resources inline with the main resource
+        :param expand: Returns related resources inline with the main resource
         :param retries: Override the default retry configuration for this method
         :param server_url: Override the default server URL for this method
         :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
@@ -4679,7 +4679,7 @@ class Admin(BaseSDK):
             base_url = self._get_url(base_url, url_variables)
 
         request = models.GetWorkspaceGroupByIDRequest(
-            dollar_expand=dollar_expand,
+            expand=expand,
             group_id=group_id,
             organization_id=organization_id,
             workspace_id=workspace_id,
@@ -4856,8 +4856,8 @@ class Admin(BaseSDK):
                     group_id=request.group_id,
                     organization_id=request.organization_id,
                     workspace_id=request.workspace_id,
-                    dollar_maxpagesize=request.dollar_maxpagesize,
-                    dollar_next=next_cursor,
+                    maxpagesize=request.maxpagesize,
+                    next=request.next,
                 ),
                 retries=retries,
             )
@@ -4992,8 +4992,8 @@ class Admin(BaseSDK):
                     group_id=request.group_id,
                     organization_id=request.organization_id,
                     workspace_id=request.workspace_id,
-                    dollar_maxpagesize=request.dollar_maxpagesize,
-                    dollar_next=next_cursor,
+                    maxpagesize=request.maxpagesize,
+                    next=request.next,
                 ),
                 retries=retries,
             )
@@ -5123,9 +5123,9 @@ class Admin(BaseSDK):
                 request=models.GetWorkspaceGroupsRequest(
                     organization_id=request.organization_id,
                     workspace_id=request.workspace_id,
-                    dollar_filter=request.dollar_filter,
-                    dollar_maxpagesize=request.dollar_maxpagesize,
-                    dollar_next=next_cursor,
+                    filter_=request.filter_,
+                    maxpagesize=request.maxpagesize,
+                    next=request.next,
                 ),
                 retries=retries,
             )
@@ -5258,9 +5258,9 @@ class Admin(BaseSDK):
                 request=models.GetWorkspaceGroupsRequest(
                     organization_id=request.organization_id,
                     workspace_id=request.workspace_id,
-                    dollar_filter=request.dollar_filter,
-                    dollar_maxpagesize=request.dollar_maxpagesize,
-                    dollar_next=next_cursor,
+                    filter_=request.filter_,
+                    maxpagesize=request.maxpagesize,
+                    next=request.next,
                 ),
                 retries=retries,
             )
@@ -5609,9 +5609,9 @@ class Admin(BaseSDK):
                 request=models.GetWorkspaceMembershipsRequest(
                     organization_id=request.organization_id,
                     workspace_id=request.workspace_id,
-                    dollar_filter=request.dollar_filter,
-                    dollar_maxpagesize=request.dollar_maxpagesize,
-                    dollar_next=next_cursor,
+                    filter_=request.filter_,
+                    maxpagesize=request.maxpagesize,
+                    next=request.next,
                 ),
                 retries=retries,
             )
@@ -5745,9 +5745,9 @@ class Admin(BaseSDK):
                 request=models.GetWorkspaceMembershipsRequest(
                     organization_id=request.organization_id,
                     workspace_id=request.workspace_id,
-                    dollar_filter=request.dollar_filter,
-                    dollar_maxpagesize=request.dollar_maxpagesize,
-                    dollar_next=next_cursor,
+                    filter_=request.filter_,
+                    maxpagesize=request.maxpagesize,
+                    next=request.next,
                 ),
                 retries=retries,
             )
@@ -6215,9 +6215,9 @@ class Admin(BaseSDK):
         self,
         *,
         organization_id: str,
-        dollar_expand: Optional[str] = None,
-        dollar_maxpagesize: Optional[int] = 1000,
-        dollar_next: Optional[str] = None,
+        expand: Optional[str] = None,
+        maxpagesize: Optional[int] = 1000,
+        next: Optional[str] = None,
         retries: OptionalNullable[utils.RetryConfig] = UNSET,
         server_url: Optional[str] = None,
         timeout_ms: Optional[int] = None,
@@ -6228,9 +6228,9 @@ class Admin(BaseSDK):
         Retrieve a list of workspaces in an organization.
 
         :param organization_id: The unique identifier of the organization
-        :param dollar_expand: Returns related resources inline with the main resource
-        :param dollar_maxpagesize: The maximum number of results to retrieve
-        :param dollar_next: Pagination cursor for next set of results.
+        :param expand: Returns related resources inline with the main resource
+        :param maxpagesize: The maximum number of results to retrieve
+        :param next: Pagination cursor for next set of results.
         :param retries: Override the default retry configuration for this method
         :param server_url: Override the default server URL for this method
         :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
@@ -6247,9 +6247,9 @@ class Admin(BaseSDK):
             base_url = self._get_url(base_url, url_variables)
 
         request = models.GetWorkspacesRequest(
-            dollar_expand=dollar_expand,
-            dollar_maxpagesize=dollar_maxpagesize,
-            dollar_next=dollar_next,
+            expand=expand,
+            maxpagesize=maxpagesize,
+            next=next,
             organization_id=organization_id,
         )
 
@@ -6316,9 +6316,9 @@ class Admin(BaseSDK):
 
             return self.get_workspaces(
                 organization_id=organization_id,
-                dollar_expand=dollar_expand,
-                dollar_maxpagesize=dollar_maxpagesize,
-                dollar_next=next_cursor,
+                expand=expand,
+                maxpagesize=maxpagesize,
+                next=next,
                 retries=retries,
             )
 
@@ -6349,9 +6349,9 @@ class Admin(BaseSDK):
         self,
         *,
         organization_id: str,
-        dollar_expand: Optional[str] = None,
-        dollar_maxpagesize: Optional[int] = 1000,
-        dollar_next: Optional[str] = None,
+        expand: Optional[str] = None,
+        maxpagesize: Optional[int] = 1000,
+        next: Optional[str] = None,
         retries: OptionalNullable[utils.RetryConfig] = UNSET,
         server_url: Optional[str] = None,
         timeout_ms: Optional[int] = None,
@@ -6362,9 +6362,9 @@ class Admin(BaseSDK):
         Retrieve a list of workspaces in an organization.
 
         :param organization_id: The unique identifier of the organization
-        :param dollar_expand: Returns related resources inline with the main resource
-        :param dollar_maxpagesize: The maximum number of results to retrieve
-        :param dollar_next: Pagination cursor for next set of results.
+        :param expand: Returns related resources inline with the main resource
+        :param maxpagesize: The maximum number of results to retrieve
+        :param next: Pagination cursor for next set of results.
         :param retries: Override the default retry configuration for this method
         :param server_url: Override the default server URL for this method
         :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
@@ -6381,9 +6381,9 @@ class Admin(BaseSDK):
             base_url = self._get_url(base_url, url_variables)
 
         request = models.GetWorkspacesRequest(
-            dollar_expand=dollar_expand,
-            dollar_maxpagesize=dollar_maxpagesize,
-            dollar_next=dollar_next,
+            expand=expand,
+            maxpagesize=maxpagesize,
+            next=next,
             organization_id=organization_id,
         )
 
@@ -6453,9 +6453,9 @@ class Admin(BaseSDK):
 
             return self.get_workspaces_async(
                 organization_id=organization_id,
-                dollar_expand=dollar_expand,
-                dollar_maxpagesize=dollar_maxpagesize,
-                dollar_next=next_cursor,
+                expand=expand,
+                maxpagesize=maxpagesize,
+                next=next,
                 retries=retries,
             )
 

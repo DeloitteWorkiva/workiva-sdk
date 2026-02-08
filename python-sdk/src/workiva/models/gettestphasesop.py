@@ -12,7 +12,7 @@ from workiva.utils import FieldMetadata, PathParamMetadata, QueryParamMetadata
 class GetTestPhasesRequestTypedDict(TypedDict):
     test_form_id: str
     r"""The unique identifier of the test form"""
-    dollar_expand: NotRequired[str]
+    expand: NotRequired[str]
     r"""Returns related resources inline with the main resource"""
 
 
@@ -24,7 +24,7 @@ class GetTestPhasesRequest(BaseModel):
     ]
     r"""The unique identifier of the test form"""
 
-    dollar_expand: Annotated[
+    expand: Annotated[
         Optional[str],
         pydantic.Field(alias="$expand"),
         FieldMetadata(query=QueryParamMetadata(style="form", explode=True)),
@@ -33,7 +33,7 @@ class GetTestPhasesRequest(BaseModel):
 
     @model_serializer(mode="wrap")
     def serialize_model(self, handler):
-        optional_fields = set(["$expand"])
+        optional_fields = set(["expand"])
         serialized = handler(self)
         m = {}
 

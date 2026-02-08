@@ -2561,10 +2561,10 @@ class Sustainability(BaseSDK):
             return self.get_dimensions(
                 request=models.GetDimensionsRequest(
                     program_id=request.program_id,
-                    dollar_filter=request.dollar_filter,
-                    dollar_maxpagesize=request.dollar_maxpagesize,
-                    dollar_next=next_cursor,
-                    dollar_order_by=request.dollar_order_by,
+                    filter_=request.filter_,
+                    maxpagesize=request.maxpagesize,
+                    next=request.next,
+                    order_by=request.order_by,
                 ),
                 retries=retries,
             )
@@ -2694,10 +2694,10 @@ class Sustainability(BaseSDK):
             return self.get_dimensions_async(
                 request=models.GetDimensionsRequest(
                     program_id=request.program_id,
-                    dollar_filter=request.dollar_filter,
-                    dollar_maxpagesize=request.dollar_maxpagesize,
-                    dollar_next=next_cursor,
-                    dollar_order_by=request.dollar_order_by,
+                    filter_=request.filter_,
+                    maxpagesize=request.maxpagesize,
+                    next=request.next,
+                    order_by=request.order_by,
                 ),
                 retries=retries,
             )
@@ -3250,10 +3250,10 @@ class Sustainability(BaseSDK):
             return self.get_metrics(
                 request=models.GetMetricsRequest(
                     program_id=request.program_id,
-                    dollar_filter=request.dollar_filter,
-                    dollar_maxpagesize=request.dollar_maxpagesize,
-                    dollar_next=next_cursor,
-                    dollar_order_by=request.dollar_order_by,
+                    filter_=request.filter_,
+                    maxpagesize=request.maxpagesize,
+                    next=request.next,
+                    order_by=request.order_by,
                 ),
                 retries=retries,
             )
@@ -3381,10 +3381,10 @@ class Sustainability(BaseSDK):
             return self.get_metrics_async(
                 request=models.GetMetricsRequest(
                     program_id=request.program_id,
-                    dollar_filter=request.dollar_filter,
-                    dollar_maxpagesize=request.dollar_maxpagesize,
-                    dollar_next=next_cursor,
-                    dollar_order_by=request.dollar_order_by,
+                    filter_=request.filter_,
+                    maxpagesize=request.maxpagesize,
+                    next=request.next,
+                    order_by=request.order_by,
                 ),
                 retries=retries,
             )
@@ -3620,9 +3620,9 @@ class Sustainability(BaseSDK):
         self,
         *,
         program_id: str,
-        dollar_filter: Optional[str] = None,
-        dollar_maxpagesize: Optional[int] = 1000,
-        dollar_next: Optional[str] = None,
+        filter_: Optional[str] = None,
+        maxpagesize: Optional[int] = 1000,
+        next: Optional[str] = None,
         retries: OptionalNullable[utils.RetryConfig] = UNSET,
         server_url: Optional[str] = None,
         timeout_ms: Optional[int] = None,
@@ -3634,9 +3634,9 @@ class Sustainability(BaseSDK):
 
 
         :param program_id: The unique identifier of the program
-        :param dollar_filter: The properties to filter the results by.
-        :param dollar_maxpagesize: The maximum number of results to retrieve
-        :param dollar_next: Pagination cursor for next set of results.
+        :param filter_: The properties to filter the results by.
+        :param maxpagesize: The maximum number of results to retrieve
+        :param next: Pagination cursor for next set of results.
         :param retries: Override the default retry configuration for this method
         :param server_url: Override the default server URL for this method
         :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
@@ -3653,9 +3653,9 @@ class Sustainability(BaseSDK):
             base_url = self._get_url(base_url, url_variables)
 
         request = models.GetProgramPermissionsRequest(
-            dollar_filter=dollar_filter,
-            dollar_maxpagesize=dollar_maxpagesize,
-            dollar_next=dollar_next,
+            filter_=filter_,
+            maxpagesize=maxpagesize,
+            next=next,
             program_id=program_id,
         )
 
@@ -3722,9 +3722,9 @@ class Sustainability(BaseSDK):
 
             return self.get_program_permissions(
                 program_id=program_id,
-                dollar_filter=dollar_filter,
-                dollar_maxpagesize=dollar_maxpagesize,
-                dollar_next=next_cursor,
+                filter_=filter_,
+                maxpagesize=maxpagesize,
+                next=next,
                 retries=retries,
             )
 
@@ -3757,9 +3757,9 @@ class Sustainability(BaseSDK):
         self,
         *,
         program_id: str,
-        dollar_filter: Optional[str] = None,
-        dollar_maxpagesize: Optional[int] = 1000,
-        dollar_next: Optional[str] = None,
+        filter_: Optional[str] = None,
+        maxpagesize: Optional[int] = 1000,
+        next: Optional[str] = None,
         retries: OptionalNullable[utils.RetryConfig] = UNSET,
         server_url: Optional[str] = None,
         timeout_ms: Optional[int] = None,
@@ -3771,9 +3771,9 @@ class Sustainability(BaseSDK):
 
 
         :param program_id: The unique identifier of the program
-        :param dollar_filter: The properties to filter the results by.
-        :param dollar_maxpagesize: The maximum number of results to retrieve
-        :param dollar_next: Pagination cursor for next set of results.
+        :param filter_: The properties to filter the results by.
+        :param maxpagesize: The maximum number of results to retrieve
+        :param next: Pagination cursor for next set of results.
         :param retries: Override the default retry configuration for this method
         :param server_url: Override the default server URL for this method
         :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
@@ -3790,9 +3790,9 @@ class Sustainability(BaseSDK):
             base_url = self._get_url(base_url, url_variables)
 
         request = models.GetProgramPermissionsRequest(
-            dollar_filter=dollar_filter,
-            dollar_maxpagesize=dollar_maxpagesize,
-            dollar_next=dollar_next,
+            filter_=filter_,
+            maxpagesize=maxpagesize,
+            next=next,
             program_id=program_id,
         )
 
@@ -3862,9 +3862,9 @@ class Sustainability(BaseSDK):
 
             return self.get_program_permissions_async(
                 program_id=program_id,
-                dollar_filter=dollar_filter,
-                dollar_maxpagesize=dollar_maxpagesize,
-                dollar_next=next_cursor,
+                filter_=filter_,
+                maxpagesize=maxpagesize,
+                next=next,
                 retries=retries,
             )
 
@@ -3896,10 +3896,10 @@ class Sustainability(BaseSDK):
     def get_programs(
         self,
         *,
-        dollar_filter: Optional[str] = None,
-        dollar_maxpagesize: Optional[int] = 1000,
-        dollar_next: Optional[str] = None,
-        dollar_order_by: Optional[str] = None,
+        filter_: Optional[str] = None,
+        maxpagesize: Optional[int] = 1000,
+        next: Optional[str] = None,
+        order_by: Optional[str] = None,
         retries: OptionalNullable[utils.RetryConfig] = UNSET,
         server_url: Optional[str] = None,
         timeout_ms: Optional[int] = None,
@@ -3909,10 +3909,10 @@ class Sustainability(BaseSDK):
 
         Returns a paginated list of [programs](ref:sustainability#program).
 
-        :param dollar_filter: The properties to filter the results by.
-        :param dollar_maxpagesize: The maximum number of results to retrieve
-        :param dollar_next: Pagination cursor for next set of results.
-        :param dollar_order_by: One or more comma-separated expressions to indicate the order in which to sort the results.
+        :param filter_: The properties to filter the results by.
+        :param maxpagesize: The maximum number of results to retrieve
+        :param next: Pagination cursor for next set of results.
+        :param order_by: One or more comma-separated expressions to indicate the order in which to sort the results.
         :param retries: Override the default retry configuration for this method
         :param server_url: Override the default server URL for this method
         :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
@@ -3929,10 +3929,10 @@ class Sustainability(BaseSDK):
             base_url = self._get_url(base_url, url_variables)
 
         request = models.GetProgramsRequest(
-            dollar_filter=dollar_filter,
-            dollar_maxpagesize=dollar_maxpagesize,
-            dollar_next=dollar_next,
-            dollar_order_by=dollar_order_by,
+            filter_=filter_,
+            maxpagesize=maxpagesize,
+            next=next,
+            order_by=order_by,
         )
 
         req = self._build_request(
@@ -3997,10 +3997,10 @@ class Sustainability(BaseSDK):
                 return None
 
             return self.get_programs(
-                dollar_filter=dollar_filter,
-                dollar_maxpagesize=dollar_maxpagesize,
-                dollar_next=next_cursor,
-                dollar_order_by=dollar_order_by,
+                filter_=filter_,
+                maxpagesize=maxpagesize,
+                next=next,
+                order_by=order_by,
                 retries=retries,
             )
 
@@ -4030,10 +4030,10 @@ class Sustainability(BaseSDK):
     async def get_programs_async(
         self,
         *,
-        dollar_filter: Optional[str] = None,
-        dollar_maxpagesize: Optional[int] = 1000,
-        dollar_next: Optional[str] = None,
-        dollar_order_by: Optional[str] = None,
+        filter_: Optional[str] = None,
+        maxpagesize: Optional[int] = 1000,
+        next: Optional[str] = None,
+        order_by: Optional[str] = None,
         retries: OptionalNullable[utils.RetryConfig] = UNSET,
         server_url: Optional[str] = None,
         timeout_ms: Optional[int] = None,
@@ -4043,10 +4043,10 @@ class Sustainability(BaseSDK):
 
         Returns a paginated list of [programs](ref:sustainability#program).
 
-        :param dollar_filter: The properties to filter the results by.
-        :param dollar_maxpagesize: The maximum number of results to retrieve
-        :param dollar_next: Pagination cursor for next set of results.
-        :param dollar_order_by: One or more comma-separated expressions to indicate the order in which to sort the results.
+        :param filter_: The properties to filter the results by.
+        :param maxpagesize: The maximum number of results to retrieve
+        :param next: Pagination cursor for next set of results.
+        :param order_by: One or more comma-separated expressions to indicate the order in which to sort the results.
         :param retries: Override the default retry configuration for this method
         :param server_url: Override the default server URL for this method
         :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
@@ -4063,10 +4063,10 @@ class Sustainability(BaseSDK):
             base_url = self._get_url(base_url, url_variables)
 
         request = models.GetProgramsRequest(
-            dollar_filter=dollar_filter,
-            dollar_maxpagesize=dollar_maxpagesize,
-            dollar_next=dollar_next,
-            dollar_order_by=dollar_order_by,
+            filter_=filter_,
+            maxpagesize=maxpagesize,
+            next=next,
+            order_by=order_by,
         )
 
         req = self._build_request_async(
@@ -4134,10 +4134,10 @@ class Sustainability(BaseSDK):
                 return empty_result()
 
             return self.get_programs_async(
-                dollar_filter=dollar_filter,
-                dollar_maxpagesize=dollar_maxpagesize,
-                dollar_next=next_cursor,
-                dollar_order_by=dollar_order_by,
+                filter_=filter_,
+                maxpagesize=maxpagesize,
+                next=next,
+                order_by=order_by,
                 retries=retries,
             )
 
@@ -4473,10 +4473,10 @@ class Sustainability(BaseSDK):
             return self.get_topics(
                 request=models.GetTopicsRequest(
                     program_id=request.program_id,
-                    dollar_filter=request.dollar_filter,
-                    dollar_maxpagesize=request.dollar_maxpagesize,
-                    dollar_next=next_cursor,
-                    dollar_order_by=request.dollar_order_by,
+                    filter_=request.filter_,
+                    maxpagesize=request.maxpagesize,
+                    next=request.next,
+                    order_by=request.order_by,
                 ),
                 retries=retries,
             )
@@ -4604,10 +4604,10 @@ class Sustainability(BaseSDK):
             return self.get_topics_async(
                 request=models.GetTopicsRequest(
                     program_id=request.program_id,
-                    dollar_filter=request.dollar_filter,
-                    dollar_maxpagesize=request.dollar_maxpagesize,
-                    dollar_next=next_cursor,
-                    dollar_order_by=request.dollar_order_by,
+                    filter_=request.filter_,
+                    maxpagesize=request.maxpagesize,
+                    next=request.next,
+                    order_by=request.order_by,
                 ),
                 retries=retries,
             )
@@ -4733,10 +4733,10 @@ class Sustainability(BaseSDK):
                 request=models.GetValuesRequest(
                     metric_id=request.metric_id,
                     program_id=request.program_id,
-                    dollar_filter=request.dollar_filter,
-                    dollar_maxpagesize=request.dollar_maxpagesize,
-                    dollar_next=next_cursor,
-                    dollar_order_by=request.dollar_order_by,
+                    filter_=request.filter_,
+                    maxpagesize=request.maxpagesize,
+                    next=request.next,
+                    order_by=request.order_by,
                 ),
                 retries=retries,
             )
@@ -4865,10 +4865,10 @@ class Sustainability(BaseSDK):
                 request=models.GetValuesRequest(
                     metric_id=request.metric_id,
                     program_id=request.program_id,
-                    dollar_filter=request.dollar_filter,
-                    dollar_maxpagesize=request.dollar_maxpagesize,
-                    dollar_next=next_cursor,
-                    dollar_order_by=request.dollar_order_by,
+                    filter_=request.filter_,
+                    maxpagesize=request.maxpagesize,
+                    next=request.next,
+                    order_by=request.order_by,
                 ),
                 retries=retries,
             )

@@ -12,7 +12,7 @@ from workiva.utils import FieldMetadata, PathParamMetadata, QueryParamMetadata
 class GetSpreadsheetByIDRequestTypedDict(TypedDict):
     spreadsheet_id: str
     r"""The unique identifier of the spreadsheet"""
-    dollar_revision: NotRequired[str]
+    revision: NotRequired[str]
     r"""Returns resources at a specific revision"""
 
 
@@ -24,7 +24,7 @@ class GetSpreadsheetByIDRequest(BaseModel):
     ]
     r"""The unique identifier of the spreadsheet"""
 
-    dollar_revision: Annotated[
+    revision: Annotated[
         Optional[str],
         pydantic.Field(alias="$revision"),
         FieldMetadata(query=QueryParamMetadata(style="form", explode=True)),
@@ -33,7 +33,7 @@ class GetSpreadsheetByIDRequest(BaseModel):
 
     @model_serializer(mode="wrap")
     def serialize_model(self, handler):
-        optional_fields = set(["$revision"])
+        optional_fields = set(["revision"])
         serialized = handler(self)
         m = {}
 

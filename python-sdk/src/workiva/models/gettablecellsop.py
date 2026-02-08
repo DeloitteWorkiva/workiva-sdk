@@ -13,11 +13,11 @@ from workiva.utils import FieldMetadata, PathParamMetadata, QueryParamMetadata
 class GetTableCellsRequestTypedDict(TypedDict):
     table_id: str
     r"""The unique identifier for the table"""
-    dollar_maxcellsperpage: NotRequired[int]
+    maxcellsperpage: NotRequired[int]
     r"""The maximum number of cells to retrieve. The default is 50000. The maximum allowed value is 50000."""
-    dollar_next: NotRequired[str]
+    next: NotRequired[str]
     r"""Pagination cursor for next set of results."""
-    dollar_revision: NotRequired[str]
+    revision: NotRequired[str]
     r"""Returns resources at a specific revision"""
     start_column: NotRequired[int]
     r"""The inclusive start column of the range of cells to retrieve. If this parameter is omitted, then the range will be unbounded in this direction."""
@@ -37,21 +37,21 @@ class GetTableCellsRequest(BaseModel):
     ]
     r"""The unique identifier for the table"""
 
-    dollar_maxcellsperpage: Annotated[
+    maxcellsperpage: Annotated[
         Optional[int],
         pydantic.Field(alias="$maxcellsperpage"),
         FieldMetadata(query=QueryParamMetadata(style="form", explode=True)),
     ] = 50000
     r"""The maximum number of cells to retrieve. The default is 50000. The maximum allowed value is 50000."""
 
-    dollar_next: Annotated[
+    next: Annotated[
         Optional[str],
         pydantic.Field(alias="$next"),
         FieldMetadata(query=QueryParamMetadata(style="form", explode=True)),
     ] = None
     r"""Pagination cursor for next set of results."""
 
-    dollar_revision: Annotated[
+    revision: Annotated[
         Optional[str],
         pydantic.Field(alias="$revision"),
         FieldMetadata(query=QueryParamMetadata(style="form", explode=True)),
@@ -90,9 +90,9 @@ class GetTableCellsRequest(BaseModel):
     def serialize_model(self, handler):
         optional_fields = set(
             [
-                "$maxcellsperpage",
-                "$next",
-                "$revision",
+                "maxcellsperpage",
+                "next",
+                "revision",
                 "startColumn",
                 "startRow",
                 "stopColumn",

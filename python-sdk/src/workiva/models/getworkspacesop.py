@@ -13,11 +13,11 @@ from workiva.utils import FieldMetadata, PathParamMetadata, QueryParamMetadata
 class GetWorkspacesRequestTypedDict(TypedDict):
     organization_id: str
     r"""The unique identifier of the organization"""
-    dollar_expand: NotRequired[str]
+    expand: NotRequired[str]
     r"""Returns related resources inline with the main resource"""
-    dollar_maxpagesize: NotRequired[int]
+    maxpagesize: NotRequired[int]
     r"""The maximum number of results to retrieve"""
-    dollar_next: NotRequired[str]
+    next: NotRequired[str]
     r"""Pagination cursor for next set of results."""
 
 
@@ -29,21 +29,21 @@ class GetWorkspacesRequest(BaseModel):
     ]
     r"""The unique identifier of the organization"""
 
-    dollar_expand: Annotated[
+    expand: Annotated[
         Optional[str],
         pydantic.Field(alias="$expand"),
         FieldMetadata(query=QueryParamMetadata(style="form", explode=True)),
     ] = None
     r"""Returns related resources inline with the main resource"""
 
-    dollar_maxpagesize: Annotated[
+    maxpagesize: Annotated[
         Optional[int],
         pydantic.Field(alias="$maxpagesize"),
         FieldMetadata(query=QueryParamMetadata(style="form", explode=True)),
     ] = 1000
     r"""The maximum number of results to retrieve"""
 
-    dollar_next: Annotated[
+    next: Annotated[
         Optional[str],
         pydantic.Field(alias="$next"),
         FieldMetadata(query=QueryParamMetadata(style="form", explode=True)),
@@ -52,7 +52,7 @@ class GetWorkspacesRequest(BaseModel):
 
     @model_serializer(mode="wrap")
     def serialize_model(self, handler):
-        optional_fields = set(["$expand", "$maxpagesize", "$next"])
+        optional_fields = set(["expand", "maxpagesize", "next"])
         serialized = handler(self)
         m = {}
 

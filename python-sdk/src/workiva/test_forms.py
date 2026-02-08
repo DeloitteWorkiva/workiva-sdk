@@ -478,7 +478,7 @@ class TestForms(BaseSDK):
         *,
         test_form_id: str,
         test_phase_id: str,
-        dollar_expand: Optional[str] = None,
+        expand: Optional[str] = None,
         retries: OptionalNullable[utils.RetryConfig] = UNSET,
         server_url: Optional[str] = None,
         timeout_ms: Optional[int] = None,
@@ -491,7 +491,7 @@ class TestForms(BaseSDK):
 
         :param test_form_id: The unique identifier of the test form
         :param test_phase_id: The unique identifier of the test phase
-        :param dollar_expand: Returns related resources inline with the main resource
+        :param expand: Returns related resources inline with the main resource
         :param retries: Override the default retry configuration for this method
         :param server_url: Override the default server URL for this method
         :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
@@ -508,7 +508,7 @@ class TestForms(BaseSDK):
             base_url = self._get_url(base_url, url_variables)
 
         request = models.GetMatricesRequest(
-            dollar_expand=dollar_expand,
+            expand=expand,
             test_form_id=test_form_id,
             test_phase_id=test_phase_id,
         )
@@ -587,7 +587,7 @@ class TestForms(BaseSDK):
         *,
         test_form_id: str,
         test_phase_id: str,
-        dollar_expand: Optional[str] = None,
+        expand: Optional[str] = None,
         retries: OptionalNullable[utils.RetryConfig] = UNSET,
         server_url: Optional[str] = None,
         timeout_ms: Optional[int] = None,
@@ -600,7 +600,7 @@ class TestForms(BaseSDK):
 
         :param test_form_id: The unique identifier of the test form
         :param test_phase_id: The unique identifier of the test phase
-        :param dollar_expand: Returns related resources inline with the main resource
+        :param expand: Returns related resources inline with the main resource
         :param retries: Override the default retry configuration for this method
         :param server_url: Override the default server URL for this method
         :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
@@ -617,7 +617,7 @@ class TestForms(BaseSDK):
             base_url = self._get_url(base_url, url_variables)
 
         request = models.GetMatricesRequest(
-            dollar_expand=dollar_expand,
+            expand=expand,
             test_form_id=test_form_id,
             test_phase_id=test_phase_id,
         )
@@ -1139,7 +1139,7 @@ class TestForms(BaseSDK):
         matrix_id: str,
         test_form_id: str,
         test_phase_id: str,
-        dollar_expand: Optional[str] = None,
+        expand: Optional[str] = None,
         retries: OptionalNullable[utils.RetryConfig] = UNSET,
         server_url: Optional[str] = None,
         timeout_ms: Optional[int] = None,
@@ -1153,7 +1153,7 @@ class TestForms(BaseSDK):
         :param matrix_id: The unique identifier of the matrix
         :param test_form_id: The unique identifier of the test form
         :param test_phase_id: The unique identifier of the test phase
-        :param dollar_expand: Returns related resources inline with the main resource
+        :param expand: Returns related resources inline with the main resource
         :param retries: Override the default retry configuration for this method
         :param server_url: Override the default server URL for this method
         :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
@@ -1170,7 +1170,7 @@ class TestForms(BaseSDK):
             base_url = self._get_url(base_url, url_variables)
 
         request = models.GetMatrixByIDRequest(
-            dollar_expand=dollar_expand,
+            expand=expand,
             matrix_id=matrix_id,
             test_form_id=test_form_id,
             test_phase_id=test_phase_id,
@@ -1251,7 +1251,7 @@ class TestForms(BaseSDK):
         matrix_id: str,
         test_form_id: str,
         test_phase_id: str,
-        dollar_expand: Optional[str] = None,
+        expand: Optional[str] = None,
         retries: OptionalNullable[utils.RetryConfig] = UNSET,
         server_url: Optional[str] = None,
         timeout_ms: Optional[int] = None,
@@ -1265,7 +1265,7 @@ class TestForms(BaseSDK):
         :param matrix_id: The unique identifier of the matrix
         :param test_form_id: The unique identifier of the test form
         :param test_phase_id: The unique identifier of the test phase
-        :param dollar_expand: Returns related resources inline with the main resource
+        :param expand: Returns related resources inline with the main resource
         :param retries: Override the default retry configuration for this method
         :param server_url: Override the default server URL for this method
         :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
@@ -1282,7 +1282,7 @@ class TestForms(BaseSDK):
             base_url = self._get_url(base_url, url_variables)
 
         request = models.GetMatrixByIDRequest(
-            dollar_expand=dollar_expand,
+            expand=expand,
             matrix_id=matrix_id,
             test_form_id=test_form_id,
             test_phase_id=test_phase_id,
@@ -2009,7 +2009,7 @@ class TestForms(BaseSDK):
         matrix_id: str,
         test_form_id: str,
         test_phase_id: str,
-        dollar_expand: Optional[str] = None,
+        expand: Optional[str] = None,
         retries: OptionalNullable[utils.RetryConfig] = UNSET,
         server_url: Optional[str] = None,
         timeout_ms: Optional[int] = None,
@@ -2023,7 +2023,7 @@ class TestForms(BaseSDK):
         :param matrix_id: The unique identifier of the matrix
         :param test_form_id: The unique identifier of the test form
         :param test_phase_id: The unique identifier of the test phase
-        :param dollar_expand: Returns related resources inline with the main resource
+        :param expand: Returns related resources inline with the main resource
         :param retries: Override the default retry configuration for this method
         :param server_url: Override the default server URL for this method
         :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
@@ -2040,7 +2040,7 @@ class TestForms(BaseSDK):
             base_url = self._get_url(base_url, url_variables)
 
         request = models.GetSamplesRequest(
-            dollar_expand=dollar_expand,
+            expand=expand,
             matrix_id=matrix_id,
             test_form_id=test_form_id,
             test_phase_id=test_phase_id,
@@ -2121,7 +2121,7 @@ class TestForms(BaseSDK):
         matrix_id: str,
         test_form_id: str,
         test_phase_id: str,
-        dollar_expand: Optional[str] = None,
+        expand: Optional[str] = None,
         retries: OptionalNullable[utils.RetryConfig] = UNSET,
         server_url: Optional[str] = None,
         timeout_ms: Optional[int] = None,
@@ -2135,7 +2135,7 @@ class TestForms(BaseSDK):
         :param matrix_id: The unique identifier of the matrix
         :param test_form_id: The unique identifier of the test form
         :param test_phase_id: The unique identifier of the test phase
-        :param dollar_expand: Returns related resources inline with the main resource
+        :param expand: Returns related resources inline with the main resource
         :param retries: Override the default retry configuration for this method
         :param server_url: Override the default server URL for this method
         :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
@@ -2152,7 +2152,7 @@ class TestForms(BaseSDK):
             base_url = self._get_url(base_url, url_variables)
 
         request = models.GetSamplesRequest(
-            dollar_expand=dollar_expand,
+            expand=expand,
             matrix_id=matrix_id,
             test_form_id=test_form_id,
             test_phase_id=test_phase_id,
@@ -2231,7 +2231,7 @@ class TestForms(BaseSDK):
         self,
         *,
         test_form_id: str,
-        dollar_expand: Optional[str] = None,
+        expand: Optional[str] = None,
         retries: OptionalNullable[utils.RetryConfig] = UNSET,
         server_url: Optional[str] = None,
         timeout_ms: Optional[int] = None,
@@ -2243,7 +2243,7 @@ class TestForms(BaseSDK):
 
 
         :param test_form_id: The unique identifier of the test form
-        :param dollar_expand: Returns related resources inline with the main resource
+        :param expand: Returns related resources inline with the main resource
         :param retries: Override the default retry configuration for this method
         :param server_url: Override the default server URL for this method
         :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
@@ -2260,7 +2260,7 @@ class TestForms(BaseSDK):
             base_url = self._get_url(base_url, url_variables)
 
         request = models.GetTestFormByIDRequest(
-            dollar_expand=dollar_expand,
+            expand=expand,
             test_form_id=test_form_id,
         )
 
@@ -2337,7 +2337,7 @@ class TestForms(BaseSDK):
         self,
         *,
         test_form_id: str,
-        dollar_expand: Optional[str] = None,
+        expand: Optional[str] = None,
         retries: OptionalNullable[utils.RetryConfig] = UNSET,
         server_url: Optional[str] = None,
         timeout_ms: Optional[int] = None,
@@ -2349,7 +2349,7 @@ class TestForms(BaseSDK):
 
 
         :param test_form_id: The unique identifier of the test form
-        :param dollar_expand: Returns related resources inline with the main resource
+        :param expand: Returns related resources inline with the main resource
         :param retries: Override the default retry configuration for this method
         :param server_url: Override the default server URL for this method
         :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
@@ -2366,7 +2366,7 @@ class TestForms(BaseSDK):
             base_url = self._get_url(base_url, url_variables)
 
         request = models.GetTestFormByIDRequest(
-            dollar_expand=dollar_expand,
+            expand=expand,
             test_form_id=test_form_id,
         )
 
@@ -2442,7 +2442,7 @@ class TestForms(BaseSDK):
     def get_test_forms(
         self,
         *,
-        dollar_expand: Optional[str] = None,
+        expand: Optional[str] = None,
         retries: OptionalNullable[utils.RetryConfig] = UNSET,
         server_url: Optional[str] = None,
         timeout_ms: Optional[int] = None,
@@ -2453,7 +2453,7 @@ class TestForms(BaseSDK):
         Retrieves a list of [test forms](ref:testforms#testform).
 
 
-        :param dollar_expand: Returns related resources inline with the main resource
+        :param expand: Returns related resources inline with the main resource
         :param retries: Override the default retry configuration for this method
         :param server_url: Override the default server URL for this method
         :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
@@ -2470,7 +2470,7 @@ class TestForms(BaseSDK):
             base_url = self._get_url(base_url, url_variables)
 
         request = models.GetTestFormsRequest(
-            dollar_expand=dollar_expand,
+            expand=expand,
         )
 
         req = self._build_request(
@@ -2545,7 +2545,7 @@ class TestForms(BaseSDK):
     async def get_test_forms_async(
         self,
         *,
-        dollar_expand: Optional[str] = None,
+        expand: Optional[str] = None,
         retries: OptionalNullable[utils.RetryConfig] = UNSET,
         server_url: Optional[str] = None,
         timeout_ms: Optional[int] = None,
@@ -2556,7 +2556,7 @@ class TestForms(BaseSDK):
         Retrieves a list of [test forms](ref:testforms#testform).
 
 
-        :param dollar_expand: Returns related resources inline with the main resource
+        :param expand: Returns related resources inline with the main resource
         :param retries: Override the default retry configuration for this method
         :param server_url: Override the default server URL for this method
         :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
@@ -2573,7 +2573,7 @@ class TestForms(BaseSDK):
             base_url = self._get_url(base_url, url_variables)
 
         request = models.GetTestFormsRequest(
-            dollar_expand=dollar_expand,
+            expand=expand,
         )
 
         req = self._build_request_async(
@@ -3080,7 +3080,7 @@ class TestForms(BaseSDK):
         *,
         test_form_id: str,
         test_phase_id: str,
-        dollar_expand: Optional[str] = None,
+        expand: Optional[str] = None,
         retries: OptionalNullable[utils.RetryConfig] = UNSET,
         server_url: Optional[str] = None,
         timeout_ms: Optional[int] = None,
@@ -3093,7 +3093,7 @@ class TestForms(BaseSDK):
 
         :param test_form_id: The unique identifier of the test form
         :param test_phase_id: The unique identifier of the test phase
-        :param dollar_expand: Returns related resources inline with the main resource
+        :param expand: Returns related resources inline with the main resource
         :param retries: Override the default retry configuration for this method
         :param server_url: Override the default server URL for this method
         :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
@@ -3110,7 +3110,7 @@ class TestForms(BaseSDK):
             base_url = self._get_url(base_url, url_variables)
 
         request = models.GetTestPhaseByIDRequest(
-            dollar_expand=dollar_expand,
+            expand=expand,
             test_form_id=test_form_id,
             test_phase_id=test_phase_id,
         )
@@ -3189,7 +3189,7 @@ class TestForms(BaseSDK):
         *,
         test_form_id: str,
         test_phase_id: str,
-        dollar_expand: Optional[str] = None,
+        expand: Optional[str] = None,
         retries: OptionalNullable[utils.RetryConfig] = UNSET,
         server_url: Optional[str] = None,
         timeout_ms: Optional[int] = None,
@@ -3202,7 +3202,7 @@ class TestForms(BaseSDK):
 
         :param test_form_id: The unique identifier of the test form
         :param test_phase_id: The unique identifier of the test phase
-        :param dollar_expand: Returns related resources inline with the main resource
+        :param expand: Returns related resources inline with the main resource
         :param retries: Override the default retry configuration for this method
         :param server_url: Override the default server URL for this method
         :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
@@ -3219,7 +3219,7 @@ class TestForms(BaseSDK):
             base_url = self._get_url(base_url, url_variables)
 
         request = models.GetTestPhaseByIDRequest(
-            dollar_expand=dollar_expand,
+            expand=expand,
             test_form_id=test_form_id,
             test_phase_id=test_phase_id,
         )
@@ -3297,7 +3297,7 @@ class TestForms(BaseSDK):
         self,
         *,
         test_form_id: str,
-        dollar_expand: Optional[str] = None,
+        expand: Optional[str] = None,
         retries: OptionalNullable[utils.RetryConfig] = UNSET,
         server_url: Optional[str] = None,
         timeout_ms: Optional[int] = None,
@@ -3309,7 +3309,7 @@ class TestForms(BaseSDK):
 
 
         :param test_form_id: The unique identifier of the test form
-        :param dollar_expand: Returns related resources inline with the main resource
+        :param expand: Returns related resources inline with the main resource
         :param retries: Override the default retry configuration for this method
         :param server_url: Override the default server URL for this method
         :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
@@ -3326,7 +3326,7 @@ class TestForms(BaseSDK):
             base_url = self._get_url(base_url, url_variables)
 
         request = models.GetTestPhasesRequest(
-            dollar_expand=dollar_expand,
+            expand=expand,
             test_form_id=test_form_id,
         )
 
@@ -3403,7 +3403,7 @@ class TestForms(BaseSDK):
         self,
         *,
         test_form_id: str,
-        dollar_expand: Optional[str] = None,
+        expand: Optional[str] = None,
         retries: OptionalNullable[utils.RetryConfig] = UNSET,
         server_url: Optional[str] = None,
         timeout_ms: Optional[int] = None,
@@ -3415,7 +3415,7 @@ class TestForms(BaseSDK):
 
 
         :param test_form_id: The unique identifier of the test form
-        :param dollar_expand: Returns related resources inline with the main resource
+        :param expand: Returns related resources inline with the main resource
         :param retries: Override the default retry configuration for this method
         :param server_url: Override the default server URL for this method
         :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
@@ -3432,7 +3432,7 @@ class TestForms(BaseSDK):
             base_url = self._get_url(base_url, url_variables)
 
         request = models.GetTestPhasesRequest(
-            dollar_expand=dollar_expand,
+            expand=expand,
             test_form_id=test_form_id,
         )
 

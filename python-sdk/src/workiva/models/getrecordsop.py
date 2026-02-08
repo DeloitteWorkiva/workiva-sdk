@@ -10,21 +10,21 @@ from workiva.utils import FieldMetadata, QueryParamMetadata
 
 
 class GetRecordsRequestTypedDict(TypedDict):
-    dollar_expand: NotRequired[str]
+    expand: NotRequired[str]
     r"""Returns related resources inline with the main resource"""
-    dollar_filter: NotRequired[str]
+    filter_: NotRequired[str]
     r"""The properties to filter the results by."""
 
 
 class GetRecordsRequest(BaseModel):
-    dollar_expand: Annotated[
+    expand: Annotated[
         Optional[str],
         pydantic.Field(alias="$expand"),
         FieldMetadata(query=QueryParamMetadata(style="form", explode=True)),
     ] = None
     r"""Returns related resources inline with the main resource"""
 
-    dollar_filter: Annotated[
+    filter_: Annotated[
         Optional[str],
         pydantic.Field(alias="$filter"),
         FieldMetadata(query=QueryParamMetadata(style="form", explode=True)),
@@ -33,7 +33,7 @@ class GetRecordsRequest(BaseModel):
 
     @model_serializer(mode="wrap")
     def serialize_model(self, handler):
-        optional_fields = set(["$expand", "$filter"])
+        optional_fields = set(["expand", "filter"])
         serialized = handler(self)
         m = {}
 

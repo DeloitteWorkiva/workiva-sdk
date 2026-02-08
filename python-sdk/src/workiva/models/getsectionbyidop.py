@@ -14,9 +14,9 @@ class GetSectionByIDRequestTypedDict(TypedDict):
     r"""The unique identifier of the document"""
     section_id: str
     r"""The unique identifier of the section"""
-    dollar_expand: NotRequired[str]
+    expand: NotRequired[str]
     r"""Returns related resources inline with the main resource"""
-    dollar_revision: NotRequired[str]
+    revision: NotRequired[str]
     r"""Returns resources at a specific revision"""
 
 
@@ -35,14 +35,14 @@ class GetSectionByIDRequest(BaseModel):
     ]
     r"""The unique identifier of the section"""
 
-    dollar_expand: Annotated[
+    expand: Annotated[
         Optional[str],
         pydantic.Field(alias="$expand"),
         FieldMetadata(query=QueryParamMetadata(style="form", explode=True)),
     ] = None
     r"""Returns related resources inline with the main resource"""
 
-    dollar_revision: Annotated[
+    revision: Annotated[
         Optional[str],
         pydantic.Field(alias="$revision"),
         FieldMetadata(query=QueryParamMetadata(style="form", explode=True)),
@@ -51,7 +51,7 @@ class GetSectionByIDRequest(BaseModel):
 
     @model_serializer(mode="wrap")
     def serialize_model(self, handler):
-        optional_fields = set(["$expand", "$revision"])
+        optional_fields = set(["expand", "revision"])
         serialized = handler(self)
         m = {}
 

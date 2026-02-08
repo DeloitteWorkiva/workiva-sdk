@@ -25,9 +25,11 @@ SENTINEL = "# --- Custom exports (added by scripts/patch_sdk.py) ---"
 CUSTOM_EXPORTS = f"""\
 
 {SENTINEL}
-from workiva._hooks.client import Workiva
-from workiva._hooks.polling import OperationPoller
-from workiva._hooks.exceptions import OperationFailed, OperationCancelled, OperationTimeout
+from workiva._hooks.client import Workiva as Workiva
+from workiva._hooks.polling import OperationPoller as OperationPoller
+from workiva._hooks.exceptions import OperationFailed as OperationFailed
+from workiva._hooks.exceptions import OperationCancelled as OperationCancelled
+from workiva._hooks.exceptions import OperationTimeout as OperationTimeout
 """
 
 PYPI_README = """\

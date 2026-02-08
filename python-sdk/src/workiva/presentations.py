@@ -16,7 +16,7 @@ class Presentations(BaseSDK):
         self,
         *,
         presentation_id: str,
-        dollar_revision: Optional[str] = None,
+        revision: Optional[str] = None,
         retries: OptionalNullable[utils.RetryConfig] = UNSET,
         server_url: Optional[str] = None,
         timeout_ms: Optional[int] = None,
@@ -28,7 +28,7 @@ class Presentations(BaseSDK):
 
 
         :param presentation_id: The unique identifier of the presentation
-        :param dollar_revision: Returns resources at a specific revision
+        :param revision: Returns resources at a specific revision
         :param retries: Override the default retry configuration for this method
         :param server_url: Override the default server URL for this method
         :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
@@ -45,8 +45,8 @@ class Presentations(BaseSDK):
             base_url = self._get_url(base_url, url_variables)
 
         request = models.GetPresentationByIDRequest(
-            dollar_revision=dollar_revision,
             presentation_id=presentation_id,
+            revision=revision,
         )
 
         req = self._build_request(
@@ -122,7 +122,7 @@ class Presentations(BaseSDK):
         self,
         *,
         presentation_id: str,
-        dollar_revision: Optional[str] = None,
+        revision: Optional[str] = None,
         retries: OptionalNullable[utils.RetryConfig] = UNSET,
         server_url: Optional[str] = None,
         timeout_ms: Optional[int] = None,
@@ -134,7 +134,7 @@ class Presentations(BaseSDK):
 
 
         :param presentation_id: The unique identifier of the presentation
-        :param dollar_revision: Returns resources at a specific revision
+        :param revision: Returns resources at a specific revision
         :param retries: Override the default retry configuration for this method
         :param server_url: Override the default server URL for this method
         :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
@@ -151,8 +151,8 @@ class Presentations(BaseSDK):
             base_url = self._get_url(base_url, url_variables)
 
         request = models.GetPresentationByIDRequest(
-            dollar_revision=dollar_revision,
             presentation_id=presentation_id,
+            revision=revision,
         )
 
         req = self._build_request_async(
@@ -228,7 +228,7 @@ class Presentations(BaseSDK):
         self,
         *,
         presentation_id: str,
-        dollar_next: Optional[str] = None,
+        next: Optional[str] = None,
         retries: OptionalNullable[utils.RetryConfig] = UNSET,
         server_url: Optional[str] = None,
         timeout_ms: Optional[int] = None,
@@ -239,7 +239,7 @@ class Presentations(BaseSDK):
         Returns [MilestoneListResult](ref:milestones#milestonelistresult).
 
         :param presentation_id: The unique identifier of the presentation
-        :param dollar_next: Pagination cursor for next set of results.
+        :param next: Pagination cursor for next set of results.
         :param retries: Override the default retry configuration for this method
         :param server_url: Override the default server URL for this method
         :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
@@ -256,7 +256,7 @@ class Presentations(BaseSDK):
             base_url = self._get_url(base_url, url_variables)
 
         request = models.GetPresentationMilestonesRequest(
-            dollar_next=dollar_next,
+            next=next,
             presentation_id=presentation_id,
         )
 
@@ -323,7 +323,7 @@ class Presentations(BaseSDK):
 
             return self.get_presentation_milestones(
                 presentation_id=presentation_id,
-                dollar_next=next_cursor,
+                next=next,
                 retries=retries,
             )
 
@@ -354,7 +354,7 @@ class Presentations(BaseSDK):
         self,
         *,
         presentation_id: str,
-        dollar_next: Optional[str] = None,
+        next: Optional[str] = None,
         retries: OptionalNullable[utils.RetryConfig] = UNSET,
         server_url: Optional[str] = None,
         timeout_ms: Optional[int] = None,
@@ -365,7 +365,7 @@ class Presentations(BaseSDK):
         Returns [MilestoneListResult](ref:milestones#milestonelistresult).
 
         :param presentation_id: The unique identifier of the presentation
-        :param dollar_next: Pagination cursor for next set of results.
+        :param next: Pagination cursor for next set of results.
         :param retries: Override the default retry configuration for this method
         :param server_url: Override the default server URL for this method
         :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
@@ -382,7 +382,7 @@ class Presentations(BaseSDK):
             base_url = self._get_url(base_url, url_variables)
 
         request = models.GetPresentationMilestonesRequest(
-            dollar_next=dollar_next,
+            next=next,
             presentation_id=presentation_id,
         )
 
@@ -454,7 +454,7 @@ class Presentations(BaseSDK):
 
             return self.get_presentation_milestones_async(
                 presentation_id=presentation_id,
-                dollar_next=next_cursor,
+                next=next,
                 retries=retries,
             )
 
@@ -486,7 +486,7 @@ class Presentations(BaseSDK):
         *,
         presentation_id: str,
         slide_id: str,
-        dollar_revision: Optional[str] = None,
+        revision: Optional[str] = None,
         retries: OptionalNullable[utils.RetryConfig] = UNSET,
         server_url: Optional[str] = None,
         timeout_ms: Optional[int] = None,
@@ -499,7 +499,7 @@ class Presentations(BaseSDK):
 
         :param presentation_id: The unique identifier of the presentation
         :param slide_id: The unique identifier of the slide
-        :param dollar_revision: Returns resources at a specific revision
+        :param revision: Returns resources at a specific revision
         :param retries: Override the default retry configuration for this method
         :param server_url: Override the default server URL for this method
         :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
@@ -516,8 +516,8 @@ class Presentations(BaseSDK):
             base_url = self._get_url(base_url, url_variables)
 
         request = models.GetSlideByIDRequest(
-            dollar_revision=dollar_revision,
             presentation_id=presentation_id,
+            revision=revision,
             slide_id=slide_id,
         )
 
@@ -595,7 +595,7 @@ class Presentations(BaseSDK):
         *,
         presentation_id: str,
         slide_id: str,
-        dollar_revision: Optional[str] = None,
+        revision: Optional[str] = None,
         retries: OptionalNullable[utils.RetryConfig] = UNSET,
         server_url: Optional[str] = None,
         timeout_ms: Optional[int] = None,
@@ -608,7 +608,7 @@ class Presentations(BaseSDK):
 
         :param presentation_id: The unique identifier of the presentation
         :param slide_id: The unique identifier of the slide
-        :param dollar_revision: Returns resources at a specific revision
+        :param revision: Returns resources at a specific revision
         :param retries: Override the default retry configuration for this method
         :param server_url: Override the default server URL for this method
         :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
@@ -625,8 +625,8 @@ class Presentations(BaseSDK):
             base_url = self._get_url(base_url, url_variables)
 
         request = models.GetSlideByIDRequest(
-            dollar_revision=dollar_revision,
             presentation_id=presentation_id,
+            revision=revision,
             slide_id=slide_id,
         )
 
@@ -704,7 +704,7 @@ class Presentations(BaseSDK):
         *,
         presentation_id: str,
         slide_layout_id: str,
-        dollar_revision: Optional[str] = None,
+        revision: Optional[str] = None,
         retries: OptionalNullable[utils.RetryConfig] = UNSET,
         server_url: Optional[str] = None,
         timeout_ms: Optional[int] = None,
@@ -717,7 +717,7 @@ class Presentations(BaseSDK):
 
         :param presentation_id: The unique identifier of the presentation
         :param slide_layout_id: The unique identifier of the slide layout
-        :param dollar_revision: Returns resources at a specific revision
+        :param revision: Returns resources at a specific revision
         :param retries: Override the default retry configuration for this method
         :param server_url: Override the default server URL for this method
         :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
@@ -734,8 +734,8 @@ class Presentations(BaseSDK):
             base_url = self._get_url(base_url, url_variables)
 
         request = models.GetSlideLayoutByIDRequest(
-            dollar_revision=dollar_revision,
             presentation_id=presentation_id,
+            revision=revision,
             slide_layout_id=slide_layout_id,
         )
 
@@ -813,7 +813,7 @@ class Presentations(BaseSDK):
         *,
         presentation_id: str,
         slide_layout_id: str,
-        dollar_revision: Optional[str] = None,
+        revision: Optional[str] = None,
         retries: OptionalNullable[utils.RetryConfig] = UNSET,
         server_url: Optional[str] = None,
         timeout_ms: Optional[int] = None,
@@ -826,7 +826,7 @@ class Presentations(BaseSDK):
 
         :param presentation_id: The unique identifier of the presentation
         :param slide_layout_id: The unique identifier of the slide layout
-        :param dollar_revision: Returns resources at a specific revision
+        :param revision: Returns resources at a specific revision
         :param retries: Override the default retry configuration for this method
         :param server_url: Override the default server URL for this method
         :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
@@ -843,8 +843,8 @@ class Presentations(BaseSDK):
             base_url = self._get_url(base_url, url_variables)
 
         request = models.GetSlideLayoutByIDRequest(
-            dollar_revision=dollar_revision,
             presentation_id=presentation_id,
+            revision=revision,
             slide_layout_id=slide_layout_id,
         )
 
@@ -921,9 +921,9 @@ class Presentations(BaseSDK):
         self,
         *,
         presentation_id: str,
-        dollar_maxpagesize: Optional[int] = 1000,
-        dollar_next: Optional[str] = None,
-        dollar_revision: Optional[str] = None,
+        maxpagesize: Optional[int] = 1000,
+        next: Optional[str] = None,
+        revision: Optional[str] = None,
         retries: OptionalNullable[utils.RetryConfig] = UNSET,
         server_url: Optional[str] = None,
         timeout_ms: Optional[int] = None,
@@ -934,9 +934,9 @@ class Presentations(BaseSDK):
         Returns a list of slide layouts.
 
         :param presentation_id: The unique identifier of the presentation
-        :param dollar_maxpagesize: The maximum number of results to retrieve
-        :param dollar_next: Pagination cursor for next set of results.
-        :param dollar_revision: Returns resources at a specific revision
+        :param maxpagesize: The maximum number of results to retrieve
+        :param next: Pagination cursor for next set of results.
+        :param revision: Returns resources at a specific revision
         :param retries: Override the default retry configuration for this method
         :param server_url: Override the default server URL for this method
         :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
@@ -953,10 +953,10 @@ class Presentations(BaseSDK):
             base_url = self._get_url(base_url, url_variables)
 
         request = models.GetSlideLayoutsRequest(
-            dollar_maxpagesize=dollar_maxpagesize,
-            dollar_next=dollar_next,
-            dollar_revision=dollar_revision,
+            maxpagesize=maxpagesize,
+            next=next,
             presentation_id=presentation_id,
+            revision=revision,
         )
 
         req = self._build_request(
@@ -1022,9 +1022,9 @@ class Presentations(BaseSDK):
 
             return self.get_slide_layouts(
                 presentation_id=presentation_id,
-                dollar_maxpagesize=dollar_maxpagesize,
-                dollar_next=next_cursor,
-                dollar_revision=dollar_revision,
+                maxpagesize=maxpagesize,
+                next=next,
+                revision=revision,
                 retries=retries,
             )
 
@@ -1055,9 +1055,9 @@ class Presentations(BaseSDK):
         self,
         *,
         presentation_id: str,
-        dollar_maxpagesize: Optional[int] = 1000,
-        dollar_next: Optional[str] = None,
-        dollar_revision: Optional[str] = None,
+        maxpagesize: Optional[int] = 1000,
+        next: Optional[str] = None,
+        revision: Optional[str] = None,
         retries: OptionalNullable[utils.RetryConfig] = UNSET,
         server_url: Optional[str] = None,
         timeout_ms: Optional[int] = None,
@@ -1068,9 +1068,9 @@ class Presentations(BaseSDK):
         Returns a list of slide layouts.
 
         :param presentation_id: The unique identifier of the presentation
-        :param dollar_maxpagesize: The maximum number of results to retrieve
-        :param dollar_next: Pagination cursor for next set of results.
-        :param dollar_revision: Returns resources at a specific revision
+        :param maxpagesize: The maximum number of results to retrieve
+        :param next: Pagination cursor for next set of results.
+        :param revision: Returns resources at a specific revision
         :param retries: Override the default retry configuration for this method
         :param server_url: Override the default server URL for this method
         :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
@@ -1087,10 +1087,10 @@ class Presentations(BaseSDK):
             base_url = self._get_url(base_url, url_variables)
 
         request = models.GetSlideLayoutsRequest(
-            dollar_maxpagesize=dollar_maxpagesize,
-            dollar_next=dollar_next,
-            dollar_revision=dollar_revision,
+            maxpagesize=maxpagesize,
+            next=next,
             presentation_id=presentation_id,
+            revision=revision,
         )
 
         req = self._build_request_async(
@@ -1159,9 +1159,9 @@ class Presentations(BaseSDK):
 
             return self.get_slide_layouts_async(
                 presentation_id=presentation_id,
-                dollar_maxpagesize=dollar_maxpagesize,
-                dollar_next=next_cursor,
-                dollar_revision=dollar_revision,
+                maxpagesize=maxpagesize,
+                next=next,
+                revision=revision,
                 retries=retries,
             )
 
@@ -1192,9 +1192,9 @@ class Presentations(BaseSDK):
         self,
         *,
         presentation_id: str,
-        dollar_maxpagesize: Optional[int] = 1000,
-        dollar_next: Optional[str] = None,
-        dollar_revision: Optional[str] = None,
+        maxpagesize: Optional[int] = 1000,
+        next: Optional[str] = None,
+        revision: Optional[str] = None,
         retries: OptionalNullable[utils.RetryConfig] = UNSET,
         server_url: Optional[str] = None,
         timeout_ms: Optional[int] = None,
@@ -1205,9 +1205,9 @@ class Presentations(BaseSDK):
         Returns a list of slides.
 
         :param presentation_id: The unique identifier of the presentation
-        :param dollar_maxpagesize: The maximum number of results to retrieve
-        :param dollar_next: Pagination cursor for next set of results.
-        :param dollar_revision: Returns resources at a specific revision
+        :param maxpagesize: The maximum number of results to retrieve
+        :param next: Pagination cursor for next set of results.
+        :param revision: Returns resources at a specific revision
         :param retries: Override the default retry configuration for this method
         :param server_url: Override the default server URL for this method
         :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
@@ -1224,10 +1224,10 @@ class Presentations(BaseSDK):
             base_url = self._get_url(base_url, url_variables)
 
         request = models.GetSlidesRequest(
-            dollar_maxpagesize=dollar_maxpagesize,
-            dollar_next=dollar_next,
-            dollar_revision=dollar_revision,
+            maxpagesize=maxpagesize,
+            next=next,
             presentation_id=presentation_id,
+            revision=revision,
         )
 
         req = self._build_request(
@@ -1293,9 +1293,9 @@ class Presentations(BaseSDK):
 
             return self.get_slides(
                 presentation_id=presentation_id,
-                dollar_maxpagesize=dollar_maxpagesize,
-                dollar_next=next_cursor,
-                dollar_revision=dollar_revision,
+                maxpagesize=maxpagesize,
+                next=next,
+                revision=revision,
                 retries=retries,
             )
 
@@ -1326,9 +1326,9 @@ class Presentations(BaseSDK):
         self,
         *,
         presentation_id: str,
-        dollar_maxpagesize: Optional[int] = 1000,
-        dollar_next: Optional[str] = None,
-        dollar_revision: Optional[str] = None,
+        maxpagesize: Optional[int] = 1000,
+        next: Optional[str] = None,
+        revision: Optional[str] = None,
         retries: OptionalNullable[utils.RetryConfig] = UNSET,
         server_url: Optional[str] = None,
         timeout_ms: Optional[int] = None,
@@ -1339,9 +1339,9 @@ class Presentations(BaseSDK):
         Returns a list of slides.
 
         :param presentation_id: The unique identifier of the presentation
-        :param dollar_maxpagesize: The maximum number of results to retrieve
-        :param dollar_next: Pagination cursor for next set of results.
-        :param dollar_revision: Returns resources at a specific revision
+        :param maxpagesize: The maximum number of results to retrieve
+        :param next: Pagination cursor for next set of results.
+        :param revision: Returns resources at a specific revision
         :param retries: Override the default retry configuration for this method
         :param server_url: Override the default server URL for this method
         :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
@@ -1358,10 +1358,10 @@ class Presentations(BaseSDK):
             base_url = self._get_url(base_url, url_variables)
 
         request = models.GetSlidesRequest(
-            dollar_maxpagesize=dollar_maxpagesize,
-            dollar_next=dollar_next,
-            dollar_revision=dollar_revision,
+            maxpagesize=maxpagesize,
+            next=next,
             presentation_id=presentation_id,
+            revision=revision,
         )
 
         req = self._build_request_async(
@@ -1430,9 +1430,9 @@ class Presentations(BaseSDK):
 
             return self.get_slides_async(
                 presentation_id=presentation_id,
-                dollar_maxpagesize=dollar_maxpagesize,
-                dollar_next=next_cursor,
-                dollar_revision=dollar_revision,
+                maxpagesize=maxpagesize,
+                next=next,
+                revision=revision,
                 retries=retries,
             )
 

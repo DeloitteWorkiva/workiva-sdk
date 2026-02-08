@@ -113,7 +113,7 @@ with SDK(
     ),
 ) as sdk:
 
-    res = sdk.content.get_anchor_by_id(anchor_id="<id>", dollar_revision="1A2B3C4D")
+    res = sdk.content.get_anchor_by_id(anchor_id="<id>", revision="1A2B3C4D")
 
     # Handle response
     print(res)
@@ -125,7 +125,7 @@ with SDK(
 | Parameter                                                           | Type                                                                | Required                                                            | Description                                                         | Example                                                             |
 | ------------------------------------------------------------------- | ------------------------------------------------------------------- | ------------------------------------------------------------------- | ------------------------------------------------------------------- | ------------------------------------------------------------------- |
 | `anchor_id`                                                         | *str*                                                               | :heavy_check_mark:                                                  | The unique identifier of the anchor                                 |                                                                     |
-| `dollar_revision`                                                   | *Optional[str]*                                                     | :heavy_minus_sign:                                                  | Returns resources at a specific revision                            | 1A2B3C4D                                                            |
+| `revision`                                                          | *Optional[str]*                                                     | :heavy_minus_sign:                                                  | Returns resources at a specific revision                            | 1A2B3C4D                                                            |
 | `retries`                                                           | [Optional[utils.RetryConfig]](../../models/utils/retryconfig.md)    | :heavy_minus_sign:                                                  | Configuration to override the default retry behavior of the client. |                                                                     |
 
 ### Response
@@ -160,8 +160,8 @@ with SDK(
 ) as sdk:
 
     res = sdk.content.get_column_properties(request={
-        "dollar_next": "JTI0bGltaXQ9MTAwJiUyNG9mZnNldD0xMDA",
-        "dollar_revision": "1A2B3C4D",
+        "next": "JTI0bGltaXQ9MTAwJiUyNG9mZnNldD0xMDA",
+        "revision": "1A2B3C4D",
         "start_column": 1,
         "stop_column": 1,
         "table_id": "WW91IGZvdW5kfIG1lIQ",
@@ -211,7 +211,7 @@ with SDK(
     ),
 ) as sdk:
 
-    res = sdk.content.get_destination_link_by_id(destination_link_id="WA5SVkJWXOy5MbSHX25Qf9BVz5xTvLfJadt5eXzqTxLT4o2Lo1ceQHmLbSppCdBhQUFBSE", dollar_revision="1A2B3C4D")
+    res = sdk.content.get_destination_link_by_id(destination_link_id="WA5SVkJWXOy5MbSHX25Qf9BVz5xTvLfJadt5eXzqTxLT4o2Lo1ceQHmLbSppCdBhQUFBSE", revision="1A2B3C4D")
 
     # Handle response
     print(res)
@@ -223,7 +223,7 @@ with SDK(
 | Parameter                                                              | Type                                                                   | Required                                                               | Description                                                            | Example                                                                |
 | ---------------------------------------------------------------------- | ---------------------------------------------------------------------- | ---------------------------------------------------------------------- | ---------------------------------------------------------------------- | ---------------------------------------------------------------------- |
 | `destination_link_id`                                                  | *str*                                                                  | :heavy_check_mark:                                                     | The unique identifier of the destination link                          | WA5SVkJWXOy5MbSHX25Qf9BVz5xTvLfJadt5eXzqTxLT4o2Lo1ceQHmLbSppCdBhQUFBSE |
-| `dollar_revision`                                                      | *Optional[str]*                                                        | :heavy_minus_sign:                                                     | Returns resources at a specific revision                               | 1A2B3C4D                                                               |
+| `revision`                                                             | *Optional[str]*                                                        | :heavy_minus_sign:                                                     | Returns resources at a specific revision                               | 1A2B3C4D                                                               |
 | `retries`                                                              | [Optional[utils.RetryConfig]](../../models/utils/retryconfig.md)       | :heavy_minus_sign:                                                     | Configuration to override the default retry behavior of the client.    |                                                                        |
 
 ### Response
@@ -256,7 +256,7 @@ with SDK(
     ),
 ) as sdk:
 
-    res = sdk.content.get_drawing_anchor_by_id(anchor_id="<id>", drawing_id="<id>", dollar_revision="1A2B3C4D")
+    res = sdk.content.get_drawing_anchor_by_id(anchor_id="<id>", drawing_id="<id>", revision="1A2B3C4D")
 
     # Handle response
     print(res)
@@ -269,7 +269,7 @@ with SDK(
 | ------------------------------------------------------------------- | ------------------------------------------------------------------- | ------------------------------------------------------------------- | ------------------------------------------------------------------- | ------------------------------------------------------------------- |
 | `anchor_id`                                                         | *str*                                                               | :heavy_check_mark:                                                  | The unique identifier of the anchor                                 |                                                                     |
 | `drawing_id`                                                        | *str*                                                               | :heavy_check_mark:                                                  | The unique identifier of a drawing                                  |                                                                     |
-| `dollar_revision`                                                   | *Optional[str]*                                                     | :heavy_minus_sign:                                                  | Returns resources at a specific revision                            | 1A2B3C4D                                                            |
+| `revision`                                                          | *Optional[str]*                                                     | :heavy_minus_sign:                                                  | Returns resources at a specific revision                            | 1A2B3C4D                                                            |
 | `retries`                                                           | [Optional[utils.RetryConfig]](../../models/utils/retryconfig.md)    | :heavy_minus_sign:                                                  | Configuration to override the default retry behavior of the client. |                                                                     |
 
 ### Response
@@ -303,10 +303,10 @@ with SDK(
 ) as sdk:
 
     res = sdk.content.get_drawing_anchor_extensions(request={
-        "dollar_next": "JTI0bGltaXQ9MTAwJiUyNG9mZnNldD0xMDA",
-        "dollar_revision": "1A2B3C4D",
         "anchor_id": "<id>",
         "drawing_id": "<id>",
+        "next": "JTI0bGltaXQ9MTAwJiUyNG9mZnNldD0xMDA",
+        "revision": "1A2B3C4D",
     })
 
     while res is not None:
@@ -353,7 +353,7 @@ with SDK(
     ),
 ) as sdk:
 
-    res = sdk.content.get_drawing_anchors(drawing_id="<id>", dollar_maxpagesize=1000, dollar_next="JTI0bGltaXQ9MTAwJiUyNG9mZnNldD0xMDA", dollar_revision="1A2B3C4D")
+    res = sdk.content.get_drawing_anchors(drawing_id="<id>", maxpagesize=1000, next="JTI0bGltaXQ9MTAwJiUyNG9mZnNldD0xMDA", revision="1A2B3C4D")
 
     while res is not None:
         # Handle items
@@ -367,9 +367,9 @@ with SDK(
 | Parameter                                                           | Type                                                                | Required                                                            | Description                                                         | Example                                                             |
 | ------------------------------------------------------------------- | ------------------------------------------------------------------- | ------------------------------------------------------------------- | ------------------------------------------------------------------- | ------------------------------------------------------------------- |
 | `drawing_id`                                                        | *str*                                                               | :heavy_check_mark:                                                  | The unique identifier of a drawing                                  |                                                                     |
-| `dollar_maxpagesize`                                                | *Optional[int]*                                                     | :heavy_minus_sign:                                                  | The maximum number of results to retrieve                           |                                                                     |
-| `dollar_next`                                                       | *Optional[str]*                                                     | :heavy_minus_sign:                                                  | Pagination cursor for next set of results.                          | JTI0bGltaXQ9MTAwJiUyNG9mZnNldD0xMDA                                 |
-| `dollar_revision`                                                   | *Optional[str]*                                                     | :heavy_minus_sign:                                                  | Returns resources at a specific revision                            | 1A2B3C4D                                                            |
+| `maxpagesize`                                                       | *Optional[int]*                                                     | :heavy_minus_sign:                                                  | The maximum number of results to retrieve                           |                                                                     |
+| `next`                                                              | *Optional[str]*                                                     | :heavy_minus_sign:                                                  | Pagination cursor for next set of results.                          | JTI0bGltaXQ9MTAwJiUyNG9mZnNldD0xMDA                                 |
+| `revision`                                                          | *Optional[str]*                                                     | :heavy_minus_sign:                                                  | Returns resources at a specific revision                            | 1A2B3C4D                                                            |
 | `retries`                                                           | [Optional[utils.RetryConfig]](../../models/utils/retryconfig.md)    | :heavy_minus_sign:                                                  | Configuration to override the default retry behavior of the client. |                                                                     |
 
 ### Response
@@ -402,7 +402,7 @@ with SDK(
     ),
 ) as sdk:
 
-    res = sdk.content.get_drawing_elements_by_id(drawing_id="<id>", dollar_maxpagesize=1000, dollar_next="JTI0bGltaXQ9MTAwJiUyNG9mZnNldD0xMDA", dollar_revision="1A2B3C4D")
+    res = sdk.content.get_drawing_elements_by_id(drawing_id="<id>", maxpagesize=1000, next="JTI0bGltaXQ9MTAwJiUyNG9mZnNldD0xMDA", revision="1A2B3C4D")
 
     while res is not None:
         # Handle items
@@ -416,9 +416,9 @@ with SDK(
 | Parameter                                                           | Type                                                                | Required                                                            | Description                                                         | Example                                                             |
 | ------------------------------------------------------------------- | ------------------------------------------------------------------- | ------------------------------------------------------------------- | ------------------------------------------------------------------- | ------------------------------------------------------------------- |
 | `drawing_id`                                                        | *str*                                                               | :heavy_check_mark:                                                  | The unique identifier of a drawing                                  |                                                                     |
-| `dollar_maxpagesize`                                                | *Optional[int]*                                                     | :heavy_minus_sign:                                                  | The maximum number of results to retrieve                           |                                                                     |
-| `dollar_next`                                                       | *Optional[str]*                                                     | :heavy_minus_sign:                                                  | Pagination cursor for next set of results.                          | JTI0bGltaXQ9MTAwJiUyNG9mZnNldD0xMDA                                 |
-| `dollar_revision`                                                   | *Optional[str]*                                                     | :heavy_minus_sign:                                                  | Returns resources at a specific revision                            | 1A2B3C4D                                                            |
+| `maxpagesize`                                                       | *Optional[int]*                                                     | :heavy_minus_sign:                                                  | The maximum number of results to retrieve                           |                                                                     |
+| `next`                                                              | *Optional[str]*                                                     | :heavy_minus_sign:                                                  | Pagination cursor for next set of results.                          | JTI0bGltaXQ9MTAwJiUyNG9mZnNldD0xMDA                                 |
+| `revision`                                                          | *Optional[str]*                                                     | :heavy_minus_sign:                                                  | Returns resources at a specific revision                            | 1A2B3C4D                                                            |
 | `retries`                                                           | [Optional[utils.RetryConfig]](../../models/utils/retryconfig.md)    | :heavy_minus_sign:                                                  | Configuration to override the default retry behavior of the client. |                                                                     |
 
 ### Response
@@ -495,7 +495,7 @@ with SDK(
     ),
 ) as sdk:
 
-    res = sdk.content.get_range_link_by_id(range_link_id="f649093edf354cfe8ce52fa60990a109", table_id="WW91IGZvdW5kfIG1lIQ", dollar_revision="1A2B3C4D")
+    res = sdk.content.get_range_link_by_id(range_link_id="f649093edf354cfe8ce52fa60990a109", table_id="WW91IGZvdW5kfIG1lIQ", revision="1A2B3C4D")
 
     # Handle response
     print(res)
@@ -508,7 +508,7 @@ with SDK(
 | ------------------------------------------------------------------- | ------------------------------------------------------------------- | ------------------------------------------------------------------- | ------------------------------------------------------------------- | ------------------------------------------------------------------- |
 | `range_link_id`                                                     | *str*                                                               | :heavy_check_mark:                                                  | The unique identifier of a range link.                              | f649093edf354cfe8ce52fa60990a109                                    |
 | `table_id`                                                          | *str*                                                               | :heavy_check_mark:                                                  | The unique identifier for the table                                 | WW91IGZvdW5kfIG1lIQ                                                 |
-| `dollar_revision`                                                   | *Optional[str]*                                                     | :heavy_minus_sign:                                                  | Returns resources at a specific revision                            | 1A2B3C4D                                                            |
+| `revision`                                                          | *Optional[str]*                                                     | :heavy_minus_sign:                                                  | Returns resources at a specific revision                            | 1A2B3C4D                                                            |
 | `retries`                                                           | [Optional[utils.RetryConfig]](../../models/utils/retryconfig.md)    | :heavy_minus_sign:                                                  | Configuration to override the default retry behavior of the client. |                                                                     |
 
 ### Response
@@ -542,9 +542,9 @@ with SDK(
 ) as sdk:
 
     res = sdk.content.get_range_link_destinations(request={
-        "dollar_next": "JTI0bGltaXQ9MTAwJiUyNG9mZnNldD0xMDA",
-        "dollar_revision": "1A2B3C4D",
+        "next": "JTI0bGltaXQ9MTAwJiUyNG9mZnNldD0xMDA",
         "range_link_id": "f649093edf354cfe8ce52fa60990a109",
+        "revision": "1A2B3C4D",
         "table_id": "WW91IGZvdW5kfIG1lIQ",
     })
 
@@ -592,7 +592,7 @@ with SDK(
     ),
 ) as sdk:
 
-    res = sdk.content.get_range_links(table_id="WW91IGZvdW5kfIG1lIQ", dollar_maxpagesize=1000, dollar_next="JTI0bGltaXQ9MTAwJiUyNG9mZnNldD0xMDA", dollar_revision="1A2B3C4D")
+    res = sdk.content.get_range_links(table_id="WW91IGZvdW5kfIG1lIQ", maxpagesize=1000, next="JTI0bGltaXQ9MTAwJiUyNG9mZnNldD0xMDA", revision="1A2B3C4D")
 
     while res is not None:
         # Handle items
@@ -606,9 +606,9 @@ with SDK(
 | Parameter                                                           | Type                                                                | Required                                                            | Description                                                         | Example                                                             |
 | ------------------------------------------------------------------- | ------------------------------------------------------------------- | ------------------------------------------------------------------- | ------------------------------------------------------------------- | ------------------------------------------------------------------- |
 | `table_id`                                                          | *str*                                                               | :heavy_check_mark:                                                  | The unique identifier for the table                                 | WW91IGZvdW5kfIG1lIQ                                                 |
-| `dollar_maxpagesize`                                                | *Optional[int]*                                                     | :heavy_minus_sign:                                                  | The maximum number of results to retrieve                           |                                                                     |
-| `dollar_next`                                                       | *Optional[str]*                                                     | :heavy_minus_sign:                                                  | Pagination cursor for next set of results.                          | JTI0bGltaXQ9MTAwJiUyNG9mZnNldD0xMDA                                 |
-| `dollar_revision`                                                   | *Optional[str]*                                                     | :heavy_minus_sign:                                                  | Returns resources at a specific revision                            | 1A2B3C4D                                                            |
+| `maxpagesize`                                                       | *Optional[int]*                                                     | :heavy_minus_sign:                                                  | The maximum number of results to retrieve                           |                                                                     |
+| `next`                                                              | *Optional[str]*                                                     | :heavy_minus_sign:                                                  | Pagination cursor for next set of results.                          | JTI0bGltaXQ9MTAwJiUyNG9mZnNldD0xMDA                                 |
+| `revision`                                                          | *Optional[str]*                                                     | :heavy_minus_sign:                                                  | Returns resources at a specific revision                            | 1A2B3C4D                                                            |
 | `retries`                                                           | [Optional[utils.RetryConfig]](../../models/utils/retryconfig.md)    | :heavy_minus_sign:                                                  | Configuration to override the default retry behavior of the client. |                                                                     |
 
 ### Response
@@ -641,7 +641,7 @@ with SDK(
     ),
 ) as sdk:
 
-    res = sdk.content.get_rich_text_anchor_by_id(anchor_id="<id>", rich_text_id="<id>", dollar_revision="1A2B3C4D")
+    res = sdk.content.get_rich_text_anchor_by_id(anchor_id="<id>", rich_text_id="<id>", revision="1A2B3C4D")
 
     # Handle response
     print(res)
@@ -654,7 +654,7 @@ with SDK(
 | ------------------------------------------------------------------- | ------------------------------------------------------------------- | ------------------------------------------------------------------- | ------------------------------------------------------------------- | ------------------------------------------------------------------- |
 | `anchor_id`                                                         | *str*                                                               | :heavy_check_mark:                                                  | The unique identifier of the anchor                                 |                                                                     |
 | `rich_text_id`                                                      | *str*                                                               | :heavy_check_mark:                                                  | The unique identifier of the rich text content                      |                                                                     |
-| `dollar_revision`                                                   | *Optional[str]*                                                     | :heavy_minus_sign:                                                  | Returns resources at a specific revision                            | 1A2B3C4D                                                            |
+| `revision`                                                          | *Optional[str]*                                                     | :heavy_minus_sign:                                                  | Returns resources at a specific revision                            | 1A2B3C4D                                                            |
 | `retries`                                                           | [Optional[utils.RetryConfig]](../../models/utils/retryconfig.md)    | :heavy_minus_sign:                                                  | Configuration to override the default retry behavior of the client. |                                                                     |
 
 ### Response
@@ -688,9 +688,9 @@ with SDK(
 ) as sdk:
 
     res = sdk.content.get_rich_text_anchor_extensions(request={
-        "dollar_next": "JTI0bGltaXQ9MTAwJiUyNG9mZnNldD0xMDA",
-        "dollar_revision": "1A2B3C4D",
         "anchor_id": "<id>",
+        "next": "JTI0bGltaXQ9MTAwJiUyNG9mZnNldD0xMDA",
+        "revision": "1A2B3C4D",
         "rich_text_id": "<id>",
     })
 
@@ -738,7 +738,7 @@ with SDK(
     ),
 ) as sdk:
 
-    res = sdk.content.get_rich_text_anchors(rich_text_id="<id>", dollar_maxpagesize=1000, dollar_next="JTI0bGltaXQ9MTAwJiUyNG9mZnNldD0xMDA", dollar_revision="1A2B3C4D")
+    res = sdk.content.get_rich_text_anchors(rich_text_id="<id>", maxpagesize=1000, next="JTI0bGltaXQ9MTAwJiUyNG9mZnNldD0xMDA", revision="1A2B3C4D")
 
     while res is not None:
         # Handle items
@@ -752,9 +752,9 @@ with SDK(
 | Parameter                                                           | Type                                                                | Required                                                            | Description                                                         | Example                                                             |
 | ------------------------------------------------------------------- | ------------------------------------------------------------------- | ------------------------------------------------------------------- | ------------------------------------------------------------------- | ------------------------------------------------------------------- |
 | `rich_text_id`                                                      | *str*                                                               | :heavy_check_mark:                                                  | The unique identifier of the rich text content                      |                                                                     |
-| `dollar_maxpagesize`                                                | *Optional[int]*                                                     | :heavy_minus_sign:                                                  | The maximum number of results to retrieve                           |                                                                     |
-| `dollar_next`                                                       | *Optional[str]*                                                     | :heavy_minus_sign:                                                  | Pagination cursor for next set of results.                          | JTI0bGltaXQ9MTAwJiUyNG9mZnNldD0xMDA                                 |
-| `dollar_revision`                                                   | *Optional[str]*                                                     | :heavy_minus_sign:                                                  | Returns resources at a specific revision                            | 1A2B3C4D                                                            |
+| `maxpagesize`                                                       | *Optional[int]*                                                     | :heavy_minus_sign:                                                  | The maximum number of results to retrieve                           |                                                                     |
+| `next`                                                              | *Optional[str]*                                                     | :heavy_minus_sign:                                                  | Pagination cursor for next set of results.                          | JTI0bGltaXQ9MTAwJiUyNG9mZnNldD0xMDA                                 |
+| `revision`                                                          | *Optional[str]*                                                     | :heavy_minus_sign:                                                  | Returns resources at a specific revision                            | 1A2B3C4D                                                            |
 | `retries`                                                           | [Optional[utils.RetryConfig]](../../models/utils/retryconfig.md)    | :heavy_minus_sign:                                                  | Configuration to override the default retry behavior of the client. |                                                                     |
 
 ### Response
@@ -787,7 +787,7 @@ with SDK(
     ),
 ) as sdk:
 
-    res = sdk.content.get_rich_text_paragraphs(rich_text_id="<id>", dollar_maxpagesize=1000, dollar_next="JTI0bGltaXQ9MTAwJiUyNG9mZnNldD0xMDA", dollar_revision="1A2B3C4D")
+    res = sdk.content.get_rich_text_paragraphs(rich_text_id="<id>", maxpagesize=1000, next="JTI0bGltaXQ9MTAwJiUyNG9mZnNldD0xMDA", revision="1A2B3C4D")
 
     while res is not None:
         # Handle items
@@ -801,9 +801,9 @@ with SDK(
 | Parameter                                                           | Type                                                                | Required                                                            | Description                                                         | Example                                                             |
 | ------------------------------------------------------------------- | ------------------------------------------------------------------- | ------------------------------------------------------------------- | ------------------------------------------------------------------- | ------------------------------------------------------------------- |
 | `rich_text_id`                                                      | *str*                                                               | :heavy_check_mark:                                                  | The unique identifier of the rich text content                      |                                                                     |
-| `dollar_maxpagesize`                                                | *Optional[int]*                                                     | :heavy_minus_sign:                                                  | The maximum number of results to retrieve                           |                                                                     |
-| `dollar_next`                                                       | *Optional[str]*                                                     | :heavy_minus_sign:                                                  | Pagination cursor for next set of results.                          | JTI0bGltaXQ9MTAwJiUyNG9mZnNldD0xMDA                                 |
-| `dollar_revision`                                                   | *Optional[str]*                                                     | :heavy_minus_sign:                                                  | Returns resources at a specific revision                            | 1A2B3C4D                                                            |
+| `maxpagesize`                                                       | *Optional[int]*                                                     | :heavy_minus_sign:                                                  | The maximum number of results to retrieve                           |                                                                     |
+| `next`                                                              | *Optional[str]*                                                     | :heavy_minus_sign:                                                  | Pagination cursor for next set of results.                          | JTI0bGltaXQ9MTAwJiUyNG9mZnNldD0xMDA                                 |
+| `revision`                                                          | *Optional[str]*                                                     | :heavy_minus_sign:                                                  | Returns resources at a specific revision                            | 1A2B3C4D                                                            |
 | `retries`                                                           | [Optional[utils.RetryConfig]](../../models/utils/retryconfig.md)    | :heavy_minus_sign:                                                  | Configuration to override the default retry behavior of the client. |                                                                     |
 
 ### Response
@@ -838,8 +838,8 @@ with SDK(
 ) as sdk:
 
     res = sdk.content.get_row_properties(request={
-        "dollar_next": "JTI0bGltaXQ9MTAwJiUyNG9mZnNldD0xMDA",
-        "dollar_revision": "1A2B3C4D",
+        "next": "JTI0bGltaXQ9MTAwJiUyNG9mZnNldD0xMDA",
+        "revision": "1A2B3C4D",
         "start_row": 1,
         "stop_row": 1,
         "table_id": "WW91IGZvdW5kfIG1lIQ",
@@ -890,7 +890,7 @@ with SDK(
     ),
 ) as sdk:
 
-    res = sdk.content.get_style_guide_by_id(style_guide_id="WW91IGZvdW5kIG1lIQ", dollar_revision="1A2B3C4D")
+    res = sdk.content.get_style_guide_by_id(style_guide_id="WW91IGZvdW5kIG1lIQ", revision="1A2B3C4D")
 
     # Handle response
     print(res)
@@ -902,7 +902,7 @@ with SDK(
 | Parameter                                                           | Type                                                                | Required                                                            | Description                                                         | Example                                                             |
 | ------------------------------------------------------------------- | ------------------------------------------------------------------- | ------------------------------------------------------------------- | ------------------------------------------------------------------- | ------------------------------------------------------------------- |
 | `style_guide_id`                                                    | *str*                                                               | :heavy_check_mark:                                                  | The unique identifier of the style guide                            | WW91IGZvdW5kIG1lIQ                                                  |
-| `dollar_revision`                                                   | *Optional[str]*                                                     | :heavy_minus_sign:                                                  | Returns resources at a specific revision                            | 1A2B3C4D                                                            |
+| `revision`                                                          | *Optional[str]*                                                     | :heavy_minus_sign:                                                  | Returns resources at a specific revision                            | 1A2B3C4D                                                            |
 | `retries`                                                           | [Optional[utils.RetryConfig]](../../models/utils/retryconfig.md)    | :heavy_minus_sign:                                                  | Configuration to override the default retry behavior of the client. |                                                                     |
 
 ### Response
@@ -935,7 +935,7 @@ with SDK(
     ),
 ) as sdk:
 
-    res = sdk.content.get_table_anchor_by_id(anchor_id="<id>", table_id="WW91IGZvdW5kfIG1lIQ", dollar_revision="1A2B3C4D")
+    res = sdk.content.get_table_anchor_by_id(anchor_id="<id>", table_id="WW91IGZvdW5kfIG1lIQ", revision="1A2B3C4D")
 
     # Handle response
     print(res)
@@ -948,7 +948,7 @@ with SDK(
 | ------------------------------------------------------------------- | ------------------------------------------------------------------- | ------------------------------------------------------------------- | ------------------------------------------------------------------- | ------------------------------------------------------------------- |
 | `anchor_id`                                                         | *str*                                                               | :heavy_check_mark:                                                  | The unique identifier of the anchor                                 |                                                                     |
 | `table_id`                                                          | *str*                                                               | :heavy_check_mark:                                                  | The unique identifier for the table                                 | WW91IGZvdW5kfIG1lIQ                                                 |
-| `dollar_revision`                                                   | *Optional[str]*                                                     | :heavy_minus_sign:                                                  | Returns resources at a specific revision                            | 1A2B3C4D                                                            |
+| `revision`                                                          | *Optional[str]*                                                     | :heavy_minus_sign:                                                  | Returns resources at a specific revision                            | 1A2B3C4D                                                            |
 | `retries`                                                           | [Optional[utils.RetryConfig]](../../models/utils/retryconfig.md)    | :heavy_minus_sign:                                                  | Configuration to override the default retry behavior of the client. |                                                                     |
 
 ### Response
@@ -982,9 +982,9 @@ with SDK(
 ) as sdk:
 
     res = sdk.content.get_table_anchor_extensions(request={
-        "dollar_next": "JTI0bGltaXQ9MTAwJiUyNG9mZnNldD0xMDA",
-        "dollar_revision": "1A2B3C4D",
         "anchor_id": "<id>",
+        "next": "JTI0bGltaXQ9MTAwJiUyNG9mZnNldD0xMDA",
+        "revision": "1A2B3C4D",
         "table_id": "WW91IGZvdW5kfIG1lIQ",
     })
 
@@ -1032,7 +1032,7 @@ with SDK(
     ),
 ) as sdk:
 
-    res = sdk.content.get_table_anchors(table_id="WW91IGZvdW5kfIG1lIQ", dollar_maxpagesize=1000, dollar_next="JTI0bGltaXQ9MTAwJiUyNG9mZnNldD0xMDA", dollar_revision="1A2B3C4D")
+    res = sdk.content.get_table_anchors(table_id="WW91IGZvdW5kfIG1lIQ", maxpagesize=1000, next="JTI0bGltaXQ9MTAwJiUyNG9mZnNldD0xMDA", revision="1A2B3C4D")
 
     while res is not None:
         # Handle items
@@ -1046,9 +1046,9 @@ with SDK(
 | Parameter                                                           | Type                                                                | Required                                                            | Description                                                         | Example                                                             |
 | ------------------------------------------------------------------- | ------------------------------------------------------------------- | ------------------------------------------------------------------- | ------------------------------------------------------------------- | ------------------------------------------------------------------- |
 | `table_id`                                                          | *str*                                                               | :heavy_check_mark:                                                  | The unique identifier for the table                                 | WW91IGZvdW5kfIG1lIQ                                                 |
-| `dollar_maxpagesize`                                                | *Optional[int]*                                                     | :heavy_minus_sign:                                                  | The maximum number of results to retrieve                           |                                                                     |
-| `dollar_next`                                                       | *Optional[str]*                                                     | :heavy_minus_sign:                                                  | Pagination cursor for next set of results.                          | JTI0bGltaXQ9MTAwJiUyNG9mZnNldD0xMDA                                 |
-| `dollar_revision`                                                   | *Optional[str]*                                                     | :heavy_minus_sign:                                                  | Returns resources at a specific revision                            | 1A2B3C4D                                                            |
+| `maxpagesize`                                                       | *Optional[int]*                                                     | :heavy_minus_sign:                                                  | The maximum number of results to retrieve                           |                                                                     |
+| `next`                                                              | *Optional[str]*                                                     | :heavy_minus_sign:                                                  | Pagination cursor for next set of results.                          | JTI0bGltaXQ9MTAwJiUyNG9mZnNldD0xMDA                                 |
+| `revision`                                                          | *Optional[str]*                                                     | :heavy_minus_sign:                                                  | Returns resources at a specific revision                            | 1A2B3C4D                                                            |
 | `retries`                                                           | [Optional[utils.RetryConfig]](../../models/utils/retryconfig.md)    | :heavy_minus_sign:                                                  | Configuration to override the default retry behavior of the client. |                                                                     |
 
 ### Response
@@ -1082,8 +1082,8 @@ with SDK(
 ) as sdk:
 
     res = sdk.content.get_table_cells(request={
-        "dollar_next": "JTI0bGltaXQ9MTAwJiUyNG9mZnNldD0xMDA",
-        "dollar_revision": "1A2B3C4D",
+        "next": "JTI0bGltaXQ9MTAwJiUyNG9mZnNldD0xMDA",
+        "revision": "1A2B3C4D",
         "start_column": 1,
         "start_row": 1,
         "stop_column": 1,
@@ -1136,7 +1136,7 @@ with SDK(
     ),
 ) as sdk:
 
-    res = sdk.content.get_table_properties(table_id="WW91IGZvdW5kfIG1lIQ", dollar_revision="1A2B3C4D")
+    res = sdk.content.get_table_properties(table_id="WW91IGZvdW5kfIG1lIQ", revision="1A2B3C4D")
 
     # Handle response
     print(res)
@@ -1148,7 +1148,7 @@ with SDK(
 | Parameter                                                           | Type                                                                | Required                                                            | Description                                                         | Example                                                             |
 | ------------------------------------------------------------------- | ------------------------------------------------------------------- | ------------------------------------------------------------------- | ------------------------------------------------------------------- | ------------------------------------------------------------------- |
 | `table_id`                                                          | *str*                                                               | :heavy_check_mark:                                                  | The unique identifier for the table                                 | WW91IGZvdW5kfIG1lIQ                                                 |
-| `dollar_revision`                                                   | *Optional[str]*                                                     | :heavy_minus_sign:                                                  | Returns resources at a specific revision                            | 1A2B3C4D                                                            |
+| `revision`                                                          | *Optional[str]*                                                     | :heavy_minus_sign:                                                  | Returns resources at a specific revision                            | 1A2B3C4D                                                            |
 | `retries`                                                           | [Optional[utils.RetryConfig]](../../models/utils/retryconfig.md)    | :heavy_minus_sign:                                                  | Configuration to override the default retry behavior of the client. |                                                                     |
 
 ### Response

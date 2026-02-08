@@ -1170,9 +1170,9 @@ class Files(BaseSDK):
         self,
         *,
         file_id: str,
-        dollar_filter: Optional[str] = None,
-        dollar_maxpagesize: Optional[int] = 1000,
-        dollar_next: Optional[str] = None,
+        filter_: Optional[str] = None,
+        maxpagesize: Optional[int] = 1000,
+        next: Optional[str] = None,
         retries: OptionalNullable[utils.RetryConfig] = UNSET,
         server_url: Optional[str] = None,
         timeout_ms: Optional[int] = None,
@@ -1184,9 +1184,9 @@ class Files(BaseSDK):
 
 
         :param file_id: The unique identifier of the file
-        :param dollar_filter: The properties to filter the results by.
-        :param dollar_maxpagesize: The maximum number of results to retrieve
-        :param dollar_next: Pagination cursor for next set of results.
+        :param filter_: The properties to filter the results by.
+        :param maxpagesize: The maximum number of results to retrieve
+        :param next: Pagination cursor for next set of results.
         :param retries: Override the default retry configuration for this method
         :param server_url: Override the default server URL for this method
         :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
@@ -1203,10 +1203,10 @@ class Files(BaseSDK):
             base_url = self._get_url(base_url, url_variables)
 
         request = models.GetFilePermissionsRequest(
-            dollar_filter=dollar_filter,
-            dollar_maxpagesize=dollar_maxpagesize,
-            dollar_next=dollar_next,
             file_id=file_id,
+            filter_=filter_,
+            maxpagesize=maxpagesize,
+            next=next,
         )
 
         req = self._build_request(
@@ -1272,9 +1272,9 @@ class Files(BaseSDK):
 
             return self.get_file_permissions(
                 file_id=file_id,
-                dollar_filter=dollar_filter,
-                dollar_maxpagesize=dollar_maxpagesize,
-                dollar_next=next_cursor,
+                filter_=filter_,
+                maxpagesize=maxpagesize,
+                next=next,
                 retries=retries,
             )
 
@@ -1307,9 +1307,9 @@ class Files(BaseSDK):
         self,
         *,
         file_id: str,
-        dollar_filter: Optional[str] = None,
-        dollar_maxpagesize: Optional[int] = 1000,
-        dollar_next: Optional[str] = None,
+        filter_: Optional[str] = None,
+        maxpagesize: Optional[int] = 1000,
+        next: Optional[str] = None,
         retries: OptionalNullable[utils.RetryConfig] = UNSET,
         server_url: Optional[str] = None,
         timeout_ms: Optional[int] = None,
@@ -1321,9 +1321,9 @@ class Files(BaseSDK):
 
 
         :param file_id: The unique identifier of the file
-        :param dollar_filter: The properties to filter the results by.
-        :param dollar_maxpagesize: The maximum number of results to retrieve
-        :param dollar_next: Pagination cursor for next set of results.
+        :param filter_: The properties to filter the results by.
+        :param maxpagesize: The maximum number of results to retrieve
+        :param next: Pagination cursor for next set of results.
         :param retries: Override the default retry configuration for this method
         :param server_url: Override the default server URL for this method
         :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
@@ -1340,10 +1340,10 @@ class Files(BaseSDK):
             base_url = self._get_url(base_url, url_variables)
 
         request = models.GetFilePermissionsRequest(
-            dollar_filter=dollar_filter,
-            dollar_maxpagesize=dollar_maxpagesize,
-            dollar_next=dollar_next,
             file_id=file_id,
+            filter_=filter_,
+            maxpagesize=maxpagesize,
+            next=next,
         )
 
         req = self._build_request_async(
@@ -1412,9 +1412,9 @@ class Files(BaseSDK):
 
             return self.get_file_permissions_async(
                 file_id=file_id,
-                dollar_filter=dollar_filter,
-                dollar_maxpagesize=dollar_maxpagesize,
-                dollar_next=next_cursor,
+                filter_=filter_,
+                maxpagesize=maxpagesize,
+                next=next,
                 retries=retries,
             )
 
@@ -1446,10 +1446,10 @@ class Files(BaseSDK):
     def get_files(
         self,
         *,
-        dollar_filter: Optional[str] = None,
-        dollar_maxpagesize: Optional[int] = 1000,
-        dollar_next: Optional[str] = None,
-        dollar_order_by: Optional[str] = None,
+        filter_: Optional[str] = None,
+        maxpagesize: Optional[int] = 1000,
+        next: Optional[str] = None,
+        order_by: Optional[str] = None,
         retries: OptionalNullable[utils.RetryConfig] = UNSET,
         server_url: Optional[str] = None,
         timeout_ms: Optional[int] = None,
@@ -1459,10 +1459,10 @@ class Files(BaseSDK):
 
         Returns a paginated list of [files](ref:files#file).
 
-        :param dollar_filter: The properties to filter the results by.
-        :param dollar_maxpagesize: The maximum number of results to retrieve
-        :param dollar_next: Pagination cursor for next set of results.
-        :param dollar_order_by: One or more comma-separated expressions to indicate the order in which to sort the results.
+        :param filter_: The properties to filter the results by.
+        :param maxpagesize: The maximum number of results to retrieve
+        :param next: Pagination cursor for next set of results.
+        :param order_by: One or more comma-separated expressions to indicate the order in which to sort the results.
         :param retries: Override the default retry configuration for this method
         :param server_url: Override the default server URL for this method
         :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
@@ -1479,10 +1479,10 @@ class Files(BaseSDK):
             base_url = self._get_url(base_url, url_variables)
 
         request = models.GetFilesRequest(
-            dollar_filter=dollar_filter,
-            dollar_maxpagesize=dollar_maxpagesize,
-            dollar_next=dollar_next,
-            dollar_order_by=dollar_order_by,
+            filter_=filter_,
+            maxpagesize=maxpagesize,
+            next=next,
+            order_by=order_by,
         )
 
         req = self._build_request(
@@ -1547,10 +1547,10 @@ class Files(BaseSDK):
                 return None
 
             return self.get_files(
-                dollar_filter=dollar_filter,
-                dollar_maxpagesize=dollar_maxpagesize,
-                dollar_next=next_cursor,
-                dollar_order_by=dollar_order_by,
+                filter_=filter_,
+                maxpagesize=maxpagesize,
+                next=next,
+                order_by=order_by,
                 retries=retries,
             )
 
@@ -1580,10 +1580,10 @@ class Files(BaseSDK):
     async def get_files_async(
         self,
         *,
-        dollar_filter: Optional[str] = None,
-        dollar_maxpagesize: Optional[int] = 1000,
-        dollar_next: Optional[str] = None,
-        dollar_order_by: Optional[str] = None,
+        filter_: Optional[str] = None,
+        maxpagesize: Optional[int] = 1000,
+        next: Optional[str] = None,
+        order_by: Optional[str] = None,
         retries: OptionalNullable[utils.RetryConfig] = UNSET,
         server_url: Optional[str] = None,
         timeout_ms: Optional[int] = None,
@@ -1593,10 +1593,10 @@ class Files(BaseSDK):
 
         Returns a paginated list of [files](ref:files#file).
 
-        :param dollar_filter: The properties to filter the results by.
-        :param dollar_maxpagesize: The maximum number of results to retrieve
-        :param dollar_next: Pagination cursor for next set of results.
-        :param dollar_order_by: One or more comma-separated expressions to indicate the order in which to sort the results.
+        :param filter_: The properties to filter the results by.
+        :param maxpagesize: The maximum number of results to retrieve
+        :param next: Pagination cursor for next set of results.
+        :param order_by: One or more comma-separated expressions to indicate the order in which to sort the results.
         :param retries: Override the default retry configuration for this method
         :param server_url: Override the default server URL for this method
         :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
@@ -1613,10 +1613,10 @@ class Files(BaseSDK):
             base_url = self._get_url(base_url, url_variables)
 
         request = models.GetFilesRequest(
-            dollar_filter=dollar_filter,
-            dollar_maxpagesize=dollar_maxpagesize,
-            dollar_next=dollar_next,
-            dollar_order_by=dollar_order_by,
+            filter_=filter_,
+            maxpagesize=maxpagesize,
+            next=next,
+            order_by=order_by,
         )
 
         req = self._build_request_async(
@@ -1684,10 +1684,10 @@ class Files(BaseSDK):
                 return empty_result()
 
             return self.get_files_async(
-                dollar_filter=dollar_filter,
-                dollar_maxpagesize=dollar_maxpagesize,
-                dollar_next=next_cursor,
-                dollar_order_by=dollar_order_by,
+                filter_=filter_,
+                maxpagesize=maxpagesize,
+                next=next,
+                order_by=order_by,
                 retries=retries,
             )
 
@@ -1717,8 +1717,8 @@ class Files(BaseSDK):
     def get_trashed_files(
         self,
         *,
-        dollar_maxpagesize: Optional[int] = 1000,
-        dollar_next: Optional[str] = None,
+        maxpagesize: Optional[int] = 1000,
+        next: Optional[str] = None,
         retries: OptionalNullable[utils.RetryConfig] = UNSET,
         server_url: Optional[str] = None,
         timeout_ms: Optional[int] = None,
@@ -1728,8 +1728,8 @@ class Files(BaseSDK):
 
         Returns a paginated list of files that have been trashed.
 
-        :param dollar_maxpagesize: The maximum number of results to retrieve
-        :param dollar_next: Pagination cursor for next set of results.
+        :param maxpagesize: The maximum number of results to retrieve
+        :param next: Pagination cursor for next set of results.
         :param retries: Override the default retry configuration for this method
         :param server_url: Override the default server URL for this method
         :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
@@ -1746,8 +1746,8 @@ class Files(BaseSDK):
             base_url = self._get_url(base_url, url_variables)
 
         request = models.GetTrashedFilesRequest(
-            dollar_maxpagesize=dollar_maxpagesize,
-            dollar_next=dollar_next,
+            maxpagesize=maxpagesize,
+            next=next,
         )
 
         req = self._build_request(
@@ -1812,8 +1812,8 @@ class Files(BaseSDK):
                 return None
 
             return self.get_trashed_files(
-                dollar_maxpagesize=dollar_maxpagesize,
-                dollar_next=next_cursor,
+                maxpagesize=maxpagesize,
+                next=next,
                 retries=retries,
             )
 
@@ -1843,8 +1843,8 @@ class Files(BaseSDK):
     async def get_trashed_files_async(
         self,
         *,
-        dollar_maxpagesize: Optional[int] = 1000,
-        dollar_next: Optional[str] = None,
+        maxpagesize: Optional[int] = 1000,
+        next: Optional[str] = None,
         retries: OptionalNullable[utils.RetryConfig] = UNSET,
         server_url: Optional[str] = None,
         timeout_ms: Optional[int] = None,
@@ -1854,8 +1854,8 @@ class Files(BaseSDK):
 
         Returns a paginated list of files that have been trashed.
 
-        :param dollar_maxpagesize: The maximum number of results to retrieve
-        :param dollar_next: Pagination cursor for next set of results.
+        :param maxpagesize: The maximum number of results to retrieve
+        :param next: Pagination cursor for next set of results.
         :param retries: Override the default retry configuration for this method
         :param server_url: Override the default server URL for this method
         :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
@@ -1872,8 +1872,8 @@ class Files(BaseSDK):
             base_url = self._get_url(base_url, url_variables)
 
         request = models.GetTrashedFilesRequest(
-            dollar_maxpagesize=dollar_maxpagesize,
-            dollar_next=dollar_next,
+            maxpagesize=maxpagesize,
+            next=next,
         )
 
         req = self._build_request_async(
@@ -1941,8 +1941,8 @@ class Files(BaseSDK):
                 return empty_result()
 
             return self.get_trashed_files_async(
-                dollar_maxpagesize=dollar_maxpagesize,
-                dollar_next=next_cursor,
+                maxpagesize=maxpagesize,
+                next=next,
                 retries=retries,
             )
 

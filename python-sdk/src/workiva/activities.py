@@ -231,9 +231,9 @@ class Activities(BaseSDK):
     def get_activity_actions(
         self,
         *,
-        dollar_maxpagesize: Optional[int] = 1000,
-        dollar_next: Optional[str] = None,
-        dollar_order_by: Optional[str] = None,
+        maxpagesize: Optional[int] = 1000,
+        next: Optional[str] = None,
+        order_by: Optional[str] = None,
         retries: OptionalNullable[utils.RetryConfig] = UNSET,
         server_url: Optional[str] = None,
         timeout_ms: Optional[int] = None,
@@ -249,9 +249,9 @@ class Activities(BaseSDK):
         :::
 
 
-        :param dollar_maxpagesize: The maximum number of results to retrieve
-        :param dollar_next: Pagination cursor for next set of results.
-        :param dollar_order_by: One or more comma-separated expressions to indicate the order in which to sort the results.
+        :param maxpagesize: The maximum number of results to retrieve
+        :param next: Pagination cursor for next set of results.
+        :param order_by: One or more comma-separated expressions to indicate the order in which to sort the results.
         :param retries: Override the default retry configuration for this method
         :param server_url: Override the default server URL for this method
         :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
@@ -268,9 +268,9 @@ class Activities(BaseSDK):
             base_url = self._get_url(base_url, url_variables)
 
         request = models.GetActivityActionsRequest(
-            dollar_maxpagesize=dollar_maxpagesize,
-            dollar_next=dollar_next,
-            dollar_order_by=dollar_order_by,
+            maxpagesize=maxpagesize,
+            next=next,
+            order_by=order_by,
         )
 
         req = self._build_request(
@@ -335,9 +335,9 @@ class Activities(BaseSDK):
                 return None
 
             return self.get_activity_actions(
-                dollar_maxpagesize=dollar_maxpagesize,
-                dollar_next=next_cursor,
-                dollar_order_by=dollar_order_by,
+                maxpagesize=maxpagesize,
+                next=next,
+                order_by=order_by,
                 retries=retries,
             )
 
@@ -369,9 +369,9 @@ class Activities(BaseSDK):
     async def get_activity_actions_async(
         self,
         *,
-        dollar_maxpagesize: Optional[int] = 1000,
-        dollar_next: Optional[str] = None,
-        dollar_order_by: Optional[str] = None,
+        maxpagesize: Optional[int] = 1000,
+        next: Optional[str] = None,
+        order_by: Optional[str] = None,
         retries: OptionalNullable[utils.RetryConfig] = UNSET,
         server_url: Optional[str] = None,
         timeout_ms: Optional[int] = None,
@@ -387,9 +387,9 @@ class Activities(BaseSDK):
         :::
 
 
-        :param dollar_maxpagesize: The maximum number of results to retrieve
-        :param dollar_next: Pagination cursor for next set of results.
-        :param dollar_order_by: One or more comma-separated expressions to indicate the order in which to sort the results.
+        :param maxpagesize: The maximum number of results to retrieve
+        :param next: Pagination cursor for next set of results.
+        :param order_by: One or more comma-separated expressions to indicate the order in which to sort the results.
         :param retries: Override the default retry configuration for this method
         :param server_url: Override the default server URL for this method
         :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
@@ -406,9 +406,9 @@ class Activities(BaseSDK):
             base_url = self._get_url(base_url, url_variables)
 
         request = models.GetActivityActionsRequest(
-            dollar_maxpagesize=dollar_maxpagesize,
-            dollar_next=dollar_next,
-            dollar_order_by=dollar_order_by,
+            maxpagesize=maxpagesize,
+            next=next,
+            order_by=order_by,
         )
 
         req = self._build_request_async(
@@ -476,9 +476,9 @@ class Activities(BaseSDK):
                 return empty_result()
 
             return self.get_activity_actions_async(
-                dollar_maxpagesize=dollar_maxpagesize,
-                dollar_next=next_cursor,
-                dollar_order_by=dollar_order_by,
+                maxpagesize=maxpagesize,
+                next=next,
+                order_by=order_by,
                 retries=retries,
             )
 
@@ -829,10 +829,10 @@ class Activities(BaseSDK):
             return self.get_organization_activities(
                 request=models.GetOrganizationActivitiesRequest(
                     organization_id=request.organization_id,
-                    dollar_filter=request.dollar_filter,
-                    dollar_maxpagesize=request.dollar_maxpagesize,
-                    dollar_next=next_cursor,
-                    dollar_order_by=request.dollar_order_by,
+                    filter_=request.filter_,
+                    maxpagesize=request.maxpagesize,
+                    next=request.next,
+                    order_by=request.order_by,
                 ),
                 retries=retries,
             )
@@ -971,10 +971,10 @@ class Activities(BaseSDK):
             return self.get_organization_activities_async(
                 request=models.GetOrganizationActivitiesRequest(
                     organization_id=request.organization_id,
-                    dollar_filter=request.dollar_filter,
-                    dollar_maxpagesize=request.dollar_maxpagesize,
-                    dollar_next=next_cursor,
-                    dollar_order_by=request.dollar_order_by,
+                    filter_=request.filter_,
+                    maxpagesize=request.maxpagesize,
+                    next=request.next,
+                    order_by=request.order_by,
                 ),
                 retries=retries,
             )
@@ -1111,10 +1111,10 @@ class Activities(BaseSDK):
                 request=models.GetOrganizationWorkspaceActivitiesRequest(
                     organization_id=request.organization_id,
                     workspace_id=request.workspace_id,
-                    dollar_filter=request.dollar_filter,
-                    dollar_maxpagesize=request.dollar_maxpagesize,
-                    dollar_next=next_cursor,
-                    dollar_order_by=request.dollar_order_by,
+                    filter_=request.filter_,
+                    maxpagesize=request.maxpagesize,
+                    next=request.next,
+                    order_by=request.order_by,
                 ),
                 retries=retries,
             )
@@ -1256,10 +1256,10 @@ class Activities(BaseSDK):
                 request=models.GetOrganizationWorkspaceActivitiesRequest(
                     organization_id=request.organization_id,
                     workspace_id=request.workspace_id,
-                    dollar_filter=request.dollar_filter,
-                    dollar_maxpagesize=request.dollar_maxpagesize,
-                    dollar_next=next_cursor,
-                    dollar_order_by=request.dollar_order_by,
+                    filter_=request.filter_,
+                    maxpagesize=request.maxpagesize,
+                    next=request.next,
+                    order_by=request.order_by,
                 ),
                 retries=retries,
             )

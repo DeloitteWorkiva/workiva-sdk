@@ -18,11 +18,11 @@ class GetValuesByRangeRequestTypedDict(TypedDict):
     r"""The unique identifier of the sheet"""
     spreadsheet_id: str
     r"""The unique identifier of the spreadsheet"""
-    dollar_maxcellsperpage: NotRequired[int]
+    maxcellsperpage: NotRequired[int]
     r"""The maximum number of cells to retrieve. The default is 50000. The maximum allowed value is 50000."""
-    dollar_next: NotRequired[str]
+    next: NotRequired[str]
     r"""Pagination cursor for next set of results."""
-    dollar_valuestyle: NotRequired[ValueStyle]
+    valuestyle: NotRequired[ValueStyle]
     r"""Whether to retrieve `raw` or `calculated` cell values. For example, if a cell's value is `=1+1`, `raw` retrieves the value `=1+1`, while `calculated` retrieves `2`."""
 
 
@@ -47,21 +47,21 @@ class GetValuesByRangeRequest(BaseModel):
     ]
     r"""The unique identifier of the spreadsheet"""
 
-    dollar_maxcellsperpage: Annotated[
+    maxcellsperpage: Annotated[
         Optional[int],
         pydantic.Field(alias="$maxcellsperpage"),
         FieldMetadata(query=QueryParamMetadata(style="form", explode=True)),
     ] = 50000
     r"""The maximum number of cells to retrieve. The default is 50000. The maximum allowed value is 50000."""
 
-    dollar_next: Annotated[
+    next: Annotated[
         Optional[str],
         pydantic.Field(alias="$next"),
         FieldMetadata(query=QueryParamMetadata(style="form", explode=True)),
     ] = None
     r"""Pagination cursor for next set of results."""
 
-    dollar_valuestyle: Annotated[
+    valuestyle: Annotated[
         Optional[ValueStyle],
         pydantic.Field(alias="$valuestyle"),
         FieldMetadata(query=QueryParamMetadata(style="form", explode=True)),
@@ -70,7 +70,7 @@ class GetValuesByRangeRequest(BaseModel):
 
     @model_serializer(mode="wrap")
     def serialize_model(self, handler):
-        optional_fields = set(["$maxcellsperpage", "$next", "$valuestyle"])
+        optional_fields = set(["maxcellsperpage", "next", "valuestyle"])
         nullable_fields = set(["range"])
         serialized = handler(self)
         m = {}
