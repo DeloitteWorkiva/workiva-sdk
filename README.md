@@ -19,6 +19,10 @@
 ## Instalación
 
 ```bash
+uv add workiva
+```
+
+```bash
 pip install workiva
 ```
 
