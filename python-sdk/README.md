@@ -40,7 +40,7 @@ with Workiva(client_id="...", client_secret="...") as client:
 - **Operaciones de larga duración** — `client.wait(response).result(timeout=300)`
 - **Paginación transparente** — `while response.next is not None: response = response.next()`
 - **Sync + Async** — Cada método tiene su variante `_async`
-- **Multi-región** — US, EU, APAC con `server_idx=0|1|2`
+- **Multi-región** — EU (default), US, APAC con `server_idx=0|1|2`
 - **Reintentos con backoff** — `RetryConfig` global o per-operation
 - **Tipado completo** — Modelos Pydantic
 

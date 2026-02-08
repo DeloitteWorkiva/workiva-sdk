@@ -3,10 +3,10 @@
 import importlib.metadata
 
 __title__: str = "workiva"
-__version__: str = "0.4.0"
+__version__: str = "0.4.7"
 __openapi_doc_version__: str = "1.2734.0"
 __gen_version__: str = "2.803.3"
-__user_agent__: str = "speakeasy-sdk/python 0.4.0 2.803.3 1.2734.0 workiva"
+__user_agent__: str = "speakeasy-sdk/python 0.4.7 2.803.3 1.2734.0 workiva"
 
 try:
     if __package__ is not None:

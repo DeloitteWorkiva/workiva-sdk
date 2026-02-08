@@ -16,10 +16,10 @@ from workiva.types import OptionalNullable, UNSET
 
 
 SERVERS = [
-    "https://api.app.wdesk.com",
-    # US
     "https://api.eu.wdesk.com",
     # EU
+    "https://api.app.wdesk.com",
+    # US
     "https://api.apac.wdesk.com",
     # APAC
 ]

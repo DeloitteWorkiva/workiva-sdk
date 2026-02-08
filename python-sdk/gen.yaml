@@ -27,15 +27,15 @@ generation:
 generate:
   version: ""
 python:
-  version: 0.4.7
+  version: 0.4.8
   additionalDependencies:
     dev:
-      pytest: ">=8.0"
-      pytest-asyncio: ">=0.24"
-      pytest-cov: ">=6.0"
-      respx: ">=0.22"
+      pytest: '>=8.0'
+      pytest-asyncio: '>=0.24'
+      pytest-cov: '>=6.0'
+      respx: '>=0.22'
     main:
-      typing-extensions: ">=4.11"
+      typing-extensions: '>=4.11'
   allowedRedefinedBuiltins:
     - id
     - object
