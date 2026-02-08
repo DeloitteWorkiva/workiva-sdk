@@ -1,0 +1,94 @@
+name: Check for OAS updates
+
+on:
+  schedule:
+    # Every Monday at 08:00 UTC
+    - cron: "0 8 * * 1"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  check-and-update:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: astral-sh/setup-uv@v4
+        with:
+          version: "latest"
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install Speakeasy CLI
+        uses: speakeasy-api/speakeasy-action/setup@v1
+        with:
+          version: latest
+
+      - name: Install SDK dependencies
+        run: cd python-sdk && uv sync
+
+      - name: Download latest specs
+        run: make download
+
+      - name: Check for changes
+        id: check
+        run: |
+          current=$(sha256sum platform.yaml chains.yaml wdata.yaml 2>/dev/null | sort | sha256sum | cut -d' ' -f1)
+          previous=$(cat .spec_checksums 2>/dev/null || echo "none")
+          if [ "$current" = "$previous" ]; then
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+            echo "✓ No changes detected"
+          else
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+            echo "⚠ Specs have changed — regeneration needed"
+          fi
+
+      - name: Regenerate SDK
+        if: steps.check.outputs.changed == 'true'
+        run: make prepare merge generate
+
+      - name: Run tests
+        if: steps.check.outputs.changed == 'true'
+        run: make test
+
+      - name: Get spec versions
+        if: steps.check.outputs.changed == 'true'
+        id: versions
+        run: |
+          platform_ver=$(grep -m1 'version:' platform.yaml | awk '{print $2}' | tr -d "'\"")
+          chains_ver=$(grep -m1 'version:' chains.yaml | awk '{print $2}' | tr -d "'\"")
+          wdata_ver=$(grep -m1 'version:' wdata.yaml | awk '{print $2}' | tr -d "'\"")
+          echo "summary=Platform ${platform_ver}, Chains ${chains_ver}, Wdata ${wdata_ver}" >> "$GITHUB_OUTPUT"
+
+      - name: Create Pull Request
+        if: steps.check.outputs.changed == 'true'
+        uses: peter-evans/create-pull-request@v7
+        with:
+          branch: chore/update-oas-specs
+          delete-branch: true
+          title: "chore: update OpenAPI specs"
+          body: |
+            ## OAS Update
+
+            Automated detection of updated OpenAPI specs from developers.workiva.com.
+
+            **Spec versions:** ${{ steps.versions.outputs.summary }}
+
+            ### What changed
+            - Downloaded latest specs via `make download`
+            - Regenerated SDK via `make prepare merge generate`
+            - All tests passing via `make test`
+
+            ### Review checklist
+            - [ ] Review generated diff for breaking changes
+            - [ ] Verify new/removed endpoints
+            - [ ] Check model changes
+          commit-message: "chore: update OpenAPI specs (${{ steps.versions.outputs.summary }})"
+          labels: |
+            automated
+            oas-update
