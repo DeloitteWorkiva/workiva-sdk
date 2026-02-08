@@ -2,8 +2,8 @@
 
 # Workiva SDK
 
-[![PyPI](https://img.shields.io/pypi/v/workiva)](https://pypi.org/project/workiva/)
-[![Python 3.10+](https://img.shields.io/pypi/pyversions/workiva)](https://pypi.org/project/workiva/)
+[![PyPI](https://img.shields.io/pypi/v/workiva?v=0.4.5)](https://pypi.org/project/workiva/)
+[![Python 3.10+](https://img.shields.io/badge/python-3.10%2B-blue)](https://pypi.org/project/workiva/)
 [![Tests](https://img.shields.io/badge/tests-100%25-brightgreen)]()
 [![Coverage](https://img.shields.io/badge/coverage-90%25-brightgreen)]()
 [![Docs](https://img.shields.io/badge/docs-GitHub%20Pages-blue)](https://deloitteworkiva.github.io/workiva-sdk/)
