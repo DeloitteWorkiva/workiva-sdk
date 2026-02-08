@@ -39,7 +39,7 @@ class Security(BaseModel):
         ),
     ] = None
 
-    token_url: Optional[str] = "/iam/v1/oauth2/token"
+    token_url: Optional[str] = "/oauth2/token"
 
     @model_serializer(mode="wrap")
     def serialize_model(self, handler):

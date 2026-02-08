@@ -7,7 +7,8 @@ to files that Speakeasy regenerates on every run:
   1. __init__.py — appends custom re-exports (Workiva, OperationPoller, etc.)
   2. README.md  — removes Speakeasy scaffolding, adds real install instructions
   3. clientcredentials.py — injects X-Version header into token requests
-  4. pyproject.toml — adds license, classifiers, and project URLs
+  4. security.py — updates token_url to /oauth2/token (2026-01-01 API)
+  5. pyproject.toml — adds license, classifiers, and project URLs
 
 Usage:
     python scripts/patch_sdk.py python-sdk
@@ -218,6 +219,31 @@ def patch_clientcredentials(sdk_dir: Path) -> None:
     print("  clientcredentials.py — injected X-Version header into token request")
 
 
+SECURITY_OLD_TOKEN_URL = '/iam/v1/oauth2/token'
+SECURITY_NEW_TOKEN_URL = '/oauth2/token'
+
+
+def patch_security(sdk_dir: Path) -> None:
+    """Update token_url default to 2026-01-01 endpoint (idempotent)."""
+    security_path = sdk_dir / "src" / "workiva" / "models" / "security.py"
+    if not security_path.exists():
+        print(f"  SKIP security.py — not found at {security_path}")
+        return
+
+    content = security_path.read_text()
+    if SECURITY_NEW_TOKEN_URL in content and SECURITY_OLD_TOKEN_URL not in content:
+        print("  security.py — token_url already updated, skipping")
+        return
+
+    if SECURITY_OLD_TOKEN_URL not in content:
+        print("  WARN security.py — old token_url pattern not found, skipping")
+        return
+
+    content = content.replace(SECURITY_OLD_TOKEN_URL, SECURITY_NEW_TOKEN_URL)
+    security_path.write_text(content)
+    print("  security.py — updated token_url to /oauth2/token")
+
+
 def main() -> None:
     if len(sys.argv) < 2:
         print(f"Usage: {sys.argv[0]} <sdk-dir>")
@@ -232,6 +258,7 @@ def main() -> None:
     patch_init(sdk_dir)
     patch_readme(sdk_dir)
     patch_clientcredentials(sdk_dir)
+    patch_security(sdk_dir)
     patch_pyproject(sdk_dir)
     print("Done.")
 

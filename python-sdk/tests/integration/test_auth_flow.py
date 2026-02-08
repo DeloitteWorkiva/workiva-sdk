@@ -18,7 +18,7 @@ class TestAuthFlow:
     """Verify OAuth2 client_credentials lifecycle through mock transport."""
 
     def test_token_request_payload(self):
-        """Token request goes to /iam/v1/oauth2/token with correct payload."""
+        """Token request goes to /oauth2/token with correct payload."""
         captured_requests = []
 
         def handler(request: httpx.Request) -> httpx.Response:
@@ -49,7 +49,7 @@ class TestAuthFlow:
         assert len(token_reqs) >= 1
 
         token_req = token_reqs[0]
-        assert "iam/v1/oauth2/token" in str(token_req.url)
+        assert str(token_req.url).endswith("/oauth2/token")
 
     def test_token_cached_across_calls(self):
         """Second API call should NOT request a new token."""
