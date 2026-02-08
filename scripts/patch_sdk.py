@@ -163,11 +163,22 @@ def patch_pyproject(sdk_dir: Path) -> None:
     content = pyproject_path.read_text()
     original = content
 
-    # Add license if missing
+    # Add license + classifiers if missing
     if 'license = ' not in content and 'requires-python' in content:
         content = content.replace(
             'requires-python',
-            'license = "Apache-2.0"\nrequires-python',
+            'license = {text = "Apache-2.0"}\nrequires-python',
+        )
+    if 'classifiers' not in content and 'dependencies' in content:
+        content = content.replace(
+            'dependencies',
+            'classifiers = [\n'
+            '    "License :: OSI Approved :: Apache Software License",\n'
+            '    "Programming Language :: Python :: 3",\n'
+            '    "Operating System :: OS Independent",\n'
+            ']\n'
+            'dependencies',
+            1,
         )
 
     # Add project URLs if missing (after dependencies, before [tool.poetry])
