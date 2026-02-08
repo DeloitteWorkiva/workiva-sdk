@@ -41,7 +41,7 @@ speakeasy merge \
   -o merged.yaml
 ```
 
-> El orden importa. El ÚLTIMO spec define los servers globales. Platform va último porque queremos US/EU/APAC como servers por defecto.
+> El orden importa. El ÚLTIMO spec define los servers globales. Platform va último porque queremos EU/US/APAC como servers por defecto (EU es el default, index 0).
 
 ### Paso 3: Generación (`speakeasy generate`)
 

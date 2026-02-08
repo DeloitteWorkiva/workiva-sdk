@@ -190,7 +190,12 @@ class ClientCredentialsHook(SDKInitHook, BeforeRequestHook, AfterErrorHook):
         if not bool(urlparse(credentials.token_url).netloc):
             token_url = urljoin(hook_ctx.base_url, credentials.token_url)
         response = self.client.send(
-            self.client.build_request(method="POST", url=token_url, data=payload)
+            self.client.build_request(
+                method="POST",
+                url=token_url,
+                data=payload,
+                headers={"X-Version": "2026-01-01"},
+            )
         )
 
         if response.status_code < 200 or response.status_code >= 300:

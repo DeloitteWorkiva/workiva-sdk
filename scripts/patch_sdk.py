@@ -6,6 +6,8 @@ to files that Speakeasy regenerates on every run:
 
   1. __init__.py — appends custom re-exports (Workiva, OperationPoller, etc.)
   2. README.md  — removes Speakeasy scaffolding, adds real install instructions
+  3. clientcredentials.py — injects X-Version header into token requests
+  4. pyproject.toml — adds license, classifiers, and project URLs
 
 Usage:
     python scripts/patch_sdk.py python-sdk
@@ -70,7 +72,7 @@ with Workiva(client_id="...", client_secret="...") as client:
 - **Operaciones de larga duración** — `client.wait(response).result(timeout=300)`
 - **Paginación transparente** — `while response.next is not None: response = response.next()`
 - **Sync + Async** — Cada método tiene su variante `_async`
-- **Multi-región** — US, EU, APAC con `server_idx=0|1|2`
+- **Multi-región** — EU (default), US, APAC con `server_idx=0|1|2`
 - **Reintentos con backoff** — `RetryConfig` global o per-operation
 - **Tipado completo** — Modelos Pydantic
 
@@ -179,6 +181,43 @@ def patch_pyproject(sdk_dir: Path) -> None:
         print("  pyproject.toml — already patched, skipping")
 
 
+VERSION_HEADER_SENTINEL = '"X-Version"'
+
+# The token request in clientcredentials.py uses self.client.send() directly,
+# bypassing the hook pipeline. We patch it to include the X-Version header
+# required by the 2026-01-01 API endpoint /oauth2/token.
+CC_OLD = 'self.client.build_request(method="POST", url=token_url, data=payload)'
+CC_NEW = (
+    'self.client.build_request(\n'
+    '                method="POST",\n'
+    '                url=token_url,\n'
+    '                data=payload,\n'
+    '                headers={"X-Version": "2026-01-01"},\n'
+    '            )'
+)
+
+
+def patch_clientcredentials(sdk_dir: Path) -> None:
+    """Inject X-Version header into token request (idempotent)."""
+    cc_path = sdk_dir / "src" / "workiva" / "_hooks" / "clientcredentials.py"
+    if not cc_path.exists():
+        print(f"  SKIP clientcredentials.py — not found at {cc_path}")
+        return
+
+    content = cc_path.read_text()
+    if VERSION_HEADER_SENTINEL in content:
+        print("  clientcredentials.py — X-Version header already present, skipping")
+        return
+
+    if CC_OLD not in content:
+        print("  WARN clientcredentials.py — build_request pattern not found, skipping")
+        return
+
+    content = content.replace(CC_OLD, CC_NEW)
+    cc_path.write_text(content)
+    print("  clientcredentials.py — injected X-Version header into token request")
+
+
 def main() -> None:
     if len(sys.argv) < 2:
         print(f"Usage: {sys.argv[0]} <sdk-dir>")
@@ -192,6 +231,7 @@ def main() -> None:
     print(f"Patching SDK in {sdk_dir} ...")
     patch_init(sdk_dir)
     patch_readme(sdk_dir)
+    patch_clientcredentials(sdk_dir)
     patch_pyproject(sdk_dir)
     print("Done.")
 

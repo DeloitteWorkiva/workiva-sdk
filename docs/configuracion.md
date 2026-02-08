@@ -8,17 +8,17 @@ Workiva tiene 3 regiones disponibles:
 
 | Índice | Región | URL |
 |--------|--------|-----|
-| 0 (default) | US | `https://api.app.wdesk.com` |
-| 1 | EU | `https://api.eu.wdesk.com` |
+| 0 (default) | EU | `https://api.eu.wdesk.com` |
+| 1 | US | `https://api.app.wdesk.com` |
 | 2 | APAC | `https://api.apac.wdesk.com` |
 
 ```python
 from workiva import Workiva
 
-# US (por defecto)
+# EU (por defecto)
 client = Workiva(client_id="...", client_secret="...")
 
-# EU
+# US
 client = Workiva(client_id="...", client_secret="...", server_idx=1)
 
 # APAC

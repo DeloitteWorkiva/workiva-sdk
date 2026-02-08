@@ -22,14 +22,14 @@ CHAINS_SCHEMA_RENAMES = {
 }
 
 CHAINS_SERVERS = [
-    {"url": "https://h.app.wdesk.com/s/wdata/oc/api", "description": "US"},
     {"url": "https://h.eu.wdesk.com/s/wdata/oc/api", "description": "EU"},
+    {"url": "https://h.app.wdesk.com/s/wdata/oc/api", "description": "US"},
     {"url": "https://h.apac.wdesk.com/s/wdata/oc/api", "description": "APAC"},
 ]
 
 WDATA_SERVERS = [
-    {"url": "https://h.app.wdesk.com/s/wdata/prep", "description": "US"},
     {"url": "https://h.eu.wdesk.com/s/wdata/prep", "description": "EU"},
+    {"url": "https://h.app.wdesk.com/s/wdata/prep", "description": "US"},
     {"url": "https://h.apac.wdesk.com/s/wdata/prep", "description": "APAC"},
 ]
 
@@ -319,6 +319,19 @@ def remove_security_scheme(spec, scheme_name):
                 ]
 
 
+def update_token_url(spec, old_url, new_url):
+    """Update tokenUrl in securitySchemes to the 2026-01-01 endpoint."""
+    schemes = spec.get("components", {}).get("securitySchemes", {})
+    updated = []
+    for name, scheme in schemes.items():
+        flows = scheme.get("flows", {})
+        for flow_name, flow in flows.items():
+            if flow.get("tokenUrl") == old_url:
+                flow["tokenUrl"] = new_url
+                updated.append(f"{name}.{flow_name}")
+    return updated
+
+
 def process_platform(base_dir):
     input_path = base_dir / "platform.yaml"
     output_path = base_dir / "platform_processed.yaml"
@@ -332,6 +345,17 @@ def process_platform(base_dir):
     # Remove contextless-oauth (subset of oauth, same tokenUrl, same credentials)
     remove_security_scheme(spec, "contextless-oauth")
 
+    # Update tokenUrl to 2026-01-01 endpoint (was /iam/v1/oauth2/token)
+    updated_flows = update_token_url(spec, "/iam/v1/oauth2/token", "/oauth2/token")
+
+    # Reorder global servers: EU first (default), then US, APAC
+    servers = spec.get("servers", [])
+    by_desc = {s.get("description", ""): s for s in servers}
+    if "EU" in by_desc and "US" in by_desc:
+        spec["servers"] = [by_desc["EU"], by_desc["US"]] + [
+            s for s in servers if s.get("description") not in ("EU", "US")
+        ]
+
     # Add pagination extensions (platform has no prefix)
     pag_count = add_pagination_extensions(spec, resolve_platform_pagination)
 
@@ -341,6 +365,7 @@ def process_platform(base_dir):
     print(f"[OK] platform: {input_path} -> {output_path}")
     print(f"     Fixed recursive parent in: {fixed}")
     print(f"     Removed contextless-oauth scheme")
+    print(f"     Updated tokenUrl: {updated_flows}")
     print(f"     Pagination extensions: {pag_count} operations")
 
 

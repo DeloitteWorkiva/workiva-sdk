@@ -112,7 +112,7 @@ Tests live in `python-sdk/tests/` (outside `src/`, safe from regeneration).
 - `asyncPaginationSep2025: true` → enables async pagination generators
 - `allOfMergeStrategy: shallowMerge` → required for the merged spec
 
-**Merge order matters**: platform.yaml is LAST in the merge command because the last spec's global `servers` win. Platform's servers (US/EU/APAC) should be the global default. All specs live in `oas/`.
+**Merge order matters**: platform.yaml is LAST in the merge command because the last spec's global `servers` win. Platform's servers (EU/US/APAC) are the global default — EU is index 0 (default). All specs live in `oas/`. The server order is set in `prepare_specs.py`.
 
 ## File Survival Matrix
 
