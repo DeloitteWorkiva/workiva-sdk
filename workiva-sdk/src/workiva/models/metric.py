@@ -5,13 +5,14 @@ from .frameworkreference import FrameworkReference, FrameworkReferenceTypedDict
 from .tag import Tag, TagTypedDict
 from enum import Enum
 import pydantic
-from pydantic import model_serializer
+from pydantic import field_serializer, model_serializer
 from typing import List, Optional
 from typing_extensions import Annotated, NotRequired, TypedDict
+from workiva import models, utils
 from workiva.types import BaseModel, UNSET_SENTINEL
 
 
-class DataType(str, Enum):
+class DataType(str, Enum, metaclass=utils.OpenEnumMeta):
     r"""Used to specify the type of data for a metric."""
 
     TEXT = "text"
@@ -114,6 +115,15 @@ class Metric(BaseModel):
 
     unit: Optional[str] = None
     r"""The unit of measurement for the metric, up to 300 characters."""
+
+    @field_serializer("data_type")
+    def serialize_data_type(self, value):
+        if isinstance(value, str):
+            try:
+                return models.DataType(value)
+            except ValueError:
+                return value
+        return value
 
     @model_serializer(mode="wrap")
     def serialize_model(self, handler):
@@ -237,6 +247,15 @@ class MetricInput(BaseModel):
 
     unit: Optional[str] = None
     r"""The unit of measurement for the metric, up to 300 characters."""
+
+    @field_serializer("data_type")
+    def serialize_data_type(self, value):
+        if isinstance(value, str):
+            try:
+                return models.DataType(value)
+            except ValueError:
+                return value
+        return value
 
     @model_serializer(mode="wrap")
     def serialize_model(self, handler):

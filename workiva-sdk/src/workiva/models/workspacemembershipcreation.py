@@ -8,7 +8,7 @@ from typing_extensions import Annotated, NotRequired, TypedDict
 from workiva.types import BaseModel, Nullable, OptionalNullable, UNSET, UNSET_SENTINEL
 
 
-class WorkspaceMembershipCreationOptionsTypedDict(TypedDict):
+class OptionsTypedDict(TypedDict):
     r"""Options for creating a new workspace membership"""
 
     notify_new_member: NotRequired[bool]
@@ -17,7 +17,7 @@ class WorkspaceMembershipCreationOptionsTypedDict(TypedDict):
     r"""Whether or not a welcome email should be sent to the user when they are added to the workspace. False by default."""
 
 
-class WorkspaceMembershipCreationOptions(BaseModel):
+class Options(BaseModel):
     r"""Options for creating a new workspace membership"""
 
     notify_new_member: Annotated[
@@ -50,7 +50,7 @@ class WorkspaceMembershipCreationOptions(BaseModel):
 class WorkspaceMembershipCreationTypedDict(TypedDict):
     r"""Details and Options for creating a new workspace membership."""
 
-    options: NotRequired[Nullable[WorkspaceMembershipCreationOptionsTypedDict]]
+    options: NotRequired[Nullable[OptionsTypedDict]]
     user: NotRequired[str]
     r"""The user id that will be made a member of the workspace."""
 
@@ -58,7 +58,7 @@ class WorkspaceMembershipCreationTypedDict(TypedDict):
 class WorkspaceMembershipCreation(BaseModel):
     r"""Details and Options for creating a new workspace membership."""
 
-    options: OptionalNullable[WorkspaceMembershipCreationOptions] = UNSET
+    options: OptionalNullable[Options] = UNSET
 
     user: Optional[str] = None
     r"""The user id that will be made a member of the workspace."""

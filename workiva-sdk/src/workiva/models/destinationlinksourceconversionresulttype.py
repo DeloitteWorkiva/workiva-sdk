@@ -2,9 +2,12 @@
 
 from __future__ import annotations
 from enum import Enum
+from workiva import utils
 
 
-class DestinationLinkSourceConversionResultType(str, Enum):
+class DestinationLinkSourceConversionResultType(
+    str, Enum, metaclass=utils.OpenEnumMeta
+):
     r"""The type of the destination link source conversion result."""
 
     ANCHOR = "anchor"

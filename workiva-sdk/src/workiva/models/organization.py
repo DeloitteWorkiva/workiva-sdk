@@ -4,10 +4,83 @@ from __future__ import annotations
 from datetime import datetime
 from enum import Enum
 import pydantic
-from pydantic import model_serializer
+from pydantic import field_serializer, model_serializer
 from typing import Optional
 from typing_extensions import Annotated, NotRequired, TypedDict
+from workiva import models, utils
 from workiva.types import BaseModel, Nullable, OptionalNullable, UNSET, UNSET_SENTINEL
+
+
+class OrganizationSchemasCreatedUserTypedDict(TypedDict):
+    r"""A user refernenced by their unique identifier"""
+
+    id: NotRequired[str]
+    r"""The unique identifier of the user"""
+
+
+class OrganizationSchemasCreatedUser(BaseModel):
+    r"""A user refernenced by their unique identifier"""
+
+    id: Optional[str] = None
+    r"""The unique identifier of the user"""
+
+    @model_serializer(mode="wrap")
+    def serialize_model(self, handler):
+        optional_fields = set(["id"])
+        serialized = handler(self)
+        m = {}
+
+        for n, f in type(self).model_fields.items():
+            k = f.alias or n
+            val = serialized.get(k)
+
+            if val != UNSET_SENTINEL:
+                if val is not None or k not in optional_fields:
+                    m[k] = val
+
+        return m
+
+
+class CreatedTypedDict(TypedDict):
+    r"""When the action was performed, and details about the user who did it"""
+
+    date_time: NotRequired[datetime]
+    r"""When the action was performed"""
+    user: NotRequired[Nullable[OrganizationSchemasCreatedUserTypedDict]]
+
+
+class Created(BaseModel):
+    r"""When the action was performed, and details about the user who did it"""
+
+    date_time: Annotated[Optional[datetime], pydantic.Field(alias="dateTime")] = None
+    r"""When the action was performed"""
+
+    user: OptionalNullable[OrganizationSchemasCreatedUser] = UNSET
+
+    @model_serializer(mode="wrap")
+    def serialize_model(self, handler):
+        optional_fields = set(["dateTime", "user"])
+        nullable_fields = set(["user"])
+        serialized = handler(self)
+        m = {}
+
+        for n, f in type(self).model_fields.items():
+            k = f.alias or n
+            val = serialized.get(k)
+            is_nullable_and_explicitly_set = (
+                k in nullable_fields
+                and (self.__pydantic_fields_set__.intersection({n}))  # pylint: disable=no-member
+            )
+
+            if val != UNSET_SENTINEL:
+                if (
+                    val is not None
+                    or k not in optional_fields
+                    or is_nullable_and_explicitly_set
+                ):
+                    m[k] = val
+
+        return m
 
 
 class OrganizationSchemasUserTypedDict(TypedDict):
@@ -40,7 +113,7 @@ class OrganizationSchemasUser(BaseModel):
         return m
 
 
-class OrganizationCreatedTypedDict(TypedDict):
+class ModifiedTypedDict(TypedDict):
     r"""When the action was performed, and details about the user who did it"""
 
     date_time: NotRequired[datetime]
@@ -48,7 +121,7 @@ class OrganizationCreatedTypedDict(TypedDict):
     user: NotRequired[Nullable[OrganizationSchemasUserTypedDict]]
 
 
-class OrganizationCreated(BaseModel):
+class Modified(BaseModel):
     r"""When the action was performed, and details about the user who did it"""
 
     date_time: Annotated[Optional[datetime], pydantic.Field(alias="dateTime")] = None
@@ -82,79 +155,7 @@ class OrganizationCreated(BaseModel):
         return m
 
 
-class OrganizationSchemasModifiedUserTypedDict(TypedDict):
-    r"""A user refernenced by their unique identifier"""
-
-    id: NotRequired[str]
-    r"""The unique identifier of the user"""
-
-
-class OrganizationSchemasModifiedUser(BaseModel):
-    r"""A user refernenced by their unique identifier"""
-
-    id: Optional[str] = None
-    r"""The unique identifier of the user"""
-
-    @model_serializer(mode="wrap")
-    def serialize_model(self, handler):
-        optional_fields = set(["id"])
-        serialized = handler(self)
-        m = {}
-
-        for n, f in type(self).model_fields.items():
-            k = f.alias or n
-            val = serialized.get(k)
-
-            if val != UNSET_SENTINEL:
-                if val is not None or k not in optional_fields:
-                    m[k] = val
-
-        return m
-
-
-class OrganizationModifiedTypedDict(TypedDict):
-    r"""When the action was performed, and details about the user who did it"""
-
-    date_time: NotRequired[datetime]
-    r"""When the action was performed"""
-    user: NotRequired[Nullable[OrganizationSchemasModifiedUserTypedDict]]
-
-
-class OrganizationModified(BaseModel):
-    r"""When the action was performed, and details about the user who did it"""
-
-    date_time: Annotated[Optional[datetime], pydantic.Field(alias="dateTime")] = None
-    r"""When the action was performed"""
-
-    user: OptionalNullable[OrganizationSchemasModifiedUser] = UNSET
-
-    @model_serializer(mode="wrap")
-    def serialize_model(self, handler):
-        optional_fields = set(["dateTime", "user"])
-        nullable_fields = set(["user"])
-        serialized = handler(self)
-        m = {}
-
-        for n, f in type(self).model_fields.items():
-            k = f.alias or n
-            val = serialized.get(k)
-            is_nullable_and_explicitly_set = (
-                k in nullable_fields
-                and (self.__pydantic_fields_set__.intersection({n}))  # pylint: disable=no-member
-            )
-
-            if val != UNSET_SENTINEL:
-                if (
-                    val is not None
-                    or k not in optional_fields
-                    or is_nullable_and_explicitly_set
-                ):
-                    m[k] = val
-
-        return m
-
-
-class OrganizationStatus(str, Enum):
+class OrganizationStatus(str, Enum, metaclass=utils.OpenEnumMeta):
     ACTIVE = "active"
     INACTIVE = "inactive"
 
@@ -162,10 +163,10 @@ class OrganizationStatus(str, Enum):
 class OrganizationTypedDict(TypedDict):
     r"""Details about the organization"""
 
-    created: NotRequired[OrganizationCreatedTypedDict]
+    created: NotRequired[CreatedTypedDict]
     id: NotRequired[str]
     r"""The unique identifier of the organization"""
-    modified: NotRequired[OrganizationModifiedTypedDict]
+    modified: NotRequired[ModifiedTypedDict]
     name: NotRequired[str]
     r"""The name of the organization"""
     status: NotRequired[OrganizationStatus]
@@ -174,17 +175,26 @@ class OrganizationTypedDict(TypedDict):
 class Organization(BaseModel):
     r"""Details about the organization"""
 
-    created: Optional[OrganizationCreated] = None
+    created: Optional[Created] = None
 
     id: Optional[str] = None
     r"""The unique identifier of the organization"""
 
-    modified: Optional[OrganizationModified] = None
+    modified: Optional[Modified] = None
 
     name: Optional[str] = None
     r"""The name of the organization"""
 
     status: Optional[OrganizationStatus] = None
+
+    @field_serializer("status")
+    def serialize_status(self, value):
+        if isinstance(value, str):
+            try:
+                return models.OrganizationStatus(value)
+            except ValueError:
+                return value
+        return value
 
     @model_serializer(mode="wrap")
     def serialize_model(self, handler):

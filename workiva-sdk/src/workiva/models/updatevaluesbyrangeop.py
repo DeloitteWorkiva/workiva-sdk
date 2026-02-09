@@ -11,28 +11,23 @@ from workiva.utils import FieldMetadata, PathParamMetadata, RequestMetadata
 
 
 class UpdateValuesByRangeRequestTypedDict(TypedDict):
-    range_values: RangeValuesTypedDict
-    r"""All values for the range, not just those to update"""
-    range: Nullable[str]
-    r"""The range of values, in A1-style notation"""
-    sheet_id: str
-    r"""The unique identifier of the sheet"""
     spreadsheet_id: str
     r"""The unique identifier of the spreadsheet"""
+    sheet_id: str
+    r"""The unique identifier of the sheet"""
+    range: Nullable[str]
+    r"""The range of values, in A1-style notation"""
+    range_values: RangeValuesTypedDict
+    r"""All values for the range, not just those to update"""
 
 
 class UpdateValuesByRangeRequest(BaseModel):
-    range_values: Annotated[
-        RangeValues,
-        FieldMetadata(request=RequestMetadata(media_type="application/json")),
-    ]
-    r"""All values for the range, not just those to update"""
-
-    range: Annotated[
-        Nullable[str],
+    spreadsheet_id: Annotated[
+        str,
+        pydantic.Field(alias="spreadsheetId"),
         FieldMetadata(path=PathParamMetadata(style="simple", explode=False)),
     ]
-    r"""The range of values, in A1-style notation"""
+    r"""The unique identifier of the spreadsheet"""
 
     sheet_id: Annotated[
         str,
@@ -41,12 +36,17 @@ class UpdateValuesByRangeRequest(BaseModel):
     ]
     r"""The unique identifier of the sheet"""
 
-    spreadsheet_id: Annotated[
-        str,
-        pydantic.Field(alias="spreadsheetId"),
+    range: Annotated[
+        Nullable[str],
         FieldMetadata(path=PathParamMetadata(style="simple", explode=False)),
     ]
-    r"""The unique identifier of the spreadsheet"""
+    r"""The range of values, in A1-style notation"""
+
+    range_values: Annotated[
+        RangeValues,
+        FieldMetadata(request=RequestMetadata(media_type="application/json")),
+    ]
+    r"""All values for the range, not just those to update"""
 
     @model_serializer(mode="wrap")
     def serialize_model(self, handler):

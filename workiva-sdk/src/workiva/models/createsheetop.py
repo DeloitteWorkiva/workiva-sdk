@@ -9,22 +9,22 @@ from workiva.utils import FieldMetadata, PathParamMetadata, RequestMetadata
 
 
 class CreateSheetRequestTypedDict(TypedDict):
-    sheet: SheetInputTypedDict
-    r"""The properties of the sheet to create"""
     spreadsheet_id: str
     r"""The unique identifier of the spreadsheet"""
+    sheet: SheetInputTypedDict
+    r"""The properties of the sheet to create"""
 
 
 class CreateSheetRequest(BaseModel):
-    sheet: Annotated[
-        SheetInput,
-        FieldMetadata(request=RequestMetadata(media_type="application/json")),
-    ]
-    r"""The properties of the sheet to create"""
-
     spreadsheet_id: Annotated[
         str,
         pydantic.Field(alias="spreadsheetId"),
         FieldMetadata(path=PathParamMetadata(style="simple", explode=False)),
     ]
     r"""The unique identifier of the spreadsheet"""
+
+    sheet: Annotated[
+        SheetInput,
+        FieldMetadata(request=RequestMetadata(media_type="application/json")),
+    ]
+    r"""The properties of the sheet to create"""

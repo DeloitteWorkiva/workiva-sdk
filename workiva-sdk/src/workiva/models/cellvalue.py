@@ -8,9 +8,10 @@ from .sourceparagraph import SourceParagraph, SourceParagraphTypedDict
 from .styleref import StyleRef, StyleRefTypedDict
 from enum import Enum
 import pydantic
-from pydantic import model_serializer
+from pydantic import field_serializer, model_serializer
 from typing import List
 from typing_extensions import Annotated, NotRequired, TypedDict
+from workiva import models, utils
 from workiva.types import BaseModel, Nullable, OptionalNullable, UNSET, UNSET_SENTINEL
 
 
@@ -83,7 +84,7 @@ class CellValueTextColor(BaseModel):
     r"""The red component of the color."""
 
 
-class CellValueSchemasFormatTypedDict(TypedDict):
+class CellValueFormatTypedDict(TypedDict):
     r"""The formatting options applied to rich text elements."""
 
     background_color: NotRequired[Nullable[CellValueBackgroundColorTypedDict]]
@@ -110,7 +111,7 @@ class CellValueSchemasFormatTypedDict(TypedDict):
     r"""Whether or not the text is underlined"""
 
 
-class CellValueSchemasFormat(BaseModel):
+class CellValueFormat(BaseModel):
     r"""The formatting options applied to rich text elements."""
 
     background_color: Annotated[
@@ -153,6 +154,15 @@ class CellValueSchemasFormat(BaseModel):
 
     underline: OptionalNullable[bool] = UNSET
     r"""Whether or not the text is underlined"""
+
+    @field_serializer("baseline_shift")
+    def serialize_baseline_shift(self, value):
+        if isinstance(value, str):
+            try:
+                return models.RichTextBaselineShift(value)
+            except ValueError:
+                return value
+        return value
 
     @model_serializer(mode="wrap")
     def serialize_model(self, handler):
@@ -213,7 +223,7 @@ class FormulaTypedDict(TypedDict):
     r"""The computed value of the formula without any value formatting applied The formula itself is in the \"rawValue\" property of the cell."""
     effective_value: str
     r"""The computed value of the formula with value formatting applied, exactly as it is displayed in the app. The formula itself is in the cell's \"rawValue\" property."""
-    format_: Nullable[CellValueSchemasFormatTypedDict]
+    format_: Nullable[CellValueFormatTypedDict]
     style: StyleRefTypedDict
     r"""A reference to a style."""
 
@@ -227,7 +237,7 @@ class Formula(BaseModel):
     effective_value: Annotated[str, pydantic.Field(alias="effectiveValue")]
     r"""The computed value of the formula with value formatting applied, exactly as it is displayed in the app. The formula itself is in the cell's \"rawValue\" property."""
 
-    format_: Annotated[Nullable[CellValueSchemasFormat], pydantic.Field(alias="format")]
+    format_: Annotated[Nullable[CellValueFormat], pydantic.Field(alias="format")]
 
     style: StyleRef
     r"""A reference to a style."""
@@ -295,7 +305,7 @@ class CellValueSchemasTextColor(BaseModel):
     r"""The red component of the color."""
 
 
-class CellValueFormatTypedDict(TypedDict):
+class CellValueSchemasFormatTypedDict(TypedDict):
     r"""The formatting options applied to rich text elements."""
 
     background_color: NotRequired[Nullable[CellValueSchemasBackgroundColorTypedDict]]
@@ -322,7 +332,7 @@ class CellValueFormatTypedDict(TypedDict):
     r"""Whether or not the text is underlined"""
 
 
-class CellValueFormat(BaseModel):
+class CellValueSchemasFormat(BaseModel):
     r"""The formatting options applied to rich text elements."""
 
     background_color: Annotated[
@@ -365,6 +375,15 @@ class CellValueFormat(BaseModel):
 
     underline: OptionalNullable[bool] = UNSET
     r"""Whether or not the text is underlined"""
+
+    @field_serializer("baseline_shift")
+    def serialize_baseline_shift(self, value):
+        if isinstance(value, str):
+            try:
+                return models.RichTextBaselineShift(value)
+            except ValueError:
+                return value
+        return value
 
     @model_serializer(mode="wrap")
     def serialize_model(self, handler):
@@ -423,7 +442,7 @@ class PlainTextTypedDict(TypedDict):
 
     effective_value: str
     r"""The value after it has been value formatted, exactly as it is displayed in the app. The original value is in the cell's \"rawValue\" property."""
-    format_: Nullable[CellValueFormatTypedDict]
+    format_: Nullable[CellValueSchemasFormatTypedDict]
     style: StyleRefTypedDict
     r"""A reference to a style."""
 
@@ -434,7 +453,7 @@ class PlainText(BaseModel):
     effective_value: Annotated[str, pydantic.Field(alias="effectiveValue")]
     r"""The value after it has been value formatted, exactly as it is displayed in the app. The original value is in the cell's \"rawValue\" property."""
 
-    format_: Annotated[Nullable[CellValueFormat], pydantic.Field(alias="format")]
+    format_: Annotated[Nullable[CellValueSchemasFormat], pydantic.Field(alias="format")]
 
     style: StyleRef
     r"""A reference to a style."""
@@ -468,7 +487,7 @@ class RichText(BaseModel):
     r"""Paragraphs contained in this cell."""
 
 
-class CellValueType(str, Enum):
+class CellValueType(str, Enum, metaclass=utils.OpenEnumMeta):
     r"""The type of content in a cell."""
 
     DESTINATION_LINK = "destinationLink"
@@ -508,6 +527,15 @@ class CellValue(BaseModel):
     rich_text: Annotated[
         OptionalNullable[RichText], pydantic.Field(alias="richText")
     ] = UNSET
+
+    @field_serializer("type")
+    def serialize_type(self, value):
+        if isinstance(value, str):
+            try:
+                return models.CellValueType(value)
+            except ValueError:
+                return value
+        return value
 
     @model_serializer(mode="wrap")
     def serialize_model(self, handler):

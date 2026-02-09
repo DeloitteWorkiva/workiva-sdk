@@ -40,39 +40,40 @@ class SDK(BaseSDK):
     https://developers.workiva.com - Developer documentation for Workiva Inc.
     """
 
+    chains: "Chains"
+    wdata: "Wdata"
     activities: "Activities"
     r"""Activities enable you to retrieve a list of actions performed in the organization or a specific workspace, such as: <ul> <li>User logins</li> <li>Added users</li> <li>Changes to roles</li> <li>Changes to organization or workspace settings</li> </ul> These activities are also available in the Workiva platform and can be exported from Organization Admin or Workspace Settings. <br /><br /> To access activities through this API or in Workiva, a user must have a valid admin role: <ul> <li>Org User Admin</li> <li>Org Workspace Admin</li> <li>Org Security Admin, for organization activities</li> <li>Workspace Owner, for workspace activities</li> </ul> Learn more about these roles [here](https://support.workiva.com/hc/en-us/articles/360036006051-Organization-roles) and Workiva activities [here](https://support.workiva.com/hc/en-us/articles/360035646392-View-organization-activities).
 
     """
-    wdata: "Wdata"
     content: "Content"
     r"""Endpoints for reading and writing Workiva content. See [**Introduction to Content Endpoints**](ref:content-guide) for more information."""
-    documents: "Documents"
-    r"""Documents enable you to organize and review data in collaborative files with linked text, documents, and images. Use these endpoints to manage documents and their sections in the Workiva Platform."""
-    files: "Files"
-    r"""Endpoints to manage files and folders."""
-    graph: "Graph"
-    r"""The Graph endpoints enable access to Integrated Risk workspaces, such as to pull reports and records, create and edit records, and more. <br /><br /> Please refer to the [Graph Guides](ref:graph-guide) for further documentation and examples."""
     milestones: "Milestones"
     r"""Endpoints for working with Milestones. See [**Introduction to Milestones Endpoints**](ref:milestones-guide) for more information."""
+    sustainability: "Sustainability"
+    r"""Endpoints to manage Sustainability Programs"""
+    admin: "Admin"
+    r"""Endpoints to manage organizations, workspaces, groups, and users"""
+    reports: "Reports"
+    r"""Endpoints used to generate Admin reports"""
     iam: "Iam"
     r"""Before your application can access private data using other Workiva APIs, it must obtain an access token that grants access to those APIs.
 
     Use the IAM REST API endpoint to exchange your OAuth credentials (clientID and clientSecret) for a token.
 
     """
+    documents: "Documents"
+    r"""Documents enable you to organize and review data in collaborative files with linked text, documents, and images. Use these endpoints to manage documents and their sections in the Workiva Platform."""
+    files: "Files"
+    r"""Endpoints to manage files and folders."""
+    graph: "Graph"
+    r"""The Graph endpoints enable access to Integrated Risk workspaces, such as to pull reports and records, create and edit records, and more. <br /><br /> Please refer to the [Graph Guides](ref:graph-guide) for further documentation and examples."""
     operations: "Operations"
     r"""Use these endpoints to manage operations, such as to check their status."""
-    admin: "Admin"
-    r"""Endpoints to manage organizations, workspaces, groups, and users"""
-    reports: "Reports"
-    r"""Endpoints used to generate Admin reports"""
     permissions: "Permissions"
     r"""Endpoints to manage Permissions"""
     presentations: "Presentations"
     r"""Endpoints to manage presentations"""
-    sustainability: "Sustainability"
-    r"""Endpoints to manage Sustainability Programs"""
     spreadsheets: "Spreadsheets"
     r"""Spreadsheets enable you to work with large, complex data in a familiar, collaborative, and controlled environment. Use these endpoints to manage spreadsheets and their sheets in the Workiva platform."""
     tasks: "Tasks"
@@ -83,26 +84,25 @@ class SDK(BaseSDK):
     r"""These endpoints are used to manage test forms, test phases, and matrices. They are also used to manage attachments on test phases, matrices, and samples.
 
     """
-    chains: "Chains"
     _sub_sdk_map = {
-        "activities": ("workiva.activities", "Activities"),
+        "chains": ("workiva.chains", "Chains"),
         "wdata": ("workiva.wdata", "Wdata"),
+        "activities": ("workiva.activities", "Activities"),
         "content": ("workiva.content", "Content"),
+        "milestones": ("workiva.milestones", "Milestones"),
+        "sustainability": ("workiva.sustainability", "Sustainability"),
+        "admin": ("workiva.admin", "Admin"),
+        "reports": ("workiva.reports", "Reports"),
+        "iam": ("workiva.iam", "Iam"),
         "documents": ("workiva.documents", "Documents"),
         "files": ("workiva.files", "Files"),
         "graph": ("workiva.graph", "Graph"),
-        "milestones": ("workiva.milestones", "Milestones"),
-        "iam": ("workiva.iam", "Iam"),
         "operations": ("workiva.operations", "Operations"),
-        "admin": ("workiva.admin", "Admin"),
-        "reports": ("workiva.reports", "Reports"),
         "permissions": ("workiva.permissions", "Permissions"),
         "presentations": ("workiva.presentations", "Presentations"),
-        "sustainability": ("workiva.sustainability", "Sustainability"),
         "spreadsheets": ("workiva.spreadsheets", "Spreadsheets"),
         "tasks": ("workiva.tasks", "Tasks"),
         "test_forms": ("workiva.test_forms", "TestForms"),
-        "chains": ("workiva.chains", "Chains"),
     }
 
     def __init__(
@@ -179,12 +179,7 @@ class SDK(BaseSDK):
         # pylint: disable=protected-access
         self.sdk_configuration.__dict__["_hooks"] = hooks
 
-        current_server_url, *_ = self.sdk_configuration.get_server_details()
-        server_url, self.sdk_configuration.client = hooks.sdk_init(
-            current_server_url, client
-        )
-        if current_server_url != server_url:
-            self.sdk_configuration.server_url = server_url
+        self.sdk_configuration = hooks.sdk_init(self.sdk_configuration)
 
         weakref.finalize(
             self,

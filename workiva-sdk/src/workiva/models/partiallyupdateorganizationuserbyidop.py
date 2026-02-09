@@ -10,21 +10,15 @@ from workiva.utils import FieldMetadata, PathParamMetadata, RequestMetadata
 
 
 class PartiallyUpdateOrganizationUserByIDRequestTypedDict(TypedDict):
-    request_body: List[JSONPatchOperationTypedDict]
-    r"""Editable details about the User."""
     organization_id: str
     r"""The unique identifier of the organization"""
     user_id: str
     r"""The unique identifier of the user"""
+    request_body: List[JSONPatchOperationTypedDict]
+    r"""Editable details about the User."""
 
 
 class PartiallyUpdateOrganizationUserByIDRequest(BaseModel):
-    request_body: Annotated[
-        List[JSONPatchOperation],
-        FieldMetadata(request=RequestMetadata(media_type="application/json")),
-    ]
-    r"""Editable details about the User."""
-
     organization_id: Annotated[
         str,
         pydantic.Field(alias="organizationId"),
@@ -38,3 +32,9 @@ class PartiallyUpdateOrganizationUserByIDRequest(BaseModel):
         FieldMetadata(path=PathParamMetadata(style="simple", explode=False)),
     ]
     r"""The unique identifier of the user"""
+
+    request_body: Annotated[
+        List[JSONPatchOperation],
+        FieldMetadata(request=RequestMetadata(media_type="application/json")),
+    ]
+    r"""Editable details about the User."""

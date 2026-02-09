@@ -2,9 +2,10 @@
 
 from __future__ import annotations
 from .textalignment import TextAlignment
-from pydantic import model_serializer
+from pydantic import field_serializer, model_serializer
 from typing import Optional
 from typing_extensions import NotRequired, TypedDict
+from workiva import models
 from workiva.types import BaseModel, Nullable, OptionalNullable, UNSET_SENTINEL
 
 
@@ -25,6 +26,15 @@ class TextStyleAlignment(BaseModel):
 
     locked: Optional[bool] = None
     r"""Whether the alignment is locked."""
+
+    @field_serializer("alignment")
+    def serialize_alignment(self, value):
+        if isinstance(value, str):
+            try:
+                return models.TextAlignment(value)
+            except ValueError:
+                return value
+        return value
 
     @model_serializer(mode="wrap")
     def serialize_model(self, handler):

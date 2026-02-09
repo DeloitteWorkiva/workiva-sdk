@@ -10,28 +10,28 @@ from workiva.utils import FieldMetadata, PathParamMetadata, QueryParamMetadata
 
 
 class DeleteDatasetBySheetIDRequestTypedDict(TypedDict):
-    sheet_id: str
-    r"""The unique identifier of the sheet"""
     spreadsheet_id: str
     r"""The unique identifier of the spreadsheet"""
+    sheet_id: str
+    r"""The unique identifier of the sheet"""
     deletevalues: NotRequired[bool]
     r"""Indicates whether values should be deleted along with the dataset"""
 
 
 class DeleteDatasetBySheetIDRequest(BaseModel):
-    sheet_id: Annotated[
-        str,
-        pydantic.Field(alias="sheetId"),
-        FieldMetadata(path=PathParamMetadata(style="simple", explode=False)),
-    ]
-    r"""The unique identifier of the sheet"""
-
     spreadsheet_id: Annotated[
         str,
         pydantic.Field(alias="spreadsheetId"),
         FieldMetadata(path=PathParamMetadata(style="simple", explode=False)),
     ]
     r"""The unique identifier of the spreadsheet"""
+
+    sheet_id: Annotated[
+        str,
+        pydantic.Field(alias="sheetId"),
+        FieldMetadata(path=PathParamMetadata(style="simple", explode=False)),
+    ]
+    r"""The unique identifier of the sheet"""
 
     deletevalues: Annotated[
         Optional[bool],

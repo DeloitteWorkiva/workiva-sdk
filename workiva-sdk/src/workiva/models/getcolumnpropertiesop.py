@@ -16,12 +16,12 @@ from workiva.utils import FieldMetadata, PathParamMetadata, QueryParamMetadata
 class GetColumnPropertiesRequestTypedDict(TypedDict):
     table_id: str
     r"""The unique identifier for the table"""
+    revision: NotRequired[str]
+    r"""Returns resources at a specific revision"""
     maxpagesize: NotRequired[int]
     r"""The maximum number of results to retrieve"""
     next: NotRequired[str]
     r"""Pagination cursor for next set of results."""
-    revision: NotRequired[str]
-    r"""Returns resources at a specific revision"""
     start_column: NotRequired[int]
     r"""The inclusive start column of the range of cells to retrieve. If this parameter is omitted, then the range will be unbounded in this direction."""
     stop_column: NotRequired[int]
@@ -36,6 +36,13 @@ class GetColumnPropertiesRequest(BaseModel):
     ]
     r"""The unique identifier for the table"""
 
+    revision: Annotated[
+        Optional[str],
+        pydantic.Field(alias="$revision"),
+        FieldMetadata(query=QueryParamMetadata(style="form", explode=True)),
+    ] = None
+    r"""Returns resources at a specific revision"""
+
     maxpagesize: Annotated[
         Optional[int],
         pydantic.Field(alias="$maxpagesize"),
@@ -49,13 +56,6 @@ class GetColumnPropertiesRequest(BaseModel):
         FieldMetadata(query=QueryParamMetadata(style="form", explode=True)),
     ] = None
     r"""Pagination cursor for next set of results."""
-
-    revision: Annotated[
-        Optional[str],
-        pydantic.Field(alias="$revision"),
-        FieldMetadata(query=QueryParamMetadata(style="form", explode=True)),
-    ] = None
-    r"""Returns resources at a specific revision"""
 
     start_column: Annotated[
         Optional[int],
@@ -74,7 +74,7 @@ class GetColumnPropertiesRequest(BaseModel):
     @model_serializer(mode="wrap")
     def serialize_model(self, handler):
         optional_fields = set(
-            ["maxpagesize", "next", "revision", "startColumn", "stopColumn"]
+            ["revision", "maxpagesize", "next", "startColumn", "stopColumn"]
         )
         serialized = handler(self)
         m = {}

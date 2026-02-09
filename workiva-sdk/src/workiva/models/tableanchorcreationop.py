@@ -10,25 +10,25 @@ from workiva.utils import FieldMetadata, PathParamMetadata, RequestMetadata
 
 
 class TableAnchorCreationRequestTypedDict(TypedDict):
-    table_anchor_creation: TableAnchorCreationTypedDict
-    r"""The details of range for which the table anchor needs to be created"""
     table_id: str
     r"""The unique identifier for the table"""
+    table_anchor_creation: TableAnchorCreationTypedDict
+    r"""The details of range for which the table anchor needs to be created"""
 
 
 class TableAnchorCreationRequest(BaseModel):
-    table_anchor_creation: Annotated[
-        TableAnchorCreation,
-        FieldMetadata(request=RequestMetadata(media_type="application/json")),
-    ]
-    r"""The details of range for which the table anchor needs to be created"""
-
     table_id: Annotated[
         str,
         pydantic.Field(alias="tableId"),
         FieldMetadata(path=PathParamMetadata(style="simple", explode=False)),
     ]
     r"""The unique identifier for the table"""
+
+    table_anchor_creation: Annotated[
+        TableAnchorCreation,
+        FieldMetadata(request=RequestMetadata(media_type="application/json")),
+    ]
+    r"""The details of range for which the table anchor needs to be created"""
 
 
 class TableAnchorCreationResponseTypedDict(TypedDict):

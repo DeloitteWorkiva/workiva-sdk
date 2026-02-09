@@ -9,22 +9,22 @@ from workiva.utils import FieldMetadata, PathParamMetadata, RequestMetadata
 
 
 class CreateDimensionRequestTypedDict(TypedDict):
-    dimension: DimensionInputTypedDict
-    r"""The properties of the dimension to create"""
     program_id: str
     r"""The unique identifier of the program"""
+    dimension: DimensionInputTypedDict
+    r"""The properties of the dimension to create"""
 
 
 class CreateDimensionRequest(BaseModel):
-    dimension: Annotated[
-        DimensionInput,
-        FieldMetadata(request=RequestMetadata(media_type="application/json")),
-    ]
-    r"""The properties of the dimension to create"""
-
     program_id: Annotated[
         str,
         pydantic.Field(alias="programId"),
         FieldMetadata(path=PathParamMetadata(style="simple", explode=False)),
     ]
     r"""The unique identifier of the program"""
+
+    dimension: Annotated[
+        DimensionInput,
+        FieldMetadata(request=RequestMetadata(media_type="application/json")),
+    ]
+    r"""The properties of the dimension to create"""

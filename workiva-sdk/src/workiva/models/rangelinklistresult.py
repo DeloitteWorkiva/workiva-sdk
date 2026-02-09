@@ -12,26 +12,26 @@ from workiva.types import BaseModel, Nullable, OptionalNullable, UNSET, UNSET_SE
 class RangeLinkListResultTypedDict(TypedDict):
     r"""Data model for range link list"""
 
-    at_next_link: NotRequired[Nullable[str]]
-    r"""Pagination link for next set of results"""
     data: NotRequired[List[RangeLinkTypedDict]]
     r"""The current page of range links"""
+    at_next_link: NotRequired[Nullable[str]]
+    r"""Pagination link for next set of results"""
 
 
 class RangeLinkListResult(BaseModel):
     r"""Data model for range link list"""
+
+    data: Optional[List[RangeLink]] = None
+    r"""The current page of range links"""
 
     at_next_link: Annotated[
         OptionalNullable[str], pydantic.Field(alias="@nextLink")
     ] = UNSET
     r"""Pagination link for next set of results"""
 
-    data: Optional[List[RangeLink]] = None
-    r"""The current page of range links"""
-
     @model_serializer(mode="wrap")
     def serialize_model(self, handler):
-        optional_fields = set(["@nextLink", "data"])
+        optional_fields = set(["data", "@nextLink"])
         nullable_fields = set(["@nextLink"])
         serialized = handler(self)
         m = {}

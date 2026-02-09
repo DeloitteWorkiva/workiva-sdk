@@ -13,25 +13,25 @@ from workiva.utils import FieldMetadata, PathParamMetadata, RequestMetadata
 
 
 class TableFiltersReapplicationRequestTypedDict(TypedDict):
-    table_filters_reapplication: TableFiltersReapplicationTypedDict
-    r"""The filter reapplication request to apply"""
     table_id: str
     r"""The unique identifier for the table"""
+    table_filters_reapplication: TableFiltersReapplicationTypedDict
+    r"""The filter reapplication request to apply"""
 
 
 class TableFiltersReapplicationRequest(BaseModel):
-    table_filters_reapplication: Annotated[
-        TableFiltersReapplication,
-        FieldMetadata(request=RequestMetadata(media_type="application/json")),
-    ]
-    r"""The filter reapplication request to apply"""
-
     table_id: Annotated[
         str,
         pydantic.Field(alias="tableId"),
         FieldMetadata(path=PathParamMetadata(style="simple", explode=False)),
     ]
     r"""The unique identifier for the table"""
+
+    table_filters_reapplication: Annotated[
+        TableFiltersReapplication,
+        FieldMetadata(request=RequestMetadata(media_type="application/json")),
+    ]
+    r"""The filter reapplication request to apply"""
 
 
 class TableFiltersReapplicationResponseTypedDict(TypedDict):

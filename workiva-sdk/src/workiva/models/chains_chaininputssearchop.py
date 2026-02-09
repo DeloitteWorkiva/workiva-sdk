@@ -24,10 +24,10 @@ class ChainsChainInputsSearchRequestTypedDict(TypedDict):
     r"""The ID of the environment to search for chains run inputs."""
     search_text: str
     r"""The fuzzy input value to search for."""
-    cursor: NotRequired[str]
-    r"""Cursor value returned from the API, indicating page information."""
     limit: NotRequired[str]
     r"""Limit number of chainExecutors returned (Max 50)."""
+    cursor: NotRequired[str]
+    r"""Cursor value returned from the API, indicating page information."""
 
 
 class ChainsChainInputsSearchRequest(BaseModel):
@@ -41,21 +41,21 @@ class ChainsChainInputsSearchRequest(BaseModel):
     ]
     r"""The fuzzy input value to search for."""
 
-    cursor: Annotated[
-        Optional[str],
-        FieldMetadata(query=QueryParamMetadata(style="form", explode=True)),
-    ] = None
-    r"""Cursor value returned from the API, indicating page information."""
-
     limit: Annotated[
         Optional[str],
         FieldMetadata(query=QueryParamMetadata(style="form", explode=True)),
     ] = None
     r"""Limit number of chainExecutors returned (Max 50)."""
 
+    cursor: Annotated[
+        Optional[str],
+        FieldMetadata(query=QueryParamMetadata(style="form", explode=True)),
+    ] = None
+    r"""Cursor value returned from the API, indicating page information."""
+
     @model_serializer(mode="wrap")
     def serialize_model(self, handler):
-        optional_fields = set(["cursor", "limit"])
+        optional_fields = set(["limit", "cursor"])
         serialized = handler(self)
         m = {}
 

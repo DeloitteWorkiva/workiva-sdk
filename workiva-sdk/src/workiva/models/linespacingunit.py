@@ -2,9 +2,10 @@
 
 from __future__ import annotations
 from enum import Enum
+from workiva import utils
 
 
-class LineSpacingUnit(str, Enum):
+class LineSpacingUnit(str, Enum, metaclass=utils.OpenEnumMeta):
     r"""The units for a line spacing value as a percent of line height or points."""
 
     PERCENT = "percent"

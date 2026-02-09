@@ -4,13 +4,14 @@ from __future__ import annotations
 from datetime import datetime
 from enum import Enum
 import pydantic
-from pydantic import model_serializer
+from pydantic import field_serializer, model_serializer
 from typing import Any, List, Optional
 from typing_extensions import Annotated, NotRequired, TypedDict
+from workiva import models, utils
 from workiva.types import BaseModel, UNSET_SENTINEL
 
 
-class SelectListDtoType(str, Enum):
+class SelectListDtoType(str, Enum, metaclass=utils.OpenEnumMeta):
     r"""This is currently not used and its value will always be 'static'. In the future,
     more types will be added.
     """
@@ -19,7 +20,7 @@ class SelectListDtoType(str, Enum):
     UNKNOWN = ""
 
 
-class ValueType(str, Enum):
+class ValueType(str, Enum, metaclass=utils.OpenEnumMeta):
     r"""Defines the type of the items in the list."""
 
     STRING = "string"
@@ -93,6 +94,24 @@ class SelectListDto(BaseModel):
     version: Optional[int] = None
     r"""The version of the current representation of the entity"""
 
+    @field_serializer("type")
+    def serialize_type(self, value):
+        if isinstance(value, str):
+            try:
+                return models.SelectListDtoType(value)
+            except ValueError:
+                return value
+        return value
+
+    @field_serializer("value_type")
+    def serialize_value_type(self, value):
+        if isinstance(value, str):
+            try:
+                return models.ValueType(value)
+            except ValueError:
+                return value
+        return value
+
     @model_serializer(mode="wrap")
     def serialize_model(self, handler):
         optional_fields = set(
@@ -135,6 +154,15 @@ class SelectListDtoInput(BaseModel):
 
     description: Optional[str] = None
     r"""Description of this select list. Max length: 1024"""
+
+    @field_serializer("value_type")
+    def serialize_value_type(self, value):
+        if isinstance(value, str):
+            try:
+                return models.ValueType(value)
+            except ValueError:
+                return value
+        return value
 
     @model_serializer(mode="wrap")
     def serialize_model(self, handler):

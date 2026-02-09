@@ -3,12 +3,13 @@
 from __future__ import annotations
 from enum import Enum
 import pydantic
-from pydantic import model_serializer
+from pydantic import field_serializer, model_serializer
 from typing_extensions import Annotated, NotRequired, TypedDict
+from workiva import models, utils
 from workiva.types import BaseModel, Nullable, OptionalNullable, UNSET, UNSET_SENTINEL
 
 
-class Code(str, Enum):
+class Code(str, Enum, metaclass=utils.OpenEnumMeta):
     r"""The ISO currency identifier"""
 
     AUD = "AUD"
@@ -49,7 +50,7 @@ class Code(str, Enum):
     VND = "VND"
 
 
-class ValueFormatDisplay(str, Enum):
+class ValueFormatDisplay(str, Enum, metaclass=utils.OpenEnumMeta):
     r"""How to display the currency. CODE simply displays the ISO currency code while SYMBOL displays the corresponding currency symbol.
     For codes where we support two different symbols, SYMBOL and SYMBOL2 display as follows:
     | code | SYMBOL | SYMBOL2 |
@@ -99,6 +100,24 @@ class Currency(BaseModel):
 
     """
 
+    @field_serializer("code")
+    def serialize_code(self, value):
+        if isinstance(value, str):
+            try:
+                return models.Code(value)
+            except ValueError:
+                return value
+        return value
+
+    @field_serializer("display")
+    def serialize_display(self, value):
+        if isinstance(value, str):
+            try:
+                return models.ValueFormatDisplay(value)
+            except ValueError:
+                return value
+        return value
+
     @model_serializer(mode="wrap")
     def serialize_model(self, handler):
         serialized = handler(self)
@@ -114,7 +133,7 @@ class Currency(BaseModel):
         return m
 
 
-class Generic(str, Enum):
+class Generic(str, Enum, metaclass=utils.OpenEnumMeta):
     r"""Generic currency options"""
 
     DOLLAR = "DOLLAR"
@@ -138,6 +157,15 @@ class CurrencySymbol(BaseModel):
 
     generic: OptionalNullable[Generic] = UNSET
     r"""Generic currency options"""
+
+    @field_serializer("generic")
+    def serialize_generic(self, value):
+        if isinstance(value, str):
+            try:
+                return models.Generic(value)
+            except ValueError:
+                return value
+        return value
 
     @model_serializer(mode="wrap")
     def serialize_model(self, handler):
@@ -165,7 +193,7 @@ class CurrencySymbol(BaseModel):
         return m
 
 
-class DisplayZeroAs(str, Enum):
+class DisplayZeroAs(str, Enum, metaclass=utils.OpenEnumMeta):
     r"""The symbol to use for zero. Valid for ACCOUNTING, CURRENCY, NUMBER, and PERCENT. This field controls the symbol to use for zero when
     not using showNumbersAsWords.
 
@@ -178,7 +206,7 @@ class DisplayZeroAs(str, Enum):
     BLANK = "BLANK"
 
 
-class EnteredIn(str, Enum):
+class EnteredIn(str, Enum, metaclass=utils.OpenEnumMeta):
     r"""The scale cell values are entered in. Valid for AUTOMATIC, ACCOUNTING, CURRENCY, and NUMBER."""
 
     MILLIONTHS = "MILLIONTHS"
@@ -194,7 +222,7 @@ class EnteredIn(str, Enum):
     TRILLIONS = "TRILLIONS"
 
 
-class ValueFormatDisplayZeroAs(str, Enum):
+class ValueFormatDisplayZeroAs(str, Enum, metaclass=utils.OpenEnumMeta):
     r"""The word to use for zero. Valid for ACCOUNTING, CURRENCY, NUMBER, and PERCENT."""
 
     ZERO = "ZERO"
@@ -236,6 +264,15 @@ class NumbersAsWordsOptions(BaseModel):
     ] = ValueFormatDisplayZeroAs.ZERO
     r"""The word to use for zero. Valid for ACCOUNTING, CURRENCY, NUMBER, and PERCENT."""
 
+    @field_serializer("display_zero_as")
+    def serialize_display_zero_as(self, value):
+        if isinstance(value, str):
+            try:
+                return models.ValueFormatDisplayZeroAs(value)
+            except ValueError:
+                return value
+        return value
+
     @model_serializer(mode="wrap")
     def serialize_model(self, handler):
         optional_fields = set(["capitalizeFirstWord", "displayZeroAs"])
@@ -262,7 +299,7 @@ class NumbersAsWordsOptions(BaseModel):
         return m
 
 
-class PercentSymbol(str, Enum):
+class PercentSymbol(str, Enum, metaclass=utils.OpenEnumMeta):
     r"""Render numbers with a percent symbol. Valid for PERCENT."""
 
     NONE = "NONE"
@@ -270,7 +307,7 @@ class PercentSymbol(str, Enum):
     WORD = "WORD"
 
 
-class Display(str, Enum):
+class Display(str, Enum, metaclass=utils.OpenEnumMeta):
     r"""Method of displaying the period value"""
 
     RAW = "RAW"
@@ -279,7 +316,7 @@ class Display(str, Enum):
     ALL = "ALL"
 
 
-class Separator(str, Enum):
+class Separator(str, Enum, metaclass=utils.OpenEnumMeta):
     r"""The separator to use between denominations if multiple are displayed"""
 
     NONE = "NONE"
@@ -329,6 +366,24 @@ class PeriodFormat(BaseModel):
         OptionalNullable[bool], pydantic.Field(alias="showNumbersAsWords")
     ] = False
     r"""Render the numbers as words instead of digits"""
+
+    @field_serializer("display")
+    def serialize_display(self, value):
+        if isinstance(value, str):
+            try:
+                return models.Display(value)
+            except ValueError:
+                return value
+        return value
+
+    @field_serializer("separator")
+    def serialize_separator(self, value):
+        if isinstance(value, str):
+            try:
+                return models.Separator(value)
+            except ValueError:
+                return value
+        return value
 
     @model_serializer(mode="wrap")
     def serialize_model(self, handler):
@@ -421,7 +476,7 @@ class Precision(BaseModel):
         return m
 
 
-class ShownIn(str, Enum):
+class ShownIn(str, Enum, metaclass=utils.OpenEnumMeta):
     r"""The scale cell values are displayed in. Valid for AUTOMATIC, ACCOUNTING, CURRENCY, and NUMBER."""
 
     MILLIONTHS = "MILLIONTHS"
@@ -437,7 +492,7 @@ class ShownIn(str, Enum):
     TRILLIONS = "TRILLIONS"
 
 
-class SymbolAlign(str, Enum):
+class SymbolAlign(str, Enum, metaclass=utils.OpenEnumMeta):
     r"""Where to render the symbol relative to the value. All values valid for ACCOUNTING and CURRENCY. Left values valid for NUMBER. Right values valid for PERCENT."""
 
     SYMBOL_DEFAULT = "SYMBOL DEFAULT"
@@ -449,7 +504,7 @@ class SymbolAlign(str, Enum):
     RIGHT_SPACED = "RIGHT SPACED"
 
 
-class ValueFormatType(str, Enum):
+class ValueFormatType(str, Enum, metaclass=utils.OpenEnumMeta):
     r"""The value format type of the content. Setting this property will clear any other ValueFormat properties that are not valid for the new value format type."""
 
     AUTOMATIC = "AUTOMATIC"
@@ -637,6 +692,60 @@ class ValueFormat(BaseModel):
         OptionalNullable[ValueFormatType], pydantic.Field(alias="valueFormatType")
     ] = UNSET
     r"""The value format type of the content. Setting this property will clear any other ValueFormat properties that are not valid for the new value format type."""
+
+    @field_serializer("display_zero_as")
+    def serialize_display_zero_as(self, value):
+        if isinstance(value, str):
+            try:
+                return models.DisplayZeroAs(value)
+            except ValueError:
+                return value
+        return value
+
+    @field_serializer("entered_in")
+    def serialize_entered_in(self, value):
+        if isinstance(value, str):
+            try:
+                return models.EnteredIn(value)
+            except ValueError:
+                return value
+        return value
+
+    @field_serializer("percent_symbol")
+    def serialize_percent_symbol(self, value):
+        if isinstance(value, str):
+            try:
+                return models.PercentSymbol(value)
+            except ValueError:
+                return value
+        return value
+
+    @field_serializer("shown_in")
+    def serialize_shown_in(self, value):
+        if isinstance(value, str):
+            try:
+                return models.ShownIn(value)
+            except ValueError:
+                return value
+        return value
+
+    @field_serializer("symbol_align")
+    def serialize_symbol_align(self, value):
+        if isinstance(value, str):
+            try:
+                return models.SymbolAlign(value)
+            except ValueError:
+                return value
+        return value
+
+    @field_serializer("value_format_type")
+    def serialize_value_format_type(self, value):
+        if isinstance(value, str):
+            try:
+                return models.ValueFormatType(value)
+            except ValueError:
+                return value
+        return value
 
     @model_serializer(mode="wrap")
     def serialize_model(self, handler):

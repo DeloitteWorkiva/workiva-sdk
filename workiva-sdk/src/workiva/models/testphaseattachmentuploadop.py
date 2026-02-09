@@ -16,22 +16,16 @@ from workiva.utils import FieldMetadata, PathParamMetadata, RequestMetadata
 class TestPhaseAttachmentUploadRequestTypedDict(TypedDict):
     __test__ = False  # pyright: ignore[reportGeneralTypeIssues]
 
-    graph_attachment_upload: GraphAttachmentUploadTypedDict
-    r"""Details about the attachment"""
     test_form_id: str
     r"""The unique identifier of the test form"""
     test_phase_id: str
     r"""The unique identifier of the test phase"""
+    graph_attachment_upload: GraphAttachmentUploadTypedDict
+    r"""Details about the attachment"""
 
 
 class TestPhaseAttachmentUploadRequest(BaseModel):
     __test__ = False
-
-    graph_attachment_upload: Annotated[
-        GraphAttachmentUpload,
-        FieldMetadata(request=RequestMetadata(media_type="application/json")),
-    ]
-    r"""Details about the attachment"""
 
     test_form_id: Annotated[
         str,
@@ -46,6 +40,12 @@ class TestPhaseAttachmentUploadRequest(BaseModel):
         FieldMetadata(path=PathParamMetadata(style="simple", explode=False)),
     ]
     r"""The unique identifier of the test phase"""
+
+    graph_attachment_upload: Annotated[
+        GraphAttachmentUpload,
+        FieldMetadata(request=RequestMetadata(media_type="application/json")),
+    ]
+    r"""Details about the attachment"""
 
 
 class TestPhaseAttachmentUploadResponseTypedDict(TypedDict):

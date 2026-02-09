@@ -10,25 +10,25 @@ from workiva.utils import FieldMetadata, PathParamMetadata, RequestMetadata
 
 
 class TableRangeLinksEditRequestTypedDict(TypedDict):
-    range_link_edit: RangeLinkEditTypedDict
-    r"""The table range link edit to apply"""
     table_id: str
     r"""The unique identifier for the table"""
+    range_link_edit: RangeLinkEditTypedDict
+    r"""The table range link edit to apply"""
 
 
 class TableRangeLinksEditRequest(BaseModel):
-    range_link_edit: Annotated[
-        RangeLinkEdit,
-        FieldMetadata(request=RequestMetadata(media_type="application/json")),
-    ]
-    r"""The table range link edit to apply"""
-
     table_id: Annotated[
         str,
         pydantic.Field(alias="tableId"),
         FieldMetadata(path=PathParamMetadata(style="simple", explode=False)),
     ]
     r"""The unique identifier for the table"""
+
+    range_link_edit: Annotated[
+        RangeLinkEdit,
+        FieldMetadata(request=RequestMetadata(media_type="application/json")),
+    ]
+    r"""The table range link edit to apply"""
 
 
 class TableRangeLinksEditResponseTypedDict(TypedDict):

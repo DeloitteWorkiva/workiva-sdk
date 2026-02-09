@@ -2,9 +2,10 @@
 
 from __future__ import annotations
 from .hyperlinktype import HyperlinkType
-from pydantic import model_serializer
+from pydantic import field_serializer, model_serializer
 from typing import Optional
 from typing_extensions import NotRequired, TypedDict
+from workiva import models
 from workiva.types import BaseModel, Nullable, OptionalNullable, UNSET, UNSET_SENTINEL
 
 
@@ -27,39 +28,6 @@ class HyperlinkDocument(BaseModel):
     @model_serializer(mode="wrap")
     def serialize_model(self, handler):
         optional_fields = set(["document", "revision"])
-        serialized = handler(self)
-        m = {}
-
-        for n, f in type(self).model_fields.items():
-            k = f.alias or n
-            val = serialized.get(k)
-
-            if val != UNSET_SENTINEL:
-                if val is not None or k not in optional_fields:
-                    m[k] = val
-
-        return m
-
-
-class HyperlinkPresentationTypedDict(TypedDict):
-    r"""The reference to the linked presentation for `presentation` type hyperlinks"""
-
-    presentation: NotRequired[str]
-    r"""The unique identifier of the presentation being referred to"""
-    revision: NotRequired[str]
-
-
-class HyperlinkPresentation(BaseModel):
-    r"""The reference to the linked presentation for `presentation` type hyperlinks"""
-
-    presentation: Optional[str] = None
-    r"""The unique identifier of the presentation being referred to"""
-
-    revision: Optional[str] = None
-
-    @model_serializer(mode="wrap")
-    def serialize_model(self, handler):
-        optional_fields = set(["presentation", "revision"])
         serialized = handler(self)
         m = {}
 
@@ -114,20 +82,51 @@ class HyperlinkSection(BaseModel):
         return m
 
 
+class HyperlinkSpreadsheetTypedDict(TypedDict):
+    r"""The reference to the linked spreadsheet for `spreadsheet` type hyperlinks"""
+
+    spreadsheet: NotRequired[str]
+    r"""The unique identifier of the spreadsheet being referred to"""
+    revision: NotRequired[str]
+
+
+class HyperlinkSpreadsheet(BaseModel):
+    r"""The reference to the linked spreadsheet for `spreadsheet` type hyperlinks"""
+
+    spreadsheet: Optional[str] = None
+    r"""The unique identifier of the spreadsheet being referred to"""
+
+    revision: Optional[str] = None
+
+    @model_serializer(mode="wrap")
+    def serialize_model(self, handler):
+        optional_fields = set(["spreadsheet", "revision"])
+        serialized = handler(self)
+        m = {}
+
+        for n, f in type(self).model_fields.items():
+            k = f.alias or n
+            val = serialized.get(k)
+
+            if val != UNSET_SENTINEL:
+                if val is not None or k not in optional_fields:
+                    m[k] = val
+
+        return m
+
+
 class HyperlinkSheetTypedDict(TypedDict):
     r"""The reference to the linked sheet for `sheet` type hyperlinks"""
 
-    revision: NotRequired[str]
     sheet: NotRequired[str]
     r"""The unique identifier of the sheet being referred to"""
     spreadsheet: NotRequired[str]
     r"""The unique identifier of the spreadsheet containing the sheet being referred to"""
+    revision: NotRequired[str]
 
 
 class HyperlinkSheet(BaseModel):
     r"""The reference to the linked sheet for `sheet` type hyperlinks"""
-
-    revision: Optional[str] = None
 
     sheet: Optional[str] = None
     r"""The unique identifier of the sheet being referred to"""
@@ -135,9 +134,44 @@ class HyperlinkSheet(BaseModel):
     spreadsheet: Optional[str] = None
     r"""The unique identifier of the spreadsheet containing the sheet being referred to"""
 
+    revision: Optional[str] = None
+
     @model_serializer(mode="wrap")
     def serialize_model(self, handler):
-        optional_fields = set(["revision", "sheet", "spreadsheet"])
+        optional_fields = set(["sheet", "spreadsheet", "revision"])
+        serialized = handler(self)
+        m = {}
+
+        for n, f in type(self).model_fields.items():
+            k = f.alias or n
+            val = serialized.get(k)
+
+            if val != UNSET_SENTINEL:
+                if val is not None or k not in optional_fields:
+                    m[k] = val
+
+        return m
+
+
+class HyperlinkPresentationTypedDict(TypedDict):
+    r"""The reference to the linked presentation for `presentation` type hyperlinks"""
+
+    presentation: NotRequired[str]
+    r"""The unique identifier of the presentation being referred to"""
+    revision: NotRequired[str]
+
+
+class HyperlinkPresentation(BaseModel):
+    r"""The reference to the linked presentation for `presentation` type hyperlinks"""
+
+    presentation: Optional[str] = None
+    r"""The unique identifier of the presentation being referred to"""
+
+    revision: Optional[str] = None
+
+    @model_serializer(mode="wrap")
+    def serialize_model(self, handler):
+        optional_fields = set(["presentation", "revision"])
         serialized = handler(self)
         m = {}
 
@@ -155,60 +189,27 @@ class HyperlinkSheet(BaseModel):
 class HyperlinkSlideTypedDict(TypedDict):
     r"""The reference to the linked slide for `slide` type hyperlinks"""
 
+    slide: NotRequired[str]
+    r"""The unique identifier of the slide being referred to"""
     presentation: NotRequired[str]
     r"""The unique identifier of the presentation containing the slide being referred to"""
     revision: NotRequired[str]
-    slide: NotRequired[str]
-    r"""The unique identifier of the slide being referred to"""
 
 
 class HyperlinkSlide(BaseModel):
     r"""The reference to the linked slide for `slide` type hyperlinks"""
+
+    slide: Optional[str] = None
+    r"""The unique identifier of the slide being referred to"""
 
     presentation: Optional[str] = None
     r"""The unique identifier of the presentation containing the slide being referred to"""
 
     revision: Optional[str] = None
 
-    slide: Optional[str] = None
-    r"""The unique identifier of the slide being referred to"""
-
     @model_serializer(mode="wrap")
     def serialize_model(self, handler):
-        optional_fields = set(["presentation", "revision", "slide"])
-        serialized = handler(self)
-        m = {}
-
-        for n, f in type(self).model_fields.items():
-            k = f.alias or n
-            val = serialized.get(k)
-
-            if val != UNSET_SENTINEL:
-                if val is not None or k not in optional_fields:
-                    m[k] = val
-
-        return m
-
-
-class HyperlinkSpreadsheetTypedDict(TypedDict):
-    r"""The reference to the linked spreadsheet for `spreadsheet` type hyperlinks"""
-
-    revision: NotRequired[str]
-    spreadsheet: NotRequired[str]
-    r"""The unique identifier of the spreadsheet being referred to"""
-
-
-class HyperlinkSpreadsheet(BaseModel):
-    r"""The reference to the linked spreadsheet for `spreadsheet` type hyperlinks"""
-
-    revision: Optional[str] = None
-
-    spreadsheet: Optional[str] = None
-    r"""The unique identifier of the spreadsheet being referred to"""
-
-    @model_serializer(mode="wrap")
-    def serialize_model(self, handler):
-        optional_fields = set(["revision", "spreadsheet"])
+        optional_fields = set(["slide", "presentation", "revision"])
         serialized = handler(self)
         m = {}
 
@@ -230,16 +231,16 @@ class HyperlinkTypedDict(TypedDict):
     r"""The type of the hyperlink"""
     document: NotRequired[Nullable[HyperlinkDocumentTypedDict]]
     r"""The reference to the linked document for `document` type hyperlinks"""
-    presentation: NotRequired[Nullable[HyperlinkPresentationTypedDict]]
-    r"""The reference to the linked presentation for `presentation` type hyperlinks"""
     section: NotRequired[Nullable[HyperlinkSectionTypedDict]]
     r"""The reference to the linked section for `section` type hyperlinks"""
-    sheet: NotRequired[Nullable[HyperlinkSheetTypedDict]]
-    r"""The reference to the linked sheet for `sheet` type hyperlinks"""
-    slide: NotRequired[Nullable[HyperlinkSlideTypedDict]]
-    r"""The reference to the linked slide for `slide` type hyperlinks"""
     spreadsheet: NotRequired[Nullable[HyperlinkSpreadsheetTypedDict]]
     r"""The reference to the linked spreadsheet for `spreadsheet` type hyperlinks"""
+    sheet: NotRequired[Nullable[HyperlinkSheetTypedDict]]
+    r"""The reference to the linked sheet for `sheet` type hyperlinks"""
+    presentation: NotRequired[Nullable[HyperlinkPresentationTypedDict]]
+    r"""The reference to the linked presentation for `presentation` type hyperlinks"""
+    slide: NotRequired[Nullable[HyperlinkSlideTypedDict]]
+    r"""The reference to the linked slide for `slide` type hyperlinks"""
     url: NotRequired[Nullable[str]]
     r"""The raw URL for `url` type hyperlinks."""
 
@@ -253,45 +254,54 @@ class Hyperlink(BaseModel):
     document: OptionalNullable[HyperlinkDocument] = UNSET
     r"""The reference to the linked document for `document` type hyperlinks"""
 
-    presentation: OptionalNullable[HyperlinkPresentation] = UNSET
-    r"""The reference to the linked presentation for `presentation` type hyperlinks"""
-
     section: OptionalNullable[HyperlinkSection] = UNSET
     r"""The reference to the linked section for `section` type hyperlinks"""
-
-    sheet: OptionalNullable[HyperlinkSheet] = UNSET
-    r"""The reference to the linked sheet for `sheet` type hyperlinks"""
-
-    slide: OptionalNullable[HyperlinkSlide] = UNSET
-    r"""The reference to the linked slide for `slide` type hyperlinks"""
 
     spreadsheet: OptionalNullable[HyperlinkSpreadsheet] = UNSET
     r"""The reference to the linked spreadsheet for `spreadsheet` type hyperlinks"""
 
+    sheet: OptionalNullable[HyperlinkSheet] = UNSET
+    r"""The reference to the linked sheet for `sheet` type hyperlinks"""
+
+    presentation: OptionalNullable[HyperlinkPresentation] = UNSET
+    r"""The reference to the linked presentation for `presentation` type hyperlinks"""
+
+    slide: OptionalNullable[HyperlinkSlide] = UNSET
+    r"""The reference to the linked slide for `slide` type hyperlinks"""
+
     url: OptionalNullable[str] = UNSET
     r"""The raw URL for `url` type hyperlinks."""
+
+    @field_serializer("type")
+    def serialize_type(self, value):
+        if isinstance(value, str):
+            try:
+                return models.HyperlinkType(value)
+            except ValueError:
+                return value
+        return value
 
     @model_serializer(mode="wrap")
     def serialize_model(self, handler):
         optional_fields = set(
             [
                 "document",
-                "presentation",
                 "section",
-                "sheet",
-                "slide",
                 "spreadsheet",
+                "sheet",
+                "presentation",
+                "slide",
                 "url",
             ]
         )
         nullable_fields = set(
             [
                 "document",
-                "presentation",
                 "section",
-                "sheet",
-                "slide",
                 "spreadsheet",
+                "sheet",
+                "presentation",
+                "slide",
                 "url",
             ]
         )

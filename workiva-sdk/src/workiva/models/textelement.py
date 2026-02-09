@@ -20,13 +20,14 @@ from .unspecifiedtextelement import (
 )
 from enum import Enum
 import pydantic
-from pydantic import model_serializer
+from pydantic import field_serializer, model_serializer
 from typing import Optional
 from typing_extensions import Annotated, NotRequired, TypedDict
+from workiva import models, utils
 from workiva.types import BaseModel, Nullable, OptionalNullable, UNSET, UNSET_SENTINEL
 
 
-class TextElementType(str, Enum):
+class TextElementType(str, Enum, metaclass=utils.OpenEnumMeta):
     r"""The type of the text element in rich text"""
 
     CHART = "chart"
@@ -153,6 +154,15 @@ class TextElement(BaseModel):
     r"""An unspecified text element to use as a placeholder for elements that have not been explicitly defined in API models.
 
     """
+
+    @field_serializer("type")
+    def serialize_type(self, value):
+        if isinstance(value, str):
+            try:
+                return models.TextElementType(value)
+            except ValueError:
+                return value
+        return value
 
     @model_serializer(mode="wrap")
     def serialize_model(self, handler):

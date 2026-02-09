@@ -3,11 +3,13 @@
 from __future__ import annotations
 from enum import Enum
 import pydantic
+from pydantic import field_serializer
 from typing_extensions import Annotated, TypedDict
+from workiva import models, utils
 from workiva.types import BaseModel
 
 
-class System(str, Enum):
+class System(str, Enum, metaclass=utils.OpenEnumMeta):
     r"""The name of the system holding this reference."""
 
     PREP = "prep"
@@ -47,3 +49,12 @@ class QueryDependencyDto(BaseModel):
 
     table_id: Annotated[str, pydantic.Field(alias="tableId")]
     r"""The id of the table this dependency represents."""
+
+    @field_serializer("system")
+    def serialize_system(self, value):
+        if isinstance(value, str):
+            try:
+                return models.System(value)
+            except ValueError:
+                return value
+        return value

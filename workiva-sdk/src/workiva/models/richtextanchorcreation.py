@@ -5,7 +5,9 @@ from .richtextselection import RichTextSelection, RichTextSelectionTypedDict
 from .richtextselectionanchorattachmentpointtype import (
     RichTextSelectionAnchorAttachmentPointType,
 )
+from pydantic import field_serializer
 from typing_extensions import TypedDict
+from workiva import models
 from workiva.types import BaseModel
 
 
@@ -31,3 +33,12 @@ class RichTextAnchorCreation(BaseModel):
 
     type: RichTextSelectionAnchorAttachmentPointType
     r"""The type of attachment point."""
+
+    @field_serializer("type")
+    def serialize_type(self, value):
+        if isinstance(value, str):
+            try:
+                return models.RichTextSelectionAnchorAttachmentPointType(value)
+            except ValueError:
+                return value
+        return value

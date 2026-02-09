@@ -3,7 +3,6 @@
 from abc import ABC, abstractmethod
 import httpx
 from typing import Any, Callable, List, Optional, Tuple, Union
-from workiva.httpclient import HttpClient
 from workiva.sdkconfiguration import SDKConfiguration
 
 
@@ -64,7 +63,7 @@ class AfterErrorContext(HookContext):
 
 class SDKInitHook(ABC):
     @abstractmethod
-    def sdk_init(self, base_url: str, client: HttpClient) -> Tuple[str, HttpClient]:
+    def sdk_init(self, config: SDKConfiguration) -> SDKConfiguration:
         pass
 
 

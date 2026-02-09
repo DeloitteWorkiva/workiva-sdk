@@ -11,37 +11,37 @@ from workiva.utils import FieldMetadata, PathParamMetadata, QueryParamMetadata
 
 
 class GetSheetDataRequestTypedDict(TypedDict):
-    sheet_id: str
-    r"""The unique identifier of the sheet"""
     spreadsheet_id: str
     r"""The unique identifier of the spreadsheet"""
+    sheet_id: str
+    r"""The unique identifier of the sheet"""
     cellrange: NotRequired[str]
     r"""The range to query. If not provided, the entire sheet will be queried.
     A1 style representation of a cell or range. A range my be unbounded in any/all directions by leaving off the corresponding column or row.
 
     """
-    fields: NotRequired[str]
-    r"""A restricted set of fields for a given resource."""
     maxcellsperpage: NotRequired[int]
     r"""The maximum number of cells to retrieve. The default is 50000. The maximum allowed value is 50000."""
     next: NotRequired[str]
     r"""Pagination cursor for next set of results."""
+    fields: NotRequired[str]
+    r"""A restricted set of fields for a given resource."""
 
 
 class GetSheetDataRequest(BaseModel):
-    sheet_id: Annotated[
-        str,
-        pydantic.Field(alias="sheetId"),
-        FieldMetadata(path=PathParamMetadata(style="simple", explode=False)),
-    ]
-    r"""The unique identifier of the sheet"""
-
     spreadsheet_id: Annotated[
         str,
         pydantic.Field(alias="spreadsheetId"),
         FieldMetadata(path=PathParamMetadata(style="simple", explode=False)),
     ]
     r"""The unique identifier of the spreadsheet"""
+
+    sheet_id: Annotated[
+        str,
+        pydantic.Field(alias="sheetId"),
+        FieldMetadata(path=PathParamMetadata(style="simple", explode=False)),
+    ]
+    r"""The unique identifier of the sheet"""
 
     cellrange: Annotated[
         Optional[str],
@@ -52,13 +52,6 @@ class GetSheetDataRequest(BaseModel):
     A1 style representation of a cell or range. A range my be unbounded in any/all directions by leaving off the corresponding column or row.
 
     """
-
-    fields: Annotated[
-        Optional[str],
-        pydantic.Field(alias="$fields"),
-        FieldMetadata(query=QueryParamMetadata(style="form", explode=True)),
-    ] = None
-    r"""A restricted set of fields for a given resource."""
 
     maxcellsperpage: Annotated[
         Optional[int],
@@ -74,9 +67,16 @@ class GetSheetDataRequest(BaseModel):
     ] = None
     r"""Pagination cursor for next set of results."""
 
+    fields: Annotated[
+        Optional[str],
+        pydantic.Field(alias="$fields"),
+        FieldMetadata(query=QueryParamMetadata(style="form", explode=True)),
+    ] = None
+    r"""A restricted set of fields for a given resource."""
+
     @model_serializer(mode="wrap")
     def serialize_model(self, handler):
-        optional_fields = set(["cellrange", "fields", "maxcellsperpage", "next"])
+        optional_fields = set(["cellrange", "maxcellsperpage", "next", "fields"])
         serialized = handler(self)
         m = {}
 

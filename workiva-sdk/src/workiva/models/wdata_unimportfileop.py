@@ -20,28 +20,28 @@ WDATA_UNIMPORT_FILE_OP_SERVERS = [
 
 
 class WdataUnimportFileRequestTypedDict(TypedDict):
-    file_id: str
-    r"""The unique identifier of the file"""
     table_id: str
     r"""The unique identifier of the table"""
+    file_id: str
+    r"""The unique identifier of the file"""
     force: NotRequired[str]
     r"""If true, unimports and deletes file from the table"""
 
 
 class WdataUnimportFileRequest(BaseModel):
-    file_id: Annotated[
-        str,
-        pydantic.Field(alias="fileId"),
-        FieldMetadata(path=PathParamMetadata(style="simple", explode=False)),
-    ]
-    r"""The unique identifier of the file"""
-
     table_id: Annotated[
         str,
         pydantic.Field(alias="tableId"),
         FieldMetadata(path=PathParamMetadata(style="simple", explode=False)),
     ]
     r"""The unique identifier of the table"""
+
+    file_id: Annotated[
+        str,
+        pydantic.Field(alias="fileId"),
+        FieldMetadata(path=PathParamMetadata(style="simple", explode=False)),
+    ]
+    r"""The unique identifier of the file"""
 
     force: Annotated[
         Optional[str],

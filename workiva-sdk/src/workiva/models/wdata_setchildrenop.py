@@ -20,22 +20,22 @@ WDATA_SET_CHILDREN_OP_SERVERS = [
 
 
 class WdataSetChildrenRequestTypedDict(TypedDict):
-    request_body: List[FolderableDtoInputTypedDict]
-    r"""The representation of the entities to drop into the folder"""
     folder_id: str
     r"""The unique identifier of the folder"""
+    request_body: List[FolderableDtoInputTypedDict]
+    r"""The representation of the entities to drop into the folder"""
 
 
 class WdataSetChildrenRequest(BaseModel):
-    request_body: Annotated[
-        List[FolderableDtoInput],
-        FieldMetadata(request=RequestMetadata(media_type="application/json")),
-    ]
-    r"""The representation of the entities to drop into the folder"""
-
     folder_id: Annotated[
         str,
         pydantic.Field(alias="folderId"),
         FieldMetadata(path=PathParamMetadata(style="simple", explode=False)),
     ]
     r"""The unique identifier of the folder"""
+
+    request_body: Annotated[
+        List[FolderableDtoInput],
+        FieldMetadata(request=RequestMetadata(media_type="application/json")),
+    ]
+    r"""The representation of the entities to drop into the folder"""

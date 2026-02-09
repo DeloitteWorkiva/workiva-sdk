@@ -13,25 +13,25 @@ from workiva.utils import FieldMetadata, PathParamMetadata, RequestMetadata
 
 
 class PresentationFiltersReapplicationRequestTypedDict(TypedDict):
-    presentation_filters_reapplication: PresentationFiltersReapplicationTypedDict
-    r"""The filter reapplication request to apply"""
     presentation_id: str
     r"""The unique identifier of the presentation"""
+    presentation_filters_reapplication: PresentationFiltersReapplicationTypedDict
+    r"""The filter reapplication request to apply"""
 
 
 class PresentationFiltersReapplicationRequest(BaseModel):
-    presentation_filters_reapplication: Annotated[
-        PresentationFiltersReapplication,
-        FieldMetadata(request=RequestMetadata(media_type="application/json")),
-    ]
-    r"""The filter reapplication request to apply"""
-
     presentation_id: Annotated[
         str,
         pydantic.Field(alias="presentationId"),
         FieldMetadata(path=PathParamMetadata(style="simple", explode=False)),
     ]
     r"""The unique identifier of the presentation"""
+
+    presentation_filters_reapplication: Annotated[
+        PresentationFiltersReapplication,
+        FieldMetadata(request=RequestMetadata(media_type="application/json")),
+    ]
+    r"""The filter reapplication request to apply"""
 
 
 class PresentationFiltersReapplicationResponseTypedDict(TypedDict):

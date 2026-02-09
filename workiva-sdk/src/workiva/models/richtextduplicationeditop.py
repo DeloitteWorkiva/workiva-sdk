@@ -13,25 +13,25 @@ from workiva.utils import FieldMetadata, PathParamMetadata, RequestMetadata
 
 
 class RichTextDuplicationEditRequestTypedDict(TypedDict):
-    rich_text_duplication_edit: RichTextDuplicationEditTypedDict
-    r"""The rich text duplication edits to apply"""
     rich_text_id: str
     r"""The unique identifier of the rich text content"""
+    rich_text_duplication_edit: RichTextDuplicationEditTypedDict
+    r"""The rich text duplication edits to apply"""
 
 
 class RichTextDuplicationEditRequest(BaseModel):
-    rich_text_duplication_edit: Annotated[
-        RichTextDuplicationEdit,
-        FieldMetadata(request=RequestMetadata(media_type="application/json")),
-    ]
-    r"""The rich text duplication edits to apply"""
-
     rich_text_id: Annotated[
         str,
         pydantic.Field(alias="richTextId"),
         FieldMetadata(path=PathParamMetadata(style="simple", explode=False)),
     ]
     r"""The unique identifier of the rich text content"""
+
+    rich_text_duplication_edit: Annotated[
+        RichTextDuplicationEdit,
+        FieldMetadata(request=RequestMetadata(media_type="application/json")),
+    ]
+    r"""The rich text duplication edits to apply"""
 
 
 class RichTextDuplicationEditResponseTypedDict(TypedDict):

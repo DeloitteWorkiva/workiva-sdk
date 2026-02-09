@@ -9,22 +9,22 @@ from workiva.utils import FieldMetadata, PathParamMetadata, RequestMetadata
 
 
 class CreateMetricRequestTypedDict(TypedDict):
-    metric: MetricInputTypedDict
-    r"""The properties of the metric to create"""
     program_id: str
     r"""The unique identifier of the program"""
+    metric: MetricInputTypedDict
+    r"""The properties of the metric to create"""
 
 
 class CreateMetricRequest(BaseModel):
-    metric: Annotated[
-        MetricInput,
-        FieldMetadata(request=RequestMetadata(media_type="application/json")),
-    ]
-    r"""The properties of the metric to create"""
-
     program_id: Annotated[
         str,
         pydantic.Field(alias="programId"),
         FieldMetadata(path=PathParamMetadata(style="simple", explode=False)),
     ]
     r"""The unique identifier of the program"""
+
+    metric: Annotated[
+        MetricInput,
+        FieldMetadata(request=RequestMetadata(media_type="application/json")),
+    ]
+    r"""The properties of the metric to create"""

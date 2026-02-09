@@ -48,7 +48,7 @@ class DocxOptions(BaseModel):
         return m
 
 
-class Format(str, Enum):
+class DocumentExportFormat(str, Enum):
     r"""The file format to export the document as."""
 
     PDF = "pdf"
@@ -73,12 +73,12 @@ class PdfOptionsTypedDict(TypedDict):
     r"""Whether to include leader dots when exporting to .PDF. False by default."""
     include_track_changes: NotRequired[bool]
     r"""Whether to include track changes when exporting to .PDF. False by default."""
-    remove_space_from_partial_export: NotRequired[bool]
-    r"""Whether to remove space from partial exports when exporting to .PDF. False by default."""
     tag_for_web_accessibility: NotRequired[bool]
     r"""Whether to tag for web accessibility when exporting to .PDF. False by default."""
     use_cmyk_colorspace: NotRequired[bool]
     r"""Whether to use CMYK colorspace when exporting to .PDF. False by default."""
+    remove_space_from_partial_export: NotRequired[bool]
+    r"""Whether to remove space from partial exports when exporting to .PDF. False by default."""
 
 
 class PdfOptions(BaseModel):
@@ -119,11 +119,6 @@ class PdfOptions(BaseModel):
     ] = False
     r"""Whether to include track changes when exporting to .PDF. False by default."""
 
-    remove_space_from_partial_export: Annotated[
-        Optional[bool], pydantic.Field(alias="removeSpaceFromPartialExport")
-    ] = False
-    r"""Whether to remove space from partial exports when exporting to .PDF. False by default."""
-
     tag_for_web_accessibility: Annotated[
         Optional[bool], pydantic.Field(alias="tagForWebAccessibility")
     ] = False
@@ -133,6 +128,11 @@ class PdfOptions(BaseModel):
         Optional[bool], pydantic.Field(alias="useCmykColorspace")
     ] = False
     r"""Whether to use CMYK colorspace when exporting to .PDF. False by default."""
+
+    remove_space_from_partial_export: Annotated[
+        Optional[bool], pydantic.Field(alias="removeSpaceFromPartialExport")
+    ] = False
+    r"""Whether to remove space from partial exports when exporting to .PDF. False by default."""
 
     @model_serializer(mode="wrap")
     def serialize_model(self, handler):
@@ -145,9 +145,9 @@ class PdfOptions(BaseModel):
                 "includeHyperlinks",
                 "includeLeaderDots",
                 "includeTrackChanges",
-                "removeSpaceFromPartialExport",
                 "tagForWebAccessibility",
                 "useCmykColorspace",
+                "removeSpaceFromPartialExport",
             ]
         )
         serialized = handler(self)
@@ -237,7 +237,7 @@ class XhtmlOptions(BaseModel):
 class DocumentExportTypedDict(TypedDict):
     r"""Details about the document export, including its format and options"""
 
-    format_: Format
+    format_: DocumentExportFormat
     r"""The file format to export the document as."""
     docx_options: NotRequired[Nullable[DocxOptionsTypedDict]]
     pdf_options: NotRequired[Nullable[PdfOptionsTypedDict]]
@@ -249,7 +249,7 @@ class DocumentExportTypedDict(TypedDict):
 class DocumentExport(BaseModel):
     r"""Details about the document export, including its format and options"""
 
-    format_: Annotated[Format, pydantic.Field(alias="format")]
+    format_: Annotated[DocumentExportFormat, pydantic.Field(alias="format")]
     r"""The file format to export the document as."""
 
     docx_options: Annotated[

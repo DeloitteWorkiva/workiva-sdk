@@ -12,26 +12,26 @@ from workiva.utils.unmarshal_json_response import unmarshal_json_response
 class Documents(BaseSDK):
     r"""Documents enable you to organize and review data in collaborative files with linked text, documents, and images. Use these endpoints to manage documents and their sections in the Workiva Platform."""
 
-    def copy_section(
+    def get_documents(
         self,
         *,
-        document_id: str,
-        section_id: str,
-        section_copy: Union[models.SectionCopy, models.SectionCopyTypedDict],
+        filter_: Optional[str] = None,
+        order_by: Optional[str] = None,
+        maxpagesize: Optional[int] = 1000,
+        next: Optional[str] = None,
         retries: OptionalNullable[utils.RetryConfig] = UNSET,
         server_url: Optional[str] = None,
         timeout_ms: Optional[int] = None,
         http_headers: Optional[Mapping[str, str]] = None,
-    ) -> models.CopySectionResponse:
-        r"""Copy section
+    ) -> Optional[models.GetDocumentsResponse]:
+        r"""Retrieve a list of documents
 
-        Asynchronously copies a [section](ref:documents#section) given details about the copy's destination within the same or another document. Options are specified using a [SectionCopy](ref:documents#sectioncopy) object.
+        Returns a paginated list of [documents](ref:documents#document).
 
-        Copies only the section's content — not any labels, comments, tasks, or formatting from a style guide. Unless otherwise specified, the copy appears at the top level of its destination document, with an index of 0, and with the same name as the original section.
-
-        :param document_id: The unique identifier of the document
-        :param section_id: The unique identifier of the section
-        :param section_copy: A SectionCopy object
+        :param filter_: The properties to filter the results by.
+        :param order_by: One or more comma-separated expressions to indicate the order in which to sort the results.
+        :param maxpagesize: The maximum number of results to retrieve
+        :param next: Pagination cursor for next set of results.
         :param retries: Override the default retry configuration for this method
         :param server_url: Override the default server URL for this method
         :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
@@ -47,28 +47,26 @@ class Documents(BaseSDK):
         else:
             base_url = self._get_url(base_url, url_variables)
 
-        request = models.CopySectionRequest(
-            document_id=document_id,
-            section_id=section_id,
-            section_copy=utils.get_pydantic_model(section_copy, models.SectionCopy),
+        request = models.GetDocumentsRequest(
+            filter_=filter_,
+            order_by=order_by,
+            maxpagesize=maxpagesize,
+            next=next,
         )
 
         req = self._build_request(
-            method="POST",
-            path="/documents/{documentId}/sections/{sectionId}/copy",
+            method="GET",
+            path="/documents",
             base_url=base_url,
             url_variables=url_variables,
             request=request,
-            request_body_required=True,
-            request_has_path_params=True,
+            request_body_required=False,
+            request_has_path_params=False,
             request_has_query_params=True,
             user_agent_header="user-agent",
             accept_header_value="application/json",
             http_headers=http_headers,
             security=self.sdk_configuration.security,
-            get_serialized_body=lambda: utils.serialize_request_body(
-                request.section_copy, False, False, "json", models.SectionCopy
-            ),
             allow_empty_value=None,
             timeout_ms=timeout_ms,
         )
@@ -85,8 +83,8 @@ class Documents(BaseSDK):
             hook_ctx=HookContext(
                 config=self.sdk_configuration,
                 base_url=base_url or "",
-                operation_id="copySection",
-                oauth2_scopes=["file:write"],
+                operation_id="getDocuments",
+                oauth2_scopes=["file:read"],
                 security_source=self.sdk_configuration.security,
             ),
             request=req,
@@ -105,10 +103,31 @@ class Documents(BaseSDK):
             retry_config=retry_config,
         )
 
+        def next_func() -> Optional[models.GetDocumentsResponse]:
+            body = utils.unmarshal_json(http_res.text, Union[Dict[Any, Any], List[Any]])
+
+            next_cursor = JSONPath("$['@nextLink']").parse(body)
+
+            if len(next_cursor) == 0:
+                return None
+
+            next_cursor = next_cursor[0]
+            if next_cursor is None or str(next_cursor).strip() == "":
+                return None
+
+            return self.get_documents(
+                filter_=filter_,
+                order_by=order_by,
+                maxpagesize=maxpagesize,
+                next=next,
+                retries=retries,
+            )
+
         response_data: Any = None
-        if utils.match_response(http_res, "202", "*"):
-            return models.CopySectionResponse(
-                headers=utils.get_response_headers(http_res.headers)
+        if utils.match_response(http_res, "200", "application/json"):
+            return models.GetDocumentsResponse(
+                result=unmarshal_json_response(models.DocumentsListResult, http_res),
+                next=next_func,
             )
         if utils.match_response(
             http_res, ["400", "401", "403", "404", "409", "429"], "application/json"
@@ -127,26 +146,26 @@ class Documents(BaseSDK):
 
         raise errors.SDKError("Unexpected response received", http_res)
 
-    async def copy_section_async(
+    async def get_documents_async(
         self,
         *,
-        document_id: str,
-        section_id: str,
-        section_copy: Union[models.SectionCopy, models.SectionCopyTypedDict],
+        filter_: Optional[str] = None,
+        order_by: Optional[str] = None,
+        maxpagesize: Optional[int] = 1000,
+        next: Optional[str] = None,
         retries: OptionalNullable[utils.RetryConfig] = UNSET,
         server_url: Optional[str] = None,
         timeout_ms: Optional[int] = None,
         http_headers: Optional[Mapping[str, str]] = None,
-    ) -> models.CopySectionResponse:
-        r"""Copy section
+    ) -> Optional[models.GetDocumentsResponse]:
+        r"""Retrieve a list of documents
 
-        Asynchronously copies a [section](ref:documents#section) given details about the copy's destination within the same or another document. Options are specified using a [SectionCopy](ref:documents#sectioncopy) object.
+        Returns a paginated list of [documents](ref:documents#document).
 
-        Copies only the section's content — not any labels, comments, tasks, or formatting from a style guide. Unless otherwise specified, the copy appears at the top level of its destination document, with an index of 0, and with the same name as the original section.
-
-        :param document_id: The unique identifier of the document
-        :param section_id: The unique identifier of the section
-        :param section_copy: A SectionCopy object
+        :param filter_: The properties to filter the results by.
+        :param order_by: One or more comma-separated expressions to indicate the order in which to sort the results.
+        :param maxpagesize: The maximum number of results to retrieve
+        :param next: Pagination cursor for next set of results.
         :param retries: Override the default retry configuration for this method
         :param server_url: Override the default server URL for this method
         :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
@@ -162,28 +181,26 @@ class Documents(BaseSDK):
         else:
             base_url = self._get_url(base_url, url_variables)
 
-        request = models.CopySectionRequest(
-            document_id=document_id,
-            section_id=section_id,
-            section_copy=utils.get_pydantic_model(section_copy, models.SectionCopy),
+        request = models.GetDocumentsRequest(
+            filter_=filter_,
+            order_by=order_by,
+            maxpagesize=maxpagesize,
+            next=next,
         )
 
         req = self._build_request_async(
-            method="POST",
-            path="/documents/{documentId}/sections/{sectionId}/copy",
+            method="GET",
+            path="/documents",
             base_url=base_url,
             url_variables=url_variables,
             request=request,
-            request_body_required=True,
-            request_has_path_params=True,
+            request_body_required=False,
+            request_has_path_params=False,
             request_has_query_params=True,
             user_agent_header="user-agent",
             accept_header_value="application/json",
             http_headers=http_headers,
             security=self.sdk_configuration.security,
-            get_serialized_body=lambda: utils.serialize_request_body(
-                request.section_copy, False, False, "json", models.SectionCopy
-            ),
             allow_empty_value=None,
             timeout_ms=timeout_ms,
         )
@@ -200,8 +217,8 @@ class Documents(BaseSDK):
             hook_ctx=HookContext(
                 config=self.sdk_configuration,
                 base_url=base_url or "",
-                operation_id="copySection",
-                oauth2_scopes=["file:write"],
+                operation_id="getDocuments",
+                oauth2_scopes=["file:read"],
                 security_source=self.sdk_configuration.security,
             ),
             request=req,
@@ -220,10 +237,34 @@ class Documents(BaseSDK):
             retry_config=retry_config,
         )
 
+        def next_func() -> Awaitable[Optional[models.GetDocumentsResponse]]:
+            body = utils.unmarshal_json(http_res.text, Union[Dict[Any, Any], List[Any]])
+
+            async def empty_result():
+                return None
+
+            next_cursor = JSONPath("$['@nextLink']").parse(body)
+
+            if len(next_cursor) == 0:
+                return empty_result()
+
+            next_cursor = next_cursor[0]
+            if next_cursor is None or str(next_cursor).strip() == "":
+                return empty_result()
+
+            return self.get_documents_async(
+                filter_=filter_,
+                order_by=order_by,
+                maxpagesize=maxpagesize,
+                next=next,
+                retries=retries,
+            )
+
         response_data: Any = None
-        if utils.match_response(http_res, "202", "*"):
-            return models.CopySectionResponse(
-                headers=utils.get_response_headers(http_res.headers)
+        if utils.match_response(http_res, "200", "application/json"):
+            return models.GetDocumentsResponse(
+                result=unmarshal_json_response(models.DocumentsListResult, http_res),
+                next=next_func,
             )
         if utils.match_response(
             http_res, ["400", "401", "403", "404", "409", "429"], "application/json"
@@ -242,23 +283,23 @@ class Documents(BaseSDK):
 
         raise errors.SDKError("Unexpected response received", http_res)
 
-    def create_section(
+    def get_document_by_id(
         self,
         *,
         document_id: str,
-        section: Union[models.SectionInput, models.SectionInputTypedDict],
+        expand: Optional[str] = None,
         retries: OptionalNullable[utils.RetryConfig] = UNSET,
         server_url: Optional[str] = None,
         timeout_ms: Optional[int] = None,
         http_headers: Optional[Mapping[str, str]] = None,
-    ) -> models.Section:
-        r"""Create a new section in a document
+    ) -> models.Document:
+        r"""Retrieve a single document
 
-        Creates a new [section](ref:documents#section) in a [document](ref:documents#document), given its properties. By default, the new section appears at the top-most position.
+        Retrieves a [document](ref:documents#document) given its ID.
 
 
         :param document_id: The unique identifier of the document
-        :param section: The properties of the section to create
+        :param expand: Returns related resources inline with the main resource
         :param retries: Override the default retry configuration for this method
         :param server_url: Override the default server URL for this method
         :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
@@ -274,232 +315,14 @@ class Documents(BaseSDK):
         else:
             base_url = self._get_url(base_url, url_variables)
 
-        request = models.CreateSectionRequest(
+        request = models.GetDocumentByIDRequest(
             document_id=document_id,
-            section=utils.get_pydantic_model(section, models.SectionInput),
+            expand=expand,
         )
 
         req = self._build_request(
-            method="POST",
-            path="/documents/{documentId}/sections",
-            base_url=base_url,
-            url_variables=url_variables,
-            request=request,
-            request_body_required=True,
-            request_has_path_params=True,
-            request_has_query_params=True,
-            user_agent_header="user-agent",
-            accept_header_value="application/json",
-            http_headers=http_headers,
-            security=self.sdk_configuration.security,
-            get_serialized_body=lambda: utils.serialize_request_body(
-                request.section, False, False, "json", models.SectionInput
-            ),
-            allow_empty_value=None,
-            timeout_ms=timeout_ms,
-        )
-
-        if retries == UNSET:
-            if self.sdk_configuration.retry_config is not UNSET:
-                retries = self.sdk_configuration.retry_config
-
-        retry_config = None
-        if isinstance(retries, utils.RetryConfig):
-            retry_config = (retries, ["429", "500", "502", "503", "504"])
-
-        http_res = self.do_request(
-            hook_ctx=HookContext(
-                config=self.sdk_configuration,
-                base_url=base_url or "",
-                operation_id="createSection",
-                oauth2_scopes=["file:write"],
-                security_source=self.sdk_configuration.security,
-            ),
-            request=req,
-            error_status_codes=[
-                "400",
-                "401",
-                "403",
-                "404",
-                "409",
-                "429",
-                "4XX",
-                "500",
-                "503",
-                "5XX",
-            ],
-            retry_config=retry_config,
-        )
-
-        response_data: Any = None
-        if utils.match_response(http_res, "201", "application/json"):
-            return unmarshal_json_response(models.Section, http_res)
-        if utils.match_response(
-            http_res, ["400", "401", "403", "404", "409", "429"], "application/json"
-        ):
-            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
-            raise errors.ErrorResponse(response_data, http_res)
-        if utils.match_response(http_res, ["500", "503"], "application/json"):
-            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
-            raise errors.ErrorResponse(response_data, http_res)
-        if utils.match_response(http_res, "4XX", "*"):
-            http_res_text = utils.stream_to_text(http_res)
-            raise errors.SDKError("API error occurred", http_res, http_res_text)
-        if utils.match_response(http_res, "5XX", "*"):
-            http_res_text = utils.stream_to_text(http_res)
-            raise errors.SDKError("API error occurred", http_res, http_res_text)
-
-        raise errors.SDKError("Unexpected response received", http_res)
-
-    async def create_section_async(
-        self,
-        *,
-        document_id: str,
-        section: Union[models.SectionInput, models.SectionInputTypedDict],
-        retries: OptionalNullable[utils.RetryConfig] = UNSET,
-        server_url: Optional[str] = None,
-        timeout_ms: Optional[int] = None,
-        http_headers: Optional[Mapping[str, str]] = None,
-    ) -> models.Section:
-        r"""Create a new section in a document
-
-        Creates a new [section](ref:documents#section) in a [document](ref:documents#document), given its properties. By default, the new section appears at the top-most position.
-
-
-        :param document_id: The unique identifier of the document
-        :param section: The properties of the section to create
-        :param retries: Override the default retry configuration for this method
-        :param server_url: Override the default server URL for this method
-        :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
-        :param http_headers: Additional headers to set or replace on requests.
-        """
-        base_url = None
-        url_variables = None
-        if timeout_ms is None:
-            timeout_ms = self.sdk_configuration.timeout_ms
-
-        if server_url is not None:
-            base_url = server_url
-        else:
-            base_url = self._get_url(base_url, url_variables)
-
-        request = models.CreateSectionRequest(
-            document_id=document_id,
-            section=utils.get_pydantic_model(section, models.SectionInput),
-        )
-
-        req = self._build_request_async(
-            method="POST",
-            path="/documents/{documentId}/sections",
-            base_url=base_url,
-            url_variables=url_variables,
-            request=request,
-            request_body_required=True,
-            request_has_path_params=True,
-            request_has_query_params=True,
-            user_agent_header="user-agent",
-            accept_header_value="application/json",
-            http_headers=http_headers,
-            security=self.sdk_configuration.security,
-            get_serialized_body=lambda: utils.serialize_request_body(
-                request.section, False, False, "json", models.SectionInput
-            ),
-            allow_empty_value=None,
-            timeout_ms=timeout_ms,
-        )
-
-        if retries == UNSET:
-            if self.sdk_configuration.retry_config is not UNSET:
-                retries = self.sdk_configuration.retry_config
-
-        retry_config = None
-        if isinstance(retries, utils.RetryConfig):
-            retry_config = (retries, ["429", "500", "502", "503", "504"])
-
-        http_res = await self.do_request_async(
-            hook_ctx=HookContext(
-                config=self.sdk_configuration,
-                base_url=base_url or "",
-                operation_id="createSection",
-                oauth2_scopes=["file:write"],
-                security_source=self.sdk_configuration.security,
-            ),
-            request=req,
-            error_status_codes=[
-                "400",
-                "401",
-                "403",
-                "404",
-                "409",
-                "429",
-                "4XX",
-                "500",
-                "503",
-                "5XX",
-            ],
-            retry_config=retry_config,
-        )
-
-        response_data: Any = None
-        if utils.match_response(http_res, "201", "application/json"):
-            return unmarshal_json_response(models.Section, http_res)
-        if utils.match_response(
-            http_res, ["400", "401", "403", "404", "409", "429"], "application/json"
-        ):
-            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
-            raise errors.ErrorResponse(response_data, http_res)
-        if utils.match_response(http_res, ["500", "503"], "application/json"):
-            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
-            raise errors.ErrorResponse(response_data, http_res)
-        if utils.match_response(http_res, "4XX", "*"):
-            http_res_text = await utils.stream_to_text_async(http_res)
-            raise errors.SDKError("API error occurred", http_res, http_res_text)
-        if utils.match_response(http_res, "5XX", "*"):
-            http_res_text = await utils.stream_to_text_async(http_res)
-            raise errors.SDKError("API error occurred", http_res, http_res_text)
-
-        raise errors.SDKError("Unexpected response received", http_res)
-
-    def delete_section_by_id(
-        self,
-        *,
-        document_id: str,
-        section_id: str,
-        retries: OptionalNullable[utils.RetryConfig] = UNSET,
-        server_url: Optional[str] = None,
-        timeout_ms: Optional[int] = None,
-        http_headers: Optional[Mapping[str, str]] = None,
-    ):
-        r"""Delete a single section
-
-        Deletes a [section](ref:documents#section) given its ID.
-
-
-        :param document_id: The unique identifier of the document
-        :param section_id: The unique identifier of the section
-        :param retries: Override the default retry configuration for this method
-        :param server_url: Override the default server URL for this method
-        :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
-        :param http_headers: Additional headers to set or replace on requests.
-        """
-        base_url = None
-        url_variables = None
-        if timeout_ms is None:
-            timeout_ms = self.sdk_configuration.timeout_ms
-
-        if server_url is not None:
-            base_url = server_url
-        else:
-            base_url = self._get_url(base_url, url_variables)
-
-        request = models.DeleteSectionByIDRequest(
-            document_id=document_id,
-            section_id=section_id,
-        )
-
-        req = self._build_request(
-            method="DELETE",
-            path="/documents/{documentId}/sections/{sectionId}",
+            method="GET",
+            path="/documents/{documentId}",
             base_url=base_url,
             url_variables=url_variables,
             request=request,
@@ -526,8 +349,8 @@ class Documents(BaseSDK):
             hook_ctx=HookContext(
                 config=self.sdk_configuration,
                 base_url=base_url or "",
-                operation_id="deleteSectionById",
-                oauth2_scopes=["file:write"],
+                operation_id="getDocumentById",
+                oauth2_scopes=["file:read"],
                 security_source=self.sdk_configuration.security,
             ),
             request=req,
@@ -547,8 +370,8 @@ class Documents(BaseSDK):
         )
 
         response_data: Any = None
-        if utils.match_response(http_res, "204", "*"):
-            return
+        if utils.match_response(http_res, "200", "application/json"):
+            return unmarshal_json_response(models.Document, http_res)
         if utils.match_response(
             http_res, ["400", "401", "403", "404", "409", "429"], "application/json"
         ):
@@ -566,23 +389,23 @@ class Documents(BaseSDK):
 
         raise errors.SDKError("Unexpected response received", http_res)
 
-    async def delete_section_by_id_async(
+    async def get_document_by_id_async(
         self,
         *,
         document_id: str,
-        section_id: str,
+        expand: Optional[str] = None,
         retries: OptionalNullable[utils.RetryConfig] = UNSET,
         server_url: Optional[str] = None,
         timeout_ms: Optional[int] = None,
         http_headers: Optional[Mapping[str, str]] = None,
-    ):
-        r"""Delete a single section
+    ) -> models.Document:
+        r"""Retrieve a single document
 
-        Deletes a [section](ref:documents#section) given its ID.
+        Retrieves a [document](ref:documents#document) given its ID.
 
 
         :param document_id: The unique identifier of the document
-        :param section_id: The unique identifier of the section
+        :param expand: Returns related resources inline with the main resource
         :param retries: Override the default retry configuration for this method
         :param server_url: Override the default server URL for this method
         :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
@@ -598,14 +421,14 @@ class Documents(BaseSDK):
         else:
             base_url = self._get_url(base_url, url_variables)
 
-        request = models.DeleteSectionByIDRequest(
+        request = models.GetDocumentByIDRequest(
             document_id=document_id,
-            section_id=section_id,
+            expand=expand,
         )
 
         req = self._build_request_async(
-            method="DELETE",
-            path="/documents/{documentId}/sections/{sectionId}",
+            method="GET",
+            path="/documents/{documentId}",
             base_url=base_url,
             url_variables=url_variables,
             request=request,
@@ -632,7 +455,203 @@ class Documents(BaseSDK):
             hook_ctx=HookContext(
                 config=self.sdk_configuration,
                 base_url=base_url or "",
-                operation_id="deleteSectionById",
+                operation_id="getDocumentById",
+                oauth2_scopes=["file:read"],
+                security_source=self.sdk_configuration.security,
+            ),
+            request=req,
+            error_status_codes=[
+                "400",
+                "401",
+                "403",
+                "404",
+                "409",
+                "429",
+                "4XX",
+                "500",
+                "503",
+                "5XX",
+            ],
+            retry_config=retry_config,
+        )
+
+        response_data: Any = None
+        if utils.match_response(http_res, "200", "application/json"):
+            return unmarshal_json_response(models.Document, http_res)
+        if utils.match_response(
+            http_res, ["400", "401", "403", "404", "409", "429"], "application/json"
+        ):
+            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
+            raise errors.ErrorResponse(response_data, http_res)
+        if utils.match_response(http_res, ["500", "503"], "application/json"):
+            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
+            raise errors.ErrorResponse(response_data, http_res)
+        if utils.match_response(http_res, "4XX", "*"):
+            http_res_text = await utils.stream_to_text_async(http_res)
+            raise errors.SDKError("API error occurred", http_res, http_res_text)
+        if utils.match_response(http_res, "5XX", "*"):
+            http_res_text = await utils.stream_to_text_async(http_res)
+            raise errors.SDKError("API error occurred", http_res, http_res_text)
+
+        raise errors.SDKError("Unexpected response received", http_res)
+
+    def partially_update_document_by_id(
+        self,
+        *,
+        document_id: str,
+        request_body: Union[
+            List[models.JSONPatchOperation], List[models.JSONPatchOperationTypedDict]
+        ],
+        retries: OptionalNullable[utils.RetryConfig] = UNSET,
+        server_url: Optional[str] = None,
+        timeout_ms: Optional[int] = None,
+        http_headers: Optional[Mapping[str, str]] = None,
+    ) -> models.PartiallyUpdateDocumentByIDResponse:
+        r"""Partially update a single document
+
+        Updates the properties of a [document](ref:documents#document).
+
+        This is a long running operation. Responses include a `Location` header,
+        which indicates where to poll for results. For more details on long-running job polling,
+        see [Operations endpoint](ref:getoperationbyid).
+
+        ### Options
+
+        |Path                             |PATCH Operations Supported        |
+        |---------------------------------|----------------------------------|
+        |`/customFields/<custom field id>`|`add`, `remove`, `replace`, `test`|
+        |`/customFieldGroups`             |`add`, `remove`, `replace`, `test`|
+        |`/sectionCustomFieldGroups`      |`add`, `remove`, `replace`, `test`|
+        |`/lock`                          |`replace`                         |
+
+        ### Examples
+
+        #### Add a custom field value
+
+        ```json
+        [
+        {
+        \"op\": \"add\",
+        \"path\": \"/customFields/com.workiva.gsr.legal_entity\",
+        \"value\": \"Workiva\"
+        }
+        ]
+        ```
+
+        #### Remove a custom field value
+
+        ```json
+        [
+        {
+        \"op\": \"remove\",
+        \"path\": \"/customFields/com.workiva.gsr.legal_entity\"
+        }
+        ]
+        ```
+
+        #### Replace a custom field value
+
+        ```json
+        [
+        {
+        \"op\": \"replace\",
+        \"path\": \"/customFields/com.workiva.gsr.legal_entity\",
+        \"value\": \"Workiva, Inc.\"
+        }
+        ]
+        ```
+
+        #### Verifying customFieldGroup is empty before replacing the list
+
+        ```json
+        [
+        {
+        \"op\": \"test\",
+        \"path\": \"/customFieldGroups\",
+        \"value\": []
+        },
+        {
+        \"op\": \"replace\",
+        \"path\": \"/customFieldGroups\",
+        \"value\": [\"gsr.reporting\"]
+        }
+        ]
+        ```
+
+        #### Adding a customFieldGroup to the end of a list
+
+        ```json
+        [
+        {
+        \"op\": \"add\",
+        \"path\": \"/customFieldGroups/-\",
+        \"value\": \"gsr.reporting\"
+        }
+        ]
+        ```
+
+
+        :param document_id: The unique identifier of the document
+        :param request_body: A collection of patch operations to apply to the document.
+        :param retries: Override the default retry configuration for this method
+        :param server_url: Override the default server URL for this method
+        :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
+        :param http_headers: Additional headers to set or replace on requests.
+        """
+        base_url = None
+        url_variables = None
+        if timeout_ms is None:
+            timeout_ms = self.sdk_configuration.timeout_ms
+
+        if server_url is not None:
+            base_url = server_url
+        else:
+            base_url = self._get_url(base_url, url_variables)
+
+        request = models.PartiallyUpdateDocumentByIDRequest(
+            document_id=document_id,
+            request_body=utils.get_pydantic_model(
+                request_body, List[models.JSONPatchOperation]
+            ),
+        )
+
+        req = self._build_request(
+            method="PATCH",
+            path="/documents/{documentId}",
+            base_url=base_url,
+            url_variables=url_variables,
+            request=request,
+            request_body_required=True,
+            request_has_path_params=True,
+            request_has_query_params=True,
+            user_agent_header="user-agent",
+            accept_header_value="application/json",
+            http_headers=http_headers,
+            security=self.sdk_configuration.security,
+            get_serialized_body=lambda: utils.serialize_request_body(
+                request.request_body,
+                False,
+                False,
+                "json",
+                List[models.JSONPatchOperation],
+            ),
+            allow_empty_value=None,
+            timeout_ms=timeout_ms,
+        )
+
+        if retries == UNSET:
+            if self.sdk_configuration.retry_config is not UNSET:
+                retries = self.sdk_configuration.retry_config
+
+        retry_config = None
+        if isinstance(retries, utils.RetryConfig):
+            retry_config = (retries, ["429", "500", "502", "503", "504"])
+
+        http_res = self.do_request(
+            hook_ctx=HookContext(
+                config=self.sdk_configuration,
+                base_url=base_url or "",
+                operation_id="partiallyUpdateDocumentById",
                 oauth2_scopes=["file:write"],
                 security_source=self.sdk_configuration.security,
             ),
@@ -653,8 +672,208 @@ class Documents(BaseSDK):
         )
 
         response_data: Any = None
-        if utils.match_response(http_res, "204", "*"):
-            return
+        if utils.match_response(http_res, "202", "*"):
+            return models.PartiallyUpdateDocumentByIDResponse(
+                headers=utils.get_response_headers(http_res.headers)
+            )
+        if utils.match_response(
+            http_res, ["400", "401", "403", "404", "409", "429"], "application/json"
+        ):
+            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
+            raise errors.ErrorResponse(response_data, http_res)
+        if utils.match_response(http_res, ["500", "503"], "application/json"):
+            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
+            raise errors.ErrorResponse(response_data, http_res)
+        if utils.match_response(http_res, "4XX", "*"):
+            http_res_text = utils.stream_to_text(http_res)
+            raise errors.SDKError("API error occurred", http_res, http_res_text)
+        if utils.match_response(http_res, "5XX", "*"):
+            http_res_text = utils.stream_to_text(http_res)
+            raise errors.SDKError("API error occurred", http_res, http_res_text)
+
+        raise errors.SDKError("Unexpected response received", http_res)
+
+    async def partially_update_document_by_id_async(
+        self,
+        *,
+        document_id: str,
+        request_body: Union[
+            List[models.JSONPatchOperation], List[models.JSONPatchOperationTypedDict]
+        ],
+        retries: OptionalNullable[utils.RetryConfig] = UNSET,
+        server_url: Optional[str] = None,
+        timeout_ms: Optional[int] = None,
+        http_headers: Optional[Mapping[str, str]] = None,
+    ) -> models.PartiallyUpdateDocumentByIDResponse:
+        r"""Partially update a single document
+
+        Updates the properties of a [document](ref:documents#document).
+
+        This is a long running operation. Responses include a `Location` header,
+        which indicates where to poll for results. For more details on long-running job polling,
+        see [Operations endpoint](ref:getoperationbyid).
+
+        ### Options
+
+        |Path                             |PATCH Operations Supported        |
+        |---------------------------------|----------------------------------|
+        |`/customFields/<custom field id>`|`add`, `remove`, `replace`, `test`|
+        |`/customFieldGroups`             |`add`, `remove`, `replace`, `test`|
+        |`/sectionCustomFieldGroups`      |`add`, `remove`, `replace`, `test`|
+        |`/lock`                          |`replace`                         |
+
+        ### Examples
+
+        #### Add a custom field value
+
+        ```json
+        [
+        {
+        \"op\": \"add\",
+        \"path\": \"/customFields/com.workiva.gsr.legal_entity\",
+        \"value\": \"Workiva\"
+        }
+        ]
+        ```
+
+        #### Remove a custom field value
+
+        ```json
+        [
+        {
+        \"op\": \"remove\",
+        \"path\": \"/customFields/com.workiva.gsr.legal_entity\"
+        }
+        ]
+        ```
+
+        #### Replace a custom field value
+
+        ```json
+        [
+        {
+        \"op\": \"replace\",
+        \"path\": \"/customFields/com.workiva.gsr.legal_entity\",
+        \"value\": \"Workiva, Inc.\"
+        }
+        ]
+        ```
+
+        #### Verifying customFieldGroup is empty before replacing the list
+
+        ```json
+        [
+        {
+        \"op\": \"test\",
+        \"path\": \"/customFieldGroups\",
+        \"value\": []
+        },
+        {
+        \"op\": \"replace\",
+        \"path\": \"/customFieldGroups\",
+        \"value\": [\"gsr.reporting\"]
+        }
+        ]
+        ```
+
+        #### Adding a customFieldGroup to the end of a list
+
+        ```json
+        [
+        {
+        \"op\": \"add\",
+        \"path\": \"/customFieldGroups/-\",
+        \"value\": \"gsr.reporting\"
+        }
+        ]
+        ```
+
+
+        :param document_id: The unique identifier of the document
+        :param request_body: A collection of patch operations to apply to the document.
+        :param retries: Override the default retry configuration for this method
+        :param server_url: Override the default server URL for this method
+        :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
+        :param http_headers: Additional headers to set or replace on requests.
+        """
+        base_url = None
+        url_variables = None
+        if timeout_ms is None:
+            timeout_ms = self.sdk_configuration.timeout_ms
+
+        if server_url is not None:
+            base_url = server_url
+        else:
+            base_url = self._get_url(base_url, url_variables)
+
+        request = models.PartiallyUpdateDocumentByIDRequest(
+            document_id=document_id,
+            request_body=utils.get_pydantic_model(
+                request_body, List[models.JSONPatchOperation]
+            ),
+        )
+
+        req = self._build_request_async(
+            method="PATCH",
+            path="/documents/{documentId}",
+            base_url=base_url,
+            url_variables=url_variables,
+            request=request,
+            request_body_required=True,
+            request_has_path_params=True,
+            request_has_query_params=True,
+            user_agent_header="user-agent",
+            accept_header_value="application/json",
+            http_headers=http_headers,
+            security=self.sdk_configuration.security,
+            get_serialized_body=lambda: utils.serialize_request_body(
+                request.request_body,
+                False,
+                False,
+                "json",
+                List[models.JSONPatchOperation],
+            ),
+            allow_empty_value=None,
+            timeout_ms=timeout_ms,
+        )
+
+        if retries == UNSET:
+            if self.sdk_configuration.retry_config is not UNSET:
+                retries = self.sdk_configuration.retry_config
+
+        retry_config = None
+        if isinstance(retries, utils.RetryConfig):
+            retry_config = (retries, ["429", "500", "502", "503", "504"])
+
+        http_res = await self.do_request_async(
+            hook_ctx=HookContext(
+                config=self.sdk_configuration,
+                base_url=base_url or "",
+                operation_id="partiallyUpdateDocumentById",
+                oauth2_scopes=["file:write"],
+                security_source=self.sdk_configuration.security,
+            ),
+            request=req,
+            error_status_codes=[
+                "400",
+                "401",
+                "403",
+                "404",
+                "409",
+                "429",
+                "4XX",
+                "500",
+                "503",
+                "5XX",
+            ],
+            retry_config=retry_config,
+        )
+
+        response_data: Any = None
+        if utils.match_response(http_res, "202", "*"):
+            return models.PartiallyUpdateDocumentByIDResponse(
+                headers=utils.get_response_headers(http_res.headers)
+            )
         if utils.match_response(
             http_res, ["400", "401", "403", "404", "409", "429"], "application/json"
         ):
@@ -1392,684 +1611,6 @@ class Documents(BaseSDK):
 
         raise errors.SDKError("Unexpected response received", http_res)
 
-    def document_permissions_modification(
-        self,
-        *,
-        document_id: str,
-        resource_permissions_modification: Union[
-            models.ResourcePermissionsModification,
-            models.ResourcePermissionsModificationTypedDict,
-        ],
-        retries: OptionalNullable[utils.RetryConfig] = UNSET,
-        server_url: Optional[str] = None,
-        timeout_ms: Optional[int] = None,
-        http_headers: Optional[Mapping[str, str]] = None,
-    ):
-        r"""Modify permissions on a document
-
-        Assign and/or revoke permissions on a document. If any modification in a request fails, all modifications on that request fail. <br /><br /> _To modify an existing permission, the existing permission must first be  explicitly revoked. Then, the new permission needs to be assigned. This  can be done in a single request by sending `toAssign` and `toRevoke` in  the request body._
-
-
-        :param document_id: The unique identifier of the document
-        :param resource_permissions_modification: Details about the document permissions modification.
-        :param retries: Override the default retry configuration for this method
-        :param server_url: Override the default server URL for this method
-        :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
-        :param http_headers: Additional headers to set or replace on requests.
-        """
-        base_url = None
-        url_variables = None
-        if timeout_ms is None:
-            timeout_ms = self.sdk_configuration.timeout_ms
-
-        if server_url is not None:
-            base_url = server_url
-        else:
-            base_url = self._get_url(base_url, url_variables)
-
-        request = models.DocumentPermissionsModificationRequest(
-            document_id=document_id,
-            resource_permissions_modification=utils.get_pydantic_model(
-                resource_permissions_modification,
-                models.ResourcePermissionsModification,
-            ),
-        )
-
-        req = self._build_request(
-            method="POST",
-            path="/documents/{documentId}/permissions/modification",
-            base_url=base_url,
-            url_variables=url_variables,
-            request=request,
-            request_body_required=True,
-            request_has_path_params=True,
-            request_has_query_params=True,
-            user_agent_header="user-agent",
-            accept_header_value="application/json",
-            http_headers=http_headers,
-            security=self.sdk_configuration.security,
-            get_serialized_body=lambda: utils.serialize_request_body(
-                request.resource_permissions_modification,
-                False,
-                False,
-                "json",
-                models.ResourcePermissionsModification,
-            ),
-            allow_empty_value=None,
-            timeout_ms=timeout_ms,
-        )
-
-        if retries == UNSET:
-            if self.sdk_configuration.retry_config is not UNSET:
-                retries = self.sdk_configuration.retry_config
-
-        retry_config = None
-        if isinstance(retries, utils.RetryConfig):
-            retry_config = (retries, ["429", "500", "502", "503", "504"])
-
-        http_res = self.do_request(
-            hook_ctx=HookContext(
-                config=self.sdk_configuration,
-                base_url=base_url or "",
-                operation_id="documentPermissionsModification",
-                oauth2_scopes=["file:write"],
-                security_source=self.sdk_configuration.security,
-            ),
-            request=req,
-            error_status_codes=[
-                "400",
-                "401",
-                "403",
-                "404",
-                "409",
-                "429",
-                "4XX",
-                "500",
-                "503",
-                "5XX",
-            ],
-            retry_config=retry_config,
-        )
-
-        response_data: Any = None
-        if utils.match_response(http_res, "204", "*"):
-            return
-        if utils.match_response(
-            http_res, ["400", "401", "403", "404", "409", "429"], "application/json"
-        ):
-            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
-            raise errors.ErrorResponse(response_data, http_res)
-        if utils.match_response(http_res, ["500", "503"], "application/json"):
-            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
-            raise errors.ErrorResponse(response_data, http_res)
-        if utils.match_response(http_res, "4XX", "*"):
-            http_res_text = utils.stream_to_text(http_res)
-            raise errors.SDKError("API error occurred", http_res, http_res_text)
-        if utils.match_response(http_res, "5XX", "*"):
-            http_res_text = utils.stream_to_text(http_res)
-            raise errors.SDKError("API error occurred", http_res, http_res_text)
-
-        raise errors.SDKError("Unexpected response received", http_res)
-
-    async def document_permissions_modification_async(
-        self,
-        *,
-        document_id: str,
-        resource_permissions_modification: Union[
-            models.ResourcePermissionsModification,
-            models.ResourcePermissionsModificationTypedDict,
-        ],
-        retries: OptionalNullable[utils.RetryConfig] = UNSET,
-        server_url: Optional[str] = None,
-        timeout_ms: Optional[int] = None,
-        http_headers: Optional[Mapping[str, str]] = None,
-    ):
-        r"""Modify permissions on a document
-
-        Assign and/or revoke permissions on a document. If any modification in a request fails, all modifications on that request fail. <br /><br /> _To modify an existing permission, the existing permission must first be  explicitly revoked. Then, the new permission needs to be assigned. This  can be done in a single request by sending `toAssign` and `toRevoke` in  the request body._
-
-
-        :param document_id: The unique identifier of the document
-        :param resource_permissions_modification: Details about the document permissions modification.
-        :param retries: Override the default retry configuration for this method
-        :param server_url: Override the default server URL for this method
-        :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
-        :param http_headers: Additional headers to set or replace on requests.
-        """
-        base_url = None
-        url_variables = None
-        if timeout_ms is None:
-            timeout_ms = self.sdk_configuration.timeout_ms
-
-        if server_url is not None:
-            base_url = server_url
-        else:
-            base_url = self._get_url(base_url, url_variables)
-
-        request = models.DocumentPermissionsModificationRequest(
-            document_id=document_id,
-            resource_permissions_modification=utils.get_pydantic_model(
-                resource_permissions_modification,
-                models.ResourcePermissionsModification,
-            ),
-        )
-
-        req = self._build_request_async(
-            method="POST",
-            path="/documents/{documentId}/permissions/modification",
-            base_url=base_url,
-            url_variables=url_variables,
-            request=request,
-            request_body_required=True,
-            request_has_path_params=True,
-            request_has_query_params=True,
-            user_agent_header="user-agent",
-            accept_header_value="application/json",
-            http_headers=http_headers,
-            security=self.sdk_configuration.security,
-            get_serialized_body=lambda: utils.serialize_request_body(
-                request.resource_permissions_modification,
-                False,
-                False,
-                "json",
-                models.ResourcePermissionsModification,
-            ),
-            allow_empty_value=None,
-            timeout_ms=timeout_ms,
-        )
-
-        if retries == UNSET:
-            if self.sdk_configuration.retry_config is not UNSET:
-                retries = self.sdk_configuration.retry_config
-
-        retry_config = None
-        if isinstance(retries, utils.RetryConfig):
-            retry_config = (retries, ["429", "500", "502", "503", "504"])
-
-        http_res = await self.do_request_async(
-            hook_ctx=HookContext(
-                config=self.sdk_configuration,
-                base_url=base_url or "",
-                operation_id="documentPermissionsModification",
-                oauth2_scopes=["file:write"],
-                security_source=self.sdk_configuration.security,
-            ),
-            request=req,
-            error_status_codes=[
-                "400",
-                "401",
-                "403",
-                "404",
-                "409",
-                "429",
-                "4XX",
-                "500",
-                "503",
-                "5XX",
-            ],
-            retry_config=retry_config,
-        )
-
-        response_data: Any = None
-        if utils.match_response(http_res, "204", "*"):
-            return
-        if utils.match_response(
-            http_res, ["400", "401", "403", "404", "409", "429"], "application/json"
-        ):
-            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
-            raise errors.ErrorResponse(response_data, http_res)
-        if utils.match_response(http_res, ["500", "503"], "application/json"):
-            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
-            raise errors.ErrorResponse(response_data, http_res)
-        if utils.match_response(http_res, "4XX", "*"):
-            http_res_text = await utils.stream_to_text_async(http_res)
-            raise errors.SDKError("API error occurred", http_res, http_res_text)
-        if utils.match_response(http_res, "5XX", "*"):
-            http_res_text = await utils.stream_to_text_async(http_res)
-            raise errors.SDKError("API error occurred", http_res, http_res_text)
-
-        raise errors.SDKError("Unexpected response received", http_res)
-
-    def edit_sections(
-        self,
-        *,
-        document_id: str,
-        sections_edits: Union[models.SectionsEdits, models.SectionsEditsTypedDict],
-        retries: OptionalNullable[utils.RetryConfig] = UNSET,
-        server_url: Optional[str] = None,
-        timeout_ms: Optional[int] = None,
-        http_headers: Optional[Mapping[str, str]] = None,
-    ) -> models.EditSectionsResponse:
-        r"""Initiate sections edits
-
-        Updates the properties of a collection of [sections](ref:documents#section) in a document using [SectionsEdits](ref:documents#sectionsedit) request. This is a long running operation.
-        Responses include a `Location` header, which indicates where to poll for results. For more details on long-running job polling, see [Operations endpoint](ref:getoperationbyid). When the update completes, its status will be `completed`.
-
-
-        :param document_id: The unique identifier of the document
-        :param sections_edits: The edits for one or more sections in a document
-        :param retries: Override the default retry configuration for this method
-        :param server_url: Override the default server URL for this method
-        :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
-        :param http_headers: Additional headers to set or replace on requests.
-        """
-        base_url = None
-        url_variables = None
-        if timeout_ms is None:
-            timeout_ms = self.sdk_configuration.timeout_ms
-
-        if server_url is not None:
-            base_url = server_url
-        else:
-            base_url = self._get_url(base_url, url_variables)
-
-        request = models.EditSectionsRequest(
-            document_id=document_id,
-            sections_edits=utils.get_pydantic_model(
-                sections_edits, models.SectionsEdits
-            ),
-        )
-
-        req = self._build_request(
-            method="POST",
-            path="/documents/{documentId}/sections/edit",
-            base_url=base_url,
-            url_variables=url_variables,
-            request=request,
-            request_body_required=True,
-            request_has_path_params=True,
-            request_has_query_params=True,
-            user_agent_header="user-agent",
-            accept_header_value="application/json",
-            http_headers=http_headers,
-            security=self.sdk_configuration.security,
-            get_serialized_body=lambda: utils.serialize_request_body(
-                request.sections_edits, False, False, "json", models.SectionsEdits
-            ),
-            allow_empty_value=None,
-            timeout_ms=timeout_ms,
-        )
-
-        if retries == UNSET:
-            if self.sdk_configuration.retry_config is not UNSET:
-                retries = self.sdk_configuration.retry_config
-
-        retry_config = None
-        if isinstance(retries, utils.RetryConfig):
-            retry_config = (retries, ["429", "500", "502", "503", "504"])
-
-        http_res = self.do_request(
-            hook_ctx=HookContext(
-                config=self.sdk_configuration,
-                base_url=base_url or "",
-                operation_id="editSections",
-                oauth2_scopes=["file:write"],
-                security_source=self.sdk_configuration.security,
-            ),
-            request=req,
-            error_status_codes=[
-                "400",
-                "401",
-                "403",
-                "404",
-                "409",
-                "429",
-                "4XX",
-                "500",
-                "503",
-                "5XX",
-            ],
-            retry_config=retry_config,
-        )
-
-        response_data: Any = None
-        if utils.match_response(http_res, "202", "*"):
-            return models.EditSectionsResponse(
-                headers=utils.get_response_headers(http_res.headers)
-            )
-        if utils.match_response(
-            http_res, ["400", "401", "403", "404", "409", "429"], "application/json"
-        ):
-            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
-            raise errors.ErrorResponse(response_data, http_res)
-        if utils.match_response(http_res, ["500", "503"], "application/json"):
-            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
-            raise errors.ErrorResponse(response_data, http_res)
-        if utils.match_response(http_res, "4XX", "*"):
-            http_res_text = utils.stream_to_text(http_res)
-            raise errors.SDKError("API error occurred", http_res, http_res_text)
-        if utils.match_response(http_res, "5XX", "*"):
-            http_res_text = utils.stream_to_text(http_res)
-            raise errors.SDKError("API error occurred", http_res, http_res_text)
-
-        raise errors.SDKError("Unexpected response received", http_res)
-
-    async def edit_sections_async(
-        self,
-        *,
-        document_id: str,
-        sections_edits: Union[models.SectionsEdits, models.SectionsEditsTypedDict],
-        retries: OptionalNullable[utils.RetryConfig] = UNSET,
-        server_url: Optional[str] = None,
-        timeout_ms: Optional[int] = None,
-        http_headers: Optional[Mapping[str, str]] = None,
-    ) -> models.EditSectionsResponse:
-        r"""Initiate sections edits
-
-        Updates the properties of a collection of [sections](ref:documents#section) in a document using [SectionsEdits](ref:documents#sectionsedit) request. This is a long running operation.
-        Responses include a `Location` header, which indicates where to poll for results. For more details on long-running job polling, see [Operations endpoint](ref:getoperationbyid). When the update completes, its status will be `completed`.
-
-
-        :param document_id: The unique identifier of the document
-        :param sections_edits: The edits for one or more sections in a document
-        :param retries: Override the default retry configuration for this method
-        :param server_url: Override the default server URL for this method
-        :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
-        :param http_headers: Additional headers to set or replace on requests.
-        """
-        base_url = None
-        url_variables = None
-        if timeout_ms is None:
-            timeout_ms = self.sdk_configuration.timeout_ms
-
-        if server_url is not None:
-            base_url = server_url
-        else:
-            base_url = self._get_url(base_url, url_variables)
-
-        request = models.EditSectionsRequest(
-            document_id=document_id,
-            sections_edits=utils.get_pydantic_model(
-                sections_edits, models.SectionsEdits
-            ),
-        )
-
-        req = self._build_request_async(
-            method="POST",
-            path="/documents/{documentId}/sections/edit",
-            base_url=base_url,
-            url_variables=url_variables,
-            request=request,
-            request_body_required=True,
-            request_has_path_params=True,
-            request_has_query_params=True,
-            user_agent_header="user-agent",
-            accept_header_value="application/json",
-            http_headers=http_headers,
-            security=self.sdk_configuration.security,
-            get_serialized_body=lambda: utils.serialize_request_body(
-                request.sections_edits, False, False, "json", models.SectionsEdits
-            ),
-            allow_empty_value=None,
-            timeout_ms=timeout_ms,
-        )
-
-        if retries == UNSET:
-            if self.sdk_configuration.retry_config is not UNSET:
-                retries = self.sdk_configuration.retry_config
-
-        retry_config = None
-        if isinstance(retries, utils.RetryConfig):
-            retry_config = (retries, ["429", "500", "502", "503", "504"])
-
-        http_res = await self.do_request_async(
-            hook_ctx=HookContext(
-                config=self.sdk_configuration,
-                base_url=base_url or "",
-                operation_id="editSections",
-                oauth2_scopes=["file:write"],
-                security_source=self.sdk_configuration.security,
-            ),
-            request=req,
-            error_status_codes=[
-                "400",
-                "401",
-                "403",
-                "404",
-                "409",
-                "429",
-                "4XX",
-                "500",
-                "503",
-                "5XX",
-            ],
-            retry_config=retry_config,
-        )
-
-        response_data: Any = None
-        if utils.match_response(http_res, "202", "*"):
-            return models.EditSectionsResponse(
-                headers=utils.get_response_headers(http_res.headers)
-            )
-        if utils.match_response(
-            http_res, ["400", "401", "403", "404", "409", "429"], "application/json"
-        ):
-            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
-            raise errors.ErrorResponse(response_data, http_res)
-        if utils.match_response(http_res, ["500", "503"], "application/json"):
-            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
-            raise errors.ErrorResponse(response_data, http_res)
-        if utils.match_response(http_res, "4XX", "*"):
-            http_res_text = await utils.stream_to_text_async(http_res)
-            raise errors.SDKError("API error occurred", http_res, http_res_text)
-        if utils.match_response(http_res, "5XX", "*"):
-            http_res_text = await utils.stream_to_text_async(http_res)
-            raise errors.SDKError("API error occurred", http_res, http_res_text)
-
-        raise errors.SDKError("Unexpected response received", http_res)
-
-    def get_document_by_id(
-        self,
-        *,
-        document_id: str,
-        expand: Optional[str] = None,
-        retries: OptionalNullable[utils.RetryConfig] = UNSET,
-        server_url: Optional[str] = None,
-        timeout_ms: Optional[int] = None,
-        http_headers: Optional[Mapping[str, str]] = None,
-    ) -> models.Document:
-        r"""Retrieve a single document
-
-        Retrieves a [document](ref:documents#document) given its ID.
-
-
-        :param document_id: The unique identifier of the document
-        :param expand: Returns related resources inline with the main resource
-        :param retries: Override the default retry configuration for this method
-        :param server_url: Override the default server URL for this method
-        :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
-        :param http_headers: Additional headers to set or replace on requests.
-        """
-        base_url = None
-        url_variables = None
-        if timeout_ms is None:
-            timeout_ms = self.sdk_configuration.timeout_ms
-
-        if server_url is not None:
-            base_url = server_url
-        else:
-            base_url = self._get_url(base_url, url_variables)
-
-        request = models.GetDocumentByIDRequest(
-            document_id=document_id,
-            expand=expand,
-        )
-
-        req = self._build_request(
-            method="GET",
-            path="/documents/{documentId}",
-            base_url=base_url,
-            url_variables=url_variables,
-            request=request,
-            request_body_required=False,
-            request_has_path_params=True,
-            request_has_query_params=True,
-            user_agent_header="user-agent",
-            accept_header_value="application/json",
-            http_headers=http_headers,
-            security=self.sdk_configuration.security,
-            allow_empty_value=None,
-            timeout_ms=timeout_ms,
-        )
-
-        if retries == UNSET:
-            if self.sdk_configuration.retry_config is not UNSET:
-                retries = self.sdk_configuration.retry_config
-
-        retry_config = None
-        if isinstance(retries, utils.RetryConfig):
-            retry_config = (retries, ["429", "500", "502", "503", "504"])
-
-        http_res = self.do_request(
-            hook_ctx=HookContext(
-                config=self.sdk_configuration,
-                base_url=base_url or "",
-                operation_id="getDocumentById",
-                oauth2_scopes=["file:read"],
-                security_source=self.sdk_configuration.security,
-            ),
-            request=req,
-            error_status_codes=[
-                "400",
-                "401",
-                "403",
-                "404",
-                "409",
-                "429",
-                "4XX",
-                "500",
-                "503",
-                "5XX",
-            ],
-            retry_config=retry_config,
-        )
-
-        response_data: Any = None
-        if utils.match_response(http_res, "200", "application/json"):
-            return unmarshal_json_response(models.Document, http_res)
-        if utils.match_response(
-            http_res, ["400", "401", "403", "404", "409", "429"], "application/json"
-        ):
-            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
-            raise errors.ErrorResponse(response_data, http_res)
-        if utils.match_response(http_res, ["500", "503"], "application/json"):
-            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
-            raise errors.ErrorResponse(response_data, http_res)
-        if utils.match_response(http_res, "4XX", "*"):
-            http_res_text = utils.stream_to_text(http_res)
-            raise errors.SDKError("API error occurred", http_res, http_res_text)
-        if utils.match_response(http_res, "5XX", "*"):
-            http_res_text = utils.stream_to_text(http_res)
-            raise errors.SDKError("API error occurred", http_res, http_res_text)
-
-        raise errors.SDKError("Unexpected response received", http_res)
-
-    async def get_document_by_id_async(
-        self,
-        *,
-        document_id: str,
-        expand: Optional[str] = None,
-        retries: OptionalNullable[utils.RetryConfig] = UNSET,
-        server_url: Optional[str] = None,
-        timeout_ms: Optional[int] = None,
-        http_headers: Optional[Mapping[str, str]] = None,
-    ) -> models.Document:
-        r"""Retrieve a single document
-
-        Retrieves a [document](ref:documents#document) given its ID.
-
-
-        :param document_id: The unique identifier of the document
-        :param expand: Returns related resources inline with the main resource
-        :param retries: Override the default retry configuration for this method
-        :param server_url: Override the default server URL for this method
-        :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
-        :param http_headers: Additional headers to set or replace on requests.
-        """
-        base_url = None
-        url_variables = None
-        if timeout_ms is None:
-            timeout_ms = self.sdk_configuration.timeout_ms
-
-        if server_url is not None:
-            base_url = server_url
-        else:
-            base_url = self._get_url(base_url, url_variables)
-
-        request = models.GetDocumentByIDRequest(
-            document_id=document_id,
-            expand=expand,
-        )
-
-        req = self._build_request_async(
-            method="GET",
-            path="/documents/{documentId}",
-            base_url=base_url,
-            url_variables=url_variables,
-            request=request,
-            request_body_required=False,
-            request_has_path_params=True,
-            request_has_query_params=True,
-            user_agent_header="user-agent",
-            accept_header_value="application/json",
-            http_headers=http_headers,
-            security=self.sdk_configuration.security,
-            allow_empty_value=None,
-            timeout_ms=timeout_ms,
-        )
-
-        if retries == UNSET:
-            if self.sdk_configuration.retry_config is not UNSET:
-                retries = self.sdk_configuration.retry_config
-
-        retry_config = None
-        if isinstance(retries, utils.RetryConfig):
-            retry_config = (retries, ["429", "500", "502", "503", "504"])
-
-        http_res = await self.do_request_async(
-            hook_ctx=HookContext(
-                config=self.sdk_configuration,
-                base_url=base_url or "",
-                operation_id="getDocumentById",
-                oauth2_scopes=["file:read"],
-                security_source=self.sdk_configuration.security,
-            ),
-            request=req,
-            error_status_codes=[
-                "400",
-                "401",
-                "403",
-                "404",
-                "409",
-                "429",
-                "4XX",
-                "500",
-                "503",
-                "5XX",
-            ],
-            retry_config=retry_config,
-        )
-
-        response_data: Any = None
-        if utils.match_response(http_res, "200", "application/json"):
-            return unmarshal_json_response(models.Document, http_res)
-        if utils.match_response(
-            http_res, ["400", "401", "403", "404", "409", "429"], "application/json"
-        ):
-            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
-            raise errors.ErrorResponse(response_data, http_res)
-        if utils.match_response(http_res, ["500", "503"], "application/json"):
-            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
-            raise errors.ErrorResponse(response_data, http_res)
-        if utils.match_response(http_res, "4XX", "*"):
-            http_res_text = await utils.stream_to_text_async(http_res)
-            raise errors.SDKError("API error occurred", http_res, http_res_text)
-        if utils.match_response(http_res, "5XX", "*"):
-            http_res_text = await utils.stream_to_text_async(http_res)
-            raise errors.SDKError("API error occurred", http_res, http_res_text)
-
-        raise errors.SDKError("Unexpected response received", http_res)
-
     def get_document_milestones(
         self,
         *,
@@ -2602,26 +2143,26 @@ class Documents(BaseSDK):
 
         raise errors.SDKError("Unexpected response received", http_res)
 
-    def get_documents(
+    def document_permissions_modification(
         self,
         *,
-        filter_: Optional[str] = None,
-        maxpagesize: Optional[int] = 1000,
-        next: Optional[str] = None,
-        order_by: Optional[str] = None,
+        document_id: str,
+        resource_permissions_modification: Union[
+            models.ResourcePermissionsModification,
+            models.ResourcePermissionsModificationTypedDict,
+        ],
         retries: OptionalNullable[utils.RetryConfig] = UNSET,
         server_url: Optional[str] = None,
         timeout_ms: Optional[int] = None,
         http_headers: Optional[Mapping[str, str]] = None,
-    ) -> Optional[models.GetDocumentsResponse]:
-        r"""Retrieve a list of documents
+    ):
+        r"""Modify permissions on a document
 
-        Returns a paginated list of [documents](ref:documents#document).
+        Assign and/or revoke permissions on a document. If any modification in a request fails, all modifications on that request fail. <br /><br /> _To modify an existing permission, the existing permission must first be  explicitly revoked. Then, the new permission needs to be assigned. This  can be done in a single request by sending `toAssign` and `toRevoke` in  the request body._
 
-        :param filter_: The properties to filter the results by.
-        :param maxpagesize: The maximum number of results to retrieve
-        :param next: Pagination cursor for next set of results.
-        :param order_by: One or more comma-separated expressions to indicate the order in which to sort the results.
+
+        :param document_id: The unique identifier of the document
+        :param resource_permissions_modification: Details about the document permissions modification.
         :param retries: Override the default retry configuration for this method
         :param server_url: Override the default server URL for this method
         :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
@@ -2637,21 +2178,260 @@ class Documents(BaseSDK):
         else:
             base_url = self._get_url(base_url, url_variables)
 
-        request = models.GetDocumentsRequest(
-            filter_=filter_,
+        request = models.DocumentPermissionsModificationRequest(
+            document_id=document_id,
+            resource_permissions_modification=utils.get_pydantic_model(
+                resource_permissions_modification,
+                models.ResourcePermissionsModification,
+            ),
+        )
+
+        req = self._build_request(
+            method="POST",
+            path="/documents/{documentId}/permissions/modification",
+            base_url=base_url,
+            url_variables=url_variables,
+            request=request,
+            request_body_required=True,
+            request_has_path_params=True,
+            request_has_query_params=True,
+            user_agent_header="user-agent",
+            accept_header_value="application/json",
+            http_headers=http_headers,
+            security=self.sdk_configuration.security,
+            get_serialized_body=lambda: utils.serialize_request_body(
+                request.resource_permissions_modification,
+                False,
+                False,
+                "json",
+                models.ResourcePermissionsModification,
+            ),
+            allow_empty_value=None,
+            timeout_ms=timeout_ms,
+        )
+
+        if retries == UNSET:
+            if self.sdk_configuration.retry_config is not UNSET:
+                retries = self.sdk_configuration.retry_config
+
+        retry_config = None
+        if isinstance(retries, utils.RetryConfig):
+            retry_config = (retries, ["429", "500", "502", "503", "504"])
+
+        http_res = self.do_request(
+            hook_ctx=HookContext(
+                config=self.sdk_configuration,
+                base_url=base_url or "",
+                operation_id="documentPermissionsModification",
+                oauth2_scopes=["file:write"],
+                security_source=self.sdk_configuration.security,
+            ),
+            request=req,
+            error_status_codes=[
+                "400",
+                "401",
+                "403",
+                "404",
+                "409",
+                "429",
+                "4XX",
+                "500",
+                "503",
+                "5XX",
+            ],
+            retry_config=retry_config,
+        )
+
+        response_data: Any = None
+        if utils.match_response(http_res, "204", "*"):
+            return
+        if utils.match_response(
+            http_res, ["400", "401", "403", "404", "409", "429"], "application/json"
+        ):
+            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
+            raise errors.ErrorResponse(response_data, http_res)
+        if utils.match_response(http_res, ["500", "503"], "application/json"):
+            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
+            raise errors.ErrorResponse(response_data, http_res)
+        if utils.match_response(http_res, "4XX", "*"):
+            http_res_text = utils.stream_to_text(http_res)
+            raise errors.SDKError("API error occurred", http_res, http_res_text)
+        if utils.match_response(http_res, "5XX", "*"):
+            http_res_text = utils.stream_to_text(http_res)
+            raise errors.SDKError("API error occurred", http_res, http_res_text)
+
+        raise errors.SDKError("Unexpected response received", http_res)
+
+    async def document_permissions_modification_async(
+        self,
+        *,
+        document_id: str,
+        resource_permissions_modification: Union[
+            models.ResourcePermissionsModification,
+            models.ResourcePermissionsModificationTypedDict,
+        ],
+        retries: OptionalNullable[utils.RetryConfig] = UNSET,
+        server_url: Optional[str] = None,
+        timeout_ms: Optional[int] = None,
+        http_headers: Optional[Mapping[str, str]] = None,
+    ):
+        r"""Modify permissions on a document
+
+        Assign and/or revoke permissions on a document. If any modification in a request fails, all modifications on that request fail. <br /><br /> _To modify an existing permission, the existing permission must first be  explicitly revoked. Then, the new permission needs to be assigned. This  can be done in a single request by sending `toAssign` and `toRevoke` in  the request body._
+
+
+        :param document_id: The unique identifier of the document
+        :param resource_permissions_modification: Details about the document permissions modification.
+        :param retries: Override the default retry configuration for this method
+        :param server_url: Override the default server URL for this method
+        :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
+        :param http_headers: Additional headers to set or replace on requests.
+        """
+        base_url = None
+        url_variables = None
+        if timeout_ms is None:
+            timeout_ms = self.sdk_configuration.timeout_ms
+
+        if server_url is not None:
+            base_url = server_url
+        else:
+            base_url = self._get_url(base_url, url_variables)
+
+        request = models.DocumentPermissionsModificationRequest(
+            document_id=document_id,
+            resource_permissions_modification=utils.get_pydantic_model(
+                resource_permissions_modification,
+                models.ResourcePermissionsModification,
+            ),
+        )
+
+        req = self._build_request_async(
+            method="POST",
+            path="/documents/{documentId}/permissions/modification",
+            base_url=base_url,
+            url_variables=url_variables,
+            request=request,
+            request_body_required=True,
+            request_has_path_params=True,
+            request_has_query_params=True,
+            user_agent_header="user-agent",
+            accept_header_value="application/json",
+            http_headers=http_headers,
+            security=self.sdk_configuration.security,
+            get_serialized_body=lambda: utils.serialize_request_body(
+                request.resource_permissions_modification,
+                False,
+                False,
+                "json",
+                models.ResourcePermissionsModification,
+            ),
+            allow_empty_value=None,
+            timeout_ms=timeout_ms,
+        )
+
+        if retries == UNSET:
+            if self.sdk_configuration.retry_config is not UNSET:
+                retries = self.sdk_configuration.retry_config
+
+        retry_config = None
+        if isinstance(retries, utils.RetryConfig):
+            retry_config = (retries, ["429", "500", "502", "503", "504"])
+
+        http_res = await self.do_request_async(
+            hook_ctx=HookContext(
+                config=self.sdk_configuration,
+                base_url=base_url or "",
+                operation_id="documentPermissionsModification",
+                oauth2_scopes=["file:write"],
+                security_source=self.sdk_configuration.security,
+            ),
+            request=req,
+            error_status_codes=[
+                "400",
+                "401",
+                "403",
+                "404",
+                "409",
+                "429",
+                "4XX",
+                "500",
+                "503",
+                "5XX",
+            ],
+            retry_config=retry_config,
+        )
+
+        response_data: Any = None
+        if utils.match_response(http_res, "204", "*"):
+            return
+        if utils.match_response(
+            http_res, ["400", "401", "403", "404", "409", "429"], "application/json"
+        ):
+            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
+            raise errors.ErrorResponse(response_data, http_res)
+        if utils.match_response(http_res, ["500", "503"], "application/json"):
+            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
+            raise errors.ErrorResponse(response_data, http_res)
+        if utils.match_response(http_res, "4XX", "*"):
+            http_res_text = await utils.stream_to_text_async(http_res)
+            raise errors.SDKError("API error occurred", http_res, http_res_text)
+        if utils.match_response(http_res, "5XX", "*"):
+            http_res_text = await utils.stream_to_text_async(http_res)
+            raise errors.SDKError("API error occurred", http_res, http_res_text)
+
+        raise errors.SDKError("Unexpected response received", http_res)
+
+    def get_sections(
+        self,
+        *,
+        document_id: str,
+        revision: Optional[str] = None,
+        maxpagesize: Optional[int] = 1000,
+        next: Optional[str] = None,
+        retries: OptionalNullable[utils.RetryConfig] = UNSET,
+        server_url: Optional[str] = None,
+        timeout_ms: Optional[int] = None,
+        http_headers: Optional[Mapping[str, str]] = None,
+    ) -> Optional[models.GetSectionsResponse]:
+        r"""Retrieve a list of sections
+
+        Returns a list of [sections](ref:documents#section).
+
+
+        :param document_id: The unique identifier of the document
+        :param revision: Returns resources at a specific revision
+        :param maxpagesize: The maximum number of results to retrieve
+        :param next: Pagination cursor for next set of results.
+        :param retries: Override the default retry configuration for this method
+        :param server_url: Override the default server URL for this method
+        :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
+        :param http_headers: Additional headers to set or replace on requests.
+        """
+        base_url = None
+        url_variables = None
+        if timeout_ms is None:
+            timeout_ms = self.sdk_configuration.timeout_ms
+
+        if server_url is not None:
+            base_url = server_url
+        else:
+            base_url = self._get_url(base_url, url_variables)
+
+        request = models.GetSectionsRequest(
+            document_id=document_id,
+            revision=revision,
             maxpagesize=maxpagesize,
             next=next,
-            order_by=order_by,
         )
 
         req = self._build_request(
             method="GET",
-            path="/documents",
+            path="/documents/{documentId}/sections",
             base_url=base_url,
             url_variables=url_variables,
             request=request,
             request_body_required=False,
-            request_has_path_params=False,
+            request_has_path_params=True,
             request_has_query_params=True,
             user_agent_header="user-agent",
             accept_header_value="application/json",
@@ -2673,7 +2453,7 @@ class Documents(BaseSDK):
             hook_ctx=HookContext(
                 config=self.sdk_configuration,
                 base_url=base_url or "",
-                operation_id="getDocuments",
+                operation_id="getSections",
                 oauth2_scopes=["file:read"],
                 security_source=self.sdk_configuration.security,
             ),
@@ -2693,7 +2473,7 @@ class Documents(BaseSDK):
             retry_config=retry_config,
         )
 
-        def next_func() -> Optional[models.GetDocumentsResponse]:
+        def next_func() -> Optional[models.GetSectionsResponse]:
             body = utils.unmarshal_json(http_res.text, Union[Dict[Any, Any], List[Any]])
 
             next_cursor = JSONPath("$['@nextLink']").parse(body)
@@ -2705,18 +2485,18 @@ class Documents(BaseSDK):
             if next_cursor is None or str(next_cursor).strip() == "":
                 return None
 
-            return self.get_documents(
-                filter_=filter_,
+            return self.get_sections(
+                document_id=document_id,
+                revision=revision,
                 maxpagesize=maxpagesize,
                 next=next,
-                order_by=order_by,
                 retries=retries,
             )
 
         response_data: Any = None
         if utils.match_response(http_res, "200", "application/json"):
-            return models.GetDocumentsResponse(
-                result=unmarshal_json_response(models.DocumentsListResult, http_res),
+            return models.GetSectionsResponse(
+                result=unmarshal_json_response(models.SectionsListResult, http_res),
                 next=next_func,
             )
         if utils.match_response(
@@ -2736,26 +2516,27 @@ class Documents(BaseSDK):
 
         raise errors.SDKError("Unexpected response received", http_res)
 
-    async def get_documents_async(
+    async def get_sections_async(
         self,
         *,
-        filter_: Optional[str] = None,
+        document_id: str,
+        revision: Optional[str] = None,
         maxpagesize: Optional[int] = 1000,
         next: Optional[str] = None,
-        order_by: Optional[str] = None,
         retries: OptionalNullable[utils.RetryConfig] = UNSET,
         server_url: Optional[str] = None,
         timeout_ms: Optional[int] = None,
         http_headers: Optional[Mapping[str, str]] = None,
-    ) -> Optional[models.GetDocumentsResponse]:
-        r"""Retrieve a list of documents
+    ) -> Optional[models.GetSectionsResponse]:
+        r"""Retrieve a list of sections
 
-        Returns a paginated list of [documents](ref:documents#document).
+        Returns a list of [sections](ref:documents#section).
 
-        :param filter_: The properties to filter the results by.
+
+        :param document_id: The unique identifier of the document
+        :param revision: Returns resources at a specific revision
         :param maxpagesize: The maximum number of results to retrieve
         :param next: Pagination cursor for next set of results.
-        :param order_by: One or more comma-separated expressions to indicate the order in which to sort the results.
         :param retries: Override the default retry configuration for this method
         :param server_url: Override the default server URL for this method
         :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
@@ -2771,21 +2552,21 @@ class Documents(BaseSDK):
         else:
             base_url = self._get_url(base_url, url_variables)
 
-        request = models.GetDocumentsRequest(
-            filter_=filter_,
+        request = models.GetSectionsRequest(
+            document_id=document_id,
+            revision=revision,
             maxpagesize=maxpagesize,
             next=next,
-            order_by=order_by,
         )
 
         req = self._build_request_async(
             method="GET",
-            path="/documents",
+            path="/documents/{documentId}/sections",
             base_url=base_url,
             url_variables=url_variables,
             request=request,
             request_body_required=False,
-            request_has_path_params=False,
+            request_has_path_params=True,
             request_has_query_params=True,
             user_agent_header="user-agent",
             accept_header_value="application/json",
@@ -2807,7 +2588,7 @@ class Documents(BaseSDK):
             hook_ctx=HookContext(
                 config=self.sdk_configuration,
                 base_url=base_url or "",
-                operation_id="getDocuments",
+                operation_id="getSections",
                 oauth2_scopes=["file:read"],
                 security_source=self.sdk_configuration.security,
             ),
@@ -2827,7 +2608,7 @@ class Documents(BaseSDK):
             retry_config=retry_config,
         )
 
-        def next_func() -> Awaitable[Optional[models.GetDocumentsResponse]]:
+        def next_func() -> Awaitable[Optional[models.GetSectionsResponse]]:
             body = utils.unmarshal_json(http_res.text, Union[Dict[Any, Any], List[Any]])
 
             async def empty_result():
@@ -2842,20 +2623,450 @@ class Documents(BaseSDK):
             if next_cursor is None or str(next_cursor).strip() == "":
                 return empty_result()
 
-            return self.get_documents_async(
-                filter_=filter_,
+            return self.get_sections_async(
+                document_id=document_id,
+                revision=revision,
                 maxpagesize=maxpagesize,
                 next=next,
-                order_by=order_by,
                 retries=retries,
             )
 
         response_data: Any = None
         if utils.match_response(http_res, "200", "application/json"):
-            return models.GetDocumentsResponse(
-                result=unmarshal_json_response(models.DocumentsListResult, http_res),
+            return models.GetSectionsResponse(
+                result=unmarshal_json_response(models.SectionsListResult, http_res),
                 next=next_func,
             )
+        if utils.match_response(
+            http_res, ["400", "401", "403", "404", "409", "429"], "application/json"
+        ):
+            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
+            raise errors.ErrorResponse(response_data, http_res)
+        if utils.match_response(http_res, ["500", "503"], "application/json"):
+            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
+            raise errors.ErrorResponse(response_data, http_res)
+        if utils.match_response(http_res, "4XX", "*"):
+            http_res_text = await utils.stream_to_text_async(http_res)
+            raise errors.SDKError("API error occurred", http_res, http_res_text)
+        if utils.match_response(http_res, "5XX", "*"):
+            http_res_text = await utils.stream_to_text_async(http_res)
+            raise errors.SDKError("API error occurred", http_res, http_res_text)
+
+        raise errors.SDKError("Unexpected response received", http_res)
+
+    def create_section(
+        self,
+        *,
+        document_id: str,
+        section: Union[models.SectionInput, models.SectionInputTypedDict],
+        retries: OptionalNullable[utils.RetryConfig] = UNSET,
+        server_url: Optional[str] = None,
+        timeout_ms: Optional[int] = None,
+        http_headers: Optional[Mapping[str, str]] = None,
+    ) -> models.Section:
+        r"""Create a new section in a document
+
+        Creates a new [section](ref:documents#section) in a [document](ref:documents#document), given its properties. By default, the new section appears at the top-most position.
+
+
+        :param document_id: The unique identifier of the document
+        :param section: The properties of the section to create
+        :param retries: Override the default retry configuration for this method
+        :param server_url: Override the default server URL for this method
+        :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
+        :param http_headers: Additional headers to set or replace on requests.
+        """
+        base_url = None
+        url_variables = None
+        if timeout_ms is None:
+            timeout_ms = self.sdk_configuration.timeout_ms
+
+        if server_url is not None:
+            base_url = server_url
+        else:
+            base_url = self._get_url(base_url, url_variables)
+
+        request = models.CreateSectionRequest(
+            document_id=document_id,
+            section=utils.get_pydantic_model(section, models.SectionInput),
+        )
+
+        req = self._build_request(
+            method="POST",
+            path="/documents/{documentId}/sections",
+            base_url=base_url,
+            url_variables=url_variables,
+            request=request,
+            request_body_required=True,
+            request_has_path_params=True,
+            request_has_query_params=True,
+            user_agent_header="user-agent",
+            accept_header_value="application/json",
+            http_headers=http_headers,
+            security=self.sdk_configuration.security,
+            get_serialized_body=lambda: utils.serialize_request_body(
+                request.section, False, False, "json", models.SectionInput
+            ),
+            allow_empty_value=None,
+            timeout_ms=timeout_ms,
+        )
+
+        if retries == UNSET:
+            if self.sdk_configuration.retry_config is not UNSET:
+                retries = self.sdk_configuration.retry_config
+
+        retry_config = None
+        if isinstance(retries, utils.RetryConfig):
+            retry_config = (retries, ["429", "500", "502", "503", "504"])
+
+        http_res = self.do_request(
+            hook_ctx=HookContext(
+                config=self.sdk_configuration,
+                base_url=base_url or "",
+                operation_id="createSection",
+                oauth2_scopes=["file:write"],
+                security_source=self.sdk_configuration.security,
+            ),
+            request=req,
+            error_status_codes=[
+                "400",
+                "401",
+                "403",
+                "404",
+                "409",
+                "429",
+                "4XX",
+                "500",
+                "503",
+                "5XX",
+            ],
+            retry_config=retry_config,
+        )
+
+        response_data: Any = None
+        if utils.match_response(http_res, "201", "application/json"):
+            return unmarshal_json_response(models.Section, http_res)
+        if utils.match_response(
+            http_res, ["400", "401", "403", "404", "409", "429"], "application/json"
+        ):
+            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
+            raise errors.ErrorResponse(response_data, http_res)
+        if utils.match_response(http_res, ["500", "503"], "application/json"):
+            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
+            raise errors.ErrorResponse(response_data, http_res)
+        if utils.match_response(http_res, "4XX", "*"):
+            http_res_text = utils.stream_to_text(http_res)
+            raise errors.SDKError("API error occurred", http_res, http_res_text)
+        if utils.match_response(http_res, "5XX", "*"):
+            http_res_text = utils.stream_to_text(http_res)
+            raise errors.SDKError("API error occurred", http_res, http_res_text)
+
+        raise errors.SDKError("Unexpected response received", http_res)
+
+    async def create_section_async(
+        self,
+        *,
+        document_id: str,
+        section: Union[models.SectionInput, models.SectionInputTypedDict],
+        retries: OptionalNullable[utils.RetryConfig] = UNSET,
+        server_url: Optional[str] = None,
+        timeout_ms: Optional[int] = None,
+        http_headers: Optional[Mapping[str, str]] = None,
+    ) -> models.Section:
+        r"""Create a new section in a document
+
+        Creates a new [section](ref:documents#section) in a [document](ref:documents#document), given its properties. By default, the new section appears at the top-most position.
+
+
+        :param document_id: The unique identifier of the document
+        :param section: The properties of the section to create
+        :param retries: Override the default retry configuration for this method
+        :param server_url: Override the default server URL for this method
+        :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
+        :param http_headers: Additional headers to set or replace on requests.
+        """
+        base_url = None
+        url_variables = None
+        if timeout_ms is None:
+            timeout_ms = self.sdk_configuration.timeout_ms
+
+        if server_url is not None:
+            base_url = server_url
+        else:
+            base_url = self._get_url(base_url, url_variables)
+
+        request = models.CreateSectionRequest(
+            document_id=document_id,
+            section=utils.get_pydantic_model(section, models.SectionInput),
+        )
+
+        req = self._build_request_async(
+            method="POST",
+            path="/documents/{documentId}/sections",
+            base_url=base_url,
+            url_variables=url_variables,
+            request=request,
+            request_body_required=True,
+            request_has_path_params=True,
+            request_has_query_params=True,
+            user_agent_header="user-agent",
+            accept_header_value="application/json",
+            http_headers=http_headers,
+            security=self.sdk_configuration.security,
+            get_serialized_body=lambda: utils.serialize_request_body(
+                request.section, False, False, "json", models.SectionInput
+            ),
+            allow_empty_value=None,
+            timeout_ms=timeout_ms,
+        )
+
+        if retries == UNSET:
+            if self.sdk_configuration.retry_config is not UNSET:
+                retries = self.sdk_configuration.retry_config
+
+        retry_config = None
+        if isinstance(retries, utils.RetryConfig):
+            retry_config = (retries, ["429", "500", "502", "503", "504"])
+
+        http_res = await self.do_request_async(
+            hook_ctx=HookContext(
+                config=self.sdk_configuration,
+                base_url=base_url or "",
+                operation_id="createSection",
+                oauth2_scopes=["file:write"],
+                security_source=self.sdk_configuration.security,
+            ),
+            request=req,
+            error_status_codes=[
+                "400",
+                "401",
+                "403",
+                "404",
+                "409",
+                "429",
+                "4XX",
+                "500",
+                "503",
+                "5XX",
+            ],
+            retry_config=retry_config,
+        )
+
+        response_data: Any = None
+        if utils.match_response(http_res, "201", "application/json"):
+            return unmarshal_json_response(models.Section, http_res)
+        if utils.match_response(
+            http_res, ["400", "401", "403", "404", "409", "429"], "application/json"
+        ):
+            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
+            raise errors.ErrorResponse(response_data, http_res)
+        if utils.match_response(http_res, ["500", "503"], "application/json"):
+            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
+            raise errors.ErrorResponse(response_data, http_res)
+        if utils.match_response(http_res, "4XX", "*"):
+            http_res_text = await utils.stream_to_text_async(http_res)
+            raise errors.SDKError("API error occurred", http_res, http_res_text)
+        if utils.match_response(http_res, "5XX", "*"):
+            http_res_text = await utils.stream_to_text_async(http_res)
+            raise errors.SDKError("API error occurred", http_res, http_res_text)
+
+        raise errors.SDKError("Unexpected response received", http_res)
+
+    def delete_section_by_id(
+        self,
+        *,
+        document_id: str,
+        section_id: str,
+        retries: OptionalNullable[utils.RetryConfig] = UNSET,
+        server_url: Optional[str] = None,
+        timeout_ms: Optional[int] = None,
+        http_headers: Optional[Mapping[str, str]] = None,
+    ):
+        r"""Delete a single section
+
+        Deletes a [section](ref:documents#section) given its ID.
+
+
+        :param document_id: The unique identifier of the document
+        :param section_id: The unique identifier of the section
+        :param retries: Override the default retry configuration for this method
+        :param server_url: Override the default server URL for this method
+        :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
+        :param http_headers: Additional headers to set or replace on requests.
+        """
+        base_url = None
+        url_variables = None
+        if timeout_ms is None:
+            timeout_ms = self.sdk_configuration.timeout_ms
+
+        if server_url is not None:
+            base_url = server_url
+        else:
+            base_url = self._get_url(base_url, url_variables)
+
+        request = models.DeleteSectionByIDRequest(
+            document_id=document_id,
+            section_id=section_id,
+        )
+
+        req = self._build_request(
+            method="DELETE",
+            path="/documents/{documentId}/sections/{sectionId}",
+            base_url=base_url,
+            url_variables=url_variables,
+            request=request,
+            request_body_required=False,
+            request_has_path_params=True,
+            request_has_query_params=True,
+            user_agent_header="user-agent",
+            accept_header_value="application/json",
+            http_headers=http_headers,
+            security=self.sdk_configuration.security,
+            allow_empty_value=None,
+            timeout_ms=timeout_ms,
+        )
+
+        if retries == UNSET:
+            if self.sdk_configuration.retry_config is not UNSET:
+                retries = self.sdk_configuration.retry_config
+
+        retry_config = None
+        if isinstance(retries, utils.RetryConfig):
+            retry_config = (retries, ["429", "500", "502", "503", "504"])
+
+        http_res = self.do_request(
+            hook_ctx=HookContext(
+                config=self.sdk_configuration,
+                base_url=base_url or "",
+                operation_id="deleteSectionById",
+                oauth2_scopes=["file:write"],
+                security_source=self.sdk_configuration.security,
+            ),
+            request=req,
+            error_status_codes=[
+                "400",
+                "401",
+                "403",
+                "404",
+                "409",
+                "429",
+                "4XX",
+                "500",
+                "503",
+                "5XX",
+            ],
+            retry_config=retry_config,
+        )
+
+        response_data: Any = None
+        if utils.match_response(http_res, "204", "*"):
+            return
+        if utils.match_response(
+            http_res, ["400", "401", "403", "404", "409", "429"], "application/json"
+        ):
+            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
+            raise errors.ErrorResponse(response_data, http_res)
+        if utils.match_response(http_res, ["500", "503"], "application/json"):
+            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
+            raise errors.ErrorResponse(response_data, http_res)
+        if utils.match_response(http_res, "4XX", "*"):
+            http_res_text = utils.stream_to_text(http_res)
+            raise errors.SDKError("API error occurred", http_res, http_res_text)
+        if utils.match_response(http_res, "5XX", "*"):
+            http_res_text = utils.stream_to_text(http_res)
+            raise errors.SDKError("API error occurred", http_res, http_res_text)
+
+        raise errors.SDKError("Unexpected response received", http_res)
+
+    async def delete_section_by_id_async(
+        self,
+        *,
+        document_id: str,
+        section_id: str,
+        retries: OptionalNullable[utils.RetryConfig] = UNSET,
+        server_url: Optional[str] = None,
+        timeout_ms: Optional[int] = None,
+        http_headers: Optional[Mapping[str, str]] = None,
+    ):
+        r"""Delete a single section
+
+        Deletes a [section](ref:documents#section) given its ID.
+
+
+        :param document_id: The unique identifier of the document
+        :param section_id: The unique identifier of the section
+        :param retries: Override the default retry configuration for this method
+        :param server_url: Override the default server URL for this method
+        :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
+        :param http_headers: Additional headers to set or replace on requests.
+        """
+        base_url = None
+        url_variables = None
+        if timeout_ms is None:
+            timeout_ms = self.sdk_configuration.timeout_ms
+
+        if server_url is not None:
+            base_url = server_url
+        else:
+            base_url = self._get_url(base_url, url_variables)
+
+        request = models.DeleteSectionByIDRequest(
+            document_id=document_id,
+            section_id=section_id,
+        )
+
+        req = self._build_request_async(
+            method="DELETE",
+            path="/documents/{documentId}/sections/{sectionId}",
+            base_url=base_url,
+            url_variables=url_variables,
+            request=request,
+            request_body_required=False,
+            request_has_path_params=True,
+            request_has_query_params=True,
+            user_agent_header="user-agent",
+            accept_header_value="application/json",
+            http_headers=http_headers,
+            security=self.sdk_configuration.security,
+            allow_empty_value=None,
+            timeout_ms=timeout_ms,
+        )
+
+        if retries == UNSET:
+            if self.sdk_configuration.retry_config is not UNSET:
+                retries = self.sdk_configuration.retry_config
+
+        retry_config = None
+        if isinstance(retries, utils.RetryConfig):
+            retry_config = (retries, ["429", "500", "502", "503", "504"])
+
+        http_res = await self.do_request_async(
+            hook_ctx=HookContext(
+                config=self.sdk_configuration,
+                base_url=base_url or "",
+                operation_id="deleteSectionById",
+                oauth2_scopes=["file:write"],
+                security_source=self.sdk_configuration.security,
+            ),
+            request=req,
+            error_status_codes=[
+                "400",
+                "401",
+                "403",
+                "404",
+                "409",
+                "429",
+                "4XX",
+                "500",
+                "503",
+                "5XX",
+            ],
+            retry_config=retry_config,
+        )
+
+        response_data: Any = None
+        if utils.match_response(http_res, "204", "*"):
+            return
         if utils.match_response(
             http_res, ["400", "401", "403", "404", "409", "429"], "application/json"
         ):
@@ -2911,9 +3122,9 @@ class Documents(BaseSDK):
 
         request = models.GetSectionByIDRequest(
             document_id=document_id,
+            section_id=section_id,
             expand=expand,
             revision=revision,
-            section_id=section_id,
         )
 
         req = self._build_request(
@@ -3023,9 +3234,9 @@ class Documents(BaseSDK):
 
         request = models.GetSectionByIDRequest(
             document_id=document_id,
+            section_id=section_id,
             expand=expand,
             revision=revision,
-            section_id=section_id,
         )
 
         req = self._build_request_async(
@@ -3080,946 +3291,6 @@ class Documents(BaseSDK):
         response_data: Any = None
         if utils.match_response(http_res, "200", "application/json"):
             return unmarshal_json_response(models.Section, http_res)
-        if utils.match_response(
-            http_res, ["400", "401", "403", "404", "409", "429"], "application/json"
-        ):
-            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
-            raise errors.ErrorResponse(response_data, http_res)
-        if utils.match_response(http_res, ["500", "503"], "application/json"):
-            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
-            raise errors.ErrorResponse(response_data, http_res)
-        if utils.match_response(http_res, "4XX", "*"):
-            http_res_text = await utils.stream_to_text_async(http_res)
-            raise errors.SDKError("API error occurred", http_res, http_res_text)
-        if utils.match_response(http_res, "5XX", "*"):
-            http_res_text = await utils.stream_to_text_async(http_res)
-            raise errors.SDKError("API error occurred", http_res, http_res_text)
-
-        raise errors.SDKError("Unexpected response received", http_res)
-
-    def get_section_permissions(
-        self,
-        *,
-        request: Union[
-            models.GetSectionPermissionsRequest,
-            models.GetSectionPermissionsRequestTypedDict,
-        ],
-        retries: OptionalNullable[utils.RetryConfig] = UNSET,
-        server_url: Optional[str] = None,
-        timeout_ms: Optional[int] = None,
-        http_headers: Optional[Mapping[str, str]] = None,
-    ) -> Optional[models.GetSectionPermissionsResponse]:
-        r"""Retrieve permissions for a section in a document
-
-        Retrieves a paginated list of permissions for the given section in a document
-
-
-        :param request: The request object to send.
-        :param retries: Override the default retry configuration for this method
-        :param server_url: Override the default server URL for this method
-        :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
-        :param http_headers: Additional headers to set or replace on requests.
-        """
-        base_url = None
-        url_variables = None
-        if timeout_ms is None:
-            timeout_ms = self.sdk_configuration.timeout_ms
-
-        if server_url is not None:
-            base_url = server_url
-        else:
-            base_url = self._get_url(base_url, url_variables)
-
-        if not isinstance(request, BaseModel):
-            request = utils.unmarshal(request, models.GetSectionPermissionsRequest)
-        request = cast(models.GetSectionPermissionsRequest, request)
-
-        req = self._build_request(
-            method="GET",
-            path="/documents/{documentId}/sections/{sectionId}/permissions",
-            base_url=base_url,
-            url_variables=url_variables,
-            request=request,
-            request_body_required=False,
-            request_has_path_params=True,
-            request_has_query_params=True,
-            user_agent_header="user-agent",
-            accept_header_value="application/json",
-            http_headers=http_headers,
-            security=self.sdk_configuration.security,
-            allow_empty_value=None,
-            timeout_ms=timeout_ms,
-        )
-
-        if retries == UNSET:
-            if self.sdk_configuration.retry_config is not UNSET:
-                retries = self.sdk_configuration.retry_config
-
-        retry_config = None
-        if isinstance(retries, utils.RetryConfig):
-            retry_config = (retries, ["429", "500", "502", "503", "504"])
-
-        http_res = self.do_request(
-            hook_ctx=HookContext(
-                config=self.sdk_configuration,
-                base_url=base_url or "",
-                operation_id="getSectionPermissions",
-                oauth2_scopes=["file:read"],
-                security_source=self.sdk_configuration.security,
-            ),
-            request=req,
-            error_status_codes=[
-                "400",
-                "401",
-                "403",
-                "404",
-                "409",
-                "429",
-                "4XX",
-                "500",
-                "503",
-                "5XX",
-            ],
-            retry_config=retry_config,
-        )
-
-        def next_func() -> Optional[models.GetSectionPermissionsResponse]:
-            body = utils.unmarshal_json(http_res.text, Union[Dict[Any, Any], List[Any]])
-
-            next_cursor = JSONPath("$['@nextLink']").parse(body)
-
-            if len(next_cursor) == 0:
-                return None
-
-            next_cursor = next_cursor[0]
-            if next_cursor is None or str(next_cursor).strip() == "":
-                return None
-
-            return self.get_section_permissions(
-                request=models.GetSectionPermissionsRequest(
-                    document_id=request.document_id,
-                    section_id=request.section_id,
-                    filter_=request.filter_,
-                    maxpagesize=request.maxpagesize,
-                    next=request.next,
-                ),
-                retries=retries,
-            )
-
-        response_data: Any = None
-        if utils.match_response(http_res, "200", "application/json"):
-            return models.GetSectionPermissionsResponse(
-                result=unmarshal_json_response(
-                    models.ResourcePermissionsListResult, http_res
-                ),
-                next=next_func,
-            )
-        if utils.match_response(
-            http_res, ["400", "401", "403", "404", "409", "429"], "application/json"
-        ):
-            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
-            raise errors.ErrorResponse(response_data, http_res)
-        if utils.match_response(http_res, ["500", "503"], "application/json"):
-            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
-            raise errors.ErrorResponse(response_data, http_res)
-        if utils.match_response(http_res, "4XX", "*"):
-            http_res_text = utils.stream_to_text(http_res)
-            raise errors.SDKError("API error occurred", http_res, http_res_text)
-        if utils.match_response(http_res, "5XX", "*"):
-            http_res_text = utils.stream_to_text(http_res)
-            raise errors.SDKError("API error occurred", http_res, http_res_text)
-
-        raise errors.SDKError("Unexpected response received", http_res)
-
-    async def get_section_permissions_async(
-        self,
-        *,
-        request: Union[
-            models.GetSectionPermissionsRequest,
-            models.GetSectionPermissionsRequestTypedDict,
-        ],
-        retries: OptionalNullable[utils.RetryConfig] = UNSET,
-        server_url: Optional[str] = None,
-        timeout_ms: Optional[int] = None,
-        http_headers: Optional[Mapping[str, str]] = None,
-    ) -> Optional[models.GetSectionPermissionsResponse]:
-        r"""Retrieve permissions for a section in a document
-
-        Retrieves a paginated list of permissions for the given section in a document
-
-
-        :param request: The request object to send.
-        :param retries: Override the default retry configuration for this method
-        :param server_url: Override the default server URL for this method
-        :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
-        :param http_headers: Additional headers to set or replace on requests.
-        """
-        base_url = None
-        url_variables = None
-        if timeout_ms is None:
-            timeout_ms = self.sdk_configuration.timeout_ms
-
-        if server_url is not None:
-            base_url = server_url
-        else:
-            base_url = self._get_url(base_url, url_variables)
-
-        if not isinstance(request, BaseModel):
-            request = utils.unmarshal(request, models.GetSectionPermissionsRequest)
-        request = cast(models.GetSectionPermissionsRequest, request)
-
-        req = self._build_request_async(
-            method="GET",
-            path="/documents/{documentId}/sections/{sectionId}/permissions",
-            base_url=base_url,
-            url_variables=url_variables,
-            request=request,
-            request_body_required=False,
-            request_has_path_params=True,
-            request_has_query_params=True,
-            user_agent_header="user-agent",
-            accept_header_value="application/json",
-            http_headers=http_headers,
-            security=self.sdk_configuration.security,
-            allow_empty_value=None,
-            timeout_ms=timeout_ms,
-        )
-
-        if retries == UNSET:
-            if self.sdk_configuration.retry_config is not UNSET:
-                retries = self.sdk_configuration.retry_config
-
-        retry_config = None
-        if isinstance(retries, utils.RetryConfig):
-            retry_config = (retries, ["429", "500", "502", "503", "504"])
-
-        http_res = await self.do_request_async(
-            hook_ctx=HookContext(
-                config=self.sdk_configuration,
-                base_url=base_url or "",
-                operation_id="getSectionPermissions",
-                oauth2_scopes=["file:read"],
-                security_source=self.sdk_configuration.security,
-            ),
-            request=req,
-            error_status_codes=[
-                "400",
-                "401",
-                "403",
-                "404",
-                "409",
-                "429",
-                "4XX",
-                "500",
-                "503",
-                "5XX",
-            ],
-            retry_config=retry_config,
-        )
-
-        def next_func() -> Awaitable[Optional[models.GetSectionPermissionsResponse]]:
-            body = utils.unmarshal_json(http_res.text, Union[Dict[Any, Any], List[Any]])
-
-            async def empty_result():
-                return None
-
-            next_cursor = JSONPath("$['@nextLink']").parse(body)
-
-            if len(next_cursor) == 0:
-                return empty_result()
-
-            next_cursor = next_cursor[0]
-            if next_cursor is None or str(next_cursor).strip() == "":
-                return empty_result()
-
-            return self.get_section_permissions_async(
-                request=models.GetSectionPermissionsRequest(
-                    document_id=request.document_id,
-                    section_id=request.section_id,
-                    filter_=request.filter_,
-                    maxpagesize=request.maxpagesize,
-                    next=request.next,
-                ),
-                retries=retries,
-            )
-
-        response_data: Any = None
-        if utils.match_response(http_res, "200", "application/json"):
-            return models.GetSectionPermissionsResponse(
-                result=unmarshal_json_response(
-                    models.ResourcePermissionsListResult, http_res
-                ),
-                next=next_func,
-            )
-        if utils.match_response(
-            http_res, ["400", "401", "403", "404", "409", "429"], "application/json"
-        ):
-            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
-            raise errors.ErrorResponse(response_data, http_res)
-        if utils.match_response(http_res, ["500", "503"], "application/json"):
-            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
-            raise errors.ErrorResponse(response_data, http_res)
-        if utils.match_response(http_res, "4XX", "*"):
-            http_res_text = await utils.stream_to_text_async(http_res)
-            raise errors.SDKError("API error occurred", http_res, http_res_text)
-        if utils.match_response(http_res, "5XX", "*"):
-            http_res_text = await utils.stream_to_text_async(http_res)
-            raise errors.SDKError("API error occurred", http_res, http_res_text)
-
-        raise errors.SDKError("Unexpected response received", http_res)
-
-    def get_sections(
-        self,
-        *,
-        document_id: str,
-        maxpagesize: Optional[int] = 1000,
-        next: Optional[str] = None,
-        revision: Optional[str] = None,
-        retries: OptionalNullable[utils.RetryConfig] = UNSET,
-        server_url: Optional[str] = None,
-        timeout_ms: Optional[int] = None,
-        http_headers: Optional[Mapping[str, str]] = None,
-    ) -> Optional[models.GetSectionsResponse]:
-        r"""Retrieve a list of sections
-
-        Returns a list of [sections](ref:documents#section).
-
-
-        :param document_id: The unique identifier of the document
-        :param maxpagesize: The maximum number of results to retrieve
-        :param next: Pagination cursor for next set of results.
-        :param revision: Returns resources at a specific revision
-        :param retries: Override the default retry configuration for this method
-        :param server_url: Override the default server URL for this method
-        :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
-        :param http_headers: Additional headers to set or replace on requests.
-        """
-        base_url = None
-        url_variables = None
-        if timeout_ms is None:
-            timeout_ms = self.sdk_configuration.timeout_ms
-
-        if server_url is not None:
-            base_url = server_url
-        else:
-            base_url = self._get_url(base_url, url_variables)
-
-        request = models.GetSectionsRequest(
-            document_id=document_id,
-            maxpagesize=maxpagesize,
-            next=next,
-            revision=revision,
-        )
-
-        req = self._build_request(
-            method="GET",
-            path="/documents/{documentId}/sections",
-            base_url=base_url,
-            url_variables=url_variables,
-            request=request,
-            request_body_required=False,
-            request_has_path_params=True,
-            request_has_query_params=True,
-            user_agent_header="user-agent",
-            accept_header_value="application/json",
-            http_headers=http_headers,
-            security=self.sdk_configuration.security,
-            allow_empty_value=None,
-            timeout_ms=timeout_ms,
-        )
-
-        if retries == UNSET:
-            if self.sdk_configuration.retry_config is not UNSET:
-                retries = self.sdk_configuration.retry_config
-
-        retry_config = None
-        if isinstance(retries, utils.RetryConfig):
-            retry_config = (retries, ["429", "500", "502", "503", "504"])
-
-        http_res = self.do_request(
-            hook_ctx=HookContext(
-                config=self.sdk_configuration,
-                base_url=base_url or "",
-                operation_id="getSections",
-                oauth2_scopes=["file:read"],
-                security_source=self.sdk_configuration.security,
-            ),
-            request=req,
-            error_status_codes=[
-                "400",
-                "401",
-                "403",
-                "404",
-                "409",
-                "429",
-                "4XX",
-                "500",
-                "503",
-                "5XX",
-            ],
-            retry_config=retry_config,
-        )
-
-        def next_func() -> Optional[models.GetSectionsResponse]:
-            body = utils.unmarshal_json(http_res.text, Union[Dict[Any, Any], List[Any]])
-
-            next_cursor = JSONPath("$['@nextLink']").parse(body)
-
-            if len(next_cursor) == 0:
-                return None
-
-            next_cursor = next_cursor[0]
-            if next_cursor is None or str(next_cursor).strip() == "":
-                return None
-
-            return self.get_sections(
-                document_id=document_id,
-                maxpagesize=maxpagesize,
-                next=next,
-                revision=revision,
-                retries=retries,
-            )
-
-        response_data: Any = None
-        if utils.match_response(http_res, "200", "application/json"):
-            return models.GetSectionsResponse(
-                result=unmarshal_json_response(models.SectionsListResult, http_res),
-                next=next_func,
-            )
-        if utils.match_response(
-            http_res, ["400", "401", "403", "404", "409", "429"], "application/json"
-        ):
-            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
-            raise errors.ErrorResponse(response_data, http_res)
-        if utils.match_response(http_res, ["500", "503"], "application/json"):
-            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
-            raise errors.ErrorResponse(response_data, http_res)
-        if utils.match_response(http_res, "4XX", "*"):
-            http_res_text = utils.stream_to_text(http_res)
-            raise errors.SDKError("API error occurred", http_res, http_res_text)
-        if utils.match_response(http_res, "5XX", "*"):
-            http_res_text = utils.stream_to_text(http_res)
-            raise errors.SDKError("API error occurred", http_res, http_res_text)
-
-        raise errors.SDKError("Unexpected response received", http_res)
-
-    async def get_sections_async(
-        self,
-        *,
-        document_id: str,
-        maxpagesize: Optional[int] = 1000,
-        next: Optional[str] = None,
-        revision: Optional[str] = None,
-        retries: OptionalNullable[utils.RetryConfig] = UNSET,
-        server_url: Optional[str] = None,
-        timeout_ms: Optional[int] = None,
-        http_headers: Optional[Mapping[str, str]] = None,
-    ) -> Optional[models.GetSectionsResponse]:
-        r"""Retrieve a list of sections
-
-        Returns a list of [sections](ref:documents#section).
-
-
-        :param document_id: The unique identifier of the document
-        :param maxpagesize: The maximum number of results to retrieve
-        :param next: Pagination cursor for next set of results.
-        :param revision: Returns resources at a specific revision
-        :param retries: Override the default retry configuration for this method
-        :param server_url: Override the default server URL for this method
-        :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
-        :param http_headers: Additional headers to set or replace on requests.
-        """
-        base_url = None
-        url_variables = None
-        if timeout_ms is None:
-            timeout_ms = self.sdk_configuration.timeout_ms
-
-        if server_url is not None:
-            base_url = server_url
-        else:
-            base_url = self._get_url(base_url, url_variables)
-
-        request = models.GetSectionsRequest(
-            document_id=document_id,
-            maxpagesize=maxpagesize,
-            next=next,
-            revision=revision,
-        )
-
-        req = self._build_request_async(
-            method="GET",
-            path="/documents/{documentId}/sections",
-            base_url=base_url,
-            url_variables=url_variables,
-            request=request,
-            request_body_required=False,
-            request_has_path_params=True,
-            request_has_query_params=True,
-            user_agent_header="user-agent",
-            accept_header_value="application/json",
-            http_headers=http_headers,
-            security=self.sdk_configuration.security,
-            allow_empty_value=None,
-            timeout_ms=timeout_ms,
-        )
-
-        if retries == UNSET:
-            if self.sdk_configuration.retry_config is not UNSET:
-                retries = self.sdk_configuration.retry_config
-
-        retry_config = None
-        if isinstance(retries, utils.RetryConfig):
-            retry_config = (retries, ["429", "500", "502", "503", "504"])
-
-        http_res = await self.do_request_async(
-            hook_ctx=HookContext(
-                config=self.sdk_configuration,
-                base_url=base_url or "",
-                operation_id="getSections",
-                oauth2_scopes=["file:read"],
-                security_source=self.sdk_configuration.security,
-            ),
-            request=req,
-            error_status_codes=[
-                "400",
-                "401",
-                "403",
-                "404",
-                "409",
-                "429",
-                "4XX",
-                "500",
-                "503",
-                "5XX",
-            ],
-            retry_config=retry_config,
-        )
-
-        def next_func() -> Awaitable[Optional[models.GetSectionsResponse]]:
-            body = utils.unmarshal_json(http_res.text, Union[Dict[Any, Any], List[Any]])
-
-            async def empty_result():
-                return None
-
-            next_cursor = JSONPath("$['@nextLink']").parse(body)
-
-            if len(next_cursor) == 0:
-                return empty_result()
-
-            next_cursor = next_cursor[0]
-            if next_cursor is None or str(next_cursor).strip() == "":
-                return empty_result()
-
-            return self.get_sections_async(
-                document_id=document_id,
-                maxpagesize=maxpagesize,
-                next=next,
-                revision=revision,
-                retries=retries,
-            )
-
-        response_data: Any = None
-        if utils.match_response(http_res, "200", "application/json"):
-            return models.GetSectionsResponse(
-                result=unmarshal_json_response(models.SectionsListResult, http_res),
-                next=next_func,
-            )
-        if utils.match_response(
-            http_res, ["400", "401", "403", "404", "409", "429"], "application/json"
-        ):
-            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
-            raise errors.ErrorResponse(response_data, http_res)
-        if utils.match_response(http_res, ["500", "503"], "application/json"):
-            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
-            raise errors.ErrorResponse(response_data, http_res)
-        if utils.match_response(http_res, "4XX", "*"):
-            http_res_text = await utils.stream_to_text_async(http_res)
-            raise errors.SDKError("API error occurred", http_res, http_res_text)
-        if utils.match_response(http_res, "5XX", "*"):
-            http_res_text = await utils.stream_to_text_async(http_res)
-            raise errors.SDKError("API error occurred", http_res, http_res_text)
-
-        raise errors.SDKError("Unexpected response received", http_res)
-
-    def partially_update_document_by_id(
-        self,
-        *,
-        document_id: str,
-        request_body: Union[
-            List[models.JSONPatchOperation], List[models.JSONPatchOperationTypedDict]
-        ],
-        retries: OptionalNullable[utils.RetryConfig] = UNSET,
-        server_url: Optional[str] = None,
-        timeout_ms: Optional[int] = None,
-        http_headers: Optional[Mapping[str, str]] = None,
-    ) -> models.PartiallyUpdateDocumentByIDResponse:
-        r"""Partially update a single document
-
-        Updates the properties of a [document](ref:documents#document).
-
-        This is a long running operation. Responses include a `Location` header,
-        which indicates where to poll for results. For more details on long-running job polling,
-        see [Operations endpoint](ref:getoperationbyid).
-
-        ### Options
-
-        |Path                             |PATCH Operations Supported        |
-        |---------------------------------|----------------------------------|
-        |`/customFields/<custom field id>`|`add`, `remove`, `replace`, `test`|
-        |`/customFieldGroups`             |`add`, `remove`, `replace`, `test`|
-        |`/sectionCustomFieldGroups`      |`add`, `remove`, `replace`, `test`|
-        |`/lock`                          |`replace`                         |
-
-        ### Examples
-
-        #### Add a custom field value
-
-        ```json
-        [
-        {
-        \"op\": \"add\",
-        \"path\": \"/customFields/com.workiva.gsr.legal_entity\",
-        \"value\": \"Workiva\"
-        }
-        ]
-        ```
-
-        #### Remove a custom field value
-
-        ```json
-        [
-        {
-        \"op\": \"remove\",
-        \"path\": \"/customFields/com.workiva.gsr.legal_entity\"
-        }
-        ]
-        ```
-
-        #### Replace a custom field value
-
-        ```json
-        [
-        {
-        \"op\": \"replace\",
-        \"path\": \"/customFields/com.workiva.gsr.legal_entity\",
-        \"value\": \"Workiva, Inc.\"
-        }
-        ]
-        ```
-
-        #### Verifying customFieldGroup is empty before replacing the list
-
-        ```json
-        [
-        {
-        \"op\": \"test\",
-        \"path\": \"/customFieldGroups\",
-        \"value\": []
-        },
-        {
-        \"op\": \"replace\",
-        \"path\": \"/customFieldGroups\",
-        \"value\": [\"gsr.reporting\"]
-        }
-        ]
-        ```
-
-        #### Adding a customFieldGroup to the end of a list
-
-        ```json
-        [
-        {
-        \"op\": \"add\",
-        \"path\": \"/customFieldGroups/-\",
-        \"value\": \"gsr.reporting\"
-        }
-        ]
-        ```
-
-
-        :param document_id: The unique identifier of the document
-        :param request_body: A collection of patch operations to apply to the document.
-        :param retries: Override the default retry configuration for this method
-        :param server_url: Override the default server URL for this method
-        :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
-        :param http_headers: Additional headers to set or replace on requests.
-        """
-        base_url = None
-        url_variables = None
-        if timeout_ms is None:
-            timeout_ms = self.sdk_configuration.timeout_ms
-
-        if server_url is not None:
-            base_url = server_url
-        else:
-            base_url = self._get_url(base_url, url_variables)
-
-        request = models.PartiallyUpdateDocumentByIDRequest(
-            document_id=document_id,
-            request_body=utils.get_pydantic_model(
-                request_body, List[models.JSONPatchOperation]
-            ),
-        )
-
-        req = self._build_request(
-            method="PATCH",
-            path="/documents/{documentId}",
-            base_url=base_url,
-            url_variables=url_variables,
-            request=request,
-            request_body_required=True,
-            request_has_path_params=True,
-            request_has_query_params=True,
-            user_agent_header="user-agent",
-            accept_header_value="application/json",
-            http_headers=http_headers,
-            security=self.sdk_configuration.security,
-            get_serialized_body=lambda: utils.serialize_request_body(
-                request.request_body,
-                False,
-                False,
-                "json",
-                List[models.JSONPatchOperation],
-            ),
-            allow_empty_value=None,
-            timeout_ms=timeout_ms,
-        )
-
-        if retries == UNSET:
-            if self.sdk_configuration.retry_config is not UNSET:
-                retries = self.sdk_configuration.retry_config
-
-        retry_config = None
-        if isinstance(retries, utils.RetryConfig):
-            retry_config = (retries, ["429", "500", "502", "503", "504"])
-
-        http_res = self.do_request(
-            hook_ctx=HookContext(
-                config=self.sdk_configuration,
-                base_url=base_url or "",
-                operation_id="partiallyUpdateDocumentById",
-                oauth2_scopes=["file:write"],
-                security_source=self.sdk_configuration.security,
-            ),
-            request=req,
-            error_status_codes=[
-                "400",
-                "401",
-                "403",
-                "404",
-                "409",
-                "429",
-                "4XX",
-                "500",
-                "503",
-                "5XX",
-            ],
-            retry_config=retry_config,
-        )
-
-        response_data: Any = None
-        if utils.match_response(http_res, "202", "*"):
-            return models.PartiallyUpdateDocumentByIDResponse(
-                headers=utils.get_response_headers(http_res.headers)
-            )
-        if utils.match_response(
-            http_res, ["400", "401", "403", "404", "409", "429"], "application/json"
-        ):
-            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
-            raise errors.ErrorResponse(response_data, http_res)
-        if utils.match_response(http_res, ["500", "503"], "application/json"):
-            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
-            raise errors.ErrorResponse(response_data, http_res)
-        if utils.match_response(http_res, "4XX", "*"):
-            http_res_text = utils.stream_to_text(http_res)
-            raise errors.SDKError("API error occurred", http_res, http_res_text)
-        if utils.match_response(http_res, "5XX", "*"):
-            http_res_text = utils.stream_to_text(http_res)
-            raise errors.SDKError("API error occurred", http_res, http_res_text)
-
-        raise errors.SDKError("Unexpected response received", http_res)
-
-    async def partially_update_document_by_id_async(
-        self,
-        *,
-        document_id: str,
-        request_body: Union[
-            List[models.JSONPatchOperation], List[models.JSONPatchOperationTypedDict]
-        ],
-        retries: OptionalNullable[utils.RetryConfig] = UNSET,
-        server_url: Optional[str] = None,
-        timeout_ms: Optional[int] = None,
-        http_headers: Optional[Mapping[str, str]] = None,
-    ) -> models.PartiallyUpdateDocumentByIDResponse:
-        r"""Partially update a single document
-
-        Updates the properties of a [document](ref:documents#document).
-
-        This is a long running operation. Responses include a `Location` header,
-        which indicates where to poll for results. For more details on long-running job polling,
-        see [Operations endpoint](ref:getoperationbyid).
-
-        ### Options
-
-        |Path                             |PATCH Operations Supported        |
-        |---------------------------------|----------------------------------|
-        |`/customFields/<custom field id>`|`add`, `remove`, `replace`, `test`|
-        |`/customFieldGroups`             |`add`, `remove`, `replace`, `test`|
-        |`/sectionCustomFieldGroups`      |`add`, `remove`, `replace`, `test`|
-        |`/lock`                          |`replace`                         |
-
-        ### Examples
-
-        #### Add a custom field value
-
-        ```json
-        [
-        {
-        \"op\": \"add\",
-        \"path\": \"/customFields/com.workiva.gsr.legal_entity\",
-        \"value\": \"Workiva\"
-        }
-        ]
-        ```
-
-        #### Remove a custom field value
-
-        ```json
-        [
-        {
-        \"op\": \"remove\",
-        \"path\": \"/customFields/com.workiva.gsr.legal_entity\"
-        }
-        ]
-        ```
-
-        #### Replace a custom field value
-
-        ```json
-        [
-        {
-        \"op\": \"replace\",
-        \"path\": \"/customFields/com.workiva.gsr.legal_entity\",
-        \"value\": \"Workiva, Inc.\"
-        }
-        ]
-        ```
-
-        #### Verifying customFieldGroup is empty before replacing the list
-
-        ```json
-        [
-        {
-        \"op\": \"test\",
-        \"path\": \"/customFieldGroups\",
-        \"value\": []
-        },
-        {
-        \"op\": \"replace\",
-        \"path\": \"/customFieldGroups\",
-        \"value\": [\"gsr.reporting\"]
-        }
-        ]
-        ```
-
-        #### Adding a customFieldGroup to the end of a list
-
-        ```json
-        [
-        {
-        \"op\": \"add\",
-        \"path\": \"/customFieldGroups/-\",
-        \"value\": \"gsr.reporting\"
-        }
-        ]
-        ```
-
-
-        :param document_id: The unique identifier of the document
-        :param request_body: A collection of patch operations to apply to the document.
-        :param retries: Override the default retry configuration for this method
-        :param server_url: Override the default server URL for this method
-        :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
-        :param http_headers: Additional headers to set or replace on requests.
-        """
-        base_url = None
-        url_variables = None
-        if timeout_ms is None:
-            timeout_ms = self.sdk_configuration.timeout_ms
-
-        if server_url is not None:
-            base_url = server_url
-        else:
-            base_url = self._get_url(base_url, url_variables)
-
-        request = models.PartiallyUpdateDocumentByIDRequest(
-            document_id=document_id,
-            request_body=utils.get_pydantic_model(
-                request_body, List[models.JSONPatchOperation]
-            ),
-        )
-
-        req = self._build_request_async(
-            method="PATCH",
-            path="/documents/{documentId}",
-            base_url=base_url,
-            url_variables=url_variables,
-            request=request,
-            request_body_required=True,
-            request_has_path_params=True,
-            request_has_query_params=True,
-            user_agent_header="user-agent",
-            accept_header_value="application/json",
-            http_headers=http_headers,
-            security=self.sdk_configuration.security,
-            get_serialized_body=lambda: utils.serialize_request_body(
-                request.request_body,
-                False,
-                False,
-                "json",
-                List[models.JSONPatchOperation],
-            ),
-            allow_empty_value=None,
-            timeout_ms=timeout_ms,
-        )
-
-        if retries == UNSET:
-            if self.sdk_configuration.retry_config is not UNSET:
-                retries = self.sdk_configuration.retry_config
-
-        retry_config = None
-        if isinstance(retries, utils.RetryConfig):
-            retry_config = (retries, ["429", "500", "502", "503", "504"])
-
-        http_res = await self.do_request_async(
-            hook_ctx=HookContext(
-                config=self.sdk_configuration,
-                base_url=base_url or "",
-                operation_id="partiallyUpdateDocumentById",
-                oauth2_scopes=["file:write"],
-                security_source=self.sdk_configuration.security,
-            ),
-            request=req,
-            error_status_codes=[
-                "400",
-                "401",
-                "403",
-                "404",
-                "409",
-                "429",
-                "4XX",
-                "500",
-                "503",
-                "5XX",
-            ],
-            retry_config=retry_config,
-        )
-
-        response_data: Any = None
-        if utils.match_response(http_res, "202", "*"):
-            return models.PartiallyUpdateDocumentByIDResponse(
-                headers=utils.get_response_headers(http_res.headers)
-            )
         if utils.match_response(
             http_res, ["400", "401", "403", "404", "409", "429"], "application/json"
         ):
@@ -4517,6 +3788,735 @@ class Documents(BaseSDK):
         if utils.match_response(http_res, "202", "*"):
             return models.PartiallyUpdateSectionByIDResponse(
                 headers=utils.get_response_headers(http_res.headers)
+            )
+        if utils.match_response(
+            http_res, ["400", "401", "403", "404", "409", "429"], "application/json"
+        ):
+            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
+            raise errors.ErrorResponse(response_data, http_res)
+        if utils.match_response(http_res, ["500", "503"], "application/json"):
+            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
+            raise errors.ErrorResponse(response_data, http_res)
+        if utils.match_response(http_res, "4XX", "*"):
+            http_res_text = await utils.stream_to_text_async(http_res)
+            raise errors.SDKError("API error occurred", http_res, http_res_text)
+        if utils.match_response(http_res, "5XX", "*"):
+            http_res_text = await utils.stream_to_text_async(http_res)
+            raise errors.SDKError("API error occurred", http_res, http_res_text)
+
+        raise errors.SDKError("Unexpected response received", http_res)
+
+    def copy_section(
+        self,
+        *,
+        document_id: str,
+        section_id: str,
+        section_copy: Union[models.SectionCopy, models.SectionCopyTypedDict],
+        retries: OptionalNullable[utils.RetryConfig] = UNSET,
+        server_url: Optional[str] = None,
+        timeout_ms: Optional[int] = None,
+        http_headers: Optional[Mapping[str, str]] = None,
+    ) -> models.CopySectionResponse:
+        r"""Copy section
+
+        Asynchronously copies a [section](ref:documents#section) given details about the copy's destination within the same or another document. Options are specified using a [SectionCopy](ref:documents#sectioncopy) object.
+
+        Copies only the section's content — not any labels, comments, tasks, or formatting from a style guide. Unless otherwise specified, the copy appears at the top level of its destination document, with an index of 0, and with the same name as the original section.
+
+        :param document_id: The unique identifier of the document
+        :param section_id: The unique identifier of the section
+        :param section_copy: A SectionCopy object
+        :param retries: Override the default retry configuration for this method
+        :param server_url: Override the default server URL for this method
+        :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
+        :param http_headers: Additional headers to set or replace on requests.
+        """
+        base_url = None
+        url_variables = None
+        if timeout_ms is None:
+            timeout_ms = self.sdk_configuration.timeout_ms
+
+        if server_url is not None:
+            base_url = server_url
+        else:
+            base_url = self._get_url(base_url, url_variables)
+
+        request = models.CopySectionRequest(
+            document_id=document_id,
+            section_id=section_id,
+            section_copy=utils.get_pydantic_model(section_copy, models.SectionCopy),
+        )
+
+        req = self._build_request(
+            method="POST",
+            path="/documents/{documentId}/sections/{sectionId}/copy",
+            base_url=base_url,
+            url_variables=url_variables,
+            request=request,
+            request_body_required=True,
+            request_has_path_params=True,
+            request_has_query_params=True,
+            user_agent_header="user-agent",
+            accept_header_value="application/json",
+            http_headers=http_headers,
+            security=self.sdk_configuration.security,
+            get_serialized_body=lambda: utils.serialize_request_body(
+                request.section_copy, False, False, "json", models.SectionCopy
+            ),
+            allow_empty_value=None,
+            timeout_ms=timeout_ms,
+        )
+
+        if retries == UNSET:
+            if self.sdk_configuration.retry_config is not UNSET:
+                retries = self.sdk_configuration.retry_config
+
+        retry_config = None
+        if isinstance(retries, utils.RetryConfig):
+            retry_config = (retries, ["429", "500", "502", "503", "504"])
+
+        http_res = self.do_request(
+            hook_ctx=HookContext(
+                config=self.sdk_configuration,
+                base_url=base_url or "",
+                operation_id="copySection",
+                oauth2_scopes=["file:write"],
+                security_source=self.sdk_configuration.security,
+            ),
+            request=req,
+            error_status_codes=[
+                "400",
+                "401",
+                "403",
+                "404",
+                "409",
+                "429",
+                "4XX",
+                "500",
+                "503",
+                "5XX",
+            ],
+            retry_config=retry_config,
+        )
+
+        response_data: Any = None
+        if utils.match_response(http_res, "202", "*"):
+            return models.CopySectionResponse(
+                headers=utils.get_response_headers(http_res.headers)
+            )
+        if utils.match_response(
+            http_res, ["400", "401", "403", "404", "409", "429"], "application/json"
+        ):
+            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
+            raise errors.ErrorResponse(response_data, http_res)
+        if utils.match_response(http_res, ["500", "503"], "application/json"):
+            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
+            raise errors.ErrorResponse(response_data, http_res)
+        if utils.match_response(http_res, "4XX", "*"):
+            http_res_text = utils.stream_to_text(http_res)
+            raise errors.SDKError("API error occurred", http_res, http_res_text)
+        if utils.match_response(http_res, "5XX", "*"):
+            http_res_text = utils.stream_to_text(http_res)
+            raise errors.SDKError("API error occurred", http_res, http_res_text)
+
+        raise errors.SDKError("Unexpected response received", http_res)
+
+    async def copy_section_async(
+        self,
+        *,
+        document_id: str,
+        section_id: str,
+        section_copy: Union[models.SectionCopy, models.SectionCopyTypedDict],
+        retries: OptionalNullable[utils.RetryConfig] = UNSET,
+        server_url: Optional[str] = None,
+        timeout_ms: Optional[int] = None,
+        http_headers: Optional[Mapping[str, str]] = None,
+    ) -> models.CopySectionResponse:
+        r"""Copy section
+
+        Asynchronously copies a [section](ref:documents#section) given details about the copy's destination within the same or another document. Options are specified using a [SectionCopy](ref:documents#sectioncopy) object.
+
+        Copies only the section's content — not any labels, comments, tasks, or formatting from a style guide. Unless otherwise specified, the copy appears at the top level of its destination document, with an index of 0, and with the same name as the original section.
+
+        :param document_id: The unique identifier of the document
+        :param section_id: The unique identifier of the section
+        :param section_copy: A SectionCopy object
+        :param retries: Override the default retry configuration for this method
+        :param server_url: Override the default server URL for this method
+        :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
+        :param http_headers: Additional headers to set or replace on requests.
+        """
+        base_url = None
+        url_variables = None
+        if timeout_ms is None:
+            timeout_ms = self.sdk_configuration.timeout_ms
+
+        if server_url is not None:
+            base_url = server_url
+        else:
+            base_url = self._get_url(base_url, url_variables)
+
+        request = models.CopySectionRequest(
+            document_id=document_id,
+            section_id=section_id,
+            section_copy=utils.get_pydantic_model(section_copy, models.SectionCopy),
+        )
+
+        req = self._build_request_async(
+            method="POST",
+            path="/documents/{documentId}/sections/{sectionId}/copy",
+            base_url=base_url,
+            url_variables=url_variables,
+            request=request,
+            request_body_required=True,
+            request_has_path_params=True,
+            request_has_query_params=True,
+            user_agent_header="user-agent",
+            accept_header_value="application/json",
+            http_headers=http_headers,
+            security=self.sdk_configuration.security,
+            get_serialized_body=lambda: utils.serialize_request_body(
+                request.section_copy, False, False, "json", models.SectionCopy
+            ),
+            allow_empty_value=None,
+            timeout_ms=timeout_ms,
+        )
+
+        if retries == UNSET:
+            if self.sdk_configuration.retry_config is not UNSET:
+                retries = self.sdk_configuration.retry_config
+
+        retry_config = None
+        if isinstance(retries, utils.RetryConfig):
+            retry_config = (retries, ["429", "500", "502", "503", "504"])
+
+        http_res = await self.do_request_async(
+            hook_ctx=HookContext(
+                config=self.sdk_configuration,
+                base_url=base_url or "",
+                operation_id="copySection",
+                oauth2_scopes=["file:write"],
+                security_source=self.sdk_configuration.security,
+            ),
+            request=req,
+            error_status_codes=[
+                "400",
+                "401",
+                "403",
+                "404",
+                "409",
+                "429",
+                "4XX",
+                "500",
+                "503",
+                "5XX",
+            ],
+            retry_config=retry_config,
+        )
+
+        response_data: Any = None
+        if utils.match_response(http_res, "202", "*"):
+            return models.CopySectionResponse(
+                headers=utils.get_response_headers(http_res.headers)
+            )
+        if utils.match_response(
+            http_res, ["400", "401", "403", "404", "409", "429"], "application/json"
+        ):
+            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
+            raise errors.ErrorResponse(response_data, http_res)
+        if utils.match_response(http_res, ["500", "503"], "application/json"):
+            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
+            raise errors.ErrorResponse(response_data, http_res)
+        if utils.match_response(http_res, "4XX", "*"):
+            http_res_text = await utils.stream_to_text_async(http_res)
+            raise errors.SDKError("API error occurred", http_res, http_res_text)
+        if utils.match_response(http_res, "5XX", "*"):
+            http_res_text = await utils.stream_to_text_async(http_res)
+            raise errors.SDKError("API error occurred", http_res, http_res_text)
+
+        raise errors.SDKError("Unexpected response received", http_res)
+
+    def edit_sections(
+        self,
+        *,
+        document_id: str,
+        sections_edits: Union[models.SectionsEdits, models.SectionsEditsTypedDict],
+        retries: OptionalNullable[utils.RetryConfig] = UNSET,
+        server_url: Optional[str] = None,
+        timeout_ms: Optional[int] = None,
+        http_headers: Optional[Mapping[str, str]] = None,
+    ) -> models.EditSectionsResponse:
+        r"""Initiate sections edits
+
+        Updates the properties of a collection of [sections](ref:documents#section) in a document using [SectionsEdits](ref:documents#sectionsedit) request. This is a long running operation.
+        Responses include a `Location` header, which indicates where to poll for results. For more details on long-running job polling, see [Operations endpoint](ref:getoperationbyid). When the update completes, its status will be `completed`.
+
+
+        :param document_id: The unique identifier of the document
+        :param sections_edits: The edits for one or more sections in a document
+        :param retries: Override the default retry configuration for this method
+        :param server_url: Override the default server URL for this method
+        :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
+        :param http_headers: Additional headers to set or replace on requests.
+        """
+        base_url = None
+        url_variables = None
+        if timeout_ms is None:
+            timeout_ms = self.sdk_configuration.timeout_ms
+
+        if server_url is not None:
+            base_url = server_url
+        else:
+            base_url = self._get_url(base_url, url_variables)
+
+        request = models.EditSectionsRequest(
+            document_id=document_id,
+            sections_edits=utils.get_pydantic_model(
+                sections_edits, models.SectionsEdits
+            ),
+        )
+
+        req = self._build_request(
+            method="POST",
+            path="/documents/{documentId}/sections/edit",
+            base_url=base_url,
+            url_variables=url_variables,
+            request=request,
+            request_body_required=True,
+            request_has_path_params=True,
+            request_has_query_params=True,
+            user_agent_header="user-agent",
+            accept_header_value="application/json",
+            http_headers=http_headers,
+            security=self.sdk_configuration.security,
+            get_serialized_body=lambda: utils.serialize_request_body(
+                request.sections_edits, False, False, "json", models.SectionsEdits
+            ),
+            allow_empty_value=None,
+            timeout_ms=timeout_ms,
+        )
+
+        if retries == UNSET:
+            if self.sdk_configuration.retry_config is not UNSET:
+                retries = self.sdk_configuration.retry_config
+
+        retry_config = None
+        if isinstance(retries, utils.RetryConfig):
+            retry_config = (retries, ["429", "500", "502", "503", "504"])
+
+        http_res = self.do_request(
+            hook_ctx=HookContext(
+                config=self.sdk_configuration,
+                base_url=base_url or "",
+                operation_id="editSections",
+                oauth2_scopes=["file:write"],
+                security_source=self.sdk_configuration.security,
+            ),
+            request=req,
+            error_status_codes=[
+                "400",
+                "401",
+                "403",
+                "404",
+                "409",
+                "429",
+                "4XX",
+                "500",
+                "503",
+                "5XX",
+            ],
+            retry_config=retry_config,
+        )
+
+        response_data: Any = None
+        if utils.match_response(http_res, "202", "*"):
+            return models.EditSectionsResponse(
+                headers=utils.get_response_headers(http_res.headers)
+            )
+        if utils.match_response(
+            http_res, ["400", "401", "403", "404", "409", "429"], "application/json"
+        ):
+            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
+            raise errors.ErrorResponse(response_data, http_res)
+        if utils.match_response(http_res, ["500", "503"], "application/json"):
+            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
+            raise errors.ErrorResponse(response_data, http_res)
+        if utils.match_response(http_res, "4XX", "*"):
+            http_res_text = utils.stream_to_text(http_res)
+            raise errors.SDKError("API error occurred", http_res, http_res_text)
+        if utils.match_response(http_res, "5XX", "*"):
+            http_res_text = utils.stream_to_text(http_res)
+            raise errors.SDKError("API error occurred", http_res, http_res_text)
+
+        raise errors.SDKError("Unexpected response received", http_res)
+
+    async def edit_sections_async(
+        self,
+        *,
+        document_id: str,
+        sections_edits: Union[models.SectionsEdits, models.SectionsEditsTypedDict],
+        retries: OptionalNullable[utils.RetryConfig] = UNSET,
+        server_url: Optional[str] = None,
+        timeout_ms: Optional[int] = None,
+        http_headers: Optional[Mapping[str, str]] = None,
+    ) -> models.EditSectionsResponse:
+        r"""Initiate sections edits
+
+        Updates the properties of a collection of [sections](ref:documents#section) in a document using [SectionsEdits](ref:documents#sectionsedit) request. This is a long running operation.
+        Responses include a `Location` header, which indicates where to poll for results. For more details on long-running job polling, see [Operations endpoint](ref:getoperationbyid). When the update completes, its status will be `completed`.
+
+
+        :param document_id: The unique identifier of the document
+        :param sections_edits: The edits for one or more sections in a document
+        :param retries: Override the default retry configuration for this method
+        :param server_url: Override the default server URL for this method
+        :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
+        :param http_headers: Additional headers to set or replace on requests.
+        """
+        base_url = None
+        url_variables = None
+        if timeout_ms is None:
+            timeout_ms = self.sdk_configuration.timeout_ms
+
+        if server_url is not None:
+            base_url = server_url
+        else:
+            base_url = self._get_url(base_url, url_variables)
+
+        request = models.EditSectionsRequest(
+            document_id=document_id,
+            sections_edits=utils.get_pydantic_model(
+                sections_edits, models.SectionsEdits
+            ),
+        )
+
+        req = self._build_request_async(
+            method="POST",
+            path="/documents/{documentId}/sections/edit",
+            base_url=base_url,
+            url_variables=url_variables,
+            request=request,
+            request_body_required=True,
+            request_has_path_params=True,
+            request_has_query_params=True,
+            user_agent_header="user-agent",
+            accept_header_value="application/json",
+            http_headers=http_headers,
+            security=self.sdk_configuration.security,
+            get_serialized_body=lambda: utils.serialize_request_body(
+                request.sections_edits, False, False, "json", models.SectionsEdits
+            ),
+            allow_empty_value=None,
+            timeout_ms=timeout_ms,
+        )
+
+        if retries == UNSET:
+            if self.sdk_configuration.retry_config is not UNSET:
+                retries = self.sdk_configuration.retry_config
+
+        retry_config = None
+        if isinstance(retries, utils.RetryConfig):
+            retry_config = (retries, ["429", "500", "502", "503", "504"])
+
+        http_res = await self.do_request_async(
+            hook_ctx=HookContext(
+                config=self.sdk_configuration,
+                base_url=base_url or "",
+                operation_id="editSections",
+                oauth2_scopes=["file:write"],
+                security_source=self.sdk_configuration.security,
+            ),
+            request=req,
+            error_status_codes=[
+                "400",
+                "401",
+                "403",
+                "404",
+                "409",
+                "429",
+                "4XX",
+                "500",
+                "503",
+                "5XX",
+            ],
+            retry_config=retry_config,
+        )
+
+        response_data: Any = None
+        if utils.match_response(http_res, "202", "*"):
+            return models.EditSectionsResponse(
+                headers=utils.get_response_headers(http_res.headers)
+            )
+        if utils.match_response(
+            http_res, ["400", "401", "403", "404", "409", "429"], "application/json"
+        ):
+            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
+            raise errors.ErrorResponse(response_data, http_res)
+        if utils.match_response(http_res, ["500", "503"], "application/json"):
+            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
+            raise errors.ErrorResponse(response_data, http_res)
+        if utils.match_response(http_res, "4XX", "*"):
+            http_res_text = await utils.stream_to_text_async(http_res)
+            raise errors.SDKError("API error occurred", http_res, http_res_text)
+        if utils.match_response(http_res, "5XX", "*"):
+            http_res_text = await utils.stream_to_text_async(http_res)
+            raise errors.SDKError("API error occurred", http_res, http_res_text)
+
+        raise errors.SDKError("Unexpected response received", http_res)
+
+    def get_section_permissions(
+        self,
+        *,
+        request: Union[
+            models.GetSectionPermissionsRequest,
+            models.GetSectionPermissionsRequestTypedDict,
+        ],
+        retries: OptionalNullable[utils.RetryConfig] = UNSET,
+        server_url: Optional[str] = None,
+        timeout_ms: Optional[int] = None,
+        http_headers: Optional[Mapping[str, str]] = None,
+    ) -> Optional[models.GetSectionPermissionsResponse]:
+        r"""Retrieve permissions for a section in a document
+
+        Retrieves a paginated list of permissions for the given section in a document
+
+
+        :param request: The request object to send.
+        :param retries: Override the default retry configuration for this method
+        :param server_url: Override the default server URL for this method
+        :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
+        :param http_headers: Additional headers to set or replace on requests.
+        """
+        base_url = None
+        url_variables = None
+        if timeout_ms is None:
+            timeout_ms = self.sdk_configuration.timeout_ms
+
+        if server_url is not None:
+            base_url = server_url
+        else:
+            base_url = self._get_url(base_url, url_variables)
+
+        if not isinstance(request, BaseModel):
+            request = utils.unmarshal(request, models.GetSectionPermissionsRequest)
+        request = cast(models.GetSectionPermissionsRequest, request)
+
+        req = self._build_request(
+            method="GET",
+            path="/documents/{documentId}/sections/{sectionId}/permissions",
+            base_url=base_url,
+            url_variables=url_variables,
+            request=request,
+            request_body_required=False,
+            request_has_path_params=True,
+            request_has_query_params=True,
+            user_agent_header="user-agent",
+            accept_header_value="application/json",
+            http_headers=http_headers,
+            security=self.sdk_configuration.security,
+            allow_empty_value=None,
+            timeout_ms=timeout_ms,
+        )
+
+        if retries == UNSET:
+            if self.sdk_configuration.retry_config is not UNSET:
+                retries = self.sdk_configuration.retry_config
+
+        retry_config = None
+        if isinstance(retries, utils.RetryConfig):
+            retry_config = (retries, ["429", "500", "502", "503", "504"])
+
+        http_res = self.do_request(
+            hook_ctx=HookContext(
+                config=self.sdk_configuration,
+                base_url=base_url or "",
+                operation_id="getSectionPermissions",
+                oauth2_scopes=["file:read"],
+                security_source=self.sdk_configuration.security,
+            ),
+            request=req,
+            error_status_codes=[
+                "400",
+                "401",
+                "403",
+                "404",
+                "409",
+                "429",
+                "4XX",
+                "500",
+                "503",
+                "5XX",
+            ],
+            retry_config=retry_config,
+        )
+
+        def next_func() -> Optional[models.GetSectionPermissionsResponse]:
+            body = utils.unmarshal_json(http_res.text, Union[Dict[Any, Any], List[Any]])
+
+            next_cursor = JSONPath("$['@nextLink']").parse(body)
+
+            if len(next_cursor) == 0:
+                return None
+
+            next_cursor = next_cursor[0]
+            if next_cursor is None or str(next_cursor).strip() == "":
+                return None
+
+            return self.get_section_permissions(
+                request=models.GetSectionPermissionsRequest(
+                    document_id=request.document_id,
+                    section_id=request.section_id,
+                    filter_=request.filter_,
+                    maxpagesize=request.maxpagesize,
+                    next=request.next,
+                ),
+                retries=retries,
+            )
+
+        response_data: Any = None
+        if utils.match_response(http_res, "200", "application/json"):
+            return models.GetSectionPermissionsResponse(
+                result=unmarshal_json_response(
+                    models.ResourcePermissionsListResult, http_res
+                ),
+                next=next_func,
+            )
+        if utils.match_response(
+            http_res, ["400", "401", "403", "404", "409", "429"], "application/json"
+        ):
+            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
+            raise errors.ErrorResponse(response_data, http_res)
+        if utils.match_response(http_res, ["500", "503"], "application/json"):
+            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
+            raise errors.ErrorResponse(response_data, http_res)
+        if utils.match_response(http_res, "4XX", "*"):
+            http_res_text = utils.stream_to_text(http_res)
+            raise errors.SDKError("API error occurred", http_res, http_res_text)
+        if utils.match_response(http_res, "5XX", "*"):
+            http_res_text = utils.stream_to_text(http_res)
+            raise errors.SDKError("API error occurred", http_res, http_res_text)
+
+        raise errors.SDKError("Unexpected response received", http_res)
+
+    async def get_section_permissions_async(
+        self,
+        *,
+        request: Union[
+            models.GetSectionPermissionsRequest,
+            models.GetSectionPermissionsRequestTypedDict,
+        ],
+        retries: OptionalNullable[utils.RetryConfig] = UNSET,
+        server_url: Optional[str] = None,
+        timeout_ms: Optional[int] = None,
+        http_headers: Optional[Mapping[str, str]] = None,
+    ) -> Optional[models.GetSectionPermissionsResponse]:
+        r"""Retrieve permissions for a section in a document
+
+        Retrieves a paginated list of permissions for the given section in a document
+
+
+        :param request: The request object to send.
+        :param retries: Override the default retry configuration for this method
+        :param server_url: Override the default server URL for this method
+        :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
+        :param http_headers: Additional headers to set or replace on requests.
+        """
+        base_url = None
+        url_variables = None
+        if timeout_ms is None:
+            timeout_ms = self.sdk_configuration.timeout_ms
+
+        if server_url is not None:
+            base_url = server_url
+        else:
+            base_url = self._get_url(base_url, url_variables)
+
+        if not isinstance(request, BaseModel):
+            request = utils.unmarshal(request, models.GetSectionPermissionsRequest)
+        request = cast(models.GetSectionPermissionsRequest, request)
+
+        req = self._build_request_async(
+            method="GET",
+            path="/documents/{documentId}/sections/{sectionId}/permissions",
+            base_url=base_url,
+            url_variables=url_variables,
+            request=request,
+            request_body_required=False,
+            request_has_path_params=True,
+            request_has_query_params=True,
+            user_agent_header="user-agent",
+            accept_header_value="application/json",
+            http_headers=http_headers,
+            security=self.sdk_configuration.security,
+            allow_empty_value=None,
+            timeout_ms=timeout_ms,
+        )
+
+        if retries == UNSET:
+            if self.sdk_configuration.retry_config is not UNSET:
+                retries = self.sdk_configuration.retry_config
+
+        retry_config = None
+        if isinstance(retries, utils.RetryConfig):
+            retry_config = (retries, ["429", "500", "502", "503", "504"])
+
+        http_res = await self.do_request_async(
+            hook_ctx=HookContext(
+                config=self.sdk_configuration,
+                base_url=base_url or "",
+                operation_id="getSectionPermissions",
+                oauth2_scopes=["file:read"],
+                security_source=self.sdk_configuration.security,
+            ),
+            request=req,
+            error_status_codes=[
+                "400",
+                "401",
+                "403",
+                "404",
+                "409",
+                "429",
+                "4XX",
+                "500",
+                "503",
+                "5XX",
+            ],
+            retry_config=retry_config,
+        )
+
+        def next_func() -> Awaitable[Optional[models.GetSectionPermissionsResponse]]:
+            body = utils.unmarshal_json(http_res.text, Union[Dict[Any, Any], List[Any]])
+
+            async def empty_result():
+                return None
+
+            next_cursor = JSONPath("$['@nextLink']").parse(body)
+
+            if len(next_cursor) == 0:
+                return empty_result()
+
+            next_cursor = next_cursor[0]
+            if next_cursor is None or str(next_cursor).strip() == "":
+                return empty_result()
+
+            return self.get_section_permissions_async(
+                request=models.GetSectionPermissionsRequest(
+                    document_id=request.document_id,
+                    section_id=request.section_id,
+                    filter_=request.filter_,
+                    maxpagesize=request.maxpagesize,
+                    next=request.next,
+                ),
+                retries=retries,
+            )
+
+        response_data: Any = None
+        if utils.match_response(http_res, "200", "application/json"):
+            return models.GetSectionPermissionsResponse(
+                result=unmarshal_json_response(
+                    models.ResourcePermissionsListResult, http_res
+                ),
+                next=next_func,
             )
         if utils.match_response(
             http_res, ["400", "401", "403", "404", "409", "429"], "application/json"

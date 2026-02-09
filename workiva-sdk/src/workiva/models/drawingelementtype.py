@@ -2,9 +2,10 @@
 
 from __future__ import annotations
 from enum import Enum
+from workiva import utils
 
 
-class DrawingElementType(str, Enum):
+class DrawingElementType(str, Enum, metaclass=utils.OpenEnumMeta):
     r"""The type of the drawing element in a drawing"""
 
     SHAPE = "shape"

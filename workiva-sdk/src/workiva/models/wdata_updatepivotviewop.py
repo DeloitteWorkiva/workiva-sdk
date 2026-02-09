@@ -19,22 +19,22 @@ WDATA_UPDATE_PIVOT_VIEW_OP_SERVERS = [
 
 
 class WdataUpdatePivotViewRequestTypedDict(TypedDict):
-    pivot_view_dto: PivotViewDtoInputTypedDict
-    r"""The representation of the pivot view to create"""
     pivot_view_id: str
     r"""The unique identifier of the pivot view"""
+    pivot_view_dto: PivotViewDtoInputTypedDict
+    r"""The representation of the pivot view to create"""
 
 
 class WdataUpdatePivotViewRequest(BaseModel):
-    pivot_view_dto: Annotated[
-        PivotViewDtoInput,
-        FieldMetadata(request=RequestMetadata(media_type="application/json")),
-    ]
-    r"""The representation of the pivot view to create"""
-
     pivot_view_id: Annotated[
         str,
         pydantic.Field(alias="pivotViewId"),
         FieldMetadata(path=PathParamMetadata(style="simple", explode=False)),
     ]
     r"""The unique identifier of the pivot view"""
+
+    pivot_view_dto: Annotated[
+        PivotViewDtoInput,
+        FieldMetadata(request=RequestMetadata(media_type="application/json")),
+    ]
+    r"""The representation of the pivot view to create"""

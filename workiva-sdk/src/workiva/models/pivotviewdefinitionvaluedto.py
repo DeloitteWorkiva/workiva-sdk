@@ -3,13 +3,14 @@
 from __future__ import annotations
 from enum import Enum
 import pydantic
-from pydantic import model_serializer
+from pydantic import field_serializer, model_serializer
 from typing import Optional
 from typing_extensions import Annotated, NotRequired, TypedDict
+from workiva import models, utils
 from workiva.types import BaseModel, UNSET_SENTINEL
 
 
-class Aggregation(str, Enum):
+class Aggregation(str, Enum, metaclass=utils.OpenEnumMeta):
     r"""The aggregation type to apply to the pivot view value"""
 
     SUM = "sum"
@@ -30,7 +31,7 @@ class Aggregation(str, Enum):
     STDEVS = "stdevs"
 
 
-class PivotViewDefinitionValueDtoColumnType(str, Enum):
+class PivotViewDefinitionValueDtoColumnType(str, Enum, metaclass=utils.OpenEnumMeta):
     r"""The column type."""
 
     INTEGER = "integer"
@@ -66,6 +67,24 @@ class PivotViewDefinitionValueDto(BaseModel):
         pydantic.Field(alias="columnType"),
     ] = None
     r"""The column type."""
+
+    @field_serializer("aggregation")
+    def serialize_aggregation(self, value):
+        if isinstance(value, str):
+            try:
+                return models.Aggregation(value)
+            except ValueError:
+                return value
+        return value
+
+    @field_serializer("column_type")
+    def serialize_column_type(self, value):
+        if isinstance(value, str):
+            try:
+                return models.PivotViewDefinitionValueDtoColumnType(value)
+            except ValueError:
+                return value
+        return value
 
     @model_serializer(mode="wrap")
     def serialize_model(self, handler):

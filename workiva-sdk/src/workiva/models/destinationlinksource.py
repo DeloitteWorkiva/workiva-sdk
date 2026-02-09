@@ -3,9 +3,10 @@
 from __future__ import annotations
 from .contentref import ContentRef, ContentRefTypedDict
 from .destinationlinksourcetype import DestinationLinkSourceType
-from pydantic import model_serializer
+from pydantic import field_serializer, model_serializer
 from typing import Optional
 from typing_extensions import NotRequired, TypedDict
+from workiva import models
 from workiva.types import BaseModel, Nullable, OptionalNullable, UNSET, UNSET_SENTINEL
 
 
@@ -67,6 +68,15 @@ class DestinationLinkSource(BaseModel):
 
     unidentified: OptionalNullable[Unidentified] = UNSET
     r"""Reference to an unidentified source if the type is unidentified."""
+
+    @field_serializer("type")
+    def serialize_type(self, value):
+        if isinstance(value, str):
+            try:
+                return models.DestinationLinkSourceType(value)
+            except ValueError:
+                return value
+        return value
 
     @model_serializer(mode="wrap")
     def serialize_model(self, handler):

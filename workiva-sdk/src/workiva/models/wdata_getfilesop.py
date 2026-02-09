@@ -24,15 +24,15 @@ WDATA_GET_FILES_OP_SERVERS = [
 ]
 
 
-class SortBy(str, Enum):
-    r"""The column to use the sort order on"""
+class SortOrder(str, Enum):
+    r"""The sort order for the files being returned"""
 
     ASC = "asc"
     DESC = "desc"
 
 
-class SortOrder(str, Enum):
-    r"""The sort order for the files being returned"""
+class SortBy(str, Enum):
+    r"""The column to use the sort order on"""
 
     ASC = "asc"
     DESC = "desc"
@@ -47,12 +47,12 @@ class WdataGetFilesRequestTypedDict(TypedDict):
     r"""The number of files to return, from 1 to 1000; by default, 1000"""
     offset: NotRequired[int]
     r"""The item to start with on the page, greater than or equal to 0; by default, 0"""
-    search_text: NotRequired[str]
-    r"""The text to filter the results upon; matching the file name"""
-    sort_by: NotRequired[SortBy]
-    r"""The column to use the sort order on"""
     sort_order: NotRequired[SortOrder]
     r"""The sort order for the files being returned"""
+    sort_by: NotRequired[SortBy]
+    r"""The column to use the sort order on"""
+    search_text: NotRequired[str]
+    r"""The text to filter the results upon; matching the file name"""
 
 
 class WdataGetFilesRequest(BaseModel):
@@ -81,12 +81,12 @@ class WdataGetFilesRequest(BaseModel):
     ] = None
     r"""The item to start with on the page, greater than or equal to 0; by default, 0"""
 
-    search_text: Annotated[
-        Optional[str],
-        pydantic.Field(alias="searchText"),
+    sort_order: Annotated[
+        Optional[SortOrder],
+        pydantic.Field(alias="sortOrder"),
         FieldMetadata(query=QueryParamMetadata(style="form", explode=True)),
     ] = None
-    r"""The text to filter the results upon; matching the file name"""
+    r"""The sort order for the files being returned"""
 
     sort_by: Annotated[
         Optional[SortBy],
@@ -95,17 +95,17 @@ class WdataGetFilesRequest(BaseModel):
     ] = None
     r"""The column to use the sort order on"""
 
-    sort_order: Annotated[
-        Optional[SortOrder],
-        pydantic.Field(alias="sortOrder"),
+    search_text: Annotated[
+        Optional[str],
+        pydantic.Field(alias="searchText"),
         FieldMetadata(query=QueryParamMetadata(style="form", explode=True)),
     ] = None
-    r"""The sort order for the files being returned"""
+    r"""The text to filter the results upon; matching the file name"""
 
     @model_serializer(mode="wrap")
     def serialize_model(self, handler):
         optional_fields = set(
-            ["cursor", "limit", "offset", "searchText", "sortBy", "sortOrder"]
+            ["cursor", "limit", "offset", "sortOrder", "sortBy", "searchText"]
         )
         serialized = handler(self)
         m = {}

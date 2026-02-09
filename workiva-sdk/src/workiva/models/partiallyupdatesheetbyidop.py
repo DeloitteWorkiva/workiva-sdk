@@ -10,20 +10,21 @@ from workiva.utils import FieldMetadata, PathParamMetadata, RequestMetadata
 
 
 class PartiallyUpdateSheetByIDRequestTypedDict(TypedDict):
-    request_body: List[JSONPatchOperationTypedDict]
-    r"""A collection of patch operations to apply to the sheet."""
-    sheet_id: str
-    r"""The unique identifier of the sheet"""
     spreadsheet_id: str
     r"""The unique identifier of the spreadsheet"""
+    sheet_id: str
+    r"""The unique identifier of the sheet"""
+    request_body: List[JSONPatchOperationTypedDict]
+    r"""A collection of patch operations to apply to the sheet."""
 
 
 class PartiallyUpdateSheetByIDRequest(BaseModel):
-    request_body: Annotated[
-        List[JSONPatchOperation],
-        FieldMetadata(request=RequestMetadata(media_type="application/json")),
+    spreadsheet_id: Annotated[
+        str,
+        pydantic.Field(alias="spreadsheetId"),
+        FieldMetadata(path=PathParamMetadata(style="simple", explode=False)),
     ]
-    r"""A collection of patch operations to apply to the sheet."""
+    r"""The unique identifier of the spreadsheet"""
 
     sheet_id: Annotated[
         str,
@@ -32,12 +33,11 @@ class PartiallyUpdateSheetByIDRequest(BaseModel):
     ]
     r"""The unique identifier of the sheet"""
 
-    spreadsheet_id: Annotated[
-        str,
-        pydantic.Field(alias="spreadsheetId"),
-        FieldMetadata(path=PathParamMetadata(style="simple", explode=False)),
+    request_body: Annotated[
+        List[JSONPatchOperation],
+        FieldMetadata(request=RequestMetadata(media_type="application/json")),
     ]
-    r"""The unique identifier of the spreadsheet"""
+    r"""A collection of patch operations to apply to the sheet."""
 
 
 class PartiallyUpdateSheetByIDResponseTypedDict(TypedDict):

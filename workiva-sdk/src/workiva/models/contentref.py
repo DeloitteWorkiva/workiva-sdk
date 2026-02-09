@@ -3,13 +3,14 @@
 from __future__ import annotations
 from enum import Enum
 import pydantic
-from pydantic import model_serializer
+from pydantic import field_serializer, model_serializer
 from typing import Optional
 from typing_extensions import Annotated, NotRequired, TypedDict
+from workiva import models, utils
 from workiva.types import BaseModel, Nullable, OptionalNullable, UNSET, UNSET_SENTINEL
 
 
-class ContentRefType(str, Enum):
+class ContentRefType(str, Enum, metaclass=utils.OpenEnumMeta):
     r"""The type of content."""
 
     RICH_TEXT = "richText"
@@ -20,21 +21,18 @@ class ContentRefType(str, Enum):
 class ContentRefTypedDict(TypedDict):
     r"""A reference to a specific content item."""
 
-    drawing: NotRequired[Nullable[str]]
-    r"""Identifier of a drawing or null if the content isn't a drawing."""
     rich_text: NotRequired[Nullable[str]]
     r"""Identifier of a rich text or null if the content isn't a rich text."""
     table: NotRequired[Nullable[str]]
     r"""Identifier of a table or null if the content isn't a table."""
+    drawing: NotRequired[Nullable[str]]
+    r"""Identifier of a drawing or null if the content isn't a drawing."""
     type: NotRequired[ContentRefType]
     r"""The type of content."""
 
 
 class ContentRef(BaseModel):
     r"""A reference to a specific content item."""
-
-    drawing: OptionalNullable[str] = UNSET
-    r"""Identifier of a drawing or null if the content isn't a drawing."""
 
     rich_text: Annotated[OptionalNullable[str], pydantic.Field(alias="richText")] = (
         UNSET
@@ -44,13 +42,25 @@ class ContentRef(BaseModel):
     table: OptionalNullable[str] = UNSET
     r"""Identifier of a table or null if the content isn't a table."""
 
+    drawing: OptionalNullable[str] = UNSET
+    r"""Identifier of a drawing or null if the content isn't a drawing."""
+
     type: Optional[ContentRefType] = None
     r"""The type of content."""
 
+    @field_serializer("type")
+    def serialize_type(self, value):
+        if isinstance(value, str):
+            try:
+                return models.ContentRefType(value)
+            except ValueError:
+                return value
+        return value
+
     @model_serializer(mode="wrap")
     def serialize_model(self, handler):
-        optional_fields = set(["drawing", "richText", "table", "type"])
-        nullable_fields = set(["drawing", "richText", "table"])
+        optional_fields = set(["richText", "table", "drawing", "type"])
+        nullable_fields = set(["richText", "table", "drawing"])
         serialized = handler(self)
         m = {}
 

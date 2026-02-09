@@ -2,9 +2,10 @@
 
 from __future__ import annotations
 from enum import Enum
+from workiva import utils
 
 
-class TextAlignment(str, Enum):
+class TextAlignment(str, Enum, metaclass=utils.OpenEnumMeta):
     r"""Indicates the horizontal alignment of the text within a paragraph."""
 
     LEFT = "left"

@@ -11,25 +11,25 @@ from workiva.utils import FieldMetadata, PathParamMetadata, RequestMetadata
 
 
 class TrashFileByIDRequestTypedDict(TypedDict):
-    file_trash_options: Nullable[FileTrashOptionsTypedDict]
-    r"""The request body for the file trash endpoint"""
     file_id: str
     r"""The unique identifier of the file"""
+    file_trash_options: Nullable[FileTrashOptionsTypedDict]
+    r"""The request body for the file trash endpoint"""
 
 
 class TrashFileByIDRequest(BaseModel):
-    file_trash_options: Annotated[
-        Nullable[FileTrashOptions],
-        FieldMetadata(request=RequestMetadata(media_type="application/json")),
-    ]
-    r"""The request body for the file trash endpoint"""
-
     file_id: Annotated[
         str,
         pydantic.Field(alias="fileId"),
         FieldMetadata(path=PathParamMetadata(style="simple", explode=False)),
     ]
     r"""The unique identifier of the file"""
+
+    file_trash_options: Annotated[
+        Nullable[FileTrashOptions],
+        FieldMetadata(request=RequestMetadata(media_type="application/json")),
+    ]
+    r"""The request body for the file trash endpoint"""
 
     @model_serializer(mode="wrap")
     def serialize_model(self, handler):

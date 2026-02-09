@@ -12,22 +12,22 @@ from workiva.utils import FieldMetadata, PathParamMetadata, RequestMetadata
 
 
 class FilePermissionsModificationRequestTypedDict(TypedDict):
-    resource_permissions_modification: ResourcePermissionsModificationTypedDict
-    r"""Details about the file permissions modification."""
     file_id: str
     r"""The unique identifier of the file"""
+    resource_permissions_modification: ResourcePermissionsModificationTypedDict
+    r"""Details about the file permissions modification."""
 
 
 class FilePermissionsModificationRequest(BaseModel):
-    resource_permissions_modification: Annotated[
-        ResourcePermissionsModification,
-        FieldMetadata(request=RequestMetadata(media_type="application/json")),
-    ]
-    r"""Details about the file permissions modification."""
-
     file_id: Annotated[
         str,
         pydantic.Field(alias="fileId"),
         FieldMetadata(path=PathParamMetadata(style="simple", explode=False)),
     ]
     r"""The unique identifier of the file"""
+
+    resource_permissions_modification: Annotated[
+        ResourcePermissionsModification,
+        FieldMetadata(request=RequestMetadata(media_type="application/json")),
+    ]
+    r"""Details about the file permissions modification."""

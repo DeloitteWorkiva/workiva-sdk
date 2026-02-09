@@ -10,20 +10,21 @@ from workiva.utils import FieldMetadata, PathParamMetadata, RequestMetadata
 
 
 class PartiallyUpdateMetricByIDRequestTypedDict(TypedDict):
-    request_body: List[JSONPatchOperationTypedDict]
-    r"""A collection of patch operations to apply to the [metric](ref:sustainability#metric). Currently only one operation may be applied at a time."""
-    metric_id: str
-    r"""The unique identifier of the metric"""
     program_id: str
     r"""The unique identifier of the program"""
+    metric_id: str
+    r"""The unique identifier of the metric"""
+    request_body: List[JSONPatchOperationTypedDict]
+    r"""A collection of patch operations to apply to the [metric](ref:sustainability#metric). Currently only one operation may be applied at a time."""
 
 
 class PartiallyUpdateMetricByIDRequest(BaseModel):
-    request_body: Annotated[
-        List[JSONPatchOperation],
-        FieldMetadata(request=RequestMetadata(media_type="application/json")),
+    program_id: Annotated[
+        str,
+        pydantic.Field(alias="programId"),
+        FieldMetadata(path=PathParamMetadata(style="simple", explode=False)),
     ]
-    r"""A collection of patch operations to apply to the [metric](ref:sustainability#metric). Currently only one operation may be applied at a time."""
+    r"""The unique identifier of the program"""
 
     metric_id: Annotated[
         str,
@@ -32,9 +33,8 @@ class PartiallyUpdateMetricByIDRequest(BaseModel):
     ]
     r"""The unique identifier of the metric"""
 
-    program_id: Annotated[
-        str,
-        pydantic.Field(alias="programId"),
-        FieldMetadata(path=PathParamMetadata(style="simple", explode=False)),
+    request_body: Annotated[
+        List[JSONPatchOperation],
+        FieldMetadata(request=RequestMetadata(media_type="application/json")),
     ]
-    r"""The unique identifier of the program"""
+    r"""A collection of patch operations to apply to the [metric](ref:sustainability#metric). Currently only one operation may be applied at a time."""

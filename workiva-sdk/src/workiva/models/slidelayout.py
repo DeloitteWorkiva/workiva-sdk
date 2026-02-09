@@ -9,12 +9,6 @@ from typing_extensions import Annotated, NotRequired, TypedDict
 from workiva.types import BaseModel, Nullable, OptionalNullable, UNSET, UNSET_SENTINEL
 
 
-class SlideLayoutLock(str, Enum):
-    r"""The type of lock applied to this slide layout, if any. Note this property is not tied to revision and will always reflect the slide layout's current lock state."""
-
-    LOCK = "lock"
-
-
 class SlideLayoutBodyTypedDict(TypedDict):
     r"""Reference to the Drawing content for this slide layout"""
 
@@ -50,6 +44,12 @@ class SlideLayoutBody(BaseModel):
         return m
 
 
+class SlideLayoutLock(str, Enum):
+    r"""The type of lock applied to this slide layout, if any. Note this property is not tied to revision and will always reflect the slide layout's current lock state."""
+
+    LOCK = "lock"
+
+
 class SlideLayoutTypedDict(TypedDict):
     r"""Details about the slide layout, including its ID and name."""
 
@@ -57,14 +57,14 @@ class SlideLayoutTypedDict(TypedDict):
     r"""The unique identifier of the slide layout"""
     index: NotRequired[int]
     r"""The integer index of the slide relative to its parent slide layout (or to the presentation if no parent slide layout). The special value -1 may be used to position a slide at the end of its siblings list."""
-    lock: NotRequired[Nullable[SlideLayoutLock]]
-    r"""The type of lock applied to this slide layout, if any. Note this property is not tied to revision and will always reflect the slide layout's current lock state."""
     name: NotRequired[str]
     r"""The name of the slide layout"""
     revision: NotRequired[str]
     r"""The revision of the slide layout"""
     slide_layout_body: NotRequired[SlideLayoutBodyTypedDict]
     r"""Reference to the Drawing content for this slide layout"""
+    lock: NotRequired[Nullable[SlideLayoutLock]]
+    r"""The type of lock applied to this slide layout, if any. Note this property is not tied to revision and will always reflect the slide layout's current lock state."""
 
 
 class SlideLayout(BaseModel):
@@ -75,9 +75,6 @@ class SlideLayout(BaseModel):
 
     index: Optional[int] = None
     r"""The integer index of the slide relative to its parent slide layout (or to the presentation if no parent slide layout). The special value -1 may be used to position a slide at the end of its siblings list."""
-
-    lock: OptionalNullable[SlideLayoutLock] = UNSET
-    r"""The type of lock applied to this slide layout, if any. Note this property is not tied to revision and will always reflect the slide layout's current lock state."""
 
     name: Optional[str] = None
     r"""The name of the slide layout"""
@@ -90,10 +87,13 @@ class SlideLayout(BaseModel):
     ] = None
     r"""Reference to the Drawing content for this slide layout"""
 
+    lock: OptionalNullable[SlideLayoutLock] = UNSET
+    r"""The type of lock applied to this slide layout, if any. Note this property is not tied to revision and will always reflect the slide layout's current lock state."""
+
     @model_serializer(mode="wrap")
     def serialize_model(self, handler):
         optional_fields = set(
-            ["id", "index", "lock", "name", "revision", "slideLayoutBody"]
+            ["id", "index", "name", "revision", "slideLayoutBody", "lock"]
         )
         nullable_fields = set(["id", "lock"])
         serialized = handler(self)

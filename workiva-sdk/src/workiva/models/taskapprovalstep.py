@@ -6,13 +6,14 @@ from .taskuser import TaskUser, TaskUserTypedDict
 from datetime import datetime
 from enum import Enum
 import pydantic
-from pydantic import model_serializer
+from pydantic import field_serializer, model_serializer
 from typing import List, Optional
 from typing_extensions import Annotated, NotRequired, TypedDict
+from workiva import models, utils
 from workiva.types import BaseModel, Nullable, OptionalNullable, UNSET, UNSET_SENTINEL
 
 
-class CompletionMode(str, Enum):
+class CompletionMode(str, Enum, metaclass=utils.OpenEnumMeta):
     ONE = "ONE"
     ALL = "ALL"
 
@@ -48,6 +49,15 @@ class TaskApprovalStep(BaseModel):
     r"""All APPROVE, REJECT, and SKIP actions for the current approval process are tracked in the `response` for each step. This surfaces any comments left, and allows for tracking the progress of the approval process. When a REJECT action is left, responses will remain on the task until the task is re-submitted for approval.
 
     """
+
+    @field_serializer("completion_mode")
+    def serialize_completion_mode(self, value):
+        if isinstance(value, str):
+            try:
+                return models.CompletionMode(value)
+            except ValueError:
+                return value
+        return value
 
     @model_serializer(mode="wrap")
     def serialize_model(self, handler):
@@ -97,6 +107,15 @@ class TaskApprovalStepInput(BaseModel):
         UNSET
     )
     r"""An ISO 8601 datetime indicating a deadline for this approval step, or null if not set."""
+
+    @field_serializer("completion_mode")
+    def serialize_completion_mode(self, value):
+        if isinstance(value, str):
+            try:
+                return models.CompletionMode(value)
+            except ValueError:
+                return value
+        return value
 
     @model_serializer(mode="wrap")
     def serialize_model(self, handler):

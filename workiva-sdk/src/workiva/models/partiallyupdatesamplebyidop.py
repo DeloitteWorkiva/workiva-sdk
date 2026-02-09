@@ -10,24 +10,32 @@ from workiva.utils import FieldMetadata, PathParamMetadata, RequestMetadata
 
 
 class PartiallyUpdateSampleByIDRequestTypedDict(TypedDict):
-    request_body: List[JSONPatchOperationTypedDict]
-    r"""A collection of patch operations to apply to the sample."""
-    matrix_id: str
-    r"""The unique identifier of the matrix"""
-    sample_id: str
-    r"""The unique identifier of the sample"""
     test_form_id: str
     r"""The unique identifier of the test form"""
     test_phase_id: str
     r"""The unique identifier of the test phase"""
+    matrix_id: str
+    r"""The unique identifier of the matrix"""
+    sample_id: str
+    r"""The unique identifier of the sample"""
+    request_body: List[JSONPatchOperationTypedDict]
+    r"""A collection of patch operations to apply to the sample."""
 
 
 class PartiallyUpdateSampleByIDRequest(BaseModel):
-    request_body: Annotated[
-        List[JSONPatchOperation],
-        FieldMetadata(request=RequestMetadata(media_type="application/json")),
+    test_form_id: Annotated[
+        str,
+        pydantic.Field(alias="testFormId"),
+        FieldMetadata(path=PathParamMetadata(style="simple", explode=False)),
     ]
-    r"""A collection of patch operations to apply to the sample."""
+    r"""The unique identifier of the test form"""
+
+    test_phase_id: Annotated[
+        str,
+        pydantic.Field(alias="testPhaseId"),
+        FieldMetadata(path=PathParamMetadata(style="simple", explode=False)),
+    ]
+    r"""The unique identifier of the test phase"""
 
     matrix_id: Annotated[
         str,
@@ -43,16 +51,8 @@ class PartiallyUpdateSampleByIDRequest(BaseModel):
     ]
     r"""The unique identifier of the sample"""
 
-    test_form_id: Annotated[
-        str,
-        pydantic.Field(alias="testFormId"),
-        FieldMetadata(path=PathParamMetadata(style="simple", explode=False)),
+    request_body: Annotated[
+        List[JSONPatchOperation],
+        FieldMetadata(request=RequestMetadata(media_type="application/json")),
     ]
-    r"""The unique identifier of the test form"""
-
-    test_phase_id: Annotated[
-        str,
-        pydantic.Field(alias="testPhaseId"),
-        FieldMetadata(path=PathParamMetadata(style="simple", explode=False)),
-    ]
-    r"""The unique identifier of the test phase"""
+    r"""A collection of patch operations to apply to the sample."""

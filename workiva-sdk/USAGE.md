@@ -11,7 +11,7 @@ with SDK(
     ),
 ) as sdk:
 
-    res = sdk.activities.get_activity_action_by_id(activity_action_id="com.workiva.activity.retention_policy.update")
+    res = sdk.chains.export_chain(chain_id="54865")
 
     # Handle response
     print(res)
@@ -35,7 +35,7 @@ async def main():
         ),
     ) as sdk:
 
-        res = await sdk.activities.get_activity_action_by_id_async(activity_action_id="com.workiva.activity.retention_policy.update")
+        res = await sdk.chains.export_chain_async(chain_id="54865")
 
         # Handle response
         print(res)

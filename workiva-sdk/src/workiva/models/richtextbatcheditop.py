@@ -10,25 +10,25 @@ from workiva.utils import FieldMetadata, PathParamMetadata, RequestMetadata
 
 
 class RichTextBatchEditRequestTypedDict(TypedDict):
-    rich_text_batch_edit: RichTextBatchEditTypedDict
-    r"""The rich text edits to apply"""
     rich_text_id: str
     r"""The unique identifier of the rich text content"""
+    rich_text_batch_edit: RichTextBatchEditTypedDict
+    r"""The rich text edits to apply"""
 
 
 class RichTextBatchEditRequest(BaseModel):
-    rich_text_batch_edit: Annotated[
-        RichTextBatchEdit,
-        FieldMetadata(request=RequestMetadata(media_type="application/json")),
-    ]
-    r"""The rich text edits to apply"""
-
     rich_text_id: Annotated[
         str,
         pydantic.Field(alias="richTextId"),
         FieldMetadata(path=PathParamMetadata(style="simple", explode=False)),
     ]
     r"""The unique identifier of the rich text content"""
+
+    rich_text_batch_edit: Annotated[
+        RichTextBatchEdit,
+        FieldMetadata(request=RequestMetadata(media_type="application/json")),
+    ]
+    r"""The rich text edits to apply"""
 
 
 class RichTextBatchEditResponseTypedDict(TypedDict):

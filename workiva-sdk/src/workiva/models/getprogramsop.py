@@ -11,24 +11,17 @@ from workiva.utils import FieldMetadata, QueryParamMetadata
 
 
 class GetProgramsRequestTypedDict(TypedDict):
-    filter_: NotRequired[str]
-    r"""The properties to filter the results by."""
     maxpagesize: NotRequired[int]
     r"""The maximum number of results to retrieve"""
     next: NotRequired[str]
     r"""Pagination cursor for next set of results."""
     order_by: NotRequired[str]
     r"""One or more comma-separated expressions to indicate the order in which to sort the results."""
+    filter_: NotRequired[str]
+    r"""The properties to filter the results by."""
 
 
 class GetProgramsRequest(BaseModel):
-    filter_: Annotated[
-        Optional[str],
-        pydantic.Field(alias="$filter"),
-        FieldMetadata(query=QueryParamMetadata(style="form", explode=True)),
-    ] = None
-    r"""The properties to filter the results by."""
-
     maxpagesize: Annotated[
         Optional[int],
         pydantic.Field(alias="$maxpagesize"),
@@ -50,9 +43,16 @@ class GetProgramsRequest(BaseModel):
     ] = None
     r"""One or more comma-separated expressions to indicate the order in which to sort the results."""
 
+    filter_: Annotated[
+        Optional[str],
+        pydantic.Field(alias="$filter"),
+        FieldMetadata(query=QueryParamMetadata(style="form", explode=True)),
+    ] = None
+    r"""The properties to filter the results by."""
+
     @model_serializer(mode="wrap")
     def serialize_model(self, handler):
-        optional_fields = set(["filter", "maxpagesize", "next", "orderBy"])
+        optional_fields = set(["maxpagesize", "next", "orderBy", "filter"])
         serialized = handler(self)
         m = {}
 

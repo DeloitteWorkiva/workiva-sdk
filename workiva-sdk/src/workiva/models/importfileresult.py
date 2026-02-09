@@ -2,13 +2,14 @@
 
 from __future__ import annotations
 from enum import Enum
-from pydantic import model_serializer
+from pydantic import field_serializer, model_serializer
 from typing import Optional
 from typing_extensions import NotRequired, TypedDict
+from workiva import models, utils
 from workiva.types import BaseModel, UNSET_SENTINEL
 
 
-class ImportFileResultKind(str, Enum):
+class ImportFileResultKind(str, Enum, metaclass=utils.OpenEnumMeta):
     r"""Kind of the file"""
 
     DOCUMENT = "Document"
@@ -44,6 +45,15 @@ class ImportFileResult(BaseModel):
 
     kind: Optional[ImportFileResultKind] = None
     r"""Kind of the file"""
+
+    @field_serializer("kind")
+    def serialize_kind(self, value):
+        if isinstance(value, str):
+            try:
+                return models.ImportFileResultKind(value)
+            except ValueError:
+                return value
+        return value
 
     @model_serializer(mode="wrap")
     def serialize_model(self, handler):

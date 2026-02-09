@@ -18,48 +18,11 @@ from .richtextselectionanchorattachmentpointtype import (
 )
 from enum import Enum
 import pydantic
-from pydantic import model_serializer
+from pydantic import field_serializer, model_serializer
 from typing import List, Optional
 from typing_extensions import Annotated, NotRequired, TypedDict
+from workiva import models, utils
 from workiva.types import BaseModel, Nullable, OptionalNullable, UNSET, UNSET_SENTINEL
-
-
-class AnchorAttachmentPointDrawingRichTextSelectionTypedDict(TypedDict):
-    r"""An attachment point to a selection in a drawing's rich text content."""
-
-    selection: DrawingRichTextSelectionTypedDict
-    r"""Describes a selection within a drawing element's text"""
-    type: DrawingRichTextSelectionAnchorAttachmentPointType
-    r"""The type of attachment point."""
-
-
-class AnchorAttachmentPointDrawingRichTextSelection(BaseModel):
-    r"""An attachment point to a selection in a drawing's rich text content."""
-
-    selection: DrawingRichTextSelection
-    r"""Describes a selection within a drawing element's text"""
-
-    type: DrawingRichTextSelectionAnchorAttachmentPointType
-    r"""The type of attachment point."""
-
-
-class DrawingSelectionTypedDict(TypedDict):
-    r"""An attachment point to a selection of drawing elements in a drawing."""
-
-    selection: List[str]
-    r"""A selection of one or more drawing elements"""
-    type: DrawingElementAnchorAttachmentPointType
-    r"""The type of attachment point."""
-
-
-class DrawingSelection(BaseModel):
-    r"""An attachment point to a selection of drawing elements in a drawing."""
-
-    selection: List[str]
-    r"""A selection of one or more drawing elements"""
-
-    type: DrawingElementAnchorAttachmentPointType
-    r"""The type of attachment point."""
 
 
 class AnchorAttachmentPointRichTextSelectionTypedDict(TypedDict):
@@ -79,6 +42,15 @@ class AnchorAttachmentPointRichTextSelection(BaseModel):
 
     type: Optional[RichTextSelectionAnchorAttachmentPointType] = None
     r"""The type of attachment point."""
+
+    @field_serializer("type")
+    def serialize_type(self, value):
+        if isinstance(value, str):
+            try:
+                return models.RichTextSelectionAnchorAttachmentPointType(value)
+            except ValueError:
+                return value
+        return value
 
     @model_serializer(mode="wrap")
     def serialize_model(self, handler):
@@ -125,7 +97,54 @@ class TableRange(BaseModel):
         return m
 
 
-class AnchorAttachmentPointType(str, Enum):
+class DrawingSelectionTypedDict(TypedDict):
+    r"""An attachment point to a selection of drawing elements in a drawing."""
+
+    selection: List[str]
+    r"""A selection of one or more drawing elements"""
+    type: DrawingElementAnchorAttachmentPointType
+    r"""The type of attachment point."""
+
+
+class DrawingSelection(BaseModel):
+    r"""An attachment point to a selection of drawing elements in a drawing."""
+
+    selection: List[str]
+    r"""A selection of one or more drawing elements"""
+
+    type: DrawingElementAnchorAttachmentPointType
+    r"""The type of attachment point."""
+
+
+class AnchorAttachmentPointDrawingRichTextSelectionTypedDict(TypedDict):
+    r"""An attachment point to a selection in a drawing's rich text content."""
+
+    selection: DrawingRichTextSelectionTypedDict
+    r"""Describes a selection within a drawing element's text"""
+    type: DrawingRichTextSelectionAnchorAttachmentPointType
+    r"""The type of attachment point."""
+
+
+class AnchorAttachmentPointDrawingRichTextSelection(BaseModel):
+    r"""An attachment point to a selection in a drawing's rich text content."""
+
+    selection: DrawingRichTextSelection
+    r"""Describes a selection within a drawing element's text"""
+
+    type: DrawingRichTextSelectionAnchorAttachmentPointType
+    r"""The type of attachment point."""
+
+    @field_serializer("type")
+    def serialize_type(self, value):
+        if isinstance(value, str):
+            try:
+                return models.DrawingRichTextSelectionAnchorAttachmentPointType(value)
+            except ValueError:
+                return value
+        return value
+
+
+class AnchorAttachmentPointType(str, Enum, metaclass=utils.OpenEnumMeta):
     r"""The type of attachment point."""
 
     RICH_TEXT_SELECTION = "richTextSelection"
@@ -137,29 +156,20 @@ class AnchorAttachmentPointType(str, Enum):
 class AnchorAttachmentPointTypedDict(TypedDict):
     r"""An attachment point for an anchor."""
 
-    drawing_rich_text_selection: NotRequired[
-        Nullable[AnchorAttachmentPointDrawingRichTextSelectionTypedDict]
-    ]
-    drawing_selection: NotRequired[Nullable[DrawingSelectionTypedDict]]
     rich_text_selection: NotRequired[
         Nullable[AnchorAttachmentPointRichTextSelectionTypedDict]
     ]
     table_range: NotRequired[Nullable[TableRangeTypedDict]]
+    drawing_selection: NotRequired[Nullable[DrawingSelectionTypedDict]]
+    drawing_rich_text_selection: NotRequired[
+        Nullable[AnchorAttachmentPointDrawingRichTextSelectionTypedDict]
+    ]
     type: NotRequired[AnchorAttachmentPointType]
     r"""The type of attachment point."""
 
 
 class AnchorAttachmentPoint(BaseModel):
     r"""An attachment point for an anchor."""
-
-    drawing_rich_text_selection: Annotated[
-        OptionalNullable[AnchorAttachmentPointDrawingRichTextSelection],
-        pydantic.Field(alias="drawingRichTextSelection"),
-    ] = UNSET
-
-    drawing_selection: Annotated[
-        OptionalNullable[DrawingSelection], pydantic.Field(alias="drawingSelection")
-    ] = UNSET
 
     rich_text_selection: Annotated[
         OptionalNullable[AnchorAttachmentPointRichTextSelection],
@@ -170,26 +180,44 @@ class AnchorAttachmentPoint(BaseModel):
         OptionalNullable[TableRange], pydantic.Field(alias="tableRange")
     ] = UNSET
 
+    drawing_selection: Annotated[
+        OptionalNullable[DrawingSelection], pydantic.Field(alias="drawingSelection")
+    ] = UNSET
+
+    drawing_rich_text_selection: Annotated[
+        OptionalNullable[AnchorAttachmentPointDrawingRichTextSelection],
+        pydantic.Field(alias="drawingRichTextSelection"),
+    ] = UNSET
+
     type: Optional[AnchorAttachmentPointType] = None
     r"""The type of attachment point."""
+
+    @field_serializer("type")
+    def serialize_type(self, value):
+        if isinstance(value, str):
+            try:
+                return models.AnchorAttachmentPointType(value)
+            except ValueError:
+                return value
+        return value
 
     @model_serializer(mode="wrap")
     def serialize_model(self, handler):
         optional_fields = set(
             [
-                "drawingRichTextSelection",
-                "drawingSelection",
                 "richTextSelection",
                 "tableRange",
+                "drawingSelection",
+                "drawingRichTextSelection",
                 "type",
             ]
         )
         nullable_fields = set(
             [
-                "drawingRichTextSelection",
-                "drawingSelection",
                 "richTextSelection",
                 "tableRange",
+                "drawingSelection",
+                "drawingRichTextSelection",
             ]
         )
         serialized = handler(self)

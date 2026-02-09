@@ -10,25 +10,25 @@ from workiva.utils import FieldMetadata, PathParamMetadata, RequestMetadata
 
 
 class DocumentExportRequestTypedDict(TypedDict):
-    document_export: DocumentExportTypedDict
-    r"""Details about the document export."""
     document_id: str
     r"""The unique identifier of the document"""
+    document_export: DocumentExportTypedDict
+    r"""Details about the document export."""
 
 
 class DocumentExportRequest(BaseModel):
-    document_export: Annotated[
-        DocumentExport,
-        FieldMetadata(request=RequestMetadata(media_type="application/json")),
-    ]
-    r"""Details about the document export."""
-
     document_id: Annotated[
         str,
         pydantic.Field(alias="documentId"),
         FieldMetadata(path=PathParamMetadata(style="simple", explode=False)),
     ]
     r"""The unique identifier of the document"""
+
+    document_export: Annotated[
+        DocumentExport,
+        FieldMetadata(request=RequestMetadata(media_type="application/json")),
+    ]
+    r"""Details about the document export."""
 
 
 class DocumentExportResponseTypedDict(TypedDict):

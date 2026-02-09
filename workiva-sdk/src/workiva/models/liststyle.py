@@ -4,9 +4,10 @@ from __future__ import annotations
 from .listprogression import ListProgression, ListProgressionTypedDict
 from .liststyletype import ListStyleType
 import pydantic
-from pydantic import model_serializer
+from pydantic import field_serializer, model_serializer
 from typing import List, Optional
 from typing_extensions import Annotated, NotRequired, TypedDict
+from workiva import models
 from workiva.types import BaseModel, UNSET_SENTINEL
 
 
@@ -56,6 +57,15 @@ class ListStyle(BaseModel):
 
     type: Optional[ListStyleType] = ListStyleType.ORDERED_LIST_STYLE
     r"""The type of the list style."""
+
+    @field_serializer("type")
+    def serialize_type(self, value):
+        if isinstance(value, str):
+            try:
+                return models.ListStyleType(value)
+            except ValueError:
+                return value
+        return value
 
     @model_serializer(mode="wrap")
     def serialize_model(self, handler):

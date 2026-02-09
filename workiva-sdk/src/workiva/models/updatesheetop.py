@@ -10,20 +10,21 @@ from workiva.utils import FieldMetadata, PathParamMetadata, RequestMetadata
 
 
 class UpdateSheetRequestTypedDict(TypedDict):
-    sheet_update: SheetUpdateTypedDict
-    r"""A SheetUpdate"""
-    sheet_id: str
-    r"""The unique identifier of the sheet"""
     spreadsheet_id: str
     r"""The unique identifier of the spreadsheet"""
+    sheet_id: str
+    r"""The unique identifier of the sheet"""
+    sheet_update: SheetUpdateTypedDict
+    r"""A SheetUpdate"""
 
 
 class UpdateSheetRequest(BaseModel):
-    sheet_update: Annotated[
-        SheetUpdate,
-        FieldMetadata(request=RequestMetadata(media_type="application/json")),
+    spreadsheet_id: Annotated[
+        str,
+        pydantic.Field(alias="spreadsheetId"),
+        FieldMetadata(path=PathParamMetadata(style="simple", explode=False)),
     ]
-    r"""A SheetUpdate"""
+    r"""The unique identifier of the spreadsheet"""
 
     sheet_id: Annotated[
         str,
@@ -32,12 +33,11 @@ class UpdateSheetRequest(BaseModel):
     ]
     r"""The unique identifier of the sheet"""
 
-    spreadsheet_id: Annotated[
-        str,
-        pydantic.Field(alias="spreadsheetId"),
-        FieldMetadata(path=PathParamMetadata(style="simple", explode=False)),
+    sheet_update: Annotated[
+        SheetUpdate,
+        FieldMetadata(request=RequestMetadata(media_type="application/json")),
     ]
-    r"""The unique identifier of the spreadsheet"""
+    r"""A SheetUpdate"""
 
 
 class UpdateSheetResponseTypedDict(TypedDict):

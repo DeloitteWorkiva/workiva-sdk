@@ -2,9 +2,10 @@
 
 from __future__ import annotations
 from enum import Enum
+from workiva import utils
 
 
-class HyperlinkType(str, Enum):
+class HyperlinkType(str, Enum, metaclass=utils.OpenEnumMeta):
     r"""The type of the hyperlink"""
 
     DOCUMENT = "document"

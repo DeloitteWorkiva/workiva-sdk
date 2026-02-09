@@ -2,12 +2,13 @@
 
 from __future__ import annotations
 from enum import Enum
-from pydantic import model_serializer
+from pydantic import field_serializer, model_serializer
 from typing_extensions import NotRequired, TypedDict
+from workiva import models, utils
 from workiva.types import BaseModel, Nullable, OptionalNullable, UNSET_SENTINEL
 
 
-class Style(str, Enum):
+class Style(str, Enum, metaclass=utils.OpenEnumMeta):
     r"""The type of border to apply"""
 
     SINGLE = "SINGLE"
@@ -41,6 +42,15 @@ class Border(BaseModel):
 
     weight: OptionalNullable[float] = 1
     r"""The thickness of the border, in points. Rounded to the nearest hundredth."""
+
+    @field_serializer("style")
+    def serialize_style(self, value):
+        if isinstance(value, str):
+            try:
+                return models.Style(value)
+            except ValueError:
+                return value
+        return value
 
     @model_serializer(mode="wrap")
     def serialize_model(self, handler):

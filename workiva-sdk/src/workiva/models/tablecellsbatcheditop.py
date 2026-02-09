@@ -10,25 +10,25 @@ from workiva.utils import FieldMetadata, PathParamMetadata, RequestMetadata
 
 
 class TableCellsBatchEditRequestTypedDict(TypedDict):
-    table_cells_batch_edit: TableCellsBatchEditTypedDict
-    r"""The table cell edit to apply"""
     table_id: str
     r"""The unique identifier for the table"""
+    table_cells_batch_edit: TableCellsBatchEditTypedDict
+    r"""The table cell edit to apply"""
 
 
 class TableCellsBatchEditRequest(BaseModel):
-    table_cells_batch_edit: Annotated[
-        TableCellsBatchEdit,
-        FieldMetadata(request=RequestMetadata(media_type="application/json")),
-    ]
-    r"""The table cell edit to apply"""
-
     table_id: Annotated[
         str,
         pydantic.Field(alias="tableId"),
         FieldMetadata(path=PathParamMetadata(style="simple", explode=False)),
     ]
     r"""The unique identifier for the table"""
+
+    table_cells_batch_edit: Annotated[
+        TableCellsBatchEdit,
+        FieldMetadata(request=RequestMetadata(media_type="application/json")),
+    ]
+    r"""The table cell edit to apply"""
 
 
 class TableCellsBatchEditResponseTypedDict(TypedDict):

@@ -420,7 +420,7 @@ class RichCellBatchEdit(BaseModel):
     r"""Whether the edits in a batch should be isolated from one-another. The edits will still be applied in order, but subsequent edits are unaffected by the previous edits in the same batch. For example, if one edit inserts some content, the next edits will act as if the content doesn't exist yet. Or if an edit deletes some content, the next edits will act as if the content is still there. This mode makes it easier to apply many edits on existing content because you don't need to manually keep track of how the previous edits have moved the content. For example, if you want to replace all instances of one word with another it will be easier to do this with isolated edits."""
 
 
-class TableCellsEditStyle(str, Enum):
+class TableCellsEditSchemasSetCellsBordersBottomStyle(str, Enum):
     r"""The style of the border to apply."""
 
     SINGLE = "single"
@@ -437,13 +437,49 @@ class BottomTypedDict(TypedDict):
 
     color: ColorTypedDict
     r"""Represents a color."""
-    style: TableCellsEditStyle
+    style: TableCellsEditSchemasSetCellsBordersBottomStyle
     r"""The style of the border to apply."""
     weight: float
     r"""The thickness of the border, in points. Rounded to the nearest hundredth."""
 
 
 class Bottom(BaseModel):
+    r"""The border of a rectangle for properties of objects such as a table cell."""
+
+    color: Color
+    r"""Represents a color."""
+
+    style: TableCellsEditSchemasSetCellsBordersBottomStyle
+    r"""The style of the border to apply."""
+
+    weight: float
+    r"""The thickness of the border, in points. Rounded to the nearest hundredth."""
+
+
+class TableCellsEditStyle(str, Enum):
+    r"""The style of the border to apply."""
+
+    SINGLE = "single"
+    DOUBLE = "double"
+    DASHED1 = "dashed1"
+    DASHED2 = "dashed2"
+    DASHED3 = "dashed3"
+    DASHED4 = "dashed4"
+    DASHED5 = "dashed5"
+
+
+class LeftTypedDict(TypedDict):
+    r"""The border of a rectangle for properties of objects such as a table cell."""
+
+    color: ColorTypedDict
+    r"""Represents a color."""
+    style: TableCellsEditStyle
+    r"""The style of the border to apply."""
+    weight: float
+    r"""The thickness of the border, in points. Rounded to the nearest hundredth."""
+
+
+class Left(BaseModel):
     r"""The border of a rectangle for properties of objects such as a table cell."""
 
     color: Color
@@ -468,7 +504,7 @@ class TableCellsEditSchemasStyle(str, Enum):
     DASHED5 = "dashed5"
 
 
-class LeftTypedDict(TypedDict):
+class RightTypedDict(TypedDict):
     r"""The border of a rectangle for properties of objects such as a table cell."""
 
     color: ColorTypedDict
@@ -479,7 +515,7 @@ class LeftTypedDict(TypedDict):
     r"""The thickness of the border, in points. Rounded to the nearest hundredth."""
 
 
-class Left(BaseModel):
+class Right(BaseModel):
     r"""The border of a rectangle for properties of objects such as a table cell."""
 
     color: Color
@@ -504,48 +540,12 @@ class TableCellsEditSchemasSetCellsBordersStyle(str, Enum):
     DASHED5 = "dashed5"
 
 
-class RightTypedDict(TypedDict):
-    r"""The border of a rectangle for properties of objects such as a table cell."""
-
-    color: ColorTypedDict
-    r"""Represents a color."""
-    style: TableCellsEditSchemasSetCellsBordersStyle
-    r"""The style of the border to apply."""
-    weight: float
-    r"""The thickness of the border, in points. Rounded to the nearest hundredth."""
-
-
-class Right(BaseModel):
-    r"""The border of a rectangle for properties of objects such as a table cell."""
-
-    color: Color
-    r"""Represents a color."""
-
-    style: TableCellsEditSchemasSetCellsBordersStyle
-    r"""The style of the border to apply."""
-
-    weight: float
-    r"""The thickness of the border, in points. Rounded to the nearest hundredth."""
-
-
-class TableCellsEditSchemasSetCellsBordersTopStyle(str, Enum):
-    r"""The style of the border to apply."""
-
-    SINGLE = "single"
-    DOUBLE = "double"
-    DASHED1 = "dashed1"
-    DASHED2 = "dashed2"
-    DASHED3 = "dashed3"
-    DASHED4 = "dashed4"
-    DASHED5 = "dashed5"
-
-
 class TopTypedDict(TypedDict):
     r"""The border of a rectangle for properties of objects such as a table cell."""
 
     color: ColorTypedDict
     r"""Represents a color."""
-    style: TableCellsEditSchemasSetCellsBordersTopStyle
+    style: TableCellsEditSchemasSetCellsBordersStyle
     r"""The style of the border to apply."""
     weight: float
     r"""The thickness of the border, in points. Rounded to the nearest hundredth."""
@@ -557,7 +557,7 @@ class Top(BaseModel):
     color: Color
     r"""Represents a color."""
 
-    style: TableCellsEditSchemasSetCellsBordersTopStyle
+    style: TableCellsEditSchemasSetCellsBordersStyle
     r"""The style of the border to apply."""
 
     weight: float
@@ -811,24 +811,24 @@ class SetCellsText(BaseModel):
 class SetInputCellsTypedDict(TypedDict):
     r"""Sets the input cells for a range of cells in a table. Setting input cells requires the input mode ability. The operation will no-op if the cell is already in the state associated with the input cell."""
 
-    input_cell: bool
-    r"""Whether the cells should be input cells."""
     ranges: List[CellRangeTypedDict]
     r"""A collection of cell ranges in a table.
 
     """
+    input_cell: bool
+    r"""Whether the cells should be input cells."""
 
 
 class SetInputCells(BaseModel):
     r"""Sets the input cells for a range of cells in a table. Setting input cells requires the input mode ability. The operation will no-op if the cell is already in the state associated with the input cell."""
 
-    input_cell: Annotated[bool, pydantic.Field(alias="inputCell")]
-    r"""Whether the cells should be input cells."""
-
     ranges: List[CellRange]
     r"""A collection of cell ranges in a table.
 
     """
+
+    input_cell: Annotated[bool, pydantic.Field(alias="inputCell")]
+    r"""Whether the cells should be input cells."""
 
 
 class TableCellsEditType(str, Enum):

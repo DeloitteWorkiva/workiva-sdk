@@ -15,8 +15,6 @@ class FileCopyOptionsTypedDict(TypedDict):
     r"""Whether or not to email the authorized user when this copy is complete."""
     include_attachments: NotRequired[bool]
     r"""Whether to preserve attachments for copied content."""
-    include_automations: NotRequired[bool]
-    r"""Whether to preserve automations for copied content."""
     include_comments: NotRequired[bool]
     r"""Whether to preserve comments for copied content."""
     include_document_markup: NotRequired[bool]
@@ -35,6 +33,8 @@ class FileCopyOptionsTypedDict(TypedDict):
     r"""Whether to preserve XBRL for copied content."""
     include_xbrl_disconnected: NotRequired[bool]
     r"""Whether to preserve disconnected XBRL for copied content."""
+    include_automations: NotRequired[bool]
+    r"""Whether to preserve automations for copied content."""
     keep_input_mode_enabled: NotRequired[bool]
     r"""Whether to preserve input mode for copied content."""
     remove_grc_links: NotRequired[bool]
@@ -57,11 +57,6 @@ class FileCopyOptions(BaseModel):
         Optional[bool], pydantic.Field(alias="includeAttachments")
     ] = False
     r"""Whether to preserve attachments for copied content."""
-
-    include_automations: Annotated[
-        Optional[bool], pydantic.Field(alias="includeAutomations")
-    ] = False
-    r"""Whether to preserve automations for copied content."""
 
     include_comments: Annotated[
         Optional[bool], pydantic.Field(alias="includeComments")
@@ -106,6 +101,11 @@ class FileCopyOptions(BaseModel):
     ] = False
     r"""Whether to preserve disconnected XBRL for copied content."""
 
+    include_automations: Annotated[
+        Optional[bool], pydantic.Field(alias="includeAutomations")
+    ] = False
+    r"""Whether to preserve automations for copied content."""
+
     keep_input_mode_enabled: Annotated[
         Optional[bool], pydantic.Field(alias="keepInputModeEnabled")
     ] = False
@@ -128,7 +128,6 @@ class FileCopyOptions(BaseModel):
             [
                 "emailOnComplete",
                 "includeAttachments",
-                "includeAutomations",
                 "includeComments",
                 "includeDocumentMarkup",
                 "includeInputCellValues",
@@ -138,6 +137,7 @@ class FileCopyOptions(BaseModel):
                 "includeWdataOutgoingConnections",
                 "includeXBRL",
                 "includeXBRLDisconnected",
+                "includeAutomations",
                 "keepInputModeEnabled",
                 "removeGRCLinks",
                 "removeLinks",

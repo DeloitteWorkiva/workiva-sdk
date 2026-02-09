@@ -11,9 +11,10 @@ from .target import Target, TargetTypedDict
 from datetime import datetime
 from enum import Enum
 import pydantic
-from pydantic import model_serializer
+from pydantic import field_serializer, model_serializer
 from typing import List, Optional
 from typing_extensions import Annotated, NotRequired, TypedDict
+from workiva import models, utils
 from workiva.types import BaseModel, Nullable, OptionalNullable, UNSET, UNSET_SENTINEL
 
 
@@ -305,7 +306,7 @@ class ActivitySchemasModified(BaseModel):
         return m
 
 
-class ActivityStatus(str, Enum):
+class ActivityStatus(str, Enum, metaclass=utils.OpenEnumMeta):
     ACTIVE = "active"
     INACTIVE = "inactive"
 
@@ -336,6 +337,15 @@ class ActivityOrganization(BaseModel):
     r"""The name of the organization"""
 
     status: Optional[ActivityStatus] = None
+
+    @field_serializer("status")
+    def serialize_status(self, value):
+        if isinstance(value, str):
+            try:
+                return models.ActivityStatus(value)
+            except ValueError:
+                return value
+        return value
 
     @model_serializer(mode="wrap")
     def serialize_model(self, handler):
@@ -476,6 +486,15 @@ class Activity(BaseModel):
 
     workspace: OptionalNullable[ActivityWorkspace] = UNSET
     r"""The workspace's ID and name"""
+
+    @field_serializer("outcome")
+    def serialize_outcome(self, value):
+        if isinstance(value, str):
+            try:
+                return models.Outcome(value)
+            except ValueError:
+                return value
+        return value
 
     @model_serializer(mode="wrap")
     def serialize_model(self, handler):

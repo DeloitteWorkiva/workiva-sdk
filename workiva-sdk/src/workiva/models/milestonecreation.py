@@ -2,37 +2,38 @@
 
 from __future__ import annotations
 from .milestoneresourcetype import MilestoneResourceType
-from pydantic import model_serializer
+from pydantic import field_serializer, model_serializer
 from typing import Optional
 from typing_extensions import NotRequired, TypedDict
+from workiva import models
 from workiva.types import BaseModel, UNSET_SENTINEL
 
 
 class MilestoneCreationTypedDict(TypedDict):
     r"""Parameters used to create a milestone in a document, presentation, or spreadsheet. The created milestone will be associated with the latest revision at the point of milestone creation."""
 
-    title: str
-    r"""The title of the milestone"""
     type: MilestoneResourceType
     r"""The type of content associated with a milestone."""
+    title: str
+    r"""The title of the milestone"""
     document: NotRequired[str]
     r"""The unique identifier of the document being referred to"""
     presentation: NotRequired[str]
     r"""The unique identifier of the presentation being referred to"""
-    remarks: NotRequired[str]
-    r"""The remarks associated with the milestone"""
     spreadsheet: NotRequired[str]
     r"""The unique identifier of the spreadsheet being referred to"""
+    remarks: NotRequired[str]
+    r"""The remarks associated with the milestone"""
 
 
 class MilestoneCreation(BaseModel):
     r"""Parameters used to create a milestone in a document, presentation, or spreadsheet. The created milestone will be associated with the latest revision at the point of milestone creation."""
 
-    title: str
-    r"""The title of the milestone"""
-
     type: MilestoneResourceType
     r"""The type of content associated with a milestone."""
+
+    title: str
+    r"""The title of the milestone"""
 
     document: Optional[str] = None
     r"""The unique identifier of the document being referred to"""
@@ -40,15 +41,24 @@ class MilestoneCreation(BaseModel):
     presentation: Optional[str] = None
     r"""The unique identifier of the presentation being referred to"""
 
-    remarks: Optional[str] = ""
-    r"""The remarks associated with the milestone"""
-
     spreadsheet: Optional[str] = None
     r"""The unique identifier of the spreadsheet being referred to"""
 
+    remarks: Optional[str] = ""
+    r"""The remarks associated with the milestone"""
+
+    @field_serializer("type")
+    def serialize_type(self, value):
+        if isinstance(value, str):
+            try:
+                return models.MilestoneResourceType(value)
+            except ValueError:
+                return value
+        return value
+
     @model_serializer(mode="wrap")
     def serialize_model(self, handler):
-        optional_fields = set(["document", "presentation", "remarks", "spreadsheet"])
+        optional_fields = set(["document", "presentation", "spreadsheet", "remarks"])
         serialized = handler(self)
         m = {}
 

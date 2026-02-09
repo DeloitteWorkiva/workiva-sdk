@@ -12,21 +12,15 @@ from workiva.utils import FieldMetadata, PathParamMetadata, RequestMetadata
 
 
 class SectionPermissionsModificationRequestTypedDict(TypedDict):
-    resource_permissions_modification: ResourcePermissionsModificationTypedDict
-    r"""Details about the section permissions modification."""
     document_id: str
     r"""The unique identifier of the document"""
     section_id: str
     r"""The unique identifier of the section"""
+    resource_permissions_modification: ResourcePermissionsModificationTypedDict
+    r"""Details about the section permissions modification."""
 
 
 class SectionPermissionsModificationRequest(BaseModel):
-    resource_permissions_modification: Annotated[
-        ResourcePermissionsModification,
-        FieldMetadata(request=RequestMetadata(media_type="application/json")),
-    ]
-    r"""Details about the section permissions modification."""
-
     document_id: Annotated[
         str,
         pydantic.Field(alias="documentId"),
@@ -40,3 +34,9 @@ class SectionPermissionsModificationRequest(BaseModel):
         FieldMetadata(path=PathParamMetadata(style="simple", explode=False)),
     ]
     r"""The unique identifier of the section"""
+
+    resource_permissions_modification: Annotated[
+        ResourcePermissionsModification,
+        FieldMetadata(request=RequestMetadata(media_type="application/json")),
+    ]
+    r"""Details about the section permissions modification."""

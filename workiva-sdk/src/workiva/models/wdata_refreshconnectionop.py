@@ -19,18 +19,18 @@ WDATA_REFRESH_CONNECTION_OP_SERVERS = [
 
 
 class WdataRefreshConnectionRequestTypedDict(TypedDict):
-    refresh_connection_dto: RefreshConnectionDtoTypedDict
     connection_id: str
+    refresh_connection_dto: RefreshConnectionDtoTypedDict
 
 
 class WdataRefreshConnectionRequest(BaseModel):
-    refresh_connection_dto: Annotated[
-        RefreshConnectionDto,
-        FieldMetadata(request=RequestMetadata(media_type="application/json")),
-    ]
-
     connection_id: Annotated[
         str,
         pydantic.Field(alias="connectionId"),
         FieldMetadata(path=PathParamMetadata(style="simple", explode=False)),
+    ]
+
+    refresh_connection_dto: Annotated[
+        RefreshConnectionDto,
+        FieldMetadata(request=RequestMetadata(media_type="application/json")),
     ]

@@ -2,9 +2,10 @@
 
 from __future__ import annotations
 from .milestoneresourcetype import MilestoneResourceType
-from pydantic import model_serializer
+from pydantic import field_serializer, model_serializer
 from typing import Optional
 from typing_extensions import NotRequired, TypedDict
+from workiva import models
 from workiva.types import BaseModel, Nullable, OptionalNullable, UNSET, UNSET_SENTINEL
 
 
@@ -77,22 +78,22 @@ class MilestoneResourceRefPresentation(BaseModel):
 class MilestoneResourceRefSpreadsheetTypedDict(TypedDict):
     r"""The reference to the spreadsheet for `spreadsheet` type milestone"""
 
-    revision: NotRequired[str]
     spreadsheet: NotRequired[str]
     r"""The unique identifier of the spreadsheet being referred to"""
+    revision: NotRequired[str]
 
 
 class MilestoneResourceRefSpreadsheet(BaseModel):
     r"""The reference to the spreadsheet for `spreadsheet` type milestone"""
 
-    revision: Optional[str] = None
-
     spreadsheet: Optional[str] = None
     r"""The unique identifier of the spreadsheet being referred to"""
 
+    revision: Optional[str] = None
+
     @model_serializer(mode="wrap")
     def serialize_model(self, handler):
-        optional_fields = set(["revision", "spreadsheet"])
+        optional_fields = set(["spreadsheet", "revision"])
         serialized = handler(self)
         m = {}
 
@@ -134,6 +135,15 @@ class MilestoneResourceRef(BaseModel):
 
     spreadsheet: OptionalNullable[MilestoneResourceRefSpreadsheet] = UNSET
     r"""The reference to the spreadsheet for `spreadsheet` type milestone"""
+
+    @field_serializer("type")
+    def serialize_type(self, value):
+        if isinstance(value, str):
+            try:
+                return models.MilestoneResourceType(value)
+            except ValueError:
+                return value
+        return value
 
     @model_serializer(mode="wrap")
     def serialize_model(self, handler):

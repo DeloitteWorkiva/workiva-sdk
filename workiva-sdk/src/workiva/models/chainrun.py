@@ -3,13 +3,14 @@
 from __future__ import annotations
 from enum import Enum
 import pydantic
-from pydantic import model_serializer
+from pydantic import field_serializer, model_serializer
 from typing import Optional
 from typing_extensions import Annotated, NotRequired, TypedDict
+from workiva import models, utils
 from workiva.types import BaseModel, UNSET_SENTINEL
 
 
-class LaunchType(str, Enum):
+class LaunchType(str, Enum, metaclass=utils.OpenEnumMeta):
     r"""The type of event that triggered the chain run."""
 
     MANUAL = "manual"
@@ -20,7 +21,7 @@ class LaunchType(str, Enum):
     TRIGGER_EVENT = "trigger_event"
 
 
-class State(str, Enum):
+class State(str, Enum, metaclass=utils.OpenEnumMeta):
     r"""The state of the chain run."""
 
     SLEEPING = "sleeping"
@@ -97,6 +98,24 @@ class ChainRun(BaseModel):
 
     user_name: Annotated[Optional[str], pydantic.Field(alias="userName")] = None
     r"""The user that triggered the chain run."""
+
+    @field_serializer("launch_type")
+    def serialize_launch_type(self, value):
+        if isinstance(value, str):
+            try:
+                return models.LaunchType(value)
+            except ValueError:
+                return value
+        return value
+
+    @field_serializer("state")
+    def serialize_state(self, value):
+        if isinstance(value, str):
+            try:
+                return models.State(value)
+            except ValueError:
+                return value
+        return value
 
     @model_serializer(mode="wrap")
     def serialize_model(self, handler):

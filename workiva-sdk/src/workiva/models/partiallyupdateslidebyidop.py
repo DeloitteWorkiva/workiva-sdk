@@ -10,21 +10,15 @@ from workiva.utils import FieldMetadata, PathParamMetadata, RequestMetadata
 
 
 class PartiallyUpdateSlideByIDRequestTypedDict(TypedDict):
-    request_body: List[JSONPatchOperationTypedDict]
-    r"""A collection of patch operations to apply to the slide."""
     presentation_id: str
     r"""The unique identifier of the presentation"""
     slide_id: str
     r"""The unique identifier of the slide"""
+    request_body: List[JSONPatchOperationTypedDict]
+    r"""A collection of patch operations to apply to the slide."""
 
 
 class PartiallyUpdateSlideByIDRequest(BaseModel):
-    request_body: Annotated[
-        List[JSONPatchOperation],
-        FieldMetadata(request=RequestMetadata(media_type="application/json")),
-    ]
-    r"""A collection of patch operations to apply to the slide."""
-
     presentation_id: Annotated[
         str,
         pydantic.Field(alias="presentationId"),
@@ -38,6 +32,12 @@ class PartiallyUpdateSlideByIDRequest(BaseModel):
         FieldMetadata(path=PathParamMetadata(style="simple", explode=False)),
     ]
     r"""The unique identifier of the slide"""
+
+    request_body: Annotated[
+        List[JSONPatchOperation],
+        FieldMetadata(request=RequestMetadata(media_type="application/json")),
+    ]
+    r"""A collection of patch operations to apply to the slide."""
 
 
 class PartiallyUpdateSlideByIDResponseTypedDict(TypedDict):

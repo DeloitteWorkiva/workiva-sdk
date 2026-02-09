@@ -23,10 +23,10 @@ CHAINS_GET_USER_GROUP_PERMISSIONS_OP_SERVERS = [
 class ChainsGetUserGroupPermissionsRequestTypedDict(TypedDict):
     user_group_id: str
     r"""The ID of the User Group."""
-    page: NotRequired[int]
-    r"""Page number to retrieve in the paginated results (0-based index)."""
     page_size: NotRequired[int]
     r"""Limit number of results returned (Max 100)."""
+    page: NotRequired[int]
+    r"""Page number to retrieve in the paginated results (0-based index)."""
 
 
 class ChainsGetUserGroupPermissionsRequest(BaseModel):
@@ -37,12 +37,6 @@ class ChainsGetUserGroupPermissionsRequest(BaseModel):
     ]
     r"""The ID of the User Group."""
 
-    page: Annotated[
-        Optional[int],
-        FieldMetadata(query=QueryParamMetadata(style="form", explode=True)),
-    ] = None
-    r"""Page number to retrieve in the paginated results (0-based index)."""
-
     page_size: Annotated[
         Optional[int],
         pydantic.Field(alias="pageSize"),
@@ -50,9 +44,15 @@ class ChainsGetUserGroupPermissionsRequest(BaseModel):
     ] = None
     r"""Limit number of results returned (Max 100)."""
 
+    page: Annotated[
+        Optional[int],
+        FieldMetadata(query=QueryParamMetadata(style="form", explode=True)),
+    ] = None
+    r"""Page number to retrieve in the paginated results (0-based index)."""
+
     @model_serializer(mode="wrap")
     def serialize_model(self, handler):
-        optional_fields = set(["page", "pageSize"])
+        optional_fields = set(["pageSize", "page"])
         serialized = handler(self)
         m = {}
 

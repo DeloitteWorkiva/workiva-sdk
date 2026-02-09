@@ -19,22 +19,22 @@ WDATA_UPDATE_FOLDER_OP_SERVERS = [
 
 
 class WdataUpdateFolderRequestTypedDict(TypedDict):
-    folder_dto: FolderDtoInputTypedDict
-    r"""The representation of the folder to update"""
     folder_id: str
     r"""The unique identifier of the folder"""
+    folder_dto: FolderDtoInputTypedDict
+    r"""The representation of the folder to update"""
 
 
 class WdataUpdateFolderRequest(BaseModel):
-    folder_dto: Annotated[
-        FolderDtoInput,
-        FieldMetadata(request=RequestMetadata(media_type="application/json")),
-    ]
-    r"""The representation of the folder to update"""
-
     folder_id: Annotated[
         str,
         pydantic.Field(alias="folderId"),
         FieldMetadata(path=PathParamMetadata(style="simple", explode=False)),
     ]
     r"""The unique identifier of the folder"""
+
+    folder_dto: Annotated[
+        FolderDtoInput,
+        FieldMetadata(request=RequestMetadata(media_type="application/json")),
+    ]
+    r"""The representation of the folder to update"""

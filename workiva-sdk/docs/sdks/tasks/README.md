@@ -7,12 +7,64 @@ Tasks enable users to manage projects, organize responsibilities, and meet deadl
 
 ### Available Operations
 
+* [get_tasks](#get_tasks) - Retrieve a list of tasks
 * [create_task](#create_task) - Create a new task
 * [delete_task_by_id](#delete_task_by_id) - Delete a single task
 * [get_task_by_id](#get_task_by_id) - Retrieve a single task
-* [get_tasks](#get_tasks) - Retrieve a list of tasks
 * [partially_update_task_by_id](#partially_update_task_by_id) - Partially update a single task
 * [submit_task_action](#submit_task_action) - Initiate a task action submission
+
+## get_tasks
+
+> Returns a paginated list of [tasks](ref:tasks#task). Currently this endpoint returns general tasks
+(such as those created as part of editing documents, sheets, and presentations) and tasks that have been associated  with a Sustainability Program.
+It does not return tasks created as part of a process.
+
+
+### Example Usage
+
+<!-- UsageSnippet language="python" operationID="getTasks" method="get" path="/tasks" -->
+```python
+from workiva import SDK, models
+
+
+with SDK(
+    security=models.Security(
+        client_id="<YOUR_CLIENT_ID_HERE>",
+        client_secret="<YOUR_CLIENT_SECRET_HERE>",
+    ),
+) as sdk:
+
+    res = sdk.tasks.get_tasks(maxpagesize=1000, next="JTI0bGltaXQ9MTAwJiUyNG9mZnNldD0xMDA")
+
+    while res is not None:
+        # Handle items
+
+        res = res.next()
+
+```
+
+### Parameters
+
+| Parameter                                                                                   | Type                                                                                        | Required                                                                                    | Description                                                                                 | Example                                                                                     |
+| ------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------- |
+| `filter_`                                                                                   | *Optional[str]*                                                                             | :heavy_minus_sign:                                                                          | The properties to filter the results by.                                                    |                                                                                             |
+| `order_by`                                                                                  | *Optional[str]*                                                                             | :heavy_minus_sign:                                                                          | One or more comma-separated expressions to indicate the order in which to sort the results. |                                                                                             |
+| `maxpagesize`                                                                               | *Optional[int]*                                                                             | :heavy_minus_sign:                                                                          | The maximum number of results to retrieve                                                   |                                                                                             |
+| `next`                                                                                      | *Optional[str]*                                                                             | :heavy_minus_sign:                                                                          | Pagination cursor for next set of results.                                                  | JTI0bGltaXQ9MTAwJiUyNG9mZnNldD0xMDA                                                         |
+| `retries`                                                                                   | [Optional[utils.RetryConfig]](../../models/utils/retryconfig.md)                            | :heavy_minus_sign:                                                                          | Configuration to override the default retry behavior of the client.                         |                                                                                             |
+
+### Response
+
+**[models.GetTasksResponse](../../models/gettasksresponse.md)**
+
+### Errors
+
+| Error Type                   | Status Code                  | Content Type                 |
+| ---------------------------- | ---------------------------- | ---------------------------- |
+| errors.ErrorResponse         | 400, 401, 403, 404, 409, 429 | application/json             |
+| errors.ErrorResponse         | 500, 503                     | application/json             |
+| errors.SDKError              | 4XX, 5XX                     | \*/\*                        |
 
 ## create_task
 
@@ -44,6 +96,7 @@ with SDK(
                         "id": "V1ZVd2VyFzU3NiQ1NDA4NjIzNzk2MjD",
                     },
                 ],
+                "due_date": parse_datetime("2023-06-11T13:00:00+00:00"),
             },
         ],
         "assignees": [
@@ -162,58 +215,6 @@ with SDK(
 ### Response
 
 **[models.Task](../../models/task.md)**
-
-### Errors
-
-| Error Type                   | Status Code                  | Content Type                 |
-| ---------------------------- | ---------------------------- | ---------------------------- |
-| errors.ErrorResponse         | 400, 401, 403, 404, 409, 429 | application/json             |
-| errors.ErrorResponse         | 500, 503                     | application/json             |
-| errors.SDKError              | 4XX, 5XX                     | \*/\*                        |
-
-## get_tasks
-
-> Returns a paginated list of [tasks](ref:tasks#task). Currently this endpoint returns general tasks
-(such as those created as part of editing documents, sheets, and presentations) and tasks that have been associated  with a Sustainability Program.
-It does not return tasks created as part of a process.
-
-
-### Example Usage
-
-<!-- UsageSnippet language="python" operationID="getTasks" method="get" path="/tasks" -->
-```python
-from workiva import SDK, models
-
-
-with SDK(
-    security=models.Security(
-        client_id="<YOUR_CLIENT_ID_HERE>",
-        client_secret="<YOUR_CLIENT_SECRET_HERE>",
-    ),
-) as sdk:
-
-    res = sdk.tasks.get_tasks(maxpagesize=1000, next="JTI0bGltaXQ9MTAwJiUyNG9mZnNldD0xMDA")
-
-    while res is not None:
-        # Handle items
-
-        res = res.next()
-
-```
-
-### Parameters
-
-| Parameter                                                                                   | Type                                                                                        | Required                                                                                    | Description                                                                                 | Example                                                                                     |
-| ------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------- |
-| `filter_`                                                                                   | *Optional[str]*                                                                             | :heavy_minus_sign:                                                                          | The properties to filter the results by.                                                    |                                                                                             |
-| `maxpagesize`                                                                               | *Optional[int]*                                                                             | :heavy_minus_sign:                                                                          | The maximum number of results to retrieve                                                   |                                                                                             |
-| `next`                                                                                      | *Optional[str]*                                                                             | :heavy_minus_sign:                                                                          | Pagination cursor for next set of results.                                                  | JTI0bGltaXQ9MTAwJiUyNG9mZnNldD0xMDA                                                         |
-| `order_by`                                                                                  | *Optional[str]*                                                                             | :heavy_minus_sign:                                                                          | One or more comma-separated expressions to indicate the order in which to sort the results. |                                                                                             |
-| `retries`                                                                                   | [Optional[utils.RetryConfig]](../../models/utils/retryconfig.md)                            | :heavy_minus_sign:                                                                          | Configuration to override the default retry behavior of the client.                         |                                                                                             |
-
-### Response
-
-**[models.GetTasksResponse](../../models/gettasksresponse.md)**
 
 ### Errors
 

@@ -13,25 +13,25 @@ from workiva.utils import FieldMetadata, PathParamMetadata, RequestMetadata
 
 
 class RichTextAnchorCreationRequestTypedDict(TypedDict):
-    rich_text_anchor_creation: RichTextAnchorCreationTypedDict
-    r"""The anchor creation requests"""
     rich_text_id: str
     r"""The unique identifier of the rich text content"""
+    rich_text_anchor_creation: RichTextAnchorCreationTypedDict
+    r"""The anchor creation requests"""
 
 
 class RichTextAnchorCreationRequest(BaseModel):
-    rich_text_anchor_creation: Annotated[
-        RichTextAnchorCreation,
-        FieldMetadata(request=RequestMetadata(media_type="application/json")),
-    ]
-    r"""The anchor creation requests"""
-
     rich_text_id: Annotated[
         str,
         pydantic.Field(alias="richTextId"),
         FieldMetadata(path=PathParamMetadata(style="simple", explode=False)),
     ]
     r"""The unique identifier of the rich text content"""
+
+    rich_text_anchor_creation: Annotated[
+        RichTextAnchorCreation,
+        FieldMetadata(request=RequestMetadata(media_type="application/json")),
+    ]
+    r"""The anchor creation requests"""
 
 
 class RichTextAnchorCreationResponseTypedDict(TypedDict):

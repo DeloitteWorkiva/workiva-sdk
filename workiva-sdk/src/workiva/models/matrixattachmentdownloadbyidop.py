@@ -9,31 +9,17 @@ from workiva.utils import FieldMetadata, PathParamMetadata
 
 
 class MatrixAttachmentDownloadByIDRequestTypedDict(TypedDict):
-    attachment_id: str
-    r"""The unique identifier of the attachment"""
-    matrix_id: str
-    r"""The unique identifier of the matrix"""
     test_form_id: str
     r"""The unique identifier of the test form"""
     test_phase_id: str
     r"""The unique identifier of the test phase"""
+    matrix_id: str
+    r"""The unique identifier of the matrix"""
+    attachment_id: str
+    r"""The unique identifier of the attachment"""
 
 
 class MatrixAttachmentDownloadByIDRequest(BaseModel):
-    attachment_id: Annotated[
-        str,
-        pydantic.Field(alias="attachmentId"),
-        FieldMetadata(path=PathParamMetadata(style="simple", explode=False)),
-    ]
-    r"""The unique identifier of the attachment"""
-
-    matrix_id: Annotated[
-        str,
-        pydantic.Field(alias="matrixId"),
-        FieldMetadata(path=PathParamMetadata(style="simple", explode=False)),
-    ]
-    r"""The unique identifier of the matrix"""
-
     test_form_id: Annotated[
         str,
         pydantic.Field(alias="testFormId"),
@@ -47,6 +33,20 @@ class MatrixAttachmentDownloadByIDRequest(BaseModel):
         FieldMetadata(path=PathParamMetadata(style="simple", explode=False)),
     ]
     r"""The unique identifier of the test phase"""
+
+    matrix_id: Annotated[
+        str,
+        pydantic.Field(alias="matrixId"),
+        FieldMetadata(path=PathParamMetadata(style="simple", explode=False)),
+    ]
+    r"""The unique identifier of the matrix"""
+
+    attachment_id: Annotated[
+        str,
+        pydantic.Field(alias="attachmentId"),
+        FieldMetadata(path=PathParamMetadata(style="simple", explode=False)),
+    ]
+    r"""The unique identifier of the attachment"""
 
 
 class MatrixAttachmentDownloadByIDResponseTypedDict(TypedDict):

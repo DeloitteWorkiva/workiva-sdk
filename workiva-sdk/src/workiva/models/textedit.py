@@ -8,9 +8,10 @@ from .richtextbaselineshift import RichTextBaselineShift
 from .richtextselection import RichTextSelection, RichTextSelectionTypedDict
 from enum import Enum
 import pydantic
-from pydantic import model_serializer
+from pydantic import field_serializer, model_serializer
 from typing import Optional
 from typing_extensions import Annotated, NotRequired, TypedDict
+from workiva import models
 from workiva.types import BaseModel, Nullable, OptionalNullable, UNSET, UNSET_SENTINEL
 
 
@@ -432,6 +433,15 @@ class FormatText(BaseModel):
 
     underline: OptionalNullable[bool] = False
     r"""Whether or not the text is underlined"""
+
+    @field_serializer("baseline_shift")
+    def serialize_baseline_shift(self, value):
+        if isinstance(value, str):
+            try:
+                return models.RichTextBaselineShift(value)
+            except ValueError:
+                return value
+        return value
 
     @model_serializer(mode="wrap")
     def serialize_model(self, handler):
@@ -1360,27 +1370,27 @@ class TextEditSchemasSetTablePropertiesType(str, Enum):
 class TextEditTableBreakingTypedDict(TypedDict):
     r"""The property that will dictate how the table will break across pages"""
 
-    breaking_percentage: NotRequired[Nullable[int]]
-    r"""The percentage the table will break at, only set when type is breakWhenExceeds"""
     type: NotRequired[Nullable[TextEditSchemasSetTablePropertiesType]]
     r"""The type of table breaking"""
+    breaking_percentage: NotRequired[Nullable[int]]
+    r"""The percentage the table will break at, only set when type is breakWhenExceeds"""
 
 
 class TextEditTableBreaking(BaseModel):
     r"""The property that will dictate how the table will break across pages"""
+
+    type: OptionalNullable[TextEditSchemasSetTablePropertiesType] = UNSET
+    r"""The type of table breaking"""
 
     breaking_percentage: Annotated[
         OptionalNullable[int], pydantic.Field(alias="breakingPercentage")
     ] = UNSET
     r"""The percentage the table will break at, only set when type is breakWhenExceeds"""
 
-    type: OptionalNullable[TextEditSchemasSetTablePropertiesType] = UNSET
-    r"""The type of table breaking"""
-
     @model_serializer(mode="wrap")
     def serialize_model(self, handler):
-        optional_fields = set(["breakingPercentage", "type"])
-        nullable_fields = set(["breakingPercentage", "type"])
+        optional_fields = set(["type", "breakingPercentage"])
+        nullable_fields = set(["type", "breakingPercentage"])
         serialized = handler(self)
         m = {}
 
@@ -1408,14 +1418,14 @@ class SetTablePropertiesTypedDict(TypedDict):
 
     selection: RichTextSelectionTypedDict
     r"""Describes a selection within piece of rich text"""
-    header_rows: NotRequired[Nullable[int]]
-    r"""The rows that are going to be headers. The value must be smaller than the row size minus 2."""
-    table_breaking: NotRequired[Nullable[TextEditTableBreakingTypedDict]]
-    r"""The property that will dictate how the table will break across pages"""
     title_row: NotRequired[Nullable[bool]]
     r"""Whether the title row displays on each page"""
     title_suffix: NotRequired[Nullable[str]]
     r"""The table title suffix"""
+    header_rows: NotRequired[Nullable[int]]
+    r"""The rows that are going to be headers. The value must be smaller than the row size minus 2."""
+    table_breaking: NotRequired[Nullable[TextEditTableBreakingTypedDict]]
+    r"""The property that will dictate how the table will break across pages"""
 
 
 class SetTableProperties(BaseModel):
@@ -1423,16 +1433,6 @@ class SetTableProperties(BaseModel):
 
     selection: RichTextSelection
     r"""Describes a selection within piece of rich text"""
-
-    header_rows: Annotated[
-        OptionalNullable[int], pydantic.Field(alias="headerRows")
-    ] = UNSET
-    r"""The rows that are going to be headers. The value must be smaller than the row size minus 2."""
-
-    table_breaking: Annotated[
-        OptionalNullable[TextEditTableBreaking], pydantic.Field(alias="tableBreaking")
-    ] = UNSET
-    r"""The property that will dictate how the table will break across pages"""
 
     title_row: Annotated[OptionalNullable[bool], pydantic.Field(alias="titleRow")] = (
         UNSET
@@ -1444,13 +1444,23 @@ class SetTableProperties(BaseModel):
     ] = UNSET
     r"""The table title suffix"""
 
+    header_rows: Annotated[
+        OptionalNullable[int], pydantic.Field(alias="headerRows")
+    ] = UNSET
+    r"""The rows that are going to be headers. The value must be smaller than the row size minus 2."""
+
+    table_breaking: Annotated[
+        OptionalNullable[TextEditTableBreaking], pydantic.Field(alias="tableBreaking")
+    ] = UNSET
+    r"""The property that will dictate how the table will break across pages"""
+
     @model_serializer(mode="wrap")
     def serialize_model(self, handler):
         optional_fields = set(
-            ["headerRows", "tableBreaking", "titleRow", "titleSuffix"]
+            ["titleRow", "titleSuffix", "headerRows", "tableBreaking"]
         )
         nullable_fields = set(
-            ["headerRows", "tableBreaking", "titleRow", "titleSuffix"]
+            ["titleRow", "titleSuffix", "headerRows", "tableBreaking"]
         )
         serialized = handler(self)
         m = {}

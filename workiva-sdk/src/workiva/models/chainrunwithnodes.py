@@ -4,13 +4,14 @@ from __future__ import annotations
 from .chainrunnode import ChainRunNode, ChainRunNodeTypedDict
 from enum import Enum
 import pydantic
-from pydantic import model_serializer
+from pydantic import field_serializer, model_serializer
 from typing import List, Optional
 from typing_extensions import Annotated, NotRequired, TypedDict
+from workiva import models, utils
 from workiva.types import BaseModel, UNSET_SENTINEL
 
 
-class ChainRunWithNodesLaunchType(str, Enum):
+class ChainRunWithNodesLaunchType(str, Enum, metaclass=utils.OpenEnumMeta):
     r"""The type of event that triggered the chain run."""
 
     MANUAL = "manual"
@@ -21,7 +22,7 @@ class ChainRunWithNodesLaunchType(str, Enum):
     TRIGGER_EVENT = "trigger_event"
 
 
-class ChainRunWithNodesState(str, Enum):
+class ChainRunWithNodesState(str, Enum, metaclass=utils.OpenEnumMeta):
     r"""The state of the chain run."""
 
     SLEEPING = "sleeping"
@@ -46,7 +47,6 @@ class ChainRunWithNodesTypedDict(TypedDict):
     r"""The unique identifier of a resource (can be a GUID)."""
     launch_type: NotRequired[ChainRunWithNodesLaunchType]
     r"""The type of event that triggered the chain run."""
-    nodes: NotRequired[List[ChainRunNodeTypedDict]]
     paused_at: NotRequired[str]
     r"""The timestamp at which the chain run was paused."""
     result_text: NotRequired[str]
@@ -61,6 +61,7 @@ class ChainRunWithNodesTypedDict(TypedDict):
     r"""The unique identifier of a resource (can be a GUID)."""
     user_name: NotRequired[str]
     r"""The user that triggered the chain run."""
+    nodes: NotRequired[List[ChainRunNodeTypedDict]]
 
 
 class ChainRunWithNodes(BaseModel):
@@ -83,8 +84,6 @@ class ChainRunWithNodes(BaseModel):
     ] = None
     r"""The type of event that triggered the chain run."""
 
-    nodes: Optional[List[ChainRunNode]] = None
-
     paused_at: Annotated[Optional[str], pydantic.Field(alias="pausedAt")] = None
     r"""The timestamp at which the chain run was paused."""
 
@@ -106,6 +105,26 @@ class ChainRunWithNodes(BaseModel):
     user_name: Annotated[Optional[str], pydantic.Field(alias="userName")] = None
     r"""The user that triggered the chain run."""
 
+    nodes: Optional[List[ChainRunNode]] = None
+
+    @field_serializer("launch_type")
+    def serialize_launch_type(self, value):
+        if isinstance(value, str):
+            try:
+                return models.ChainRunWithNodesLaunchType(value)
+            except ValueError:
+                return value
+        return value
+
+    @field_serializer("state")
+    def serialize_state(self, value):
+        if isinstance(value, str):
+            try:
+                return models.ChainRunWithNodesState(value)
+            except ValueError:
+                return value
+        return value
+
     @model_serializer(mode="wrap")
     def serialize_model(self, handler):
         optional_fields = set(
@@ -115,7 +134,6 @@ class ChainRunWithNodes(BaseModel):
                 "envId",
                 "id",
                 "launchType",
-                "nodes",
                 "pausedAt",
                 "resultText",
                 "resumedAt",
@@ -123,6 +141,7 @@ class ChainRunWithNodes(BaseModel):
                 "state",
                 "userId",
                 "userName",
+                "nodes",
             ]
         )
         serialized = handler(self)

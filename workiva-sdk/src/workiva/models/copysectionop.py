@@ -10,21 +10,15 @@ from workiva.utils import FieldMetadata, PathParamMetadata, RequestMetadata
 
 
 class CopySectionRequestTypedDict(TypedDict):
-    section_copy: SectionCopyTypedDict
-    r"""A SectionCopy object"""
     document_id: str
     r"""The unique identifier of the document"""
     section_id: str
     r"""The unique identifier of the section"""
+    section_copy: SectionCopyTypedDict
+    r"""A SectionCopy object"""
 
 
 class CopySectionRequest(BaseModel):
-    section_copy: Annotated[
-        SectionCopy,
-        FieldMetadata(request=RequestMetadata(media_type="application/json")),
-    ]
-    r"""A SectionCopy object"""
-
     document_id: Annotated[
         str,
         pydantic.Field(alias="documentId"),
@@ -38,6 +32,12 @@ class CopySectionRequest(BaseModel):
         FieldMetadata(path=PathParamMetadata(style="simple", explode=False)),
     ]
     r"""The unique identifier of the section"""
+
+    section_copy: Annotated[
+        SectionCopy,
+        FieldMetadata(request=RequestMetadata(media_type="application/json")),
+    ]
+    r"""A SectionCopy object"""
 
 
 class CopySectionResponseTypedDict(TypedDict):

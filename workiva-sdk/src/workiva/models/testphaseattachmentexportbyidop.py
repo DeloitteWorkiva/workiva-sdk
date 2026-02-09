@@ -12,31 +12,18 @@ from workiva.utils import FieldMetadata, PathParamMetadata, RequestMetadata
 class TestPhaseAttachmentExportByIDRequestTypedDict(TypedDict):
     __test__ = False  # pyright: ignore[reportGeneralTypeIssues]
 
-    graph_attachment_export: GraphAttachmentExportTypedDict
-    r"""Details about the attachment export"""
-    attachment_id: str
-    r"""The unique identifier of the attachment"""
     test_form_id: str
     r"""The unique identifier of the test form"""
     test_phase_id: str
     r"""The unique identifier of the test phase"""
+    attachment_id: str
+    r"""The unique identifier of the attachment"""
+    graph_attachment_export: GraphAttachmentExportTypedDict
+    r"""Details about the attachment export"""
 
 
 class TestPhaseAttachmentExportByIDRequest(BaseModel):
     __test__ = False
-
-    graph_attachment_export: Annotated[
-        GraphAttachmentExport,
-        FieldMetadata(request=RequestMetadata(media_type="application/json")),
-    ]
-    r"""Details about the attachment export"""
-
-    attachment_id: Annotated[
-        str,
-        pydantic.Field(alias="attachmentId"),
-        FieldMetadata(path=PathParamMetadata(style="simple", explode=False)),
-    ]
-    r"""The unique identifier of the attachment"""
 
     test_form_id: Annotated[
         str,
@@ -51,6 +38,19 @@ class TestPhaseAttachmentExportByIDRequest(BaseModel):
         FieldMetadata(path=PathParamMetadata(style="simple", explode=False)),
     ]
     r"""The unique identifier of the test phase"""
+
+    attachment_id: Annotated[
+        str,
+        pydantic.Field(alias="attachmentId"),
+        FieldMetadata(path=PathParamMetadata(style="simple", explode=False)),
+    ]
+    r"""The unique identifier of the attachment"""
+
+    graph_attachment_export: Annotated[
+        GraphAttachmentExport,
+        FieldMetadata(request=RequestMetadata(media_type="application/json")),
+    ]
+    r"""Details about the attachment export"""
 
 
 class TestPhaseAttachmentExportByIDResponseTypedDict(TypedDict):

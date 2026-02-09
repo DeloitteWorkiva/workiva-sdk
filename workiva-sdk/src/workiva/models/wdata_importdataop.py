@@ -26,20 +26,20 @@ WDATA_IMPORT_DATA_OP_SERVERS = [
 
 
 class WdataImportDataFileTypedDict(TypedDict):
-    content: Union[bytes, IO[bytes], io.BufferedReader]
     file_name: str
+    content: Union[bytes, IO[bytes], io.BufferedReader]
     content_type: NotRequired[str]
 
 
 class WdataImportDataFile(BaseModel):
+    file_name: Annotated[
+        str, pydantic.Field(alias="fileName"), FieldMetadata(multipart=True)
+    ]
+
     content: Annotated[
         Union[bytes, IO[bytes], io.BufferedReader],
         pydantic.Field(alias=""),
         FieldMetadata(multipart=MultipartFormMetadata(content=True)),
-    ]
-
-    file_name: Annotated[
-        str, pydantic.Field(alias="fileName"), FieldMetadata(multipart=True)
     ]
 
     content_type: Annotated[
@@ -78,24 +78,24 @@ class WdataImportDataRequestBody(BaseModel):
 
 
 class WdataImportDataRequestTypedDict(TypedDict):
-    request_body: NotRequired[WdataImportDataRequestBodyTypedDict]
     wipe: NotRequired[bool]
+    request_body: NotRequired[WdataImportDataRequestBodyTypedDict]
 
 
 class WdataImportDataRequest(BaseModel):
-    request_body: Annotated[
-        Optional[WdataImportDataRequestBody],
-        FieldMetadata(request=RequestMetadata(media_type="multipart/form-data")),
-    ] = None
-
     wipe: Annotated[
         Optional[bool],
         FieldMetadata(query=QueryParamMetadata(style="form", explode=True)),
     ] = True
 
+    request_body: Annotated[
+        Optional[WdataImportDataRequestBody],
+        FieldMetadata(request=RequestMetadata(media_type="multipart/form-data")),
+    ] = None
+
     @model_serializer(mode="wrap")
     def serialize_model(self, handler):
-        optional_fields = set(["RequestBody", "wipe"])
+        optional_fields = set(["wipe", "RequestBody"])
         serialized = handler(self)
         m = {}
 

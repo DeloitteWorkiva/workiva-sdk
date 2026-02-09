@@ -11,9 +11,10 @@ from .unspecifieddrawingelement import (
     UnspecifiedDrawingElement,
     UnspecifiedDrawingElementTypedDict,
 )
-from pydantic import model_serializer
+from pydantic import field_serializer, model_serializer
 from typing import Optional
 from typing_extensions import NotRequired, TypedDict
+from workiva import models
 from workiva.types import BaseModel, Nullable, OptionalNullable, UNSET, UNSET_SENTINEL
 
 
@@ -89,6 +90,15 @@ class DrawingElement(BaseModel):
     it gives the  element''s identifier.
 
     """
+
+    @field_serializer("type")
+    def serialize_type(self, value):
+        if isinstance(value, str):
+            try:
+                return models.DrawingElementType(value)
+            except ValueError:
+                return value
+        return value
 
     @model_serializer(mode="wrap")
     def serialize_model(self, handler):

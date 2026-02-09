@@ -10,19 +10,21 @@ from workiva.utils import FieldMetadata, PathParamMetadata, RequestMetadata
 
 
 class CopySheetRequestTypedDict(TypedDict):
-    sheet_copy: SheetCopyTypedDict
-    r"""A SheetCopy object"""
-    sheet_id: str
-    r"""The unique identifier of the sheet"""
     spreadsheet_id: str
     r"""The unique identifier of the spreadsheet"""
+    sheet_id: str
+    r"""The unique identifier of the sheet"""
+    sheet_copy: SheetCopyTypedDict
+    r"""A SheetCopy object"""
 
 
 class CopySheetRequest(BaseModel):
-    sheet_copy: Annotated[
-        SheetCopy, FieldMetadata(request=RequestMetadata(media_type="application/json"))
+    spreadsheet_id: Annotated[
+        str,
+        pydantic.Field(alias="spreadsheetId"),
+        FieldMetadata(path=PathParamMetadata(style="simple", explode=False)),
     ]
-    r"""A SheetCopy object"""
+    r"""The unique identifier of the spreadsheet"""
 
     sheet_id: Annotated[
         str,
@@ -31,12 +33,10 @@ class CopySheetRequest(BaseModel):
     ]
     r"""The unique identifier of the sheet"""
 
-    spreadsheet_id: Annotated[
-        str,
-        pydantic.Field(alias="spreadsheetId"),
-        FieldMetadata(path=PathParamMetadata(style="simple", explode=False)),
+    sheet_copy: Annotated[
+        SheetCopy, FieldMetadata(request=RequestMetadata(media_type="application/json"))
     ]
-    r"""The unique identifier of the spreadsheet"""
+    r"""A SheetCopy object"""
 
 
 class CopySheetResponseTypedDict(TypedDict):

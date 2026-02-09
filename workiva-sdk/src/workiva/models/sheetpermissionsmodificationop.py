@@ -12,20 +12,21 @@ from workiva.utils import FieldMetadata, PathParamMetadata, RequestMetadata
 
 
 class SheetPermissionsModificationRequestTypedDict(TypedDict):
-    resource_permissions_modification: ResourcePermissionsModificationTypedDict
-    r"""Details about the sheet permissions modification."""
-    sheet_id: str
-    r"""The unique identifier of the sheet"""
     spreadsheet_id: str
     r"""The unique identifier of the spreadsheet"""
+    sheet_id: str
+    r"""The unique identifier of the sheet"""
+    resource_permissions_modification: ResourcePermissionsModificationTypedDict
+    r"""Details about the sheet permissions modification."""
 
 
 class SheetPermissionsModificationRequest(BaseModel):
-    resource_permissions_modification: Annotated[
-        ResourcePermissionsModification,
-        FieldMetadata(request=RequestMetadata(media_type="application/json")),
+    spreadsheet_id: Annotated[
+        str,
+        pydantic.Field(alias="spreadsheetId"),
+        FieldMetadata(path=PathParamMetadata(style="simple", explode=False)),
     ]
-    r"""Details about the sheet permissions modification."""
+    r"""The unique identifier of the spreadsheet"""
 
     sheet_id: Annotated[
         str,
@@ -34,9 +35,8 @@ class SheetPermissionsModificationRequest(BaseModel):
     ]
     r"""The unique identifier of the sheet"""
 
-    spreadsheet_id: Annotated[
-        str,
-        pydantic.Field(alias="spreadsheetId"),
-        FieldMetadata(path=PathParamMetadata(style="simple", explode=False)),
+    resource_permissions_modification: Annotated[
+        ResourcePermissionsModification,
+        FieldMetadata(request=RequestMetadata(media_type="application/json")),
     ]
-    r"""The unique identifier of the spreadsheet"""
+    r"""Details about the sheet permissions modification."""

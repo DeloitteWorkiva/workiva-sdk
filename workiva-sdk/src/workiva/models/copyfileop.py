@@ -10,24 +10,24 @@ from workiva.utils import FieldMetadata, PathParamMetadata, RequestMetadata
 
 
 class CopyFileRequestTypedDict(TypedDict):
-    file_copy: FileCopyTypedDict
-    r"""The details of the file copy"""
     file_id: str
     r"""The unique identifier of the file"""
+    file_copy: FileCopyTypedDict
+    r"""The details of the file copy"""
 
 
 class CopyFileRequest(BaseModel):
-    file_copy: Annotated[
-        FileCopy, FieldMetadata(request=RequestMetadata(media_type="application/json"))
-    ]
-    r"""The details of the file copy"""
-
     file_id: Annotated[
         str,
         pydantic.Field(alias="fileId"),
         FieldMetadata(path=PathParamMetadata(style="simple", explode=False)),
     ]
     r"""The unique identifier of the file"""
+
+    file_copy: Annotated[
+        FileCopy, FieldMetadata(request=RequestMetadata(media_type="application/json"))
+    ]
+    r"""The details of the file copy"""
 
 
 class CopyFileResponseTypedDict(TypedDict):

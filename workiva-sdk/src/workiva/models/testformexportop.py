@@ -12,20 +12,14 @@ from workiva.utils import FieldMetadata, PathParamMetadata, RequestMetadata
 class TestFormExportRequestTypedDict(TypedDict):
     __test__ = False  # pyright: ignore[reportGeneralTypeIssues]
 
-    test_form_export: TestFormExportTypedDict
-    r"""Details about the test form export"""
     test_form_id: str
     r"""The unique identifier of the test form"""
+    test_form_export: TestFormExportTypedDict
+    r"""Details about the test form export"""
 
 
 class TestFormExportRequest(BaseModel):
     __test__ = False
-
-    test_form_export: Annotated[
-        TestFormExport,
-        FieldMetadata(request=RequestMetadata(media_type="application/json")),
-    ]
-    r"""Details about the test form export"""
 
     test_form_id: Annotated[
         str,
@@ -33,6 +27,12 @@ class TestFormExportRequest(BaseModel):
         FieldMetadata(path=PathParamMetadata(style="simple", explode=False)),
     ]
     r"""The unique identifier of the test form"""
+
+    test_form_export: Annotated[
+        TestFormExport,
+        FieldMetadata(request=RequestMetadata(media_type="application/json")),
+    ]
+    r"""Details about the test form export"""
 
 
 class TestFormExportResponseTypedDict(TypedDict):

@@ -19,22 +19,22 @@ WDATA_UPDATE_SELECT_LIST_OP_SERVERS = [
 
 
 class WdataUpdateSelectListRequestTypedDict(TypedDict):
-    select_list_dto: SelectListDtoInputTypedDict
-    r"""The representation of the select list to update"""
     select_list_id: str
     r"""The unique identifier of the select list"""
+    select_list_dto: SelectListDtoInputTypedDict
+    r"""The representation of the select list to update"""
 
 
 class WdataUpdateSelectListRequest(BaseModel):
-    select_list_dto: Annotated[
-        SelectListDtoInput,
-        FieldMetadata(request=RequestMetadata(media_type="application/json")),
-    ]
-    r"""The representation of the select list to update"""
-
     select_list_id: Annotated[
         str,
         pydantic.Field(alias="selectListId"),
         FieldMetadata(path=PathParamMetadata(style="simple", explode=False)),
     ]
     r"""The unique identifier of the select list"""
+
+    select_list_dto: Annotated[
+        SelectListDtoInput,
+        FieldMetadata(request=RequestMetadata(media_type="application/json")),
+    ]
+    r"""The representation of the select list to update"""

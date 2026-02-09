@@ -13,25 +13,25 @@ from workiva.utils import FieldMetadata, PathParamMetadata, RequestMetadata
 
 
 class PresentationLinksPublicationRequestTypedDict(TypedDict):
-    links_publication_options: LinksPublicationOptionsTypedDict
-    r"""Details about the link publication."""
     presentation_id: str
     r"""The unique identifier of the presentation"""
+    links_publication_options: LinksPublicationOptionsTypedDict
+    r"""Details about the link publication."""
 
 
 class PresentationLinksPublicationRequest(BaseModel):
-    links_publication_options: Annotated[
-        LinksPublicationOptions,
-        FieldMetadata(request=RequestMetadata(media_type="application/json")),
-    ]
-    r"""Details about the link publication."""
-
     presentation_id: Annotated[
         str,
         pydantic.Field(alias="presentationId"),
         FieldMetadata(path=PathParamMetadata(style="simple", explode=False)),
     ]
     r"""The unique identifier of the presentation"""
+
+    links_publication_options: Annotated[
+        LinksPublicationOptions,
+        FieldMetadata(request=RequestMetadata(media_type="application/json")),
+    ]
+    r"""Details about the link publication."""
 
 
 class PresentationLinksPublicationResponseTypedDict(TypedDict):

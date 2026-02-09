@@ -2,9 +2,10 @@
 
 from __future__ import annotations
 from enum import Enum
+from workiva import utils
 
 
-class ShapeType(str, Enum):
+class ShapeType(str, Enum, metaclass=utils.OpenEnumMeta):
     r"""The type of a shape to draw. Some shapes are aliased to others;
     for example, decision is an alias of diamond. The shape \"offPageReference\"
     is unsupported by some non-Workiva applications and may cause issues during

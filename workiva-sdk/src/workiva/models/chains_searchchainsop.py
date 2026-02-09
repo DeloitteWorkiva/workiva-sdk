@@ -19,30 +19,36 @@ CHAINS_SEARCH_CHAINS_OP_SERVERS = [
 
 
 class ChainsSearchChainsRequestTypedDict(TypedDict):
-    environment_id: NotRequired[int]
-    r"""The ID of the environment to search for chains."""
+    workspace_id: NotRequired[int]
+    r"""The ID of the workspace to search for chains."""
     external_workspace_id: NotRequired[str]
     r"""The ID of the associated Workiva workspace to search for chains."""
+    environment_id: NotRequired[int]
+    r"""The ID of the environment to search for chains."""
     name: NotRequired[str]
     r"""The fuzzy name of the chain to search for."""
     parallel_execution_enabled: NotRequired[bool]
     r"""Whether or not to return only chains that run in parallel or serially."""
-    workspace_id: NotRequired[int]
-    r"""The ID of the workspace to search for chains."""
 
 
 class ChainsSearchChainsRequest(BaseModel):
-    environment_id: Annotated[
+    workspace_id: Annotated[
         Optional[int],
         FieldMetadata(query=QueryParamMetadata(style="form", explode=True)),
     ] = None
-    r"""The ID of the environment to search for chains."""
+    r"""The ID of the workspace to search for chains."""
 
     external_workspace_id: Annotated[
         Optional[str],
         FieldMetadata(query=QueryParamMetadata(style="form", explode=True)),
     ] = None
     r"""The ID of the associated Workiva workspace to search for chains."""
+
+    environment_id: Annotated[
+        Optional[int],
+        FieldMetadata(query=QueryParamMetadata(style="form", explode=True)),
+    ] = None
+    r"""The ID of the environment to search for chains."""
 
     name: Annotated[
         Optional[str],
@@ -56,21 +62,15 @@ class ChainsSearchChainsRequest(BaseModel):
     ] = None
     r"""Whether or not to return only chains that run in parallel or serially."""
 
-    workspace_id: Annotated[
-        Optional[int],
-        FieldMetadata(query=QueryParamMetadata(style="form", explode=True)),
-    ] = None
-    r"""The ID of the workspace to search for chains."""
-
     @model_serializer(mode="wrap")
     def serialize_model(self, handler):
         optional_fields = set(
             [
-                "environment_id",
+                "workspace_id",
                 "external_workspace_id",
+                "environment_id",
                 "name",
                 "parallel_execution_enabled",
-                "workspace_id",
             ]
         )
         serialized = handler(self)

@@ -3,13 +3,14 @@
 from __future__ import annotations
 from enum import Enum
 import pydantic
-from pydantic import model_serializer
+from pydantic import field_serializer, model_serializer
 from typing import List, Optional
 from typing_extensions import Annotated, NotRequired, TypedDict
+from workiva import models, utils
 from workiva.types import BaseModel, UNSET_SENTINEL
 
 
-class PivotViewDefinitionFilterDtoColumnType(str, Enum):
+class PivotViewDefinitionFilterDtoColumnType(str, Enum, metaclass=utils.OpenEnumMeta):
     r"""The column type."""
 
     INTEGER = "integer"
@@ -21,7 +22,7 @@ class PivotViewDefinitionFilterDtoColumnType(str, Enum):
     FLOAT = "float"
 
 
-class Filter(str, Enum):
+class Filter(str, Enum, metaclass=utils.OpenEnumMeta):
     r"""The filter to perform."""
 
     EQUAL = "EQUAL"
@@ -76,6 +77,24 @@ class PivotViewDefinitionFilterDto(BaseModel):
 
     value: Optional[str] = None
     r"""The value to filter on."""
+
+    @field_serializer("column_type")
+    def serialize_column_type(self, value):
+        if isinstance(value, str):
+            try:
+                return models.PivotViewDefinitionFilterDtoColumnType(value)
+            except ValueError:
+                return value
+        return value
+
+    @field_serializer("filter_")
+    def serialize_filter_(self, value):
+        if isinstance(value, str):
+            try:
+                return models.Filter(value)
+            except ValueError:
+                return value
+        return value
 
     @model_serializer(mode="wrap")
     def serialize_model(self, handler):

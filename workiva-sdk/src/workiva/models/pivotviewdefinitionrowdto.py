@@ -2,13 +2,14 @@
 
 from __future__ import annotations
 from enum import Enum
-from pydantic import model_serializer
+from pydantic import field_serializer, model_serializer
 from typing import Optional
 from typing_extensions import NotRequired, TypedDict
+from workiva import models, utils
 from workiva.types import BaseModel, UNSET_SENTINEL
 
 
-class PivotViewDefinitionRowDtoType(str, Enum):
+class PivotViewDefinitionRowDtoType(str, Enum, metaclass=utils.OpenEnumMeta):
     r"""The column type."""
 
     INTEGER = "integer"
@@ -33,6 +34,15 @@ class PivotViewDefinitionRowDto(BaseModel):
 
     type: Optional[PivotViewDefinitionRowDtoType] = None
     r"""The column type."""
+
+    @field_serializer("type")
+    def serialize_type(self, value):
+        if isinstance(value, str):
+            try:
+                return models.PivotViewDefinitionRowDtoType(value)
+            except ValueError:
+                return value
+        return value
 
     @model_serializer(mode="wrap")
     def serialize_model(self, handler):

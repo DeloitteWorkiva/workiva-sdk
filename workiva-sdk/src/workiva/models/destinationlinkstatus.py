@@ -2,9 +2,10 @@
 
 from __future__ import annotations
 from enum import Enum
+from workiva import utils
 
 
-class DestinationLinkStatus(str, Enum):
+class DestinationLinkStatus(str, Enum, metaclass=utils.OpenEnumMeta):
     r"""Destination link status"""
 
     CONNECTED = "connected"

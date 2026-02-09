@@ -19,22 +19,22 @@ WDATA_UPDATE_TABLE_OP_SERVERS = [
 
 
 class WdataUpdateTableRequestTypedDict(TypedDict):
-    table_dto: TableDtoInputTypedDict
-    r"""The representation of the table to update"""
     table_id: str
     r"""The unique identifier of the table"""
+    table_dto: TableDtoInputTypedDict
+    r"""The representation of the table to update"""
 
 
 class WdataUpdateTableRequest(BaseModel):
-    table_dto: Annotated[
-        TableDtoInput,
-        FieldMetadata(request=RequestMetadata(media_type="application/json")),
-    ]
-    r"""The representation of the table to update"""
-
     table_id: Annotated[
         str,
         pydantic.Field(alias="tableId"),
         FieldMetadata(path=PathParamMetadata(style="simple", explode=False)),
     ]
     r"""The unique identifier of the table"""
+
+    table_dto: Annotated[
+        TableDtoInput,
+        FieldMetadata(request=RequestMetadata(media_type="application/json")),
+    ]
+    r"""The representation of the table to update"""

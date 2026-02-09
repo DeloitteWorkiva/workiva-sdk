@@ -5,8 +5,9 @@ from .destinationlinksourceconversionresulttype import (
     DestinationLinkSourceConversionResultType,
 )
 import pydantic
-from pydantic import model_serializer
+from pydantic import field_serializer, model_serializer
 from typing_extensions import Annotated, NotRequired, TypedDict
+from workiva import models
 from workiva.types import BaseModel, Nullable, OptionalNullable, UNSET, UNSET_SENTINEL
 
 
@@ -34,6 +35,15 @@ class DestinationLinkSourceConversionResult(BaseModel):
         OptionalNullable[str], pydantic.Field(alias="destinationLink")
     ] = UNSET
     r"""The unique identifier for the destination link."""
+
+    @field_serializer("type")
+    def serialize_type(self, value):
+        if isinstance(value, str):
+            try:
+                return models.DestinationLinkSourceConversionResultType(value)
+            except ValueError:
+                return value
+        return value
 
     @model_serializer(mode="wrap")
     def serialize_model(self, handler):

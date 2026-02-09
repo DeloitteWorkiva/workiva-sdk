@@ -10,25 +10,25 @@ from workiva.utils import FieldMetadata, PathParamMetadata, RequestMetadata
 
 
 class SpreadsheetExportRequestTypedDict(TypedDict):
-    spreadsheet_export: SpreadsheetExportTypedDict
-    r"""Details about the spreadsheet export, including its format and options"""
     spreadsheet_id: str
     r"""The unique identifier of the spreadsheet"""
+    spreadsheet_export: SpreadsheetExportTypedDict
+    r"""Details about the spreadsheet export, including its format and options"""
 
 
 class SpreadsheetExportRequest(BaseModel):
-    spreadsheet_export: Annotated[
-        SpreadsheetExport,
-        FieldMetadata(request=RequestMetadata(media_type="application/json")),
-    ]
-    r"""Details about the spreadsheet export, including its format and options"""
-
     spreadsheet_id: Annotated[
         str,
         pydantic.Field(alias="spreadsheetId"),
         FieldMetadata(path=PathParamMetadata(style="simple", explode=False)),
     ]
     r"""The unique identifier of the spreadsheet"""
+
+    spreadsheet_export: Annotated[
+        SpreadsheetExport,
+        FieldMetadata(request=RequestMetadata(media_type="application/json")),
+    ]
+    r"""Details about the spreadsheet export, including its format and options"""
 
 
 class SpreadsheetExportResponseTypedDict(TypedDict):

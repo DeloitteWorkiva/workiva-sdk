@@ -2,9 +2,10 @@
 
 from __future__ import annotations
 from enum import Enum
+from workiva import utils
 
 
-class Outcome(str, Enum):
+class Outcome(str, Enum, metaclass=utils.OpenEnumMeta):
     r"""Result of the activity action performed"""
 
     SUCCESS = "success"
