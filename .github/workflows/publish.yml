@@ -20,7 +20,7 @@ jobs:
           python-version: "3.12"
 
       - name: Install dependencies
-        run: cd python-sdk && uv sync
+        run: cd workiva-sdk && uv sync
 
       - name: Run tests
         run: make test
@@ -49,5 +49,5 @@ jobs:
       - name: Publish to PyPI
         uses: pypa/gh-action-pypi-publish@release/v1
         with:
-          packages-dir: python-sdk/dist/
+          packages-dir: workiva-sdk/dist/
           password: ${{ secrets.PYPI_API_TOKEN }}

@@ -11,7 +11,7 @@ to files that Speakeasy regenerates on every run:
   5. pyproject.toml — adds license, classifiers, and project URLs
 
 Usage:
-    python scripts/patch_sdk.py python-sdk
+    python scripts/patch_sdk.py workiva-sdk
 """
 
 from __future__ import annotations

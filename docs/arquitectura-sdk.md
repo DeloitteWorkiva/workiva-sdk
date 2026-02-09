@@ -12,7 +12,7 @@ oas/wdata.yaml    ─┘         │
                   speakeasy merge → merged.yaml
                           │
                           ▼
-                speakeasy generate → python-sdk/src/workiva/
+                speakeasy generate → workiva-sdk/src/workiva/
                           │
                           ▼
                    patch_sdk.py → __init__.py exports + README cleanup
@@ -46,7 +46,7 @@ speakeasy merge \
 ### Paso 3: Generación (`speakeasy generate`)
 
 ```bash
-speakeasy generate sdk --lang python --schema merged.yaml --out python-sdk
+speakeasy generate sdk --lang python --schema merged.yaml --out workiva-sdk
 ```
 
 Speakeasy genera:
@@ -186,7 +186,7 @@ make build                # → dist/workiva-0.4.0-py3-none-any.whl
 1. **Código custom** → edita directamente en `_hooks/` (sobrevive regeneración)
 2. **Cambios en API** → modifica `prepare_specs.py`, luego `make force`
 3. **Nueva configuración** → edita `gen.yaml`, luego `make force`
-4. **Tests** → `python-sdk/tests/` (fuera de `src/`, seguro)
+4. **Tests** → `workiva-sdk/tests/` (fuera de `src/`, seguro)
 
 ### Agregar un nuevo endpoint
 

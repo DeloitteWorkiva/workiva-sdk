@@ -16,7 +16,7 @@ git clone https://github.com/DeloitteWorkiva/workiva-sdk.git
 cd workiva-sdk
 
 # Instalar dependencias del SDK
-cd python-sdk && uv sync && cd ..
+cd workiva-sdk && uv sync && cd ..
 
 # Verificar que todo funciona
 make test
@@ -30,10 +30,10 @@ Antes de hacer cambios, entiende qué puedes y qué NO puedes modificar:
 
 | Ubicación | Descripción |
 |-----------|-------------|
-| `python-sdk/src/workiva/_hooks/client.py` | Clase `Workiva` con `wait()` |
-| `python-sdk/src/workiva/_hooks/polling.py` | `OperationPoller` |
-| `python-sdk/src/workiva/_hooks/exceptions.py` | Excepciones custom |
-| `python-sdk/tests/` | Tests unitarios e integración |
+| `workiva-sdk/src/workiva/_hooks/client.py` | Clase `Workiva` con `wait()` |
+| `workiva-sdk/src/workiva/_hooks/polling.py` | `OperationPoller` |
+| `workiva-sdk/src/workiva/_hooks/exceptions.py` | Excepciones custom |
+| `workiva-sdk/tests/` | Tests unitarios e integración |
 | `scripts/` | Pipeline de pre/post procesamiento |
 | `docs/` | Documentación |
 | `Makefile` | Build system |
@@ -41,7 +41,7 @@ Antes de hacer cambios, entiende qué puedes y qué NO puedes modificar:
 
 ### NO editar (se regenera con `make force`)
 
-Todo en `python-sdk/src/workiva/` excepto `_hooks/` se regenera automáticamente. Cualquier cambio manual se pierde.
+Todo en `workiva-sdk/src/workiva/` excepto `_hooks/` se regenera automáticamente. Cualquier cambio manual se pierde.
 
 Si necesitas modificar código generado, el cambio debe ir en:
 - `scripts/prepare_specs.py` — para cambios en el OpenAPI spec antes de generar
@@ -61,7 +61,7 @@ git checkout -b feat/mi-cambio
 - **Código custom** → edita en `_hooks/`
 - **Cambios en API** → modifica `prepare_specs.py`, luego `make force`
 - **Configuración** → edita `gen.yaml`, luego `make force`
-- **Tests** → `python-sdk/tests/`
+- **Tests** → `workiva-sdk/tests/`
 - **Docs** → `docs/`
 
 ### 3. Ejecuta los tests
@@ -99,13 +99,13 @@ make test-integration   # Solo integration
 make test-cov           # Con cobertura
 
 # Un test específico
-cd python-sdk && uv run pytest tests/unit/test_polling_helpers.py -v
+cd workiva-sdk && uv run pytest tests/unit/test_polling_helpers.py -v
 ```
 
 ### Escribir tests
 
-- **Unit tests** → `python-sdk/tests/unit/` — mockean el SDK con `MagicMock`/`AsyncMock`
-- **Integration tests** → `python-sdk/tests/integration/` — usan `httpx.MockTransport`
+- **Unit tests** → `workiva-sdk/tests/unit/` — mockean el SDK con `MagicMock`/`AsyncMock`
+- **Integration tests** → `workiva-sdk/tests/integration/` — usan `httpx.MockTransport`
 
 Consideraciones:
 

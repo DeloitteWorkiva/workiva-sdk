@@ -15,7 +15,7 @@ SHELL := /bin/bash
 # Directories
 SPECS_DIR := oas
 SCRIPTS_DIR := scripts
-SDK_DIR := python-sdk
+SDK_DIR := workiva-sdk
 CHECKSUMS_FILE := .spec_checksums
 
 # Source specs

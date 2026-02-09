@@ -1,9 +1,9 @@
 
 [project]
 name = "workiva"
-version = "0.5.0"
+version = "0.5.1"
 description = "Workiva Python SDK - Unified client for Platform, Chains, and Wdata APIs"
-authors = [{ name = "Jorge Revenga" },]
+authors = [{ name = "Jorge Revenga", email = "jrevengamartindevida@deloitte.es" },]
 readme = "README.md"
 license = {text = "Proprietary"}
 requires-python = ">=3.10"
@@ -46,6 +46,14 @@ pytest = ">=8.0"
 pytest-asyncio = ">=0.24"
 pytest-cov = ">=6.0"
 respx = ">=0.22"
+
+[dependency-groups]
+dev = [
+    "pytest>=8.0",
+    "pytest-asyncio>=0.24",
+    "pytest-cov>=6.0",
+    "respx>=0.22",
+]
 
 [build-system]
 requires = ["poetry-core"]

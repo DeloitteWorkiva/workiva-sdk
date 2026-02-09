@@ -28,7 +28,7 @@ jobs:
         run: curl -fsSL https://go.speakeasy.com/cli-install.sh | sh
 
       - name: Install SDK dependencies
-        run: cd python-sdk && uv sync
+        run: cd workiva-sdk && uv sync
 
       - name: Download latest specs
         run: make download

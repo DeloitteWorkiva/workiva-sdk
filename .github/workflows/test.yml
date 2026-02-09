@@ -21,7 +21,7 @@ jobs:
           python-version: "3.12"
 
       - name: Install dependencies
-        run: cd python-sdk && uv sync
+        run: cd workiva-sdk && uv sync
 
       - name: Run tests
         run: make test
