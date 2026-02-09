@@ -4,7 +4,7 @@ from .basesdk import BaseSDK
 from .httpclient import AsyncHttpClient, ClientOwner, HttpClient, close_clients
 from .sdkconfiguration import SDKConfiguration
 from .utils.logger import Logger, get_default_logger
-from .utils.retries import RetryConfig
+from .utils.retries import BackoffStrategy, RetryConfig
 import httpx
 import importlib
 import sys
@@ -115,7 +115,9 @@ class SDK(BaseSDK):
         url_params: Optional[Dict[str, str]] = None,
         client: Optional[HttpClient] = None,
         async_client: Optional[AsyncHttpClient] = None,
-        retry_config: OptionalNullable[RetryConfig] = UNSET,
+        retry_config: OptionalNullable[RetryConfig] = RetryConfig(
+            "backoff", BackoffStrategy(500, 30000, 1.5, 120000), True
+        ),
         timeout_ms: Optional[int] = None,
         debug_logger: Optional[Logger] = None,
     ) -> None:

@@ -251,41 +251,44 @@ def patch_clientcredentials(sdk_dir: Path) -> None:
 
 RETRY_SENTINEL = "BackoffStrategy"
 
-RETRY_OLD = 'retry_config: OptionalNullable[RetryConfig] = Field(default_factory=lambda: UNSET)'
-RETRY_NEW = (
-    'retry_config: OptionalNullable[RetryConfig] = Field(\n'
-    '        default_factory=lambda: RetryConfig(\n'
-    '            "backoff",\n'
-    '            BackoffStrategy(500, 30000, 1.5, 120000),\n'
-    '            True,\n'
-    '        )\n'
-    '    )'
-)
+# sdk.py: change constructor default from UNSET to a real RetryConfig
+SDK_RETRY_IMPORT_OLD = 'from .utils.retries import RetryConfig'
+SDK_RETRY_IMPORT_NEW = 'from .utils.retries import BackoffStrategy, RetryConfig'
 
-RETRY_IMPORT_OLD = 'from .utils import Logger, RetryConfig, remove_suffix'
-RETRY_IMPORT_NEW = 'from .utils import BackoffStrategy, Logger, RetryConfig, remove_suffix'
+SDK_RETRY_DEFAULT_OLD = 'retry_config: OptionalNullable[RetryConfig] = UNSET,'
+SDK_RETRY_DEFAULT_NEW = (
+    'retry_config: OptionalNullable[RetryConfig] = RetryConfig(\n'
+    '            "backoff", BackoffStrategy(500, 30000, 1.5, 120000), True\n'
+    '        ),'
+)
 
 
 def patch_retry_defaults(sdk_dir: Path) -> None:
-    """Set default retry config with backoff in SDKConfiguration (idempotent)."""
-    config_path = sdk_dir / "src" / "workiva" / "sdkconfiguration.py"
-    if not config_path.exists():
-        print(f"  SKIP sdkconfiguration.py — not found at {config_path}")
+    """Set default retry config in SDK constructor (idempotent).
+
+    Speakeasy generates `retry_config: ... = UNSET` in the SDK constructor,
+    which means consumers must explicitly opt-in to retries. This patch
+    changes the default to a concrete RetryConfig so all consumers get
+    automatic retry with backoff on 429/5xx out of the box.
+    """
+    sdk_path = sdk_dir / "src" / "workiva" / "sdk.py"
+    if not sdk_path.exists():
+        print(f"  SKIP sdk.py — not found at {sdk_path}")
         return
 
-    content = config_path.read_text()
+    content = sdk_path.read_text()
     if RETRY_SENTINEL in content:
-        print("  sdkconfiguration.py — retry defaults already patched, skipping")
+        print("  sdk.py — retry defaults already patched, skipping")
         return
 
-    if RETRY_OLD not in content:
-        print("  WARN sdkconfiguration.py — retry_config pattern not found, skipping")
+    if SDK_RETRY_DEFAULT_OLD not in content:
+        print("  WARN sdk.py — retry_config default pattern not found, skipping")
         return
 
-    content = content.replace(RETRY_IMPORT_OLD, RETRY_IMPORT_NEW)
-    content = content.replace(RETRY_OLD, RETRY_NEW)
-    config_path.write_text(content)
-    print("  sdkconfiguration.py — set default retry config (backoff 500ms-30s, 2min max)")
+    content = content.replace(SDK_RETRY_IMPORT_OLD, SDK_RETRY_IMPORT_NEW)
+    content = content.replace(SDK_RETRY_DEFAULT_OLD, SDK_RETRY_DEFAULT_NEW)
+    sdk_path.write_text(content)
+    print("  sdk.py — set default retry config (backoff 500ms-30s, 2min max)")
 
 
 SECURITY_OLD_TOKEN_URL = '/iam/v1/oauth2/token'
