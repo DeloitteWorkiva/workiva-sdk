@@ -1255,7 +1255,7 @@ Starts a chain run for a specific chain in an environment, specified by the Chai
 
 ### Example Usage
 
-<!-- UsageSnippet language="python" operationID="chains_startChain" method="post" path="/v1/execute/environment/{environment_id}/chain/{chain_id}/start" -->
+<!-- UsageSnippet language="python" operationID="chains_startChain" method="post" path="/v1/execute/environment/{environment_id}/chain/{chain_id}/start" example="any" -->
 ```python
 from workiva import SDK, models
 
@@ -1267,7 +1267,7 @@ with SDK(
     ),
 ) as sdk:
 
-    res = sdk.chains.start_chain(chain_id="34090", environment_id="139", request_body={
+    res = sdk.chains.start_chain(chain_id="34090", environment_id="74", request_body={
         "runtime_variables": {
             "variableName": "variableValue",
         },

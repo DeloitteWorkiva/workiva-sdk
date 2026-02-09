@@ -50,7 +50,7 @@ Assign a User's roles within an Organization. If one assignment fails, all assig
 
 ### Example Usage
 
-<!-- UsageSnippet language="python" operationID="assignOrganizationUserRoles" method="post" path="/organizations/{organizationId}/users/{userId}/roles/assignment" -->
+<!-- UsageSnippet language="python" operationID="assignOrganizationUserRoles" method="post" path="/organizations/{organizationId}/users/{userId}/roles/assignment" example="BadRequest" -->
 ```python
 from workiva import SDK, models
 
@@ -99,7 +99,7 @@ Assign an existing organization user to an organization
 
 ### Example Usage
 
-<!-- UsageSnippet language="python" operationID="assignUserToOrganization" method="post" path="/organizations/{organizationId}/users/assignment" -->
+<!-- UsageSnippet language="python" operationID="assignUserToOrganization" method="post" path="/organizations/{organizationId}/users/assignment" example="BadRequest" -->
 ```python
 from workiva import SDK, models
 
@@ -147,7 +147,7 @@ Assign a member's roles within a Workspace. If one assignment fails, all assignm
 
 ### Example Usage
 
-<!-- UsageSnippet language="python" operationID="assignWorkspaceMembershipRoles" method="post" path="/organizations/{organizationId}/workspaces/{workspaceId}/memberships/{workspaceMembershipId}/roles/assignment" -->
+<!-- UsageSnippet language="python" operationID="assignWorkspaceMembershipRoles" method="post" path="/organizations/{organizationId}/workspaces/{workspaceId}/memberships/{workspaceMembershipId}/roles/assignment" example="BadRequest" -->
 ```python
 from workiva import SDK, models
 
@@ -160,7 +160,9 @@ with SDK(
 ) as sdk:
 
     res = sdk.admin.assign_workspace_membership_roles(organization_id="d6e178fd-4dd5-47e5-9457-68dd64b03655", workspace_id="<id>", workspace_membership_id="<id>", request_body=[
-        "7e65b8dd-c9ad-4473-a555-86ca6c6cc878",
+        "774921ee-d626-4a59-8858-e7a3253becce",
+        "605f947d-dee1-4e81-bd75-a4461adb9be5",
+        "7d434915-4ab2-472e-ac4d-1aaf090a7565",
     ])
 
     # Handle response
@@ -197,7 +199,7 @@ Creates a new OrganizationUser resource
 
 ### Example Usage
 
-<!-- UsageSnippet language="python" operationID="createOrganizationUser" method="post" path="/organizations/{organizationId}/users" -->
+<!-- UsageSnippet language="python" operationID="createOrganizationUser" method="post" path="/organizations/{organizationId}/users" example="BadRequest" -->
 ```python
 from workiva import SDK, models
 
@@ -249,7 +251,7 @@ Creates a new workspace resource
 
 ### Example Usage
 
-<!-- UsageSnippet language="python" operationID="createWorkspace" method="post" path="/organizations/{organizationId}/workspaces" -->
+<!-- UsageSnippet language="python" operationID="createWorkspace" method="post" path="/organizations/{organizationId}/workspaces" example="BadRequest" -->
 ```python
 from workiva import SDK, models
 
@@ -303,7 +305,7 @@ Creates a new group resource
 
 ### Example Usage
 
-<!-- UsageSnippet language="python" operationID="createWorkspaceGroup" method="post" path="/organizations/{organizationId}/workspaces/{workspaceId}/groups" -->
+<!-- UsageSnippet language="python" operationID="createWorkspaceGroup" method="post" path="/organizations/{organizationId}/workspaces/{workspaceId}/groups" example="BadRequest" -->
 ```python
 from workiva import SDK, models
 
@@ -350,9 +352,46 @@ with SDK(
 Creates a new `WorkspaceMembership` resource
 
 
-### Example Usage
+### Example Usage: BadRequest
 
-<!-- UsageSnippet language="python" operationID="createWorkspaceMembership" method="post" path="/organizations/{organizationId}/workspaces/{workspaceId}/memberships" -->
+<!-- UsageSnippet language="python" operationID="createWorkspaceMembership" method="post" path="/organizations/{organizationId}/workspaces/{workspaceId}/memberships" example="BadRequest" -->
+```python
+from workiva import SDK, models
+
+
+with SDK(
+    security=models.Security(
+        client_id="<YOUR_CLIENT_ID_HERE>",
+        client_secret="<YOUR_CLIENT_SECRET_HERE>",
+    ),
+) as sdk:
+
+    res = sdk.admin.create_workspace_membership(organization_id="d6e178fd-4dd5-47e5-9457-68dd64b03655", workspace_id="<id>", workspace_membership={
+        "user": {
+            "display_name": "John Doe",
+            "email": "john.doe@example.com",
+            "family_name": "Doe",
+            "given_name": "John",
+            "username": "john.doe@example.com",
+        },
+        "workspace": {
+            "name": "Quarterly Planning",
+            "solutions": [
+                {
+                    "id": "60",
+                    "name": "Connected Global Statutory Reporting (with Entity Management)",
+                },
+            ],
+        },
+    })
+
+    # Handle response
+    print(res)
+
+```
+### Example Usage: body
+
+<!-- UsageSnippet language="python" operationID="createWorkspaceMembership" method="post" path="/organizations/{organizationId}/workspaces/{workspaceId}/memberships" example="body" -->
 ```python
 from workiva import SDK, models
 
@@ -528,7 +567,7 @@ Retrieves an organization given its ID
 
 ### Example Usage
 
-<!-- UsageSnippet language="python" operationID="getOrganizationById" method="get" path="/organizations/{organizationId}" -->
+<!-- UsageSnippet language="python" operationID="getOrganizationById" method="get" path="/organizations/{organizationId}" example="OK" -->
 ```python
 from workiva import SDK, models
 
@@ -1378,7 +1417,7 @@ Add and/or remove members from a group. When failures are encountered for partic
 
 ### Example Usage
 
-<!-- UsageSnippet language="python" operationID="modifyWorkspaceGroupMembers" method="post" path="/organizations/{organizationId}/workspaces/{workspaceId}/groups/{groupId}/members/modification" -->
+<!-- UsageSnippet language="python" operationID="modifyWorkspaceGroupMembers" method="post" path="/organizations/{organizationId}/workspaces/{workspaceId}/groups/{groupId}/members/modification" example="BadRequest" -->
 ```python
 from workiva import SDK, models
 
@@ -1430,9 +1469,35 @@ Updates the properties of an organization.
 |`/name`|`replace`|
 
 
-### Example Usage
+### Example Usage: BadRequest
 
-<!-- UsageSnippet language="python" operationID="partiallyUpdateOrganizationById" method="patch" path="/organizations/{organizationId}" -->
+<!-- UsageSnippet language="python" operationID="partiallyUpdateOrganizationById" method="patch" path="/organizations/{organizationId}" example="BadRequest" -->
+```python
+from workiva import SDK, models
+
+
+with SDK(
+    security=models.Security(
+        client_id="<YOUR_CLIENT_ID_HERE>",
+        client_secret="<YOUR_CLIENT_SECRET_HERE>",
+    ),
+) as sdk:
+
+    res = sdk.admin.partially_update_organization_by_id(organization_id="d6e178fd-4dd5-47e5-9457-68dd64b03655", request_body=[
+        {
+            "op": models.Op.REPLACE,
+            "path": "/name",
+            "value": "New name",
+        },
+    ])
+
+    # Handle response
+    print(res)
+
+```
+### Example Usage: body
+
+<!-- UsageSnippet language="python" operationID="partiallyUpdateOrganizationById" method="patch" path="/organizations/{organizationId}" example="body" -->
 ```python
 from workiva import SDK, models
 
@@ -1490,9 +1555,35 @@ Partially update the properties of a [User](ref:admin#user) within an Organizati
 |`/email`|`replace`|
 
 
-### Example Usage
+### Example Usage: BadRequest
 
-<!-- UsageSnippet language="python" operationID="partiallyUpdateOrganizationUserById" method="patch" path="/organizations/{organizationId}/users/{userId}" -->
+<!-- UsageSnippet language="python" operationID="partiallyUpdateOrganizationUserById" method="patch" path="/organizations/{organizationId}/users/{userId}" example="BadRequest" -->
+```python
+from workiva import SDK, models
+
+
+with SDK(
+    security=models.Security(
+        client_id="<YOUR_CLIENT_ID_HERE>",
+        client_secret="<YOUR_CLIENT_SECRET_HERE>",
+    ),
+) as sdk:
+
+    res = sdk.admin.partially_update_organization_user_by_id(organization_id="d6e178fd-4dd5-47e5-9457-68dd64b03655", user_id="<id>", request_body=[
+        {
+            "op": models.Op.REPLACE,
+            "path": "/name",
+            "value": "New name",
+        },
+    ])
+
+    # Handle response
+    print(res)
+
+```
+### Example Usage: body
+
+<!-- UsageSnippet language="python" operationID="partiallyUpdateOrganizationUserById" method="patch" path="/organizations/{organizationId}/users/{userId}" example="body" -->
 ```python
 from workiva import SDK, models
 
@@ -1547,9 +1638,35 @@ Updates the properties of a workspace.
 |`/name`|`replace`|
 
 
-### Example Usage
+### Example Usage: BadRequest
 
-<!-- UsageSnippet language="python" operationID="partiallyUpdateWorkspaceById" method="patch" path="/organizations/{organizationId}/workspaces/{workspaceId}" -->
+<!-- UsageSnippet language="python" operationID="partiallyUpdateWorkspaceById" method="patch" path="/organizations/{organizationId}/workspaces/{workspaceId}" example="BadRequest" -->
+```python
+from workiva import SDK, models
+
+
+with SDK(
+    security=models.Security(
+        client_id="<YOUR_CLIENT_ID_HERE>",
+        client_secret="<YOUR_CLIENT_SECRET_HERE>",
+    ),
+) as sdk:
+
+    res = sdk.admin.partially_update_workspace_by_id(organization_id="d6e178fd-4dd5-47e5-9457-68dd64b03655", workspace_id="<id>", request_body=[
+        {
+            "op": models.Op.REPLACE,
+            "path": "/name",
+            "value": "New name",
+        },
+    ])
+
+    # Handle response
+    print(res)
+
+```
+### Example Usage: body
+
+<!-- UsageSnippet language="python" operationID="partiallyUpdateWorkspaceById" method="patch" path="/organizations/{organizationId}/workspaces/{workspaceId}" example="body" -->
 ```python
 from workiva import SDK, models
 
@@ -1604,9 +1721,35 @@ Updates the properties of a group.
 |`/name`|`replace`|
 
 
-### Example Usage
+### Example Usage: BadRequest
 
-<!-- UsageSnippet language="python" operationID="partiallyUpdateWorkspaceGroupById" method="patch" path="/organizations/{organizationId}/workspaces/{workspaceId}/groups/{groupId}" -->
+<!-- UsageSnippet language="python" operationID="partiallyUpdateWorkspaceGroupById" method="patch" path="/organizations/{organizationId}/workspaces/{workspaceId}/groups/{groupId}" example="BadRequest" -->
+```python
+from workiva import SDK, models
+
+
+with SDK(
+    security=models.Security(
+        client_id="<YOUR_CLIENT_ID_HERE>",
+        client_secret="<YOUR_CLIENT_SECRET_HERE>",
+    ),
+) as sdk:
+
+    res = sdk.admin.partially_update_workspace_group_by_id(group_id="V0ZHcm91cB5XRkdyb3VwOkFMTF9VU0VSUznxMjD1NTVyNDg3", organization_id="d6e178fd-4dd5-47e5-9457-68dd64b03655", workspace_id="<id>", request_body=[
+        {
+            "op": models.Op.REPLACE,
+            "path": "/name",
+            "value": "New name",
+        },
+    ])
+
+    # Handle response
+    print(res)
+
+```
+### Example Usage: body
+
+<!-- UsageSnippet language="python" operationID="partiallyUpdateWorkspaceGroupById" method="patch" path="/organizations/{organizationId}/workspaces/{workspaceId}/groups/{groupId}" example="body" -->
 ```python
 from workiva import SDK, models
 
@@ -1660,7 +1803,7 @@ Revoke a User's roles within an Organization. If one revocation fails, all revoc
 
 ### Example Usage
 
-<!-- UsageSnippet language="python" operationID="revokeOrganizationUserRoles" method="post" path="/organizations/{organizationId}/users/{userId}/roles/revocation" -->
+<!-- UsageSnippet language="python" operationID="revokeOrganizationUserRoles" method="post" path="/organizations/{organizationId}/users/{userId}/roles/revocation" example="BadRequest" -->
 ```python
 from workiva import SDK, models
 
@@ -1710,7 +1853,7 @@ Revoke a member's roles within a Workspace. If one revocation fails, all revocat
 
 ### Example Usage
 
-<!-- UsageSnippet language="python" operationID="revokeWorkspaceMembershipRoles" method="post" path="/organizations/{organizationId}/workspaces/{workspaceId}/memberships/{workspaceMembershipId}/roles/revocation" -->
+<!-- UsageSnippet language="python" operationID="revokeWorkspaceMembershipRoles" method="post" path="/organizations/{organizationId}/workspaces/{workspaceId}/memberships/{workspaceMembershipId}/roles/revocation" example="BadRequest" -->
 ```python
 from workiva import SDK, models
 
@@ -1722,10 +1865,7 @@ with SDK(
     ),
 ) as sdk:
 
-    res = sdk.admin.revoke_workspace_membership_roles(organization_id="d6e178fd-4dd5-47e5-9457-68dd64b03655", workspace_id="<id>", workspace_membership_id="<id>", request_body=[
-        "c22b6a26-a790-48e2-8486-4a7bc82647e2",
-        "79ff49b8-93df-499a-8bab-dd0abcad84e7",
-    ])
+    res = sdk.admin.revoke_workspace_membership_roles(organization_id="d6e178fd-4dd5-47e5-9457-68dd64b03655", workspace_id="<id>", workspace_membership_id="<id>", request_body=[])
 
     # Handle response
     print(res)
@@ -1761,7 +1901,7 @@ Creates a new `WorkspaceMembership` and allows control over notification options
 
 ### Example Usage
 
-<!-- UsageSnippet language="python" operationID="workspaceMembershipCreationWithOptions" method="post" path="/organizations/{organizationId}/workspaces/{workspaceId}/memberships/membershipCreation" -->
+<!-- UsageSnippet language="python" operationID="workspaceMembershipCreationWithOptions" method="post" path="/organizations/{organizationId}/workspaces/{workspaceId}/memberships/membershipCreation" example="BadRequest" -->
 ```python
 from workiva import SDK, models
 

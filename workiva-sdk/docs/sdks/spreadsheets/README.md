@@ -41,7 +41,7 @@ Unless otherwise specified, the copy appears at the top level of its  destinatio
 
 ### Example Usage
 
-<!-- UsageSnippet language="python" operationID="copySheet" method="post" path="/spreadsheets/{spreadsheetId}/sheets/{sheetId}/copy" -->
+<!-- UsageSnippet language="python" operationID="copySheet" method="post" path="/spreadsheets/{spreadsheetId}/sheets/{sheetId}/copy" example="BadRequest" -->
 ```python
 from workiva import SDK, models
 
@@ -91,9 +91,36 @@ with SDK(
 Creates a new [sheet](ref:spreadsheets#sheet) in a [spreadsheet](ref:spreadsheets#spreadsheet), given its properties. If the sheet name provided isn't unique, a number is appended to make it unique. By default, creates a top-level sheet in the top-most position.
 
 
-### Example Usage
+### Example Usage: BadRequest
 
-<!-- UsageSnippet language="python" operationID="createSheet" method="post" path="/spreadsheets/{spreadsheetId}/sheets" -->
+<!-- UsageSnippet language="python" operationID="createSheet" method="post" path="/spreadsheets/{spreadsheetId}/sheets" example="BadRequest" -->
+```python
+from workiva import SDK, models
+
+
+with SDK(
+    security=models.Security(
+        client_id="<YOUR_CLIENT_ID_HERE>",
+        client_secret="<YOUR_CLIENT_SECRET_HERE>",
+    ),
+) as sdk:
+
+    res = sdk.spreadsheets.create_sheet(spreadsheet_id="<id>", sheet={
+        "id": "27f1b61c04ae4b0991bc73c631914e1d",
+        "index": 1,
+        "name": "Q1",
+        "table": {
+            "table": "WA7i5vbm7lNaEn6XT97lNaEn6XT9AtcW5vb22BJjMrqxmrujMrqxmru",
+        },
+    })
+
+    # Handle response
+    print(res)
+
+```
+### Example Usage: body
+
+<!-- UsageSnippet language="python" operationID="createSheet" method="post" path="/spreadsheets/{spreadsheetId}/sheets" example="body" -->
 ```python
 from workiva import SDK, models
 
@@ -812,9 +839,35 @@ see [Operations endpoint](ref:getoperationbyid).
 ```
 
 
-### Example Usage
+### Example Usage: BadRequest
 
-<!-- UsageSnippet language="python" operationID="partiallyUpdateSheetById" method="patch" path="/spreadsheets/{spreadsheetId}/sheets/{sheetId}" -->
+<!-- UsageSnippet language="python" operationID="partiallyUpdateSheetById" method="patch" path="/spreadsheets/{spreadsheetId}/sheets/{sheetId}" example="BadRequest" -->
+```python
+from workiva import SDK, models
+
+
+with SDK(
+    security=models.Security(
+        client_id="<YOUR_CLIENT_ID_HERE>",
+        client_secret="<YOUR_CLIENT_SECRET_HERE>",
+    ),
+) as sdk:
+
+    res = sdk.spreadsheets.partially_update_sheet_by_id(sheet_id="<id>", spreadsheet_id="<id>", request_body=[
+        {
+            "op": models.Op.REPLACE,
+            "path": "/name",
+            "value": "New name",
+        },
+    ])
+
+    # Handle response
+    print(res)
+
+```
+### Example Usage: body
+
+<!-- UsageSnippet language="python" operationID="partiallyUpdateSheetById" method="patch" path="/spreadsheets/{spreadsheetId}/sheets/{sheetId}" example="body" -->
 ```python
 from workiva import SDK, models
 
@@ -943,9 +996,35 @@ see [Operations endpoint](ref:getoperationbyid).
 ```
 
 
-### Example Usage
+### Example Usage: BadRequest
 
-<!-- UsageSnippet language="python" operationID="partiallyUpdateSpreadsheetById" method="patch" path="/spreadsheets/{spreadsheetId}" -->
+<!-- UsageSnippet language="python" operationID="partiallyUpdateSpreadsheetById" method="patch" path="/spreadsheets/{spreadsheetId}" example="BadRequest" -->
+```python
+from workiva import SDK, models
+
+
+with SDK(
+    security=models.Security(
+        client_id="<YOUR_CLIENT_ID_HERE>",
+        client_secret="<YOUR_CLIENT_SECRET_HERE>",
+    ),
+) as sdk:
+
+    res = sdk.spreadsheets.partially_update_spreadsheet_by_id(spreadsheet_id="<id>", request_body=[
+        {
+            "op": models.Op.REPLACE,
+            "path": "/name",
+            "value": "New name",
+        },
+    ])
+
+    # Handle response
+    print(res)
+
+```
+### Example Usage: body
+
+<!-- UsageSnippet language="python" operationID="partiallyUpdateSpreadsheetById" method="patch" path="/spreadsheets/{spreadsheetId}" example="body" -->
 ```python
 from workiva import SDK, models
 
@@ -997,7 +1076,7 @@ Assign and/or revoke permissions on a sheet. If any modification in a request fa
 
 ### Example Usage
 
-<!-- UsageSnippet language="python" operationID="sheetPermissionsModification" method="post" path="/spreadsheets/{spreadsheetId}/sheets/{sheetId}/permissions/modification" -->
+<!-- UsageSnippet language="python" operationID="sheetPermissionsModification" method="post" path="/spreadsheets/{spreadsheetId}/sheets/{sheetId}/permissions/modification" example="BadRequest" -->
 ```python
 from workiva import SDK, models
 
@@ -1056,7 +1135,7 @@ Note: To export to .PDF, the spreadsheet can have no more than 250,000 cells.
 
 ### Example Usage
 
-<!-- UsageSnippet language="python" operationID="spreadsheetExport" method="post" path="/spreadsheets/{spreadsheetId}/export" -->
+<!-- UsageSnippet language="python" operationID="spreadsheetExport" method="post" path="/spreadsheets/{spreadsheetId}/export" example="BadRequest" -->
 ```python
 from workiva import SDK, models
 
@@ -1117,7 +1196,7 @@ For more details on long-running job polling, see [Operations endpoint](ref:geto
 
 ### Example Usage
 
-<!-- UsageSnippet language="python" operationID="spreadsheetFiltersReapplication" method="post" path="/spreadsheets/{spreadsheetId}/filters/reapplication" -->
+<!-- UsageSnippet language="python" operationID="spreadsheetFiltersReapplication" method="post" path="/spreadsheets/{spreadsheetId}/filters/reapplication" example="BadRequest" -->
 ```python
 from workiva import SDK, models
 
@@ -1166,7 +1245,7 @@ The response also includes a `Location` header, which indicates where to poll fo
 
 ### Example Usage
 
-<!-- UsageSnippet language="python" operationID="spreadsheetLinksPublication" method="post" path="/spreadsheets/{spreadsheetId}/links/publication" -->
+<!-- UsageSnippet language="python" operationID="spreadsheetLinksPublication" method="post" path="/spreadsheets/{spreadsheetId}/links/publication" example="BadRequest" -->
 ```python
 from workiva import SDK, models
 
@@ -1214,7 +1293,7 @@ Assign and/or revoke permissions on a spreadsheet. If any modification in a requ
 
 ### Example Usage
 
-<!-- UsageSnippet language="python" operationID="spreadsheetPermissionsModification" method="post" path="/spreadsheets/{spreadsheetId}/permissions/modification" -->
+<!-- UsageSnippet language="python" operationID="spreadsheetPermissionsModification" method="post" path="/spreadsheets/{spreadsheetId}/permissions/modification" example="BadRequest" -->
 ```python
 from workiva import SDK, models
 
@@ -1267,7 +1346,7 @@ Asynchronously submits a [SheetUpdate](ref:spreadsheets#sheetupdate) to a [sheet
 
 ### Example Usage
 
-<!-- UsageSnippet language="python" operationID="updateSheet" method="post" path="/spreadsheets/{spreadsheetId}/sheets/{sheetId}/update" -->
+<!-- UsageSnippet language="python" operationID="updateSheet" method="post" path="/spreadsheets/{spreadsheetId}/sheets/{sheetId}/update" example="BadRequest" -->
 ```python
 from workiva import SDK, models
 
@@ -1581,9 +1660,41 @@ Overwrites all values in a range with new values. The provided range must not ex
 To indicate that a cell's value shouldn't be replaced, use the special cell value `null`.
 When you add a value to a cell, it uses Ones scale regardless of the cell's scale formatting.
 
-### Example Usage
+### Example Usage: BadRequest
 
-<!-- UsageSnippet language="python" operationID="updateValuesByRange" method="put" path="/spreadsheets/{spreadsheetId}/sheets/{sheetId}/values/{range}" -->
+<!-- UsageSnippet language="python" operationID="updateValuesByRange" method="put" path="/spreadsheets/{spreadsheetId}/sheets/{sheetId}/values/{range}" example="BadRequest" -->
+```python
+from workiva import SDK, models
+
+
+with SDK(
+    security=models.Security(
+        client_id="<YOUR_CLIENT_ID_HERE>",
+        client_secret="<YOUR_CLIENT_SECRET_HERE>",
+    ),
+) as sdk:
+
+    res = sdk.spreadsheets.update_values_by_range(range="<value>", sheet_id="<id>", spreadsheet_id="<id>", range_values={
+        "range": "A1:B2",
+        "values": [
+            [
+                1,
+                4,
+            ],
+            [
+                2,
+                "",
+            ],
+        ],
+    })
+
+    # Handle response
+    print(res)
+
+```
+### Example Usage: body
+
+<!-- UsageSnippet language="python" operationID="updateValuesByRange" method="put" path="/spreadsheets/{spreadsheetId}/sheets/{sheetId}/values/{range}" example="body" -->
 ```python
 from workiva import SDK, models
 
@@ -1641,7 +1752,7 @@ Asynchronously upserts an array of [datasets](ref:spreadsheets#dataset) to a [sp
 
 ### Example Usage
 
-<!-- UsageSnippet language="python" operationID="upsertDatasets" method="post" path="/spreadsheets/{spreadsheetId}/datasets/bulkUpsert" -->
+<!-- UsageSnippet language="python" operationID="upsertDatasets" method="post" path="/spreadsheets/{spreadsheetId}/datasets/bulkUpsert" example="BadRequest" -->
 ```python
 from workiva import SDK, models
 

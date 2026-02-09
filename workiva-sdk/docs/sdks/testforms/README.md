@@ -42,9 +42,50 @@ These endpoints are used to manage test forms, test phases, and matrices. They a
 Create a new empty [matrix](ref:testforms#matrix). The `id` field for the matrix and its columns should be left blank; this will be populated by the endpoint.
 
 
-### Example Usage
+### Example Usage: BadRequest
 
-<!-- UsageSnippet language="python" operationID="createMatrix" method="post" path="/testForms/{testFormId}/testPhases/{testPhaseId}/matrices" -->
+<!-- UsageSnippet language="python" operationID="createMatrix" method="post" path="/testForms/{testFormId}/testPhases/{testPhaseId}/matrices" example="BadRequest" -->
+```python
+from workiva import SDK, models
+
+
+with SDK(
+    security=models.Security(
+        client_id="<YOUR_CLIENT_ID_HERE>",
+        client_secret="<YOUR_CLIENT_SECRET_HERE>",
+    ),
+) as sdk:
+
+    res = sdk.test_forms.create_matrix(test_form_id="<id>", test_phase_id="<id>", matrix={
+        "data_columns": [
+            {
+                "external_id": "TA05",
+                "id": "d795d7a3-e7f7-4b3f-be6a-109653b2929b",
+                "name": "PO Number",
+            },
+            {
+                "external_id": "TA06",
+                "id": "fbd818ec-4fd1-42ad-9112-3c80e71dc2dc",
+                "name": "Amount",
+            },
+        ],
+        "name": "Purchase Orders",
+        "result_columns": [
+            {
+                "external_id": "TA07",
+                "id": "d795d7a3-e7f7-4b3f-be6a-109653b2c34d",
+                "name": "A",
+            },
+        ],
+    })
+
+    # Handle response
+    print(res)
+
+```
+### Example Usage: body
+
+<!-- UsageSnippet language="python" operationID="createMatrix" method="post" path="/testForms/{testFormId}/testPhases/{testPhaseId}/matrices" example="body" -->
 ```python
 from workiva import SDK, models
 
@@ -107,9 +148,51 @@ with SDK(
 Create a new [sample](ref:testforms#matrixsample) in a [matrix](ref:testforms#matrix). The new sample will be appended to the end of the matrix.
 
 
-### Example Usage
+### Example Usage: BadRequest
 
-<!-- UsageSnippet language="python" operationID="createSample" method="post" path="/testForms/{testFormId}/testPhases/{testPhaseId}/matrices/{matrixId}/samples" -->
+<!-- UsageSnippet language="python" operationID="createSample" method="post" path="/testForms/{testFormId}/testPhases/{testPhaseId}/matrices/{matrixId}/samples" example="BadRequest" -->
+```python
+from workiva import SDK, models
+
+
+with SDK(
+    security=models.Security(
+        client_id="<YOUR_CLIENT_ID_HERE>",
+        client_secret="<YOUR_CLIENT_SECRET_HERE>",
+    ),
+) as sdk:
+
+    res = sdk.test_forms.create_sample(matrix_id="<id>", test_form_id="<id>", test_phase_id="<id>", matrix_sample={
+        "data_values": [
+            {
+                "column": "6d870cd1-7bbe-4b14-b85d-f152913b068c",
+                "value": "23897",
+            },
+            {
+                "column": "6301bea4-30be-4c24-9f15-287396f41d2c",
+                "value": "385.3",
+            },
+        ],
+        "id": "3dd42da0-3543-4e03-ac4a-2ddefebe27d6",
+        "result_values": [
+            {
+                "column": "674a9283-fd03-425d-bd62-0552263699e2",
+                "value": "PASS",
+            },
+            {
+                "column": "c7b812b4-70bb-47ed-a9bb-f56ca496c92f",
+                "value": "FAIL",
+            },
+        ],
+    })
+
+    # Handle response
+    print(res)
+
+```
+### Example Usage: body
+
+<!-- UsageSnippet language="python" operationID="createSample" method="post" path="/testForms/{testFormId}/testPhases/{testPhaseId}/matrices/{matrixId}/samples" example="body" -->
 ```python
 from workiva import SDK, models
 
@@ -891,7 +974,7 @@ Responses include a `Location` header, which indicates where to poll for export 
 
 ### Example Usage
 
-<!-- UsageSnippet language="python" operationID="matrixAttachmentExportById" method="post" path="/testForms/{testFormId}/testPhases/{testPhaseId}/matrices/{matrixId}/attachments/{attachmentId}/export" -->
+<!-- UsageSnippet language="python" operationID="matrixAttachmentExportById" method="post" path="/testForms/{testFormId}/testPhases/{testPhaseId}/matrices/{matrixId}/attachments/{attachmentId}/export" example="BadRequest" -->
 ```python
 from workiva import SDK, models
 
@@ -946,7 +1029,7 @@ The response also includes a `Location` header, which indicates where to poll fo
 
 ### Example Usage
 
-<!-- UsageSnippet language="python" operationID="matrixAttachmentUpload" method="post" path="/testForms/{testFormId}/testPhases/{testPhaseId}/matrices/{matrixId}/attachmentUpload" -->
+<!-- UsageSnippet language="python" operationID="matrixAttachmentUpload" method="post" path="/testForms/{testFormId}/testPhases/{testPhaseId}/matrices/{matrixId}/attachmentUpload" example="BadRequest" -->
 ```python
 from workiva import SDK, models
 
@@ -999,9 +1082,41 @@ Partially updates the properties of a [sample](ref:testforms#matrixsample). Note
 |`/resultValues/<index>/value`|`replace`|
 
 
-### Example Usage
+### Example Usage: BadRequest
 
-<!-- UsageSnippet language="python" operationID="partiallyUpdateSampleById" method="patch" path="/testForms/{testFormId}/testPhases/{testPhaseId}/matrices/{matrixId}/samples/{sampleId}" -->
+<!-- UsageSnippet language="python" operationID="partiallyUpdateSampleById" method="patch" path="/testForms/{testFormId}/testPhases/{testPhaseId}/matrices/{matrixId}/samples/{sampleId}" example="BadRequest" -->
+```python
+from workiva import SDK, models
+
+
+with SDK(
+    security=models.Security(
+        client_id="<YOUR_CLIENT_ID_HERE>",
+        client_secret="<YOUR_CLIENT_SECRET_HERE>",
+    ),
+) as sdk:
+
+    res = sdk.test_forms.partially_update_sample_by_id(request={
+        "request_body": [
+            {
+                "op": models.Op.REPLACE,
+                "path": "/name",
+                "value": "New name",
+            },
+        ],
+        "matrix_id": "<id>",
+        "sample_id": "<id>",
+        "test_form_id": "<id>",
+        "test_phase_id": "<id>",
+    })
+
+    # Handle response
+    print(res)
+
+```
+### Example Usage: body
+
+<!-- UsageSnippet language="python" operationID="partiallyUpdateSampleById" method="patch" path="/testForms/{testFormId}/testPhases/{testPhaseId}/matrices/{matrixId}/samples/{sampleId}" example="body" -->
 ```python
 from workiva import SDK, models
 
@@ -1113,7 +1228,7 @@ Responses include a `Location` header, which indicates where to poll for export 
 
 ### Example Usage
 
-<!-- UsageSnippet language="python" operationID="sampleAttachmentExportById" method="post" path="/testForms/{testFormId}/testPhases/{testPhaseId}/matrices/{matrixId}/samples/{sampleId}/attachments/{attachmentId}/export" -->
+<!-- UsageSnippet language="python" operationID="sampleAttachmentExportById" method="post" path="/testForms/{testFormId}/testPhases/{testPhaseId}/matrices/{matrixId}/samples/{sampleId}/attachments/{attachmentId}/export" example="BadRequest" -->
 ```python
 from workiva import SDK, models
 
@@ -1169,7 +1284,7 @@ The response also includes a `Location` header, which indicates where to poll fo
 
 ### Example Usage
 
-<!-- UsageSnippet language="python" operationID="sampleAttachmentUpload" method="post" path="/testForms/{testFormId}/testPhases/{testPhaseId}/matrices/{matrixId}/samples/{sampleId}/attachmentUpload" -->
+<!-- UsageSnippet language="python" operationID="sampleAttachmentUpload" method="post" path="/testForms/{testFormId}/testPhases/{testPhaseId}/matrices/{matrixId}/samples/{sampleId}/attachmentUpload" example="BadRequest" -->
 ```python
 from workiva import SDK, models
 
@@ -1219,9 +1334,53 @@ with SDK(
 
 Inserts multiple [samples](ref:testforms#matrixsamples) into a [matrix](ref:testforms#matrix), and appends new samples to the end of the matrix. You can leave columns empty for later use. For new samples, provide no IDs; the endpoint generates them.
 
-### Example Usage
+### Example Usage: BadRequest
 
-<!-- UsageSnippet language="python" operationID="sampleInsertion" method="post" path="/testForms/{testFormId}/testPhases/{testPhaseId}/matrices/{matrixId}/samples/insertion" -->
+<!-- UsageSnippet language="python" operationID="sampleInsertion" method="post" path="/testForms/{testFormId}/testPhases/{testPhaseId}/matrices/{matrixId}/samples/insertion" example="BadRequest" -->
+```python
+from workiva import SDK, models
+
+
+with SDK(
+    security=models.Security(
+        client_id="<YOUR_CLIENT_ID_HERE>",
+        client_secret="<YOUR_CLIENT_SECRET_HERE>",
+    ),
+) as sdk:
+
+    res = sdk.test_forms.sample_insertion(matrix_id="<id>", test_form_id="<id>", test_phase_id="<id>", request_body=[
+        {
+            "data_values": [
+                {
+                    "column": "6d870cd1-7bbe-4b14-b85d-f152913b068c",
+                    "value": "23897",
+                },
+                {
+                    "column": "6301bea4-30be-4c24-9f15-287396f41d2c",
+                    "value": "385.3",
+                },
+            ],
+            "id": "3dd42da0-3543-4e03-ac4a-2ddefebe27d6",
+            "result_values": [
+                {
+                    "column": "674a9283-fd03-425d-bd62-0552263699e2",
+                    "value": "PASS",
+                },
+                {
+                    "column": "c7b812b4-70bb-47ed-a9bb-f56ca496c92f",
+                    "value": "FAIL",
+                },
+            ],
+        },
+    ])
+
+    # Handle response
+    print(res)
+
+```
+### Example Usage: body
+
+<!-- UsageSnippet language="python" operationID="sampleInsertion" method="post" path="/testForms/{testFormId}/testPhases/{testPhaseId}/matrices/{matrixId}/samples/insertion" example="body" -->
 ```python
 from workiva import SDK, models
 
@@ -1303,9 +1462,53 @@ with SDK(
 
 Updates multiple [samples](ref:testforms#matrixsamples), with the requestBody of each specifying columns to update by their IDs. Columns not included in the request remain as-is.
 
-### Example Usage
+### Example Usage: BadRequest
 
-<!-- UsageSnippet language="python" operationID="sampleUpdate" method="post" path="/testForms/{testFormId}/testPhases/{testPhaseId}/matrices/{matrixId}/samples/update" -->
+<!-- UsageSnippet language="python" operationID="sampleUpdate" method="post" path="/testForms/{testFormId}/testPhases/{testPhaseId}/matrices/{matrixId}/samples/update" example="BadRequest" -->
+```python
+from workiva import SDK, models
+
+
+with SDK(
+    security=models.Security(
+        client_id="<YOUR_CLIENT_ID_HERE>",
+        client_secret="<YOUR_CLIENT_SECRET_HERE>",
+    ),
+) as sdk:
+
+    res = sdk.test_forms.sample_update(matrix_id="<id>", test_form_id="<id>", test_phase_id="<id>", request_body=[
+        {
+            "data_values": [
+                {
+                    "column": "6d870cd1-7bbe-4b14-b85d-f152913b068c",
+                    "value": "23897",
+                },
+                {
+                    "column": "6301bea4-30be-4c24-9f15-287396f41d2c",
+                    "value": "385.3",
+                },
+            ],
+            "id": "3dd42da0-3543-4e03-ac4a-2ddefebe27d6",
+            "result_values": [
+                {
+                    "column": "674a9283-fd03-425d-bd62-0552263699e2",
+                    "value": "PASS",
+                },
+                {
+                    "column": "c7b812b4-70bb-47ed-a9bb-f56ca496c92f",
+                    "value": "FAIL",
+                },
+            ],
+        },
+    ])
+
+    # Handle response
+    print(res)
+
+```
+### Example Usage: body
+
+<!-- UsageSnippet language="python" operationID="sampleUpdate" method="post" path="/testForms/{testFormId}/testPhases/{testPhaseId}/matrices/{matrixId}/samples/update" example="body" -->
 ```python
 from workiva import SDK, models
 
@@ -1386,7 +1589,7 @@ Responses include a `Location` header, which indicates where to poll for export 
 
 ### Example Usage
 
-<!-- UsageSnippet language="python" operationID="testFormExport" method="post" path="/testForms/{testFormId}/export" -->
+<!-- UsageSnippet language="python" operationID="testFormExport" method="post" path="/testForms/{testFormId}/export" example="BadRequest" -->
 ```python
 from workiva import SDK, models
 
@@ -1485,7 +1688,7 @@ Responses include a `Location` header, which indicates where to poll for export 
 
 ### Example Usage
 
-<!-- UsageSnippet language="python" operationID="testPhaseAttachmentExportById" method="post" path="/testForms/{testFormId}/testPhases/{testPhaseId}/attachments/{attachmentId}/export" -->
+<!-- UsageSnippet language="python" operationID="testPhaseAttachmentExportById" method="post" path="/testForms/{testFormId}/testPhases/{testPhaseId}/attachments/{attachmentId}/export" example="BadRequest" -->
 ```python
 from workiva import SDK, models
 
@@ -1536,7 +1739,7 @@ The response also includes a `Location` header, which indicates where to poll fo
 
 ### Example Usage
 
-<!-- UsageSnippet language="python" operationID="testPhaseAttachmentUpload" method="post" path="/testForms/{testFormId}/testPhases/{testPhaseId}/attachmentUpload" -->
+<!-- UsageSnippet language="python" operationID="testPhaseAttachmentUpload" method="post" path="/testForms/{testFormId}/testPhases/{testPhaseId}/attachmentUpload" example="BadRequest" -->
 ```python
 from workiva import SDK, models
 

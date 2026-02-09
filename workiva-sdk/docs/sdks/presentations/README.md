@@ -390,9 +390,35 @@ job polling, see [Operations endpoint](ref:getoperationbyid).
 ```
 
 
-### Example Usage
+### Example Usage: BadRequest
 
-<!-- UsageSnippet language="python" operationID="partiallyUpdatePresentationById" method="patch" path="/presentations/{presentationId}" -->
+<!-- UsageSnippet language="python" operationID="partiallyUpdatePresentationById" method="patch" path="/presentations/{presentationId}" example="BadRequest" -->
+```python
+from workiva import SDK, models
+
+
+with SDK(
+    security=models.Security(
+        client_id="<YOUR_CLIENT_ID_HERE>",
+        client_secret="<YOUR_CLIENT_SECRET_HERE>",
+    ),
+) as sdk:
+
+    res = sdk.presentations.partially_update_presentation_by_id(presentation_id="<id>", request_body=[
+        {
+            "op": models.Op.REPLACE,
+            "path": "/name",
+            "value": "New name",
+        },
+    ])
+
+    # Handle response
+    print(res)
+
+```
+### Example Usage: body
+
+<!-- UsageSnippet language="python" operationID="partiallyUpdatePresentationById" method="patch" path="/presentations/{presentationId}" example="body" -->
 ```python
 from workiva import SDK, models
 
@@ -538,9 +564,35 @@ job polling, see [Operations endpoint](ref:getoperationbyid).
 ```
 
 
-### Example Usage
+### Example Usage: BadRequest
 
-<!-- UsageSnippet language="python" operationID="partiallyUpdateSlideById" method="patch" path="/presentations/{presentationId}/slides/{slideId}" -->
+<!-- UsageSnippet language="python" operationID="partiallyUpdateSlideById" method="patch" path="/presentations/{presentationId}/slides/{slideId}" example="BadRequest" -->
+```python
+from workiva import SDK, models
+
+
+with SDK(
+    security=models.Security(
+        client_id="<YOUR_CLIENT_ID_HERE>",
+        client_secret="<YOUR_CLIENT_SECRET_HERE>",
+    ),
+) as sdk:
+
+    res = sdk.presentations.partially_update_slide_by_id(presentation_id="<id>", slide_id="<id>", request_body=[
+        {
+            "op": models.Op.REPLACE,
+            "path": "/name",
+            "value": "New name",
+        },
+    ])
+
+    # Handle response
+    print(res)
+
+```
+### Example Usage: body
+
+<!-- UsageSnippet language="python" operationID="partiallyUpdateSlideById" method="patch" path="/presentations/{presentationId}/slides/{slideId}" example="body" -->
 ```python
 from workiva import SDK, models
 
@@ -603,9 +655,35 @@ job polling, see [Operations endpoint](ref:getoperationbyid).
 | `/lock`         | `replace`                  |
 
 
-### Example Usage
+### Example Usage: BadRequest
 
-<!-- UsageSnippet language="python" operationID="partiallyUpdateSlideLayoutById" method="patch" path="/presentations/{presentationId}/slideLayouts/{slideLayoutId}" -->
+<!-- UsageSnippet language="python" operationID="partiallyUpdateSlideLayoutById" method="patch" path="/presentations/{presentationId}/slideLayouts/{slideLayoutId}" example="BadRequest" -->
+```python
+from workiva import SDK, models
+
+
+with SDK(
+    security=models.Security(
+        client_id="<YOUR_CLIENT_ID_HERE>",
+        client_secret="<YOUR_CLIENT_SECRET_HERE>",
+    ),
+) as sdk:
+
+    res = sdk.presentations.partially_update_slide_layout_by_id(presentation_id="<id>", slide_layout_id="<id>", request_body=[
+        {
+            "op": models.Op.REPLACE,
+            "path": "/name",
+            "value": "New name",
+        },
+    ])
+
+    # Handle response
+    print(res)
+
+```
+### Example Usage: body
+
+<!-- UsageSnippet language="python" operationID="partiallyUpdateSlideLayoutById" method="patch" path="/presentations/{presentationId}/slideLayouts/{slideLayoutId}" example="body" -->
 ```python
 from workiva import SDK, models
 
@@ -660,7 +738,7 @@ Responses include a `Location` header, which indicates where to poll for export 
 
 ### Example Usage
 
-<!-- UsageSnippet language="python" operationID="presentationExport" method="post" path="/presentations/{presentationId}/export" -->
+<!-- UsageSnippet language="python" operationID="presentationExport" method="post" path="/presentations/{presentationId}/export" example="BadRequest" -->
 ```python
 from workiva import SDK, models
 
@@ -720,7 +798,7 @@ For more details on long-running job polling, see [Operations endpoint](ref:geto
 
 ### Example Usage
 
-<!-- UsageSnippet language="python" operationID="presentationFiltersReapplication" method="post" path="/presentations/{presentationId}/filters/reapplication" -->
+<!-- UsageSnippet language="python" operationID="presentationFiltersReapplication" method="post" path="/presentations/{presentationId}/filters/reapplication" example="BadRequest" -->
 ```python
 from workiva import SDK, models
 
@@ -769,7 +847,7 @@ The response also includes a `Location` header, which indicates where to poll fo
 
 ### Example Usage
 
-<!-- UsageSnippet language="python" operationID="presentationLinksPublication" method="post" path="/presentations/{presentationId}/links/publication" -->
+<!-- UsageSnippet language="python" operationID="presentationLinksPublication" method="post" path="/presentations/{presentationId}/links/publication" example="BadRequest" -->
 ```python
 from workiva import SDK, models
 

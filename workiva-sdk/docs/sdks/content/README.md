@@ -1185,7 +1185,7 @@ a `Location` header, which indicates where to poll for results. For more details
 
 ### Example Usage
 
-<!-- UsageSnippet language="python" operationID="imageUpload" method="post" path="/content/images/upload" -->
+<!-- UsageSnippet language="python" operationID="imageUpload" method="post" path="/content/images/upload" example="BadRequest" -->
 ```python
 from workiva import SDK, models
 
@@ -1240,9 +1240,35 @@ For more details on long-running job polling, see [Operations endpoint](ref:geto
 | `/lock`            | `replace`                  |
 
 
-### Example Usage
+### Example Usage: BadRequest
 
-<!-- UsageSnippet language="python" operationID="partiallyUpdateTableProperties" method="patch" path="/content/tables/{tableId}/properties" -->
+<!-- UsageSnippet language="python" operationID="partiallyUpdateTableProperties" method="patch" path="/content/tables/{tableId}/properties" example="BadRequest" -->
+```python
+from workiva import SDK, models
+
+
+with SDK(
+    security=models.Security(
+        client_id="<YOUR_CLIENT_ID_HERE>",
+        client_secret="<YOUR_CLIENT_SECRET_HERE>",
+    ),
+) as sdk:
+
+    res = sdk.content.partially_update_table_properties(table_id="WW91IGZvdW5kfIG1lIQ", request_body=[
+        {
+            "op": models.Op.REPLACE,
+            "path": "/name",
+            "value": "New name",
+        },
+    ])
+
+    # Handle response
+    print(res)
+
+```
+### Example Usage: body
+
+<!-- UsageSnippet language="python" operationID="partiallyUpdateTableProperties" method="patch" path="/content/tables/{tableId}/properties" example="body" -->
 ```python
 from workiva import SDK, models
 
@@ -1303,7 +1329,7 @@ initial request. For more details, see
 
 ### Example Usage
 
-<!-- UsageSnippet language="python" operationID="richTextAnchorCreation" method="post" path="/content/richText/{richTextId}/anchors/creation" -->
+<!-- UsageSnippet language="python" operationID="richTextAnchorCreation" method="post" path="/content/richText/{richTextId}/anchors/creation" example="BadRequest" -->
 ```python
 from workiva import SDK, models
 
@@ -1364,7 +1390,7 @@ If the batch edit creates any new resources such as embedded tables, the `resour
 
 ### Example Usage
 
-<!-- UsageSnippet language="python" operationID="richTextBatchEdit" method="post" path="/content/richText/{richTextId}/edit" -->
+<!-- UsageSnippet language="python" operationID="richTextBatchEdit" method="post" path="/content/richText/{richTextId}/edit" example="BadRequest" -->
 ```python
 from workiva import SDK, models
 
@@ -1435,7 +1461,7 @@ The `resourceUrl` field will be populated with a link to the [Rich Text Duplicat
 
 ### Example Usage
 
-<!-- UsageSnippet language="python" operationID="richTextDuplicationEdit" method="post" path="/content/richText/{richTextId}/duplication/edit" -->
+<!-- UsageSnippet language="python" operationID="richTextDuplicationEdit" method="post" path="/content/richText/{richTextId}/duplication/edit" example="BadRequest" -->
 ```python
 from workiva import SDK, models
 
@@ -1493,7 +1519,7 @@ If the batch edit creates any new resources, such as destination links, the `res
 
 ### Example Usage
 
-<!-- UsageSnippet language="python" operationID="richTextLinksBatchEdit" method="post" path="/content/richText/{richTextId}/links/edit" -->
+<!-- UsageSnippet language="python" operationID="richTextLinksBatchEdit" method="post" path="/content/richText/{richTextId}/links/edit" example="BadRequest" -->
 ```python
 from workiva import SDK, models
 
@@ -1564,7 +1590,7 @@ initial request. For more details, see
 
 ### Example Usage
 
-<!-- UsageSnippet language="python" operationID="styleGuideExport" method="post" path="/content/styleGuides/{styleGuideId}/export" -->
+<!-- UsageSnippet language="python" operationID="styleGuideExport" method="post" path="/content/styleGuides/{styleGuideId}/export" example="BadRequest" -->
 ```python
 from workiva import SDK, models
 
@@ -1674,7 +1700,7 @@ initial request. For more details, see
 
 ### Example Usage
 
-<!-- UsageSnippet language="python" operationID="tableAnchorCreation" method="post" path="/content/tables/{tableId}/anchors/creation" -->
+<!-- UsageSnippet language="python" operationID="tableAnchorCreation" method="post" path="/content/tables/{tableId}/anchors/creation" example="BadRequest" -->
 ```python
 from workiva import SDK, models
 
@@ -1732,7 +1758,7 @@ Responses include a `Location` header, which indicates where to poll for results
 
 ### Example Usage
 
-<!-- UsageSnippet language="python" operationID="tableCellsBatchEdit" method="post" path="/content/tables/{tableId}/cells/edit" -->
+<!-- UsageSnippet language="python" operationID="tableCellsBatchEdit" method="post" path="/content/tables/{tableId}/cells/edit" example="BadRequest" -->
 ```python
 from workiva import SDK, models
 
@@ -1806,7 +1832,7 @@ body includes a `resourceURL`.
 
 ### Example Usage
 
-<!-- UsageSnippet language="python" operationID="tableEdit" method="post" path="/content/tables/{tableId}/edit" -->
+<!-- UsageSnippet language="python" operationID="tableEdit" method="post" path="/content/tables/{tableId}/edit" example="BadRequest" -->
 ```python
 from workiva import SDK, models
 
@@ -1864,7 +1890,7 @@ long-running job polling, see [Operations endpoint](ref:getoperationbyid).
 
 ### Example Usage
 
-<!-- UsageSnippet language="python" operationID="tableFiltersReapplication" method="post" path="/content/tables/{tableId}/filters/reapplication" -->
+<!-- UsageSnippet language="python" operationID="tableFiltersReapplication" method="post" path="/content/tables/{tableId}/filters/reapplication" example="BadRequest" -->
 ```python
 from workiva import SDK, models
 
@@ -1916,7 +1942,7 @@ If the edit creates any new resources, such as destination links, the `resourceU
 
 ### Example Usage
 
-<!-- UsageSnippet language="python" operationID="tableLinksBatchEdit" method="post" path="/content/tables/{tableId}/links/edit" -->
+<!-- UsageSnippet language="python" operationID="tableLinksBatchEdit" method="post" path="/content/tables/{tableId}/links/edit" example="BadRequest" -->
 ```python
 from workiva import SDK, models
 
@@ -1977,7 +2003,7 @@ This is a long running operation. Responses include a `Location` header, which i
 
 ### Example Usage
 
-<!-- UsageSnippet language="python" operationID="tableRangeLinksEdit" method="post" path="/content/tables/{tableId}/rangeLinks/edit" -->
+<!-- UsageSnippet language="python" operationID="tableRangeLinksEdit" method="post" path="/content/tables/{tableId}/rangeLinks/edit" example="BadRequest" -->
 ```python
 from workiva import SDK, models
 

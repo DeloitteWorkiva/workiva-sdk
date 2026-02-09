@@ -27,7 +27,7 @@ Once the operation is completed, the `resourceUrl` field will be populated with 
 
 ### Example Usage
 
-<!-- UsageSnippet language="python" operationID="copyFile" method="post" path="/files/{fileId}/copy" -->
+<!-- UsageSnippet language="python" operationID="copyFile" method="post" path="/files/{fileId}/copy" example="BadRequest" -->
 ```python
 from workiva import SDK, models
 
@@ -115,7 +115,7 @@ asynchronously and may not immediately be available on a subsequent `GET`.
 
 ### Example Usage
 
-<!-- UsageSnippet language="python" operationID="createFile" method="post" path="/files" -->
+<!-- UsageSnippet language="python" operationID="createFile" method="post" path="/files" example="BadRequest" -->
 ```python
 from workiva import SDK, models
 
@@ -165,7 +165,7 @@ For more on Document, Spreadsheet, and Presentation export options, see the foll
 
 ### Example Usage
 
-<!-- UsageSnippet language="python" operationID="exportFileById" method="post" path="/files/{fileId}/export" -->
+<!-- UsageSnippet language="python" operationID="exportFileById" method="post" path="/files/{fileId}/export" example="BadRequest" -->
 ```python
 from workiva import SDK, models
 
@@ -213,7 +213,7 @@ Assign and/or revoke permissions on a file. If any modification in a request fai
 
 ### Example Usage
 
-<!-- UsageSnippet language="python" operationID="filePermissionsModification" method="post" path="/files/{fileId}/permissions/modification" -->
+<!-- UsageSnippet language="python" operationID="filePermissionsModification" method="post" path="/files/{fileId}/permissions/modification" example="BadRequest" -->
 ```python
 from workiva import SDK, models
 
@@ -459,7 +459,7 @@ Response includes an `uploadUrl` which indicates where to upload the file for im
 
 ### Example Usage
 
-<!-- UsageSnippet language="python" operationID="importFile" method="post" path="/files/import" -->
+<!-- UsageSnippet language="python" operationID="importFile" method="post" path="/files/import" example="BadRequest" -->
 ```python
 from workiva import SDK, models
 
@@ -514,9 +514,35 @@ Updates are applied asynchronously and may not immediately be reflected on a sub
 |`/name`|`replace`|
 
 
-### Example Usage
+### Example Usage: BadRequest
 
-<!-- UsageSnippet language="python" operationID="partiallyUpdateFileById" method="patch" path="/files/{fileId}" -->
+<!-- UsageSnippet language="python" operationID="partiallyUpdateFileById" method="patch" path="/files/{fileId}" example="BadRequest" -->
+```python
+from workiva import SDK, models
+
+
+with SDK(
+    security=models.Security(
+        client_id="<YOUR_CLIENT_ID_HERE>",
+        client_secret="<YOUR_CLIENT_SECRET_HERE>",
+    ),
+) as sdk:
+
+    res = sdk.files.partially_update_file_by_id(file_id="<id>", request_body=[
+        {
+            "op": models.Op.REPLACE,
+            "path": "/name",
+            "value": "New name",
+        },
+    ])
+
+    # Handle response
+    print(res)
+
+```
+### Example Usage: body
+
+<!-- UsageSnippet language="python" operationID="partiallyUpdateFileById" method="patch" path="/files/{fileId}" example="body" -->
 ```python
 from workiva import SDK, models
 
@@ -567,7 +593,7 @@ Restores a file given its ID. If the file being restored is a Folder, its conten
 
 ### Example Usage
 
-<!-- UsageSnippet language="python" operationID="restoreFileById" method="post" path="/files/{fileId}/restore" -->
+<!-- UsageSnippet language="python" operationID="restoreFileById" method="post" path="/files/{fileId}/restore" example="BadRequest" -->
 ```python
 from workiva import SDK, models
 
@@ -612,7 +638,7 @@ Trashes a file given its ID. If the file being trashed is a Folder, its contents
 
 ### Example Usage
 
-<!-- UsageSnippet language="python" operationID="trashFileById" method="post" path="/files/{fileId}/trash" -->
+<!-- UsageSnippet language="python" operationID="trashFileById" method="post" path="/files/{fileId}/trash" example="BadRequest" -->
 ```python
 from workiva import SDK, models
 

@@ -20,7 +20,7 @@ If there are invalid edits, the error details will include a list of errors enco
 
 ### Example Usage
 
-<!-- UsageSnippet language="python" operationID="createEdits" method="post" path="/graph/edits" -->
+<!-- UsageSnippet language="python" operationID="createEdits" method="post" path="/graph/edits" example="BadRequest" -->
 ```python
 from workiva import SDK, models
 
@@ -290,7 +290,7 @@ Responses include a `Location` header, which indicates where to poll for export 
 
 ### Example Usage
 
-<!-- UsageSnippet language="python" operationID="graphReportExport" method="post" path="/graph/reports/{reportId}/export" -->
+<!-- UsageSnippet language="python" operationID="graphReportExport" method="post" path="/graph/reports/{reportId}/export" example="BadRequest" -->
 ```python
 from workiva import SDK, models
 

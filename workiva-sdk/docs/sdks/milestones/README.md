@@ -101,7 +101,7 @@ Create a new [`Milestone`](ref:milestones#milestone) using a [`MilestoneCreation
 
 ### Example Usage
 
-<!-- UsageSnippet language="python" operationID="milestoneCreation" method="post" path="/milestones/creation" -->
+<!-- UsageSnippet language="python" operationID="milestoneCreation" method="post" path="/milestones/creation" example="BadRequest" -->
 ```python
 from workiva import SDK, models
 
@@ -158,7 +158,7 @@ Partially updates a [`Milestone`](ref:milestones#milestone) with a given id.
 
 ### Example Usage
 
-<!-- UsageSnippet language="python" operationID="partiallyUpdateMilestoneById" method="patch" path="/milestones/{milestoneId}" -->
+<!-- UsageSnippet language="python" operationID="partiallyUpdateMilestoneById" method="patch" path="/milestones/{milestoneId}" example="BadRequest" -->
 ```python
 from workiva import SDK, models
 

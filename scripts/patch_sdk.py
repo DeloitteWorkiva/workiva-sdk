@@ -8,7 +8,9 @@ to files that Speakeasy regenerates on every run:
   2. README.md  — removes Speakeasy scaffolding, adds real install instructions
   3. clientcredentials.py — injects X-Version header into token requests
   4. security.py — updates token_url to /oauth2/token (2026-01-01 API)
-  5. pyproject.toml — adds license, classifiers, and project URLs
+  5. sdkconfiguration.py — sets default retry config (backoff 500ms-30s, 2min max)
+  6. pyproject.toml — adds license, classifiers, project URLs, [dependency-groups],
+     and fixes authors format (Speakeasy merges email into name field)
 
 Usage:
     python scripts/patch_sdk.py workiva-sdk
@@ -131,6 +133,18 @@ def patch_readme(sdk_dir: Path) -> None:
     print("  README.md — replaced with production version")
 
 
+DEPENDENCY_GROUPS_SENTINEL = "[dependency-groups]"
+
+DEPENDENCY_GROUPS = """\
+[dependency-groups]
+dev = [
+    "pytest>=8.0",
+    "pytest-asyncio>=0.24",
+    "pytest-cov>=6.0",
+    "respx>=0.22",
+]
+"""
+
 PYPROJECT_URLS_SENTINEL = "[project.urls]"
 
 PYPROJECT_URLS = """
@@ -152,6 +166,20 @@ def patch_pyproject(sdk_dir: Path) -> None:
 
     content = pyproject_path.read_text()
     original = content
+
+    # Fix authors format: Speakeasy merges email into name field
+    content = re.sub(
+        r'authors\s*=\s*\[\{\s*name\s*=\s*"([^<"]+)\s*<([^>]+)>"\s*},?\s*\]',
+        r'authors = [{ name = "\1", email = "\2" },]',
+        content,
+    )
+
+    # Restore [dependency-groups] for uv sync (Speakeasy drops it on regeneration)
+    if DEPENDENCY_GROUPS_SENTINEL not in content and "[build-system]" in content:
+        content = content.replace(
+            "\n[build-system]",
+            "\n" + DEPENDENCY_GROUPS.strip() + "\n\n[build-system]",
+        )
 
     # Add proprietary license if missing
     if 'license = ' not in content and 'requires-python' in content:
@@ -221,6 +249,45 @@ def patch_clientcredentials(sdk_dir: Path) -> None:
     print("  clientcredentials.py — injected X-Version header into token request")
 
 
+RETRY_SENTINEL = "BackoffStrategy"
+
+RETRY_OLD = 'retry_config: OptionalNullable[RetryConfig] = Field(default_factory=lambda: UNSET)'
+RETRY_NEW = (
+    'retry_config: OptionalNullable[RetryConfig] = Field(\n'
+    '        default_factory=lambda: RetryConfig(\n'
+    '            "backoff",\n'
+    '            BackoffStrategy(500, 30000, 1.5, 120000),\n'
+    '            True,\n'
+    '        )\n'
+    '    )'
+)
+
+RETRY_IMPORT_OLD = 'from .utils import Logger, RetryConfig, remove_suffix'
+RETRY_IMPORT_NEW = 'from .utils import BackoffStrategy, Logger, RetryConfig, remove_suffix'
+
+
+def patch_retry_defaults(sdk_dir: Path) -> None:
+    """Set default retry config with backoff in SDKConfiguration (idempotent)."""
+    config_path = sdk_dir / "src" / "workiva" / "sdkconfiguration.py"
+    if not config_path.exists():
+        print(f"  SKIP sdkconfiguration.py — not found at {config_path}")
+        return
+
+    content = config_path.read_text()
+    if RETRY_SENTINEL in content:
+        print("  sdkconfiguration.py — retry defaults already patched, skipping")
+        return
+
+    if RETRY_OLD not in content:
+        print("  WARN sdkconfiguration.py — retry_config pattern not found, skipping")
+        return
+
+    content = content.replace(RETRY_IMPORT_OLD, RETRY_IMPORT_NEW)
+    content = content.replace(RETRY_OLD, RETRY_NEW)
+    config_path.write_text(content)
+    print("  sdkconfiguration.py — set default retry config (backoff 500ms-30s, 2min max)")
+
+
 SECURITY_OLD_TOKEN_URL = '/iam/v1/oauth2/token'
 SECURITY_NEW_TOKEN_URL = '/oauth2/token'
 
@@ -261,6 +328,7 @@ def main() -> None:
     patch_readme(sdk_dir)
     patch_clientcredentials(sdk_dir)
     patch_security(sdk_dir)
+    patch_retry_defaults(sdk_dir)
     patch_pyproject(sdk_dir)
     print("Done.")
 

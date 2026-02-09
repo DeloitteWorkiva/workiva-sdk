@@ -27,7 +27,7 @@ generation:
 generate:
   version: ""
 python:
-  version: 0.5.1
+  version: 0.5.2
   additionalDependencies:
     dev:
       pytest: '>=8.0'
@@ -56,6 +56,7 @@ python:
   flattenGlobalSecurity: true
   flattenRequests: false
   flatteningOrder: parameters-first
+  forwardCompatibleEnumsByDefault: false
   imports:
     option: openapi
     paths:
@@ -78,6 +79,17 @@ python:
   pytestFilterWarnings: []
   pytestTimeout: 0
   responseFormat: flat
+  retries:
+    backoff:
+      exponent: 1.5
+      initialInterval: 500
+      maxElapsedTime: 120000
+      maxInterval: 30000
+    retryConnectionErrors: true
+    statusCodes:
+      - 429
+      - 5XX
+    strategy: backoff
   sseFlatResponse: false
   templateVersion: v2
   useAsyncHooks: false

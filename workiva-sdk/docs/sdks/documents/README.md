@@ -33,7 +33,7 @@ Copies only the section's content — not any labels, comments, tasks, or format
 
 ### Example Usage
 
-<!-- UsageSnippet language="python" operationID="copySection" method="post" path="/documents/{documentId}/sections/{sectionId}/copy" -->
+<!-- UsageSnippet language="python" operationID="copySection" method="post" path="/documents/{documentId}/sections/{sectionId}/copy" example="BadRequest" -->
 ```python
 from workiva import SDK, models
 
@@ -83,9 +83,34 @@ with SDK(
 Creates a new [section](ref:documents#section) in a [document](ref:documents#document), given its properties. By default, the new section appears at the top-most position.
 
 
-### Example Usage
+### Example Usage: BadRequest
 
-<!-- UsageSnippet language="python" operationID="createSection" method="post" path="/documents/{documentId}/sections" -->
+<!-- UsageSnippet language="python" operationID="createSection" method="post" path="/documents/{documentId}/sections" example="BadRequest" -->
+```python
+from workiva import SDK, models
+
+
+with SDK(
+    security=models.Security(
+        client_id="<YOUR_CLIENT_ID_HERE>",
+        client_secret="<YOUR_CLIENT_SECRET_HERE>",
+    ),
+) as sdk:
+
+    res = sdk.documents.create_section(document_id="<id>", section={
+        "id": "a8b3adb687644b27fafcb3a9875f0f0d_18",
+        "index": 1,
+        "name": "Risk factors",
+        "non_printing": True,
+    })
+
+    # Handle response
+    print(res)
+
+```
+### Example Usage: body
+
+<!-- UsageSnippet language="python" operationID="createSection" method="post" path="/documents/{documentId}/sections" example="body" -->
 ```python
 from workiva import SDK, models
 
@@ -179,7 +204,7 @@ Responses include a `Location` header, which indicates where to poll for export 
 
 ### Example Usage
 
-<!-- UsageSnippet language="python" operationID="documentExport" method="post" path="/documents/{documentId}/export" -->
+<!-- UsageSnippet language="python" operationID="documentExport" method="post" path="/documents/{documentId}/export" example="BadRequest" -->
 ```python
 from workiva import SDK, models
 
@@ -240,7 +265,7 @@ For more details on long-running job polling, see [Operations endpoint](ref:geto
 
 ### Example Usage
 
-<!-- UsageSnippet language="python" operationID="documentFiltersReapplication" method="post" path="/documents/{documentId}/filters/reapplication" -->
+<!-- UsageSnippet language="python" operationID="documentFiltersReapplication" method="post" path="/documents/{documentId}/filters/reapplication" example="BadRequest" -->
 ```python
 from workiva import SDK, models
 
@@ -290,7 +315,7 @@ The response also includes a `Location` header, which indicates where to poll fo
 
 ### Example Usage
 
-<!-- UsageSnippet language="python" operationID="documentLinksPublication" method="post" path="/documents/{documentId}/links/publication" -->
+<!-- UsageSnippet language="python" operationID="documentLinksPublication" method="post" path="/documents/{documentId}/links/publication" example="BadRequest" -->
 ```python
 from workiva import SDK, models
 
@@ -338,7 +363,7 @@ Assign and/or revoke permissions on a document. If any modification in a request
 
 ### Example Usage
 
-<!-- UsageSnippet language="python" operationID="documentPermissionsModification" method="post" path="/documents/{documentId}/permissions/modification" -->
+<!-- UsageSnippet language="python" operationID="documentPermissionsModification" method="post" path="/documents/{documentId}/permissions/modification" example="BadRequest" -->
 ```python
 from workiva import SDK, models
 
@@ -391,9 +416,52 @@ Updates the properties of a collection of [sections](ref:documents#section) in a
 Responses include a `Location` header, which indicates where to poll for results. For more details on long-running job polling, see [Operations endpoint](ref:getoperationbyid). When the update completes, its status will be `completed`.
 
 
-### Example Usage
+### Example Usage: BadRequest
 
-<!-- UsageSnippet language="python" operationID="editSections" method="post" path="/documents/{documentId}/sections/edit" -->
+<!-- UsageSnippet language="python" operationID="editSections" method="post" path="/documents/{documentId}/sections/edit" example="BadRequest" -->
+```python
+from workiva import SDK, models
+
+
+with SDK(
+    security=models.Security(
+        client_id="<YOUR_CLIENT_ID_HERE>",
+        client_secret="<YOUR_CLIENT_SECRET_HERE>",
+    ),
+) as sdk:
+
+    res = sdk.documents.edit_sections(document_id="<id>", sections_edits={
+        "data": [
+            {
+                "set_non_printing": {
+                    "non_printing": True,
+                    "selection": [
+                        "9fdff0887cb5425292dfb1fdd759753a_35",
+                        "9fdff0887cb5425292dfb1fdd759753a_50",
+                    ],
+                },
+                "type": models.SectionEditType.SET_NON_PRINTING,
+            },
+            {
+                "set_non_printing": {
+                    "non_printing": False,
+                    "selection": [
+                        "9fdff0887cb5425292dfb1fdd759753a_45",
+                        "9fdff0887cb5425292dfb1fdd759753a_40",
+                    ],
+                },
+                "type": models.SectionEditType.SET_NON_PRINTING,
+            },
+        ],
+    })
+
+    # Handle response
+    print(res)
+
+```
+### Example Usage: body
+
+<!-- UsageSnippet language="python" operationID="editSections" method="post" path="/documents/{documentId}/sections/edit" example="body" -->
 ```python
 from workiva import SDK, models
 
@@ -870,9 +938,35 @@ see [Operations endpoint](ref:getoperationbyid).
 ```
 
 
-### Example Usage
+### Example Usage: BadRequest
 
-<!-- UsageSnippet language="python" operationID="partiallyUpdateDocumentById" method="patch" path="/documents/{documentId}" -->
+<!-- UsageSnippet language="python" operationID="partiallyUpdateDocumentById" method="patch" path="/documents/{documentId}" example="BadRequest" -->
+```python
+from workiva import SDK, models
+
+
+with SDK(
+    security=models.Security(
+        client_id="<YOUR_CLIENT_ID_HERE>",
+        client_secret="<YOUR_CLIENT_SECRET_HERE>",
+    ),
+) as sdk:
+
+    res = sdk.documents.partially_update_document_by_id(document_id="<id>", request_body=[
+        {
+            "op": models.Op.REPLACE,
+            "path": "/name",
+            "value": "New name",
+        },
+    ])
+
+    # Handle response
+    print(res)
+
+```
+### Example Usage: body
+
+<!-- UsageSnippet language="python" operationID="partiallyUpdateDocumentById" method="patch" path="/documents/{documentId}" example="body" -->
 ```python
 from workiva import SDK, models
 
@@ -1049,9 +1143,35 @@ see [Operations endpoint](ref:getoperationbyid).
 ```
 
 
-### Example Usage
+### Example Usage: BadRequest
 
-<!-- UsageSnippet language="python" operationID="partiallyUpdateSectionById" method="patch" path="/documents/{documentId}/sections/{sectionId}" -->
+<!-- UsageSnippet language="python" operationID="partiallyUpdateSectionById" method="patch" path="/documents/{documentId}/sections/{sectionId}" example="BadRequest" -->
+```python
+from workiva import SDK, models
+
+
+with SDK(
+    security=models.Security(
+        client_id="<YOUR_CLIENT_ID_HERE>",
+        client_secret="<YOUR_CLIENT_SECRET_HERE>",
+    ),
+) as sdk:
+
+    res = sdk.documents.partially_update_section_by_id(document_id="<id>", section_id="<id>", request_body=[
+        {
+            "op": models.Op.REPLACE,
+            "path": "/name",
+            "value": "New name",
+        },
+    ])
+
+    # Handle response
+    print(res)
+
+```
+### Example Usage: body
+
+<!-- UsageSnippet language="python" operationID="partiallyUpdateSectionById" method="patch" path="/documents/{documentId}/sections/{sectionId}" example="body" -->
 ```python
 from workiva import SDK, models
 
@@ -1104,7 +1224,7 @@ Assign and/or revoke permissions on a section. If any modification in a request 
 
 ### Example Usage
 
-<!-- UsageSnippet language="python" operationID="sectionPermissionsModification" method="post" path="/documents/{documentId}/sections/{sectionId}/permissions/modification" -->
+<!-- UsageSnippet language="python" operationID="sectionPermissionsModification" method="post" path="/documents/{documentId}/sections/{sectionId}/permissions/modification" example="BadRequest" -->
 ```python
 from workiva import SDK, models
 

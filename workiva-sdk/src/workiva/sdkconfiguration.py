@@ -7,7 +7,7 @@ from ._version import (
     __version__,
 )
 from .httpclient import AsyncHttpClient, HttpClient
-from .utils import Logger, RetryConfig, remove_suffix
+from .utils import BackoffStrategy, Logger, RetryConfig, remove_suffix
 from dataclasses import dataclass
 from pydantic import Field
 from typing import Callable, Dict, Optional, Tuple, Union
@@ -41,7 +41,13 @@ class SDKConfiguration:
     sdk_version: str = __version__
     gen_version: str = __gen_version__
     user_agent: str = __user_agent__
-    retry_config: OptionalNullable[RetryConfig] = Field(default_factory=lambda: UNSET)
+    retry_config: OptionalNullable[RetryConfig] = Field(
+        default_factory=lambda: RetryConfig(
+            "backoff",
+            BackoffStrategy(500, 30000, 1.5, 120000),
+            True,
+        )
+    )
     timeout_ms: Optional[int] = None
 
     def get_server_details(self) -> Tuple[str, Dict[str, str]]:

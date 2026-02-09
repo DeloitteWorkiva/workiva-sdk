@@ -44,7 +44,7 @@ If both are provided, the given id will be used.
 
 ### Example Usage
 
-<!-- UsageSnippet language="python" operationID="batchDeletionMetricValues" method="post" path="/programs/{programId}/metrics/{metricId}/values/batchDeletion" -->
+<!-- UsageSnippet language="python" operationID="batchDeletionMetricValues" method="post" path="/programs/{programId}/metrics/{metricId}/values/batchDeletion" example="BadRequest" -->
 ```python
 from workiva import SDK, models
 
@@ -108,7 +108,7 @@ If any of the values fail to be processed, no changes will be stored in the syst
 
 ### Example Usage
 
-<!-- UsageSnippet language="python" operationID="batchUpsertionMetricValues" method="post" path="/programs/{programId}/metrics/{metricId}/values/batchUpsertion" -->
+<!-- UsageSnippet language="python" operationID="batchUpsertionMetricValues" method="post" path="/programs/{programId}/metrics/{metricId}/values/batchUpsertion" example="BadRequest" -->
 ```python
 from workiva import SDK, models
 
@@ -183,7 +183,7 @@ Creates a new [dimension](ref:sustainability#dimension).
 
 ### Example Usage
 
-<!-- UsageSnippet language="python" operationID="createDimension" method="post" path="/programs/{programId}/dimensions" -->
+<!-- UsageSnippet language="python" operationID="createDimension" method="post" path="/programs/{programId}/dimensions" example="BadRequest" -->
 ```python
 from workiva import SDK, models
 
@@ -241,7 +241,7 @@ Creates a new [metric](ref:sustainability#metric).
 
 ### Example Usage
 
-<!-- UsageSnippet language="python" operationID="createMetric" method="post" path="/programs/{programId}/metrics" -->
+<!-- UsageSnippet language="python" operationID="createMetric" method="post" path="/programs/{programId}/metrics" example="BadRequest" -->
 ```python
 from workiva import SDK, models
 
@@ -295,7 +295,7 @@ Creates a new [program](ref:sustainability#program).
 
 ### Example Usage
 
-<!-- UsageSnippet language="python" operationID="createProgram" method="post" path="/programs" -->
+<!-- UsageSnippet language="python" operationID="createProgram" method="post" path="/programs" example="BadRequest" -->
 ```python
 from workiva import SDK, models
 
@@ -342,7 +342,7 @@ Creates a new [topic](ref:sustainability#topic).
 
 ### Example Usage
 
-<!-- UsageSnippet language="python" operationID="createTopic" method="post" path="/programs/{programId}/topics" -->
+<!-- UsageSnippet language="python" operationID="createTopic" method="post" path="/programs/{programId}/topics" example="BadRequest" -->
 ```python
 from workiva import SDK, models
 
@@ -392,7 +392,7 @@ Creates a new [metric value](ref:sustainability#metricvalue)
 
 ### Example Usage
 
-<!-- UsageSnippet language="python" operationID="createValue" method="post" path="/programs/{programId}/metrics/{metricId}/values" -->
+<!-- UsageSnippet language="python" operationID="createValue" method="post" path="/programs/{programId}/metrics/{metricId}/values" example="BadRequest" -->
 ```python
 from workiva import SDK, models
 
@@ -1114,9 +1114,35 @@ Partially updates the properties of a [dimension](ref:sustainability#dimension).
 |`/values`|`replace`, `test`|
 
 
-### Example Usage
+### Example Usage: BadRequest
 
-<!-- UsageSnippet language="python" operationID="partiallyUpdateDimensionById" method="patch" path="/programs/{programId}/dimensions/{dimensionId}" -->
+<!-- UsageSnippet language="python" operationID="partiallyUpdateDimensionById" method="patch" path="/programs/{programId}/dimensions/{dimensionId}" example="BadRequest" -->
+```python
+from workiva import SDK, models
+
+
+with SDK(
+    security=models.Security(
+        client_id="<YOUR_CLIENT_ID_HERE>",
+        client_secret="<YOUR_CLIENT_SECRET_HERE>",
+    ),
+) as sdk:
+
+    res = sdk.sustainability.partially_update_dimension_by_id(dimension_id="<id>", program_id="<id>", request_body=[
+        {
+            "op": models.Op.REPLACE,
+            "path": "/name",
+            "value": "New name",
+        },
+    ])
+
+    # Handle response
+    print(res)
+
+```
+### Example Usage: body
+
+<!-- UsageSnippet language="python" operationID="partiallyUpdateDimensionById" method="patch" path="/programs/{programId}/dimensions/{dimensionId}" example="body" -->
 ```python
 from workiva import SDK, models
 
@@ -1178,9 +1204,35 @@ Partially updates the properties of a [metric](ref:sustainability#metric). Only 
 |`/unit`|`replace`, `test`|
 
 
-### Example Usage
+### Example Usage: BadRequest
 
-<!-- UsageSnippet language="python" operationID="partiallyUpdateMetricById" method="patch" path="/programs/{programId}/metrics/{metricId}" -->
+<!-- UsageSnippet language="python" operationID="partiallyUpdateMetricById" method="patch" path="/programs/{programId}/metrics/{metricId}" example="BadRequest" -->
+```python
+from workiva import SDK, models
+
+
+with SDK(
+    security=models.Security(
+        client_id="<YOUR_CLIENT_ID_HERE>",
+        client_secret="<YOUR_CLIENT_SECRET_HERE>",
+    ),
+) as sdk:
+
+    res = sdk.sustainability.partially_update_metric_by_id(metric_id="<id>", program_id="<id>", request_body=[
+        {
+            "op": models.Op.REPLACE,
+            "path": "/name",
+            "value": "New name",
+        },
+    ])
+
+    # Handle response
+    print(res)
+
+```
+### Example Usage: replaceName
+
+<!-- UsageSnippet language="python" operationID="partiallyUpdateMetricById" method="patch" path="/programs/{programId}/metrics/{metricId}" example="replaceName" -->
 ```python
 from workiva import SDK, models
 
@@ -1236,9 +1288,35 @@ Partially updates the properties of a [metric value](ref:sustainability#metricva
 |`/value`|`replace`, `test`|
 
 
-### Example Usage
+### Example Usage: BadRequest
 
-<!-- UsageSnippet language="python" operationID="partiallyUpdateMetricValueById" method="patch" path="/programs/{programId}/metrics/{metricId}/values/{metricValueId}" -->
+<!-- UsageSnippet language="python" operationID="partiallyUpdateMetricValueById" method="patch" path="/programs/{programId}/metrics/{metricId}/values/{metricValueId}" example="BadRequest" -->
+```python
+from workiva import SDK, models
+
+
+with SDK(
+    security=models.Security(
+        client_id="<YOUR_CLIENT_ID_HERE>",
+        client_secret="<YOUR_CLIENT_SECRET_HERE>",
+    ),
+) as sdk:
+
+    res = sdk.sustainability.partially_update_metric_value_by_id(metric_id="<id>", metric_value_id="<id>", program_id="<id>", request_body=[
+        {
+            "op": models.Op.REPLACE,
+            "path": "/name",
+            "value": "New name",
+        },
+    ])
+
+    # Handle response
+    print(res)
+
+```
+### Example Usage: replaceName
+
+<!-- UsageSnippet language="python" operationID="partiallyUpdateMetricValueById" method="patch" path="/programs/{programId}/metrics/{metricId}/values/{metricValueId}" example="replaceName" -->
 ```python
 from workiva import SDK, models
 
@@ -1294,9 +1372,35 @@ Partially updates the properties of a [program](ref:sustainability#program). Onl
 |`/name`|`replace`, `test`|
 
 
-### Example Usage
+### Example Usage: BadRequest
 
-<!-- UsageSnippet language="python" operationID="partiallyUpdateProgramById" method="patch" path="/programs/{programId}" -->
+<!-- UsageSnippet language="python" operationID="partiallyUpdateProgramById" method="patch" path="/programs/{programId}" example="BadRequest" -->
+```python
+from workiva import SDK, models
+
+
+with SDK(
+    security=models.Security(
+        client_id="<YOUR_CLIENT_ID_HERE>",
+        client_secret="<YOUR_CLIENT_SECRET_HERE>",
+    ),
+) as sdk:
+
+    res = sdk.sustainability.partially_update_program_by_id(program_id="<id>", request_body=[
+        {
+            "op": models.Op.REPLACE,
+            "path": "/name",
+            "value": "New name",
+        },
+    ])
+
+    # Handle response
+    print(res)
+
+```
+### Example Usage: body
+
+<!-- UsageSnippet language="python" operationID="partiallyUpdateProgramById" method="patch" path="/programs/{programId}" example="body" -->
 ```python
 from workiva import SDK, models
 
@@ -1352,9 +1456,35 @@ Partially updates the properties of a [topic](ref:sustainability#topic). Only on
 |`/parent`|`replace`, `test`|
 
 
-### Example Usage
+### Example Usage: BadRequest
 
-<!-- UsageSnippet language="python" operationID="partiallyUpdateTopicById" method="patch" path="/programs/{programId}/topics/{topicId}" -->
+<!-- UsageSnippet language="python" operationID="partiallyUpdateTopicById" method="patch" path="/programs/{programId}/topics/{topicId}" example="BadRequest" -->
+```python
+from workiva import SDK, models
+
+
+with SDK(
+    security=models.Security(
+        client_id="<YOUR_CLIENT_ID_HERE>",
+        client_secret="<YOUR_CLIENT_SECRET_HERE>",
+    ),
+) as sdk:
+
+    res = sdk.sustainability.partially_update_topic_by_id(program_id="<id>", topic_id="<id>", request_body=[
+        {
+            "op": models.Op.REPLACE,
+            "path": "/name",
+            "value": "New name",
+        },
+    ])
+
+    # Handle response
+    print(res)
+
+```
+### Example Usage: body
+
+<!-- UsageSnippet language="python" operationID="partiallyUpdateTopicById" method="patch" path="/programs/{programId}/topics/{topicId}" example="body" -->
 ```python
 from workiva import SDK, models
 
@@ -1407,7 +1537,7 @@ Assign and/or revoke permissions on a Sustainability Program. If any modificatio
 
 ### Example Usage
 
-<!-- UsageSnippet language="python" operationID="programPermissionsModification" method="post" path="/programs/{programId}/permissions/modification" -->
+<!-- UsageSnippet language="python" operationID="programPermissionsModification" method="post" path="/programs/{programId}/permissions/modification" example="BadRequest" -->
 ```python
 from workiva import SDK, models
 
