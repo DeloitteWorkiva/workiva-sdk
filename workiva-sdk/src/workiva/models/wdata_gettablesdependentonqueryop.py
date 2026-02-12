@@ -11,10 +11,10 @@ from workiva.utils import FieldMetadata, PathParamMetadata, QueryParamMetadata
 
 
 WDATA_GET_TABLES_DEPENDENT_ON_QUERY_OP_SERVERS = [
-    # US
-    "https://h.app.wdesk.com/s/wdata/prep",
     # EU
     "https://h.eu.wdesk.com/s/wdata/prep",
+    # US
+    "https://h.app.wdesk.com/s/wdata/prep",
     # APAC
     "https://h.apac.wdesk.com/s/wdata/prep",
 ]

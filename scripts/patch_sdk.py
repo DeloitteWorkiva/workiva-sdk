@@ -291,6 +291,123 @@ def patch_retry_defaults(sdk_dir: Path) -> None:
     print("  sdk.py — set default retry config (backoff 500ms-30s, 2min max)")
 
 
+TOKEN_URL_SENTINEL = "hook_ctx.config.get_server_details()"
+
+TOKEN_URL_OLD = "token_url = urljoin(hook_ctx.base_url, credentials.token_url)"
+TOKEN_URL_NEW = (
+    "global_base_url, _ = hook_ctx.config.get_server_details()\n"
+    "            token_url = urljoin(global_base_url, credentials.token_url)"
+)
+
+
+def patch_token_url_resolution(sdk_dir: Path) -> None:
+    """Fix token URL resolution to use global server, not operation server (idempotent).
+
+    Speakeasy generates ``urljoin(hook_ctx.base_url, ...)`` which resolves the
+    relative /oauth2/token against the operation-specific server (e.g.
+    h.eu.wdesk.com).  The token endpoint only exists on the global API server
+    (api.eu.wdesk.com), so we resolve against ``hook_ctx.config`` instead.
+    """
+    cc_path = sdk_dir / "src" / "workiva" / "_hooks" / "clientcredentials.py"
+    if not cc_path.exists():
+        print(f"  SKIP clientcredentials.py — not found at {cc_path}")
+        return
+
+    content = cc_path.read_text()
+    if TOKEN_URL_SENTINEL in content:
+        print("  clientcredentials.py — token URL resolution already patched, skipping")
+        return
+
+    if TOKEN_URL_OLD not in content:
+        print("  WARN clientcredentials.py — token URL pattern not found, skipping")
+        return
+
+    content = content.replace(TOKEN_URL_OLD, TOKEN_URL_NEW)
+    cc_path.write_text(content)
+    print("  clientcredentials.py — fixed token URL resolution (use global server)")
+
+
+REGION_ORDER = {".eu.": 0, ".app.": 1, ".apac.": 2}
+
+
+def patch_operation_server_order(sdk_dir: Path) -> None:
+    """Reorder ``*_OP_SERVERS`` lists: EU=0, US=1, APAC=2 (idempotent).
+
+    Speakeasy reorders path-level servers during generation, placing US at
+    index 0.  This must match the global ``SERVERS`` order (EU=0, US=1,
+    APAC=2) because ``sdk.server_idx`` applies to both global and
+    per-operation server lists.
+    """
+    models_dir = sdk_dir / "src" / "workiva" / "models"
+    if not models_dir.is_dir():
+        print(f"  SKIP models/ — not found at {models_dir}")
+        return
+
+    op_servers_re = re.compile(
+        r"(\w+_OP_SERVERS)\s*=\s*\[(.*?)\]",
+        re.DOTALL,
+    )
+    url_entry_re = re.compile(r"#\s*(\w+)\s*\n\s*\"([^\"]+)\"")
+
+    patched_count = 0
+    skipped_count = 0
+    model_files = sorted(models_dir.glob("wdata_*.py")) + sorted(
+        models_dir.glob("chains_*.py")
+    )
+
+    for model_file in model_files:
+        content = model_file.read_text()
+
+        match = op_servers_re.search(content)
+        if not match:
+            continue
+
+        var_name = match.group(1)
+        block = match.group(2)
+
+        entries = url_entry_re.findall(block)
+        if len(entries) != 3:
+            continue
+
+        # Classify each (comment, url) pair by region marker in the URL
+        ordered: list[tuple[str, str] | None] = [None, None, None]
+        for comment, url in entries:
+            for marker, idx in REGION_ORDER.items():
+                if marker in url:
+                    ordered[idx] = (comment, url)
+                    break
+
+        if None in ordered:
+            print(
+                f"  WARN {model_file.name} — could not classify all server URLs, skipping"
+            )
+            continue
+
+        # Already correct?
+        current_urls = [url for _, url in entries]
+        target_urls = [url for _, url in ordered]  # type: ignore[misc]
+        if current_urls == target_urls:
+            skipped_count += 1
+            continue
+
+        # Rebuild the list literal
+        new_entries = []
+        for comment, url in ordered:  # type: ignore[misc]
+            new_entries.append(f'    # {comment}\n    "{url}",')
+        new_block = f"{var_name} = [\n" + "\n".join(new_entries) + "\n]"
+
+        content = content[: match.start()] + new_block + content[match.end() :]
+        model_file.write_text(content)
+        patched_count += 1
+
+    if patched_count > 0:
+        print(
+            f"  models/ — reordered {patched_count} *_OP_SERVERS lists (EU=0, US=1, APAC=2)"
+        )
+    else:
+        print("  models/ — all *_OP_SERVERS lists already in correct order")
+
+
 SECURITY_OLD_TOKEN_URL = '/iam/v1/oauth2/token'
 SECURITY_NEW_TOKEN_URL = '/oauth2/token'
 
@@ -330,8 +447,10 @@ def main() -> None:
     patch_init(sdk_dir)
     patch_readme(sdk_dir)
     patch_clientcredentials(sdk_dir)
+    patch_token_url_resolution(sdk_dir)
     patch_security(sdk_dir)
     patch_retry_defaults(sdk_dir)
+    patch_operation_server_order(sdk_dir)
     patch_pyproject(sdk_dir)
     print("Done.")
 

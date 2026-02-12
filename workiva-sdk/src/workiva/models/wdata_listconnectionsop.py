@@ -15,10 +15,10 @@ from workiva.utils import FieldMetadata, QueryParamMetadata
 
 
 WDATA_LIST_CONNECTIONS_OP_SERVERS = [
-    # US
-    "https://h.app.wdesk.com/s/wdata/prep",
     # EU
     "https://h.eu.wdesk.com/s/wdata/prep",
+    # US
+    "https://h.app.wdesk.com/s/wdata/prep",
     # APAC
     "https://h.apac.wdesk.com/s/wdata/prep",
 ]

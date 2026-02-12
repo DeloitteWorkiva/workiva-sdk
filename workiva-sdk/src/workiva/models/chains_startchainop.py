@@ -10,10 +10,10 @@ from workiva.utils import FieldMetadata, PathParamMetadata, RequestMetadata
 
 
 CHAINS_START_CHAIN_OP_SERVERS = [
-    # US
-    "https://h.app.wdesk.com/s/wdata/oc/api",
     # EU
     "https://h.eu.wdesk.com/s/wdata/oc/api",
+    # US
+    "https://h.app.wdesk.com/s/wdata/oc/api",
     # APAC
     "https://h.apac.wdesk.com/s/wdata/oc/api",
 ]

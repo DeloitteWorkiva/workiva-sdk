@@ -191,7 +191,8 @@ class ClientCredentialsHook(SDKInitHook, BeforeRequestHook, AfterErrorHook):
 
         token_url = credentials.token_url
         if not bool(urlparse(credentials.token_url).netloc):
-            token_url = urljoin(hook_ctx.base_url, credentials.token_url)
+            global_base_url, _ = hook_ctx.config.get_server_details()
+            token_url = urljoin(global_base_url, credentials.token_url)
         response = self.client.send(
             self.client.build_request(
                 method="POST",
