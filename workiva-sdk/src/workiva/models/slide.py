@@ -9,12 +9,6 @@ from typing_extensions import Annotated, NotRequired, TypedDict
 from workiva.types import BaseModel, Nullable, OptionalNullable, UNSET, UNSET_SENTINEL
 
 
-class SlideLock(str, Enum):
-    r"""The type of lock applied to this slide, if any. Note this property is not tied to revision and will always reflect the slide's current lock state."""
-
-    LOCK = "lock"
-
-
 class SlideParentTypedDict(TypedDict):
     r"""Partial reference to the parent slide"""
 
@@ -81,6 +75,12 @@ class SlideBody(BaseModel):
         return m
 
 
+class SlideLock(str, Enum):
+    r"""The type of lock applied to this slide, if any. Note this property is not tied to revision and will always reflect the slide's current lock state."""
+
+    LOCK = "lock"
+
+
 class SlideTypedDict(TypedDict):
     r"""Details about the slide, including its ID and name."""
 
@@ -96,8 +96,6 @@ class SlideTypedDict(TypedDict):
     r"""The integer index of the slide relative to its parent slide (or to the presentation if no parent slide). The special value -1 may be used to position a slide at the end of its siblings list."""
     layout_source: NotRequired[Nullable[str]]
     r"""The ID of the slide layout from which this slide's layout is derived."""
-    lock: NotRequired[Nullable[SlideLock]]
-    r"""The type of lock applied to this slide, if any. Note this property is not tied to revision and will always reflect the slide's current lock state."""
     name: NotRequired[str]
     r"""The name of the slide"""
     parent: NotRequired[Nullable[SlideParentTypedDict]]
@@ -106,6 +104,8 @@ class SlideTypedDict(TypedDict):
     r"""The revision of the slide"""
     slide_body: NotRequired[SlideBodyTypedDict]
     r"""Reference to the Drawing content for this slide"""
+    lock: NotRequired[Nullable[SlideLock]]
+    r"""The type of lock applied to this slide, if any. Note this property is not tied to revision and will always reflect the slide's current lock state."""
 
 
 class Slide(BaseModel):
@@ -130,9 +130,6 @@ class Slide(BaseModel):
     ] = UNSET
     r"""The ID of the slide layout from which this slide's layout is derived."""
 
-    lock: OptionalNullable[SlideLock] = UNSET
-    r"""The type of lock applied to this slide, if any. Note this property is not tied to revision and will always reflect the slide's current lock state."""
-
     name: Optional[str] = None
     r"""The name of the slide"""
 
@@ -145,6 +142,9 @@ class Slide(BaseModel):
     slide_body: Annotated[Optional[SlideBody], pydantic.Field(alias="slideBody")] = None
     r"""Reference to the Drawing content for this slide"""
 
+    lock: OptionalNullable[SlideLock] = UNSET
+    r"""The type of lock applied to this slide, if any. Note this property is not tied to revision and will always reflect the slide's current lock state."""
+
     @model_serializer(mode="wrap")
     def serialize_model(self, handler):
         optional_fields = set(
@@ -154,14 +154,14 @@ class Slide(BaseModel):
                 "id",
                 "index",
                 "layoutSource",
-                "lock",
                 "name",
                 "parent",
                 "revision",
                 "slideBody",
+                "lock",
             ]
         )
-        nullable_fields = set(["id", "layoutSource", "lock", "parent"])
+        nullable_fields = set(["id", "layoutSource", "parent", "lock"])
         serialized = handler(self)
         m = {}
 

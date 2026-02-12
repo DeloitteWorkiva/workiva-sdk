@@ -4,9 +4,10 @@ from __future__ import annotations
 from .linespacing import LineSpacing, LineSpacingTypedDict
 from .paragraphpropertiesalignment import ParagraphPropertiesAlignment
 import pydantic
-from pydantic import model_serializer
+from pydantic import field_serializer, model_serializer
 from typing import Optional
 from typing_extensions import Annotated, NotRequired, TypedDict
+from workiva import models
 from workiva.types import BaseModel, Nullable, OptionalNullable, UNSET, UNSET_SENTINEL
 
 
@@ -89,6 +90,15 @@ class ParagraphProperties(BaseModel):
     r"""The amount of indent, in points, from the margin to apply to all the lines of a paragraph from the start of each line. Positive is towards the center of the page.
 
     """
+
+    @field_serializer("alignment")
+    def serialize_alignment(self, value):
+        if isinstance(value, str):
+            try:
+                return models.ParagraphPropertiesAlignment(value)
+            except ValueError:
+                return value
+        return value
 
     @model_serializer(mode="wrap")
     def serialize_model(self, handler):

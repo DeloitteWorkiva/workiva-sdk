@@ -2,9 +2,10 @@
 
 from __future__ import annotations
 from enum import Enum
+from workiva import utils
 
 
-class DrawingRelativeType(str, Enum):
+class DrawingRelativeType(str, Enum, metaclass=utils.OpenEnumMeta):
     r"""The relative position type used for a drawing element."""
 
     DESIGN_PAGE_RELATIVE = "designPageRelative"

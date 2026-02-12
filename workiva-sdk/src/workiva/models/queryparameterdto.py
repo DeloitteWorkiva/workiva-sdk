@@ -3,13 +3,14 @@
 from __future__ import annotations
 from enum import Enum
 import pydantic
-from pydantic import model_serializer
+from pydantic import field_serializer, model_serializer
 from typing import Any, List, Optional
 from typing_extensions import Annotated, NotRequired, TypedDict
+from workiva import models, utils
 from workiva.types import BaseModel, UNSET_SENTINEL
 
 
-class QueryParameterDtoMode(str, Enum):
+class QueryParameterDtoMode(str, Enum, metaclass=utils.OpenEnumMeta):
     r"""The mode of the query parameter"""
 
     SCALAR = "scalar"
@@ -18,7 +19,7 @@ class QueryParameterDtoMode(str, Enum):
     REFERENCE = "reference"
 
 
-class QueryParameterDtoType(str, Enum):
+class QueryParameterDtoType(str, Enum, metaclass=utils.OpenEnumMeta):
     r"""The type of the query parameter"""
 
     STRING = "string"
@@ -101,6 +102,24 @@ class QueryParameterDto(BaseModel):
 
     value: Optional[Any] = None
 
+    @field_serializer("mode")
+    def serialize_mode(self, value):
+        if isinstance(value, str):
+            try:
+                return models.QueryParameterDtoMode(value)
+            except ValueError:
+                return value
+        return value
+
+    @field_serializer("type")
+    def serialize_type(self, value):
+        if isinstance(value, str):
+            try:
+                return models.QueryParameterDtoType(value)
+            except ValueError:
+                return value
+        return value
+
     @model_serializer(mode="wrap")
     def serialize_model(self, handler):
         optional_fields = set(
@@ -176,6 +195,24 @@ class QueryParameterDtoInput(BaseModel):
     """
 
     value: Optional[Any] = None
+
+    @field_serializer("mode")
+    def serialize_mode(self, value):
+        if isinstance(value, str):
+            try:
+                return models.QueryParameterDtoMode(value)
+            except ValueError:
+                return value
+        return value
+
+    @field_serializer("type")
+    def serialize_type(self, value):
+        if isinstance(value, str):
+            try:
+                return models.QueryParameterDtoType(value)
+            except ValueError:
+                return value
+        return value
 
     @model_serializer(mode="wrap")
     def serialize_model(self, handler):

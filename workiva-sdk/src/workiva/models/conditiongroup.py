@@ -3,9 +3,10 @@
 from __future__ import annotations
 from .combinator import Combinator
 from .condition import Condition, ConditionTypedDict
-from pydantic import model_serializer
+from pydantic import field_serializer, model_serializer
 from typing import List, Optional
 from typing_extensions import NotRequired, TypedDict
+from workiva import models
 from workiva.types import BaseModel, UNSET_SENTINEL
 
 
@@ -18,6 +19,15 @@ class ConditionGroup(BaseModel):
     combinator: Optional[Combinator] = None
 
     rules: Optional[List[Condition]] = None
+
+    @field_serializer("combinator")
+    def serialize_combinator(self, value):
+        if isinstance(value, str):
+            try:
+                return models.Combinator(value)
+            except ValueError:
+                return value
+        return value
 
     @model_serializer(mode="wrap")
     def serialize_model(self, handler):

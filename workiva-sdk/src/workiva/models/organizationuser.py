@@ -4,10 +4,18 @@ from __future__ import annotations
 from datetime import datetime
 from enum import Enum
 import pydantic
-from pydantic import model_serializer
+from pydantic import field_serializer, model_serializer
 from typing import Optional
 from typing_extensions import Annotated, NotRequired, TypedDict
+from workiva import models, utils
 from workiva.types import BaseModel, Nullable, OptionalNullable, UNSET, UNSET_SENTINEL
+
+
+class OrganizationUserStatus(str, Enum, metaclass=utils.OpenEnumMeta):
+    r"""Whether or not this user is active"""
+
+    ACTIVE = "active"
+    SUSPENDED = "suspended"
 
 
 class OrganizationUserUserTypedDict(TypedDict):
@@ -154,38 +162,38 @@ class OrganizationUserModified(BaseModel):
         return m
 
 
-class OrganizationUserStatus(str, Enum):
-    r"""Whether or not this user is active"""
-
-    ACTIVE = "active"
-    SUSPENDED = "suspended"
-
-
 class OrganizationUserTypedDict(TypedDict):
     r"""Details about the user."""
 
-    created: NotRequired[Nullable[OrganizationUserCreatedTypedDict]]
+    id: NotRequired[Nullable[str]]
+    r"""The unique identifier of the user"""
+    given_name: NotRequired[str]
+    r"""The user's given name"""
+    family_name: NotRequired[str]
+    r"""The user's family name"""
     display_name: NotRequired[str]
     r"""The displayed name of the user"""
     email: NotRequired[str]
     r"""The email address of the user"""
-    family_name: NotRequired[str]
-    r"""The user's family name"""
-    given_name: NotRequired[str]
-    r"""The user's given name"""
-    id: NotRequired[Nullable[str]]
-    r"""The unique identifier of the user"""
-    modified: NotRequired[Nullable[OrganizationUserModifiedTypedDict]]
-    status: NotRequired[Nullable[OrganizationUserStatus]]
-    r"""Whether or not this user is active"""
     username: NotRequired[str]
     r"""The user name of the user"""
+    status: NotRequired[Nullable[OrganizationUserStatus]]
+    r"""Whether or not this user is active"""
+    created: NotRequired[Nullable[OrganizationUserCreatedTypedDict]]
+    modified: NotRequired[Nullable[OrganizationUserModifiedTypedDict]]
 
 
 class OrganizationUser(BaseModel):
     r"""Details about the user."""
 
-    created: OptionalNullable[OrganizationUserCreated] = UNSET
+    id: OptionalNullable[str] = UNSET
+    r"""The unique identifier of the user"""
+
+    given_name: Annotated[Optional[str], pydantic.Field(alias="givenName")] = None
+    r"""The user's given name"""
+
+    family_name: Annotated[Optional[str], pydantic.Field(alias="familyName")] = None
+    r"""The user's family name"""
 
     display_name: Annotated[Optional[str], pydantic.Field(alias="displayName")] = None
     r"""The displayed name of the user"""
@@ -193,39 +201,41 @@ class OrganizationUser(BaseModel):
     email: Optional[str] = None
     r"""The email address of the user"""
 
-    family_name: Annotated[Optional[str], pydantic.Field(alias="familyName")] = None
-    r"""The user's family name"""
-
-    given_name: Annotated[Optional[str], pydantic.Field(alias="givenName")] = None
-    r"""The user's given name"""
-
-    id: OptionalNullable[str] = UNSET
-    r"""The unique identifier of the user"""
-
-    modified: OptionalNullable[OrganizationUserModified] = UNSET
+    username: Optional[str] = None
+    r"""The user name of the user"""
 
     status: OptionalNullable[OrganizationUserStatus] = UNSET
     r"""Whether or not this user is active"""
 
-    username: Optional[str] = None
-    r"""The user name of the user"""
+    created: OptionalNullable[OrganizationUserCreated] = UNSET
+
+    modified: OptionalNullable[OrganizationUserModified] = UNSET
+
+    @field_serializer("status")
+    def serialize_status(self, value):
+        if isinstance(value, str):
+            try:
+                return models.OrganizationUserStatus(value)
+            except ValueError:
+                return value
+        return value
 
     @model_serializer(mode="wrap")
     def serialize_model(self, handler):
         optional_fields = set(
             [
-                "created",
+                "id",
+                "givenName",
+                "familyName",
                 "displayName",
                 "email",
-                "familyName",
-                "givenName",
-                "id",
-                "modified",
-                "status",
                 "username",
+                "status",
+                "created",
+                "modified",
             ]
         )
-        nullable_fields = set(["created", "id", "modified", "status"])
+        nullable_fields = set(["id", "status", "created", "modified"])
         serialized = handler(self)
         m = {}
 
@@ -251,22 +261,28 @@ class OrganizationUser(BaseModel):
 class OrganizationUserInputTypedDict(TypedDict):
     r"""Details about the user."""
 
+    given_name: NotRequired[str]
+    r"""The user's given name"""
+    family_name: NotRequired[str]
+    r"""The user's family name"""
     display_name: NotRequired[str]
     r"""The displayed name of the user"""
     email: NotRequired[str]
     r"""The email address of the user"""
-    family_name: NotRequired[str]
-    r"""The user's family name"""
-    given_name: NotRequired[str]
-    r"""The user's given name"""
-    status: NotRequired[Nullable[OrganizationUserStatus]]
-    r"""Whether or not this user is active"""
     username: NotRequired[str]
     r"""The user name of the user"""
+    status: NotRequired[Nullable[OrganizationUserStatus]]
+    r"""Whether or not this user is active"""
 
 
 class OrganizationUserInput(BaseModel):
     r"""Details about the user."""
+
+    given_name: Annotated[Optional[str], pydantic.Field(alias="givenName")] = None
+    r"""The user's given name"""
+
+    family_name: Annotated[Optional[str], pydantic.Field(alias="familyName")] = None
+    r"""The user's family name"""
 
     display_name: Annotated[Optional[str], pydantic.Field(alias="displayName")] = None
     r"""The displayed name of the user"""
@@ -274,22 +290,25 @@ class OrganizationUserInput(BaseModel):
     email: Optional[str] = None
     r"""The email address of the user"""
 
-    family_name: Annotated[Optional[str], pydantic.Field(alias="familyName")] = None
-    r"""The user's family name"""
-
-    given_name: Annotated[Optional[str], pydantic.Field(alias="givenName")] = None
-    r"""The user's given name"""
+    username: Optional[str] = None
+    r"""The user name of the user"""
 
     status: OptionalNullable[OrganizationUserStatus] = UNSET
     r"""Whether or not this user is active"""
 
-    username: Optional[str] = None
-    r"""The user name of the user"""
+    @field_serializer("status")
+    def serialize_status(self, value):
+        if isinstance(value, str):
+            try:
+                return models.OrganizationUserStatus(value)
+            except ValueError:
+                return value
+        return value
 
     @model_serializer(mode="wrap")
     def serialize_model(self, handler):
         optional_fields = set(
-            ["displayName", "email", "familyName", "givenName", "status", "username"]
+            ["givenName", "familyName", "displayName", "email", "username", "status"]
         )
         nullable_fields = set(["status"])
         serialized = handler(self)

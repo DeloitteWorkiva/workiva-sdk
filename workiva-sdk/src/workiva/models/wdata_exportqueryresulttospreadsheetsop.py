@@ -19,22 +19,22 @@ WDATA_EXPORT_QUERY_RESULT_TO_SPREADSHEETS_OP_SERVERS = [
 
 
 class WdataExportQueryResultToSpreadsheetsRequestTypedDict(TypedDict):
-    export_query_result_dto: ExportQueryResultDtoTypedDict
-    r"""The representation of the export query result"""
     query_result_id: str
     r"""The unique identifier of the query result"""
+    export_query_result_dto: ExportQueryResultDtoTypedDict
+    r"""The representation of the export query result"""
 
 
 class WdataExportQueryResultToSpreadsheetsRequest(BaseModel):
-    export_query_result_dto: Annotated[
-        ExportQueryResultDto,
-        FieldMetadata(request=RequestMetadata(media_type="application/json")),
-    ]
-    r"""The representation of the export query result"""
-
     query_result_id: Annotated[
         str,
         pydantic.Field(alias="queryResultId"),
         FieldMetadata(path=PathParamMetadata(style="simple", explode=False)),
     ]
     r"""The unique identifier of the query result"""
+
+    export_query_result_dto: Annotated[
+        ExportQueryResultDto,
+        FieldMetadata(request=RequestMetadata(media_type="application/json")),
+    ]
+    r"""The representation of the export query result"""

@@ -6,94 +6,43 @@ Endpoints for reading and writing Workiva content. See [**Introduction to Conten
 
 ### Available Operations
 
-* [destination_link_source_conversion](#destination_link_source_conversion) - Initiate a destination link conversion
 * [get_anchor_by_id](#get_anchor_by_id) - Retrieve an anchor by ID
-* [get_column_properties](#get_column_properties) - Retrieve table column properties
 * [get_destination_link_by_id](#get_destination_link_by_id) - Retrieve a destination link by id
+* [destination_link_source_conversion](#destination_link_source_conversion) - Initiate a destination link conversion
+* [get_drawing_elements_by_id](#get_drawing_elements_by_id) - Retrieve drawing elements by id
+* [get_drawing_anchors](#get_drawing_anchors) - Retrieve a list of drawing anchors
 * [get_drawing_anchor_by_id](#get_drawing_anchor_by_id) - Retrieve a drawing anchor by ID
 * [get_drawing_anchor_extensions](#get_drawing_anchor_extensions) - Retrieve a list of drawing anchor extensions
-* [get_drawing_anchors](#get_drawing_anchors) - Retrieve a list of drawing anchors
-* [get_drawing_elements_by_id](#get_drawing_elements_by_id) - Retrieve drawing elements by id
+* [image_upload](#image_upload) - Initiate upload of an image
 * [get_image_by_id](#get_image_by_id) - Retrieve an image by id
-* [get_range_link_by_id](#get_range_link_by_id) - Retrieve a range link by id
-* [get_range_link_destinations](#get_range_link_destinations) - Retrieve range link destinations for a source
-* [get_range_links](#get_range_links) - Retrieve a list of range links
+* [get_rich_text_anchors](#get_rich_text_anchors) - Retrieve a list of rich text anchors
+* [rich_text_anchor_creation](#rich_text_anchor_creation) - Initiate creation of a new rich text anchor
 * [get_rich_text_anchor_by_id](#get_rich_text_anchor_by_id) - Retrieve a rich text anchor by id
 * [get_rich_text_anchor_extensions](#get_rich_text_anchor_extensions) - Retrieve a list of rich text anchor extensions
-* [get_rich_text_anchors](#get_rich_text_anchors) - Retrieve a list of rich text anchors
-* [get_rich_text_paragraphs](#get_rich_text_paragraphs) - Retrieve rich text paragraphs
-* [get_row_properties](#get_row_properties) - Retrieve table row properties
-* [get_style_guide_by_id](#get_style_guide_by_id) - Retrieve a style guide by id
-* [get_table_anchor_by_id](#get_table_anchor_by_id) - Retrieve a table anchor by ID
-* [get_table_anchor_extensions](#get_table_anchor_extensions) - Retrieve a list of table anchor extensions
-* [get_table_anchors](#get_table_anchors) - Retrieve a list of table anchors
-* [get_table_cells](#get_table_cells) - Retrieve table cell content
-* [get_table_properties](#get_table_properties) - Retrieve a table's properties by id
-* [image_upload](#image_upload) - Initiate upload of an image
-* [partially_update_table_properties](#partially_update_table_properties) - Partially update a table's properties
-* [rich_text_anchor_creation](#rich_text_anchor_creation) - Initiate creation of a new rich text anchor
-* [rich_text_batch_edit](#rich_text_batch_edit) - Initiate edits to rich text
 * [rich_text_duplication_edit](#rich_text_duplication_edit) - Initiate duplication edits to rich text
+* [rich_text_batch_edit](#rich_text_batch_edit) - Initiate edits to rich text
 * [rich_text_links_batch_edit](#rich_text_links_batch_edit) - Initiate edits to rich text links
+* [get_rich_text_paragraphs](#get_rich_text_paragraphs) - Retrieve rich text paragraphs
+* [get_style_guide_by_id](#get_style_guide_by_id) - Retrieve a style guide by id
 * [style_guide_export](#style_guide_export) - Initiate a style guide export
 * [style_guide_import](#style_guide_import) - Initiate import of a style guide
+* [get_table_anchors](#get_table_anchors) - Retrieve a list of table anchors
 * [table_anchor_creation](#table_anchor_creation) - Initiate creation of a new table anchor
+* [get_table_anchor_by_id](#get_table_anchor_by_id) - Retrieve a table anchor by ID
+* [get_table_anchor_extensions](#get_table_anchor_extensions) - Retrieve a list of table anchor extensions
+* [get_table_cells](#get_table_cells) - Retrieve table cell content
 * [table_cells_batch_edit](#table_cells_batch_edit) - Initiate edits to table cells
+* [get_column_properties](#get_column_properties) - Retrieve table column properties
 * [table_edit](#table_edit) - Initiate edit to a table
 * [table_filters_reapplication](#table_filters_reapplication) - Reapply filters to the table
 * [table_links_batch_edit](#table_links_batch_edit) - Initiate edit to table links
+* [get_range_links](#get_range_links) - Retrieve a list of range links
+* [get_range_link_by_id](#get_range_link_by_id) - Retrieve a range link by id
+* [get_range_link_destinations](#get_range_link_destinations) - Retrieve range link destinations for a source
 * [table_range_links_edit](#table_range_links_edit) - Initiate range links edits on a table
-
-## destination_link_source_conversion
-
-Converts a destination link into a source link. The previous source, if any, will be converted into a destination link.
-
-Responses include a `Location` header, which indicates where to poll for results. For more details on long-running
-job polling, see [Operations endpoint](ref:getoperationbyid). When the source conversion
-completes, its status will be `completed`, and the response body includes a `resourceURL`. For more details on the `resourceURL`
-see [operation results endpoint](ref:getdestinationlinksourceconversionresults).
-For more details, see [Authentication documentation](ref:authentication).
-
-
-### Example Usage
-
-<!-- UsageSnippet language="python" operationID="destinationLinkSourceConversion" method="post" path="/content/destinationLinks/{destinationLinkId}/sourceConversion" -->
-```python
-from workiva import SDK, models
-
-
-with SDK(
-    security=models.Security(
-        client_id="<YOUR_CLIENT_ID_HERE>",
-        client_secret="<YOUR_CLIENT_SECRET_HERE>",
-    ),
-) as sdk:
-
-    res = sdk.content.destination_link_source_conversion(destination_link_id="WA5SVkJWXOy5MbSHX25Qf9BVz5xTvLfJadt5eXzqTxLT4o2Lo1ceQHmLbSppCdBhQUFBSE")
-
-    # Handle response
-    print(res)
-
-```
-
-### Parameters
-
-| Parameter                                                              | Type                                                                   | Required                                                               | Description                                                            | Example                                                                |
-| ---------------------------------------------------------------------- | ---------------------------------------------------------------------- | ---------------------------------------------------------------------- | ---------------------------------------------------------------------- | ---------------------------------------------------------------------- |
-| `destination_link_id`                                                  | *str*                                                                  | :heavy_check_mark:                                                     | The unique identifier of the destination link                          | WA5SVkJWXOy5MbSHX25Qf9BVz5xTvLfJadt5eXzqTxLT4o2Lo1ceQHmLbSppCdBhQUFBSE |
-| `retries`                                                              | [Optional[utils.RetryConfig]](../../models/utils/retryconfig.md)       | :heavy_minus_sign:                                                     | Configuration to override the default retry behavior of the client.    |                                                                        |
-
-### Response
-
-**[models.DestinationLinkSourceConversionResponse](../../models/destinationlinksourceconversionresponse.md)**
-
-### Errors
-
-| Error Type                   | Status Code                  | Content Type                 |
-| ---------------------------- | ---------------------------- | ---------------------------- |
-| errors.ErrorResponse         | 400, 401, 403, 404, 409, 429 | application/json             |
-| errors.ErrorResponse         | 500, 503                     | application/json             |
-| errors.SDKError              | 4XX, 5XX                     | \*/\*                        |
+* [get_table_properties](#get_table_properties) - Retrieve a table's properties by id
+* [partially_update_table_properties](#partially_update_table_properties) - Partially update a table's properties
+* [get_row_properties](#get_row_properties) - Retrieve table row properties
 
 ## get_anchor_by_id
 
@@ -131,59 +80,6 @@ with SDK(
 ### Response
 
 **[models.Anchor](../../models/anchor.md)**
-
-### Errors
-
-| Error Type                   | Status Code                  | Content Type                 |
-| ---------------------------- | ---------------------------- | ---------------------------- |
-| errors.ErrorResponse         | 400, 401, 403, 404, 409, 429 | application/json             |
-| errors.ErrorResponse         | 500, 503                     | application/json             |
-| errors.SDKError              | 4XX, 5XX                     | \*/\*                        |
-
-## get_column_properties
-
-Returns a [`ColumnPropertiesListResult`](ref:content#columnpropertieslistresult) for a table
-
-
-### Example Usage
-
-<!-- UsageSnippet language="python" operationID="getColumnProperties" method="get" path="/content/tables/{tableId}/properties/columns" -->
-```python
-from workiva import SDK, models
-
-
-with SDK(
-    security=models.Security(
-        client_id="<YOUR_CLIENT_ID_HERE>",
-        client_secret="<YOUR_CLIENT_SECRET_HERE>",
-    ),
-) as sdk:
-
-    res = sdk.content.get_column_properties(request={
-        "next": "JTI0bGltaXQ9MTAwJiUyNG9mZnNldD0xMDA",
-        "revision": "1A2B3C4D",
-        "start_column": 1,
-        "stop_column": 1,
-        "table_id": "WW91IGZvdW5kfIG1lIQ",
-    })
-
-    while res is not None:
-        # Handle items
-
-        res = res.next()
-
-```
-
-### Parameters
-
-| Parameter                                                                       | Type                                                                            | Required                                                                        | Description                                                                     |
-| ------------------------------------------------------------------------------- | ------------------------------------------------------------------------------- | ------------------------------------------------------------------------------- | ------------------------------------------------------------------------------- |
-| `request`                                                                       | [models.GetColumnPropertiesRequest](../../models/getcolumnpropertiesrequest.md) | :heavy_check_mark:                                                              | The request object to use for the request.                                      |
-| `retries`                                                                       | [Optional[utils.RetryConfig]](../../models/utils/retryconfig.md)                | :heavy_minus_sign:                                                              | Configuration to override the default retry behavior of the client.             |
-
-### Response
-
-**[models.GetColumnPropertiesResponse](../../models/getcolumnpropertiesresponse.md)**
 
 ### Errors
 
@@ -238,13 +134,20 @@ with SDK(
 | errors.ErrorResponse         | 500, 503                     | application/json             |
 | errors.SDKError              | 4XX, 5XX                     | \*/\*                        |
 
-## get_drawing_anchor_by_id
+## destination_link_source_conversion
 
-Returns an [`Anchor`](ref:content#anchor) given its id.
+Converts a destination link into a source link. The previous source, if any, will be converted into a destination link.
+
+Responses include a `Location` header, which indicates where to poll for results. For more details on long-running
+job polling, see [Operations endpoint](ref:getoperationbyid). When the source conversion
+completes, its status will be `completed`, and the response body includes a `resourceURL`. For more details on the `resourceURL`
+see [operation results endpoint](ref:getdestinationlinksourceconversionresults).
+For more details, see [Authentication documentation](ref:authentication).
+
 
 ### Example Usage
 
-<!-- UsageSnippet language="python" operationID="getDrawingAnchorById" method="get" path="/content/drawings/{drawingId}/anchors/{anchorId}" -->
+<!-- UsageSnippet language="python" operationID="destinationLinkSourceConversion" method="post" path="/content/destinationLinks/{destinationLinkId}/sourceConversion" -->
 ```python
 from workiva import SDK, models
 
@@ -256,7 +159,7 @@ with SDK(
     ),
 ) as sdk:
 
-    res = sdk.content.get_drawing_anchor_by_id(anchor_id="<id>", drawing_id="<id>", revision="1A2B3C4D")
+    res = sdk.content.destination_link_source_conversion(destination_link_id="WA5SVkJWXOy5MbSHX25Qf9BVz5xTvLfJadt5eXzqTxLT4o2Lo1ceQHmLbSppCdBhQUFBSE")
 
     # Handle response
     print(res)
@@ -265,16 +168,14 @@ with SDK(
 
 ### Parameters
 
-| Parameter                                                           | Type                                                                | Required                                                            | Description                                                         | Example                                                             |
-| ------------------------------------------------------------------- | ------------------------------------------------------------------- | ------------------------------------------------------------------- | ------------------------------------------------------------------- | ------------------------------------------------------------------- |
-| `anchor_id`                                                         | *str*                                                               | :heavy_check_mark:                                                  | The unique identifier of the anchor                                 |                                                                     |
-| `drawing_id`                                                        | *str*                                                               | :heavy_check_mark:                                                  | The unique identifier of a drawing                                  |                                                                     |
-| `revision`                                                          | *Optional[str]*                                                     | :heavy_minus_sign:                                                  | Returns resources at a specific revision                            | 1A2B3C4D                                                            |
-| `retries`                                                           | [Optional[utils.RetryConfig]](../../models/utils/retryconfig.md)    | :heavy_minus_sign:                                                  | Configuration to override the default retry behavior of the client. |                                                                     |
+| Parameter                                                              | Type                                                                   | Required                                                               | Description                                                            | Example                                                                |
+| ---------------------------------------------------------------------- | ---------------------------------------------------------------------- | ---------------------------------------------------------------------- | ---------------------------------------------------------------------- | ---------------------------------------------------------------------- |
+| `destination_link_id`                                                  | *str*                                                                  | :heavy_check_mark:                                                     | The unique identifier of the destination link                          | WA5SVkJWXOy5MbSHX25Qf9BVz5xTvLfJadt5eXzqTxLT4o2Lo1ceQHmLbSppCdBhQUFBSE |
+| `retries`                                                              | [Optional[utils.RetryConfig]](../../models/utils/retryconfig.md)       | :heavy_minus_sign:                                                     | Configuration to override the default retry behavior of the client.    |                                                                        |
 
 ### Response
 
-**[models.Anchor](../../models/anchor.md)**
+**[models.DestinationLinkSourceConversionResponse](../../models/destinationlinksourceconversionresponse.md)**
 
 ### Errors
 
@@ -284,13 +185,13 @@ with SDK(
 | errors.ErrorResponse         | 500, 503                     | application/json             |
 | errors.SDKError              | 4XX, 5XX                     | \*/\*                        |
 
-## get_drawing_anchor_extensions
+## get_drawing_elements_by_id
 
-Returns a paginated list of [`AnchorExtensions`](ref:content#anchorextension) for a given anchorId.
+Returns a [`DrawingElementListResult`](ref:content#drawingelementlistresult) given its id
 
 ### Example Usage
 
-<!-- UsageSnippet language="python" operationID="getDrawingAnchorExtensions" method="get" path="/content/drawings/{drawingId}/anchors/{anchorId}/extensions" -->
+<!-- UsageSnippet language="python" operationID="getDrawingElementsById" method="get" path="/content/drawings/{drawingId}/elements" -->
 ```python
 from workiva import SDK, models
 
@@ -302,12 +203,7 @@ with SDK(
     ),
 ) as sdk:
 
-    res = sdk.content.get_drawing_anchor_extensions(request={
-        "anchor_id": "<id>",
-        "drawing_id": "<id>",
-        "next": "JTI0bGltaXQ9MTAwJiUyNG9mZnNldD0xMDA",
-        "revision": "1A2B3C4D",
-    })
+    res = sdk.content.get_drawing_elements_by_id(drawing_id="<id>", revision="1A2B3C4D", maxpagesize=1000, next="JTI0bGltaXQ9MTAwJiUyNG9mZnNldD0xMDA")
 
     while res is not None:
         # Handle items
@@ -318,14 +214,17 @@ with SDK(
 
 ### Parameters
 
-| Parameter                                                                                     | Type                                                                                          | Required                                                                                      | Description                                                                                   |
-| --------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------- |
-| `request`                                                                                     | [models.GetDrawingAnchorExtensionsRequest](../../models/getdrawinganchorextensionsrequest.md) | :heavy_check_mark:                                                                            | The request object to use for the request.                                                    |
-| `retries`                                                                                     | [Optional[utils.RetryConfig]](../../models/utils/retryconfig.md)                              | :heavy_minus_sign:                                                                            | Configuration to override the default retry behavior of the client.                           |
+| Parameter                                                           | Type                                                                | Required                                                            | Description                                                         | Example                                                             |
+| ------------------------------------------------------------------- | ------------------------------------------------------------------- | ------------------------------------------------------------------- | ------------------------------------------------------------------- | ------------------------------------------------------------------- |
+| `drawing_id`                                                        | *str*                                                               | :heavy_check_mark:                                                  | The unique identifier of a drawing                                  |                                                                     |
+| `revision`                                                          | *Optional[str]*                                                     | :heavy_minus_sign:                                                  | Returns resources at a specific revision                            | 1A2B3C4D                                                            |
+| `maxpagesize`                                                       | *Optional[int]*                                                     | :heavy_minus_sign:                                                  | The maximum number of results to retrieve                           |                                                                     |
+| `next`                                                              | *Optional[str]*                                                     | :heavy_minus_sign:                                                  | Pagination cursor for next set of results.                          | JTI0bGltaXQ9MTAwJiUyNG9mZnNldD0xMDA                                 |
+| `retries`                                                           | [Optional[utils.RetryConfig]](../../models/utils/retryconfig.md)    | :heavy_minus_sign:                                                  | Configuration to override the default retry behavior of the client. |                                                                     |
 
 ### Response
 
-**[models.GetDrawingAnchorExtensionsResponse](../../models/getdrawinganchorextensionsresponse.md)**
+**[models.GetDrawingElementsByIDResponse](../../models/getdrawingelementsbyidresponse.md)**
 
 ### Errors
 
@@ -384,13 +283,13 @@ with SDK(
 | errors.ErrorResponse         | 500, 503                     | application/json             |
 | errors.SDKError              | 4XX, 5XX                     | \*/\*                        |
 
-## get_drawing_elements_by_id
+## get_drawing_anchor_by_id
 
-Returns a [`DrawingElementListResult`](ref:content#drawingelementlistresult) given its id
+Returns an [`Anchor`](ref:content#anchor) given its id.
 
 ### Example Usage
 
-<!-- UsageSnippet language="python" operationID="getDrawingElementsById" method="get" path="/content/drawings/{drawingId}/elements" -->
+<!-- UsageSnippet language="python" operationID="getDrawingAnchorById" method="get" path="/content/drawings/{drawingId}/anchors/{anchorId}" -->
 ```python
 from workiva import SDK, models
 
@@ -402,12 +301,10 @@ with SDK(
     ),
 ) as sdk:
 
-    res = sdk.content.get_drawing_elements_by_id(drawing_id="<id>", maxpagesize=1000, next="JTI0bGltaXQ9MTAwJiUyNG9mZnNldD0xMDA", revision="1A2B3C4D")
+    res = sdk.content.get_drawing_anchor_by_id(drawing_id="<id>", anchor_id="<id>", revision="1A2B3C4D")
 
-    while res is not None:
-        # Handle items
-
-        res = res.next()
+    # Handle response
+    print(res)
 
 ```
 
@@ -416,244 +313,7 @@ with SDK(
 | Parameter                                                           | Type                                                                | Required                                                            | Description                                                         | Example                                                             |
 | ------------------------------------------------------------------- | ------------------------------------------------------------------- | ------------------------------------------------------------------- | ------------------------------------------------------------------- | ------------------------------------------------------------------- |
 | `drawing_id`                                                        | *str*                                                               | :heavy_check_mark:                                                  | The unique identifier of a drawing                                  |                                                                     |
-| `maxpagesize`                                                       | *Optional[int]*                                                     | :heavy_minus_sign:                                                  | The maximum number of results to retrieve                           |                                                                     |
-| `next`                                                              | *Optional[str]*                                                     | :heavy_minus_sign:                                                  | Pagination cursor for next set of results.                          | JTI0bGltaXQ9MTAwJiUyNG9mZnNldD0xMDA                                 |
-| `revision`                                                          | *Optional[str]*                                                     | :heavy_minus_sign:                                                  | Returns resources at a specific revision                            | 1A2B3C4D                                                            |
-| `retries`                                                           | [Optional[utils.RetryConfig]](../../models/utils/retryconfig.md)    | :heavy_minus_sign:                                                  | Configuration to override the default retry behavior of the client. |                                                                     |
-
-### Response
-
-**[models.GetDrawingElementsByIDResponse](../../models/getdrawingelementsbyidresponse.md)**
-
-### Errors
-
-| Error Type                   | Status Code                  | Content Type                 |
-| ---------------------------- | ---------------------------- | ---------------------------- |
-| errors.ErrorResponse         | 400, 401, 403, 404, 409, 429 | application/json             |
-| errors.ErrorResponse         | 500, 503                     | application/json             |
-| errors.SDKError              | 4XX, 5XX                     | \*/\*                        |
-
-## get_image_by_id
-
-Returns a [`Image`](ref:content#image) given its id
-
-### Example Usage
-
-<!-- UsageSnippet language="python" operationID="getImageById" method="get" path="/content/images/{imageId}" -->
-```python
-from workiva import SDK, models
-
-
-with SDK(
-    security=models.Security(
-        client_id="<YOUR_CLIENT_ID_HERE>",
-        client_secret="<YOUR_CLIENT_SECRET_HERE>",
-    ),
-) as sdk:
-
-    res = sdk.content.get_image_by_id(image_id="<id>")
-
-    # Handle response
-    print(res)
-
-```
-
-### Parameters
-
-| Parameter                                                           | Type                                                                | Required                                                            | Description                                                         |
-| ------------------------------------------------------------------- | ------------------------------------------------------------------- | ------------------------------------------------------------------- | ------------------------------------------------------------------- |
-| `image_id`                                                          | *str*                                                               | :heavy_check_mark:                                                  | The unique identifier of the image                                  |
-| `retries`                                                           | [Optional[utils.RetryConfig]](../../models/utils/retryconfig.md)    | :heavy_minus_sign:                                                  | Configuration to override the default retry behavior of the client. |
-
-### Response
-
-**[models.Image](../../models/image.md)**
-
-### Errors
-
-| Error Type                   | Status Code                  | Content Type                 |
-| ---------------------------- | ---------------------------- | ---------------------------- |
-| errors.ErrorResponse         | 400, 401, 403, 404, 409, 429 | application/json             |
-| errors.ErrorResponse         | 500, 503                     | application/json             |
-| errors.SDKError              | 4XX, 5XX                     | \*/\*                        |
-
-## get_range_link_by_id
-
-Returns a [`RangeLink`](ref:content#rangelink) given its id
-
-### Example Usage
-
-<!-- UsageSnippet language="python" operationID="getRangeLinkById" method="get" path="/content/tables/{tableId}/rangeLinks/{rangeLinkId}" -->
-```python
-from workiva import SDK, models
-
-
-with SDK(
-    security=models.Security(
-        client_id="<YOUR_CLIENT_ID_HERE>",
-        client_secret="<YOUR_CLIENT_SECRET_HERE>",
-    ),
-) as sdk:
-
-    res = sdk.content.get_range_link_by_id(range_link_id="f649093edf354cfe8ce52fa60990a109", table_id="WW91IGZvdW5kfIG1lIQ", revision="1A2B3C4D")
-
-    # Handle response
-    print(res)
-
-```
-
-### Parameters
-
-| Parameter                                                           | Type                                                                | Required                                                            | Description                                                         | Example                                                             |
-| ------------------------------------------------------------------- | ------------------------------------------------------------------- | ------------------------------------------------------------------- | ------------------------------------------------------------------- | ------------------------------------------------------------------- |
-| `range_link_id`                                                     | *str*                                                               | :heavy_check_mark:                                                  | The unique identifier of a range link.                              | f649093edf354cfe8ce52fa60990a109                                    |
-| `table_id`                                                          | *str*                                                               | :heavy_check_mark:                                                  | The unique identifier for the table                                 | WW91IGZvdW5kfIG1lIQ                                                 |
-| `revision`                                                          | *Optional[str]*                                                     | :heavy_minus_sign:                                                  | Returns resources at a specific revision                            | 1A2B3C4D                                                            |
-| `retries`                                                           | [Optional[utils.RetryConfig]](../../models/utils/retryconfig.md)    | :heavy_minus_sign:                                                  | Configuration to override the default retry behavior of the client. |                                                                     |
-
-### Response
-
-**[models.RangeLink](../../models/rangelink.md)**
-
-### Errors
-
-| Error Type              | Status Code             | Content Type            |
-| ----------------------- | ----------------------- | ----------------------- |
-| errors.ErrorResponse    | 400, 401, 403, 404, 429 | application/json        |
-| errors.ErrorResponse    | 500, 503                | application/json        |
-| errors.SDKError         | 4XX, 5XX                | \*/\*                   |
-
-## get_range_link_destinations
-
-Returns a [`RangeLinkListResult`](ref:content#rangelinklistresult) of destinations for a given source range link.
-
-### Example Usage
-
-<!-- UsageSnippet language="python" operationID="getRangeLinkDestinations" method="get" path="/content/tables/{tableId}/rangeLinks/{rangeLinkId}/destinations" -->
-```python
-from workiva import SDK, models
-
-
-with SDK(
-    security=models.Security(
-        client_id="<YOUR_CLIENT_ID_HERE>",
-        client_secret="<YOUR_CLIENT_SECRET_HERE>",
-    ),
-) as sdk:
-
-    res = sdk.content.get_range_link_destinations(request={
-        "next": "JTI0bGltaXQ9MTAwJiUyNG9mZnNldD0xMDA",
-        "range_link_id": "f649093edf354cfe8ce52fa60990a109",
-        "revision": "1A2B3C4D",
-        "table_id": "WW91IGZvdW5kfIG1lIQ",
-    })
-
-    while res is not None:
-        # Handle items
-
-        res = res.next()
-
-```
-
-### Parameters
-
-| Parameter                                                                                 | Type                                                                                      | Required                                                                                  | Description                                                                               |
-| ----------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------- |
-| `request`                                                                                 | [models.GetRangeLinkDestinationsRequest](../../models/getrangelinkdestinationsrequest.md) | :heavy_check_mark:                                                                        | The request object to use for the request.                                                |
-| `retries`                                                                                 | [Optional[utils.RetryConfig]](../../models/utils/retryconfig.md)                          | :heavy_minus_sign:                                                                        | Configuration to override the default retry behavior of the client.                       |
-
-### Response
-
-**[models.GetRangeLinkDestinationsResponse](../../models/getrangelinkdestinationsresponse.md)**
-
-### Errors
-
-| Error Type              | Status Code             | Content Type            |
-| ----------------------- | ----------------------- | ----------------------- |
-| errors.ErrorResponse    | 400, 401, 403, 404, 429 | application/json        |
-| errors.ErrorResponse    | 500, 503                | application/json        |
-| errors.SDKError         | 4XX, 5XX                | \*/\*                   |
-
-## get_range_links
-
-Returns a [`RangeLinkListResult`](ref:content#rangelinklistresult) for a given tableId.
-
-### Example Usage
-
-<!-- UsageSnippet language="python" operationID="getRangeLinks" method="get" path="/content/tables/{tableId}/rangeLinks" -->
-```python
-from workiva import SDK, models
-
-
-with SDK(
-    security=models.Security(
-        client_id="<YOUR_CLIENT_ID_HERE>",
-        client_secret="<YOUR_CLIENT_SECRET_HERE>",
-    ),
-) as sdk:
-
-    res = sdk.content.get_range_links(table_id="WW91IGZvdW5kfIG1lIQ", maxpagesize=1000, next="JTI0bGltaXQ9MTAwJiUyNG9mZnNldD0xMDA", revision="1A2B3C4D")
-
-    while res is not None:
-        # Handle items
-
-        res = res.next()
-
-```
-
-### Parameters
-
-| Parameter                                                           | Type                                                                | Required                                                            | Description                                                         | Example                                                             |
-| ------------------------------------------------------------------- | ------------------------------------------------------------------- | ------------------------------------------------------------------- | ------------------------------------------------------------------- | ------------------------------------------------------------------- |
-| `table_id`                                                          | *str*                                                               | :heavy_check_mark:                                                  | The unique identifier for the table                                 | WW91IGZvdW5kfIG1lIQ                                                 |
-| `maxpagesize`                                                       | *Optional[int]*                                                     | :heavy_minus_sign:                                                  | The maximum number of results to retrieve                           |                                                                     |
-| `next`                                                              | *Optional[str]*                                                     | :heavy_minus_sign:                                                  | Pagination cursor for next set of results.                          | JTI0bGltaXQ9MTAwJiUyNG9mZnNldD0xMDA                                 |
-| `revision`                                                          | *Optional[str]*                                                     | :heavy_minus_sign:                                                  | Returns resources at a specific revision                            | 1A2B3C4D                                                            |
-| `retries`                                                           | [Optional[utils.RetryConfig]](../../models/utils/retryconfig.md)    | :heavy_minus_sign:                                                  | Configuration to override the default retry behavior of the client. |                                                                     |
-
-### Response
-
-**[models.GetRangeLinksResponse](../../models/getrangelinksresponse.md)**
-
-### Errors
-
-| Error Type              | Status Code             | Content Type            |
-| ----------------------- | ----------------------- | ----------------------- |
-| errors.ErrorResponse    | 400, 401, 403, 404, 429 | application/json        |
-| errors.ErrorResponse    | 500, 503                | application/json        |
-| errors.SDKError         | 4XX, 5XX                | \*/\*                   |
-
-## get_rich_text_anchor_by_id
-
-Returns an [`Anchor`](ref:content#anchor) given its id.
-
-### Example Usage
-
-<!-- UsageSnippet language="python" operationID="getRichTextAnchorById" method="get" path="/content/richText/{richTextId}/anchors/{anchorId}" -->
-```python
-from workiva import SDK, models
-
-
-with SDK(
-    security=models.Security(
-        client_id="<YOUR_CLIENT_ID_HERE>",
-        client_secret="<YOUR_CLIENT_SECRET_HERE>",
-    ),
-) as sdk:
-
-    res = sdk.content.get_rich_text_anchor_by_id(anchor_id="<id>", rich_text_id="<id>", revision="1A2B3C4D")
-
-    # Handle response
-    print(res)
-
-```
-
-### Parameters
-
-| Parameter                                                           | Type                                                                | Required                                                            | Description                                                         | Example                                                             |
-| ------------------------------------------------------------------- | ------------------------------------------------------------------- | ------------------------------------------------------------------- | ------------------------------------------------------------------- | ------------------------------------------------------------------- |
 | `anchor_id`                                                         | *str*                                                               | :heavy_check_mark:                                                  | The unique identifier of the anchor                                 |                                                                     |
-| `rich_text_id`                                                      | *str*                                                               | :heavy_check_mark:                                                  | The unique identifier of the rich text content                      |                                                                     |
 | `revision`                                                          | *Optional[str]*                                                     | :heavy_minus_sign:                                                  | Returns resources at a specific revision                            | 1A2B3C4D                                                            |
 | `retries`                                                           | [Optional[utils.RetryConfig]](../../models/utils/retryconfig.md)    | :heavy_minus_sign:                                                  | Configuration to override the default retry behavior of the client. |                                                                     |
 
@@ -669,13 +329,13 @@ with SDK(
 | errors.ErrorResponse         | 500, 503                     | application/json             |
 | errors.SDKError              | 4XX, 5XX                     | \*/\*                        |
 
-## get_rich_text_anchor_extensions
+## get_drawing_anchor_extensions
 
 Returns a paginated list of [`AnchorExtensions`](ref:content#anchorextension) for a given anchorId.
 
 ### Example Usage
 
-<!-- UsageSnippet language="python" operationID="getRichTextAnchorExtensions" method="get" path="/content/richText/{richTextId}/anchors/{anchorId}/extensions" -->
+<!-- UsageSnippet language="python" operationID="getDrawingAnchorExtensions" method="get" path="/content/drawings/{drawingId}/anchors/{anchorId}/extensions" -->
 ```python
 from workiva import SDK, models
 
@@ -687,11 +347,11 @@ with SDK(
     ),
 ) as sdk:
 
-    res = sdk.content.get_rich_text_anchor_extensions(request={
+    res = sdk.content.get_drawing_anchor_extensions(request={
+        "drawing_id": "<id>",
         "anchor_id": "<id>",
         "next": "JTI0bGltaXQ9MTAwJiUyNG9mZnNldD0xMDA",
         "revision": "1A2B3C4D",
-        "rich_text_id": "<id>",
     })
 
     while res is not None:
@@ -703,457 +363,14 @@ with SDK(
 
 ### Parameters
 
-| Parameter                                                                                       | Type                                                                                            | Required                                                                                        | Description                                                                                     |
-| ----------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------- |
-| `request`                                                                                       | [models.GetRichTextAnchorExtensionsRequest](../../models/getrichtextanchorextensionsrequest.md) | :heavy_check_mark:                                                                              | The request object to use for the request.                                                      |
-| `retries`                                                                                       | [Optional[utils.RetryConfig]](../../models/utils/retryconfig.md)                                | :heavy_minus_sign:                                                                              | Configuration to override the default retry behavior of the client.                             |
+| Parameter                                                                                     | Type                                                                                          | Required                                                                                      | Description                                                                                   |
+| --------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------- |
+| `request`                                                                                     | [models.GetDrawingAnchorExtensionsRequest](../../models/getdrawinganchorextensionsrequest.md) | :heavy_check_mark:                                                                            | The request object to use for the request.                                                    |
+| `retries`                                                                                     | [Optional[utils.RetryConfig]](../../models/utils/retryconfig.md)                              | :heavy_minus_sign:                                                                            | Configuration to override the default retry behavior of the client.                           |
 
 ### Response
 
-**[models.GetRichTextAnchorExtensionsResponse](../../models/getrichtextanchorextensionsresponse.md)**
-
-### Errors
-
-| Error Type                   | Status Code                  | Content Type                 |
-| ---------------------------- | ---------------------------- | ---------------------------- |
-| errors.ErrorResponse         | 400, 401, 403, 404, 409, 429 | application/json             |
-| errors.ErrorResponse         | 500, 503                     | application/json             |
-| errors.SDKError              | 4XX, 5XX                     | \*/\*                        |
-
-## get_rich_text_anchors
-
-Returns an [`AnchorsListResult`](ref:content#anchorslistresult) for a given richTextId.
-
-### Example Usage
-
-<!-- UsageSnippet language="python" operationID="getRichTextAnchors" method="get" path="/content/richText/{richTextId}/anchors" -->
-```python
-from workiva import SDK, models
-
-
-with SDK(
-    security=models.Security(
-        client_id="<YOUR_CLIENT_ID_HERE>",
-        client_secret="<YOUR_CLIENT_SECRET_HERE>",
-    ),
-) as sdk:
-
-    res = sdk.content.get_rich_text_anchors(rich_text_id="<id>", maxpagesize=1000, next="JTI0bGltaXQ9MTAwJiUyNG9mZnNldD0xMDA", revision="1A2B3C4D")
-
-    while res is not None:
-        # Handle items
-
-        res = res.next()
-
-```
-
-### Parameters
-
-| Parameter                                                           | Type                                                                | Required                                                            | Description                                                         | Example                                                             |
-| ------------------------------------------------------------------- | ------------------------------------------------------------------- | ------------------------------------------------------------------- | ------------------------------------------------------------------- | ------------------------------------------------------------------- |
-| `rich_text_id`                                                      | *str*                                                               | :heavy_check_mark:                                                  | The unique identifier of the rich text content                      |                                                                     |
-| `maxpagesize`                                                       | *Optional[int]*                                                     | :heavy_minus_sign:                                                  | The maximum number of results to retrieve                           |                                                                     |
-| `next`                                                              | *Optional[str]*                                                     | :heavy_minus_sign:                                                  | Pagination cursor for next set of results.                          | JTI0bGltaXQ9MTAwJiUyNG9mZnNldD0xMDA                                 |
-| `revision`                                                          | *Optional[str]*                                                     | :heavy_minus_sign:                                                  | Returns resources at a specific revision                            | 1A2B3C4D                                                            |
-| `retries`                                                           | [Optional[utils.RetryConfig]](../../models/utils/retryconfig.md)    | :heavy_minus_sign:                                                  | Configuration to override the default retry behavior of the client. |                                                                     |
-
-### Response
-
-**[models.GetRichTextAnchorsResponse](../../models/getrichtextanchorsresponse.md)**
-
-### Errors
-
-| Error Type                   | Status Code                  | Content Type                 |
-| ---------------------------- | ---------------------------- | ---------------------------- |
-| errors.ErrorResponse         | 400, 401, 403, 404, 409, 429 | application/json             |
-| errors.ErrorResponse         | 500, 503                     | application/json             |
-| errors.SDKError              | 4XX, 5XX                     | \*/\*                        |
-
-## get_rich_text_paragraphs
-
-Returns a [`ParagraphsListResult`](ref:content#paragraphslistresult) for a rich text object, given its id.
-
-### Example Usage
-
-<!-- UsageSnippet language="python" operationID="getRichTextParagraphs" method="get" path="/content/richText/{richTextId}/paragraphs" -->
-```python
-from workiva import SDK, models
-
-
-with SDK(
-    security=models.Security(
-        client_id="<YOUR_CLIENT_ID_HERE>",
-        client_secret="<YOUR_CLIENT_SECRET_HERE>",
-    ),
-) as sdk:
-
-    res = sdk.content.get_rich_text_paragraphs(rich_text_id="<id>", maxpagesize=1000, next="JTI0bGltaXQ9MTAwJiUyNG9mZnNldD0xMDA", revision="1A2B3C4D")
-
-    while res is not None:
-        # Handle items
-
-        res = res.next()
-
-```
-
-### Parameters
-
-| Parameter                                                           | Type                                                                | Required                                                            | Description                                                         | Example                                                             |
-| ------------------------------------------------------------------- | ------------------------------------------------------------------- | ------------------------------------------------------------------- | ------------------------------------------------------------------- | ------------------------------------------------------------------- |
-| `rich_text_id`                                                      | *str*                                                               | :heavy_check_mark:                                                  | The unique identifier of the rich text content                      |                                                                     |
-| `maxpagesize`                                                       | *Optional[int]*                                                     | :heavy_minus_sign:                                                  | The maximum number of results to retrieve                           |                                                                     |
-| `next`                                                              | *Optional[str]*                                                     | :heavy_minus_sign:                                                  | Pagination cursor for next set of results.                          | JTI0bGltaXQ9MTAwJiUyNG9mZnNldD0xMDA                                 |
-| `revision`                                                          | *Optional[str]*                                                     | :heavy_minus_sign:                                                  | Returns resources at a specific revision                            | 1A2B3C4D                                                            |
-| `retries`                                                           | [Optional[utils.RetryConfig]](../../models/utils/retryconfig.md)    | :heavy_minus_sign:                                                  | Configuration to override the default retry behavior of the client. |                                                                     |
-
-### Response
-
-**[models.GetRichTextParagraphsResponse](../../models/getrichtextparagraphsresponse.md)**
-
-### Errors
-
-| Error Type                   | Status Code                  | Content Type                 |
-| ---------------------------- | ---------------------------- | ---------------------------- |
-| errors.ErrorResponse         | 400, 401, 403, 404, 409, 429 | application/json             |
-| errors.ErrorResponse         | 500, 503                     | application/json             |
-| errors.SDKError              | 4XX, 5XX                     | \*/\*                        |
-
-## get_row_properties
-
-Returns a [`RowPropertiesListResult`](ref:content#rowpropertieslistresult) for a table
-
-
-### Example Usage
-
-<!-- UsageSnippet language="python" operationID="getRowProperties" method="get" path="/content/tables/{tableId}/properties/rows" -->
-```python
-from workiva import SDK, models
-
-
-with SDK(
-    security=models.Security(
-        client_id="<YOUR_CLIENT_ID_HERE>",
-        client_secret="<YOUR_CLIENT_SECRET_HERE>",
-    ),
-) as sdk:
-
-    res = sdk.content.get_row_properties(request={
-        "next": "JTI0bGltaXQ9MTAwJiUyNG9mZnNldD0xMDA",
-        "revision": "1A2B3C4D",
-        "start_row": 1,
-        "stop_row": 1,
-        "table_id": "WW91IGZvdW5kfIG1lIQ",
-    })
-
-    while res is not None:
-        # Handle items
-
-        res = res.next()
-
-```
-
-### Parameters
-
-| Parameter                                                                 | Type                                                                      | Required                                                                  | Description                                                               |
-| ------------------------------------------------------------------------- | ------------------------------------------------------------------------- | ------------------------------------------------------------------------- | ------------------------------------------------------------------------- |
-| `request`                                                                 | [models.GetRowPropertiesRequest](../../models/getrowpropertiesrequest.md) | :heavy_check_mark:                                                        | The request object to use for the request.                                |
-| `retries`                                                                 | [Optional[utils.RetryConfig]](../../models/utils/retryconfig.md)          | :heavy_minus_sign:                                                        | Configuration to override the default retry behavior of the client.       |
-
-### Response
-
-**[models.GetRowPropertiesResponse](../../models/getrowpropertiesresponse.md)**
-
-### Errors
-
-| Error Type                   | Status Code                  | Content Type                 |
-| ---------------------------- | ---------------------------- | ---------------------------- |
-| errors.ErrorResponse         | 400, 401, 403, 404, 409, 429 | application/json             |
-| errors.ErrorResponse         | 500, 503                     | application/json             |
-| errors.SDKError              | 4XX, 5XX                     | \*/\*                        |
-
-## get_style_guide_by_id
-
-Returns the [`StyleGuide`](ref:content#styleguide) populated with the text styles, list styles, etc. The revision will ensure a static content.
-
-
-### Example Usage
-
-<!-- UsageSnippet language="python" operationID="getStyleGuideById" method="get" path="/content/styleGuides/{styleGuideId}" -->
-```python
-from workiva import SDK, models
-
-
-with SDK(
-    security=models.Security(
-        client_id="<YOUR_CLIENT_ID_HERE>",
-        client_secret="<YOUR_CLIENT_SECRET_HERE>",
-    ),
-) as sdk:
-
-    res = sdk.content.get_style_guide_by_id(style_guide_id="WW91IGZvdW5kIG1lIQ", revision="1A2B3C4D")
-
-    # Handle response
-    print(res)
-
-```
-
-### Parameters
-
-| Parameter                                                           | Type                                                                | Required                                                            | Description                                                         | Example                                                             |
-| ------------------------------------------------------------------- | ------------------------------------------------------------------- | ------------------------------------------------------------------- | ------------------------------------------------------------------- | ------------------------------------------------------------------- |
-| `style_guide_id`                                                    | *str*                                                               | :heavy_check_mark:                                                  | The unique identifier of the style guide                            | WW91IGZvdW5kIG1lIQ                                                  |
-| `revision`                                                          | *Optional[str]*                                                     | :heavy_minus_sign:                                                  | Returns resources at a specific revision                            | 1A2B3C4D                                                            |
-| `retries`                                                           | [Optional[utils.RetryConfig]](../../models/utils/retryconfig.md)    | :heavy_minus_sign:                                                  | Configuration to override the default retry behavior of the client. |                                                                     |
-
-### Response
-
-**[models.StyleGuide](../../models/styleguide.md)**
-
-### Errors
-
-| Error Type                   | Status Code                  | Content Type                 |
-| ---------------------------- | ---------------------------- | ---------------------------- |
-| errors.ErrorResponse         | 400, 401, 403, 404, 409, 429 | application/json             |
-| errors.ErrorResponse         | 500, 503                     | application/json             |
-| errors.SDKError              | 4XX, 5XX                     | \*/\*                        |
-
-## get_table_anchor_by_id
-
-Returns an [`Anchor`](ref:content#anchor) given its id.
-
-### Example Usage
-
-<!-- UsageSnippet language="python" operationID="getTableAnchorById" method="get" path="/content/tables/{tableId}/anchors/{anchorId}" -->
-```python
-from workiva import SDK, models
-
-
-with SDK(
-    security=models.Security(
-        client_id="<YOUR_CLIENT_ID_HERE>",
-        client_secret="<YOUR_CLIENT_SECRET_HERE>",
-    ),
-) as sdk:
-
-    res = sdk.content.get_table_anchor_by_id(anchor_id="<id>", table_id="WW91IGZvdW5kfIG1lIQ", revision="1A2B3C4D")
-
-    # Handle response
-    print(res)
-
-```
-
-### Parameters
-
-| Parameter                                                           | Type                                                                | Required                                                            | Description                                                         | Example                                                             |
-| ------------------------------------------------------------------- | ------------------------------------------------------------------- | ------------------------------------------------------------------- | ------------------------------------------------------------------- | ------------------------------------------------------------------- |
-| `anchor_id`                                                         | *str*                                                               | :heavy_check_mark:                                                  | The unique identifier of the anchor                                 |                                                                     |
-| `table_id`                                                          | *str*                                                               | :heavy_check_mark:                                                  | The unique identifier for the table                                 | WW91IGZvdW5kfIG1lIQ                                                 |
-| `revision`                                                          | *Optional[str]*                                                     | :heavy_minus_sign:                                                  | Returns resources at a specific revision                            | 1A2B3C4D                                                            |
-| `retries`                                                           | [Optional[utils.RetryConfig]](../../models/utils/retryconfig.md)    | :heavy_minus_sign:                                                  | Configuration to override the default retry behavior of the client. |                                                                     |
-
-### Response
-
-**[models.Anchor](../../models/anchor.md)**
-
-### Errors
-
-| Error Type                   | Status Code                  | Content Type                 |
-| ---------------------------- | ---------------------------- | ---------------------------- |
-| errors.ErrorResponse         | 400, 401, 403, 404, 409, 429 | application/json             |
-| errors.ErrorResponse         | 500, 503                     | application/json             |
-| errors.SDKError              | 4XX, 5XX                     | \*/\*                        |
-
-## get_table_anchor_extensions
-
-Returns a paginated list of [`AnchorExtensions`](ref:content#anchorextension) for a given anchorId.
-
-### Example Usage
-
-<!-- UsageSnippet language="python" operationID="getTableAnchorExtensions" method="get" path="/content/tables/{tableId}/anchors/{anchorId}/extensions" -->
-```python
-from workiva import SDK, models
-
-
-with SDK(
-    security=models.Security(
-        client_id="<YOUR_CLIENT_ID_HERE>",
-        client_secret="<YOUR_CLIENT_SECRET_HERE>",
-    ),
-) as sdk:
-
-    res = sdk.content.get_table_anchor_extensions(request={
-        "anchor_id": "<id>",
-        "next": "JTI0bGltaXQ9MTAwJiUyNG9mZnNldD0xMDA",
-        "revision": "1A2B3C4D",
-        "table_id": "WW91IGZvdW5kfIG1lIQ",
-    })
-
-    while res is not None:
-        # Handle items
-
-        res = res.next()
-
-```
-
-### Parameters
-
-| Parameter                                                                                 | Type                                                                                      | Required                                                                                  | Description                                                                               |
-| ----------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------- |
-| `request`                                                                                 | [models.GetTableAnchorExtensionsRequest](../../models/gettableanchorextensionsrequest.md) | :heavy_check_mark:                                                                        | The request object to use for the request.                                                |
-| `retries`                                                                                 | [Optional[utils.RetryConfig]](../../models/utils/retryconfig.md)                          | :heavy_minus_sign:                                                                        | Configuration to override the default retry behavior of the client.                       |
-
-### Response
-
-**[models.GetTableAnchorExtensionsResponse](../../models/gettableanchorextensionsresponse.md)**
-
-### Errors
-
-| Error Type                   | Status Code                  | Content Type                 |
-| ---------------------------- | ---------------------------- | ---------------------------- |
-| errors.ErrorResponse         | 400, 401, 403, 404, 409, 429 | application/json             |
-| errors.ErrorResponse         | 500, 503                     | application/json             |
-| errors.SDKError              | 4XX, 5XX                     | \*/\*                        |
-
-## get_table_anchors
-
-Returns an [`AnchorsListResult`](ref:content#anchorslistresult) given tableId.
-
-### Example Usage
-
-<!-- UsageSnippet language="python" operationID="getTableAnchors" method="get" path="/content/tables/{tableId}/anchors" -->
-```python
-from workiva import SDK, models
-
-
-with SDK(
-    security=models.Security(
-        client_id="<YOUR_CLIENT_ID_HERE>",
-        client_secret="<YOUR_CLIENT_SECRET_HERE>",
-    ),
-) as sdk:
-
-    res = sdk.content.get_table_anchors(table_id="WW91IGZvdW5kfIG1lIQ", maxpagesize=1000, next="JTI0bGltaXQ9MTAwJiUyNG9mZnNldD0xMDA", revision="1A2B3C4D")
-
-    while res is not None:
-        # Handle items
-
-        res = res.next()
-
-```
-
-### Parameters
-
-| Parameter                                                           | Type                                                                | Required                                                            | Description                                                         | Example                                                             |
-| ------------------------------------------------------------------- | ------------------------------------------------------------------- | ------------------------------------------------------------------- | ------------------------------------------------------------------- | ------------------------------------------------------------------- |
-| `table_id`                                                          | *str*                                                               | :heavy_check_mark:                                                  | The unique identifier for the table                                 | WW91IGZvdW5kfIG1lIQ                                                 |
-| `maxpagesize`                                                       | *Optional[int]*                                                     | :heavy_minus_sign:                                                  | The maximum number of results to retrieve                           |                                                                     |
-| `next`                                                              | *Optional[str]*                                                     | :heavy_minus_sign:                                                  | Pagination cursor for next set of results.                          | JTI0bGltaXQ9MTAwJiUyNG9mZnNldD0xMDA                                 |
-| `revision`                                                          | *Optional[str]*                                                     | :heavy_minus_sign:                                                  | Returns resources at a specific revision                            | 1A2B3C4D                                                            |
-| `retries`                                                           | [Optional[utils.RetryConfig]](../../models/utils/retryconfig.md)    | :heavy_minus_sign:                                                  | Configuration to override the default retry behavior of the client. |                                                                     |
-
-### Response
-
-**[models.GetTableAnchorsResponse](../../models/gettableanchorsresponse.md)**
-
-### Errors
-
-| Error Type                   | Status Code                  | Content Type                 |
-| ---------------------------- | ---------------------------- | ---------------------------- |
-| errors.ErrorResponse         | 400, 401, 403, 404, 409, 429 | application/json             |
-| errors.ErrorResponse         | 500, 503                     | application/json             |
-| errors.SDKError              | 4XX, 5XX                     | \*/\*                        |
-
-## get_table_cells
-
-Returns a [`TableCellsResult`](ref:content#tablecellsresult) for a given tableId.
-
-### Example Usage
-
-<!-- UsageSnippet language="python" operationID="getTableCells" method="get" path="/content/tables/{tableId}/cells" -->
-```python
-from workiva import SDK, models
-
-
-with SDK(
-    security=models.Security(
-        client_id="<YOUR_CLIENT_ID_HERE>",
-        client_secret="<YOUR_CLIENT_SECRET_HERE>",
-    ),
-) as sdk:
-
-    res = sdk.content.get_table_cells(request={
-        "next": "JTI0bGltaXQ9MTAwJiUyNG9mZnNldD0xMDA",
-        "revision": "1A2B3C4D",
-        "start_column": 1,
-        "start_row": 1,
-        "stop_column": 1,
-        "stop_row": 1,
-        "table_id": "WW91IGZvdW5kfIG1lIQ",
-    })
-
-    while res is not None:
-        # Handle items
-
-        res = res.next()
-
-```
-
-### Parameters
-
-| Parameter                                                           | Type                                                                | Required                                                            | Description                                                         |
-| ------------------------------------------------------------------- | ------------------------------------------------------------------- | ------------------------------------------------------------------- | ------------------------------------------------------------------- |
-| `request`                                                           | [models.GetTableCellsRequest](../../models/gettablecellsrequest.md) | :heavy_check_mark:                                                  | The request object to use for the request.                          |
-| `retries`                                                           | [Optional[utils.RetryConfig]](../../models/utils/retryconfig.md)    | :heavy_minus_sign:                                                  | Configuration to override the default retry behavior of the client. |
-
-### Response
-
-**[models.GetTableCellsResponse](../../models/gettablecellsresponse.md)**
-
-### Errors
-
-| Error Type                   | Status Code                  | Content Type                 |
-| ---------------------------- | ---------------------------- | ---------------------------- |
-| errors.ErrorResponse         | 400, 401, 403, 404, 409, 429 | application/json             |
-| errors.ErrorResponse         | 500, 503                     | application/json             |
-| errors.SDKError              | 4XX, 5XX                     | \*/\*                        |
-
-## get_table_properties
-
-Returns a [`TableProperties`](ref:content#tableproperties) for a table
-
-
-### Example Usage
-
-<!-- UsageSnippet language="python" operationID="getTableProperties" method="get" path="/content/tables/{tableId}/properties" -->
-```python
-from workiva import SDK, models
-
-
-with SDK(
-    security=models.Security(
-        client_id="<YOUR_CLIENT_ID_HERE>",
-        client_secret="<YOUR_CLIENT_SECRET_HERE>",
-    ),
-) as sdk:
-
-    res = sdk.content.get_table_properties(table_id="WW91IGZvdW5kfIG1lIQ", revision="1A2B3C4D")
-
-    # Handle response
-    print(res)
-
-```
-
-### Parameters
-
-| Parameter                                                           | Type                                                                | Required                                                            | Description                                                         | Example                                                             |
-| ------------------------------------------------------------------- | ------------------------------------------------------------------- | ------------------------------------------------------------------- | ------------------------------------------------------------------- | ------------------------------------------------------------------- |
-| `table_id`                                                          | *str*                                                               | :heavy_check_mark:                                                  | The unique identifier for the table                                 | WW91IGZvdW5kfIG1lIQ                                                 |
-| `revision`                                                          | *Optional[str]*                                                     | :heavy_minus_sign:                                                  | Returns resources at a specific revision                            | 1A2B3C4D                                                            |
-| `retries`                                                           | [Optional[utils.RetryConfig]](../../models/utils/retryconfig.md)    | :heavy_minus_sign:                                                  | Configuration to override the default retry behavior of the client. |                                                                     |
-
-### Response
-
-**[models.TableProperties](../../models/tableproperties.md)**
+**[models.GetDrawingAnchorExtensionsResponse](../../models/getdrawinganchorextensionsresponse.md)**
 
 ### Errors
 
@@ -1225,24 +442,13 @@ with SDK(
 | errors.ErrorResponse         | 500, 503                     | application/json             |
 | errors.SDKError              | 4XX, 5XX                     | \*/\*                        |
 
-## partially_update_table_properties
+## get_image_by_id
 
-Partially updates a table's properties given its ID.
+Returns a [`Image`](ref:content#image) given its id
 
-This is a long running operation. Responses include a `Location` header, which indicates where to poll for results.
-For more details on long-running job polling, see [Operations endpoint](ref:getoperationbyid).
+### Example Usage
 
-### Options
-| Path               | PATCH Operations Supported |
-|--------------------|----------------------------|
-| `/name`            | `replace`                  |
-| `/resizeRowsToFit` | `replace`                  |
-| `/lock`            | `replace`                  |
-
-
-### Example Usage: BadRequest
-
-<!-- UsageSnippet language="python" operationID="partiallyUpdateTableProperties" method="patch" path="/content/tables/{tableId}/properties" example="BadRequest" -->
+<!-- UsageSnippet language="python" operationID="getImageById" method="get" path="/content/images/{imageId}" -->
 ```python
 from workiva import SDK, models
 
@@ -1254,39 +460,7 @@ with SDK(
     ),
 ) as sdk:
 
-    res = sdk.content.partially_update_table_properties(table_id="WW91IGZvdW5kfIG1lIQ", request_body=[
-        {
-            "op": models.Op.REPLACE,
-            "path": "/name",
-            "value": "New name",
-        },
-    ])
-
-    # Handle response
-    print(res)
-
-```
-### Example Usage: body
-
-<!-- UsageSnippet language="python" operationID="partiallyUpdateTableProperties" method="patch" path="/content/tables/{tableId}/properties" example="body" -->
-```python
-from workiva import SDK, models
-
-
-with SDK(
-    security=models.Security(
-        client_id="<YOUR_CLIENT_ID_HERE>",
-        client_secret="<YOUR_CLIENT_SECRET_HERE>",
-    ),
-) as sdk:
-
-    res = sdk.content.partially_update_table_properties(table_id="WW91IGZvdW5kfIG1lIQ", request_body=[
-        {
-            "op": models.Op.REPLACE,
-            "path": "/resizeRowsToFit",
-            "value": True,
-        },
-    ])
+    res = sdk.content.get_image_by_id(image_id="<id>")
 
     # Handle response
     print(res)
@@ -1295,15 +469,63 @@ with SDK(
 
 ### Parameters
 
-| Parameter                                                                    | Type                                                                         | Required                                                                     | Description                                                                  | Example                                                                      |
-| ---------------------------------------------------------------------------- | ---------------------------------------------------------------------------- | ---------------------------------------------------------------------------- | ---------------------------------------------------------------------------- | ---------------------------------------------------------------------------- |
-| `table_id`                                                                   | *str*                                                                        | :heavy_check_mark:                                                           | The unique identifier for the table                                          | WW91IGZvdW5kfIG1lIQ                                                          |
-| `request_body`                                                               | List[[models.JSONPatchOperation](../../models/jsonpatchoperation.md)]        | :heavy_check_mark:                                                           | Patch document representing the changes to be made to the table's properties |                                                                              |
-| `retries`                                                                    | [Optional[utils.RetryConfig]](../../models/utils/retryconfig.md)             | :heavy_minus_sign:                                                           | Configuration to override the default retry behavior of the client.          |                                                                              |
+| Parameter                                                           | Type                                                                | Required                                                            | Description                                                         |
+| ------------------------------------------------------------------- | ------------------------------------------------------------------- | ------------------------------------------------------------------- | ------------------------------------------------------------------- |
+| `image_id`                                                          | *str*                                                               | :heavy_check_mark:                                                  | The unique identifier of the image                                  |
+| `retries`                                                           | [Optional[utils.RetryConfig]](../../models/utils/retryconfig.md)    | :heavy_minus_sign:                                                  | Configuration to override the default retry behavior of the client. |
 
 ### Response
 
-**[models.PartiallyUpdateTablePropertiesResponse](../../models/partiallyupdatetablepropertiesresponse.md)**
+**[models.Image](../../models/image.md)**
+
+### Errors
+
+| Error Type                   | Status Code                  | Content Type                 |
+| ---------------------------- | ---------------------------- | ---------------------------- |
+| errors.ErrorResponse         | 400, 401, 403, 404, 409, 429 | application/json             |
+| errors.ErrorResponse         | 500, 503                     | application/json             |
+| errors.SDKError              | 4XX, 5XX                     | \*/\*                        |
+
+## get_rich_text_anchors
+
+Returns an [`AnchorsListResult`](ref:content#anchorslistresult) for a given richTextId.
+
+### Example Usage
+
+<!-- UsageSnippet language="python" operationID="getRichTextAnchors" method="get" path="/content/richText/{richTextId}/anchors" -->
+```python
+from workiva import SDK, models
+
+
+with SDK(
+    security=models.Security(
+        client_id="<YOUR_CLIENT_ID_HERE>",
+        client_secret="<YOUR_CLIENT_SECRET_HERE>",
+    ),
+) as sdk:
+
+    res = sdk.content.get_rich_text_anchors(rich_text_id="<id>", maxpagesize=1000, next="JTI0bGltaXQ9MTAwJiUyNG9mZnNldD0xMDA", revision="1A2B3C4D")
+
+    while res is not None:
+        # Handle items
+
+        res = res.next()
+
+```
+
+### Parameters
+
+| Parameter                                                           | Type                                                                | Required                                                            | Description                                                         | Example                                                             |
+| ------------------------------------------------------------------- | ------------------------------------------------------------------- | ------------------------------------------------------------------- | ------------------------------------------------------------------- | ------------------------------------------------------------------- |
+| `rich_text_id`                                                      | *str*                                                               | :heavy_check_mark:                                                  | The unique identifier of the rich text content                      |                                                                     |
+| `maxpagesize`                                                       | *Optional[int]*                                                     | :heavy_minus_sign:                                                  | The maximum number of results to retrieve                           |                                                                     |
+| `next`                                                              | *Optional[str]*                                                     | :heavy_minus_sign:                                                  | Pagination cursor for next set of results.                          | JTI0bGltaXQ9MTAwJiUyNG9mZnNldD0xMDA                                 |
+| `revision`                                                          | *Optional[str]*                                                     | :heavy_minus_sign:                                                  | Returns resources at a specific revision                            | 1A2B3C4D                                                            |
+| `retries`                                                           | [Optional[utils.RetryConfig]](../../models/utils/retryconfig.md)    | :heavy_minus_sign:                                                  | Configuration to override the default retry behavior of the client. |                                                                     |
+
+### Response
+
+**[models.GetRichTextAnchorsResponse](../../models/getrichtextanchorsresponse.md)**
 
 ### Errors
 
@@ -1372,6 +594,161 @@ with SDK(
 ### Response
 
 **[models.RichTextAnchorCreationResponse](../../models/richtextanchorcreationresponse.md)**
+
+### Errors
+
+| Error Type                   | Status Code                  | Content Type                 |
+| ---------------------------- | ---------------------------- | ---------------------------- |
+| errors.ErrorResponse         | 400, 401, 403, 404, 409, 429 | application/json             |
+| errors.ErrorResponse         | 500, 503                     | application/json             |
+| errors.SDKError              | 4XX, 5XX                     | \*/\*                        |
+
+## get_rich_text_anchor_by_id
+
+Returns an [`Anchor`](ref:content#anchor) given its id.
+
+### Example Usage
+
+<!-- UsageSnippet language="python" operationID="getRichTextAnchorById" method="get" path="/content/richText/{richTextId}/anchors/{anchorId}" -->
+```python
+from workiva import SDK, models
+
+
+with SDK(
+    security=models.Security(
+        client_id="<YOUR_CLIENT_ID_HERE>",
+        client_secret="<YOUR_CLIENT_SECRET_HERE>",
+    ),
+) as sdk:
+
+    res = sdk.content.get_rich_text_anchor_by_id(rich_text_id="<id>", anchor_id="<id>", revision="1A2B3C4D")
+
+    # Handle response
+    print(res)
+
+```
+
+### Parameters
+
+| Parameter                                                           | Type                                                                | Required                                                            | Description                                                         | Example                                                             |
+| ------------------------------------------------------------------- | ------------------------------------------------------------------- | ------------------------------------------------------------------- | ------------------------------------------------------------------- | ------------------------------------------------------------------- |
+| `rich_text_id`                                                      | *str*                                                               | :heavy_check_mark:                                                  | The unique identifier of the rich text content                      |                                                                     |
+| `anchor_id`                                                         | *str*                                                               | :heavy_check_mark:                                                  | The unique identifier of the anchor                                 |                                                                     |
+| `revision`                                                          | *Optional[str]*                                                     | :heavy_minus_sign:                                                  | Returns resources at a specific revision                            | 1A2B3C4D                                                            |
+| `retries`                                                           | [Optional[utils.RetryConfig]](../../models/utils/retryconfig.md)    | :heavy_minus_sign:                                                  | Configuration to override the default retry behavior of the client. |                                                                     |
+
+### Response
+
+**[models.Anchor](../../models/anchor.md)**
+
+### Errors
+
+| Error Type                   | Status Code                  | Content Type                 |
+| ---------------------------- | ---------------------------- | ---------------------------- |
+| errors.ErrorResponse         | 400, 401, 403, 404, 409, 429 | application/json             |
+| errors.ErrorResponse         | 500, 503                     | application/json             |
+| errors.SDKError              | 4XX, 5XX                     | \*/\*                        |
+
+## get_rich_text_anchor_extensions
+
+Returns a paginated list of [`AnchorExtensions`](ref:content#anchorextension) for a given anchorId.
+
+### Example Usage
+
+<!-- UsageSnippet language="python" operationID="getRichTextAnchorExtensions" method="get" path="/content/richText/{richTextId}/anchors/{anchorId}/extensions" -->
+```python
+from workiva import SDK, models
+
+
+with SDK(
+    security=models.Security(
+        client_id="<YOUR_CLIENT_ID_HERE>",
+        client_secret="<YOUR_CLIENT_SECRET_HERE>",
+    ),
+) as sdk:
+
+    res = sdk.content.get_rich_text_anchor_extensions(request={
+        "rich_text_id": "<id>",
+        "anchor_id": "<id>",
+        "next": "JTI0bGltaXQ9MTAwJiUyNG9mZnNldD0xMDA",
+        "revision": "1A2B3C4D",
+    })
+
+    while res is not None:
+        # Handle items
+
+        res = res.next()
+
+```
+
+### Parameters
+
+| Parameter                                                                                       | Type                                                                                            | Required                                                                                        | Description                                                                                     |
+| ----------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------- |
+| `request`                                                                                       | [models.GetRichTextAnchorExtensionsRequest](../../models/getrichtextanchorextensionsrequest.md) | :heavy_check_mark:                                                                              | The request object to use for the request.                                                      |
+| `retries`                                                                                       | [Optional[utils.RetryConfig]](../../models/utils/retryconfig.md)                                | :heavy_minus_sign:                                                                              | Configuration to override the default retry behavior of the client.                             |
+
+### Response
+
+**[models.GetRichTextAnchorExtensionsResponse](../../models/getrichtextanchorextensionsresponse.md)**
+
+### Errors
+
+| Error Type                   | Status Code                  | Content Type                 |
+| ---------------------------- | ---------------------------- | ---------------------------- |
+| errors.ErrorResponse         | 400, 401, 403, 404, 409, 429 | application/json             |
+| errors.ErrorResponse         | 500, 503                     | application/json             |
+| errors.SDKError              | 4XX, 5XX                     | \*/\*                        |
+
+## rich_text_duplication_edit
+
+Sends a [`RichTextDuplicationEdit`](ref:content#richtextduplicationedit) to perform on the rich text.
+The optional revision property can be used to identify a stable version of the text to use for selections. The latest revision is used if not specified.
+This is a long running operation. Responses include a `Location` header, which indicates where to poll for results. For more details on long-running job polling, see [Operations endpoint](ref:getoperationbyid).
+The `resourceUrl` field will be populated with a link to the [Rich Text Duplication Edit Results endpoint](ref:getrichtextduplicationeditresults) to retrieve the IDs of the new resources.
+
+### Example Usage
+
+<!-- UsageSnippet language="python" operationID="richTextDuplicationEdit" method="post" path="/content/richText/{richTextId}/duplication/edit" example="BadRequest" -->
+```python
+from workiva import SDK, models
+
+
+with SDK(
+    security=models.Security(
+        client_id="<YOUR_CLIENT_ID_HERE>",
+        client_secret="<YOUR_CLIENT_SECRET_HERE>",
+    ),
+) as sdk:
+
+    res = sdk.content.rich_text_duplication_edit(rich_text_id="<id>", rich_text_duplication_edit={
+        "duplicate_table": {
+            "insert_at": {
+                "offset": 0,
+                "paragraph_index": 2,
+            },
+            "source_table": "WAxsaHxoYvTB4D0twUm6YtiF99TNO0gBkSOhgYBed9AMB99EUxqELDQychBaGR9SkZucm5sK",
+        },
+        "revision": "24601abc",
+        "type": models.RichTextDuplicationEditType.DUPLICATE_TABLE,
+    })
+
+    # Handle response
+    print(res)
+
+```
+
+### Parameters
+
+| Parameter                                                                                                                                                                                                               | Type                                                                                                                                                                                                                    | Required                                                                                                                                                                                                                | Description                                                                                                                                                                                                             | Example                                                                                                                                                                                                                 |
+| ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `rich_text_id`                                                                                                                                                                                                          | *str*                                                                                                                                                                                                                   | :heavy_check_mark:                                                                                                                                                                                                      | The unique identifier of the rich text content                                                                                                                                                                          |                                                                                                                                                                                                                         |
+| `rich_text_duplication_edit`                                                                                                                                                                                            | [models.RichTextDuplicationEdit](../../models/richtextduplicationedit.md)                                                                                                                                               | :heavy_check_mark:                                                                                                                                                                                                      | The rich text duplication edits to apply                                                                                                                                                                                | {<br/>"duplicateTable": {<br/>"insertAt": {<br/>"offset": 0,<br/>"paragraphIndex": 2<br/>},<br/>"sourceTable": "WAxsaHxoYvTB4D0twUm6YtiF99TNO0gBkSOhgYBed9AMB99EUxqELDQychBaGR9SkZucm5sK"<br/>},<br/>"revision": "24601abc",<br/>"type": "duplicateTable"<br/>} |
+| `retries`                                                                                                                                                                                                               | [Optional[utils.RetryConfig]](../../models/utils/retryconfig.md)                                                                                                                                                        | :heavy_minus_sign:                                                                                                                                                                                                      | Configuration to override the default retry behavior of the client.                                                                                                                                                     |                                                                                                                                                                                                                         |
+
+### Response
+
+**[models.RichTextDuplicationEditResponse](../../models/richtextduplicationeditresponse.md)**
 
 ### Errors
 
@@ -1452,64 +829,6 @@ with SDK(
 | errors.ErrorResponse         | 500, 503                     | application/json             |
 | errors.SDKError              | 4XX, 5XX                     | \*/\*                        |
 
-## rich_text_duplication_edit
-
-Sends a [`RichTextDuplicationEdit`](ref:content#richtextduplicationedit) to perform on the rich text.
-The optional revision property can be used to identify a stable version of the text to use for selections. The latest revision is used if not specified.
-This is a long running operation. Responses include a `Location` header, which indicates where to poll for results. For more details on long-running job polling, see [Operations endpoint](ref:getoperationbyid).
-The `resourceUrl` field will be populated with a link to the [Rich Text Duplication Edit Results endpoint](ref:getrichtextduplicationeditresults) to retrieve the IDs of the new resources.
-
-### Example Usage
-
-<!-- UsageSnippet language="python" operationID="richTextDuplicationEdit" method="post" path="/content/richText/{richTextId}/duplication/edit" example="BadRequest" -->
-```python
-from workiva import SDK, models
-
-
-with SDK(
-    security=models.Security(
-        client_id="<YOUR_CLIENT_ID_HERE>",
-        client_secret="<YOUR_CLIENT_SECRET_HERE>",
-    ),
-) as sdk:
-
-    res = sdk.content.rich_text_duplication_edit(rich_text_id="<id>", rich_text_duplication_edit={
-        "duplicate_table": {
-            "insert_at": {
-                "offset": 0,
-                "paragraph_index": 2,
-            },
-            "source_table": "WAxsaHxoYvTB4D0twUm6YtiF99TNO0gBkSOhgYBed9AMB99EUxqELDQychBaGR9SkZucm5sK",
-        },
-        "revision": "24601abc",
-        "type": models.RichTextDuplicationEditType.DUPLICATE_TABLE,
-    })
-
-    # Handle response
-    print(res)
-
-```
-
-### Parameters
-
-| Parameter                                                                                                                                                                                                               | Type                                                                                                                                                                                                                    | Required                                                                                                                                                                                                                | Description                                                                                                                                                                                                             | Example                                                                                                                                                                                                                 |
-| ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `rich_text_id`                                                                                                                                                                                                          | *str*                                                                                                                                                                                                                   | :heavy_check_mark:                                                                                                                                                                                                      | The unique identifier of the rich text content                                                                                                                                                                          |                                                                                                                                                                                                                         |
-| `rich_text_duplication_edit`                                                                                                                                                                                            | [models.RichTextDuplicationEdit](../../models/richtextduplicationedit.md)                                                                                                                                               | :heavy_check_mark:                                                                                                                                                                                                      | The rich text duplication edits to apply                                                                                                                                                                                | {<br/>"duplicateTable": {<br/>"insertAt": {<br/>"offset": 0,<br/>"paragraphIndex": 2<br/>},<br/>"sourceTable": "WAxsaHxoYvTB4D0twUm6YtiF99TNO0gBkSOhgYBed9AMB99EUxqELDQychBaGR9SkZucm5sK"<br/>},<br/>"revision": "24601abc",<br/>"type": "duplicateTable"<br/>} |
-| `retries`                                                                                                                                                                                                               | [Optional[utils.RetryConfig]](../../models/utils/retryconfig.md)                                                                                                                                                        | :heavy_minus_sign:                                                                                                                                                                                                      | Configuration to override the default retry behavior of the client.                                                                                                                                                     |                                                                                                                                                                                                                         |
-
-### Response
-
-**[models.RichTextDuplicationEditResponse](../../models/richtextduplicationeditresponse.md)**
-
-### Errors
-
-| Error Type                   | Status Code                  | Content Type                 |
-| ---------------------------- | ---------------------------- | ---------------------------- |
-| errors.ErrorResponse         | 400, 401, 403, 404, 409, 429 | application/json             |
-| errors.ErrorResponse         | 500, 503                     | application/json             |
-| errors.SDKError              | 4XX, 5XX                     | \*/\*                        |
-
 ## rich_text_links_batch_edit
 
 Sends a [`RichTextLinksBatchEdit`](ref:content#richtextlinksbatchedit) to perform as a batch on the rich text.
@@ -1563,6 +882,101 @@ with SDK(
 ### Response
 
 **[models.RichTextLinksBatchEditResponse](../../models/richtextlinksbatcheditresponse.md)**
+
+### Errors
+
+| Error Type                   | Status Code                  | Content Type                 |
+| ---------------------------- | ---------------------------- | ---------------------------- |
+| errors.ErrorResponse         | 400, 401, 403, 404, 409, 429 | application/json             |
+| errors.ErrorResponse         | 500, 503                     | application/json             |
+| errors.SDKError              | 4XX, 5XX                     | \*/\*                        |
+
+## get_rich_text_paragraphs
+
+Returns a [`ParagraphsListResult`](ref:content#paragraphslistresult) for a rich text object, given its id.
+
+### Example Usage
+
+<!-- UsageSnippet language="python" operationID="getRichTextParagraphs" method="get" path="/content/richText/{richTextId}/paragraphs" -->
+```python
+from workiva import SDK, models
+
+
+with SDK(
+    security=models.Security(
+        client_id="<YOUR_CLIENT_ID_HERE>",
+        client_secret="<YOUR_CLIENT_SECRET_HERE>",
+    ),
+) as sdk:
+
+    res = sdk.content.get_rich_text_paragraphs(rich_text_id="<id>", maxpagesize=1000, next="JTI0bGltaXQ9MTAwJiUyNG9mZnNldD0xMDA", revision="1A2B3C4D")
+
+    while res is not None:
+        # Handle items
+
+        res = res.next()
+
+```
+
+### Parameters
+
+| Parameter                                                           | Type                                                                | Required                                                            | Description                                                         | Example                                                             |
+| ------------------------------------------------------------------- | ------------------------------------------------------------------- | ------------------------------------------------------------------- | ------------------------------------------------------------------- | ------------------------------------------------------------------- |
+| `rich_text_id`                                                      | *str*                                                               | :heavy_check_mark:                                                  | The unique identifier of the rich text content                      |                                                                     |
+| `maxpagesize`                                                       | *Optional[int]*                                                     | :heavy_minus_sign:                                                  | The maximum number of results to retrieve                           |                                                                     |
+| `next`                                                              | *Optional[str]*                                                     | :heavy_minus_sign:                                                  | Pagination cursor for next set of results.                          | JTI0bGltaXQ9MTAwJiUyNG9mZnNldD0xMDA                                 |
+| `revision`                                                          | *Optional[str]*                                                     | :heavy_minus_sign:                                                  | Returns resources at a specific revision                            | 1A2B3C4D                                                            |
+| `retries`                                                           | [Optional[utils.RetryConfig]](../../models/utils/retryconfig.md)    | :heavy_minus_sign:                                                  | Configuration to override the default retry behavior of the client. |                                                                     |
+
+### Response
+
+**[models.GetRichTextParagraphsResponse](../../models/getrichtextparagraphsresponse.md)**
+
+### Errors
+
+| Error Type                   | Status Code                  | Content Type                 |
+| ---------------------------- | ---------------------------- | ---------------------------- |
+| errors.ErrorResponse         | 400, 401, 403, 404, 409, 429 | application/json             |
+| errors.ErrorResponse         | 500, 503                     | application/json             |
+| errors.SDKError              | 4XX, 5XX                     | \*/\*                        |
+
+## get_style_guide_by_id
+
+Returns the [`StyleGuide`](ref:content#styleguide) populated with the text styles, list styles, etc. The revision will ensure a static content.
+
+
+### Example Usage
+
+<!-- UsageSnippet language="python" operationID="getStyleGuideById" method="get" path="/content/styleGuides/{styleGuideId}" -->
+```python
+from workiva import SDK, models
+
+
+with SDK(
+    security=models.Security(
+        client_id="<YOUR_CLIENT_ID_HERE>",
+        client_secret="<YOUR_CLIENT_SECRET_HERE>",
+    ),
+) as sdk:
+
+    res = sdk.content.get_style_guide_by_id(style_guide_id="WW91IGZvdW5kIG1lIQ", revision="1A2B3C4D")
+
+    # Handle response
+    print(res)
+
+```
+
+### Parameters
+
+| Parameter                                                           | Type                                                                | Required                                                            | Description                                                         | Example                                                             |
+| ------------------------------------------------------------------- | ------------------------------------------------------------------- | ------------------------------------------------------------------- | ------------------------------------------------------------------- | ------------------------------------------------------------------- |
+| `style_guide_id`                                                    | *str*                                                               | :heavy_check_mark:                                                  | The unique identifier of the style guide                            | WW91IGZvdW5kIG1lIQ                                                  |
+| `revision`                                                          | *Optional[str]*                                                     | :heavy_minus_sign:                                                  | Returns resources at a specific revision                            | 1A2B3C4D                                                            |
+| `retries`                                                           | [Optional[utils.RetryConfig]](../../models/utils/retryconfig.md)    | :heavy_minus_sign:                                                  | Configuration to override the default retry behavior of the client. |                                                                     |
+
+### Response
+
+**[models.StyleGuide](../../models/styleguide.md)**
 
 ### Errors
 
@@ -1684,6 +1098,55 @@ with SDK(
 | errors.ErrorResponse         | 500, 503                     | application/json             |
 | errors.SDKError              | 4XX, 5XX                     | \*/\*                        |
 
+## get_table_anchors
+
+Returns an [`AnchorsListResult`](ref:content#anchorslistresult) given tableId.
+
+### Example Usage
+
+<!-- UsageSnippet language="python" operationID="getTableAnchors" method="get" path="/content/tables/{tableId}/anchors" -->
+```python
+from workiva import SDK, models
+
+
+with SDK(
+    security=models.Security(
+        client_id="<YOUR_CLIENT_ID_HERE>",
+        client_secret="<YOUR_CLIENT_SECRET_HERE>",
+    ),
+) as sdk:
+
+    res = sdk.content.get_table_anchors(table_id="WW91IGZvdW5kfIG1lIQ", maxpagesize=1000, next="JTI0bGltaXQ9MTAwJiUyNG9mZnNldD0xMDA", revision="1A2B3C4D")
+
+    while res is not None:
+        # Handle items
+
+        res = res.next()
+
+```
+
+### Parameters
+
+| Parameter                                                           | Type                                                                | Required                                                            | Description                                                         | Example                                                             |
+| ------------------------------------------------------------------- | ------------------------------------------------------------------- | ------------------------------------------------------------------- | ------------------------------------------------------------------- | ------------------------------------------------------------------- |
+| `table_id`                                                          | *str*                                                               | :heavy_check_mark:                                                  | The unique identifier for the table                                 | WW91IGZvdW5kfIG1lIQ                                                 |
+| `maxpagesize`                                                       | *Optional[int]*                                                     | :heavy_minus_sign:                                                  | The maximum number of results to retrieve                           |                                                                     |
+| `next`                                                              | *Optional[str]*                                                     | :heavy_minus_sign:                                                  | Pagination cursor for next set of results.                          | JTI0bGltaXQ9MTAwJiUyNG9mZnNldD0xMDA                                 |
+| `revision`                                                          | *Optional[str]*                                                     | :heavy_minus_sign:                                                  | Returns resources at a specific revision                            | 1A2B3C4D                                                            |
+| `retries`                                                           | [Optional[utils.RetryConfig]](../../models/utils/retryconfig.md)    | :heavy_minus_sign:                                                  | Configuration to override the default retry behavior of the client. |                                                                     |
+
+### Response
+
+**[models.GetTableAnchorsResponse](../../models/gettableanchorsresponse.md)**
+
+### Errors
+
+| Error Type                   | Status Code                  | Content Type                 |
+| ---------------------------- | ---------------------------- | ---------------------------- |
+| errors.ErrorResponse         | 400, 401, 403, 404, 409, 429 | application/json             |
+| errors.ErrorResponse         | 500, 503                     | application/json             |
+| errors.SDKError              | 4XX, 5XX                     | \*/\*                        |
+
 ## table_anchor_creation
 
 Create a new [`Anchor`](ref:content#anchor) using a [`TableAnchorCreation`](ref:content#tableanchorcreation) request. This is a long running operation.
@@ -1738,6 +1201,157 @@ with SDK(
 ### Response
 
 **[models.TableAnchorCreationResponse](../../models/tableanchorcreationresponse.md)**
+
+### Errors
+
+| Error Type                   | Status Code                  | Content Type                 |
+| ---------------------------- | ---------------------------- | ---------------------------- |
+| errors.ErrorResponse         | 400, 401, 403, 404, 409, 429 | application/json             |
+| errors.ErrorResponse         | 500, 503                     | application/json             |
+| errors.SDKError              | 4XX, 5XX                     | \*/\*                        |
+
+## get_table_anchor_by_id
+
+Returns an [`Anchor`](ref:content#anchor) given its id.
+
+### Example Usage
+
+<!-- UsageSnippet language="python" operationID="getTableAnchorById" method="get" path="/content/tables/{tableId}/anchors/{anchorId}" -->
+```python
+from workiva import SDK, models
+
+
+with SDK(
+    security=models.Security(
+        client_id="<YOUR_CLIENT_ID_HERE>",
+        client_secret="<YOUR_CLIENT_SECRET_HERE>",
+    ),
+) as sdk:
+
+    res = sdk.content.get_table_anchor_by_id(table_id="WW91IGZvdW5kfIG1lIQ", anchor_id="<id>", revision="1A2B3C4D")
+
+    # Handle response
+    print(res)
+
+```
+
+### Parameters
+
+| Parameter                                                           | Type                                                                | Required                                                            | Description                                                         | Example                                                             |
+| ------------------------------------------------------------------- | ------------------------------------------------------------------- | ------------------------------------------------------------------- | ------------------------------------------------------------------- | ------------------------------------------------------------------- |
+| `table_id`                                                          | *str*                                                               | :heavy_check_mark:                                                  | The unique identifier for the table                                 | WW91IGZvdW5kfIG1lIQ                                                 |
+| `anchor_id`                                                         | *str*                                                               | :heavy_check_mark:                                                  | The unique identifier of the anchor                                 |                                                                     |
+| `revision`                                                          | *Optional[str]*                                                     | :heavy_minus_sign:                                                  | Returns resources at a specific revision                            | 1A2B3C4D                                                            |
+| `retries`                                                           | [Optional[utils.RetryConfig]](../../models/utils/retryconfig.md)    | :heavy_minus_sign:                                                  | Configuration to override the default retry behavior of the client. |                                                                     |
+
+### Response
+
+**[models.Anchor](../../models/anchor.md)**
+
+### Errors
+
+| Error Type                   | Status Code                  | Content Type                 |
+| ---------------------------- | ---------------------------- | ---------------------------- |
+| errors.ErrorResponse         | 400, 401, 403, 404, 409, 429 | application/json             |
+| errors.ErrorResponse         | 500, 503                     | application/json             |
+| errors.SDKError              | 4XX, 5XX                     | \*/\*                        |
+
+## get_table_anchor_extensions
+
+Returns a paginated list of [`AnchorExtensions`](ref:content#anchorextension) for a given anchorId.
+
+### Example Usage
+
+<!-- UsageSnippet language="python" operationID="getTableAnchorExtensions" method="get" path="/content/tables/{tableId}/anchors/{anchorId}/extensions" -->
+```python
+from workiva import SDK, models
+
+
+with SDK(
+    security=models.Security(
+        client_id="<YOUR_CLIENT_ID_HERE>",
+        client_secret="<YOUR_CLIENT_SECRET_HERE>",
+    ),
+) as sdk:
+
+    res = sdk.content.get_table_anchor_extensions(request={
+        "table_id": "WW91IGZvdW5kfIG1lIQ",
+        "anchor_id": "<id>",
+        "next": "JTI0bGltaXQ9MTAwJiUyNG9mZnNldD0xMDA",
+        "revision": "1A2B3C4D",
+    })
+
+    while res is not None:
+        # Handle items
+
+        res = res.next()
+
+```
+
+### Parameters
+
+| Parameter                                                                                 | Type                                                                                      | Required                                                                                  | Description                                                                               |
+| ----------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------- |
+| `request`                                                                                 | [models.GetTableAnchorExtensionsRequest](../../models/gettableanchorextensionsrequest.md) | :heavy_check_mark:                                                                        | The request object to use for the request.                                                |
+| `retries`                                                                                 | [Optional[utils.RetryConfig]](../../models/utils/retryconfig.md)                          | :heavy_minus_sign:                                                                        | Configuration to override the default retry behavior of the client.                       |
+
+### Response
+
+**[models.GetTableAnchorExtensionsResponse](../../models/gettableanchorextensionsresponse.md)**
+
+### Errors
+
+| Error Type                   | Status Code                  | Content Type                 |
+| ---------------------------- | ---------------------------- | ---------------------------- |
+| errors.ErrorResponse         | 400, 401, 403, 404, 409, 429 | application/json             |
+| errors.ErrorResponse         | 500, 503                     | application/json             |
+| errors.SDKError              | 4XX, 5XX                     | \*/\*                        |
+
+## get_table_cells
+
+Returns a [`TableCellsResult`](ref:content#tablecellsresult) for a given tableId.
+
+### Example Usage
+
+<!-- UsageSnippet language="python" operationID="getTableCells" method="get" path="/content/tables/{tableId}/cells" -->
+```python
+from workiva import SDK, models
+
+
+with SDK(
+    security=models.Security(
+        client_id="<YOUR_CLIENT_ID_HERE>",
+        client_secret="<YOUR_CLIENT_SECRET_HERE>",
+    ),
+) as sdk:
+
+    res = sdk.content.get_table_cells(request={
+        "table_id": "WW91IGZvdW5kfIG1lIQ",
+        "revision": "1A2B3C4D",
+        "next": "JTI0bGltaXQ9MTAwJiUyNG9mZnNldD0xMDA",
+        "start_row": 1,
+        "stop_row": 1,
+        "start_column": 1,
+        "stop_column": 1,
+    })
+
+    while res is not None:
+        # Handle items
+
+        res = res.next()
+
+```
+
+### Parameters
+
+| Parameter                                                           | Type                                                                | Required                                                            | Description                                                         |
+| ------------------------------------------------------------------- | ------------------------------------------------------------------- | ------------------------------------------------------------------- | ------------------------------------------------------------------- |
+| `request`                                                           | [models.GetTableCellsRequest](../../models/gettablecellsrequest.md) | :heavy_check_mark:                                                  | The request object to use for the request.                          |
+| `retries`                                                           | [Optional[utils.RetryConfig]](../../models/utils/retryconfig.md)    | :heavy_minus_sign:                                                  | Configuration to override the default retry behavior of the client. |
+
+### Response
+
+**[models.GetTableCellsResponse](../../models/gettablecellsresponse.md)**
 
 ### Errors
 
@@ -1812,6 +1426,59 @@ with SDK(
 ### Response
 
 **[models.TableCellsBatchEditResponse](../../models/tablecellsbatcheditresponse.md)**
+
+### Errors
+
+| Error Type                   | Status Code                  | Content Type                 |
+| ---------------------------- | ---------------------------- | ---------------------------- |
+| errors.ErrorResponse         | 400, 401, 403, 404, 409, 429 | application/json             |
+| errors.ErrorResponse         | 500, 503                     | application/json             |
+| errors.SDKError              | 4XX, 5XX                     | \*/\*                        |
+
+## get_column_properties
+
+Returns a [`ColumnPropertiesListResult`](ref:content#columnpropertieslistresult) for a table
+
+
+### Example Usage
+
+<!-- UsageSnippet language="python" operationID="getColumnProperties" method="get" path="/content/tables/{tableId}/properties/columns" -->
+```python
+from workiva import SDK, models
+
+
+with SDK(
+    security=models.Security(
+        client_id="<YOUR_CLIENT_ID_HERE>",
+        client_secret="<YOUR_CLIENT_SECRET_HERE>",
+    ),
+) as sdk:
+
+    res = sdk.content.get_column_properties(request={
+        "table_id": "WW91IGZvdW5kfIG1lIQ",
+        "revision": "1A2B3C4D",
+        "next": "JTI0bGltaXQ9MTAwJiUyNG9mZnNldD0xMDA",
+        "start_column": 1,
+        "stop_column": 1,
+    })
+
+    while res is not None:
+        # Handle items
+
+        res = res.next()
+
+```
+
+### Parameters
+
+| Parameter                                                                       | Type                                                                            | Required                                                                        | Description                                                                     |
+| ------------------------------------------------------------------------------- | ------------------------------------------------------------------------------- | ------------------------------------------------------------------------------- | ------------------------------------------------------------------------------- |
+| `request`                                                                       | [models.GetColumnPropertiesRequest](../../models/getcolumnpropertiesrequest.md) | :heavy_check_mark:                                                              | The request object to use for the request.                                      |
+| `retries`                                                                       | [Optional[utils.RetryConfig]](../../models/utils/retryconfig.md)                | :heavy_minus_sign:                                                              | Configuration to override the default retry behavior of the client.             |
+
+### Response
+
+**[models.GetColumnPropertiesResponse](../../models/getcolumnpropertiesresponse.md)**
 
 ### Errors
 
@@ -1995,6 +1662,152 @@ with SDK(
 | errors.ErrorResponse         | 500, 503                     | application/json             |
 | errors.SDKError              | 4XX, 5XX                     | \*/\*                        |
 
+## get_range_links
+
+Returns a [`RangeLinkListResult`](ref:content#rangelinklistresult) for a given tableId.
+
+### Example Usage
+
+<!-- UsageSnippet language="python" operationID="getRangeLinks" method="get" path="/content/tables/{tableId}/rangeLinks" -->
+```python
+from workiva import SDK, models
+
+
+with SDK(
+    security=models.Security(
+        client_id="<YOUR_CLIENT_ID_HERE>",
+        client_secret="<YOUR_CLIENT_SECRET_HERE>",
+    ),
+) as sdk:
+
+    res = sdk.content.get_range_links(table_id="WW91IGZvdW5kfIG1lIQ", maxpagesize=1000, next="JTI0bGltaXQ9MTAwJiUyNG9mZnNldD0xMDA", revision="1A2B3C4D")
+
+    while res is not None:
+        # Handle items
+
+        res = res.next()
+
+```
+
+### Parameters
+
+| Parameter                                                           | Type                                                                | Required                                                            | Description                                                         | Example                                                             |
+| ------------------------------------------------------------------- | ------------------------------------------------------------------- | ------------------------------------------------------------------- | ------------------------------------------------------------------- | ------------------------------------------------------------------- |
+| `table_id`                                                          | *str*                                                               | :heavy_check_mark:                                                  | The unique identifier for the table                                 | WW91IGZvdW5kfIG1lIQ                                                 |
+| `maxpagesize`                                                       | *Optional[int]*                                                     | :heavy_minus_sign:                                                  | The maximum number of results to retrieve                           |                                                                     |
+| `next`                                                              | *Optional[str]*                                                     | :heavy_minus_sign:                                                  | Pagination cursor for next set of results.                          | JTI0bGltaXQ9MTAwJiUyNG9mZnNldD0xMDA                                 |
+| `revision`                                                          | *Optional[str]*                                                     | :heavy_minus_sign:                                                  | Returns resources at a specific revision                            | 1A2B3C4D                                                            |
+| `retries`                                                           | [Optional[utils.RetryConfig]](../../models/utils/retryconfig.md)    | :heavy_minus_sign:                                                  | Configuration to override the default retry behavior of the client. |                                                                     |
+
+### Response
+
+**[models.GetRangeLinksResponse](../../models/getrangelinksresponse.md)**
+
+### Errors
+
+| Error Type              | Status Code             | Content Type            |
+| ----------------------- | ----------------------- | ----------------------- |
+| errors.ErrorResponse    | 400, 401, 403, 404, 429 | application/json        |
+| errors.ErrorResponse    | 500, 503                | application/json        |
+| errors.SDKError         | 4XX, 5XX                | \*/\*                   |
+
+## get_range_link_by_id
+
+Returns a [`RangeLink`](ref:content#rangelink) given its id
+
+### Example Usage
+
+<!-- UsageSnippet language="python" operationID="getRangeLinkById" method="get" path="/content/tables/{tableId}/rangeLinks/{rangeLinkId}" -->
+```python
+from workiva import SDK, models
+
+
+with SDK(
+    security=models.Security(
+        client_id="<YOUR_CLIENT_ID_HERE>",
+        client_secret="<YOUR_CLIENT_SECRET_HERE>",
+    ),
+) as sdk:
+
+    res = sdk.content.get_range_link_by_id(table_id="WW91IGZvdW5kfIG1lIQ", range_link_id="f649093edf354cfe8ce52fa60990a109", revision="1A2B3C4D")
+
+    # Handle response
+    print(res)
+
+```
+
+### Parameters
+
+| Parameter                                                           | Type                                                                | Required                                                            | Description                                                         | Example                                                             |
+| ------------------------------------------------------------------- | ------------------------------------------------------------------- | ------------------------------------------------------------------- | ------------------------------------------------------------------- | ------------------------------------------------------------------- |
+| `table_id`                                                          | *str*                                                               | :heavy_check_mark:                                                  | The unique identifier for the table                                 | WW91IGZvdW5kfIG1lIQ                                                 |
+| `range_link_id`                                                     | *str*                                                               | :heavy_check_mark:                                                  | The unique identifier of a range link.                              | f649093edf354cfe8ce52fa60990a109                                    |
+| `revision`                                                          | *Optional[str]*                                                     | :heavy_minus_sign:                                                  | Returns resources at a specific revision                            | 1A2B3C4D                                                            |
+| `retries`                                                           | [Optional[utils.RetryConfig]](../../models/utils/retryconfig.md)    | :heavy_minus_sign:                                                  | Configuration to override the default retry behavior of the client. |                                                                     |
+
+### Response
+
+**[models.RangeLink](../../models/rangelink.md)**
+
+### Errors
+
+| Error Type              | Status Code             | Content Type            |
+| ----------------------- | ----------------------- | ----------------------- |
+| errors.ErrorResponse    | 400, 401, 403, 404, 429 | application/json        |
+| errors.ErrorResponse    | 500, 503                | application/json        |
+| errors.SDKError         | 4XX, 5XX                | \*/\*                   |
+
+## get_range_link_destinations
+
+Returns a [`RangeLinkListResult`](ref:content#rangelinklistresult) of destinations for a given source range link.
+
+### Example Usage
+
+<!-- UsageSnippet language="python" operationID="getRangeLinkDestinations" method="get" path="/content/tables/{tableId}/rangeLinks/{rangeLinkId}/destinations" -->
+```python
+from workiva import SDK, models
+
+
+with SDK(
+    security=models.Security(
+        client_id="<YOUR_CLIENT_ID_HERE>",
+        client_secret="<YOUR_CLIENT_SECRET_HERE>",
+    ),
+) as sdk:
+
+    res = sdk.content.get_range_link_destinations(request={
+        "table_id": "WW91IGZvdW5kfIG1lIQ",
+        "range_link_id": "f649093edf354cfe8ce52fa60990a109",
+        "next": "JTI0bGltaXQ9MTAwJiUyNG9mZnNldD0xMDA",
+        "revision": "1A2B3C4D",
+    })
+
+    while res is not None:
+        # Handle items
+
+        res = res.next()
+
+```
+
+### Parameters
+
+| Parameter                                                                                 | Type                                                                                      | Required                                                                                  | Description                                                                               |
+| ----------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------- |
+| `request`                                                                                 | [models.GetRangeLinkDestinationsRequest](../../models/getrangelinkdestinationsrequest.md) | :heavy_check_mark:                                                                        | The request object to use for the request.                                                |
+| `retries`                                                                                 | [Optional[utils.RetryConfig]](../../models/utils/retryconfig.md)                          | :heavy_minus_sign:                                                                        | Configuration to override the default retry behavior of the client.                       |
+
+### Response
+
+**[models.GetRangeLinkDestinationsResponse](../../models/getrangelinkdestinationsresponse.md)**
+
+### Errors
+
+| Error Type              | Status Code             | Content Type            |
+| ----------------------- | ----------------------- | ----------------------- |
+| errors.ErrorResponse    | 400, 401, 403, 404, 429 | application/json        |
+| errors.ErrorResponse    | 500, 503                | application/json        |
+| errors.SDKError         | 4XX, 5XX                | \*/\*                   |
+
 ## table_range_links_edit
 
 Sends a [`RangeLinkEdit`](ref:content#rangelinkedit) to perform on the range links in a table.
@@ -2038,6 +1851,193 @@ with SDK(
 ### Response
 
 **[models.TableRangeLinksEditResponse](../../models/tablerangelinkseditresponse.md)**
+
+### Errors
+
+| Error Type                   | Status Code                  | Content Type                 |
+| ---------------------------- | ---------------------------- | ---------------------------- |
+| errors.ErrorResponse         | 400, 401, 403, 404, 409, 429 | application/json             |
+| errors.ErrorResponse         | 500, 503                     | application/json             |
+| errors.SDKError              | 4XX, 5XX                     | \*/\*                        |
+
+## get_table_properties
+
+Returns a [`TableProperties`](ref:content#tableproperties) for a table
+
+
+### Example Usage
+
+<!-- UsageSnippet language="python" operationID="getTableProperties" method="get" path="/content/tables/{tableId}/properties" -->
+```python
+from workiva import SDK, models
+
+
+with SDK(
+    security=models.Security(
+        client_id="<YOUR_CLIENT_ID_HERE>",
+        client_secret="<YOUR_CLIENT_SECRET_HERE>",
+    ),
+) as sdk:
+
+    res = sdk.content.get_table_properties(table_id="WW91IGZvdW5kfIG1lIQ", revision="1A2B3C4D")
+
+    # Handle response
+    print(res)
+
+```
+
+### Parameters
+
+| Parameter                                                           | Type                                                                | Required                                                            | Description                                                         | Example                                                             |
+| ------------------------------------------------------------------- | ------------------------------------------------------------------- | ------------------------------------------------------------------- | ------------------------------------------------------------------- | ------------------------------------------------------------------- |
+| `table_id`                                                          | *str*                                                               | :heavy_check_mark:                                                  | The unique identifier for the table                                 | WW91IGZvdW5kfIG1lIQ                                                 |
+| `revision`                                                          | *Optional[str]*                                                     | :heavy_minus_sign:                                                  | Returns resources at a specific revision                            | 1A2B3C4D                                                            |
+| `retries`                                                           | [Optional[utils.RetryConfig]](../../models/utils/retryconfig.md)    | :heavy_minus_sign:                                                  | Configuration to override the default retry behavior of the client. |                                                                     |
+
+### Response
+
+**[models.TableProperties](../../models/tableproperties.md)**
+
+### Errors
+
+| Error Type                   | Status Code                  | Content Type                 |
+| ---------------------------- | ---------------------------- | ---------------------------- |
+| errors.ErrorResponse         | 400, 401, 403, 404, 409, 429 | application/json             |
+| errors.ErrorResponse         | 500, 503                     | application/json             |
+| errors.SDKError              | 4XX, 5XX                     | \*/\*                        |
+
+## partially_update_table_properties
+
+Partially updates a table's properties given its ID.
+
+This is a long running operation. Responses include a `Location` header, which indicates where to poll for results.
+For more details on long-running job polling, see [Operations endpoint](ref:getoperationbyid).
+
+### Options
+| Path               | PATCH Operations Supported |
+|--------------------|----------------------------|
+| `/name`            | `replace`                  |
+| `/resizeRowsToFit` | `replace`                  |
+| `/lock`            | `replace`                  |
+
+
+### Example Usage: BadRequest
+
+<!-- UsageSnippet language="python" operationID="partiallyUpdateTableProperties" method="patch" path="/content/tables/{tableId}/properties" example="BadRequest" -->
+```python
+from workiva import SDK, models
+
+
+with SDK(
+    security=models.Security(
+        client_id="<YOUR_CLIENT_ID_HERE>",
+        client_secret="<YOUR_CLIENT_SECRET_HERE>",
+    ),
+) as sdk:
+
+    res = sdk.content.partially_update_table_properties(table_id="WW91IGZvdW5kfIG1lIQ", request_body=[
+        {
+            "op": models.Op.REPLACE,
+            "path": "/name",
+            "value": "New name",
+        },
+    ])
+
+    # Handle response
+    print(res)
+
+```
+### Example Usage: body
+
+<!-- UsageSnippet language="python" operationID="partiallyUpdateTableProperties" method="patch" path="/content/tables/{tableId}/properties" example="body" -->
+```python
+from workiva import SDK, models
+
+
+with SDK(
+    security=models.Security(
+        client_id="<YOUR_CLIENT_ID_HERE>",
+        client_secret="<YOUR_CLIENT_SECRET_HERE>",
+    ),
+) as sdk:
+
+    res = sdk.content.partially_update_table_properties(table_id="WW91IGZvdW5kfIG1lIQ", request_body=[
+        {
+            "op": models.Op.REPLACE,
+            "path": "/resizeRowsToFit",
+            "value": True,
+        },
+    ])
+
+    # Handle response
+    print(res)
+
+```
+
+### Parameters
+
+| Parameter                                                                    | Type                                                                         | Required                                                                     | Description                                                                  | Example                                                                      |
+| ---------------------------------------------------------------------------- | ---------------------------------------------------------------------------- | ---------------------------------------------------------------------------- | ---------------------------------------------------------------------------- | ---------------------------------------------------------------------------- |
+| `table_id`                                                                   | *str*                                                                        | :heavy_check_mark:                                                           | The unique identifier for the table                                          | WW91IGZvdW5kfIG1lIQ                                                          |
+| `request_body`                                                               | List[[models.JSONPatchOperation](../../models/jsonpatchoperation.md)]        | :heavy_check_mark:                                                           | Patch document representing the changes to be made to the table's properties |                                                                              |
+| `retries`                                                                    | [Optional[utils.RetryConfig]](../../models/utils/retryconfig.md)             | :heavy_minus_sign:                                                           | Configuration to override the default retry behavior of the client.          |                                                                              |
+
+### Response
+
+**[models.PartiallyUpdateTablePropertiesResponse](../../models/partiallyupdatetablepropertiesresponse.md)**
+
+### Errors
+
+| Error Type                   | Status Code                  | Content Type                 |
+| ---------------------------- | ---------------------------- | ---------------------------- |
+| errors.ErrorResponse         | 400, 401, 403, 404, 409, 429 | application/json             |
+| errors.ErrorResponse         | 500, 503                     | application/json             |
+| errors.SDKError              | 4XX, 5XX                     | \*/\*                        |
+
+## get_row_properties
+
+Returns a [`RowPropertiesListResult`](ref:content#rowpropertieslistresult) for a table
+
+
+### Example Usage
+
+<!-- UsageSnippet language="python" operationID="getRowProperties" method="get" path="/content/tables/{tableId}/properties/rows" -->
+```python
+from workiva import SDK, models
+
+
+with SDK(
+    security=models.Security(
+        client_id="<YOUR_CLIENT_ID_HERE>",
+        client_secret="<YOUR_CLIENT_SECRET_HERE>",
+    ),
+) as sdk:
+
+    res = sdk.content.get_row_properties(request={
+        "table_id": "WW91IGZvdW5kfIG1lIQ",
+        "revision": "1A2B3C4D",
+        "next": "JTI0bGltaXQ9MTAwJiUyNG9mZnNldD0xMDA",
+        "start_row": 1,
+        "stop_row": 1,
+    })
+
+    while res is not None:
+        # Handle items
+
+        res = res.next()
+
+```
+
+### Parameters
+
+| Parameter                                                                 | Type                                                                      | Required                                                                  | Description                                                               |
+| ------------------------------------------------------------------------- | ------------------------------------------------------------------------- | ------------------------------------------------------------------------- | ------------------------------------------------------------------------- |
+| `request`                                                                 | [models.GetRowPropertiesRequest](../../models/getrowpropertiesrequest.md) | :heavy_check_mark:                                                        | The request object to use for the request.                                |
+| `retries`                                                                 | [Optional[utils.RetryConfig]](../../models/utils/retryconfig.md)          | :heavy_minus_sign:                                                        | Configuration to override the default retry behavior of the client.       |
+
+### Response
+
+**[models.GetRowPropertiesResponse](../../models/getrowpropertiesresponse.md)**
 
 ### Errors
 

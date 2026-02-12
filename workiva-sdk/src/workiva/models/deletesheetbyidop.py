@@ -8,23 +8,23 @@ from workiva.utils import FieldMetadata, PathParamMetadata
 
 
 class DeleteSheetByIDRequestTypedDict(TypedDict):
-    sheet_id: str
-    r"""The unique identifier of the sheet"""
     spreadsheet_id: str
     r"""The unique identifier of the spreadsheet"""
+    sheet_id: str
+    r"""The unique identifier of the sheet"""
 
 
 class DeleteSheetByIDRequest(BaseModel):
-    sheet_id: Annotated[
-        str,
-        pydantic.Field(alias="sheetId"),
-        FieldMetadata(path=PathParamMetadata(style="simple", explode=False)),
-    ]
-    r"""The unique identifier of the sheet"""
-
     spreadsheet_id: Annotated[
         str,
         pydantic.Field(alias="spreadsheetId"),
         FieldMetadata(path=PathParamMetadata(style="simple", explode=False)),
     ]
     r"""The unique identifier of the spreadsheet"""
+
+    sheet_id: Annotated[
+        str,
+        pydantic.Field(alias="sheetId"),
+        FieldMetadata(path=PathParamMetadata(style="simple", explode=False)),
+    ]
+    r"""The unique identifier of the sheet"""

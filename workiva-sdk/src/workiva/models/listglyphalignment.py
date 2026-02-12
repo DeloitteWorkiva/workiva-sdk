@@ -2,9 +2,10 @@
 
 from __future__ import annotations
 from enum import Enum
+from workiva import utils
 
 
-class ListGlyphAlignment(str, Enum):
+class ListGlyphAlignment(str, Enum, metaclass=utils.OpenEnumMeta):
     r"""How the list glyph is aligned relative to the indentation point of the list level."""
 
     GLYPH_ALIGN_LEFT = "glyphAlignLeft"

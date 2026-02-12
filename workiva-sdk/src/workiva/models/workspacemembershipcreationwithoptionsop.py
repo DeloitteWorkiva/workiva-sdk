@@ -12,21 +12,15 @@ from workiva.utils import FieldMetadata, PathParamMetadata, RequestMetadata
 
 
 class WorkspaceMembershipCreationWithOptionsRequestTypedDict(TypedDict):
-    workspace_membership_creation: WorkspaceMembershipCreationTypedDict
-    r"""Details about the workspace membership creation."""
     organization_id: str
     r"""The unique identifier of the organization"""
     workspace_id: str
     r"""The unique identifier of the workspace"""
+    workspace_membership_creation: WorkspaceMembershipCreationTypedDict
+    r"""Details about the workspace membership creation."""
 
 
 class WorkspaceMembershipCreationWithOptionsRequest(BaseModel):
-    workspace_membership_creation: Annotated[
-        WorkspaceMembershipCreation,
-        FieldMetadata(request=RequestMetadata(media_type="application/json")),
-    ]
-    r"""Details about the workspace membership creation."""
-
     organization_id: Annotated[
         str,
         pydantic.Field(alias="organizationId"),
@@ -40,3 +34,9 @@ class WorkspaceMembershipCreationWithOptionsRequest(BaseModel):
         FieldMetadata(path=PathParamMetadata(style="simple", explode=False)),
     ]
     r"""The unique identifier of the workspace"""
+
+    workspace_membership_creation: Annotated[
+        WorkspaceMembershipCreation,
+        FieldMetadata(request=RequestMetadata(media_type="application/json")),
+    ]
+    r"""Details about the workspace membership creation."""

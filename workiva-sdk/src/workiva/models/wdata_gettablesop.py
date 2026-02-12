@@ -21,10 +21,10 @@ WDATA_GET_TABLES_OP_SERVERS = [
 
 
 class WdataGetTablesRequestTypedDict(TypedDict):
-    cursor: NotRequired[str]
-    r"""a paging cursor; if included the limit is ignored"""
     include_shared: NotRequired[bool]
     r"""If true, returns all tables shared with the workspace associated with the request. If false, returns only tables the workspace owns."""
+    cursor: NotRequired[str]
+    r"""a paging cursor; if included the limit is ignored"""
     limit: NotRequired[int]
     r"""the number of folders to return, from 1 to 1000; by default, 1000"""
     offset: NotRequired[int]
@@ -32,18 +32,18 @@ class WdataGetTablesRequestTypedDict(TypedDict):
 
 
 class WdataGetTablesRequest(BaseModel):
-    cursor: Annotated[
-        Optional[str],
-        FieldMetadata(query=QueryParamMetadata(style="form", explode=True)),
-    ] = None
-    r"""a paging cursor; if included the limit is ignored"""
-
     include_shared: Annotated[
         Optional[bool],
         pydantic.Field(alias="includeShared"),
         FieldMetadata(query=QueryParamMetadata(style="form", explode=True)),
     ] = False
     r"""If true, returns all tables shared with the workspace associated with the request. If false, returns only tables the workspace owns."""
+
+    cursor: Annotated[
+        Optional[str],
+        FieldMetadata(query=QueryParamMetadata(style="form", explode=True)),
+    ] = None
+    r"""a paging cursor; if included the limit is ignored"""
 
     limit: Annotated[
         Optional[int],
@@ -59,7 +59,7 @@ class WdataGetTablesRequest(BaseModel):
 
     @model_serializer(mode="wrap")
     def serialize_model(self, handler):
-        optional_fields = set(["cursor", "includeShared", "limit", "offset"])
+        optional_fields = set(["includeShared", "cursor", "limit", "offset"])
         serialized = handler(self)
         m = {}
 

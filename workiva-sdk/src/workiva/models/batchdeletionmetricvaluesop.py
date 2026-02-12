@@ -9,20 +9,21 @@ from workiva.utils import FieldMetadata, PathParamMetadata, RequestMetadata
 
 
 class BatchDeletionMetricValuesRequestTypedDict(TypedDict):
-    metric_value_identifier: MetricValueIdentifierTypedDict
-    r"""The metric values to delete"""
-    metric_id: str
-    r"""The unique identifier of the metric"""
     program_id: str
     r"""The unique identifier of the program"""
+    metric_id: str
+    r"""The unique identifier of the metric"""
+    metric_value_identifier: MetricValueIdentifierTypedDict
+    r"""The metric values to delete"""
 
 
 class BatchDeletionMetricValuesRequest(BaseModel):
-    metric_value_identifier: Annotated[
-        MetricValueIdentifier,
-        FieldMetadata(request=RequestMetadata(media_type="application/json")),
+    program_id: Annotated[
+        str,
+        pydantic.Field(alias="programId"),
+        FieldMetadata(path=PathParamMetadata(style="simple", explode=False)),
     ]
-    r"""The metric values to delete"""
+    r"""The unique identifier of the program"""
 
     metric_id: Annotated[
         str,
@@ -31,9 +32,8 @@ class BatchDeletionMetricValuesRequest(BaseModel):
     ]
     r"""The unique identifier of the metric"""
 
-    program_id: Annotated[
-        str,
-        pydantic.Field(alias="programId"),
-        FieldMetadata(path=PathParamMetadata(style="simple", explode=False)),
+    metric_value_identifier: Annotated[
+        MetricValueIdentifier,
+        FieldMetadata(request=RequestMetadata(media_type="application/json")),
     ]
-    r"""The unique identifier of the program"""
+    r"""The metric values to delete"""

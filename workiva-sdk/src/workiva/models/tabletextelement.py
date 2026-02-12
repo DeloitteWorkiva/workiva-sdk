@@ -32,10 +32,10 @@ class TableTextElementTypedDict(TypedDict):
     r"""The number of items to skip over in a collection before the items which will be returned or worked on. The items may be shapes, sections, elements, characters, slides, etc depending on which object or path the offset is being used on.
 
     """
-    properties: NotRequired[TableTextElementPropertiesTypedDict]
-    r"""The properties for a table text element."""
     style: NotRequired[StyleRefTypedDict]
     r"""A reference to a style."""
+    properties: NotRequired[TableTextElementPropertiesTypedDict]
+    r"""The properties for a table text element."""
 
 
 class TableTextElement(BaseModel):
@@ -61,15 +61,15 @@ class TableTextElement(BaseModel):
 
     """
 
-    properties: Optional[TableTextElementProperties] = None
-    r"""The properties for a table text element."""
-
     style: Optional[StyleRef] = None
     r"""A reference to a style."""
 
+    properties: Optional[TableTextElementProperties] = None
+    r"""The properties for a table text element."""
+
     @model_serializer(mode="wrap")
     def serialize_model(self, handler):
-        optional_fields = set(["format", "length", "offset", "properties", "style"])
+        optional_fields = set(["format", "length", "offset", "style", "properties"])
         nullable_fields = set(["format"])
         serialized = handler(self)
         m = {}

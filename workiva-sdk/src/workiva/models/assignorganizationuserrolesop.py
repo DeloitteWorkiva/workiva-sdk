@@ -9,20 +9,15 @@ from workiva.utils import FieldMetadata, PathParamMetadata, RequestMetadata
 
 
 class AssignOrganizationUserRolesRequestTypedDict(TypedDict):
-    request_body: List[str]
-    r"""Editable details about the user's roles."""
     organization_id: str
     r"""The unique identifier of the organization"""
     user_id: str
     r"""The unique identifier of the user"""
+    request_body: List[str]
+    r"""Editable details about the user's roles."""
 
 
 class AssignOrganizationUserRolesRequest(BaseModel):
-    request_body: Annotated[
-        List[str], FieldMetadata(request=RequestMetadata(media_type="application/json"))
-    ]
-    r"""Editable details about the user's roles."""
-
     organization_id: Annotated[
         str,
         pydantic.Field(alias="organizationId"),
@@ -36,6 +31,11 @@ class AssignOrganizationUserRolesRequest(BaseModel):
         FieldMetadata(path=PathParamMetadata(style="simple", explode=False)),
     ]
     r"""The unique identifier of the user"""
+
+    request_body: Annotated[
+        List[str], FieldMetadata(request=RequestMetadata(media_type="application/json"))
+    ]
+    r"""Editable details about the user's roles."""
 
 
 class AssignOrganizationUserRolesResponseTypedDict(TypedDict):

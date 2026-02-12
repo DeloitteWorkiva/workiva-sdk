@@ -2,9 +2,10 @@
 
 from __future__ import annotations
 from enum import Enum
+from workiva import utils
 
 
-class ConditionalOperator(str, Enum):
+class ConditionalOperator(str, Enum, metaclass=utils.OpenEnumMeta):
     NULL = "NULL"
     NOT_NULL = "NOT_NULL"
     EQUALS = "EQUALS"

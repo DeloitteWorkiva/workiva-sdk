@@ -4,13 +4,14 @@ from __future__ import annotations
 from .conditions import Conditions, ConditionsTypedDict
 from enum import Enum
 import pydantic
-from pydantic import model_serializer
+from pydantic import field_serializer, model_serializer
 from typing import Optional
 from typing_extensions import Annotated, NotRequired, TypedDict
+from workiva import models, utils
 from workiva.types import BaseModel, UNSET_SENTINEL
 
 
-class MappingRuleType(str, Enum):
+class MappingRuleType(str, Enum, metaclass=utils.OpenEnumMeta):
     LIKE = "LIKE"
     EXACT = "EXACT"
     REGEX = "REGEX"
@@ -48,6 +49,15 @@ class MappingRule(BaseModel):
     target: Optional[str] = None
 
     type: Optional[MappingRuleType] = None
+
+    @field_serializer("type")
+    def serialize_type(self, value):
+        if isinstance(value, str):
+            try:
+                return models.MappingRuleType(value)
+            except ValueError:
+                return value
+        return value
 
     @model_serializer(mode="wrap")
     def serialize_model(self, handler):

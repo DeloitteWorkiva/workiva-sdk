@@ -3,9 +3,10 @@
 from __future__ import annotations
 from enum import Enum
 import pydantic
-from pydantic import model_serializer
+from pydantic import field_serializer, model_serializer
 from typing import Optional
 from typing_extensions import Annotated, NotRequired, TypedDict
+from workiva import models, utils
 from workiva.types import BaseModel, UNSET_SENTINEL
 
 
@@ -36,7 +37,7 @@ class OutputVariables(BaseModel):
         return m
 
 
-class ChainRunNodeResultState(str, Enum):
+class ChainRunNodeResultState(str, Enum, metaclass=utils.OpenEnumMeta):
     ACTIVE = "active"
     ERRORED = "errored"
     SKIPPED = "skipped"
@@ -71,6 +72,15 @@ class ChainRunNodeResult(BaseModel):
     ] = None
 
     state: Optional[ChainRunNodeResultState] = None
+
+    @field_serializer("state")
+    def serialize_state(self, value):
+        if isinstance(value, str):
+            try:
+                return models.ChainRunNodeResultState(value)
+            except ValueError:
+                return value
+        return value
 
     @model_serializer(mode="wrap")
     def serialize_model(self, handler):

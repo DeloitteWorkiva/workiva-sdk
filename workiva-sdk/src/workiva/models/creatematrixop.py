@@ -9,21 +9,15 @@ from workiva.utils import FieldMetadata, PathParamMetadata, RequestMetadata
 
 
 class CreateMatrixRequestTypedDict(TypedDict):
-    matrix: MatrixInputTypedDict
-    r"""The properties of the matrix to create"""
     test_form_id: str
     r"""The unique identifier of the test form"""
     test_phase_id: str
     r"""The unique identifier of the test phase"""
+    matrix: MatrixInputTypedDict
+    r"""The properties of the matrix to create"""
 
 
 class CreateMatrixRequest(BaseModel):
-    matrix: Annotated[
-        MatrixInput,
-        FieldMetadata(request=RequestMetadata(media_type="application/json")),
-    ]
-    r"""The properties of the matrix to create"""
-
     test_form_id: Annotated[
         str,
         pydantic.Field(alias="testFormId"),
@@ -37,3 +31,9 @@ class CreateMatrixRequest(BaseModel):
         FieldMetadata(path=PathParamMetadata(style="simple", explode=False)),
     ]
     r"""The unique identifier of the test phase"""
+
+    matrix: Annotated[
+        MatrixInput,
+        FieldMetadata(request=RequestMetadata(media_type="application/json")),
+    ]
+    r"""The properties of the matrix to create"""

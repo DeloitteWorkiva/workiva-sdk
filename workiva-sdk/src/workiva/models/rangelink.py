@@ -4,8 +4,9 @@ from __future__ import annotations
 from .rangelinkdestination import RangeLinkDestination, RangeLinkDestinationTypedDict
 from .rangelinksource import RangeLinkSource, RangeLinkSourceTypedDict
 from .rangelinktype import RangeLinkType
-from pydantic import model_serializer
+from pydantic import field_serializer, model_serializer
 from typing_extensions import NotRequired, TypedDict
+from workiva import models
 from workiva.types import BaseModel, Nullable, OptionalNullable, UNSET, UNSET_SENTINEL
 
 
@@ -14,19 +15,19 @@ class RangeLinkTypedDict(TypedDict):
 
     id: str
     r"""The unique identifier of a range link."""
+    table: str
+    r"""The unique identifier of a table"""
     revision: str
     r"""Identifies a unique revision of content. The same revision can be used for any content request within a file because revisions are allocated at the file-level.
     When querying for content, this can be used to get a consistent version of the content. When editing content, this can be used to make the change to the content at a known state. In either case, omitting the revision (when allowed) will always default to the latest revision of the file.
 
     """
-    table: str
-    r"""The unique identifier of a table"""
     type: RangeLinkType
     r"""The type of range link."""
-    destination: NotRequired[Nullable[RangeLinkDestinationTypedDict]]
-    r"""Contains properties for a range link destination."""
     source: NotRequired[Nullable[RangeLinkSourceTypedDict]]
     r"""Contains properties for a range link source."""
+    destination: NotRequired[Nullable[RangeLinkDestinationTypedDict]]
+    r"""Contains properties for a range link destination."""
 
 
 class RangeLink(BaseModel):
@@ -35,28 +36,37 @@ class RangeLink(BaseModel):
     id: str
     r"""The unique identifier of a range link."""
 
+    table: str
+    r"""The unique identifier of a table"""
+
     revision: str
     r"""Identifies a unique revision of content. The same revision can be used for any content request within a file because revisions are allocated at the file-level.
     When querying for content, this can be used to get a consistent version of the content. When editing content, this can be used to make the change to the content at a known state. In either case, omitting the revision (when allowed) will always default to the latest revision of the file.
 
     """
 
-    table: str
-    r"""The unique identifier of a table"""
-
     type: RangeLinkType
     r"""The type of range link."""
-
-    destination: OptionalNullable[RangeLinkDestination] = UNSET
-    r"""Contains properties for a range link destination."""
 
     source: OptionalNullable[RangeLinkSource] = UNSET
     r"""Contains properties for a range link source."""
 
+    destination: OptionalNullable[RangeLinkDestination] = UNSET
+    r"""Contains properties for a range link destination."""
+
+    @field_serializer("type")
+    def serialize_type(self, value):
+        if isinstance(value, str):
+            try:
+                return models.RangeLinkType(value)
+            except ValueError:
+                return value
+        return value
+
     @model_serializer(mode="wrap")
     def serialize_model(self, handler):
-        optional_fields = set(["destination", "source"])
-        nullable_fields = set(["destination", "source"])
+        optional_fields = set(["source", "destination"])
+        nullable_fields = set(["source", "destination"])
         serialized = handler(self)
         m = {}
 

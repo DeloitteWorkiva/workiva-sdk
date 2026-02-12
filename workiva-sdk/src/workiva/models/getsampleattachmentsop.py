@@ -8,31 +8,17 @@ from workiva.utils import FieldMetadata, PathParamMetadata
 
 
 class GetSampleAttachmentsRequestTypedDict(TypedDict):
-    matrix_id: str
-    r"""The unique identifier of the matrix"""
-    sample_id: str
-    r"""The unique identifier of the sample"""
     test_form_id: str
     r"""The unique identifier of the test form"""
     test_phase_id: str
     r"""The unique identifier of the test phase"""
+    matrix_id: str
+    r"""The unique identifier of the matrix"""
+    sample_id: str
+    r"""The unique identifier of the sample"""
 
 
 class GetSampleAttachmentsRequest(BaseModel):
-    matrix_id: Annotated[
-        str,
-        pydantic.Field(alias="matrixId"),
-        FieldMetadata(path=PathParamMetadata(style="simple", explode=False)),
-    ]
-    r"""The unique identifier of the matrix"""
-
-    sample_id: Annotated[
-        str,
-        pydantic.Field(alias="sampleId"),
-        FieldMetadata(path=PathParamMetadata(style="simple", explode=False)),
-    ]
-    r"""The unique identifier of the sample"""
-
     test_form_id: Annotated[
         str,
         pydantic.Field(alias="testFormId"),
@@ -46,3 +32,17 @@ class GetSampleAttachmentsRequest(BaseModel):
         FieldMetadata(path=PathParamMetadata(style="simple", explode=False)),
     ]
     r"""The unique identifier of the test phase"""
+
+    matrix_id: Annotated[
+        str,
+        pydantic.Field(alias="matrixId"),
+        FieldMetadata(path=PathParamMetadata(style="simple", explode=False)),
+    ]
+    r"""The unique identifier of the matrix"""
+
+    sample_id: Annotated[
+        str,
+        pydantic.Field(alias="sampleId"),
+        FieldMetadata(path=PathParamMetadata(style="simple", explode=False)),
+    ]
+    r"""The unique identifier of the sample"""

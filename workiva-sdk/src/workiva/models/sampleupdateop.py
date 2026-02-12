@@ -10,30 +10,17 @@ from workiva.utils import FieldMetadata, PathParamMetadata, RequestMetadata
 
 
 class SampleUpdateRequestTypedDict(TypedDict):
-    request_body: List[MatrixSampleInputTypedDict]
-    r"""Details about the samples to update"""
-    matrix_id: str
-    r"""The unique identifier of the matrix"""
     test_form_id: str
     r"""The unique identifier of the test form"""
     test_phase_id: str
     r"""The unique identifier of the test phase"""
+    matrix_id: str
+    r"""The unique identifier of the matrix"""
+    request_body: List[MatrixSampleInputTypedDict]
+    r"""Details about the samples to update"""
 
 
 class SampleUpdateRequest(BaseModel):
-    request_body: Annotated[
-        List[MatrixSampleInput],
-        FieldMetadata(request=RequestMetadata(media_type="application/json")),
-    ]
-    r"""Details about the samples to update"""
-
-    matrix_id: Annotated[
-        str,
-        pydantic.Field(alias="matrixId"),
-        FieldMetadata(path=PathParamMetadata(style="simple", explode=False)),
-    ]
-    r"""The unique identifier of the matrix"""
-
     test_form_id: Annotated[
         str,
         pydantic.Field(alias="testFormId"),
@@ -47,6 +34,19 @@ class SampleUpdateRequest(BaseModel):
         FieldMetadata(path=PathParamMetadata(style="simple", explode=False)),
     ]
     r"""The unique identifier of the test phase"""
+
+    matrix_id: Annotated[
+        str,
+        pydantic.Field(alias="matrixId"),
+        FieldMetadata(path=PathParamMetadata(style="simple", explode=False)),
+    ]
+    r"""The unique identifier of the matrix"""
+
+    request_body: Annotated[
+        List[MatrixSampleInput],
+        FieldMetadata(request=RequestMetadata(media_type="application/json")),
+    ]
+    r"""Details about the samples to update"""
 
 
 class SampleUpdateResponseTypedDict(TypedDict):

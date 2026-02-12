@@ -24,12 +24,6 @@ WDATA_LIST_SHARED_TABLES_OP_SERVERS = [
 
 
 class WdataListSharedTablesRequestTypedDict(TypedDict):
-    cursor: NotRequired[str]
-    r"""A paging cursor; if included, `limit` is ignored"""
-    limit: NotRequired[int]
-    r"""The number of shared files to return, from 1 to 1000; by default, 1000"""
-    offset: NotRequired[int]
-    r"""The item to start with on the page, greater than or equal to 0; by default, 0"""
     shared_with_me: NotRequired[bool]
     r"""If true, returns a list of tables that have been shared _to_ it rather than
     from it. The entities contain both the shared table entity _and_ the table being
@@ -37,9 +31,32 @@ class WdataListSharedTablesRequestTypedDict(TypedDict):
     """
     table_id: NotRequired[str]
     r"""The unique table identifier associated with the shared table"""
+    cursor: NotRequired[str]
+    r"""A paging cursor; if included, `limit` is ignored"""
+    limit: NotRequired[int]
+    r"""The number of shared files to return, from 1 to 1000; by default, 1000"""
+    offset: NotRequired[int]
+    r"""The item to start with on the page, greater than or equal to 0; by default, 0"""
 
 
 class WdataListSharedTablesRequest(BaseModel):
+    shared_with_me: Annotated[
+        Optional[bool],
+        pydantic.Field(alias="sharedWithMe"),
+        FieldMetadata(query=QueryParamMetadata(style="form", explode=True)),
+    ] = None
+    r"""If true, returns a list of tables that have been shared _to_ it rather than
+    from it. The entities contain both the shared table entity _and_ the table being
+    shared. If true, `tableId` is ignored.
+    """
+
+    table_id: Annotated[
+        Optional[str],
+        pydantic.Field(alias="tableId"),
+        FieldMetadata(query=QueryParamMetadata(style="form", explode=True)),
+    ] = None
+    r"""The unique table identifier associated with the shared table"""
+
     cursor: Annotated[
         Optional[str],
         FieldMetadata(query=QueryParamMetadata(style="form", explode=True)),
@@ -58,26 +75,9 @@ class WdataListSharedTablesRequest(BaseModel):
     ] = None
     r"""The item to start with on the page, greater than or equal to 0; by default, 0"""
 
-    shared_with_me: Annotated[
-        Optional[bool],
-        pydantic.Field(alias="sharedWithMe"),
-        FieldMetadata(query=QueryParamMetadata(style="form", explode=True)),
-    ] = None
-    r"""If true, returns a list of tables that have been shared _to_ it rather than
-    from it. The entities contain both the shared table entity _and_ the table being
-    shared. If true, `tableId` is ignored.
-    """
-
-    table_id: Annotated[
-        Optional[str],
-        pydantic.Field(alias="tableId"),
-        FieldMetadata(query=QueryParamMetadata(style="form", explode=True)),
-    ] = None
-    r"""The unique table identifier associated with the shared table"""
-
     @model_serializer(mode="wrap")
     def serialize_model(self, handler):
-        optional_fields = set(["cursor", "limit", "offset", "sharedWithMe", "tableId"])
+        optional_fields = set(["sharedWithMe", "tableId", "cursor", "limit", "offset"])
         serialized = handler(self)
         m = {}
 

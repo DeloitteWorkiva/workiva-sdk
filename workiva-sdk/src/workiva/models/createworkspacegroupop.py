@@ -9,21 +9,15 @@ from workiva.utils import FieldMetadata, PathParamMetadata, RequestMetadata
 
 
 class CreateWorkspaceGroupRequestTypedDict(TypedDict):
-    workspace_group: WorkspaceGroupInputTypedDict
-    r"""The properties of the group to create"""
     organization_id: str
     r"""The unique identifier of the organization"""
     workspace_id: str
     r"""The unique identifier of the workspace"""
+    workspace_group: WorkspaceGroupInputTypedDict
+    r"""The properties of the group to create"""
 
 
 class CreateWorkspaceGroupRequest(BaseModel):
-    workspace_group: Annotated[
-        WorkspaceGroupInput,
-        FieldMetadata(request=RequestMetadata(media_type="application/json")),
-    ]
-    r"""The properties of the group to create"""
-
     organization_id: Annotated[
         str,
         pydantic.Field(alias="organizationId"),
@@ -37,3 +31,9 @@ class CreateWorkspaceGroupRequest(BaseModel):
         FieldMetadata(path=PathParamMetadata(style="simple", explode=False)),
     ]
     r"""The unique identifier of the workspace"""
+
+    workspace_group: Annotated[
+        WorkspaceGroupInput,
+        FieldMetadata(request=RequestMetadata(media_type="application/json")),
+    ]
+    r"""The properties of the group to create"""

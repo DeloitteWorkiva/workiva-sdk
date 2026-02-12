@@ -11,20 +11,21 @@ from workiva.utils.unmarshal_json_response import unmarshal_json_response
 class Milestones(BaseSDK):
     r"""Endpoints for working with Milestones. See [**Introduction to Milestones Endpoints**](ref:milestones-guide) for more information."""
 
-    def delete_milestone_by_id(
+    def milestone_creation(
         self,
         *,
-        milestone_id: str,
+        request: Union[models.MilestoneCreation, models.MilestoneCreationTypedDict],
         retries: OptionalNullable[utils.RetryConfig] = UNSET,
         server_url: Optional[str] = None,
         timeout_ms: Optional[int] = None,
         http_headers: Optional[Mapping[str, str]] = None,
-    ):
-        r"""Deletes a milestone
+    ) -> models.MilestoneCreationResponse:
+        r"""Initiates a request to create a new milestone
 
-        Deletes the [`Milestone`](ref:milestones#milestone) with a given id.
+        Create a new [`Milestone`](ref:milestones#milestone) using a [`MilestoneCreation`](ref:milestones#milestonecreation) request. This is a long running operation. Responses include a `Location` header, which indicates where to poll for results. For more details on long-running job polling, see [Operations endpoint](ref:getoperationbyid). When the creation completes, its status will be `completed`, and the response body includes a `resourceURL`. To GET the new milestone, perform a GET on the `resourceURL` with the same authentication credentials and flow as the initial request. For more details, see [Authentication documentation](ref:authentication).
 
-        :param milestone_id: The unique identifier of a milestone.
+
+        :param request: The request object to send.
         :param retries: Override the default retry configuration for this method
         :param server_url: Override the default server URL for this method
         :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
@@ -40,23 +41,26 @@ class Milestones(BaseSDK):
         else:
             base_url = self._get_url(base_url, url_variables)
 
-        request = models.DeleteMilestoneByIDRequest(
-            milestone_id=milestone_id,
-        )
+        if not isinstance(request, BaseModel):
+            request = utils.unmarshal(request, models.MilestoneCreation)
+        request = cast(models.MilestoneCreation, request)
 
         req = self._build_request(
-            method="DELETE",
-            path="/milestones/{milestoneId}",
+            method="POST",
+            path="/milestones/creation",
             base_url=base_url,
             url_variables=url_variables,
             request=request,
-            request_body_required=False,
-            request_has_path_params=True,
+            request_body_required=True,
+            request_has_path_params=False,
             request_has_query_params=True,
             user_agent_header="user-agent",
             accept_header_value="application/json",
             http_headers=http_headers,
             security=self.sdk_configuration.security,
+            get_serialized_body=lambda: utils.serialize_request_body(
+                request, False, False, "json", models.MilestoneCreation
+            ),
             allow_empty_value=None,
             timeout_ms=timeout_ms,
         )
@@ -73,21 +77,21 @@ class Milestones(BaseSDK):
             hook_ctx=HookContext(
                 config=self.sdk_configuration,
                 base_url=base_url or "",
-                operation_id="deleteMilestoneById",
+                operation_id="milestoneCreation",
                 oauth2_scopes=["file:write"],
                 security_source=self.sdk_configuration.security,
             ),
             request=req,
-            error_status_codes=["400", "401", "403", "404", "4XX", "500", "5XX"],
+            error_status_codes=["400", "401", "403", "4XX", "500", "5XX"],
             retry_config=retry_config,
         )
 
         response_data: Any = None
-        if utils.match_response(http_res, "204", "*"):
-            return
-        if utils.match_response(
-            http_res, ["400", "401", "403", "404"], "application/json"
-        ):
+        if utils.match_response(http_res, "202", "*"):
+            return models.MilestoneCreationResponse(
+                headers=utils.get_response_headers(http_res.headers)
+            )
+        if utils.match_response(http_res, ["400", "401", "403"], "application/json"):
             response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
             raise errors.ErrorResponse(response_data, http_res)
         if utils.match_response(http_res, "500", "application/json"):
@@ -102,20 +106,21 @@ class Milestones(BaseSDK):
 
         raise errors.SDKError("Unexpected response received", http_res)
 
-    async def delete_milestone_by_id_async(
+    async def milestone_creation_async(
         self,
         *,
-        milestone_id: str,
+        request: Union[models.MilestoneCreation, models.MilestoneCreationTypedDict],
         retries: OptionalNullable[utils.RetryConfig] = UNSET,
         server_url: Optional[str] = None,
         timeout_ms: Optional[int] = None,
         http_headers: Optional[Mapping[str, str]] = None,
-    ):
-        r"""Deletes a milestone
+    ) -> models.MilestoneCreationResponse:
+        r"""Initiates a request to create a new milestone
 
-        Deletes the [`Milestone`](ref:milestones#milestone) with a given id.
+        Create a new [`Milestone`](ref:milestones#milestone) using a [`MilestoneCreation`](ref:milestones#milestonecreation) request. This is a long running operation. Responses include a `Location` header, which indicates where to poll for results. For more details on long-running job polling, see [Operations endpoint](ref:getoperationbyid). When the creation completes, its status will be `completed`, and the response body includes a `resourceURL`. To GET the new milestone, perform a GET on the `resourceURL` with the same authentication credentials and flow as the initial request. For more details, see [Authentication documentation](ref:authentication).
 
-        :param milestone_id: The unique identifier of a milestone.
+
+        :param request: The request object to send.
         :param retries: Override the default retry configuration for this method
         :param server_url: Override the default server URL for this method
         :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
@@ -131,23 +136,26 @@ class Milestones(BaseSDK):
         else:
             base_url = self._get_url(base_url, url_variables)
 
-        request = models.DeleteMilestoneByIDRequest(
-            milestone_id=milestone_id,
-        )
+        if not isinstance(request, BaseModel):
+            request = utils.unmarshal(request, models.MilestoneCreation)
+        request = cast(models.MilestoneCreation, request)
 
         req = self._build_request_async(
-            method="DELETE",
-            path="/milestones/{milestoneId}",
+            method="POST",
+            path="/milestones/creation",
             base_url=base_url,
             url_variables=url_variables,
             request=request,
-            request_body_required=False,
-            request_has_path_params=True,
+            request_body_required=True,
+            request_has_path_params=False,
             request_has_query_params=True,
             user_agent_header="user-agent",
             accept_header_value="application/json",
             http_headers=http_headers,
             security=self.sdk_configuration.security,
+            get_serialized_body=lambda: utils.serialize_request_body(
+                request, False, False, "json", models.MilestoneCreation
+            ),
             allow_empty_value=None,
             timeout_ms=timeout_ms,
         )
@@ -164,21 +172,21 @@ class Milestones(BaseSDK):
             hook_ctx=HookContext(
                 config=self.sdk_configuration,
                 base_url=base_url or "",
-                operation_id="deleteMilestoneById",
+                operation_id="milestoneCreation",
                 oauth2_scopes=["file:write"],
                 security_source=self.sdk_configuration.security,
             ),
             request=req,
-            error_status_codes=["400", "401", "403", "404", "4XX", "500", "5XX"],
+            error_status_codes=["400", "401", "403", "4XX", "500", "5XX"],
             retry_config=retry_config,
         )
 
         response_data: Any = None
-        if utils.match_response(http_res, "204", "*"):
-            return
-        if utils.match_response(
-            http_res, ["400", "401", "403", "404"], "application/json"
-        ):
+        if utils.match_response(http_res, "202", "*"):
+            return models.MilestoneCreationResponse(
+                headers=utils.get_response_headers(http_res.headers)
+            )
+        if utils.match_response(http_res, ["400", "401", "403"], "application/json"):
             response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
             raise errors.ErrorResponse(response_data, http_res)
         if utils.match_response(http_res, "500", "application/json"):
@@ -397,21 +405,20 @@ class Milestones(BaseSDK):
 
         raise errors.SDKError("Unexpected response received", http_res)
 
-    def milestone_creation(
+    def delete_milestone_by_id(
         self,
         *,
-        request: Union[models.MilestoneCreation, models.MilestoneCreationTypedDict],
+        milestone_id: str,
         retries: OptionalNullable[utils.RetryConfig] = UNSET,
         server_url: Optional[str] = None,
         timeout_ms: Optional[int] = None,
         http_headers: Optional[Mapping[str, str]] = None,
-    ) -> models.MilestoneCreationResponse:
-        r"""Initiates a request to create a new milestone
+    ):
+        r"""Deletes a milestone
 
-        Create a new [`Milestone`](ref:milestones#milestone) using a [`MilestoneCreation`](ref:milestones#milestonecreation) request. This is a long running operation. Responses include a `Location` header, which indicates where to poll for results. For more details on long-running job polling, see [Operations endpoint](ref:getoperationbyid). When the creation completes, its status will be `completed`, and the response body includes a `resourceURL`. To GET the new milestone, perform a GET on the `resourceURL` with the same authentication credentials and flow as the initial request. For more details, see [Authentication documentation](ref:authentication).
+        Deletes the [`Milestone`](ref:milestones#milestone) with a given id.
 
-
-        :param request: The request object to send.
+        :param milestone_id: The unique identifier of a milestone.
         :param retries: Override the default retry configuration for this method
         :param server_url: Override the default server URL for this method
         :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
@@ -427,26 +434,23 @@ class Milestones(BaseSDK):
         else:
             base_url = self._get_url(base_url, url_variables)
 
-        if not isinstance(request, BaseModel):
-            request = utils.unmarshal(request, models.MilestoneCreation)
-        request = cast(models.MilestoneCreation, request)
+        request = models.DeleteMilestoneByIDRequest(
+            milestone_id=milestone_id,
+        )
 
         req = self._build_request(
-            method="POST",
-            path="/milestones/creation",
+            method="DELETE",
+            path="/milestones/{milestoneId}",
             base_url=base_url,
             url_variables=url_variables,
             request=request,
-            request_body_required=True,
-            request_has_path_params=False,
+            request_body_required=False,
+            request_has_path_params=True,
             request_has_query_params=True,
             user_agent_header="user-agent",
             accept_header_value="application/json",
             http_headers=http_headers,
             security=self.sdk_configuration.security,
-            get_serialized_body=lambda: utils.serialize_request_body(
-                request, False, False, "json", models.MilestoneCreation
-            ),
             allow_empty_value=None,
             timeout_ms=timeout_ms,
         )
@@ -463,21 +467,21 @@ class Milestones(BaseSDK):
             hook_ctx=HookContext(
                 config=self.sdk_configuration,
                 base_url=base_url or "",
-                operation_id="milestoneCreation",
+                operation_id="deleteMilestoneById",
                 oauth2_scopes=["file:write"],
                 security_source=self.sdk_configuration.security,
             ),
             request=req,
-            error_status_codes=["400", "401", "403", "4XX", "500", "5XX"],
+            error_status_codes=["400", "401", "403", "404", "4XX", "500", "5XX"],
             retry_config=retry_config,
         )
 
         response_data: Any = None
-        if utils.match_response(http_res, "202", "*"):
-            return models.MilestoneCreationResponse(
-                headers=utils.get_response_headers(http_res.headers)
-            )
-        if utils.match_response(http_res, ["400", "401", "403"], "application/json"):
+        if utils.match_response(http_res, "204", "*"):
+            return
+        if utils.match_response(
+            http_res, ["400", "401", "403", "404"], "application/json"
+        ):
             response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
             raise errors.ErrorResponse(response_data, http_res)
         if utils.match_response(http_res, "500", "application/json"):
@@ -492,21 +496,20 @@ class Milestones(BaseSDK):
 
         raise errors.SDKError("Unexpected response received", http_res)
 
-    async def milestone_creation_async(
+    async def delete_milestone_by_id_async(
         self,
         *,
-        request: Union[models.MilestoneCreation, models.MilestoneCreationTypedDict],
+        milestone_id: str,
         retries: OptionalNullable[utils.RetryConfig] = UNSET,
         server_url: Optional[str] = None,
         timeout_ms: Optional[int] = None,
         http_headers: Optional[Mapping[str, str]] = None,
-    ) -> models.MilestoneCreationResponse:
-        r"""Initiates a request to create a new milestone
+    ):
+        r"""Deletes a milestone
 
-        Create a new [`Milestone`](ref:milestones#milestone) using a [`MilestoneCreation`](ref:milestones#milestonecreation) request. This is a long running operation. Responses include a `Location` header, which indicates where to poll for results. For more details on long-running job polling, see [Operations endpoint](ref:getoperationbyid). When the creation completes, its status will be `completed`, and the response body includes a `resourceURL`. To GET the new milestone, perform a GET on the `resourceURL` with the same authentication credentials and flow as the initial request. For more details, see [Authentication documentation](ref:authentication).
+        Deletes the [`Milestone`](ref:milestones#milestone) with a given id.
 
-
-        :param request: The request object to send.
+        :param milestone_id: The unique identifier of a milestone.
         :param retries: Override the default retry configuration for this method
         :param server_url: Override the default server URL for this method
         :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
@@ -522,26 +525,23 @@ class Milestones(BaseSDK):
         else:
             base_url = self._get_url(base_url, url_variables)
 
-        if not isinstance(request, BaseModel):
-            request = utils.unmarshal(request, models.MilestoneCreation)
-        request = cast(models.MilestoneCreation, request)
+        request = models.DeleteMilestoneByIDRequest(
+            milestone_id=milestone_id,
+        )
 
         req = self._build_request_async(
-            method="POST",
-            path="/milestones/creation",
+            method="DELETE",
+            path="/milestones/{milestoneId}",
             base_url=base_url,
             url_variables=url_variables,
             request=request,
-            request_body_required=True,
-            request_has_path_params=False,
+            request_body_required=False,
+            request_has_path_params=True,
             request_has_query_params=True,
             user_agent_header="user-agent",
             accept_header_value="application/json",
             http_headers=http_headers,
             security=self.sdk_configuration.security,
-            get_serialized_body=lambda: utils.serialize_request_body(
-                request, False, False, "json", models.MilestoneCreation
-            ),
             allow_empty_value=None,
             timeout_ms=timeout_ms,
         )
@@ -558,21 +558,21 @@ class Milestones(BaseSDK):
             hook_ctx=HookContext(
                 config=self.sdk_configuration,
                 base_url=base_url or "",
-                operation_id="milestoneCreation",
+                operation_id="deleteMilestoneById",
                 oauth2_scopes=["file:write"],
                 security_source=self.sdk_configuration.security,
             ),
             request=req,
-            error_status_codes=["400", "401", "403", "4XX", "500", "5XX"],
+            error_status_codes=["400", "401", "403", "404", "4XX", "500", "5XX"],
             retry_config=retry_config,
         )
 
         response_data: Any = None
-        if utils.match_response(http_res, "202", "*"):
-            return models.MilestoneCreationResponse(
-                headers=utils.get_response_headers(http_res.headers)
-            )
-        if utils.match_response(http_res, ["400", "401", "403"], "application/json"):
+        if utils.match_response(http_res, "204", "*"):
+            return
+        if utils.match_response(
+            http_res, ["400", "401", "403", "404"], "application/json"
+        ):
             response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
             raise errors.ErrorResponse(response_data, http_res)
         if utils.match_response(http_res, "500", "application/json"):

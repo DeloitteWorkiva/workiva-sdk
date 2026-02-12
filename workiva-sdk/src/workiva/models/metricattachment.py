@@ -2,11 +2,13 @@
 
 from __future__ import annotations
 from enum import Enum
+from pydantic import field_serializer
 from typing_extensions import TypedDict
+from workiva import models, utils
 from workiva.types import BaseModel
 
 
-class MetricAttachmentType(str, Enum):
+class MetricAttachmentType(str, Enum, metaclass=utils.OpenEnumMeta):
     r"""The type of attachment"""
 
     URL = "url"
@@ -31,3 +33,12 @@ class MetricAttachment(BaseModel):
 
     type: MetricAttachmentType
     r"""The type of attachment"""
+
+    @field_serializer("type")
+    def serialize_type(self, value):
+        if isinstance(value, str):
+            try:
+                return models.MetricAttachmentType(value)
+            except ValueError:
+                return value
+        return value

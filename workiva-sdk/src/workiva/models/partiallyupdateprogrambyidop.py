@@ -10,22 +10,22 @@ from workiva.utils import FieldMetadata, PathParamMetadata, RequestMetadata
 
 
 class PartiallyUpdateProgramByIDRequestTypedDict(TypedDict):
-    request_body: List[JSONPatchOperationTypedDict]
-    r"""A collection of patch operations to apply to the [program](ref:sustainability#program). Currently only one operation may be applied at a time."""
     program_id: str
     r"""The unique identifier of the program"""
+    request_body: List[JSONPatchOperationTypedDict]
+    r"""A collection of patch operations to apply to the [program](ref:sustainability#program). Currently only one operation may be applied at a time."""
 
 
 class PartiallyUpdateProgramByIDRequest(BaseModel):
-    request_body: Annotated[
-        List[JSONPatchOperation],
-        FieldMetadata(request=RequestMetadata(media_type="application/json")),
-    ]
-    r"""A collection of patch operations to apply to the [program](ref:sustainability#program). Currently only one operation may be applied at a time."""
-
     program_id: Annotated[
         str,
         pydantic.Field(alias="programId"),
         FieldMetadata(path=PathParamMetadata(style="simple", explode=False)),
     ]
     r"""The unique identifier of the program"""
+
+    request_body: Annotated[
+        List[JSONPatchOperation],
+        FieldMetadata(request=RequestMetadata(media_type="application/json")),
+    ]
+    r"""A collection of patch operations to apply to the [program](ref:sustainability#program). Currently only one operation may be applied at a time."""

@@ -2,19 +2,20 @@
 
 from __future__ import annotations
 from enum import Enum
-from pydantic import model_serializer
+from pydantic import field_serializer, model_serializer
 from typing import Any, Dict, Optional
 from typing_extensions import NotRequired, TypedDict
+from workiva import models, utils
 from workiva.types import BaseModel, UNSET_SENTINEL
 
 
-class Mode(str, Enum):
+class ColumnMode(str, Enum, metaclass=utils.OpenEnumMeta):
     NULLABLE = "nullable"
     REQUIRED = "required"
     REPEATED = "repeated"
 
 
-class ColumnSchemasType(str, Enum):
+class ColumnSchemasType(str, Enum, metaclass=utils.OpenEnumMeta):
     STRING = "string"
     BYTES = "bytes"
     INTEGER = "integer"
@@ -32,7 +33,7 @@ class ColumnTypedDict(TypedDict):
     alias: NotRequired[str]
     description: NotRequired[str]
     metadata: NotRequired[Dict[str, Any]]
-    mode: NotRequired[Mode]
+    mode: NotRequired[ColumnMode]
     name: NotRequired[str]
     type: NotRequired[ColumnSchemasType]
 
@@ -44,11 +45,29 @@ class Column(BaseModel):
 
     metadata: Optional[Dict[str, Any]] = None
 
-    mode: Optional[Mode] = None
+    mode: Optional[ColumnMode] = None
 
     name: Optional[str] = None
 
     type: Optional[ColumnSchemasType] = None
+
+    @field_serializer("mode")
+    def serialize_mode(self, value):
+        if isinstance(value, str):
+            try:
+                return models.ColumnMode(value)
+            except ValueError:
+                return value
+        return value
+
+    @field_serializer("type")
+    def serialize_type(self, value):
+        if isinstance(value, str):
+            try:
+                return models.ColumnSchemasType(value)
+            except ValueError:
+                return value
+        return value
 
     @model_serializer(mode="wrap")
     def serialize_model(self, handler):

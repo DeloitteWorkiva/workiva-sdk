@@ -2,9 +2,10 @@
 
 from __future__ import annotations
 from enum import Enum
+from workiva import utils
 
 
-class StrokePattern(str, Enum):
+class StrokePattern(str, Enum, metaclass=utils.OpenEnumMeta):
     r"""The pattern to apply to the stroke."""
 
     SOLID = "solid"

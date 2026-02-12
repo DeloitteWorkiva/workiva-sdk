@@ -5,9 +5,10 @@ from .tableref import TableRef, TableRefTypedDict
 from .tableref_input import TableRefInput, TableRefInputTypedDict
 from enum import Enum
 import pydantic
-from pydantic import model_serializer
+from pydantic import field_serializer, model_serializer
 from typing import Any, List, Optional
 from typing_extensions import Annotated, NotRequired, TypedDict
+from workiva import models, utils
 from workiva.types import BaseModel, Nullable, OptionalNullable, UNSET, UNSET_SENTINEL
 
 
@@ -64,7 +65,7 @@ class SheetDataset(BaseModel):
         return m
 
 
-class SheetLock(str, Enum):
+class SheetLock(str, Enum, metaclass=utils.OpenEnumMeta):
     r"""The type of lock applied to this sheet, if any. Note this property is not tied to revision and will always reflect the sheet's current lock state."""
 
     LOCK = "lock"
@@ -172,6 +173,15 @@ class Sheet(BaseModel):
 
     """
 
+    @field_serializer("lock")
+    def serialize_lock(self, value):
+        if isinstance(value, str):
+            try:
+                return models.SheetLock(value)
+            except ValueError:
+                return value
+        return value
+
     @model_serializer(mode="wrap")
     def serialize_model(self, handler):
         optional_fields = set(
@@ -261,6 +271,15 @@ class SheetInput(BaseModel):
     r"""A reference to table content in a document, spreadsheet, or presentation
 
     """
+
+    @field_serializer("lock")
+    def serialize_lock(self, value):
+        if isinstance(value, str):
+            try:
+                return models.SheetLock(value)
+            except ValueError:
+                return value
+        return value
 
     @model_serializer(mode="wrap")
     def serialize_model(self, handler):

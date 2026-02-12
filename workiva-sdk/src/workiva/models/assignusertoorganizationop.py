@@ -12,22 +12,22 @@ from workiva.utils import FieldMetadata, PathParamMetadata, RequestMetadata
 
 
 class AssignUserToOrganizationRequestTypedDict(TypedDict):
-    organization_user_assignment: OrganizationUserAssignmentTypedDict
-    r"""Configuration options for the assignment"""
     organization_id: str
     r"""The unique identifier of the organization"""
+    organization_user_assignment: OrganizationUserAssignmentTypedDict
+    r"""Configuration options for the assignment"""
 
 
 class AssignUserToOrganizationRequest(BaseModel):
-    organization_user_assignment: Annotated[
-        OrganizationUserAssignment,
-        FieldMetadata(request=RequestMetadata(media_type="application/json")),
-    ]
-    r"""Configuration options for the assignment"""
-
     organization_id: Annotated[
         str,
         pydantic.Field(alias="organizationId"),
         FieldMetadata(path=PathParamMetadata(style="simple", explode=False)),
     ]
     r"""The unique identifier of the organization"""
+
+    organization_user_assignment: Annotated[
+        OrganizationUserAssignment,
+        FieldMetadata(request=RequestMetadata(media_type="application/json")),
+    ]
+    r"""Configuration options for the assignment"""

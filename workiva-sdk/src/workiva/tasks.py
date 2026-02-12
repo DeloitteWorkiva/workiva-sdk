@@ -12,6 +12,283 @@ from workiva.utils.unmarshal_json_response import unmarshal_json_response
 class Tasks(BaseSDK):
     r"""Tasks enable users to manage projects, organize responsibilities, and meet deadlines in the Workiva platform. Use these endpoints to create and manage tasks."""
 
+    def get_tasks(
+        self,
+        *,
+        filter_: Optional[str] = None,
+        order_by: Optional[str] = None,
+        maxpagesize: Optional[int] = 1000,
+        next: Optional[str] = None,
+        retries: OptionalNullable[utils.RetryConfig] = UNSET,
+        server_url: Optional[str] = None,
+        timeout_ms: Optional[int] = None,
+        http_headers: Optional[Mapping[str, str]] = None,
+    ) -> Optional[models.GetTasksResponse]:
+        r"""Retrieve a list of tasks
+
+        > Returns a paginated list of [tasks](ref:tasks#task). Currently this endpoint returns general tasks
+        (such as those created as part of editing documents, sheets, and presentations) and tasks that have been associated  with a Sustainability Program.
+        It does not return tasks created as part of a process.
+
+
+        :param filter_: The properties to filter the results by.
+        :param order_by: One or more comma-separated expressions to indicate the order in which to sort the results.
+        :param maxpagesize: The maximum number of results to retrieve
+        :param next: Pagination cursor for next set of results.
+        :param retries: Override the default retry configuration for this method
+        :param server_url: Override the default server URL for this method
+        :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
+        :param http_headers: Additional headers to set or replace on requests.
+        """
+        base_url = None
+        url_variables = None
+        if timeout_ms is None:
+            timeout_ms = self.sdk_configuration.timeout_ms
+
+        if server_url is not None:
+            base_url = server_url
+        else:
+            base_url = self._get_url(base_url, url_variables)
+
+        request = models.GetTasksRequest(
+            filter_=filter_,
+            order_by=order_by,
+            maxpagesize=maxpagesize,
+            next=next,
+        )
+
+        req = self._build_request(
+            method="GET",
+            path="/tasks",
+            base_url=base_url,
+            url_variables=url_variables,
+            request=request,
+            request_body_required=False,
+            request_has_path_params=False,
+            request_has_query_params=True,
+            user_agent_header="user-agent",
+            accept_header_value="application/json",
+            http_headers=http_headers,
+            security=self.sdk_configuration.security,
+            allow_empty_value=None,
+            timeout_ms=timeout_ms,
+        )
+
+        if retries == UNSET:
+            if self.sdk_configuration.retry_config is not UNSET:
+                retries = self.sdk_configuration.retry_config
+
+        retry_config = None
+        if isinstance(retries, utils.RetryConfig):
+            retry_config = (retries, ["429", "500", "502", "503", "504"])
+
+        http_res = self.do_request(
+            hook_ctx=HookContext(
+                config=self.sdk_configuration,
+                base_url=base_url or "",
+                operation_id="getTasks",
+                oauth2_scopes=["task:read"],
+                security_source=self.sdk_configuration.security,
+            ),
+            request=req,
+            error_status_codes=[
+                "400",
+                "401",
+                "403",
+                "404",
+                "409",
+                "429",
+                "4XX",
+                "500",
+                "503",
+                "5XX",
+            ],
+            retry_config=retry_config,
+        )
+
+        def next_func() -> Optional[models.GetTasksResponse]:
+            body = utils.unmarshal_json(http_res.text, Union[Dict[Any, Any], List[Any]])
+
+            next_cursor = JSONPath("$['@nextLink']").parse(body)
+
+            if len(next_cursor) == 0:
+                return None
+
+            next_cursor = next_cursor[0]
+            if next_cursor is None or str(next_cursor).strip() == "":
+                return None
+
+            return self.get_tasks(
+                filter_=filter_,
+                order_by=order_by,
+                maxpagesize=maxpagesize,
+                next=next,
+                retries=retries,
+            )
+
+        response_data: Any = None
+        if utils.match_response(http_res, "200", "application/json"):
+            return models.GetTasksResponse(
+                result=unmarshal_json_response(models.TasksListResult, http_res),
+                next=next_func,
+            )
+        if utils.match_response(
+            http_res, ["400", "401", "403", "404", "409", "429"], "application/json"
+        ):
+            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
+            raise errors.ErrorResponse(response_data, http_res)
+        if utils.match_response(http_res, ["500", "503"], "application/json"):
+            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
+            raise errors.ErrorResponse(response_data, http_res)
+        if utils.match_response(http_res, "4XX", "*"):
+            http_res_text = utils.stream_to_text(http_res)
+            raise errors.SDKError("API error occurred", http_res, http_res_text)
+        if utils.match_response(http_res, "5XX", "*"):
+            http_res_text = utils.stream_to_text(http_res)
+            raise errors.SDKError("API error occurred", http_res, http_res_text)
+
+        raise errors.SDKError("Unexpected response received", http_res)
+
+    async def get_tasks_async(
+        self,
+        *,
+        filter_: Optional[str] = None,
+        order_by: Optional[str] = None,
+        maxpagesize: Optional[int] = 1000,
+        next: Optional[str] = None,
+        retries: OptionalNullable[utils.RetryConfig] = UNSET,
+        server_url: Optional[str] = None,
+        timeout_ms: Optional[int] = None,
+        http_headers: Optional[Mapping[str, str]] = None,
+    ) -> Optional[models.GetTasksResponse]:
+        r"""Retrieve a list of tasks
+
+        > Returns a paginated list of [tasks](ref:tasks#task). Currently this endpoint returns general tasks
+        (such as those created as part of editing documents, sheets, and presentations) and tasks that have been associated  with a Sustainability Program.
+        It does not return tasks created as part of a process.
+
+
+        :param filter_: The properties to filter the results by.
+        :param order_by: One or more comma-separated expressions to indicate the order in which to sort the results.
+        :param maxpagesize: The maximum number of results to retrieve
+        :param next: Pagination cursor for next set of results.
+        :param retries: Override the default retry configuration for this method
+        :param server_url: Override the default server URL for this method
+        :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
+        :param http_headers: Additional headers to set or replace on requests.
+        """
+        base_url = None
+        url_variables = None
+        if timeout_ms is None:
+            timeout_ms = self.sdk_configuration.timeout_ms
+
+        if server_url is not None:
+            base_url = server_url
+        else:
+            base_url = self._get_url(base_url, url_variables)
+
+        request = models.GetTasksRequest(
+            filter_=filter_,
+            order_by=order_by,
+            maxpagesize=maxpagesize,
+            next=next,
+        )
+
+        req = self._build_request_async(
+            method="GET",
+            path="/tasks",
+            base_url=base_url,
+            url_variables=url_variables,
+            request=request,
+            request_body_required=False,
+            request_has_path_params=False,
+            request_has_query_params=True,
+            user_agent_header="user-agent",
+            accept_header_value="application/json",
+            http_headers=http_headers,
+            security=self.sdk_configuration.security,
+            allow_empty_value=None,
+            timeout_ms=timeout_ms,
+        )
+
+        if retries == UNSET:
+            if self.sdk_configuration.retry_config is not UNSET:
+                retries = self.sdk_configuration.retry_config
+
+        retry_config = None
+        if isinstance(retries, utils.RetryConfig):
+            retry_config = (retries, ["429", "500", "502", "503", "504"])
+
+        http_res = await self.do_request_async(
+            hook_ctx=HookContext(
+                config=self.sdk_configuration,
+                base_url=base_url or "",
+                operation_id="getTasks",
+                oauth2_scopes=["task:read"],
+                security_source=self.sdk_configuration.security,
+            ),
+            request=req,
+            error_status_codes=[
+                "400",
+                "401",
+                "403",
+                "404",
+                "409",
+                "429",
+                "4XX",
+                "500",
+                "503",
+                "5XX",
+            ],
+            retry_config=retry_config,
+        )
+
+        def next_func() -> Awaitable[Optional[models.GetTasksResponse]]:
+            body = utils.unmarshal_json(http_res.text, Union[Dict[Any, Any], List[Any]])
+
+            async def empty_result():
+                return None
+
+            next_cursor = JSONPath("$['@nextLink']").parse(body)
+
+            if len(next_cursor) == 0:
+                return empty_result()
+
+            next_cursor = next_cursor[0]
+            if next_cursor is None or str(next_cursor).strip() == "":
+                return empty_result()
+
+            return self.get_tasks_async(
+                filter_=filter_,
+                order_by=order_by,
+                maxpagesize=maxpagesize,
+                next=next,
+                retries=retries,
+            )
+
+        response_data: Any = None
+        if utils.match_response(http_res, "200", "application/json"):
+            return models.GetTasksResponse(
+                result=unmarshal_json_response(models.TasksListResult, http_res),
+                next=next_func,
+            )
+        if utils.match_response(
+            http_res, ["400", "401", "403", "404", "409", "429"], "application/json"
+        ):
+            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
+            raise errors.ErrorResponse(response_data, http_res)
+        if utils.match_response(http_res, ["500", "503"], "application/json"):
+            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
+            raise errors.ErrorResponse(response_data, http_res)
+        if utils.match_response(http_res, "4XX", "*"):
+            http_res_text = await utils.stream_to_text_async(http_res)
+            raise errors.SDKError("API error occurred", http_res, http_res_text)
+        if utils.match_response(http_res, "5XX", "*"):
+            http_res_text = await utils.stream_to_text_async(http_res)
+            raise errors.SDKError("API error occurred", http_res, http_res_text)
+
+        raise errors.SDKError("Unexpected response received", http_res)
+
     def create_task(
         self,
         *,
@@ -619,283 +896,6 @@ class Tasks(BaseSDK):
         response_data: Any = None
         if utils.match_response(http_res, "200", "application/json"):
             return unmarshal_json_response(models.Task, http_res)
-        if utils.match_response(
-            http_res, ["400", "401", "403", "404", "409", "429"], "application/json"
-        ):
-            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
-            raise errors.ErrorResponse(response_data, http_res)
-        if utils.match_response(http_res, ["500", "503"], "application/json"):
-            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
-            raise errors.ErrorResponse(response_data, http_res)
-        if utils.match_response(http_res, "4XX", "*"):
-            http_res_text = await utils.stream_to_text_async(http_res)
-            raise errors.SDKError("API error occurred", http_res, http_res_text)
-        if utils.match_response(http_res, "5XX", "*"):
-            http_res_text = await utils.stream_to_text_async(http_res)
-            raise errors.SDKError("API error occurred", http_res, http_res_text)
-
-        raise errors.SDKError("Unexpected response received", http_res)
-
-    def get_tasks(
-        self,
-        *,
-        filter_: Optional[str] = None,
-        maxpagesize: Optional[int] = 1000,
-        next: Optional[str] = None,
-        order_by: Optional[str] = None,
-        retries: OptionalNullable[utils.RetryConfig] = UNSET,
-        server_url: Optional[str] = None,
-        timeout_ms: Optional[int] = None,
-        http_headers: Optional[Mapping[str, str]] = None,
-    ) -> Optional[models.GetTasksResponse]:
-        r"""Retrieve a list of tasks
-
-        > Returns a paginated list of [tasks](ref:tasks#task). Currently this endpoint returns general tasks
-        (such as those created as part of editing documents, sheets, and presentations) and tasks that have been associated  with a Sustainability Program.
-        It does not return tasks created as part of a process.
-
-
-        :param filter_: The properties to filter the results by.
-        :param maxpagesize: The maximum number of results to retrieve
-        :param next: Pagination cursor for next set of results.
-        :param order_by: One or more comma-separated expressions to indicate the order in which to sort the results.
-        :param retries: Override the default retry configuration for this method
-        :param server_url: Override the default server URL for this method
-        :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
-        :param http_headers: Additional headers to set or replace on requests.
-        """
-        base_url = None
-        url_variables = None
-        if timeout_ms is None:
-            timeout_ms = self.sdk_configuration.timeout_ms
-
-        if server_url is not None:
-            base_url = server_url
-        else:
-            base_url = self._get_url(base_url, url_variables)
-
-        request = models.GetTasksRequest(
-            filter_=filter_,
-            maxpagesize=maxpagesize,
-            next=next,
-            order_by=order_by,
-        )
-
-        req = self._build_request(
-            method="GET",
-            path="/tasks",
-            base_url=base_url,
-            url_variables=url_variables,
-            request=request,
-            request_body_required=False,
-            request_has_path_params=False,
-            request_has_query_params=True,
-            user_agent_header="user-agent",
-            accept_header_value="application/json",
-            http_headers=http_headers,
-            security=self.sdk_configuration.security,
-            allow_empty_value=None,
-            timeout_ms=timeout_ms,
-        )
-
-        if retries == UNSET:
-            if self.sdk_configuration.retry_config is not UNSET:
-                retries = self.sdk_configuration.retry_config
-
-        retry_config = None
-        if isinstance(retries, utils.RetryConfig):
-            retry_config = (retries, ["429", "500", "502", "503", "504"])
-
-        http_res = self.do_request(
-            hook_ctx=HookContext(
-                config=self.sdk_configuration,
-                base_url=base_url or "",
-                operation_id="getTasks",
-                oauth2_scopes=["task:read"],
-                security_source=self.sdk_configuration.security,
-            ),
-            request=req,
-            error_status_codes=[
-                "400",
-                "401",
-                "403",
-                "404",
-                "409",
-                "429",
-                "4XX",
-                "500",
-                "503",
-                "5XX",
-            ],
-            retry_config=retry_config,
-        )
-
-        def next_func() -> Optional[models.GetTasksResponse]:
-            body = utils.unmarshal_json(http_res.text, Union[Dict[Any, Any], List[Any]])
-
-            next_cursor = JSONPath("$['@nextLink']").parse(body)
-
-            if len(next_cursor) == 0:
-                return None
-
-            next_cursor = next_cursor[0]
-            if next_cursor is None or str(next_cursor).strip() == "":
-                return None
-
-            return self.get_tasks(
-                filter_=filter_,
-                maxpagesize=maxpagesize,
-                next=next,
-                order_by=order_by,
-                retries=retries,
-            )
-
-        response_data: Any = None
-        if utils.match_response(http_res, "200", "application/json"):
-            return models.GetTasksResponse(
-                result=unmarshal_json_response(models.TasksListResult, http_res),
-                next=next_func,
-            )
-        if utils.match_response(
-            http_res, ["400", "401", "403", "404", "409", "429"], "application/json"
-        ):
-            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
-            raise errors.ErrorResponse(response_data, http_res)
-        if utils.match_response(http_res, ["500", "503"], "application/json"):
-            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
-            raise errors.ErrorResponse(response_data, http_res)
-        if utils.match_response(http_res, "4XX", "*"):
-            http_res_text = utils.stream_to_text(http_res)
-            raise errors.SDKError("API error occurred", http_res, http_res_text)
-        if utils.match_response(http_res, "5XX", "*"):
-            http_res_text = utils.stream_to_text(http_res)
-            raise errors.SDKError("API error occurred", http_res, http_res_text)
-
-        raise errors.SDKError("Unexpected response received", http_res)
-
-    async def get_tasks_async(
-        self,
-        *,
-        filter_: Optional[str] = None,
-        maxpagesize: Optional[int] = 1000,
-        next: Optional[str] = None,
-        order_by: Optional[str] = None,
-        retries: OptionalNullable[utils.RetryConfig] = UNSET,
-        server_url: Optional[str] = None,
-        timeout_ms: Optional[int] = None,
-        http_headers: Optional[Mapping[str, str]] = None,
-    ) -> Optional[models.GetTasksResponse]:
-        r"""Retrieve a list of tasks
-
-        > Returns a paginated list of [tasks](ref:tasks#task). Currently this endpoint returns general tasks
-        (such as those created as part of editing documents, sheets, and presentations) and tasks that have been associated  with a Sustainability Program.
-        It does not return tasks created as part of a process.
-
-
-        :param filter_: The properties to filter the results by.
-        :param maxpagesize: The maximum number of results to retrieve
-        :param next: Pagination cursor for next set of results.
-        :param order_by: One or more comma-separated expressions to indicate the order in which to sort the results.
-        :param retries: Override the default retry configuration for this method
-        :param server_url: Override the default server URL for this method
-        :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
-        :param http_headers: Additional headers to set or replace on requests.
-        """
-        base_url = None
-        url_variables = None
-        if timeout_ms is None:
-            timeout_ms = self.sdk_configuration.timeout_ms
-
-        if server_url is not None:
-            base_url = server_url
-        else:
-            base_url = self._get_url(base_url, url_variables)
-
-        request = models.GetTasksRequest(
-            filter_=filter_,
-            maxpagesize=maxpagesize,
-            next=next,
-            order_by=order_by,
-        )
-
-        req = self._build_request_async(
-            method="GET",
-            path="/tasks",
-            base_url=base_url,
-            url_variables=url_variables,
-            request=request,
-            request_body_required=False,
-            request_has_path_params=False,
-            request_has_query_params=True,
-            user_agent_header="user-agent",
-            accept_header_value="application/json",
-            http_headers=http_headers,
-            security=self.sdk_configuration.security,
-            allow_empty_value=None,
-            timeout_ms=timeout_ms,
-        )
-
-        if retries == UNSET:
-            if self.sdk_configuration.retry_config is not UNSET:
-                retries = self.sdk_configuration.retry_config
-
-        retry_config = None
-        if isinstance(retries, utils.RetryConfig):
-            retry_config = (retries, ["429", "500", "502", "503", "504"])
-
-        http_res = await self.do_request_async(
-            hook_ctx=HookContext(
-                config=self.sdk_configuration,
-                base_url=base_url or "",
-                operation_id="getTasks",
-                oauth2_scopes=["task:read"],
-                security_source=self.sdk_configuration.security,
-            ),
-            request=req,
-            error_status_codes=[
-                "400",
-                "401",
-                "403",
-                "404",
-                "409",
-                "429",
-                "4XX",
-                "500",
-                "503",
-                "5XX",
-            ],
-            retry_config=retry_config,
-        )
-
-        def next_func() -> Awaitable[Optional[models.GetTasksResponse]]:
-            body = utils.unmarshal_json(http_res.text, Union[Dict[Any, Any], List[Any]])
-
-            async def empty_result():
-                return None
-
-            next_cursor = JSONPath("$['@nextLink']").parse(body)
-
-            if len(next_cursor) == 0:
-                return empty_result()
-
-            next_cursor = next_cursor[0]
-            if next_cursor is None or str(next_cursor).strip() == "":
-                return empty_result()
-
-            return self.get_tasks_async(
-                filter_=filter_,
-                maxpagesize=maxpagesize,
-                next=next,
-                order_by=order_by,
-                retries=retries,
-            )
-
-        response_data: Any = None
-        if utils.match_response(http_res, "200", "application/json"):
-            return models.GetTasksResponse(
-                result=unmarshal_json_response(models.TasksListResult, http_res),
-                next=next_func,
-            )
         if utils.match_response(
             http_res, ["400", "401", "403", "404", "409", "429"], "application/json"
         ):

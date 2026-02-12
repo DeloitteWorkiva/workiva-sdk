@@ -12,9 +12,10 @@ from .margins import Margins, MarginsTypedDict
 from .stroke import Stroke, StrokeTypedDict
 from .wrapstyletype import WrapStyleType
 import pydantic
-from pydantic import model_serializer
+from pydantic import field_serializer, model_serializer
 from typing import Optional
 from typing_extensions import Annotated, NotRequired, TypedDict
+from workiva import models
 from workiva.types import BaseModel, Nullable, OptionalNullable, UNSET, UNSET_SENTINEL
 
 
@@ -27,8 +28,6 @@ class ImageDrawingElementTypedDict(TypedDict):
     """
     id: str
     r"""Identifier of the drawing element"""
-    image: ImageRefTypedDict
-    r"""A reference to image content in a document, spreadsheet, or presentation"""
     margins: Nullable[MarginsTypedDict]
     r"""The margins of a rectangle for properties of objects such as a shape, text box, or page.
 
@@ -37,16 +36,18 @@ class ImageDrawingElementTypedDict(TypedDict):
     r"""The relative position of a drawing element."""
     wrap_style: Nullable[WrapStyleType]
     r"""The relative position type"""
+    image: ImageRefTypedDict
+    r"""A reference to image content in a document, spreadsheet, or presentation"""
     fill: NotRequired[Nullable[FillTypedDict]]
     r"""A shape or box fill settings for things like shapes. Use a null to indicate no fill."""
+    stroke: NotRequired[Nullable[StrokeTypedDict]]
+    r"""Line stroke setting for things like shape edges. Use a null to indicate no stroke line."""
     rotation: NotRequired[float]
     r"""The rotation in degrees of a shape around the center point of
     the shape. The rotation is applied after the shape is positioned and sized
     meaning the position and dimensions are for the shape without any rotation.
 
     """
-    stroke: NotRequired[Nullable[StrokeTypedDict]]
-    r"""Line stroke setting for things like shape edges. Use a null to indicate no stroke line."""
 
 
 class ImageDrawingElement(BaseModel):
@@ -60,9 +61,6 @@ class ImageDrawingElement(BaseModel):
     id: str
     r"""Identifier of the drawing element"""
 
-    image: ImageRef
-    r"""A reference to image content in a document, spreadsheet, or presentation"""
-
     margins: Nullable[Margins]
     r"""The margins of a rectangle for properties of objects such as a shape, text box, or page.
 
@@ -74,8 +72,14 @@ class ImageDrawingElement(BaseModel):
     wrap_style: Annotated[Nullable[WrapStyleType], pydantic.Field(alias="wrapStyle")]
     r"""The relative position type"""
 
+    image: ImageRef
+    r"""A reference to image content in a document, spreadsheet, or presentation"""
+
     fill: OptionalNullable[Fill] = UNSET
     r"""A shape or box fill settings for things like shapes. Use a null to indicate no fill."""
+
+    stroke: OptionalNullable[Stroke] = UNSET
+    r"""Line stroke setting for things like shape edges. Use a null to indicate no stroke line."""
 
     rotation: Optional[float] = 0
     r"""The rotation in degrees of a shape around the center point of
@@ -84,12 +88,18 @@ class ImageDrawingElement(BaseModel):
 
     """
 
-    stroke: OptionalNullable[Stroke] = UNSET
-    r"""Line stroke setting for things like shape edges. Use a null to indicate no stroke line."""
+    @field_serializer("wrap_style")
+    def serialize_wrap_style(self, value):
+        if isinstance(value, str):
+            try:
+                return models.WrapStyleType(value)
+            except ValueError:
+                return value
+        return value
 
     @model_serializer(mode="wrap")
     def serialize_model(self, handler):
-        optional_fields = set(["fill", "rotation", "stroke"])
+        optional_fields = set(["fill", "stroke", "rotation"])
         nullable_fields = set(["fill", "margins", "stroke", "wrapStyle"])
         serialized = handler(self)
         m = {}

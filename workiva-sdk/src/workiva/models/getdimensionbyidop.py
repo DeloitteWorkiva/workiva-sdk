@@ -8,23 +8,23 @@ from workiva.utils import FieldMetadata, PathParamMetadata
 
 
 class GetDimensionByIDRequestTypedDict(TypedDict):
-    dimension_id: str
-    r"""The unique identifier of the dimension"""
     program_id: str
     r"""The unique identifier of the program"""
+    dimension_id: str
+    r"""The unique identifier of the dimension"""
 
 
 class GetDimensionByIDRequest(BaseModel):
-    dimension_id: Annotated[
-        str,
-        pydantic.Field(alias="dimensionId"),
-        FieldMetadata(path=PathParamMetadata(style="simple", explode=False)),
-    ]
-    r"""The unique identifier of the dimension"""
-
     program_id: Annotated[
         str,
         pydantic.Field(alias="programId"),
         FieldMetadata(path=PathParamMetadata(style="simple", explode=False)),
     ]
     r"""The unique identifier of the program"""
+
+    dimension_id: Annotated[
+        str,
+        pydantic.Field(alias="dimensionId"),
+        FieldMetadata(path=PathParamMetadata(style="simple", explode=False)),
+    ]
+    r"""The unique identifier of the dimension"""

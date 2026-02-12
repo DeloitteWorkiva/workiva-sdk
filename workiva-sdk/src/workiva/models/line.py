@@ -6,8 +6,9 @@ from .margins import Margins, MarginsTypedDict
 from .stroke import Stroke, StrokeTypedDict
 from .wrapstyletype import WrapStyleType
 import pydantic
-from pydantic import model_serializer
+from pydantic import field_serializer, model_serializer
 from typing_extensions import Annotated, TypedDict
+from workiva import models
 from workiva.types import BaseModel, Nullable, UNSET_SENTINEL
 
 
@@ -69,6 +70,15 @@ class Line(BaseModel):
 
     wrap_style: Annotated[Nullable[WrapStyleType], pydantic.Field(alias="wrapStyle")]
     r"""The relative position type"""
+
+    @field_serializer("wrap_style")
+    def serialize_wrap_style(self, value):
+        if isinstance(value, str):
+            try:
+                return models.WrapStyleType(value)
+            except ValueError:
+                return value
+        return value
 
     @model_serializer(mode="wrap")
     def serialize_model(self, handler):

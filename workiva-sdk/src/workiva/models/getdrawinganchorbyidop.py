@@ -10,28 +10,28 @@ from workiva.utils import FieldMetadata, PathParamMetadata, QueryParamMetadata
 
 
 class GetDrawingAnchorByIDRequestTypedDict(TypedDict):
-    anchor_id: str
-    r"""The unique identifier of the anchor"""
     drawing_id: str
     r"""The unique identifier of a drawing"""
+    anchor_id: str
+    r"""The unique identifier of the anchor"""
     revision: NotRequired[str]
     r"""Returns resources at a specific revision"""
 
 
 class GetDrawingAnchorByIDRequest(BaseModel):
-    anchor_id: Annotated[
-        str,
-        pydantic.Field(alias="anchorId"),
-        FieldMetadata(path=PathParamMetadata(style="simple", explode=False)),
-    ]
-    r"""The unique identifier of the anchor"""
-
     drawing_id: Annotated[
         str,
         pydantic.Field(alias="drawingId"),
         FieldMetadata(path=PathParamMetadata(style="simple", explode=False)),
     ]
     r"""The unique identifier of a drawing"""
+
+    anchor_id: Annotated[
+        str,
+        pydantic.Field(alias="anchorId"),
+        FieldMetadata(path=PathParamMetadata(style="simple", explode=False)),
+    ]
+    r"""The unique identifier of the anchor"""
 
     revision: Annotated[
         Optional[str],

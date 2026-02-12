@@ -5,13 +5,14 @@ from .connectionrundto import ConnectionRunDto, ConnectionRunDtoTypedDict
 from datetime import datetime
 from enum import Enum
 import pydantic
-from pydantic import model_serializer
+from pydantic import field_serializer, model_serializer
 from typing import Any, Dict, Optional
 from typing_extensions import Annotated, NotRequired, TypedDict
+from workiva import models, utils
 from workiva.types import BaseModel, UNSET_SENTINEL
 
 
-class DestinationType(str, Enum):
+class DestinationType(str, Enum, metaclass=utils.OpenEnumMeta):
     r"""The type of file or item the connection sends data to"""
 
     SPREADSHEET = "spreadsheet"
@@ -31,7 +32,7 @@ class DestinationType(str, Enum):
     UNKNOWN_RECORD_TYPE = "unknown_record_type"
 
 
-class SourceType(str, Enum):
+class SourceType(str, Enum, metaclass=utils.OpenEnumMeta):
     r"""The type of file or item the connection pulls data from"""
 
     SPREADSHEET = "spreadsheet"
@@ -172,6 +173,24 @@ class ConnectionDto(BaseModel):
 
     workspace_id: Annotated[Optional[str], pydantic.Field(alias="workspaceId")] = None
     r"""The workspace the connection belongs to"""
+
+    @field_serializer("destination_type")
+    def serialize_destination_type(self, value):
+        if isinstance(value, str):
+            try:
+                return models.DestinationType(value)
+            except ValueError:
+                return value
+        return value
+
+    @field_serializer("source_type")
+    def serialize_source_type(self, value):
+        if isinstance(value, str):
+            try:
+                return models.SourceType(value)
+            except ValueError:
+                return value
+        return value
 
     @model_serializer(mode="wrap")
     def serialize_model(self, handler):

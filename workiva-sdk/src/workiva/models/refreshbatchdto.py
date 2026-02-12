@@ -5,13 +5,14 @@ from .connectionrundto import ConnectionRunDto, ConnectionRunDtoTypedDict
 from datetime import datetime
 from enum import Enum
 import pydantic
-from pydantic import model_serializer
+from pydantic import field_serializer, model_serializer
 from typing import List, Optional
 from typing_extensions import Annotated, NotRequired, TypedDict
+from workiva import models, utils
 from workiva.types import BaseModel, UNSET_SENTINEL
 
 
-class RefreshBatchDtoDestinationStatus(str, Enum):
+class RefreshBatchDtoDestinationStatus(str, Enum, metaclass=utils.OpenEnumMeta):
     r"""The run status of the destination"""
 
     NOT_STARTED = "not_started"
@@ -21,7 +22,7 @@ class RefreshBatchDtoDestinationStatus(str, Enum):
     CANCELLED = "cancelled"
 
 
-class RefreshBatchDtoSourceStatus(str, Enum):
+class RefreshBatchDtoSourceStatus(str, Enum, metaclass=utils.OpenEnumMeta):
     r"""The run status of the source"""
 
     NOT_STARTED = "not_started"
@@ -83,6 +84,24 @@ class RefreshBatchDto(BaseModel):
 
     updated: Optional[datetime] = None
     r"""When the batch was updated, as a datetime"""
+
+    @field_serializer("destination_status")
+    def serialize_destination_status(self, value):
+        if isinstance(value, str):
+            try:
+                return models.RefreshBatchDtoDestinationStatus(value)
+            except ValueError:
+                return value
+        return value
+
+    @field_serializer("source_status")
+    def serialize_source_status(self, value):
+        if isinstance(value, str):
+            try:
+                return models.RefreshBatchDtoSourceStatus(value)
+            except ValueError:
+                return value
+        return value
 
     @model_serializer(mode="wrap")
     def serialize_model(self, handler):

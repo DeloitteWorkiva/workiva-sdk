@@ -3,13 +3,14 @@
 from __future__ import annotations
 from enum import Enum
 import pydantic
-from pydantic import model_serializer
+from pydantic import field_serializer, model_serializer
 from typing import Optional
 from typing_extensions import Annotated, NotRequired, TypedDict
+from workiva import models, utils
 from workiva.types import BaseModel, UNSET_SENTINEL
 
 
-class ColumnType(str, Enum):
+class ColumnType(str, Enum, metaclass=utils.OpenEnumMeta):
     r"""The column type."""
 
     INTEGER = "integer"
@@ -36,6 +37,15 @@ class PivotViewDefinitionColumnDto(BaseModel):
         None
     )
     r"""The column type."""
+
+    @field_serializer("column_type")
+    def serialize_column_type(self, value):
+        if isinstance(value, str):
+            try:
+                return models.ColumnType(value)
+            except ValueError:
+                return value
+        return value
 
     @model_serializer(mode="wrap")
     def serialize_model(self, handler):

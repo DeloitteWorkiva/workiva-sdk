@@ -4,9 +4,10 @@ from __future__ import annotations
 from datetime import datetime
 from enum import Enum
 import pydantic
-from pydantic import model_serializer
+from pydantic import field_serializer, model_serializer
 from typing import Optional
 from typing_extensions import Annotated, NotRequired, TypedDict
+from workiva import models, utils
 from workiva.types import BaseModel, Nullable, OptionalNullable, UNSET, UNSET_SENTINEL
 
 
@@ -82,7 +83,7 @@ class FileCreated(BaseModel):
         return m
 
 
-class FileKind(str, Enum):
+class Kind(str, Enum, metaclass=utils.OpenEnumMeta):
     r"""Kind of the file"""
 
     DOCUMENT = "Document"
@@ -165,7 +166,7 @@ class FileModified(BaseModel):
         return m
 
 
-class FileState(str, Enum):
+class FileState(str, Enum, metaclass=utils.OpenEnumMeta):
     r"""State of the file"""
 
     ACTIVE = "Active"
@@ -182,7 +183,7 @@ class FileTypedDict(TypedDict):
     created: NotRequired[Nullable[FileCreatedTypedDict]]
     id: NotRequired[Nullable[str]]
     r"""The unique identifier of the file"""
-    kind: NotRequired[FileKind]
+    kind: NotRequired[Kind]
     r"""Kind of the file"""
     modified: NotRequired[Nullable[FileModifiedTypedDict]]
     name: NotRequired[str]
@@ -207,7 +208,7 @@ class File(BaseModel):
     id: OptionalNullable[str] = UNSET
     r"""The unique identifier of the file"""
 
-    kind: Optional[FileKind] = None
+    kind: Optional[Kind] = None
     r"""Kind of the file"""
 
     modified: OptionalNullable[FileModified] = UNSET
@@ -222,6 +223,24 @@ class File(BaseModel):
 
     type: OptionalNullable[str] = UNSET
     r"""Type of the file"""
+
+    @field_serializer("kind")
+    def serialize_kind(self, value):
+        if isinstance(value, str):
+            try:
+                return models.Kind(value)
+            except ValueError:
+                return value
+        return value
+
+    @field_serializer("state")
+    def serialize_state(self, value):
+        if isinstance(value, str):
+            try:
+                return models.FileState(value)
+            except ValueError:
+                return value
+        return value
 
     @model_serializer(mode="wrap")
     def serialize_model(self, handler):
@@ -266,7 +285,7 @@ class File(BaseModel):
 class FileInputTypedDict(TypedDict):
     r"""Details about the file, including its ID, name, kind, and milestone dates."""
 
-    kind: NotRequired[FileKind]
+    kind: NotRequired[Kind]
     r"""Kind of the file"""
     name: NotRequired[str]
     r"""Name of the file"""
@@ -275,11 +294,20 @@ class FileInputTypedDict(TypedDict):
 class FileInput(BaseModel):
     r"""Details about the file, including its ID, name, kind, and milestone dates."""
 
-    kind: Optional[FileKind] = None
+    kind: Optional[Kind] = None
     r"""Kind of the file"""
 
     name: Optional[str] = None
     r"""Name of the file"""
+
+    @field_serializer("kind")
+    def serialize_kind(self, value):
+        if isinstance(value, str):
+            try:
+                return models.Kind(value)
+            except ValueError:
+                return value
+        return value
 
     @model_serializer(mode="wrap")
     def serialize_model(self, handler):

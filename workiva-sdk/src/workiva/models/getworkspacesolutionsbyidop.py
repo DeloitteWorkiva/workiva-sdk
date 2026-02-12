@@ -10,10 +10,10 @@ from workiva.utils import FieldMetadata, PathParamMetadata
 class GetWorkspaceSolutionsByIDRequestTypedDict(TypedDict):
     organization_id: str
     r"""The unique identifier of the organization"""
-    solution_id: str
-    r"""The unique identifier of the solution"""
     workspace_id: str
     r"""The unique identifier of the workspace"""
+    solution_id: str
+    r"""The unique identifier of the solution"""
 
 
 class GetWorkspaceSolutionsByIDRequest(BaseModel):
@@ -24,16 +24,16 @@ class GetWorkspaceSolutionsByIDRequest(BaseModel):
     ]
     r"""The unique identifier of the organization"""
 
-    solution_id: Annotated[
-        str,
-        pydantic.Field(alias="solutionId"),
-        FieldMetadata(path=PathParamMetadata(style="simple", explode=False)),
-    ]
-    r"""The unique identifier of the solution"""
-
     workspace_id: Annotated[
         str,
         pydantic.Field(alias="workspaceId"),
         FieldMetadata(path=PathParamMetadata(style="simple", explode=False)),
     ]
     r"""The unique identifier of the workspace"""
+
+    solution_id: Annotated[
+        str,
+        pydantic.Field(alias="solutionId"),
+        FieldMetadata(path=PathParamMetadata(style="simple", explode=False)),
+    ]
+    r"""The unique identifier of the solution"""

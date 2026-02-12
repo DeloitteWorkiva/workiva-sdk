@@ -10,24 +10,24 @@ from workiva.utils import FieldMetadata, PathParamMetadata, RequestMetadata
 
 
 class TableEditRequestTypedDict(TypedDict):
-    table_edit: TableEditTypedDict
-    r"""The table edit to apply"""
     table_id: str
     r"""The unique identifier for the table"""
+    table_edit: TableEditTypedDict
+    r"""The table edit to apply"""
 
 
 class TableEditRequest(BaseModel):
-    table_edit: Annotated[
-        TableEdit, FieldMetadata(request=RequestMetadata(media_type="application/json"))
-    ]
-    r"""The table edit to apply"""
-
     table_id: Annotated[
         str,
         pydantic.Field(alias="tableId"),
         FieldMetadata(path=PathParamMetadata(style="simple", explode=False)),
     ]
     r"""The unique identifier for the table"""
+
+    table_edit: Annotated[
+        TableEdit, FieldMetadata(request=RequestMetadata(media_type="application/json"))
+    ]
+    r"""The table edit to apply"""
 
 
 class TableEditResponseTypedDict(TypedDict):

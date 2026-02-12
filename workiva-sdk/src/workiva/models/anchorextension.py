@@ -2,9 +2,10 @@
 
 from __future__ import annotations
 from .extensiontype import ExtensionType
-from pydantic import model_serializer
+from pydantic import field_serializer, model_serializer
 from typing import Optional
 from typing_extensions import NotRequired, TypedDict
+from workiva import models
 from workiva.types import BaseModel, UNSET_SENTINEL
 
 
@@ -29,6 +30,15 @@ class AnchorExtension(BaseModel):
 
     type: Optional[ExtensionType] = None
     r"""Indicates the type of the anchor extension."""
+
+    @field_serializer("type")
+    def serialize_type(self, value):
+        if isinstance(value, str):
+            try:
+                return models.ExtensionType(value)
+            except ValueError:
+                return value
+        return value
 
     @model_serializer(mode="wrap")
     def serialize_model(self, handler):

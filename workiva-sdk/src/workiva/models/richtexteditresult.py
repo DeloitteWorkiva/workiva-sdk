@@ -3,13 +3,14 @@
 from __future__ import annotations
 from enum import Enum
 import pydantic
-from pydantic import model_serializer
+from pydantic import field_serializer, model_serializer
 from typing import Optional
 from typing_extensions import Annotated, NotRequired, TypedDict
+from workiva import models, utils
 from workiva.types import BaseModel, Nullable, OptionalNullable, UNSET, UNSET_SENTINEL
 
 
-class RichTextEditResultType(str, Enum):
+class RichTextEditResultType(str, Enum, metaclass=utils.OpenEnumMeta):
     r"""The type of resource created from a rich text edit."""
 
     TABLE = "table"
@@ -19,10 +20,10 @@ class RichTextEditResultType(str, Enum):
 class RichTextEditResultTypedDict(TypedDict):
     r"""A reference to a resource that was created by a rich text edit."""
 
-    rich_text: NotRequired[Nullable[str]]
-    r"""The unique identifier of the rich text created by the rich text edit."""
     table: NotRequired[Nullable[str]]
     r"""The unique identifier of the table created by the rich text edit."""
+    rich_text: NotRequired[Nullable[str]]
+    r"""The unique identifier of the rich text created by the rich text edit."""
     type: NotRequired[RichTextEditResultType]
     r"""The type of resource created from a rich text edit."""
 
@@ -30,21 +31,30 @@ class RichTextEditResultTypedDict(TypedDict):
 class RichTextEditResult(BaseModel):
     r"""A reference to a resource that was created by a rich text edit."""
 
+    table: OptionalNullable[str] = UNSET
+    r"""The unique identifier of the table created by the rich text edit."""
+
     rich_text: Annotated[OptionalNullable[str], pydantic.Field(alias="richText")] = (
         UNSET
     )
     r"""The unique identifier of the rich text created by the rich text edit."""
 
-    table: OptionalNullable[str] = UNSET
-    r"""The unique identifier of the table created by the rich text edit."""
-
     type: Optional[RichTextEditResultType] = None
     r"""The type of resource created from a rich text edit."""
 
+    @field_serializer("type")
+    def serialize_type(self, value):
+        if isinstance(value, str):
+            try:
+                return models.RichTextEditResultType(value)
+            except ValueError:
+                return value
+        return value
+
     @model_serializer(mode="wrap")
     def serialize_model(self, handler):
-        optional_fields = set(["richText", "table", "type"])
-        nullable_fields = set(["richText", "table"])
+        optional_fields = set(["table", "richText", "type"])
+        nullable_fields = set(["table", "richText"])
         serialized = handler(self)
         m = {}
 

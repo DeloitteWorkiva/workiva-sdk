@@ -83,12 +83,6 @@ class PresentationCreated(BaseModel):
         return m
 
 
-class PresentationLock(str, Enum):
-    r"""The type of lock applied to this presentation, if any. Note this property is not tied to revision and will always reflect the presentation's current lock state."""
-
-    LOCKED = "locked"
-
-
 class PresentationSchemasUserTypedDict(TypedDict):
     r"""A user refernenced by their unique identifier"""
 
@@ -161,6 +155,12 @@ class PresentationModified(BaseModel):
         return m
 
 
+class PresentationLock(str, Enum):
+    r"""The type of lock applied to this presentation, if any. Note this property is not tied to revision and will always reflect the presentation's current lock state."""
+
+    LOCKED = "locked"
+
+
 class PresentationTypedDict(TypedDict):
     r"""Details about the presentation, including its ID, name, and milestone dates."""
 
@@ -171,9 +171,9 @@ class PresentationTypedDict(TypedDict):
     r"""A map of ids to values representing Custom Fields on the  presentation."""
     id: NotRequired[str]
     r"""The unique identifier of the presentation"""
+    modified: NotRequired[PresentationModifiedTypedDict]
     lock: NotRequired[Nullable[PresentationLock]]
     r"""The type of lock applied to this presentation, if any. Note this property is not tied to revision and will always reflect the presentation's current lock state."""
-    modified: NotRequired[PresentationModifiedTypedDict]
     name: NotRequired[str]
     r"""Name of the presentation"""
     revision: NotRequired[Nullable[str]]
@@ -205,10 +205,10 @@ class Presentation(BaseModel):
     id: Optional[str] = None
     r"""The unique identifier of the presentation"""
 
+    modified: Optional[PresentationModified] = None
+
     lock: OptionalNullable[PresentationLock] = UNSET
     r"""The type of lock applied to this presentation, if any. Note this property is not tied to revision and will always reflect the presentation's current lock state."""
-
-    modified: Optional[PresentationModified] = None
 
     name: Optional[str] = None
     r"""Name of the presentation"""
@@ -238,8 +238,8 @@ class Presentation(BaseModel):
                 "customFieldGroups",
                 "customFields",
                 "id",
-                "lock",
                 "modified",
+                "lock",
                 "name",
                 "revision",
                 "slideCustomFieldGroups",

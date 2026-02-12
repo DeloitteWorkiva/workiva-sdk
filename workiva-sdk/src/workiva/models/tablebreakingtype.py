@@ -2,9 +2,10 @@
 
 from __future__ import annotations
 from enum import Enum
+from workiva import utils
 
 
-class TableBreakingType(str, Enum):
+class TableBreakingType(str, Enum, metaclass=utils.OpenEnumMeta):
     r"""The type of table breaking"""
 
     NEVER_BREAK = "neverBreak"

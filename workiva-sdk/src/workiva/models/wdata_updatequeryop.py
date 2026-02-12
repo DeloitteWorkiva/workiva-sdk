@@ -19,22 +19,22 @@ WDATA_UPDATE_QUERY_OP_SERVERS = [
 
 
 class WdataUpdateQueryRequestTypedDict(TypedDict):
-    query_dto: QueryDtoInputTypedDict
-    r"""The representation of the query to update"""
     query_id: str
     r"""The unique identifier of the query"""
+    query_dto: QueryDtoInputTypedDict
+    r"""The representation of the query to update"""
 
 
 class WdataUpdateQueryRequest(BaseModel):
-    query_dto: Annotated[
-        QueryDtoInput,
-        FieldMetadata(request=RequestMetadata(media_type="application/json")),
-    ]
-    r"""The representation of the query to update"""
-
     query_id: Annotated[
         str,
         pydantic.Field(alias="queryId"),
         FieldMetadata(path=PathParamMetadata(style="simple", explode=False)),
     ]
     r"""The unique identifier of the query"""
+
+    query_dto: Annotated[
+        QueryDtoInput,
+        FieldMetadata(request=RequestMetadata(media_type="application/json")),
+    ]
+    r"""The representation of the query to update"""

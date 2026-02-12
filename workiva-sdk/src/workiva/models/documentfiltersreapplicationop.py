@@ -13,25 +13,25 @@ from workiva.utils import FieldMetadata, PathParamMetadata, RequestMetadata
 
 
 class DocumentFiltersReapplicationRequestTypedDict(TypedDict):
-    document_filters_reapplication: DocumentFiltersReapplicationTypedDict
-    r"""The filter reapplication request to apply"""
     document_id: str
     r"""The unique identifier of the document"""
+    document_filters_reapplication: DocumentFiltersReapplicationTypedDict
+    r"""The filter reapplication request to apply"""
 
 
 class DocumentFiltersReapplicationRequest(BaseModel):
-    document_filters_reapplication: Annotated[
-        DocumentFiltersReapplication,
-        FieldMetadata(request=RequestMetadata(media_type="application/json")),
-    ]
-    r"""The filter reapplication request to apply"""
-
     document_id: Annotated[
         str,
         pydantic.Field(alias="documentId"),
         FieldMetadata(path=PathParamMetadata(style="simple", explode=False)),
     ]
     r"""The unique identifier of the document"""
+
+    document_filters_reapplication: Annotated[
+        DocumentFiltersReapplication,
+        FieldMetadata(request=RequestMetadata(media_type="application/json")),
+    ]
+    r"""The filter reapplication request to apply"""
 
 
 class DocumentFiltersReapplicationResponseTypedDict(TypedDict):

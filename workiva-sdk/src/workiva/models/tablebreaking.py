@@ -3,9 +3,10 @@
 from __future__ import annotations
 from .tablebreakingtype import TableBreakingType
 import pydantic
-from pydantic import model_serializer
+from pydantic import field_serializer, model_serializer
 from typing import Optional
 from typing_extensions import Annotated, NotRequired, TypedDict
+from workiva import models
 from workiva.types import BaseModel, Nullable, OptionalNullable, UNSET, UNSET_SENTINEL
 
 
@@ -28,6 +29,15 @@ class TableBreaking(BaseModel):
 
     type: Optional[TableBreakingType] = None
     r"""The type of table breaking"""
+
+    @field_serializer("type")
+    def serialize_type(self, value):
+        if isinstance(value, str):
+            try:
+                return models.TableBreakingType(value)
+            except ValueError:
+                return value
+        return value
 
     @model_serializer(mode="wrap")
     def serialize_model(self, handler):

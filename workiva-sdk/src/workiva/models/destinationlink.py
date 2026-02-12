@@ -4,9 +4,10 @@ from __future__ import annotations
 from .contentref import ContentRef, ContentRefTypedDict
 from .destinationlinksource import DestinationLinkSource, DestinationLinkSourceTypedDict
 from .destinationlinkstatus import DestinationLinkStatus
-from pydantic import model_serializer
+from pydantic import field_serializer, model_serializer
 from typing import Optional
 from typing_extensions import NotRequired, TypedDict
+from workiva import models
 from workiva.types import BaseModel, UNSET_SENTINEL
 
 
@@ -42,6 +43,15 @@ class DestinationLink(BaseModel):
 
     status: Optional[DestinationLinkStatus] = DestinationLinkStatus.CONNECTED
     r"""Destination link status"""
+
+    @field_serializer("status")
+    def serialize_status(self, value):
+        if isinstance(value, str):
+            try:
+                return models.DestinationLinkStatus(value)
+            except ValueError:
+                return value
+        return value
 
     @model_serializer(mode="wrap")
     def serialize_model(self, handler):

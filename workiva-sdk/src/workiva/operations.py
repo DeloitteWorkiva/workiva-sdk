@@ -12,1604 +12,6 @@ from workiva.utils.unmarshal_json_response import unmarshal_json_response
 class Operations(BaseSDK):
     r"""Use these endpoints to manage operations, such as to check their status."""
 
-    def get_batch_upsertion_metric_values_results(
-        self,
-        *,
-        operation_id: str,
-        maxpagesize: Optional[int] = 1000,
-        next: Optional[str] = None,
-        retries: OptionalNullable[utils.RetryConfig] = UNSET,
-        server_url: Optional[str] = None,
-        timeout_ms: Optional[int] = None,
-        http_headers: Optional[Mapping[str, str]] = None,
-    ) -> Optional[models.GetBatchUpsertionMetricValuesResultsResponse]:
-        r"""Retrieve the results of a metric values batch upsertion operation
-
-        Returns a [`MetricValuesListResult`](ref:sustainability#metricvalueslistresult) describing the results of a metric values batch upsertion operation. <br /><br /> Note: This endpoint is rate-limited. You may experience rates as low as 1 request per second. When polling for updates, examine the `Retry-After` header and retry after that many seconds.
-
-
-        :param operation_id: The unique identifier of the operation
-        :param maxpagesize: The maximum number of results to retrieve
-        :param next: Pagination cursor for next set of results.
-        :param retries: Override the default retry configuration for this method
-        :param server_url: Override the default server URL for this method
-        :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
-        :param http_headers: Additional headers to set or replace on requests.
-        """
-        base_url = None
-        url_variables = None
-        if timeout_ms is None:
-            timeout_ms = self.sdk_configuration.timeout_ms
-
-        if server_url is not None:
-            base_url = server_url
-        else:
-            base_url = self._get_url(base_url, url_variables)
-
-        request = models.GetBatchUpsertionMetricValuesResultsRequest(
-            maxpagesize=maxpagesize,
-            next=next,
-            operation_id=operation_id,
-        )
-
-        req = self._build_request(
-            method="GET",
-            path="/operations/{operationId}/metricValuesBatchUpsertionResults",
-            base_url=base_url,
-            url_variables=url_variables,
-            request=request,
-            request_body_required=False,
-            request_has_path_params=True,
-            request_has_query_params=True,
-            user_agent_header="user-agent",
-            accept_header_value="application/json",
-            http_headers=http_headers,
-            security=self.sdk_configuration.security,
-            allow_empty_value=None,
-            timeout_ms=timeout_ms,
-        )
-
-        if retries == UNSET:
-            if self.sdk_configuration.retry_config is not UNSET:
-                retries = self.sdk_configuration.retry_config
-
-        retry_config = None
-        if isinstance(retries, utils.RetryConfig):
-            retry_config = (retries, ["429", "500", "502", "503", "504"])
-
-        http_res = self.do_request(
-            hook_ctx=HookContext(
-                config=self.sdk_configuration,
-                base_url=base_url or "",
-                operation_id="getBatchUpsertionMetricValuesResults",
-                oauth2_scopes=["file:read"],
-                security_source=self.sdk_configuration.security,
-            ),
-            request=req,
-            error_status_codes=[
-                "400",
-                "401",
-                "403",
-                "404",
-                "409",
-                "429",
-                "4XX",
-                "500",
-                "503",
-                "5XX",
-            ],
-            retry_config=retry_config,
-        )
-
-        def next_func() -> (
-            Optional[models.GetBatchUpsertionMetricValuesResultsResponse]
-        ):
-            body = utils.unmarshal_json(http_res.text, Union[Dict[Any, Any], List[Any]])
-
-            next_cursor = JSONPath("$['@nextLink']").parse(body)
-
-            if len(next_cursor) == 0:
-                return None
-
-            next_cursor = next_cursor[0]
-            if next_cursor is None or str(next_cursor).strip() == "":
-                return None
-
-            return self.get_batch_upsertion_metric_values_results(
-                operation_id=operation_id,
-                maxpagesize=maxpagesize,
-                next=next,
-                retries=retries,
-            )
-
-        response_data: Any = None
-        if utils.match_response(http_res, "200", "application/json"):
-            return models.GetBatchUpsertionMetricValuesResultsResponse(
-                result=unmarshal_json_response(models.MetricValuesListResult, http_res),
-                next=next_func,
-                headers=utils.get_response_headers(http_res.headers),
-            )
-        if utils.match_response(
-            http_res, ["400", "401", "403", "404", "409", "429"], "application/json"
-        ):
-            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
-            raise errors.ErrorResponse(response_data, http_res)
-        if utils.match_response(http_res, ["500", "503"], "application/json"):
-            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
-            raise errors.ErrorResponse(response_data, http_res)
-        if utils.match_response(http_res, "4XX", "*"):
-            http_res_text = utils.stream_to_text(http_res)
-            raise errors.SDKError("API error occurred", http_res, http_res_text)
-        if utils.match_response(http_res, "5XX", "*"):
-            http_res_text = utils.stream_to_text(http_res)
-            raise errors.SDKError("API error occurred", http_res, http_res_text)
-
-        raise errors.SDKError("Unexpected response received", http_res)
-
-    async def get_batch_upsertion_metric_values_results_async(
-        self,
-        *,
-        operation_id: str,
-        maxpagesize: Optional[int] = 1000,
-        next: Optional[str] = None,
-        retries: OptionalNullable[utils.RetryConfig] = UNSET,
-        server_url: Optional[str] = None,
-        timeout_ms: Optional[int] = None,
-        http_headers: Optional[Mapping[str, str]] = None,
-    ) -> Optional[models.GetBatchUpsertionMetricValuesResultsResponse]:
-        r"""Retrieve the results of a metric values batch upsertion operation
-
-        Returns a [`MetricValuesListResult`](ref:sustainability#metricvalueslistresult) describing the results of a metric values batch upsertion operation. <br /><br /> Note: This endpoint is rate-limited. You may experience rates as low as 1 request per second. When polling for updates, examine the `Retry-After` header and retry after that many seconds.
-
-
-        :param operation_id: The unique identifier of the operation
-        :param maxpagesize: The maximum number of results to retrieve
-        :param next: Pagination cursor for next set of results.
-        :param retries: Override the default retry configuration for this method
-        :param server_url: Override the default server URL for this method
-        :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
-        :param http_headers: Additional headers to set or replace on requests.
-        """
-        base_url = None
-        url_variables = None
-        if timeout_ms is None:
-            timeout_ms = self.sdk_configuration.timeout_ms
-
-        if server_url is not None:
-            base_url = server_url
-        else:
-            base_url = self._get_url(base_url, url_variables)
-
-        request = models.GetBatchUpsertionMetricValuesResultsRequest(
-            maxpagesize=maxpagesize,
-            next=next,
-            operation_id=operation_id,
-        )
-
-        req = self._build_request_async(
-            method="GET",
-            path="/operations/{operationId}/metricValuesBatchUpsertionResults",
-            base_url=base_url,
-            url_variables=url_variables,
-            request=request,
-            request_body_required=False,
-            request_has_path_params=True,
-            request_has_query_params=True,
-            user_agent_header="user-agent",
-            accept_header_value="application/json",
-            http_headers=http_headers,
-            security=self.sdk_configuration.security,
-            allow_empty_value=None,
-            timeout_ms=timeout_ms,
-        )
-
-        if retries == UNSET:
-            if self.sdk_configuration.retry_config is not UNSET:
-                retries = self.sdk_configuration.retry_config
-
-        retry_config = None
-        if isinstance(retries, utils.RetryConfig):
-            retry_config = (retries, ["429", "500", "502", "503", "504"])
-
-        http_res = await self.do_request_async(
-            hook_ctx=HookContext(
-                config=self.sdk_configuration,
-                base_url=base_url or "",
-                operation_id="getBatchUpsertionMetricValuesResults",
-                oauth2_scopes=["file:read"],
-                security_source=self.sdk_configuration.security,
-            ),
-            request=req,
-            error_status_codes=[
-                "400",
-                "401",
-                "403",
-                "404",
-                "409",
-                "429",
-                "4XX",
-                "500",
-                "503",
-                "5XX",
-            ],
-            retry_config=retry_config,
-        )
-
-        def next_func() -> (
-            Awaitable[Optional[models.GetBatchUpsertionMetricValuesResultsResponse]]
-        ):
-            body = utils.unmarshal_json(http_res.text, Union[Dict[Any, Any], List[Any]])
-
-            async def empty_result():
-                return None
-
-            next_cursor = JSONPath("$['@nextLink']").parse(body)
-
-            if len(next_cursor) == 0:
-                return empty_result()
-
-            next_cursor = next_cursor[0]
-            if next_cursor is None or str(next_cursor).strip() == "":
-                return empty_result()
-
-            return self.get_batch_upsertion_metric_values_results_async(
-                operation_id=operation_id,
-                maxpagesize=maxpagesize,
-                next=next,
-                retries=retries,
-            )
-
-        response_data: Any = None
-        if utils.match_response(http_res, "200", "application/json"):
-            return models.GetBatchUpsertionMetricValuesResultsResponse(
-                result=unmarshal_json_response(models.MetricValuesListResult, http_res),
-                next=next_func,
-                headers=utils.get_response_headers(http_res.headers),
-            )
-        if utils.match_response(
-            http_res, ["400", "401", "403", "404", "409", "429"], "application/json"
-        ):
-            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
-            raise errors.ErrorResponse(response_data, http_res)
-        if utils.match_response(http_res, ["500", "503"], "application/json"):
-            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
-            raise errors.ErrorResponse(response_data, http_res)
-        if utils.match_response(http_res, "4XX", "*"):
-            http_res_text = await utils.stream_to_text_async(http_res)
-            raise errors.SDKError("API error occurred", http_res, http_res_text)
-        if utils.match_response(http_res, "5XX", "*"):
-            http_res_text = await utils.stream_to_text_async(http_res)
-            raise errors.SDKError("API error occurred", http_res, http_res_text)
-
-        raise errors.SDKError("Unexpected response received", http_res)
-
-    def get_copy_file_results(
-        self,
-        *,
-        operation_id: str,
-        maxpagesize: Optional[int] = 1000,
-        next: Optional[str] = None,
-        retries: OptionalNullable[utils.RetryConfig] = UNSET,
-        server_url: Optional[str] = None,
-        timeout_ms: Optional[int] = None,
-        http_headers: Optional[Mapping[str, str]] = None,
-    ) -> Optional[models.GetCopyFileResultsResponse]:
-        r"""Retrieve copy file results for a single operation
-
-        Returns a [`CopyFileListResult`](ref:operations#copyfilelistresult) describing the results of a file copy operation. <br /><br /> Note: This endpoint is rate-limited. You may experience rates as low as 1 request per second. When polling for updates, examine the `Retry-After` header and retry after that many seconds.
-
-
-        :param operation_id: The unique identifier of the operation
-        :param maxpagesize: The maximum number of results to retrieve
-        :param next: Pagination cursor for next set of results.
-        :param retries: Override the default retry configuration for this method
-        :param server_url: Override the default server URL for this method
-        :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
-        :param http_headers: Additional headers to set or replace on requests.
-        """
-        base_url = None
-        url_variables = None
-        if timeout_ms is None:
-            timeout_ms = self.sdk_configuration.timeout_ms
-
-        if server_url is not None:
-            base_url = server_url
-        else:
-            base_url = self._get_url(base_url, url_variables)
-
-        request = models.GetCopyFileResultsRequest(
-            maxpagesize=maxpagesize,
-            next=next,
-            operation_id=operation_id,
-        )
-
-        req = self._build_request(
-            method="GET",
-            path="/operations/{operationId}/copyFileResults",
-            base_url=base_url,
-            url_variables=url_variables,
-            request=request,
-            request_body_required=False,
-            request_has_path_params=True,
-            request_has_query_params=True,
-            user_agent_header="user-agent",
-            accept_header_value="application/json",
-            http_headers=http_headers,
-            security=self.sdk_configuration.security,
-            allow_empty_value=None,
-            timeout_ms=timeout_ms,
-        )
-
-        if retries == UNSET:
-            if self.sdk_configuration.retry_config is not UNSET:
-                retries = self.sdk_configuration.retry_config
-
-        retry_config = None
-        if isinstance(retries, utils.RetryConfig):
-            retry_config = (retries, ["429", "500", "502", "503", "504"])
-
-        http_res = self.do_request(
-            hook_ctx=HookContext(
-                config=self.sdk_configuration,
-                base_url=base_url or "",
-                operation_id="getCopyFileResults",
-                oauth2_scopes=["file:read"],
-                security_source=self.sdk_configuration.security,
-            ),
-            request=req,
-            error_status_codes=[
-                "400",
-                "401",
-                "403",
-                "404",
-                "409",
-                "429",
-                "4XX",
-                "500",
-                "503",
-                "5XX",
-            ],
-            retry_config=retry_config,
-        )
-
-        def next_func() -> Optional[models.GetCopyFileResultsResponse]:
-            body = utils.unmarshal_json(http_res.text, Union[Dict[Any, Any], List[Any]])
-
-            next_cursor = JSONPath("$['@nextLink']").parse(body)
-
-            if len(next_cursor) == 0:
-                return None
-
-            next_cursor = next_cursor[0]
-            if next_cursor is None or str(next_cursor).strip() == "":
-                return None
-
-            return self.get_copy_file_results(
-                operation_id=operation_id,
-                maxpagesize=maxpagesize,
-                next=next,
-                retries=retries,
-            )
-
-        response_data: Any = None
-        if utils.match_response(http_res, "200", "application/json"):
-            return models.GetCopyFileResultsResponse(
-                result=unmarshal_json_response(models.CopyFileListResult, http_res),
-                next=next_func,
-                headers=utils.get_response_headers(http_res.headers),
-            )
-        if utils.match_response(
-            http_res, ["400", "401", "403", "404", "409", "429"], "application/json"
-        ):
-            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
-            raise errors.ErrorResponse(response_data, http_res)
-        if utils.match_response(http_res, ["500", "503"], "application/json"):
-            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
-            raise errors.ErrorResponse(response_data, http_res)
-        if utils.match_response(http_res, "4XX", "*"):
-            http_res_text = utils.stream_to_text(http_res)
-            raise errors.SDKError("API error occurred", http_res, http_res_text)
-        if utils.match_response(http_res, "5XX", "*"):
-            http_res_text = utils.stream_to_text(http_res)
-            raise errors.SDKError("API error occurred", http_res, http_res_text)
-
-        raise errors.SDKError("Unexpected response received", http_res)
-
-    async def get_copy_file_results_async(
-        self,
-        *,
-        operation_id: str,
-        maxpagesize: Optional[int] = 1000,
-        next: Optional[str] = None,
-        retries: OptionalNullable[utils.RetryConfig] = UNSET,
-        server_url: Optional[str] = None,
-        timeout_ms: Optional[int] = None,
-        http_headers: Optional[Mapping[str, str]] = None,
-    ) -> Optional[models.GetCopyFileResultsResponse]:
-        r"""Retrieve copy file results for a single operation
-
-        Returns a [`CopyFileListResult`](ref:operations#copyfilelistresult) describing the results of a file copy operation. <br /><br /> Note: This endpoint is rate-limited. You may experience rates as low as 1 request per second. When polling for updates, examine the `Retry-After` header and retry after that many seconds.
-
-
-        :param operation_id: The unique identifier of the operation
-        :param maxpagesize: The maximum number of results to retrieve
-        :param next: Pagination cursor for next set of results.
-        :param retries: Override the default retry configuration for this method
-        :param server_url: Override the default server URL for this method
-        :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
-        :param http_headers: Additional headers to set or replace on requests.
-        """
-        base_url = None
-        url_variables = None
-        if timeout_ms is None:
-            timeout_ms = self.sdk_configuration.timeout_ms
-
-        if server_url is not None:
-            base_url = server_url
-        else:
-            base_url = self._get_url(base_url, url_variables)
-
-        request = models.GetCopyFileResultsRequest(
-            maxpagesize=maxpagesize,
-            next=next,
-            operation_id=operation_id,
-        )
-
-        req = self._build_request_async(
-            method="GET",
-            path="/operations/{operationId}/copyFileResults",
-            base_url=base_url,
-            url_variables=url_variables,
-            request=request,
-            request_body_required=False,
-            request_has_path_params=True,
-            request_has_query_params=True,
-            user_agent_header="user-agent",
-            accept_header_value="application/json",
-            http_headers=http_headers,
-            security=self.sdk_configuration.security,
-            allow_empty_value=None,
-            timeout_ms=timeout_ms,
-        )
-
-        if retries == UNSET:
-            if self.sdk_configuration.retry_config is not UNSET:
-                retries = self.sdk_configuration.retry_config
-
-        retry_config = None
-        if isinstance(retries, utils.RetryConfig):
-            retry_config = (retries, ["429", "500", "502", "503", "504"])
-
-        http_res = await self.do_request_async(
-            hook_ctx=HookContext(
-                config=self.sdk_configuration,
-                base_url=base_url or "",
-                operation_id="getCopyFileResults",
-                oauth2_scopes=["file:read"],
-                security_source=self.sdk_configuration.security,
-            ),
-            request=req,
-            error_status_codes=[
-                "400",
-                "401",
-                "403",
-                "404",
-                "409",
-                "429",
-                "4XX",
-                "500",
-                "503",
-                "5XX",
-            ],
-            retry_config=retry_config,
-        )
-
-        def next_func() -> Awaitable[Optional[models.GetCopyFileResultsResponse]]:
-            body = utils.unmarshal_json(http_res.text, Union[Dict[Any, Any], List[Any]])
-
-            async def empty_result():
-                return None
-
-            next_cursor = JSONPath("$['@nextLink']").parse(body)
-
-            if len(next_cursor) == 0:
-                return empty_result()
-
-            next_cursor = next_cursor[0]
-            if next_cursor is None or str(next_cursor).strip() == "":
-                return empty_result()
-
-            return self.get_copy_file_results_async(
-                operation_id=operation_id,
-                maxpagesize=maxpagesize,
-                next=next,
-                retries=retries,
-            )
-
-        response_data: Any = None
-        if utils.match_response(http_res, "200", "application/json"):
-            return models.GetCopyFileResultsResponse(
-                result=unmarshal_json_response(models.CopyFileListResult, http_res),
-                next=next_func,
-                headers=utils.get_response_headers(http_res.headers),
-            )
-        if utils.match_response(
-            http_res, ["400", "401", "403", "404", "409", "429"], "application/json"
-        ):
-            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
-            raise errors.ErrorResponse(response_data, http_res)
-        if utils.match_response(http_res, ["500", "503"], "application/json"):
-            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
-            raise errors.ErrorResponse(response_data, http_res)
-        if utils.match_response(http_res, "4XX", "*"):
-            http_res_text = await utils.stream_to_text_async(http_res)
-            raise errors.SDKError("API error occurred", http_res, http_res_text)
-        if utils.match_response(http_res, "5XX", "*"):
-            http_res_text = await utils.stream_to_text_async(http_res)
-            raise errors.SDKError("API error occurred", http_res, http_res_text)
-
-        raise errors.SDKError("Unexpected response received", http_res)
-
-    def get_destination_link_source_conversion_results(
-        self,
-        *,
-        operation_id: str,
-        maxpagesize: Optional[int] = 1000,
-        next: Optional[str] = None,
-        retries: OptionalNullable[utils.RetryConfig] = UNSET,
-        server_url: Optional[str] = None,
-        timeout_ms: Optional[int] = None,
-        http_headers: Optional[Mapping[str, str]] = None,
-    ) -> Optional[models.GetDestinationLinkSourceConversionResultsResponse]:
-        r"""Retrieves the results from a destination link source conversion.
-
-        Returns the results for a destination link source conversion.
-        This will include the new source anchor's ID and the destination link ID for the old source (if any).
-
-
-        :param operation_id: The unique identifier of the operation
-        :param maxpagesize: The maximum number of results to retrieve
-        :param next: Pagination cursor for next set of results.
-        :param retries: Override the default retry configuration for this method
-        :param server_url: Override the default server URL for this method
-        :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
-        :param http_headers: Additional headers to set or replace on requests.
-        """
-        base_url = None
-        url_variables = None
-        if timeout_ms is None:
-            timeout_ms = self.sdk_configuration.timeout_ms
-
-        if server_url is not None:
-            base_url = server_url
-        else:
-            base_url = self._get_url(base_url, url_variables)
-
-        request = models.GetDestinationLinkSourceConversionResultsRequest(
-            maxpagesize=maxpagesize,
-            next=next,
-            operation_id=operation_id,
-        )
-
-        req = self._build_request(
-            method="GET",
-            path="/operations/{operationId}/destinationLinkSourceConversionResults",
-            base_url=base_url,
-            url_variables=url_variables,
-            request=request,
-            request_body_required=False,
-            request_has_path_params=True,
-            request_has_query_params=True,
-            user_agent_header="user-agent",
-            accept_header_value="application/json",
-            http_headers=http_headers,
-            security=self.sdk_configuration.security,
-            allow_empty_value=None,
-            timeout_ms=timeout_ms,
-        )
-
-        if retries == UNSET:
-            if self.sdk_configuration.retry_config is not UNSET:
-                retries = self.sdk_configuration.retry_config
-
-        retry_config = None
-        if isinstance(retries, utils.RetryConfig):
-            retry_config = (retries, ["429", "500", "502", "503", "504"])
-
-        http_res = self.do_request(
-            hook_ctx=HookContext(
-                config=self.sdk_configuration,
-                base_url=base_url or "",
-                operation_id="getDestinationLinkSourceConversionResults",
-                oauth2_scopes=["file:read"],
-                security_source=self.sdk_configuration.security,
-            ),
-            request=req,
-            error_status_codes=[
-                "400",
-                "401",
-                "403",
-                "404",
-                "409",
-                "429",
-                "4XX",
-                "500",
-                "503",
-                "5XX",
-            ],
-            retry_config=retry_config,
-        )
-
-        def next_func() -> (
-            Optional[models.GetDestinationLinkSourceConversionResultsResponse]
-        ):
-            body = utils.unmarshal_json(http_res.text, Union[Dict[Any, Any], List[Any]])
-
-            next_cursor = JSONPath("$['@nextLink']").parse(body)
-
-            if len(next_cursor) == 0:
-                return None
-
-            next_cursor = next_cursor[0]
-            if next_cursor is None or str(next_cursor).strip() == "":
-                return None
-
-            return self.get_destination_link_source_conversion_results(
-                operation_id=operation_id,
-                maxpagesize=maxpagesize,
-                next=next,
-                retries=retries,
-            )
-
-        response_data: Any = None
-        if utils.match_response(http_res, "200", "application/json"):
-            return models.GetDestinationLinkSourceConversionResultsResponse(
-                result=unmarshal_json_response(
-                    models.DestinationLinkSourceConversionResultListResult, http_res
-                ),
-                next=next_func,
-            )
-        if utils.match_response(
-            http_res, ["400", "401", "403", "404", "409", "429"], "application/json"
-        ):
-            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
-            raise errors.ErrorResponse(response_data, http_res)
-        if utils.match_response(http_res, ["500", "503"], "application/json"):
-            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
-            raise errors.ErrorResponse(response_data, http_res)
-        if utils.match_response(http_res, "4XX", "*"):
-            http_res_text = utils.stream_to_text(http_res)
-            raise errors.SDKError("API error occurred", http_res, http_res_text)
-        if utils.match_response(http_res, "5XX", "*"):
-            http_res_text = utils.stream_to_text(http_res)
-            raise errors.SDKError("API error occurred", http_res, http_res_text)
-
-        raise errors.SDKError("Unexpected response received", http_res)
-
-    async def get_destination_link_source_conversion_results_async(
-        self,
-        *,
-        operation_id: str,
-        maxpagesize: Optional[int] = 1000,
-        next: Optional[str] = None,
-        retries: OptionalNullable[utils.RetryConfig] = UNSET,
-        server_url: Optional[str] = None,
-        timeout_ms: Optional[int] = None,
-        http_headers: Optional[Mapping[str, str]] = None,
-    ) -> Optional[models.GetDestinationLinkSourceConversionResultsResponse]:
-        r"""Retrieves the results from a destination link source conversion.
-
-        Returns the results for a destination link source conversion.
-        This will include the new source anchor's ID and the destination link ID for the old source (if any).
-
-
-        :param operation_id: The unique identifier of the operation
-        :param maxpagesize: The maximum number of results to retrieve
-        :param next: Pagination cursor for next set of results.
-        :param retries: Override the default retry configuration for this method
-        :param server_url: Override the default server URL for this method
-        :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
-        :param http_headers: Additional headers to set or replace on requests.
-        """
-        base_url = None
-        url_variables = None
-        if timeout_ms is None:
-            timeout_ms = self.sdk_configuration.timeout_ms
-
-        if server_url is not None:
-            base_url = server_url
-        else:
-            base_url = self._get_url(base_url, url_variables)
-
-        request = models.GetDestinationLinkSourceConversionResultsRequest(
-            maxpagesize=maxpagesize,
-            next=next,
-            operation_id=operation_id,
-        )
-
-        req = self._build_request_async(
-            method="GET",
-            path="/operations/{operationId}/destinationLinkSourceConversionResults",
-            base_url=base_url,
-            url_variables=url_variables,
-            request=request,
-            request_body_required=False,
-            request_has_path_params=True,
-            request_has_query_params=True,
-            user_agent_header="user-agent",
-            accept_header_value="application/json",
-            http_headers=http_headers,
-            security=self.sdk_configuration.security,
-            allow_empty_value=None,
-            timeout_ms=timeout_ms,
-        )
-
-        if retries == UNSET:
-            if self.sdk_configuration.retry_config is not UNSET:
-                retries = self.sdk_configuration.retry_config
-
-        retry_config = None
-        if isinstance(retries, utils.RetryConfig):
-            retry_config = (retries, ["429", "500", "502", "503", "504"])
-
-        http_res = await self.do_request_async(
-            hook_ctx=HookContext(
-                config=self.sdk_configuration,
-                base_url=base_url or "",
-                operation_id="getDestinationLinkSourceConversionResults",
-                oauth2_scopes=["file:read"],
-                security_source=self.sdk_configuration.security,
-            ),
-            request=req,
-            error_status_codes=[
-                "400",
-                "401",
-                "403",
-                "404",
-                "409",
-                "429",
-                "4XX",
-                "500",
-                "503",
-                "5XX",
-            ],
-            retry_config=retry_config,
-        )
-
-        def next_func() -> (
-            Awaitable[
-                Optional[models.GetDestinationLinkSourceConversionResultsResponse]
-            ]
-        ):
-            body = utils.unmarshal_json(http_res.text, Union[Dict[Any, Any], List[Any]])
-
-            async def empty_result():
-                return None
-
-            next_cursor = JSONPath("$['@nextLink']").parse(body)
-
-            if len(next_cursor) == 0:
-                return empty_result()
-
-            next_cursor = next_cursor[0]
-            if next_cursor is None or str(next_cursor).strip() == "":
-                return empty_result()
-
-            return self.get_destination_link_source_conversion_results_async(
-                operation_id=operation_id,
-                maxpagesize=maxpagesize,
-                next=next,
-                retries=retries,
-            )
-
-        response_data: Any = None
-        if utils.match_response(http_res, "200", "application/json"):
-            return models.GetDestinationLinkSourceConversionResultsResponse(
-                result=unmarshal_json_response(
-                    models.DestinationLinkSourceConversionResultListResult, http_res
-                ),
-                next=next_func,
-            )
-        if utils.match_response(
-            http_res, ["400", "401", "403", "404", "409", "429"], "application/json"
-        ):
-            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
-            raise errors.ErrorResponse(response_data, http_res)
-        if utils.match_response(http_res, ["500", "503"], "application/json"):
-            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
-            raise errors.ErrorResponse(response_data, http_res)
-        if utils.match_response(http_res, "4XX", "*"):
-            http_res_text = await utils.stream_to_text_async(http_res)
-            raise errors.SDKError("API error occurred", http_res, http_res_text)
-        if utils.match_response(http_res, "5XX", "*"):
-            http_res_text = await utils.stream_to_text_async(http_res)
-            raise errors.SDKError("API error occurred", http_res, http_res_text)
-
-        raise errors.SDKError("Unexpected response received", http_res)
-
-    def get_image_upload_creation_results(
-        self,
-        *,
-        operation_id: str,
-        maxpagesize: Optional[int] = 1000,
-        next: Optional[str] = None,
-        retries: OptionalNullable[utils.RetryConfig] = UNSET,
-        server_url: Optional[str] = None,
-        timeout_ms: Optional[int] = None,
-        http_headers: Optional[Mapping[str, str]] = None,
-    ) -> Optional[models.GetImageUploadCreationResultsResponse]:
-        r"""Retrieve results for a image upload
-
-        Returns a [`ImageUploadResultCollection`](ref:operations#imageuploadresultcollection) describing the results of a image upload.
-
-        :param operation_id: The unique identifier of the operation
-        :param maxpagesize: The maximum number of results to retrieve
-        :param next: Pagination cursor for next set of results.
-        :param retries: Override the default retry configuration for this method
-        :param server_url: Override the default server URL for this method
-        :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
-        :param http_headers: Additional headers to set or replace on requests.
-        """
-        base_url = None
-        url_variables = None
-        if timeout_ms is None:
-            timeout_ms = self.sdk_configuration.timeout_ms
-
-        if server_url is not None:
-            base_url = server_url
-        else:
-            base_url = self._get_url(base_url, url_variables)
-
-        request = models.GetImageUploadCreationResultsRequest(
-            maxpagesize=maxpagesize,
-            next=next,
-            operation_id=operation_id,
-        )
-
-        req = self._build_request(
-            method="GET",
-            path="/operations/{operationId}/imageUploadResults",
-            base_url=base_url,
-            url_variables=url_variables,
-            request=request,
-            request_body_required=False,
-            request_has_path_params=True,
-            request_has_query_params=True,
-            user_agent_header="user-agent",
-            accept_header_value="application/json",
-            http_headers=http_headers,
-            security=self.sdk_configuration.security,
-            allow_empty_value=None,
-            timeout_ms=timeout_ms,
-        )
-
-        if retries == UNSET:
-            if self.sdk_configuration.retry_config is not UNSET:
-                retries = self.sdk_configuration.retry_config
-
-        retry_config = None
-        if isinstance(retries, utils.RetryConfig):
-            retry_config = (retries, ["429", "500", "502", "503", "504"])
-
-        http_res = self.do_request(
-            hook_ctx=HookContext(
-                config=self.sdk_configuration,
-                base_url=base_url or "",
-                operation_id="getImageUploadCreationResults",
-                oauth2_scopes=["file:read"],
-                security_source=self.sdk_configuration.security,
-            ),
-            request=req,
-            error_status_codes=[
-                "400",
-                "401",
-                "403",
-                "404",
-                "409",
-                "429",
-                "4XX",
-                "500",
-                "503",
-                "5XX",
-            ],
-            retry_config=retry_config,
-        )
-
-        def next_func() -> Optional[models.GetImageUploadCreationResultsResponse]:
-            body = utils.unmarshal_json(http_res.text, Union[Dict[Any, Any], List[Any]])
-
-            next_cursor = JSONPath("$['@nextLink']").parse(body)
-
-            if len(next_cursor) == 0:
-                return None
-
-            next_cursor = next_cursor[0]
-            if next_cursor is None or str(next_cursor).strip() == "":
-                return None
-
-            return self.get_image_upload_creation_results(
-                operation_id=operation_id,
-                maxpagesize=maxpagesize,
-                next=next,
-                retries=retries,
-            )
-
-        response_data: Any = None
-        if utils.match_response(http_res, "200", "application/json"):
-            return models.GetImageUploadCreationResultsResponse(
-                result=unmarshal_json_response(
-                    models.ImageUploadResultCollection, http_res
-                ),
-                next=next_func,
-            )
-        if utils.match_response(
-            http_res, ["400", "401", "403", "404", "409", "429"], "application/json"
-        ):
-            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
-            raise errors.ErrorResponse(response_data, http_res)
-        if utils.match_response(http_res, ["500", "503"], "application/json"):
-            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
-            raise errors.ErrorResponse(response_data, http_res)
-        if utils.match_response(http_res, "4XX", "*"):
-            http_res_text = utils.stream_to_text(http_res)
-            raise errors.SDKError("API error occurred", http_res, http_res_text)
-        if utils.match_response(http_res, "5XX", "*"):
-            http_res_text = utils.stream_to_text(http_res)
-            raise errors.SDKError("API error occurred", http_res, http_res_text)
-
-        raise errors.SDKError("Unexpected response received", http_res)
-
-    async def get_image_upload_creation_results_async(
-        self,
-        *,
-        operation_id: str,
-        maxpagesize: Optional[int] = 1000,
-        next: Optional[str] = None,
-        retries: OptionalNullable[utils.RetryConfig] = UNSET,
-        server_url: Optional[str] = None,
-        timeout_ms: Optional[int] = None,
-        http_headers: Optional[Mapping[str, str]] = None,
-    ) -> Optional[models.GetImageUploadCreationResultsResponse]:
-        r"""Retrieve results for a image upload
-
-        Returns a [`ImageUploadResultCollection`](ref:operations#imageuploadresultcollection) describing the results of a image upload.
-
-        :param operation_id: The unique identifier of the operation
-        :param maxpagesize: The maximum number of results to retrieve
-        :param next: Pagination cursor for next set of results.
-        :param retries: Override the default retry configuration for this method
-        :param server_url: Override the default server URL for this method
-        :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
-        :param http_headers: Additional headers to set or replace on requests.
-        """
-        base_url = None
-        url_variables = None
-        if timeout_ms is None:
-            timeout_ms = self.sdk_configuration.timeout_ms
-
-        if server_url is not None:
-            base_url = server_url
-        else:
-            base_url = self._get_url(base_url, url_variables)
-
-        request = models.GetImageUploadCreationResultsRequest(
-            maxpagesize=maxpagesize,
-            next=next,
-            operation_id=operation_id,
-        )
-
-        req = self._build_request_async(
-            method="GET",
-            path="/operations/{operationId}/imageUploadResults",
-            base_url=base_url,
-            url_variables=url_variables,
-            request=request,
-            request_body_required=False,
-            request_has_path_params=True,
-            request_has_query_params=True,
-            user_agent_header="user-agent",
-            accept_header_value="application/json",
-            http_headers=http_headers,
-            security=self.sdk_configuration.security,
-            allow_empty_value=None,
-            timeout_ms=timeout_ms,
-        )
-
-        if retries == UNSET:
-            if self.sdk_configuration.retry_config is not UNSET:
-                retries = self.sdk_configuration.retry_config
-
-        retry_config = None
-        if isinstance(retries, utils.RetryConfig):
-            retry_config = (retries, ["429", "500", "502", "503", "504"])
-
-        http_res = await self.do_request_async(
-            hook_ctx=HookContext(
-                config=self.sdk_configuration,
-                base_url=base_url or "",
-                operation_id="getImageUploadCreationResults",
-                oauth2_scopes=["file:read"],
-                security_source=self.sdk_configuration.security,
-            ),
-            request=req,
-            error_status_codes=[
-                "400",
-                "401",
-                "403",
-                "404",
-                "409",
-                "429",
-                "4XX",
-                "500",
-                "503",
-                "5XX",
-            ],
-            retry_config=retry_config,
-        )
-
-        def next_func() -> (
-            Awaitable[Optional[models.GetImageUploadCreationResultsResponse]]
-        ):
-            body = utils.unmarshal_json(http_res.text, Union[Dict[Any, Any], List[Any]])
-
-            async def empty_result():
-                return None
-
-            next_cursor = JSONPath("$['@nextLink']").parse(body)
-
-            if len(next_cursor) == 0:
-                return empty_result()
-
-            next_cursor = next_cursor[0]
-            if next_cursor is None or str(next_cursor).strip() == "":
-                return empty_result()
-
-            return self.get_image_upload_creation_results_async(
-                operation_id=operation_id,
-                maxpagesize=maxpagesize,
-                next=next,
-                retries=retries,
-            )
-
-        response_data: Any = None
-        if utils.match_response(http_res, "200", "application/json"):
-            return models.GetImageUploadCreationResultsResponse(
-                result=unmarshal_json_response(
-                    models.ImageUploadResultCollection, http_res
-                ),
-                next=next_func,
-            )
-        if utils.match_response(
-            http_res, ["400", "401", "403", "404", "409", "429"], "application/json"
-        ):
-            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
-            raise errors.ErrorResponse(response_data, http_res)
-        if utils.match_response(http_res, ["500", "503"], "application/json"):
-            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
-            raise errors.ErrorResponse(response_data, http_res)
-        if utils.match_response(http_res, "4XX", "*"):
-            http_res_text = await utils.stream_to_text_async(http_res)
-            raise errors.SDKError("API error occurred", http_res, http_res_text)
-        if utils.match_response(http_res, "5XX", "*"):
-            http_res_text = await utils.stream_to_text_async(http_res)
-            raise errors.SDKError("API error occurred", http_res, http_res_text)
-
-        raise errors.SDKError("Unexpected response received", http_res)
-
-    def get_import_file_results(
-        self,
-        *,
-        operation_id: str,
-        maxpagesize: Optional[int] = 1000,
-        next: Optional[str] = None,
-        retries: OptionalNullable[utils.RetryConfig] = UNSET,
-        server_url: Optional[str] = None,
-        timeout_ms: Optional[int] = None,
-        http_headers: Optional[Mapping[str, str]] = None,
-    ) -> Optional[models.GetImportFileResultsResponse]:
-        r"""Retrieve import file results for a single operation
-
-        Returns a [`ImportFileListResult`](ref:operations#importfilelistresult) describing the results of a file import operation. <br /><br /> Note: This endpoint is rate-limited. You may experience rates as low as 1 request per second. When polling for updates, examine the `Retry-After` header and retry after that many seconds.
-
-
-        :param operation_id: The unique identifier of the operation
-        :param maxpagesize: The maximum number of results to retrieve
-        :param next: Pagination cursor for next set of results.
-        :param retries: Override the default retry configuration for this method
-        :param server_url: Override the default server URL for this method
-        :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
-        :param http_headers: Additional headers to set or replace on requests.
-        """
-        base_url = None
-        url_variables = None
-        if timeout_ms is None:
-            timeout_ms = self.sdk_configuration.timeout_ms
-
-        if server_url is not None:
-            base_url = server_url
-        else:
-            base_url = self._get_url(base_url, url_variables)
-
-        request = models.GetImportFileResultsRequest(
-            maxpagesize=maxpagesize,
-            next=next,
-            operation_id=operation_id,
-        )
-
-        req = self._build_request(
-            method="GET",
-            path="/operations/{operationId}/importFileResults",
-            base_url=base_url,
-            url_variables=url_variables,
-            request=request,
-            request_body_required=False,
-            request_has_path_params=True,
-            request_has_query_params=True,
-            user_agent_header="user-agent",
-            accept_header_value="application/json",
-            http_headers=http_headers,
-            security=self.sdk_configuration.security,
-            allow_empty_value=None,
-            timeout_ms=timeout_ms,
-        )
-
-        if retries == UNSET:
-            if self.sdk_configuration.retry_config is not UNSET:
-                retries = self.sdk_configuration.retry_config
-
-        retry_config = None
-        if isinstance(retries, utils.RetryConfig):
-            retry_config = (retries, ["429", "500", "502", "503", "504"])
-
-        http_res = self.do_request(
-            hook_ctx=HookContext(
-                config=self.sdk_configuration,
-                base_url=base_url or "",
-                operation_id="getImportFileResults",
-                oauth2_scopes=["file:read"],
-                security_source=self.sdk_configuration.security,
-            ),
-            request=req,
-            error_status_codes=[
-                "400",
-                "401",
-                "403",
-                "404",
-                "409",
-                "429",
-                "4XX",
-                "500",
-                "503",
-                "5XX",
-            ],
-            retry_config=retry_config,
-        )
-
-        def next_func() -> Optional[models.GetImportFileResultsResponse]:
-            body = utils.unmarshal_json(http_res.text, Union[Dict[Any, Any], List[Any]])
-
-            next_cursor = JSONPath("$['@nextLink']").parse(body)
-
-            if len(next_cursor) == 0:
-                return None
-
-            next_cursor = next_cursor[0]
-            if next_cursor is None or str(next_cursor).strip() == "":
-                return None
-
-            return self.get_import_file_results(
-                operation_id=operation_id,
-                maxpagesize=maxpagesize,
-                next=next,
-                retries=retries,
-            )
-
-        response_data: Any = None
-        if utils.match_response(http_res, "200", "application/json"):
-            return models.GetImportFileResultsResponse(
-                result=unmarshal_json_response(models.ImportFileListResult, http_res),
-                next=next_func,
-                headers=utils.get_response_headers(http_res.headers),
-            )
-        if utils.match_response(
-            http_res, ["400", "401", "403", "404", "409", "429"], "application/json"
-        ):
-            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
-            raise errors.ErrorResponse(response_data, http_res)
-        if utils.match_response(http_res, ["500", "503"], "application/json"):
-            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
-            raise errors.ErrorResponse(response_data, http_res)
-        if utils.match_response(http_res, "4XX", "*"):
-            http_res_text = utils.stream_to_text(http_res)
-            raise errors.SDKError("API error occurred", http_res, http_res_text)
-        if utils.match_response(http_res, "5XX", "*"):
-            http_res_text = utils.stream_to_text(http_res)
-            raise errors.SDKError("API error occurred", http_res, http_res_text)
-
-        raise errors.SDKError("Unexpected response received", http_res)
-
-    async def get_import_file_results_async(
-        self,
-        *,
-        operation_id: str,
-        maxpagesize: Optional[int] = 1000,
-        next: Optional[str] = None,
-        retries: OptionalNullable[utils.RetryConfig] = UNSET,
-        server_url: Optional[str] = None,
-        timeout_ms: Optional[int] = None,
-        http_headers: Optional[Mapping[str, str]] = None,
-    ) -> Optional[models.GetImportFileResultsResponse]:
-        r"""Retrieve import file results for a single operation
-
-        Returns a [`ImportFileListResult`](ref:operations#importfilelistresult) describing the results of a file import operation. <br /><br /> Note: This endpoint is rate-limited. You may experience rates as low as 1 request per second. When polling for updates, examine the `Retry-After` header and retry after that many seconds.
-
-
-        :param operation_id: The unique identifier of the operation
-        :param maxpagesize: The maximum number of results to retrieve
-        :param next: Pagination cursor for next set of results.
-        :param retries: Override the default retry configuration for this method
-        :param server_url: Override the default server URL for this method
-        :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
-        :param http_headers: Additional headers to set or replace on requests.
-        """
-        base_url = None
-        url_variables = None
-        if timeout_ms is None:
-            timeout_ms = self.sdk_configuration.timeout_ms
-
-        if server_url is not None:
-            base_url = server_url
-        else:
-            base_url = self._get_url(base_url, url_variables)
-
-        request = models.GetImportFileResultsRequest(
-            maxpagesize=maxpagesize,
-            next=next,
-            operation_id=operation_id,
-        )
-
-        req = self._build_request_async(
-            method="GET",
-            path="/operations/{operationId}/importFileResults",
-            base_url=base_url,
-            url_variables=url_variables,
-            request=request,
-            request_body_required=False,
-            request_has_path_params=True,
-            request_has_query_params=True,
-            user_agent_header="user-agent",
-            accept_header_value="application/json",
-            http_headers=http_headers,
-            security=self.sdk_configuration.security,
-            allow_empty_value=None,
-            timeout_ms=timeout_ms,
-        )
-
-        if retries == UNSET:
-            if self.sdk_configuration.retry_config is not UNSET:
-                retries = self.sdk_configuration.retry_config
-
-        retry_config = None
-        if isinstance(retries, utils.RetryConfig):
-            retry_config = (retries, ["429", "500", "502", "503", "504"])
-
-        http_res = await self.do_request_async(
-            hook_ctx=HookContext(
-                config=self.sdk_configuration,
-                base_url=base_url or "",
-                operation_id="getImportFileResults",
-                oauth2_scopes=["file:read"],
-                security_source=self.sdk_configuration.security,
-            ),
-            request=req,
-            error_status_codes=[
-                "400",
-                "401",
-                "403",
-                "404",
-                "409",
-                "429",
-                "4XX",
-                "500",
-                "503",
-                "5XX",
-            ],
-            retry_config=retry_config,
-        )
-
-        def next_func() -> Awaitable[Optional[models.GetImportFileResultsResponse]]:
-            body = utils.unmarshal_json(http_res.text, Union[Dict[Any, Any], List[Any]])
-
-            async def empty_result():
-                return None
-
-            next_cursor = JSONPath("$['@nextLink']").parse(body)
-
-            if len(next_cursor) == 0:
-                return empty_result()
-
-            next_cursor = next_cursor[0]
-            if next_cursor is None or str(next_cursor).strip() == "":
-                return empty_result()
-
-            return self.get_import_file_results_async(
-                operation_id=operation_id,
-                maxpagesize=maxpagesize,
-                next=next,
-                retries=retries,
-            )
-
-        response_data: Any = None
-        if utils.match_response(http_res, "200", "application/json"):
-            return models.GetImportFileResultsResponse(
-                result=unmarshal_json_response(models.ImportFileListResult, http_res),
-                next=next_func,
-                headers=utils.get_response_headers(http_res.headers),
-            )
-        if utils.match_response(
-            http_res, ["400", "401", "403", "404", "409", "429"], "application/json"
-        ):
-            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
-            raise errors.ErrorResponse(response_data, http_res)
-        if utils.match_response(http_res, ["500", "503"], "application/json"):
-            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
-            raise errors.ErrorResponse(response_data, http_res)
-        if utils.match_response(http_res, "4XX", "*"):
-            http_res_text = await utils.stream_to_text_async(http_res)
-            raise errors.SDKError("API error occurred", http_res, http_res_text)
-        if utils.match_response(http_res, "5XX", "*"):
-            http_res_text = await utils.stream_to_text_async(http_res)
-            raise errors.SDKError("API error occurred", http_res, http_res_text)
-
-        raise errors.SDKError("Unexpected response received", http_res)
-
-    def get_milestone_creation_results(
-        self,
-        *,
-        operation_id: str,
-        maxpagesize: Optional[int] = 1000,
-        next: Optional[str] = None,
-        retries: OptionalNullable[utils.RetryConfig] = UNSET,
-        server_url: Optional[str] = None,
-        timeout_ms: Optional[int] = None,
-        http_headers: Optional[Mapping[str, str]] = None,
-    ) -> Optional[models.GetMilestoneCreationResultsResponse]:
-        r"""Retrieve results for a milestone creation
-
-        Returns a [`MilestoneCreationListResult`](ref:operations#milestonecreationlistresult) describing the results of a milestone creation.
-
-        :param operation_id: The unique identifier of the operation
-        :param maxpagesize: The maximum number of results to retrieve
-        :param next: Pagination cursor for next set of results.
-        :param retries: Override the default retry configuration for this method
-        :param server_url: Override the default server URL for this method
-        :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
-        :param http_headers: Additional headers to set or replace on requests.
-        """
-        base_url = None
-        url_variables = None
-        if timeout_ms is None:
-            timeout_ms = self.sdk_configuration.timeout_ms
-
-        if server_url is not None:
-            base_url = server_url
-        else:
-            base_url = self._get_url(base_url, url_variables)
-
-        request = models.GetMilestoneCreationResultsRequest(
-            maxpagesize=maxpagesize,
-            next=next,
-            operation_id=operation_id,
-        )
-
-        req = self._build_request(
-            method="GET",
-            path="/operations/{operationId}/milestoneCreationResults",
-            base_url=base_url,
-            url_variables=url_variables,
-            request=request,
-            request_body_required=False,
-            request_has_path_params=True,
-            request_has_query_params=True,
-            user_agent_header="user-agent",
-            accept_header_value="application/json",
-            http_headers=http_headers,
-            security=self.sdk_configuration.security,
-            allow_empty_value=None,
-            timeout_ms=timeout_ms,
-        )
-
-        if retries == UNSET:
-            if self.sdk_configuration.retry_config is not UNSET:
-                retries = self.sdk_configuration.retry_config
-
-        retry_config = None
-        if isinstance(retries, utils.RetryConfig):
-            retry_config = (retries, ["429", "500", "502", "503", "504"])
-
-        http_res = self.do_request(
-            hook_ctx=HookContext(
-                config=self.sdk_configuration,
-                base_url=base_url or "",
-                operation_id="getMilestoneCreationResults",
-                oauth2_scopes=["file:read"],
-                security_source=self.sdk_configuration.security,
-            ),
-            request=req,
-            error_status_codes=["400", "401", "403", "404", "4XX", "500", "5XX"],
-            retry_config=retry_config,
-        )
-
-        def next_func() -> Optional[models.GetMilestoneCreationResultsResponse]:
-            body = utils.unmarshal_json(http_res.text, Union[Dict[Any, Any], List[Any]])
-
-            next_cursor = JSONPath("$['@nextLink']").parse(body)
-
-            if len(next_cursor) == 0:
-                return None
-
-            next_cursor = next_cursor[0]
-            if next_cursor is None or str(next_cursor).strip() == "":
-                return None
-
-            return self.get_milestone_creation_results(
-                operation_id=operation_id,
-                maxpagesize=maxpagesize,
-                next=next,
-                retries=retries,
-            )
-
-        response_data: Any = None
-        if utils.match_response(http_res, "200", "application/json"):
-            return models.GetMilestoneCreationResultsResponse(
-                result=unmarshal_json_response(
-                    models.MilestoneCreationListResult, http_res
-                ),
-                next=next_func,
-            )
-        if utils.match_response(
-            http_res, ["400", "401", "403", "404"], "application/json"
-        ):
-            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
-            raise errors.ErrorResponse(response_data, http_res)
-        if utils.match_response(http_res, "500", "application/json"):
-            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
-            raise errors.ErrorResponse(response_data, http_res)
-        if utils.match_response(http_res, "4XX", "*"):
-            http_res_text = utils.stream_to_text(http_res)
-            raise errors.SDKError("API error occurred", http_res, http_res_text)
-        if utils.match_response(http_res, "5XX", "*"):
-            http_res_text = utils.stream_to_text(http_res)
-            raise errors.SDKError("API error occurred", http_res, http_res_text)
-
-        raise errors.SDKError("Unexpected response received", http_res)
-
-    async def get_milestone_creation_results_async(
-        self,
-        *,
-        operation_id: str,
-        maxpagesize: Optional[int] = 1000,
-        next: Optional[str] = None,
-        retries: OptionalNullable[utils.RetryConfig] = UNSET,
-        server_url: Optional[str] = None,
-        timeout_ms: Optional[int] = None,
-        http_headers: Optional[Mapping[str, str]] = None,
-    ) -> Optional[models.GetMilestoneCreationResultsResponse]:
-        r"""Retrieve results for a milestone creation
-
-        Returns a [`MilestoneCreationListResult`](ref:operations#milestonecreationlistresult) describing the results of a milestone creation.
-
-        :param operation_id: The unique identifier of the operation
-        :param maxpagesize: The maximum number of results to retrieve
-        :param next: Pagination cursor for next set of results.
-        :param retries: Override the default retry configuration for this method
-        :param server_url: Override the default server URL for this method
-        :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
-        :param http_headers: Additional headers to set or replace on requests.
-        """
-        base_url = None
-        url_variables = None
-        if timeout_ms is None:
-            timeout_ms = self.sdk_configuration.timeout_ms
-
-        if server_url is not None:
-            base_url = server_url
-        else:
-            base_url = self._get_url(base_url, url_variables)
-
-        request = models.GetMilestoneCreationResultsRequest(
-            maxpagesize=maxpagesize,
-            next=next,
-            operation_id=operation_id,
-        )
-
-        req = self._build_request_async(
-            method="GET",
-            path="/operations/{operationId}/milestoneCreationResults",
-            base_url=base_url,
-            url_variables=url_variables,
-            request=request,
-            request_body_required=False,
-            request_has_path_params=True,
-            request_has_query_params=True,
-            user_agent_header="user-agent",
-            accept_header_value="application/json",
-            http_headers=http_headers,
-            security=self.sdk_configuration.security,
-            allow_empty_value=None,
-            timeout_ms=timeout_ms,
-        )
-
-        if retries == UNSET:
-            if self.sdk_configuration.retry_config is not UNSET:
-                retries = self.sdk_configuration.retry_config
-
-        retry_config = None
-        if isinstance(retries, utils.RetryConfig):
-            retry_config = (retries, ["429", "500", "502", "503", "504"])
-
-        http_res = await self.do_request_async(
-            hook_ctx=HookContext(
-                config=self.sdk_configuration,
-                base_url=base_url or "",
-                operation_id="getMilestoneCreationResults",
-                oauth2_scopes=["file:read"],
-                security_source=self.sdk_configuration.security,
-            ),
-            request=req,
-            error_status_codes=["400", "401", "403", "404", "4XX", "500", "5XX"],
-            retry_config=retry_config,
-        )
-
-        def next_func() -> (
-            Awaitable[Optional[models.GetMilestoneCreationResultsResponse]]
-        ):
-            body = utils.unmarshal_json(http_res.text, Union[Dict[Any, Any], List[Any]])
-
-            async def empty_result():
-                return None
-
-            next_cursor = JSONPath("$['@nextLink']").parse(body)
-
-            if len(next_cursor) == 0:
-                return empty_result()
-
-            next_cursor = next_cursor[0]
-            if next_cursor is None or str(next_cursor).strip() == "":
-                return empty_result()
-
-            return self.get_milestone_creation_results_async(
-                operation_id=operation_id,
-                maxpagesize=maxpagesize,
-                next=next,
-                retries=retries,
-            )
-
-        response_data: Any = None
-        if utils.match_response(http_res, "200", "application/json"):
-            return models.GetMilestoneCreationResultsResponse(
-                result=unmarshal_json_response(
-                    models.MilestoneCreationListResult, http_res
-                ),
-                next=next_func,
-            )
-        if utils.match_response(
-            http_res, ["400", "401", "403", "404"], "application/json"
-        ):
-            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
-            raise errors.ErrorResponse(response_data, http_res)
-        if utils.match_response(http_res, "500", "application/json"):
-            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
-            raise errors.ErrorResponse(response_data, http_res)
-        if utils.match_response(http_res, "4XX", "*"):
-            http_res_text = await utils.stream_to_text_async(http_res)
-            raise errors.SDKError("API error occurred", http_res, http_res_text)
-        if utils.match_response(http_res, "5XX", "*"):
-            http_res_text = await utils.stream_to_text_async(http_res)
-            raise errors.SDKError("API error occurred", http_res, http_res_text)
-
-        raise errors.SDKError("Unexpected response received", http_res)
-
     def get_operation_by_id(
         self,
         *,
@@ -1811,6 +213,1604 @@ class Operations(BaseSDK):
             response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
             raise errors.ErrorResponse(response_data, http_res)
         if utils.match_response(http_res, ["500", "503"], "application/json"):
+            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
+            raise errors.ErrorResponse(response_data, http_res)
+        if utils.match_response(http_res, "4XX", "*"):
+            http_res_text = await utils.stream_to_text_async(http_res)
+            raise errors.SDKError("API error occurred", http_res, http_res_text)
+        if utils.match_response(http_res, "5XX", "*"):
+            http_res_text = await utils.stream_to_text_async(http_res)
+            raise errors.SDKError("API error occurred", http_res, http_res_text)
+
+        raise errors.SDKError("Unexpected response received", http_res)
+
+    def get_copy_file_results(
+        self,
+        *,
+        operation_id: str,
+        maxpagesize: Optional[int] = 1000,
+        next: Optional[str] = None,
+        retries: OptionalNullable[utils.RetryConfig] = UNSET,
+        server_url: Optional[str] = None,
+        timeout_ms: Optional[int] = None,
+        http_headers: Optional[Mapping[str, str]] = None,
+    ) -> Optional[models.GetCopyFileResultsResponse]:
+        r"""Retrieve copy file results for a single operation
+
+        Returns a [`CopyFileListResult`](ref:operations#copyfilelistresult) describing the results of a file copy operation. <br /><br /> Note: This endpoint is rate-limited. You may experience rates as low as 1 request per second. When polling for updates, examine the `Retry-After` header and retry after that many seconds.
+
+
+        :param operation_id: The unique identifier of the operation
+        :param maxpagesize: The maximum number of results to retrieve
+        :param next: Pagination cursor for next set of results.
+        :param retries: Override the default retry configuration for this method
+        :param server_url: Override the default server URL for this method
+        :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
+        :param http_headers: Additional headers to set or replace on requests.
+        """
+        base_url = None
+        url_variables = None
+        if timeout_ms is None:
+            timeout_ms = self.sdk_configuration.timeout_ms
+
+        if server_url is not None:
+            base_url = server_url
+        else:
+            base_url = self._get_url(base_url, url_variables)
+
+        request = models.GetCopyFileResultsRequest(
+            operation_id=operation_id,
+            maxpagesize=maxpagesize,
+            next=next,
+        )
+
+        req = self._build_request(
+            method="GET",
+            path="/operations/{operationId}/copyFileResults",
+            base_url=base_url,
+            url_variables=url_variables,
+            request=request,
+            request_body_required=False,
+            request_has_path_params=True,
+            request_has_query_params=True,
+            user_agent_header="user-agent",
+            accept_header_value="application/json",
+            http_headers=http_headers,
+            security=self.sdk_configuration.security,
+            allow_empty_value=None,
+            timeout_ms=timeout_ms,
+        )
+
+        if retries == UNSET:
+            if self.sdk_configuration.retry_config is not UNSET:
+                retries = self.sdk_configuration.retry_config
+
+        retry_config = None
+        if isinstance(retries, utils.RetryConfig):
+            retry_config = (retries, ["429", "500", "502", "503", "504"])
+
+        http_res = self.do_request(
+            hook_ctx=HookContext(
+                config=self.sdk_configuration,
+                base_url=base_url or "",
+                operation_id="getCopyFileResults",
+                oauth2_scopes=["file:read"],
+                security_source=self.sdk_configuration.security,
+            ),
+            request=req,
+            error_status_codes=[
+                "400",
+                "401",
+                "403",
+                "404",
+                "409",
+                "429",
+                "4XX",
+                "500",
+                "503",
+                "5XX",
+            ],
+            retry_config=retry_config,
+        )
+
+        def next_func() -> Optional[models.GetCopyFileResultsResponse]:
+            body = utils.unmarshal_json(http_res.text, Union[Dict[Any, Any], List[Any]])
+
+            next_cursor = JSONPath("$['@nextLink']").parse(body)
+
+            if len(next_cursor) == 0:
+                return None
+
+            next_cursor = next_cursor[0]
+            if next_cursor is None or str(next_cursor).strip() == "":
+                return None
+
+            return self.get_copy_file_results(
+                operation_id=operation_id,
+                maxpagesize=maxpagesize,
+                next=next,
+                retries=retries,
+            )
+
+        response_data: Any = None
+        if utils.match_response(http_res, "200", "application/json"):
+            return models.GetCopyFileResultsResponse(
+                result=unmarshal_json_response(models.CopyFileListResult, http_res),
+                next=next_func,
+                headers=utils.get_response_headers(http_res.headers),
+            )
+        if utils.match_response(
+            http_res, ["400", "401", "403", "404", "409", "429"], "application/json"
+        ):
+            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
+            raise errors.ErrorResponse(response_data, http_res)
+        if utils.match_response(http_res, ["500", "503"], "application/json"):
+            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
+            raise errors.ErrorResponse(response_data, http_res)
+        if utils.match_response(http_res, "4XX", "*"):
+            http_res_text = utils.stream_to_text(http_res)
+            raise errors.SDKError("API error occurred", http_res, http_res_text)
+        if utils.match_response(http_res, "5XX", "*"):
+            http_res_text = utils.stream_to_text(http_res)
+            raise errors.SDKError("API error occurred", http_res, http_res_text)
+
+        raise errors.SDKError("Unexpected response received", http_res)
+
+    async def get_copy_file_results_async(
+        self,
+        *,
+        operation_id: str,
+        maxpagesize: Optional[int] = 1000,
+        next: Optional[str] = None,
+        retries: OptionalNullable[utils.RetryConfig] = UNSET,
+        server_url: Optional[str] = None,
+        timeout_ms: Optional[int] = None,
+        http_headers: Optional[Mapping[str, str]] = None,
+    ) -> Optional[models.GetCopyFileResultsResponse]:
+        r"""Retrieve copy file results for a single operation
+
+        Returns a [`CopyFileListResult`](ref:operations#copyfilelistresult) describing the results of a file copy operation. <br /><br /> Note: This endpoint is rate-limited. You may experience rates as low as 1 request per second. When polling for updates, examine the `Retry-After` header and retry after that many seconds.
+
+
+        :param operation_id: The unique identifier of the operation
+        :param maxpagesize: The maximum number of results to retrieve
+        :param next: Pagination cursor for next set of results.
+        :param retries: Override the default retry configuration for this method
+        :param server_url: Override the default server URL for this method
+        :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
+        :param http_headers: Additional headers to set or replace on requests.
+        """
+        base_url = None
+        url_variables = None
+        if timeout_ms is None:
+            timeout_ms = self.sdk_configuration.timeout_ms
+
+        if server_url is not None:
+            base_url = server_url
+        else:
+            base_url = self._get_url(base_url, url_variables)
+
+        request = models.GetCopyFileResultsRequest(
+            operation_id=operation_id,
+            maxpagesize=maxpagesize,
+            next=next,
+        )
+
+        req = self._build_request_async(
+            method="GET",
+            path="/operations/{operationId}/copyFileResults",
+            base_url=base_url,
+            url_variables=url_variables,
+            request=request,
+            request_body_required=False,
+            request_has_path_params=True,
+            request_has_query_params=True,
+            user_agent_header="user-agent",
+            accept_header_value="application/json",
+            http_headers=http_headers,
+            security=self.sdk_configuration.security,
+            allow_empty_value=None,
+            timeout_ms=timeout_ms,
+        )
+
+        if retries == UNSET:
+            if self.sdk_configuration.retry_config is not UNSET:
+                retries = self.sdk_configuration.retry_config
+
+        retry_config = None
+        if isinstance(retries, utils.RetryConfig):
+            retry_config = (retries, ["429", "500", "502", "503", "504"])
+
+        http_res = await self.do_request_async(
+            hook_ctx=HookContext(
+                config=self.sdk_configuration,
+                base_url=base_url or "",
+                operation_id="getCopyFileResults",
+                oauth2_scopes=["file:read"],
+                security_source=self.sdk_configuration.security,
+            ),
+            request=req,
+            error_status_codes=[
+                "400",
+                "401",
+                "403",
+                "404",
+                "409",
+                "429",
+                "4XX",
+                "500",
+                "503",
+                "5XX",
+            ],
+            retry_config=retry_config,
+        )
+
+        def next_func() -> Awaitable[Optional[models.GetCopyFileResultsResponse]]:
+            body = utils.unmarshal_json(http_res.text, Union[Dict[Any, Any], List[Any]])
+
+            async def empty_result():
+                return None
+
+            next_cursor = JSONPath("$['@nextLink']").parse(body)
+
+            if len(next_cursor) == 0:
+                return empty_result()
+
+            next_cursor = next_cursor[0]
+            if next_cursor is None or str(next_cursor).strip() == "":
+                return empty_result()
+
+            return self.get_copy_file_results_async(
+                operation_id=operation_id,
+                maxpagesize=maxpagesize,
+                next=next,
+                retries=retries,
+            )
+
+        response_data: Any = None
+        if utils.match_response(http_res, "200", "application/json"):
+            return models.GetCopyFileResultsResponse(
+                result=unmarshal_json_response(models.CopyFileListResult, http_res),
+                next=next_func,
+                headers=utils.get_response_headers(http_res.headers),
+            )
+        if utils.match_response(
+            http_res, ["400", "401", "403", "404", "409", "429"], "application/json"
+        ):
+            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
+            raise errors.ErrorResponse(response_data, http_res)
+        if utils.match_response(http_res, ["500", "503"], "application/json"):
+            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
+            raise errors.ErrorResponse(response_data, http_res)
+        if utils.match_response(http_res, "4XX", "*"):
+            http_res_text = await utils.stream_to_text_async(http_res)
+            raise errors.SDKError("API error occurred", http_res, http_res_text)
+        if utils.match_response(http_res, "5XX", "*"):
+            http_res_text = await utils.stream_to_text_async(http_res)
+            raise errors.SDKError("API error occurred", http_res, http_res_text)
+
+        raise errors.SDKError("Unexpected response received", http_res)
+
+    def get_destination_link_source_conversion_results(
+        self,
+        *,
+        operation_id: str,
+        maxpagesize: Optional[int] = 1000,
+        next: Optional[str] = None,
+        retries: OptionalNullable[utils.RetryConfig] = UNSET,
+        server_url: Optional[str] = None,
+        timeout_ms: Optional[int] = None,
+        http_headers: Optional[Mapping[str, str]] = None,
+    ) -> Optional[models.GetDestinationLinkSourceConversionResultsResponse]:
+        r"""Retrieves the results from a destination link source conversion.
+
+        Returns the results for a destination link source conversion.
+        This will include the new source anchor's ID and the destination link ID for the old source (if any).
+
+
+        :param operation_id: The unique identifier of the operation
+        :param maxpagesize: The maximum number of results to retrieve
+        :param next: Pagination cursor for next set of results.
+        :param retries: Override the default retry configuration for this method
+        :param server_url: Override the default server URL for this method
+        :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
+        :param http_headers: Additional headers to set or replace on requests.
+        """
+        base_url = None
+        url_variables = None
+        if timeout_ms is None:
+            timeout_ms = self.sdk_configuration.timeout_ms
+
+        if server_url is not None:
+            base_url = server_url
+        else:
+            base_url = self._get_url(base_url, url_variables)
+
+        request = models.GetDestinationLinkSourceConversionResultsRequest(
+            operation_id=operation_id,
+            maxpagesize=maxpagesize,
+            next=next,
+        )
+
+        req = self._build_request(
+            method="GET",
+            path="/operations/{operationId}/destinationLinkSourceConversionResults",
+            base_url=base_url,
+            url_variables=url_variables,
+            request=request,
+            request_body_required=False,
+            request_has_path_params=True,
+            request_has_query_params=True,
+            user_agent_header="user-agent",
+            accept_header_value="application/json",
+            http_headers=http_headers,
+            security=self.sdk_configuration.security,
+            allow_empty_value=None,
+            timeout_ms=timeout_ms,
+        )
+
+        if retries == UNSET:
+            if self.sdk_configuration.retry_config is not UNSET:
+                retries = self.sdk_configuration.retry_config
+
+        retry_config = None
+        if isinstance(retries, utils.RetryConfig):
+            retry_config = (retries, ["429", "500", "502", "503", "504"])
+
+        http_res = self.do_request(
+            hook_ctx=HookContext(
+                config=self.sdk_configuration,
+                base_url=base_url or "",
+                operation_id="getDestinationLinkSourceConversionResults",
+                oauth2_scopes=["file:read"],
+                security_source=self.sdk_configuration.security,
+            ),
+            request=req,
+            error_status_codes=[
+                "400",
+                "401",
+                "403",
+                "404",
+                "409",
+                "429",
+                "4XX",
+                "500",
+                "503",
+                "5XX",
+            ],
+            retry_config=retry_config,
+        )
+
+        def next_func() -> (
+            Optional[models.GetDestinationLinkSourceConversionResultsResponse]
+        ):
+            body = utils.unmarshal_json(http_res.text, Union[Dict[Any, Any], List[Any]])
+
+            next_cursor = JSONPath("$['@nextLink']").parse(body)
+
+            if len(next_cursor) == 0:
+                return None
+
+            next_cursor = next_cursor[0]
+            if next_cursor is None or str(next_cursor).strip() == "":
+                return None
+
+            return self.get_destination_link_source_conversion_results(
+                operation_id=operation_id,
+                maxpagesize=maxpagesize,
+                next=next,
+                retries=retries,
+            )
+
+        response_data: Any = None
+        if utils.match_response(http_res, "200", "application/json"):
+            return models.GetDestinationLinkSourceConversionResultsResponse(
+                result=unmarshal_json_response(
+                    models.DestinationLinkSourceConversionResultListResult, http_res
+                ),
+                next=next_func,
+            )
+        if utils.match_response(
+            http_res, ["400", "401", "403", "404", "409", "429"], "application/json"
+        ):
+            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
+            raise errors.ErrorResponse(response_data, http_res)
+        if utils.match_response(http_res, ["500", "503"], "application/json"):
+            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
+            raise errors.ErrorResponse(response_data, http_res)
+        if utils.match_response(http_res, "4XX", "*"):
+            http_res_text = utils.stream_to_text(http_res)
+            raise errors.SDKError("API error occurred", http_res, http_res_text)
+        if utils.match_response(http_res, "5XX", "*"):
+            http_res_text = utils.stream_to_text(http_res)
+            raise errors.SDKError("API error occurred", http_res, http_res_text)
+
+        raise errors.SDKError("Unexpected response received", http_res)
+
+    async def get_destination_link_source_conversion_results_async(
+        self,
+        *,
+        operation_id: str,
+        maxpagesize: Optional[int] = 1000,
+        next: Optional[str] = None,
+        retries: OptionalNullable[utils.RetryConfig] = UNSET,
+        server_url: Optional[str] = None,
+        timeout_ms: Optional[int] = None,
+        http_headers: Optional[Mapping[str, str]] = None,
+    ) -> Optional[models.GetDestinationLinkSourceConversionResultsResponse]:
+        r"""Retrieves the results from a destination link source conversion.
+
+        Returns the results for a destination link source conversion.
+        This will include the new source anchor's ID and the destination link ID for the old source (if any).
+
+
+        :param operation_id: The unique identifier of the operation
+        :param maxpagesize: The maximum number of results to retrieve
+        :param next: Pagination cursor for next set of results.
+        :param retries: Override the default retry configuration for this method
+        :param server_url: Override the default server URL for this method
+        :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
+        :param http_headers: Additional headers to set or replace on requests.
+        """
+        base_url = None
+        url_variables = None
+        if timeout_ms is None:
+            timeout_ms = self.sdk_configuration.timeout_ms
+
+        if server_url is not None:
+            base_url = server_url
+        else:
+            base_url = self._get_url(base_url, url_variables)
+
+        request = models.GetDestinationLinkSourceConversionResultsRequest(
+            operation_id=operation_id,
+            maxpagesize=maxpagesize,
+            next=next,
+        )
+
+        req = self._build_request_async(
+            method="GET",
+            path="/operations/{operationId}/destinationLinkSourceConversionResults",
+            base_url=base_url,
+            url_variables=url_variables,
+            request=request,
+            request_body_required=False,
+            request_has_path_params=True,
+            request_has_query_params=True,
+            user_agent_header="user-agent",
+            accept_header_value="application/json",
+            http_headers=http_headers,
+            security=self.sdk_configuration.security,
+            allow_empty_value=None,
+            timeout_ms=timeout_ms,
+        )
+
+        if retries == UNSET:
+            if self.sdk_configuration.retry_config is not UNSET:
+                retries = self.sdk_configuration.retry_config
+
+        retry_config = None
+        if isinstance(retries, utils.RetryConfig):
+            retry_config = (retries, ["429", "500", "502", "503", "504"])
+
+        http_res = await self.do_request_async(
+            hook_ctx=HookContext(
+                config=self.sdk_configuration,
+                base_url=base_url or "",
+                operation_id="getDestinationLinkSourceConversionResults",
+                oauth2_scopes=["file:read"],
+                security_source=self.sdk_configuration.security,
+            ),
+            request=req,
+            error_status_codes=[
+                "400",
+                "401",
+                "403",
+                "404",
+                "409",
+                "429",
+                "4XX",
+                "500",
+                "503",
+                "5XX",
+            ],
+            retry_config=retry_config,
+        )
+
+        def next_func() -> (
+            Awaitable[
+                Optional[models.GetDestinationLinkSourceConversionResultsResponse]
+            ]
+        ):
+            body = utils.unmarshal_json(http_res.text, Union[Dict[Any, Any], List[Any]])
+
+            async def empty_result():
+                return None
+
+            next_cursor = JSONPath("$['@nextLink']").parse(body)
+
+            if len(next_cursor) == 0:
+                return empty_result()
+
+            next_cursor = next_cursor[0]
+            if next_cursor is None or str(next_cursor).strip() == "":
+                return empty_result()
+
+            return self.get_destination_link_source_conversion_results_async(
+                operation_id=operation_id,
+                maxpagesize=maxpagesize,
+                next=next,
+                retries=retries,
+            )
+
+        response_data: Any = None
+        if utils.match_response(http_res, "200", "application/json"):
+            return models.GetDestinationLinkSourceConversionResultsResponse(
+                result=unmarshal_json_response(
+                    models.DestinationLinkSourceConversionResultListResult, http_res
+                ),
+                next=next_func,
+            )
+        if utils.match_response(
+            http_res, ["400", "401", "403", "404", "409", "429"], "application/json"
+        ):
+            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
+            raise errors.ErrorResponse(response_data, http_res)
+        if utils.match_response(http_res, ["500", "503"], "application/json"):
+            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
+            raise errors.ErrorResponse(response_data, http_res)
+        if utils.match_response(http_res, "4XX", "*"):
+            http_res_text = await utils.stream_to_text_async(http_res)
+            raise errors.SDKError("API error occurred", http_res, http_res_text)
+        if utils.match_response(http_res, "5XX", "*"):
+            http_res_text = await utils.stream_to_text_async(http_res)
+            raise errors.SDKError("API error occurred", http_res, http_res_text)
+
+        raise errors.SDKError("Unexpected response received", http_res)
+
+    def get_image_upload_creation_results(
+        self,
+        *,
+        operation_id: str,
+        maxpagesize: Optional[int] = 1000,
+        next: Optional[str] = None,
+        retries: OptionalNullable[utils.RetryConfig] = UNSET,
+        server_url: Optional[str] = None,
+        timeout_ms: Optional[int] = None,
+        http_headers: Optional[Mapping[str, str]] = None,
+    ) -> Optional[models.GetImageUploadCreationResultsResponse]:
+        r"""Retrieve results for a image upload
+
+        Returns a [`ImageUploadResultCollection`](ref:operations#imageuploadresultcollection) describing the results of a image upload.
+
+        :param operation_id: The unique identifier of the operation
+        :param maxpagesize: The maximum number of results to retrieve
+        :param next: Pagination cursor for next set of results.
+        :param retries: Override the default retry configuration for this method
+        :param server_url: Override the default server URL for this method
+        :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
+        :param http_headers: Additional headers to set or replace on requests.
+        """
+        base_url = None
+        url_variables = None
+        if timeout_ms is None:
+            timeout_ms = self.sdk_configuration.timeout_ms
+
+        if server_url is not None:
+            base_url = server_url
+        else:
+            base_url = self._get_url(base_url, url_variables)
+
+        request = models.GetImageUploadCreationResultsRequest(
+            operation_id=operation_id,
+            maxpagesize=maxpagesize,
+            next=next,
+        )
+
+        req = self._build_request(
+            method="GET",
+            path="/operations/{operationId}/imageUploadResults",
+            base_url=base_url,
+            url_variables=url_variables,
+            request=request,
+            request_body_required=False,
+            request_has_path_params=True,
+            request_has_query_params=True,
+            user_agent_header="user-agent",
+            accept_header_value="application/json",
+            http_headers=http_headers,
+            security=self.sdk_configuration.security,
+            allow_empty_value=None,
+            timeout_ms=timeout_ms,
+        )
+
+        if retries == UNSET:
+            if self.sdk_configuration.retry_config is not UNSET:
+                retries = self.sdk_configuration.retry_config
+
+        retry_config = None
+        if isinstance(retries, utils.RetryConfig):
+            retry_config = (retries, ["429", "500", "502", "503", "504"])
+
+        http_res = self.do_request(
+            hook_ctx=HookContext(
+                config=self.sdk_configuration,
+                base_url=base_url or "",
+                operation_id="getImageUploadCreationResults",
+                oauth2_scopes=["file:read"],
+                security_source=self.sdk_configuration.security,
+            ),
+            request=req,
+            error_status_codes=[
+                "400",
+                "401",
+                "403",
+                "404",
+                "409",
+                "429",
+                "4XX",
+                "500",
+                "503",
+                "5XX",
+            ],
+            retry_config=retry_config,
+        )
+
+        def next_func() -> Optional[models.GetImageUploadCreationResultsResponse]:
+            body = utils.unmarshal_json(http_res.text, Union[Dict[Any, Any], List[Any]])
+
+            next_cursor = JSONPath("$['@nextLink']").parse(body)
+
+            if len(next_cursor) == 0:
+                return None
+
+            next_cursor = next_cursor[0]
+            if next_cursor is None or str(next_cursor).strip() == "":
+                return None
+
+            return self.get_image_upload_creation_results(
+                operation_id=operation_id,
+                maxpagesize=maxpagesize,
+                next=next,
+                retries=retries,
+            )
+
+        response_data: Any = None
+        if utils.match_response(http_res, "200", "application/json"):
+            return models.GetImageUploadCreationResultsResponse(
+                result=unmarshal_json_response(
+                    models.ImageUploadResultCollection, http_res
+                ),
+                next=next_func,
+            )
+        if utils.match_response(
+            http_res, ["400", "401", "403", "404", "409", "429"], "application/json"
+        ):
+            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
+            raise errors.ErrorResponse(response_data, http_res)
+        if utils.match_response(http_res, ["500", "503"], "application/json"):
+            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
+            raise errors.ErrorResponse(response_data, http_res)
+        if utils.match_response(http_res, "4XX", "*"):
+            http_res_text = utils.stream_to_text(http_res)
+            raise errors.SDKError("API error occurred", http_res, http_res_text)
+        if utils.match_response(http_res, "5XX", "*"):
+            http_res_text = utils.stream_to_text(http_res)
+            raise errors.SDKError("API error occurred", http_res, http_res_text)
+
+        raise errors.SDKError("Unexpected response received", http_res)
+
+    async def get_image_upload_creation_results_async(
+        self,
+        *,
+        operation_id: str,
+        maxpagesize: Optional[int] = 1000,
+        next: Optional[str] = None,
+        retries: OptionalNullable[utils.RetryConfig] = UNSET,
+        server_url: Optional[str] = None,
+        timeout_ms: Optional[int] = None,
+        http_headers: Optional[Mapping[str, str]] = None,
+    ) -> Optional[models.GetImageUploadCreationResultsResponse]:
+        r"""Retrieve results for a image upload
+
+        Returns a [`ImageUploadResultCollection`](ref:operations#imageuploadresultcollection) describing the results of a image upload.
+
+        :param operation_id: The unique identifier of the operation
+        :param maxpagesize: The maximum number of results to retrieve
+        :param next: Pagination cursor for next set of results.
+        :param retries: Override the default retry configuration for this method
+        :param server_url: Override the default server URL for this method
+        :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
+        :param http_headers: Additional headers to set or replace on requests.
+        """
+        base_url = None
+        url_variables = None
+        if timeout_ms is None:
+            timeout_ms = self.sdk_configuration.timeout_ms
+
+        if server_url is not None:
+            base_url = server_url
+        else:
+            base_url = self._get_url(base_url, url_variables)
+
+        request = models.GetImageUploadCreationResultsRequest(
+            operation_id=operation_id,
+            maxpagesize=maxpagesize,
+            next=next,
+        )
+
+        req = self._build_request_async(
+            method="GET",
+            path="/operations/{operationId}/imageUploadResults",
+            base_url=base_url,
+            url_variables=url_variables,
+            request=request,
+            request_body_required=False,
+            request_has_path_params=True,
+            request_has_query_params=True,
+            user_agent_header="user-agent",
+            accept_header_value="application/json",
+            http_headers=http_headers,
+            security=self.sdk_configuration.security,
+            allow_empty_value=None,
+            timeout_ms=timeout_ms,
+        )
+
+        if retries == UNSET:
+            if self.sdk_configuration.retry_config is not UNSET:
+                retries = self.sdk_configuration.retry_config
+
+        retry_config = None
+        if isinstance(retries, utils.RetryConfig):
+            retry_config = (retries, ["429", "500", "502", "503", "504"])
+
+        http_res = await self.do_request_async(
+            hook_ctx=HookContext(
+                config=self.sdk_configuration,
+                base_url=base_url or "",
+                operation_id="getImageUploadCreationResults",
+                oauth2_scopes=["file:read"],
+                security_source=self.sdk_configuration.security,
+            ),
+            request=req,
+            error_status_codes=[
+                "400",
+                "401",
+                "403",
+                "404",
+                "409",
+                "429",
+                "4XX",
+                "500",
+                "503",
+                "5XX",
+            ],
+            retry_config=retry_config,
+        )
+
+        def next_func() -> (
+            Awaitable[Optional[models.GetImageUploadCreationResultsResponse]]
+        ):
+            body = utils.unmarshal_json(http_res.text, Union[Dict[Any, Any], List[Any]])
+
+            async def empty_result():
+                return None
+
+            next_cursor = JSONPath("$['@nextLink']").parse(body)
+
+            if len(next_cursor) == 0:
+                return empty_result()
+
+            next_cursor = next_cursor[0]
+            if next_cursor is None or str(next_cursor).strip() == "":
+                return empty_result()
+
+            return self.get_image_upload_creation_results_async(
+                operation_id=operation_id,
+                maxpagesize=maxpagesize,
+                next=next,
+                retries=retries,
+            )
+
+        response_data: Any = None
+        if utils.match_response(http_res, "200", "application/json"):
+            return models.GetImageUploadCreationResultsResponse(
+                result=unmarshal_json_response(
+                    models.ImageUploadResultCollection, http_res
+                ),
+                next=next_func,
+            )
+        if utils.match_response(
+            http_res, ["400", "401", "403", "404", "409", "429"], "application/json"
+        ):
+            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
+            raise errors.ErrorResponse(response_data, http_res)
+        if utils.match_response(http_res, ["500", "503"], "application/json"):
+            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
+            raise errors.ErrorResponse(response_data, http_res)
+        if utils.match_response(http_res, "4XX", "*"):
+            http_res_text = await utils.stream_to_text_async(http_res)
+            raise errors.SDKError("API error occurred", http_res, http_res_text)
+        if utils.match_response(http_res, "5XX", "*"):
+            http_res_text = await utils.stream_to_text_async(http_res)
+            raise errors.SDKError("API error occurred", http_res, http_res_text)
+
+        raise errors.SDKError("Unexpected response received", http_res)
+
+    def get_import_file_results(
+        self,
+        *,
+        operation_id: str,
+        maxpagesize: Optional[int] = 1000,
+        next: Optional[str] = None,
+        retries: OptionalNullable[utils.RetryConfig] = UNSET,
+        server_url: Optional[str] = None,
+        timeout_ms: Optional[int] = None,
+        http_headers: Optional[Mapping[str, str]] = None,
+    ) -> Optional[models.GetImportFileResultsResponse]:
+        r"""Retrieve import file results for a single operation
+
+        Returns a [`ImportFileListResult`](ref:operations#importfilelistresult) describing the results of a file import operation. <br /><br /> Note: This endpoint is rate-limited. You may experience rates as low as 1 request per second. When polling for updates, examine the `Retry-After` header and retry after that many seconds.
+
+
+        :param operation_id: The unique identifier of the operation
+        :param maxpagesize: The maximum number of results to retrieve
+        :param next: Pagination cursor for next set of results.
+        :param retries: Override the default retry configuration for this method
+        :param server_url: Override the default server URL for this method
+        :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
+        :param http_headers: Additional headers to set or replace on requests.
+        """
+        base_url = None
+        url_variables = None
+        if timeout_ms is None:
+            timeout_ms = self.sdk_configuration.timeout_ms
+
+        if server_url is not None:
+            base_url = server_url
+        else:
+            base_url = self._get_url(base_url, url_variables)
+
+        request = models.GetImportFileResultsRequest(
+            operation_id=operation_id,
+            maxpagesize=maxpagesize,
+            next=next,
+        )
+
+        req = self._build_request(
+            method="GET",
+            path="/operations/{operationId}/importFileResults",
+            base_url=base_url,
+            url_variables=url_variables,
+            request=request,
+            request_body_required=False,
+            request_has_path_params=True,
+            request_has_query_params=True,
+            user_agent_header="user-agent",
+            accept_header_value="application/json",
+            http_headers=http_headers,
+            security=self.sdk_configuration.security,
+            allow_empty_value=None,
+            timeout_ms=timeout_ms,
+        )
+
+        if retries == UNSET:
+            if self.sdk_configuration.retry_config is not UNSET:
+                retries = self.sdk_configuration.retry_config
+
+        retry_config = None
+        if isinstance(retries, utils.RetryConfig):
+            retry_config = (retries, ["429", "500", "502", "503", "504"])
+
+        http_res = self.do_request(
+            hook_ctx=HookContext(
+                config=self.sdk_configuration,
+                base_url=base_url or "",
+                operation_id="getImportFileResults",
+                oauth2_scopes=["file:read"],
+                security_source=self.sdk_configuration.security,
+            ),
+            request=req,
+            error_status_codes=[
+                "400",
+                "401",
+                "403",
+                "404",
+                "409",
+                "429",
+                "4XX",
+                "500",
+                "503",
+                "5XX",
+            ],
+            retry_config=retry_config,
+        )
+
+        def next_func() -> Optional[models.GetImportFileResultsResponse]:
+            body = utils.unmarshal_json(http_res.text, Union[Dict[Any, Any], List[Any]])
+
+            next_cursor = JSONPath("$['@nextLink']").parse(body)
+
+            if len(next_cursor) == 0:
+                return None
+
+            next_cursor = next_cursor[0]
+            if next_cursor is None or str(next_cursor).strip() == "":
+                return None
+
+            return self.get_import_file_results(
+                operation_id=operation_id,
+                maxpagesize=maxpagesize,
+                next=next,
+                retries=retries,
+            )
+
+        response_data: Any = None
+        if utils.match_response(http_res, "200", "application/json"):
+            return models.GetImportFileResultsResponse(
+                result=unmarshal_json_response(models.ImportFileListResult, http_res),
+                next=next_func,
+                headers=utils.get_response_headers(http_res.headers),
+            )
+        if utils.match_response(
+            http_res, ["400", "401", "403", "404", "409", "429"], "application/json"
+        ):
+            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
+            raise errors.ErrorResponse(response_data, http_res)
+        if utils.match_response(http_res, ["500", "503"], "application/json"):
+            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
+            raise errors.ErrorResponse(response_data, http_res)
+        if utils.match_response(http_res, "4XX", "*"):
+            http_res_text = utils.stream_to_text(http_res)
+            raise errors.SDKError("API error occurred", http_res, http_res_text)
+        if utils.match_response(http_res, "5XX", "*"):
+            http_res_text = utils.stream_to_text(http_res)
+            raise errors.SDKError("API error occurred", http_res, http_res_text)
+
+        raise errors.SDKError("Unexpected response received", http_res)
+
+    async def get_import_file_results_async(
+        self,
+        *,
+        operation_id: str,
+        maxpagesize: Optional[int] = 1000,
+        next: Optional[str] = None,
+        retries: OptionalNullable[utils.RetryConfig] = UNSET,
+        server_url: Optional[str] = None,
+        timeout_ms: Optional[int] = None,
+        http_headers: Optional[Mapping[str, str]] = None,
+    ) -> Optional[models.GetImportFileResultsResponse]:
+        r"""Retrieve import file results for a single operation
+
+        Returns a [`ImportFileListResult`](ref:operations#importfilelistresult) describing the results of a file import operation. <br /><br /> Note: This endpoint is rate-limited. You may experience rates as low as 1 request per second. When polling for updates, examine the `Retry-After` header and retry after that many seconds.
+
+
+        :param operation_id: The unique identifier of the operation
+        :param maxpagesize: The maximum number of results to retrieve
+        :param next: Pagination cursor for next set of results.
+        :param retries: Override the default retry configuration for this method
+        :param server_url: Override the default server URL for this method
+        :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
+        :param http_headers: Additional headers to set or replace on requests.
+        """
+        base_url = None
+        url_variables = None
+        if timeout_ms is None:
+            timeout_ms = self.sdk_configuration.timeout_ms
+
+        if server_url is not None:
+            base_url = server_url
+        else:
+            base_url = self._get_url(base_url, url_variables)
+
+        request = models.GetImportFileResultsRequest(
+            operation_id=operation_id,
+            maxpagesize=maxpagesize,
+            next=next,
+        )
+
+        req = self._build_request_async(
+            method="GET",
+            path="/operations/{operationId}/importFileResults",
+            base_url=base_url,
+            url_variables=url_variables,
+            request=request,
+            request_body_required=False,
+            request_has_path_params=True,
+            request_has_query_params=True,
+            user_agent_header="user-agent",
+            accept_header_value="application/json",
+            http_headers=http_headers,
+            security=self.sdk_configuration.security,
+            allow_empty_value=None,
+            timeout_ms=timeout_ms,
+        )
+
+        if retries == UNSET:
+            if self.sdk_configuration.retry_config is not UNSET:
+                retries = self.sdk_configuration.retry_config
+
+        retry_config = None
+        if isinstance(retries, utils.RetryConfig):
+            retry_config = (retries, ["429", "500", "502", "503", "504"])
+
+        http_res = await self.do_request_async(
+            hook_ctx=HookContext(
+                config=self.sdk_configuration,
+                base_url=base_url or "",
+                operation_id="getImportFileResults",
+                oauth2_scopes=["file:read"],
+                security_source=self.sdk_configuration.security,
+            ),
+            request=req,
+            error_status_codes=[
+                "400",
+                "401",
+                "403",
+                "404",
+                "409",
+                "429",
+                "4XX",
+                "500",
+                "503",
+                "5XX",
+            ],
+            retry_config=retry_config,
+        )
+
+        def next_func() -> Awaitable[Optional[models.GetImportFileResultsResponse]]:
+            body = utils.unmarshal_json(http_res.text, Union[Dict[Any, Any], List[Any]])
+
+            async def empty_result():
+                return None
+
+            next_cursor = JSONPath("$['@nextLink']").parse(body)
+
+            if len(next_cursor) == 0:
+                return empty_result()
+
+            next_cursor = next_cursor[0]
+            if next_cursor is None or str(next_cursor).strip() == "":
+                return empty_result()
+
+            return self.get_import_file_results_async(
+                operation_id=operation_id,
+                maxpagesize=maxpagesize,
+                next=next,
+                retries=retries,
+            )
+
+        response_data: Any = None
+        if utils.match_response(http_res, "200", "application/json"):
+            return models.GetImportFileResultsResponse(
+                result=unmarshal_json_response(models.ImportFileListResult, http_res),
+                next=next_func,
+                headers=utils.get_response_headers(http_res.headers),
+            )
+        if utils.match_response(
+            http_res, ["400", "401", "403", "404", "409", "429"], "application/json"
+        ):
+            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
+            raise errors.ErrorResponse(response_data, http_res)
+        if utils.match_response(http_res, ["500", "503"], "application/json"):
+            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
+            raise errors.ErrorResponse(response_data, http_res)
+        if utils.match_response(http_res, "4XX", "*"):
+            http_res_text = await utils.stream_to_text_async(http_res)
+            raise errors.SDKError("API error occurred", http_res, http_res_text)
+        if utils.match_response(http_res, "5XX", "*"):
+            http_res_text = await utils.stream_to_text_async(http_res)
+            raise errors.SDKError("API error occurred", http_res, http_res_text)
+
+        raise errors.SDKError("Unexpected response received", http_res)
+
+    def get_batch_upsertion_metric_values_results(
+        self,
+        *,
+        operation_id: str,
+        maxpagesize: Optional[int] = 1000,
+        next: Optional[str] = None,
+        retries: OptionalNullable[utils.RetryConfig] = UNSET,
+        server_url: Optional[str] = None,
+        timeout_ms: Optional[int] = None,
+        http_headers: Optional[Mapping[str, str]] = None,
+    ) -> Optional[models.GetBatchUpsertionMetricValuesResultsResponse]:
+        r"""Retrieve the results of a metric values batch upsertion operation
+
+        Returns a [`MetricValuesListResult`](ref:sustainability#metricvalueslistresult) describing the results of a metric values batch upsertion operation. <br /><br /> Note: This endpoint is rate-limited. You may experience rates as low as 1 request per second. When polling for updates, examine the `Retry-After` header and retry after that many seconds.
+
+
+        :param operation_id: The unique identifier of the operation
+        :param maxpagesize: The maximum number of results to retrieve
+        :param next: Pagination cursor for next set of results.
+        :param retries: Override the default retry configuration for this method
+        :param server_url: Override the default server URL for this method
+        :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
+        :param http_headers: Additional headers to set or replace on requests.
+        """
+        base_url = None
+        url_variables = None
+        if timeout_ms is None:
+            timeout_ms = self.sdk_configuration.timeout_ms
+
+        if server_url is not None:
+            base_url = server_url
+        else:
+            base_url = self._get_url(base_url, url_variables)
+
+        request = models.GetBatchUpsertionMetricValuesResultsRequest(
+            operation_id=operation_id,
+            maxpagesize=maxpagesize,
+            next=next,
+        )
+
+        req = self._build_request(
+            method="GET",
+            path="/operations/{operationId}/metricValuesBatchUpsertionResults",
+            base_url=base_url,
+            url_variables=url_variables,
+            request=request,
+            request_body_required=False,
+            request_has_path_params=True,
+            request_has_query_params=True,
+            user_agent_header="user-agent",
+            accept_header_value="application/json",
+            http_headers=http_headers,
+            security=self.sdk_configuration.security,
+            allow_empty_value=None,
+            timeout_ms=timeout_ms,
+        )
+
+        if retries == UNSET:
+            if self.sdk_configuration.retry_config is not UNSET:
+                retries = self.sdk_configuration.retry_config
+
+        retry_config = None
+        if isinstance(retries, utils.RetryConfig):
+            retry_config = (retries, ["429", "500", "502", "503", "504"])
+
+        http_res = self.do_request(
+            hook_ctx=HookContext(
+                config=self.sdk_configuration,
+                base_url=base_url or "",
+                operation_id="getBatchUpsertionMetricValuesResults",
+                oauth2_scopes=["file:read"],
+                security_source=self.sdk_configuration.security,
+            ),
+            request=req,
+            error_status_codes=[
+                "400",
+                "401",
+                "403",
+                "404",
+                "409",
+                "429",
+                "4XX",
+                "500",
+                "503",
+                "5XX",
+            ],
+            retry_config=retry_config,
+        )
+
+        def next_func() -> (
+            Optional[models.GetBatchUpsertionMetricValuesResultsResponse]
+        ):
+            body = utils.unmarshal_json(http_res.text, Union[Dict[Any, Any], List[Any]])
+
+            next_cursor = JSONPath("$['@nextLink']").parse(body)
+
+            if len(next_cursor) == 0:
+                return None
+
+            next_cursor = next_cursor[0]
+            if next_cursor is None or str(next_cursor).strip() == "":
+                return None
+
+            return self.get_batch_upsertion_metric_values_results(
+                operation_id=operation_id,
+                maxpagesize=maxpagesize,
+                next=next,
+                retries=retries,
+            )
+
+        response_data: Any = None
+        if utils.match_response(http_res, "200", "application/json"):
+            return models.GetBatchUpsertionMetricValuesResultsResponse(
+                result=unmarshal_json_response(models.MetricValuesListResult, http_res),
+                next=next_func,
+                headers=utils.get_response_headers(http_res.headers),
+            )
+        if utils.match_response(
+            http_res, ["400", "401", "403", "404", "409", "429"], "application/json"
+        ):
+            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
+            raise errors.ErrorResponse(response_data, http_res)
+        if utils.match_response(http_res, ["500", "503"], "application/json"):
+            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
+            raise errors.ErrorResponse(response_data, http_res)
+        if utils.match_response(http_res, "4XX", "*"):
+            http_res_text = utils.stream_to_text(http_res)
+            raise errors.SDKError("API error occurred", http_res, http_res_text)
+        if utils.match_response(http_res, "5XX", "*"):
+            http_res_text = utils.stream_to_text(http_res)
+            raise errors.SDKError("API error occurred", http_res, http_res_text)
+
+        raise errors.SDKError("Unexpected response received", http_res)
+
+    async def get_batch_upsertion_metric_values_results_async(
+        self,
+        *,
+        operation_id: str,
+        maxpagesize: Optional[int] = 1000,
+        next: Optional[str] = None,
+        retries: OptionalNullable[utils.RetryConfig] = UNSET,
+        server_url: Optional[str] = None,
+        timeout_ms: Optional[int] = None,
+        http_headers: Optional[Mapping[str, str]] = None,
+    ) -> Optional[models.GetBatchUpsertionMetricValuesResultsResponse]:
+        r"""Retrieve the results of a metric values batch upsertion operation
+
+        Returns a [`MetricValuesListResult`](ref:sustainability#metricvalueslistresult) describing the results of a metric values batch upsertion operation. <br /><br /> Note: This endpoint is rate-limited. You may experience rates as low as 1 request per second. When polling for updates, examine the `Retry-After` header and retry after that many seconds.
+
+
+        :param operation_id: The unique identifier of the operation
+        :param maxpagesize: The maximum number of results to retrieve
+        :param next: Pagination cursor for next set of results.
+        :param retries: Override the default retry configuration for this method
+        :param server_url: Override the default server URL for this method
+        :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
+        :param http_headers: Additional headers to set or replace on requests.
+        """
+        base_url = None
+        url_variables = None
+        if timeout_ms is None:
+            timeout_ms = self.sdk_configuration.timeout_ms
+
+        if server_url is not None:
+            base_url = server_url
+        else:
+            base_url = self._get_url(base_url, url_variables)
+
+        request = models.GetBatchUpsertionMetricValuesResultsRequest(
+            operation_id=operation_id,
+            maxpagesize=maxpagesize,
+            next=next,
+        )
+
+        req = self._build_request_async(
+            method="GET",
+            path="/operations/{operationId}/metricValuesBatchUpsertionResults",
+            base_url=base_url,
+            url_variables=url_variables,
+            request=request,
+            request_body_required=False,
+            request_has_path_params=True,
+            request_has_query_params=True,
+            user_agent_header="user-agent",
+            accept_header_value="application/json",
+            http_headers=http_headers,
+            security=self.sdk_configuration.security,
+            allow_empty_value=None,
+            timeout_ms=timeout_ms,
+        )
+
+        if retries == UNSET:
+            if self.sdk_configuration.retry_config is not UNSET:
+                retries = self.sdk_configuration.retry_config
+
+        retry_config = None
+        if isinstance(retries, utils.RetryConfig):
+            retry_config = (retries, ["429", "500", "502", "503", "504"])
+
+        http_res = await self.do_request_async(
+            hook_ctx=HookContext(
+                config=self.sdk_configuration,
+                base_url=base_url or "",
+                operation_id="getBatchUpsertionMetricValuesResults",
+                oauth2_scopes=["file:read"],
+                security_source=self.sdk_configuration.security,
+            ),
+            request=req,
+            error_status_codes=[
+                "400",
+                "401",
+                "403",
+                "404",
+                "409",
+                "429",
+                "4XX",
+                "500",
+                "503",
+                "5XX",
+            ],
+            retry_config=retry_config,
+        )
+
+        def next_func() -> (
+            Awaitable[Optional[models.GetBatchUpsertionMetricValuesResultsResponse]]
+        ):
+            body = utils.unmarshal_json(http_res.text, Union[Dict[Any, Any], List[Any]])
+
+            async def empty_result():
+                return None
+
+            next_cursor = JSONPath("$['@nextLink']").parse(body)
+
+            if len(next_cursor) == 0:
+                return empty_result()
+
+            next_cursor = next_cursor[0]
+            if next_cursor is None or str(next_cursor).strip() == "":
+                return empty_result()
+
+            return self.get_batch_upsertion_metric_values_results_async(
+                operation_id=operation_id,
+                maxpagesize=maxpagesize,
+                next=next,
+                retries=retries,
+            )
+
+        response_data: Any = None
+        if utils.match_response(http_res, "200", "application/json"):
+            return models.GetBatchUpsertionMetricValuesResultsResponse(
+                result=unmarshal_json_response(models.MetricValuesListResult, http_res),
+                next=next_func,
+                headers=utils.get_response_headers(http_res.headers),
+            )
+        if utils.match_response(
+            http_res, ["400", "401", "403", "404", "409", "429"], "application/json"
+        ):
+            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
+            raise errors.ErrorResponse(response_data, http_res)
+        if utils.match_response(http_res, ["500", "503"], "application/json"):
+            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
+            raise errors.ErrorResponse(response_data, http_res)
+        if utils.match_response(http_res, "4XX", "*"):
+            http_res_text = await utils.stream_to_text_async(http_res)
+            raise errors.SDKError("API error occurred", http_res, http_res_text)
+        if utils.match_response(http_res, "5XX", "*"):
+            http_res_text = await utils.stream_to_text_async(http_res)
+            raise errors.SDKError("API error occurred", http_res, http_res_text)
+
+        raise errors.SDKError("Unexpected response received", http_res)
+
+    def get_milestone_creation_results(
+        self,
+        *,
+        operation_id: str,
+        maxpagesize: Optional[int] = 1000,
+        next: Optional[str] = None,
+        retries: OptionalNullable[utils.RetryConfig] = UNSET,
+        server_url: Optional[str] = None,
+        timeout_ms: Optional[int] = None,
+        http_headers: Optional[Mapping[str, str]] = None,
+    ) -> Optional[models.GetMilestoneCreationResultsResponse]:
+        r"""Retrieve results for a milestone creation
+
+        Returns a [`MilestoneCreationListResult`](ref:operations#milestonecreationlistresult) describing the results of a milestone creation.
+
+        :param operation_id: The unique identifier of the operation
+        :param maxpagesize: The maximum number of results to retrieve
+        :param next: Pagination cursor for next set of results.
+        :param retries: Override the default retry configuration for this method
+        :param server_url: Override the default server URL for this method
+        :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
+        :param http_headers: Additional headers to set or replace on requests.
+        """
+        base_url = None
+        url_variables = None
+        if timeout_ms is None:
+            timeout_ms = self.sdk_configuration.timeout_ms
+
+        if server_url is not None:
+            base_url = server_url
+        else:
+            base_url = self._get_url(base_url, url_variables)
+
+        request = models.GetMilestoneCreationResultsRequest(
+            operation_id=operation_id,
+            maxpagesize=maxpagesize,
+            next=next,
+        )
+
+        req = self._build_request(
+            method="GET",
+            path="/operations/{operationId}/milestoneCreationResults",
+            base_url=base_url,
+            url_variables=url_variables,
+            request=request,
+            request_body_required=False,
+            request_has_path_params=True,
+            request_has_query_params=True,
+            user_agent_header="user-agent",
+            accept_header_value="application/json",
+            http_headers=http_headers,
+            security=self.sdk_configuration.security,
+            allow_empty_value=None,
+            timeout_ms=timeout_ms,
+        )
+
+        if retries == UNSET:
+            if self.sdk_configuration.retry_config is not UNSET:
+                retries = self.sdk_configuration.retry_config
+
+        retry_config = None
+        if isinstance(retries, utils.RetryConfig):
+            retry_config = (retries, ["429", "500", "502", "503", "504"])
+
+        http_res = self.do_request(
+            hook_ctx=HookContext(
+                config=self.sdk_configuration,
+                base_url=base_url or "",
+                operation_id="getMilestoneCreationResults",
+                oauth2_scopes=["file:read"],
+                security_source=self.sdk_configuration.security,
+            ),
+            request=req,
+            error_status_codes=["400", "401", "403", "404", "4XX", "500", "5XX"],
+            retry_config=retry_config,
+        )
+
+        def next_func() -> Optional[models.GetMilestoneCreationResultsResponse]:
+            body = utils.unmarshal_json(http_res.text, Union[Dict[Any, Any], List[Any]])
+
+            next_cursor = JSONPath("$['@nextLink']").parse(body)
+
+            if len(next_cursor) == 0:
+                return None
+
+            next_cursor = next_cursor[0]
+            if next_cursor is None or str(next_cursor).strip() == "":
+                return None
+
+            return self.get_milestone_creation_results(
+                operation_id=operation_id,
+                maxpagesize=maxpagesize,
+                next=next,
+                retries=retries,
+            )
+
+        response_data: Any = None
+        if utils.match_response(http_res, "200", "application/json"):
+            return models.GetMilestoneCreationResultsResponse(
+                result=unmarshal_json_response(
+                    models.MilestoneCreationListResult, http_res
+                ),
+                next=next_func,
+            )
+        if utils.match_response(
+            http_res, ["400", "401", "403", "404"], "application/json"
+        ):
+            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
+            raise errors.ErrorResponse(response_data, http_res)
+        if utils.match_response(http_res, "500", "application/json"):
+            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
+            raise errors.ErrorResponse(response_data, http_res)
+        if utils.match_response(http_res, "4XX", "*"):
+            http_res_text = utils.stream_to_text(http_res)
+            raise errors.SDKError("API error occurred", http_res, http_res_text)
+        if utils.match_response(http_res, "5XX", "*"):
+            http_res_text = utils.stream_to_text(http_res)
+            raise errors.SDKError("API error occurred", http_res, http_res_text)
+
+        raise errors.SDKError("Unexpected response received", http_res)
+
+    async def get_milestone_creation_results_async(
+        self,
+        *,
+        operation_id: str,
+        maxpagesize: Optional[int] = 1000,
+        next: Optional[str] = None,
+        retries: OptionalNullable[utils.RetryConfig] = UNSET,
+        server_url: Optional[str] = None,
+        timeout_ms: Optional[int] = None,
+        http_headers: Optional[Mapping[str, str]] = None,
+    ) -> Optional[models.GetMilestoneCreationResultsResponse]:
+        r"""Retrieve results for a milestone creation
+
+        Returns a [`MilestoneCreationListResult`](ref:operations#milestonecreationlistresult) describing the results of a milestone creation.
+
+        :param operation_id: The unique identifier of the operation
+        :param maxpagesize: The maximum number of results to retrieve
+        :param next: Pagination cursor for next set of results.
+        :param retries: Override the default retry configuration for this method
+        :param server_url: Override the default server URL for this method
+        :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
+        :param http_headers: Additional headers to set or replace on requests.
+        """
+        base_url = None
+        url_variables = None
+        if timeout_ms is None:
+            timeout_ms = self.sdk_configuration.timeout_ms
+
+        if server_url is not None:
+            base_url = server_url
+        else:
+            base_url = self._get_url(base_url, url_variables)
+
+        request = models.GetMilestoneCreationResultsRequest(
+            operation_id=operation_id,
+            maxpagesize=maxpagesize,
+            next=next,
+        )
+
+        req = self._build_request_async(
+            method="GET",
+            path="/operations/{operationId}/milestoneCreationResults",
+            base_url=base_url,
+            url_variables=url_variables,
+            request=request,
+            request_body_required=False,
+            request_has_path_params=True,
+            request_has_query_params=True,
+            user_agent_header="user-agent",
+            accept_header_value="application/json",
+            http_headers=http_headers,
+            security=self.sdk_configuration.security,
+            allow_empty_value=None,
+            timeout_ms=timeout_ms,
+        )
+
+        if retries == UNSET:
+            if self.sdk_configuration.retry_config is not UNSET:
+                retries = self.sdk_configuration.retry_config
+
+        retry_config = None
+        if isinstance(retries, utils.RetryConfig):
+            retry_config = (retries, ["429", "500", "502", "503", "504"])
+
+        http_res = await self.do_request_async(
+            hook_ctx=HookContext(
+                config=self.sdk_configuration,
+                base_url=base_url or "",
+                operation_id="getMilestoneCreationResults",
+                oauth2_scopes=["file:read"],
+                security_source=self.sdk_configuration.security,
+            ),
+            request=req,
+            error_status_codes=["400", "401", "403", "404", "4XX", "500", "5XX"],
+            retry_config=retry_config,
+        )
+
+        def next_func() -> (
+            Awaitable[Optional[models.GetMilestoneCreationResultsResponse]]
+        ):
+            body = utils.unmarshal_json(http_res.text, Union[Dict[Any, Any], List[Any]])
+
+            async def empty_result():
+                return None
+
+            next_cursor = JSONPath("$['@nextLink']").parse(body)
+
+            if len(next_cursor) == 0:
+                return empty_result()
+
+            next_cursor = next_cursor[0]
+            if next_cursor is None or str(next_cursor).strip() == "":
+                return empty_result()
+
+            return self.get_milestone_creation_results_async(
+                operation_id=operation_id,
+                maxpagesize=maxpagesize,
+                next=next,
+                retries=retries,
+            )
+
+        response_data: Any = None
+        if utils.match_response(http_res, "200", "application/json"):
+            return models.GetMilestoneCreationResultsResponse(
+                result=unmarshal_json_response(
+                    models.MilestoneCreationListResult, http_res
+                ),
+                next=next_func,
+            )
+        if utils.match_response(
+            http_res, ["400", "401", "403", "404"], "application/json"
+        ):
+            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
+            raise errors.ErrorResponse(response_data, http_res)
+        if utils.match_response(http_res, "500", "application/json"):
             response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
             raise errors.ErrorResponse(response_data, http_res)
         if utils.match_response(http_res, "4XX", "*"):
@@ -3492,9 +3492,9 @@ class Operations(BaseSDK):
             base_url = self._get_url(base_url, url_variables)
 
         request = models.GetRangeLinkEditResultsRequest(
+            operation_id=operation_id,
             maxpagesize=maxpagesize,
             next=next,
-            operation_id=operation_id,
         )
 
         req = self._build_request(
@@ -3625,9 +3625,9 @@ class Operations(BaseSDK):
             base_url = self._get_url(base_url, url_variables)
 
         request = models.GetRangeLinkEditResultsRequest(
+            operation_id=operation_id,
             maxpagesize=maxpagesize,
             next=next,
-            operation_id=operation_id,
         )
 
         req = self._build_request_async(
@@ -3727,6 +3727,271 @@ class Operations(BaseSDK):
 
         raise errors.SDKError("Unexpected response received", http_res)
 
+    def get_rich_text_batch_edit_results(
+        self,
+        *,
+        operation_id: str,
+        maxpagesize: Optional[int] = 1000,
+        next: Optional[str] = None,
+        retries: OptionalNullable[utils.RetryConfig] = UNSET,
+        server_url: Optional[str] = None,
+        timeout_ms: Optional[int] = None,
+        http_headers: Optional[Mapping[str, str]] = None,
+    ) -> Optional[models.GetRichTextBatchEditResultsResponse]:
+        r"""Retrieve results for a rich text batch edit
+
+        Returns a [`RichTextEditListResult`](ref:operations#richtexteditlistresult) describing the results of a rich text batch edit.
+
+        :param operation_id: The unique identifier of the operation
+        :param maxpagesize: The maximum number of results to retrieve
+        :param next: Pagination cursor for next set of results.
+        :param retries: Override the default retry configuration for this method
+        :param server_url: Override the default server URL for this method
+        :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
+        :param http_headers: Additional headers to set or replace on requests.
+        """
+        base_url = None
+        url_variables = None
+        if timeout_ms is None:
+            timeout_ms = self.sdk_configuration.timeout_ms
+
+        if server_url is not None:
+            base_url = server_url
+        else:
+            base_url = self._get_url(base_url, url_variables)
+
+        request = models.GetRichTextBatchEditResultsRequest(
+            operation_id=operation_id,
+            maxpagesize=maxpagesize,
+            next=next,
+        )
+
+        req = self._build_request(
+            method="GET",
+            path="/operations/{operationId}/richTextBatchEditResults",
+            base_url=base_url,
+            url_variables=url_variables,
+            request=request,
+            request_body_required=False,
+            request_has_path_params=True,
+            request_has_query_params=True,
+            user_agent_header="user-agent",
+            accept_header_value="application/json",
+            http_headers=http_headers,
+            security=self.sdk_configuration.security,
+            allow_empty_value=None,
+            timeout_ms=timeout_ms,
+        )
+
+        if retries == UNSET:
+            if self.sdk_configuration.retry_config is not UNSET:
+                retries = self.sdk_configuration.retry_config
+
+        retry_config = None
+        if isinstance(retries, utils.RetryConfig):
+            retry_config = (retries, ["429", "500", "502", "503", "504"])
+
+        http_res = self.do_request(
+            hook_ctx=HookContext(
+                config=self.sdk_configuration,
+                base_url=base_url or "",
+                operation_id="getRichTextBatchEditResults",
+                oauth2_scopes=["file:read"],
+                security_source=self.sdk_configuration.security,
+            ),
+            request=req,
+            error_status_codes=[
+                "400",
+                "401",
+                "403",
+                "404",
+                "409",
+                "429",
+                "4XX",
+                "500",
+                "503",
+                "5XX",
+            ],
+            retry_config=retry_config,
+        )
+
+        def next_func() -> Optional[models.GetRichTextBatchEditResultsResponse]:
+            body = utils.unmarshal_json(http_res.text, Union[Dict[Any, Any], List[Any]])
+
+            next_cursor = JSONPath("$['@nextLink']").parse(body)
+
+            if len(next_cursor) == 0:
+                return None
+
+            next_cursor = next_cursor[0]
+            if next_cursor is None or str(next_cursor).strip() == "":
+                return None
+
+            return self.get_rich_text_batch_edit_results(
+                operation_id=operation_id,
+                maxpagesize=maxpagesize,
+                next=next,
+                retries=retries,
+            )
+
+        response_data: Any = None
+        if utils.match_response(http_res, "200", "application/json"):
+            return models.GetRichTextBatchEditResultsResponse(
+                result=unmarshal_json_response(models.RichTextEditListResult, http_res),
+                next=next_func,
+            )
+        if utils.match_response(
+            http_res, ["400", "401", "403", "404", "409", "429"], "application/json"
+        ):
+            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
+            raise errors.ErrorResponse(response_data, http_res)
+        if utils.match_response(http_res, ["500", "503"], "application/json"):
+            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
+            raise errors.ErrorResponse(response_data, http_res)
+        if utils.match_response(http_res, "4XX", "*"):
+            http_res_text = utils.stream_to_text(http_res)
+            raise errors.SDKError("API error occurred", http_res, http_res_text)
+        if utils.match_response(http_res, "5XX", "*"):
+            http_res_text = utils.stream_to_text(http_res)
+            raise errors.SDKError("API error occurred", http_res, http_res_text)
+
+        raise errors.SDKError("Unexpected response received", http_res)
+
+    async def get_rich_text_batch_edit_results_async(
+        self,
+        *,
+        operation_id: str,
+        maxpagesize: Optional[int] = 1000,
+        next: Optional[str] = None,
+        retries: OptionalNullable[utils.RetryConfig] = UNSET,
+        server_url: Optional[str] = None,
+        timeout_ms: Optional[int] = None,
+        http_headers: Optional[Mapping[str, str]] = None,
+    ) -> Optional[models.GetRichTextBatchEditResultsResponse]:
+        r"""Retrieve results for a rich text batch edit
+
+        Returns a [`RichTextEditListResult`](ref:operations#richtexteditlistresult) describing the results of a rich text batch edit.
+
+        :param operation_id: The unique identifier of the operation
+        :param maxpagesize: The maximum number of results to retrieve
+        :param next: Pagination cursor for next set of results.
+        :param retries: Override the default retry configuration for this method
+        :param server_url: Override the default server URL for this method
+        :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
+        :param http_headers: Additional headers to set or replace on requests.
+        """
+        base_url = None
+        url_variables = None
+        if timeout_ms is None:
+            timeout_ms = self.sdk_configuration.timeout_ms
+
+        if server_url is not None:
+            base_url = server_url
+        else:
+            base_url = self._get_url(base_url, url_variables)
+
+        request = models.GetRichTextBatchEditResultsRequest(
+            operation_id=operation_id,
+            maxpagesize=maxpagesize,
+            next=next,
+        )
+
+        req = self._build_request_async(
+            method="GET",
+            path="/operations/{operationId}/richTextBatchEditResults",
+            base_url=base_url,
+            url_variables=url_variables,
+            request=request,
+            request_body_required=False,
+            request_has_path_params=True,
+            request_has_query_params=True,
+            user_agent_header="user-agent",
+            accept_header_value="application/json",
+            http_headers=http_headers,
+            security=self.sdk_configuration.security,
+            allow_empty_value=None,
+            timeout_ms=timeout_ms,
+        )
+
+        if retries == UNSET:
+            if self.sdk_configuration.retry_config is not UNSET:
+                retries = self.sdk_configuration.retry_config
+
+        retry_config = None
+        if isinstance(retries, utils.RetryConfig):
+            retry_config = (retries, ["429", "500", "502", "503", "504"])
+
+        http_res = await self.do_request_async(
+            hook_ctx=HookContext(
+                config=self.sdk_configuration,
+                base_url=base_url or "",
+                operation_id="getRichTextBatchEditResults",
+                oauth2_scopes=["file:read"],
+                security_source=self.sdk_configuration.security,
+            ),
+            request=req,
+            error_status_codes=[
+                "400",
+                "401",
+                "403",
+                "404",
+                "409",
+                "429",
+                "4XX",
+                "500",
+                "503",
+                "5XX",
+            ],
+            retry_config=retry_config,
+        )
+
+        def next_func() -> (
+            Awaitable[Optional[models.GetRichTextBatchEditResultsResponse]]
+        ):
+            body = utils.unmarshal_json(http_res.text, Union[Dict[Any, Any], List[Any]])
+
+            async def empty_result():
+                return None
+
+            next_cursor = JSONPath("$['@nextLink']").parse(body)
+
+            if len(next_cursor) == 0:
+                return empty_result()
+
+            next_cursor = next_cursor[0]
+            if next_cursor is None or str(next_cursor).strip() == "":
+                return empty_result()
+
+            return self.get_rich_text_batch_edit_results_async(
+                operation_id=operation_id,
+                maxpagesize=maxpagesize,
+                next=next,
+                retries=retries,
+            )
+
+        response_data: Any = None
+        if utils.match_response(http_res, "200", "application/json"):
+            return models.GetRichTextBatchEditResultsResponse(
+                result=unmarshal_json_response(models.RichTextEditListResult, http_res),
+                next=next_func,
+            )
+        if utils.match_response(
+            http_res, ["400", "401", "403", "404", "409", "429"], "application/json"
+        ):
+            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
+            raise errors.ErrorResponse(response_data, http_res)
+        if utils.match_response(http_res, ["500", "503"], "application/json"):
+            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
+            raise errors.ErrorResponse(response_data, http_res)
+        if utils.match_response(http_res, "4XX", "*"):
+            http_res_text = await utils.stream_to_text_async(http_res)
+            raise errors.SDKError("API error occurred", http_res, http_res_text)
+        if utils.match_response(http_res, "5XX", "*"):
+            http_res_text = await utils.stream_to_text_async(http_res)
+            raise errors.SDKError("API error occurred", http_res, http_res_text)
+
+        raise errors.SDKError("Unexpected response received", http_res)
+
     def get_rich_text_anchor_creation_results(
         self,
         *,
@@ -3761,9 +4026,9 @@ class Operations(BaseSDK):
             base_url = self._get_url(base_url, url_variables)
 
         request = models.GetRichTextAnchorCreationResultsRequest(
+            operation_id=operation_id,
             maxpagesize=maxpagesize,
             next=next,
-            operation_id=operation_id,
         )
 
         req = self._build_request(
@@ -3893,9 +4158,9 @@ class Operations(BaseSDK):
             base_url = self._get_url(base_url, url_variables)
 
         request = models.GetRichTextAnchorCreationResultsRequest(
+            operation_id=operation_id,
             maxpagesize=maxpagesize,
             next=next,
-            operation_id=operation_id,
         )
 
         req = self._build_request_async(
@@ -3996,271 +4261,6 @@ class Operations(BaseSDK):
 
         raise errors.SDKError("Unexpected response received", http_res)
 
-    def get_rich_text_batch_edit_results(
-        self,
-        *,
-        operation_id: str,
-        maxpagesize: Optional[int] = 1000,
-        next: Optional[str] = None,
-        retries: OptionalNullable[utils.RetryConfig] = UNSET,
-        server_url: Optional[str] = None,
-        timeout_ms: Optional[int] = None,
-        http_headers: Optional[Mapping[str, str]] = None,
-    ) -> Optional[models.GetRichTextBatchEditResultsResponse]:
-        r"""Retrieve results for a rich text batch edit
-
-        Returns a [`RichTextEditListResult`](ref:operations#richtexteditlistresult) describing the results of a rich text batch edit.
-
-        :param operation_id: The unique identifier of the operation
-        :param maxpagesize: The maximum number of results to retrieve
-        :param next: Pagination cursor for next set of results.
-        :param retries: Override the default retry configuration for this method
-        :param server_url: Override the default server URL for this method
-        :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
-        :param http_headers: Additional headers to set or replace on requests.
-        """
-        base_url = None
-        url_variables = None
-        if timeout_ms is None:
-            timeout_ms = self.sdk_configuration.timeout_ms
-
-        if server_url is not None:
-            base_url = server_url
-        else:
-            base_url = self._get_url(base_url, url_variables)
-
-        request = models.GetRichTextBatchEditResultsRequest(
-            maxpagesize=maxpagesize,
-            next=next,
-            operation_id=operation_id,
-        )
-
-        req = self._build_request(
-            method="GET",
-            path="/operations/{operationId}/richTextBatchEditResults",
-            base_url=base_url,
-            url_variables=url_variables,
-            request=request,
-            request_body_required=False,
-            request_has_path_params=True,
-            request_has_query_params=True,
-            user_agent_header="user-agent",
-            accept_header_value="application/json",
-            http_headers=http_headers,
-            security=self.sdk_configuration.security,
-            allow_empty_value=None,
-            timeout_ms=timeout_ms,
-        )
-
-        if retries == UNSET:
-            if self.sdk_configuration.retry_config is not UNSET:
-                retries = self.sdk_configuration.retry_config
-
-        retry_config = None
-        if isinstance(retries, utils.RetryConfig):
-            retry_config = (retries, ["429", "500", "502", "503", "504"])
-
-        http_res = self.do_request(
-            hook_ctx=HookContext(
-                config=self.sdk_configuration,
-                base_url=base_url or "",
-                operation_id="getRichTextBatchEditResults",
-                oauth2_scopes=["file:read"],
-                security_source=self.sdk_configuration.security,
-            ),
-            request=req,
-            error_status_codes=[
-                "400",
-                "401",
-                "403",
-                "404",
-                "409",
-                "429",
-                "4XX",
-                "500",
-                "503",
-                "5XX",
-            ],
-            retry_config=retry_config,
-        )
-
-        def next_func() -> Optional[models.GetRichTextBatchEditResultsResponse]:
-            body = utils.unmarshal_json(http_res.text, Union[Dict[Any, Any], List[Any]])
-
-            next_cursor = JSONPath("$['@nextLink']").parse(body)
-
-            if len(next_cursor) == 0:
-                return None
-
-            next_cursor = next_cursor[0]
-            if next_cursor is None or str(next_cursor).strip() == "":
-                return None
-
-            return self.get_rich_text_batch_edit_results(
-                operation_id=operation_id,
-                maxpagesize=maxpagesize,
-                next=next,
-                retries=retries,
-            )
-
-        response_data: Any = None
-        if utils.match_response(http_res, "200", "application/json"):
-            return models.GetRichTextBatchEditResultsResponse(
-                result=unmarshal_json_response(models.RichTextEditListResult, http_res),
-                next=next_func,
-            )
-        if utils.match_response(
-            http_res, ["400", "401", "403", "404", "409", "429"], "application/json"
-        ):
-            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
-            raise errors.ErrorResponse(response_data, http_res)
-        if utils.match_response(http_res, ["500", "503"], "application/json"):
-            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
-            raise errors.ErrorResponse(response_data, http_res)
-        if utils.match_response(http_res, "4XX", "*"):
-            http_res_text = utils.stream_to_text(http_res)
-            raise errors.SDKError("API error occurred", http_res, http_res_text)
-        if utils.match_response(http_res, "5XX", "*"):
-            http_res_text = utils.stream_to_text(http_res)
-            raise errors.SDKError("API error occurred", http_res, http_res_text)
-
-        raise errors.SDKError("Unexpected response received", http_res)
-
-    async def get_rich_text_batch_edit_results_async(
-        self,
-        *,
-        operation_id: str,
-        maxpagesize: Optional[int] = 1000,
-        next: Optional[str] = None,
-        retries: OptionalNullable[utils.RetryConfig] = UNSET,
-        server_url: Optional[str] = None,
-        timeout_ms: Optional[int] = None,
-        http_headers: Optional[Mapping[str, str]] = None,
-    ) -> Optional[models.GetRichTextBatchEditResultsResponse]:
-        r"""Retrieve results for a rich text batch edit
-
-        Returns a [`RichTextEditListResult`](ref:operations#richtexteditlistresult) describing the results of a rich text batch edit.
-
-        :param operation_id: The unique identifier of the operation
-        :param maxpagesize: The maximum number of results to retrieve
-        :param next: Pagination cursor for next set of results.
-        :param retries: Override the default retry configuration for this method
-        :param server_url: Override the default server URL for this method
-        :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
-        :param http_headers: Additional headers to set or replace on requests.
-        """
-        base_url = None
-        url_variables = None
-        if timeout_ms is None:
-            timeout_ms = self.sdk_configuration.timeout_ms
-
-        if server_url is not None:
-            base_url = server_url
-        else:
-            base_url = self._get_url(base_url, url_variables)
-
-        request = models.GetRichTextBatchEditResultsRequest(
-            maxpagesize=maxpagesize,
-            next=next,
-            operation_id=operation_id,
-        )
-
-        req = self._build_request_async(
-            method="GET",
-            path="/operations/{operationId}/richTextBatchEditResults",
-            base_url=base_url,
-            url_variables=url_variables,
-            request=request,
-            request_body_required=False,
-            request_has_path_params=True,
-            request_has_query_params=True,
-            user_agent_header="user-agent",
-            accept_header_value="application/json",
-            http_headers=http_headers,
-            security=self.sdk_configuration.security,
-            allow_empty_value=None,
-            timeout_ms=timeout_ms,
-        )
-
-        if retries == UNSET:
-            if self.sdk_configuration.retry_config is not UNSET:
-                retries = self.sdk_configuration.retry_config
-
-        retry_config = None
-        if isinstance(retries, utils.RetryConfig):
-            retry_config = (retries, ["429", "500", "502", "503", "504"])
-
-        http_res = await self.do_request_async(
-            hook_ctx=HookContext(
-                config=self.sdk_configuration,
-                base_url=base_url or "",
-                operation_id="getRichTextBatchEditResults",
-                oauth2_scopes=["file:read"],
-                security_source=self.sdk_configuration.security,
-            ),
-            request=req,
-            error_status_codes=[
-                "400",
-                "401",
-                "403",
-                "404",
-                "409",
-                "429",
-                "4XX",
-                "500",
-                "503",
-                "5XX",
-            ],
-            retry_config=retry_config,
-        )
-
-        def next_func() -> (
-            Awaitable[Optional[models.GetRichTextBatchEditResultsResponse]]
-        ):
-            body = utils.unmarshal_json(http_res.text, Union[Dict[Any, Any], List[Any]])
-
-            async def empty_result():
-                return None
-
-            next_cursor = JSONPath("$['@nextLink']").parse(body)
-
-            if len(next_cursor) == 0:
-                return empty_result()
-
-            next_cursor = next_cursor[0]
-            if next_cursor is None or str(next_cursor).strip() == "":
-                return empty_result()
-
-            return self.get_rich_text_batch_edit_results_async(
-                operation_id=operation_id,
-                maxpagesize=maxpagesize,
-                next=next,
-                retries=retries,
-            )
-
-        response_data: Any = None
-        if utils.match_response(http_res, "200", "application/json"):
-            return models.GetRichTextBatchEditResultsResponse(
-                result=unmarshal_json_response(models.RichTextEditListResult, http_res),
-                next=next_func,
-            )
-        if utils.match_response(
-            http_res, ["400", "401", "403", "404", "409", "429"], "application/json"
-        ):
-            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
-            raise errors.ErrorResponse(response_data, http_res)
-        if utils.match_response(http_res, ["500", "503"], "application/json"):
-            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
-            raise errors.ErrorResponse(response_data, http_res)
-        if utils.match_response(http_res, "4XX", "*"):
-            http_res_text = await utils.stream_to_text_async(http_res)
-            raise errors.SDKError("API error occurred", http_res, http_res_text)
-        if utils.match_response(http_res, "5XX", "*"):
-            http_res_text = await utils.stream_to_text_async(http_res)
-            raise errors.SDKError("API error occurred", http_res, http_res_text)
-
-        raise errors.SDKError("Unexpected response received", http_res)
-
     def get_rich_text_duplication_edit_results(
         self,
         *,
@@ -4295,9 +4295,9 @@ class Operations(BaseSDK):
             base_url = self._get_url(base_url, url_variables)
 
         request = models.GetRichTextDuplicationEditResultsRequest(
+            operation_id=operation_id,
             maxpagesize=maxpagesize,
             next=next,
-            operation_id=operation_id,
         )
 
         req = self._build_request(
@@ -4427,9 +4427,9 @@ class Operations(BaseSDK):
             base_url = self._get_url(base_url, url_variables)
 
         request = models.GetRichTextDuplicationEditResultsRequest(
+            operation_id=operation_id,
             maxpagesize=maxpagesize,
             next=next,
-            operation_id=operation_id,
         )
 
         req = self._build_request_async(
@@ -4564,9 +4564,9 @@ class Operations(BaseSDK):
             base_url = self._get_url(base_url, url_variables)
 
         request = models.GetRichTextLinksBatchEditResultsRequest(
+            operation_id=operation_id,
             maxpagesize=maxpagesize,
             next=next,
-            operation_id=operation_id,
         )
 
         req = self._build_request(
@@ -4696,9 +4696,9 @@ class Operations(BaseSDK):
             base_url = self._get_url(base_url, url_variables)
 
         request = models.GetRichTextLinksBatchEditResultsRequest(
+            operation_id=operation_id,
             maxpagesize=maxpagesize,
             next=next,
-            operation_id=operation_id,
         )
 
         req = self._build_request_async(
@@ -4833,9 +4833,9 @@ class Operations(BaseSDK):
             base_url = self._get_url(base_url, url_variables)
 
         request = models.GetTableAnchorCreationResultsRequest(
+            operation_id=operation_id,
             maxpagesize=maxpagesize,
             next=next,
-            operation_id=operation_id,
         )
 
         req = self._build_request(
@@ -4965,9 +4965,9 @@ class Operations(BaseSDK):
             base_url = self._get_url(base_url, url_variables)
 
         request = models.GetTableAnchorCreationResultsRequest(
+            operation_id=operation_id,
             maxpagesize=maxpagesize,
             next=next,
-            operation_id=operation_id,
         )
 
         req = self._build_request_async(
@@ -5510,9 +5510,9 @@ class Operations(BaseSDK):
             base_url = self._get_url(base_url, url_variables)
 
         request = models.GetTableLinksEditResultsRequest(
+            operation_id=operation_id,
             maxpagesize=maxpagesize,
             next=next,
-            operation_id=operation_id,
         )
 
         req = self._build_request(
@@ -5642,9 +5642,9 @@ class Operations(BaseSDK):
             base_url = self._get_url(base_url, url_variables)
 
         request = models.GetTableLinksEditResultsRequest(
+            operation_id=operation_id,
             maxpagesize=maxpagesize,
             next=next,
-            operation_id=operation_id,
         )
 
         req = self._build_request_async(

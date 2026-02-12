@@ -10,22 +10,22 @@ from workiva.utils import FieldMetadata, PathParamMetadata, RequestMetadata
 
 
 class PartiallyUpdateMilestoneByIDRequestTypedDict(TypedDict):
-    request_body: List[JSONPatchOperationTypedDict]
-    r"""The batch of JSON patch operations to apply"""
     milestone_id: str
     r"""The unique identifier of a milestone."""
+    request_body: List[JSONPatchOperationTypedDict]
+    r"""The batch of JSON patch operations to apply"""
 
 
 class PartiallyUpdateMilestoneByIDRequest(BaseModel):
-    request_body: Annotated[
-        List[JSONPatchOperation],
-        FieldMetadata(request=RequestMetadata(media_type="application/json")),
-    ]
-    r"""The batch of JSON patch operations to apply"""
-
     milestone_id: Annotated[
         str,
         pydantic.Field(alias="milestoneId"),
         FieldMetadata(path=PathParamMetadata(style="simple", explode=False)),
     ]
     r"""The unique identifier of a milestone."""
+
+    request_body: Annotated[
+        List[JSONPatchOperation],
+        FieldMetadata(request=RequestMetadata(media_type="application/json")),
+    ]
+    r"""The batch of JSON patch operations to apply"""

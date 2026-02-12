@@ -9,7 +9,7 @@ from typing_extensions import Annotated, NotRequired, TypedDict
 from workiva.types import BaseModel, Nullable, OptionalNullable, UNSET, UNSET_SENTINEL
 
 
-class OptionsTypedDict(TypedDict):
+class SheetUpdateEditCellsOptionsTypedDict(TypedDict):
     r"""Edit cells options"""
 
     apply_entered_in_scaling: NotRequired[bool]
@@ -22,7 +22,7 @@ class OptionsTypedDict(TypedDict):
     """
 
 
-class Options(BaseModel):
+class SheetUpdateEditCellsOptions(BaseModel):
     r"""Edit cells options"""
 
     apply_entered_in_scaling: Annotated[
@@ -61,7 +61,7 @@ class SheetUpdateEditCellsTypedDict(TypedDict):
 
     cells: List[CellEditTypedDict]
     r"""The cells to edit"""
-    options: NotRequired[Nullable[OptionsTypedDict]]
+    options: NotRequired[Nullable[SheetUpdateEditCellsOptionsTypedDict]]
     r"""Edit cells options"""
 
 
@@ -71,7 +71,7 @@ class SheetUpdateEditCells(BaseModel):
     cells: List[CellEdit]
     r"""The cells to edit"""
 
-    options: OptionalNullable[Options] = UNSET
+    options: OptionalNullable[SheetUpdateEditCellsOptions] = UNSET
     r"""Edit cells options"""
 
     @model_serializer(mode="wrap")

@@ -2,13 +2,14 @@
 
 from __future__ import annotations
 from enum import Enum
-from pydantic import model_serializer
+from pydantic import field_serializer, model_serializer
 from typing import Optional
 from typing_extensions import NotRequired, TypedDict
+from workiva import models, utils
 from workiva.types import BaseModel, UNSET_SENTINEL
 
 
-class Unit(str, Enum):
+class Unit(str, Enum, metaclass=utils.OpenEnumMeta):
     r"""The unit of the line spacing value."""
 
     PERCENT = "percent"
@@ -36,6 +37,15 @@ class LineSpacing(BaseModel):
     r"""The line spacing value. Valid percent range: 80% - 720% Valid points range: 1 - 400 points
 
     """
+
+    @field_serializer("unit")
+    def serialize_unit(self, value):
+        if isinstance(value, str):
+            try:
+                return models.Unit(value)
+            except ValueError:
+                return value
+        return value
 
     @model_serializer(mode="wrap")
     def serialize_model(self, handler):

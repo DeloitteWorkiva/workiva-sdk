@@ -10,25 +10,25 @@ from workiva.utils import FieldMetadata, PathParamMetadata, RequestMetadata
 
 
 class EditSectionsRequestTypedDict(TypedDict):
-    sections_edits: SectionsEditsTypedDict
-    r"""The edits for one or more sections in a document"""
     document_id: str
     r"""The unique identifier of the document"""
+    sections_edits: SectionsEditsTypedDict
+    r"""The edits for one or more sections in a document"""
 
 
 class EditSectionsRequest(BaseModel):
-    sections_edits: Annotated[
-        SectionsEdits,
-        FieldMetadata(request=RequestMetadata(media_type="application/json")),
-    ]
-    r"""The edits for one or more sections in a document"""
-
     document_id: Annotated[
         str,
         pydantic.Field(alias="documentId"),
         FieldMetadata(path=PathParamMetadata(style="simple", explode=False)),
     ]
     r"""The unique identifier of the document"""
+
+    sections_edits: Annotated[
+        SectionsEdits,
+        FieldMetadata(request=RequestMetadata(media_type="application/json")),
+    ]
+    r"""The edits for one or more sections in a document"""
 
 
 class EditSectionsResponseTypedDict(TypedDict):

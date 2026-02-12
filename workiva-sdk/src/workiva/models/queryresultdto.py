@@ -7,13 +7,14 @@ from .queryparameterdto import QueryParameterDto, QueryParameterDtoTypedDict
 from datetime import datetime
 from enum import Enum
 import pydantic
-from pydantic import model_serializer
+from pydantic import field_serializer, model_serializer
 from typing import Any, Dict, List, Optional
 from typing_extensions import Annotated, NotRequired, TypedDict
+from workiva import models, utils
 from workiva.types import BaseModel, UNSET_SENTINEL
 
 
-class PivotStatus(str, Enum):
+class PivotStatus(str, Enum, metaclass=utils.OpenEnumMeta):
     r"""The current status of the pivot execution"""
 
     NOT_STARTED = "NOT_STARTED"
@@ -29,7 +30,7 @@ class PivotStatus(str, Enum):
     PIVOT_ERROR = "PIVOT_ERROR"
 
 
-class QueryResultDtoStatus(str, Enum):
+class QueryResultDtoStatus(str, Enum, metaclass=utils.OpenEnumMeta):
     r"""The current status of the query execution"""
 
     NOT_STARTED = "NOT_STARTED"
@@ -149,6 +150,24 @@ class QueryResultDto(BaseModel):
 
     version: Optional[int] = None
     r"""The version of the current representation of the entity"""
+
+    @field_serializer("pivot_status")
+    def serialize_pivot_status(self, value):
+        if isinstance(value, str):
+            try:
+                return models.PivotStatus(value)
+            except ValueError:
+                return value
+        return value
+
+    @field_serializer("status")
+    def serialize_status(self, value):
+        if isinstance(value, str):
+            try:
+                return models.QueryResultDtoStatus(value)
+            except ValueError:
+                return value
+        return value
 
     @model_serializer(mode="wrap")
     def serialize_model(self, handler):

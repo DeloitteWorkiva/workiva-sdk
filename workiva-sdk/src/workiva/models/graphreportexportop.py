@@ -10,25 +10,25 @@ from workiva.utils import FieldMetadata, PathParamMetadata, RequestMetadata
 
 
 class GraphReportExportRequestTypedDict(TypedDict):
-    graph_report_export: GraphReportExportTypedDict
-    r"""Details about the report export"""
     report_id: str
     r"""The unique identifier of the report"""
+    graph_report_export: GraphReportExportTypedDict
+    r"""Details about the report export"""
 
 
 class GraphReportExportRequest(BaseModel):
-    graph_report_export: Annotated[
-        GraphReportExport,
-        FieldMetadata(request=RequestMetadata(media_type="application/json")),
-    ]
-    r"""Details about the report export"""
-
     report_id: Annotated[
         str,
         pydantic.Field(alias="reportId"),
         FieldMetadata(path=PathParamMetadata(style="simple", explode=False)),
     ]
     r"""The unique identifier of the report"""
+
+    graph_report_export: Annotated[
+        GraphReportExport,
+        FieldMetadata(request=RequestMetadata(media_type="application/json")),
+    ]
+    r"""Details about the report export"""
 
 
 class GraphReportExportResponseTypedDict(TypedDict):

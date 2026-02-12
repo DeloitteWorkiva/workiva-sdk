@@ -6,9 +6,10 @@ from .cellvalue import CellValue, CellValueTypedDict
 from .color import Color, ColorTypedDict
 from enum import Enum
 import pydantic
-from pydantic import model_serializer
+from pydantic import field_serializer, model_serializer
 from typing import Optional
 from typing_extensions import Annotated, NotRequired, TypedDict
+from workiva import models, utils
 from workiva.types import BaseModel, Nullable, OptionalNullable, UNSET, UNSET_SENTINEL
 
 
@@ -91,7 +92,7 @@ class ParentOf(BaseModel):
         return m
 
 
-class TableCellType(str, Enum):
+class TableCellType(str, Enum, metaclass=utils.OpenEnumMeta):
     r"""The raw value or formula of the cell with no value formatting applied. This matches the formula bar value in the app."""
 
     PARENT_OF = "parentOf"
@@ -125,6 +126,15 @@ class Merges(BaseModel):
     ] = UNSET
     r"""The range of cells included in this cell's merge."""
 
+    @field_serializer("type")
+    def serialize_type(self, value):
+        if isinstance(value, str):
+            try:
+                return models.TableCellType(value)
+            except ValueError:
+                return value
+        return value
+
     @model_serializer(mode="wrap")
     def serialize_model(self, handler):
         optional_fields = set(["childOf", "parentOf"])
@@ -151,7 +161,7 @@ class Merges(BaseModel):
         return m
 
 
-class TableCellStyle(str, Enum):
+class TableCellSchemasPropertiesBordersStyle(str, Enum, metaclass=utils.OpenEnumMeta):
     r"""The style of the border to apply."""
 
     SINGLE = "single"
@@ -168,7 +178,7 @@ class TableCellBottomTypedDict(TypedDict):
 
     color: ColorTypedDict
     r"""Represents a color."""
-    style: TableCellStyle
+    style: TableCellSchemasPropertiesBordersStyle
     r"""The style of the border to apply."""
     weight: float
     r"""The thickness of the border, in points. Rounded to the nearest hundredth."""
@@ -180,14 +190,23 @@ class TableCellBottom(BaseModel):
     color: Color
     r"""Represents a color."""
 
-    style: TableCellStyle
+    style: TableCellSchemasPropertiesBordersStyle
     r"""The style of the border to apply."""
 
     weight: float
     r"""The thickness of the border, in points. Rounded to the nearest hundredth."""
 
+    @field_serializer("style")
+    def serialize_style(self, value):
+        if isinstance(value, str):
+            try:
+                return models.TableCellSchemasPropertiesBordersStyle(value)
+            except ValueError:
+                return value
+        return value
 
-class TableCellSchemasStyle(str, Enum):
+
+class TableCellStyle(str, Enum, metaclass=utils.OpenEnumMeta):
     r"""The style of the border to apply."""
 
     SINGLE = "single"
@@ -204,7 +223,7 @@ class TableCellLeftTypedDict(TypedDict):
 
     color: ColorTypedDict
     r"""Represents a color."""
-    style: TableCellSchemasStyle
+    style: TableCellStyle
     r"""The style of the border to apply."""
     weight: float
     r"""The thickness of the border, in points. Rounded to the nearest hundredth."""
@@ -216,14 +235,23 @@ class TableCellLeft(BaseModel):
     color: Color
     r"""Represents a color."""
 
-    style: TableCellSchemasStyle
+    style: TableCellStyle
     r"""The style of the border to apply."""
 
     weight: float
     r"""The thickness of the border, in points. Rounded to the nearest hundredth."""
 
+    @field_serializer("style")
+    def serialize_style(self, value):
+        if isinstance(value, str):
+            try:
+                return models.TableCellStyle(value)
+            except ValueError:
+                return value
+        return value
 
-class TableCellSchemasPropertiesStyle(str, Enum):
+
+class TableCellSchemasStyle(str, Enum, metaclass=utils.OpenEnumMeta):
     r"""The style of the border to apply."""
 
     SINGLE = "single"
@@ -240,7 +268,7 @@ class TableCellRightTypedDict(TypedDict):
 
     color: ColorTypedDict
     r"""Represents a color."""
-    style: TableCellSchemasPropertiesStyle
+    style: TableCellSchemasStyle
     r"""The style of the border to apply."""
     weight: float
     r"""The thickness of the border, in points. Rounded to the nearest hundredth."""
@@ -252,14 +280,23 @@ class TableCellRight(BaseModel):
     color: Color
     r"""Represents a color."""
 
-    style: TableCellSchemasPropertiesStyle
+    style: TableCellSchemasStyle
     r"""The style of the border to apply."""
 
     weight: float
     r"""The thickness of the border, in points. Rounded to the nearest hundredth."""
 
+    @field_serializer("style")
+    def serialize_style(self, value):
+        if isinstance(value, str):
+            try:
+                return models.TableCellSchemasStyle(value)
+            except ValueError:
+                return value
+        return value
 
-class TableCellSchemasPropertiesBordersStyle(str, Enum):
+
+class TableCellSchemasPropertiesStyle(str, Enum, metaclass=utils.OpenEnumMeta):
     r"""The style of the border to apply."""
 
     SINGLE = "single"
@@ -276,7 +313,7 @@ class TableCellTopTypedDict(TypedDict):
 
     color: ColorTypedDict
     r"""Represents a color."""
-    style: TableCellSchemasPropertiesBordersStyle
+    style: TableCellSchemasPropertiesStyle
     r"""The style of the border to apply."""
     weight: float
     r"""The thickness of the border, in points. Rounded to the nearest hundredth."""
@@ -288,11 +325,20 @@ class TableCellTop(BaseModel):
     color: Color
     r"""Represents a color."""
 
-    style: TableCellSchemasPropertiesBordersStyle
+    style: TableCellSchemasPropertiesStyle
     r"""The style of the border to apply."""
 
     weight: float
     r"""The thickness of the border, in points. Rounded to the nearest hundredth."""
+
+    @field_serializer("style")
+    def serialize_style(self, value):
+        if isinstance(value, str):
+            try:
+                return models.TableCellSchemasPropertiesStyle(value)
+            except ValueError:
+                return value
+        return value
 
 
 class TableCellBordersTypedDict(TypedDict):
@@ -365,7 +411,7 @@ class FillColor(BaseModel):
     r"""The red component of the color."""
 
 
-class VerticalAlignment(str, Enum):
+class VerticalAlignment(str, Enum, metaclass=utils.OpenEnumMeta):
     r"""The vertical alignment of the content in the cell."""
 
     TOP = "top"
@@ -408,6 +454,24 @@ class TableCellProperties(BaseModel):
         OptionalNullable[VerticalAlignment], pydantic.Field(alias="verticalAlignment")
     ] = UNSET
     r"""The vertical alignment of the content in the cell."""
+
+    @field_serializer("horizontal_alignment")
+    def serialize_horizontal_alignment(self, value):
+        if isinstance(value, str):
+            try:
+                return models.CellHorizontalAlignment(value)
+            except ValueError:
+                return value
+        return value
+
+    @field_serializer("vertical_alignment")
+    def serialize_vertical_alignment(self, value):
+        if isinstance(value, str):
+            try:
+                return models.VerticalAlignment(value)
+            except ValueError:
+                return value
+        return value
 
     @model_serializer(mode="wrap")
     def serialize_model(self, handler):

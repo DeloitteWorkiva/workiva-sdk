@@ -12,228 +12,6 @@ from workiva.utils.unmarshal_json_response import unmarshal_json_response
 class Content(BaseSDK):
     r"""Endpoints for reading and writing Workiva content. See [**Introduction to Content Endpoints**](ref:content-guide) for more information."""
 
-    def destination_link_source_conversion(
-        self,
-        *,
-        destination_link_id: str,
-        retries: OptionalNullable[utils.RetryConfig] = UNSET,
-        server_url: Optional[str] = None,
-        timeout_ms: Optional[int] = None,
-        http_headers: Optional[Mapping[str, str]] = None,
-    ) -> models.DestinationLinkSourceConversionResponse:
-        r"""Initiate a destination link conversion
-
-        Converts a destination link into a source link. The previous source, if any, will be converted into a destination link.
-
-        Responses include a `Location` header, which indicates where to poll for results. For more details on long-running
-        job polling, see [Operations endpoint](ref:getoperationbyid). When the source conversion
-        completes, its status will be `completed`, and the response body includes a `resourceURL`. For more details on the `resourceURL`
-        see [operation results endpoint](ref:getdestinationlinksourceconversionresults).
-        For more details, see [Authentication documentation](ref:authentication).
-
-
-        :param destination_link_id: The unique identifier of the destination link
-        :param retries: Override the default retry configuration for this method
-        :param server_url: Override the default server URL for this method
-        :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
-        :param http_headers: Additional headers to set or replace on requests.
-        """
-        base_url = None
-        url_variables = None
-        if timeout_ms is None:
-            timeout_ms = self.sdk_configuration.timeout_ms
-
-        if server_url is not None:
-            base_url = server_url
-        else:
-            base_url = self._get_url(base_url, url_variables)
-
-        request = models.DestinationLinkSourceConversionRequest(
-            destination_link_id=destination_link_id,
-        )
-
-        req = self._build_request(
-            method="POST",
-            path="/content/destinationLinks/{destinationLinkId}/sourceConversion",
-            base_url=base_url,
-            url_variables=url_variables,
-            request=request,
-            request_body_required=False,
-            request_has_path_params=True,
-            request_has_query_params=True,
-            user_agent_header="user-agent",
-            accept_header_value="application/json",
-            http_headers=http_headers,
-            security=self.sdk_configuration.security,
-            allow_empty_value=None,
-            timeout_ms=timeout_ms,
-        )
-
-        if retries == UNSET:
-            if self.sdk_configuration.retry_config is not UNSET:
-                retries = self.sdk_configuration.retry_config
-
-        retry_config = None
-        if isinstance(retries, utils.RetryConfig):
-            retry_config = (retries, ["429", "500", "502", "503", "504"])
-
-        http_res = self.do_request(
-            hook_ctx=HookContext(
-                config=self.sdk_configuration,
-                base_url=base_url or "",
-                operation_id="destinationLinkSourceConversion",
-                oauth2_scopes=["file:write"],
-                security_source=self.sdk_configuration.security,
-            ),
-            request=req,
-            error_status_codes=[
-                "400",
-                "401",
-                "403",
-                "404",
-                "409",
-                "429",
-                "4XX",
-                "500",
-                "503",
-                "5XX",
-            ],
-            retry_config=retry_config,
-        )
-
-        response_data: Any = None
-        if utils.match_response(http_res, "202", "*"):
-            return models.DestinationLinkSourceConversionResponse(
-                headers=utils.get_response_headers(http_res.headers)
-            )
-        if utils.match_response(
-            http_res, ["400", "401", "403", "404", "409", "429"], "application/json"
-        ):
-            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
-            raise errors.ErrorResponse(response_data, http_res)
-        if utils.match_response(http_res, ["500", "503"], "application/json"):
-            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
-            raise errors.ErrorResponse(response_data, http_res)
-        if utils.match_response(http_res, "4XX", "*"):
-            http_res_text = utils.stream_to_text(http_res)
-            raise errors.SDKError("API error occurred", http_res, http_res_text)
-        if utils.match_response(http_res, "5XX", "*"):
-            http_res_text = utils.stream_to_text(http_res)
-            raise errors.SDKError("API error occurred", http_res, http_res_text)
-
-        raise errors.SDKError("Unexpected response received", http_res)
-
-    async def destination_link_source_conversion_async(
-        self,
-        *,
-        destination_link_id: str,
-        retries: OptionalNullable[utils.RetryConfig] = UNSET,
-        server_url: Optional[str] = None,
-        timeout_ms: Optional[int] = None,
-        http_headers: Optional[Mapping[str, str]] = None,
-    ) -> models.DestinationLinkSourceConversionResponse:
-        r"""Initiate a destination link conversion
-
-        Converts a destination link into a source link. The previous source, if any, will be converted into a destination link.
-
-        Responses include a `Location` header, which indicates where to poll for results. For more details on long-running
-        job polling, see [Operations endpoint](ref:getoperationbyid). When the source conversion
-        completes, its status will be `completed`, and the response body includes a `resourceURL`. For more details on the `resourceURL`
-        see [operation results endpoint](ref:getdestinationlinksourceconversionresults).
-        For more details, see [Authentication documentation](ref:authentication).
-
-
-        :param destination_link_id: The unique identifier of the destination link
-        :param retries: Override the default retry configuration for this method
-        :param server_url: Override the default server URL for this method
-        :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
-        :param http_headers: Additional headers to set or replace on requests.
-        """
-        base_url = None
-        url_variables = None
-        if timeout_ms is None:
-            timeout_ms = self.sdk_configuration.timeout_ms
-
-        if server_url is not None:
-            base_url = server_url
-        else:
-            base_url = self._get_url(base_url, url_variables)
-
-        request = models.DestinationLinkSourceConversionRequest(
-            destination_link_id=destination_link_id,
-        )
-
-        req = self._build_request_async(
-            method="POST",
-            path="/content/destinationLinks/{destinationLinkId}/sourceConversion",
-            base_url=base_url,
-            url_variables=url_variables,
-            request=request,
-            request_body_required=False,
-            request_has_path_params=True,
-            request_has_query_params=True,
-            user_agent_header="user-agent",
-            accept_header_value="application/json",
-            http_headers=http_headers,
-            security=self.sdk_configuration.security,
-            allow_empty_value=None,
-            timeout_ms=timeout_ms,
-        )
-
-        if retries == UNSET:
-            if self.sdk_configuration.retry_config is not UNSET:
-                retries = self.sdk_configuration.retry_config
-
-        retry_config = None
-        if isinstance(retries, utils.RetryConfig):
-            retry_config = (retries, ["429", "500", "502", "503", "504"])
-
-        http_res = await self.do_request_async(
-            hook_ctx=HookContext(
-                config=self.sdk_configuration,
-                base_url=base_url or "",
-                operation_id="destinationLinkSourceConversion",
-                oauth2_scopes=["file:write"],
-                security_source=self.sdk_configuration.security,
-            ),
-            request=req,
-            error_status_codes=[
-                "400",
-                "401",
-                "403",
-                "404",
-                "409",
-                "429",
-                "4XX",
-                "500",
-                "503",
-                "5XX",
-            ],
-            retry_config=retry_config,
-        )
-
-        response_data: Any = None
-        if utils.match_response(http_res, "202", "*"):
-            return models.DestinationLinkSourceConversionResponse(
-                headers=utils.get_response_headers(http_res.headers)
-            )
-        if utils.match_response(
-            http_res, ["400", "401", "403", "404", "409", "429"], "application/json"
-        ):
-            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
-            raise errors.ErrorResponse(response_data, http_res)
-        if utils.match_response(http_res, ["500", "503"], "application/json"):
-            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
-            raise errors.ErrorResponse(response_data, http_res)
-        if utils.match_response(http_res, "4XX", "*"):
-            http_res_text = await utils.stream_to_text_async(http_res)
-            raise errors.SDKError("API error occurred", http_res, http_res_text)
-        if utils.match_response(http_res, "5XX", "*"):
-            http_res_text = await utils.stream_to_text_async(http_res)
-            raise errors.SDKError("API error occurred", http_res, http_res_text)
-
-        raise errors.SDKError("Unexpected response received", http_res)
-
     def get_anchor_by_id(
         self,
         *,
@@ -427,279 +205,6 @@ class Content(BaseSDK):
         response_data: Any = None
         if utils.match_response(http_res, "200", "application/json"):
             return unmarshal_json_response(models.Anchor, http_res)
-        if utils.match_response(
-            http_res, ["400", "401", "403", "404", "409", "429"], "application/json"
-        ):
-            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
-            raise errors.ErrorResponse(response_data, http_res)
-        if utils.match_response(http_res, ["500", "503"], "application/json"):
-            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
-            raise errors.ErrorResponse(response_data, http_res)
-        if utils.match_response(http_res, "4XX", "*"):
-            http_res_text = await utils.stream_to_text_async(http_res)
-            raise errors.SDKError("API error occurred", http_res, http_res_text)
-        if utils.match_response(http_res, "5XX", "*"):
-            http_res_text = await utils.stream_to_text_async(http_res)
-            raise errors.SDKError("API error occurred", http_res, http_res_text)
-
-        raise errors.SDKError("Unexpected response received", http_res)
-
-    def get_column_properties(
-        self,
-        *,
-        request: Union[
-            models.GetColumnPropertiesRequest,
-            models.GetColumnPropertiesRequestTypedDict,
-        ],
-        retries: OptionalNullable[utils.RetryConfig] = UNSET,
-        server_url: Optional[str] = None,
-        timeout_ms: Optional[int] = None,
-        http_headers: Optional[Mapping[str, str]] = None,
-    ) -> Optional[models.GetColumnPropertiesResponse]:
-        r"""Retrieve table column properties
-
-        Returns a [`ColumnPropertiesListResult`](ref:content#columnpropertieslistresult) for a table
-
-
-        :param request: The request object to send.
-        :param retries: Override the default retry configuration for this method
-        :param server_url: Override the default server URL for this method
-        :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
-        :param http_headers: Additional headers to set or replace on requests.
-        """
-        base_url = None
-        url_variables = None
-        if timeout_ms is None:
-            timeout_ms = self.sdk_configuration.timeout_ms
-
-        if server_url is not None:
-            base_url = server_url
-        else:
-            base_url = self._get_url(base_url, url_variables)
-
-        if not isinstance(request, BaseModel):
-            request = utils.unmarshal(request, models.GetColumnPropertiesRequest)
-        request = cast(models.GetColumnPropertiesRequest, request)
-
-        req = self._build_request(
-            method="GET",
-            path="/content/tables/{tableId}/properties/columns",
-            base_url=base_url,
-            url_variables=url_variables,
-            request=request,
-            request_body_required=False,
-            request_has_path_params=True,
-            request_has_query_params=True,
-            user_agent_header="user-agent",
-            accept_header_value="application/json",
-            http_headers=http_headers,
-            security=self.sdk_configuration.security,
-            allow_empty_value=None,
-            timeout_ms=timeout_ms,
-        )
-
-        if retries == UNSET:
-            if self.sdk_configuration.retry_config is not UNSET:
-                retries = self.sdk_configuration.retry_config
-
-        retry_config = None
-        if isinstance(retries, utils.RetryConfig):
-            retry_config = (retries, ["429", "500", "502", "503", "504"])
-
-        http_res = self.do_request(
-            hook_ctx=HookContext(
-                config=self.sdk_configuration,
-                base_url=base_url or "",
-                operation_id="getColumnProperties",
-                oauth2_scopes=["file:read"],
-                security_source=self.sdk_configuration.security,
-            ),
-            request=req,
-            error_status_codes=[
-                "400",
-                "401",
-                "403",
-                "404",
-                "409",
-                "429",
-                "4XX",
-                "500",
-                "503",
-                "5XX",
-            ],
-            retry_config=retry_config,
-        )
-
-        def next_func() -> Optional[models.GetColumnPropertiesResponse]:
-            body = utils.unmarshal_json(http_res.text, Union[Dict[Any, Any], List[Any]])
-
-            next_cursor = JSONPath("$['@nextLink']").parse(body)
-
-            if len(next_cursor) == 0:
-                return None
-
-            next_cursor = next_cursor[0]
-            if next_cursor is None or str(next_cursor).strip() == "":
-                return None
-
-            return self.get_column_properties(
-                request=models.GetColumnPropertiesRequest(
-                    table_id=request.table_id,
-                    maxpagesize=request.maxpagesize,
-                    next=request.next,
-                    revision=request.revision,
-                    start_column=request.start_column,
-                    stop_column=request.stop_column,
-                ),
-                retries=retries,
-            )
-
-        response_data: Any = None
-        if utils.match_response(http_res, "200", "application/json"):
-            return models.GetColumnPropertiesResponse(
-                result=unmarshal_json_response(
-                    models.ColumnPropertiesListResult, http_res
-                ),
-                next=next_func,
-            )
-        if utils.match_response(
-            http_res, ["400", "401", "403", "404", "409", "429"], "application/json"
-        ):
-            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
-            raise errors.ErrorResponse(response_data, http_res)
-        if utils.match_response(http_res, ["500", "503"], "application/json"):
-            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
-            raise errors.ErrorResponse(response_data, http_res)
-        if utils.match_response(http_res, "4XX", "*"):
-            http_res_text = utils.stream_to_text(http_res)
-            raise errors.SDKError("API error occurred", http_res, http_res_text)
-        if utils.match_response(http_res, "5XX", "*"):
-            http_res_text = utils.stream_to_text(http_res)
-            raise errors.SDKError("API error occurred", http_res, http_res_text)
-
-        raise errors.SDKError("Unexpected response received", http_res)
-
-    async def get_column_properties_async(
-        self,
-        *,
-        request: Union[
-            models.GetColumnPropertiesRequest,
-            models.GetColumnPropertiesRequestTypedDict,
-        ],
-        retries: OptionalNullable[utils.RetryConfig] = UNSET,
-        server_url: Optional[str] = None,
-        timeout_ms: Optional[int] = None,
-        http_headers: Optional[Mapping[str, str]] = None,
-    ) -> Optional[models.GetColumnPropertiesResponse]:
-        r"""Retrieve table column properties
-
-        Returns a [`ColumnPropertiesListResult`](ref:content#columnpropertieslistresult) for a table
-
-
-        :param request: The request object to send.
-        :param retries: Override the default retry configuration for this method
-        :param server_url: Override the default server URL for this method
-        :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
-        :param http_headers: Additional headers to set or replace on requests.
-        """
-        base_url = None
-        url_variables = None
-        if timeout_ms is None:
-            timeout_ms = self.sdk_configuration.timeout_ms
-
-        if server_url is not None:
-            base_url = server_url
-        else:
-            base_url = self._get_url(base_url, url_variables)
-
-        if not isinstance(request, BaseModel):
-            request = utils.unmarshal(request, models.GetColumnPropertiesRequest)
-        request = cast(models.GetColumnPropertiesRequest, request)
-
-        req = self._build_request_async(
-            method="GET",
-            path="/content/tables/{tableId}/properties/columns",
-            base_url=base_url,
-            url_variables=url_variables,
-            request=request,
-            request_body_required=False,
-            request_has_path_params=True,
-            request_has_query_params=True,
-            user_agent_header="user-agent",
-            accept_header_value="application/json",
-            http_headers=http_headers,
-            security=self.sdk_configuration.security,
-            allow_empty_value=None,
-            timeout_ms=timeout_ms,
-        )
-
-        if retries == UNSET:
-            if self.sdk_configuration.retry_config is not UNSET:
-                retries = self.sdk_configuration.retry_config
-
-        retry_config = None
-        if isinstance(retries, utils.RetryConfig):
-            retry_config = (retries, ["429", "500", "502", "503", "504"])
-
-        http_res = await self.do_request_async(
-            hook_ctx=HookContext(
-                config=self.sdk_configuration,
-                base_url=base_url or "",
-                operation_id="getColumnProperties",
-                oauth2_scopes=["file:read"],
-                security_source=self.sdk_configuration.security,
-            ),
-            request=req,
-            error_status_codes=[
-                "400",
-                "401",
-                "403",
-                "404",
-                "409",
-                "429",
-                "4XX",
-                "500",
-                "503",
-                "5XX",
-            ],
-            retry_config=retry_config,
-        )
-
-        def next_func() -> Awaitable[Optional[models.GetColumnPropertiesResponse]]:
-            body = utils.unmarshal_json(http_res.text, Union[Dict[Any, Any], List[Any]])
-
-            async def empty_result():
-                return None
-
-            next_cursor = JSONPath("$['@nextLink']").parse(body)
-
-            if len(next_cursor) == 0:
-                return empty_result()
-
-            next_cursor = next_cursor[0]
-            if next_cursor is None or str(next_cursor).strip() == "":
-                return empty_result()
-
-            return self.get_column_properties_async(
-                request=models.GetColumnPropertiesRequest(
-                    table_id=request.table_id,
-                    maxpagesize=request.maxpagesize,
-                    next=request.next,
-                    revision=request.revision,
-                    start_column=request.start_column,
-                    stop_column=request.stop_column,
-                ),
-                retries=retries,
-            )
-
-        response_data: Any = None
-        if utils.match_response(http_res, "200", "application/json"):
-            return models.GetColumnPropertiesResponse(
-                result=unmarshal_json_response(
-                    models.ColumnPropertiesListResult, http_res
-                ),
-                next=next_func,
-            )
         if utils.match_response(
             http_res, ["400", "401", "403", "404", "409", "429"], "application/json"
         ):
@@ -927,24 +432,27 @@ class Content(BaseSDK):
 
         raise errors.SDKError("Unexpected response received", http_res)
 
-    def get_drawing_anchor_by_id(
+    def destination_link_source_conversion(
         self,
         *,
-        anchor_id: str,
-        drawing_id: str,
-        revision: Optional[str] = None,
+        destination_link_id: str,
         retries: OptionalNullable[utils.RetryConfig] = UNSET,
         server_url: Optional[str] = None,
         timeout_ms: Optional[int] = None,
         http_headers: Optional[Mapping[str, str]] = None,
-    ) -> models.Anchor:
-        r"""Retrieve a drawing anchor by ID
+    ) -> models.DestinationLinkSourceConversionResponse:
+        r"""Initiate a destination link conversion
 
-        Returns an [`Anchor`](ref:content#anchor) given its id.
+        Converts a destination link into a source link. The previous source, if any, will be converted into a destination link.
 
-        :param anchor_id: The unique identifier of the anchor
-        :param drawing_id: The unique identifier of a drawing
-        :param revision: Returns resources at a specific revision
+        Responses include a `Location` header, which indicates where to poll for results. For more details on long-running
+        job polling, see [Operations endpoint](ref:getoperationbyid). When the source conversion
+        completes, its status will be `completed`, and the response body includes a `resourceURL`. For more details on the `resourceURL`
+        see [operation results endpoint](ref:getdestinationlinksourceconversionresults).
+        For more details, see [Authentication documentation](ref:authentication).
+
+
+        :param destination_link_id: The unique identifier of the destination link
         :param retries: Override the default retry configuration for this method
         :param server_url: Override the default server URL for this method
         :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
@@ -960,15 +468,13 @@ class Content(BaseSDK):
         else:
             base_url = self._get_url(base_url, url_variables)
 
-        request = models.GetDrawingAnchorByIDRequest(
-            anchor_id=anchor_id,
-            drawing_id=drawing_id,
-            revision=revision,
+        request = models.DestinationLinkSourceConversionRequest(
+            destination_link_id=destination_link_id,
         )
 
         req = self._build_request(
-            method="GET",
-            path="/content/drawings/{drawingId}/anchors/{anchorId}",
+            method="POST",
+            path="/content/destinationLinks/{destinationLinkId}/sourceConversion",
             base_url=base_url,
             url_variables=url_variables,
             request=request,
@@ -995,8 +501,8 @@ class Content(BaseSDK):
             hook_ctx=HookContext(
                 config=self.sdk_configuration,
                 base_url=base_url or "",
-                operation_id="getDrawingAnchorById",
-                oauth2_scopes=["file:read"],
+                operation_id="destinationLinkSourceConversion",
+                oauth2_scopes=["file:write"],
                 security_source=self.sdk_configuration.security,
             ),
             request=req,
@@ -1016,8 +522,10 @@ class Content(BaseSDK):
         )
 
         response_data: Any = None
-        if utils.match_response(http_res, "200", "application/json"):
-            return unmarshal_json_response(models.Anchor, http_res)
+        if utils.match_response(http_res, "202", "*"):
+            return models.DestinationLinkSourceConversionResponse(
+                headers=utils.get_response_headers(http_res.headers)
+            )
         if utils.match_response(
             http_res, ["400", "401", "403", "404", "409", "429"], "application/json"
         ):
@@ -1035,24 +543,27 @@ class Content(BaseSDK):
 
         raise errors.SDKError("Unexpected response received", http_res)
 
-    async def get_drawing_anchor_by_id_async(
+    async def destination_link_source_conversion_async(
         self,
         *,
-        anchor_id: str,
-        drawing_id: str,
-        revision: Optional[str] = None,
+        destination_link_id: str,
         retries: OptionalNullable[utils.RetryConfig] = UNSET,
         server_url: Optional[str] = None,
         timeout_ms: Optional[int] = None,
         http_headers: Optional[Mapping[str, str]] = None,
-    ) -> models.Anchor:
-        r"""Retrieve a drawing anchor by ID
+    ) -> models.DestinationLinkSourceConversionResponse:
+        r"""Initiate a destination link conversion
 
-        Returns an [`Anchor`](ref:content#anchor) given its id.
+        Converts a destination link into a source link. The previous source, if any, will be converted into a destination link.
 
-        :param anchor_id: The unique identifier of the anchor
-        :param drawing_id: The unique identifier of a drawing
-        :param revision: Returns resources at a specific revision
+        Responses include a `Location` header, which indicates where to poll for results. For more details on long-running
+        job polling, see [Operations endpoint](ref:getoperationbyid). When the source conversion
+        completes, its status will be `completed`, and the response body includes a `resourceURL`. For more details on the `resourceURL`
+        see [operation results endpoint](ref:getdestinationlinksourceconversionresults).
+        For more details, see [Authentication documentation](ref:authentication).
+
+
+        :param destination_link_id: The unique identifier of the destination link
         :param retries: Override the default retry configuration for this method
         :param server_url: Override the default server URL for this method
         :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
@@ -1068,15 +579,13 @@ class Content(BaseSDK):
         else:
             base_url = self._get_url(base_url, url_variables)
 
-        request = models.GetDrawingAnchorByIDRequest(
-            anchor_id=anchor_id,
-            drawing_id=drawing_id,
-            revision=revision,
+        request = models.DestinationLinkSourceConversionRequest(
+            destination_link_id=destination_link_id,
         )
 
         req = self._build_request_async(
-            method="GET",
-            path="/content/drawings/{drawingId}/anchors/{anchorId}",
+            method="POST",
+            path="/content/destinationLinks/{destinationLinkId}/sourceConversion",
             base_url=base_url,
             url_variables=url_variables,
             request=request,
@@ -1103,8 +612,8 @@ class Content(BaseSDK):
             hook_ctx=HookContext(
                 config=self.sdk_configuration,
                 base_url=base_url or "",
-                operation_id="getDrawingAnchorById",
-                oauth2_scopes=["file:read"],
+                operation_id="destinationLinkSourceConversion",
+                oauth2_scopes=["file:write"],
                 security_source=self.sdk_configuration.security,
             ),
             request=req,
@@ -1124,8 +633,10 @@ class Content(BaseSDK):
         )
 
         response_data: Any = None
-        if utils.match_response(http_res, "200", "application/json"):
-            return unmarshal_json_response(models.Anchor, http_res)
+        if utils.match_response(http_res, "202", "*"):
+            return models.DestinationLinkSourceConversionResponse(
+                headers=utils.get_response_headers(http_res.headers)
+            )
         if utils.match_response(
             http_res, ["400", "401", "403", "404", "409", "429"], "application/json"
         ):
@@ -1143,23 +654,26 @@ class Content(BaseSDK):
 
         raise errors.SDKError("Unexpected response received", http_res)
 
-    def get_drawing_anchor_extensions(
+    def get_drawing_elements_by_id(
         self,
         *,
-        request: Union[
-            models.GetDrawingAnchorExtensionsRequest,
-            models.GetDrawingAnchorExtensionsRequestTypedDict,
-        ],
+        drawing_id: str,
+        revision: Optional[str] = None,
+        maxpagesize: Optional[int] = 1000,
+        next: Optional[str] = None,
         retries: OptionalNullable[utils.RetryConfig] = UNSET,
         server_url: Optional[str] = None,
         timeout_ms: Optional[int] = None,
         http_headers: Optional[Mapping[str, str]] = None,
-    ) -> Optional[models.GetDrawingAnchorExtensionsResponse]:
-        r"""Retrieve a list of drawing anchor extensions
+    ) -> Optional[models.GetDrawingElementsByIDResponse]:
+        r"""Retrieve drawing elements by id
 
-        Returns a paginated list of [`AnchorExtensions`](ref:content#anchorextension) for a given anchorId.
+        Returns a [`DrawingElementListResult`](ref:content#drawingelementlistresult) given its id
 
-        :param request: The request object to send.
+        :param drawing_id: The unique identifier of a drawing
+        :param revision: Returns resources at a specific revision
+        :param maxpagesize: The maximum number of results to retrieve
+        :param next: Pagination cursor for next set of results.
         :param retries: Override the default retry configuration for this method
         :param server_url: Override the default server URL for this method
         :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
@@ -1175,13 +689,16 @@ class Content(BaseSDK):
         else:
             base_url = self._get_url(base_url, url_variables)
 
-        if not isinstance(request, BaseModel):
-            request = utils.unmarshal(request, models.GetDrawingAnchorExtensionsRequest)
-        request = cast(models.GetDrawingAnchorExtensionsRequest, request)
+        request = models.GetDrawingElementsByIDRequest(
+            drawing_id=drawing_id,
+            revision=revision,
+            maxpagesize=maxpagesize,
+            next=next,
+        )
 
         req = self._build_request(
             method="GET",
-            path="/content/drawings/{drawingId}/anchors/{anchorId}/extensions",
+            path="/content/drawings/{drawingId}/elements",
             base_url=base_url,
             url_variables=url_variables,
             request=request,
@@ -1208,7 +725,7 @@ class Content(BaseSDK):
             hook_ctx=HookContext(
                 config=self.sdk_configuration,
                 base_url=base_url or "",
-                operation_id="getDrawingAnchorExtensions",
+                operation_id="getDrawingElementsById",
                 oauth2_scopes=["file:read"],
                 security_source=self.sdk_configuration.security,
             ),
@@ -1228,7 +745,7 @@ class Content(BaseSDK):
             retry_config=retry_config,
         )
 
-        def next_func() -> Optional[models.GetDrawingAnchorExtensionsResponse]:
+        def next_func() -> Optional[models.GetDrawingElementsByIDResponse]:
             body = utils.unmarshal_json(http_res.text, Union[Dict[Any, Any], List[Any]])
 
             next_cursor = JSONPath("$['@nextLink']").parse(body)
@@ -1240,22 +757,19 @@ class Content(BaseSDK):
             if next_cursor is None or str(next_cursor).strip() == "":
                 return None
 
-            return self.get_drawing_anchor_extensions(
-                request=models.GetDrawingAnchorExtensionsRequest(
-                    anchor_id=request.anchor_id,
-                    drawing_id=request.drawing_id,
-                    maxpagesize=request.maxpagesize,
-                    next=request.next,
-                    revision=request.revision,
-                ),
+            return self.get_drawing_elements_by_id(
+                drawing_id=drawing_id,
+                revision=revision,
+                maxpagesize=maxpagesize,
+                next=next,
                 retries=retries,
             )
 
         response_data: Any = None
         if utils.match_response(http_res, "200", "application/json"):
-            return models.GetDrawingAnchorExtensionsResponse(
+            return models.GetDrawingElementsByIDResponse(
                 result=unmarshal_json_response(
-                    models.AnchorExtensionsListResult, http_res
+                    models.DrawingElementListResult, http_res
                 ),
                 next=next_func,
             )
@@ -1276,23 +790,26 @@ class Content(BaseSDK):
 
         raise errors.SDKError("Unexpected response received", http_res)
 
-    async def get_drawing_anchor_extensions_async(
+    async def get_drawing_elements_by_id_async(
         self,
         *,
-        request: Union[
-            models.GetDrawingAnchorExtensionsRequest,
-            models.GetDrawingAnchorExtensionsRequestTypedDict,
-        ],
+        drawing_id: str,
+        revision: Optional[str] = None,
+        maxpagesize: Optional[int] = 1000,
+        next: Optional[str] = None,
         retries: OptionalNullable[utils.RetryConfig] = UNSET,
         server_url: Optional[str] = None,
         timeout_ms: Optional[int] = None,
         http_headers: Optional[Mapping[str, str]] = None,
-    ) -> Optional[models.GetDrawingAnchorExtensionsResponse]:
-        r"""Retrieve a list of drawing anchor extensions
+    ) -> Optional[models.GetDrawingElementsByIDResponse]:
+        r"""Retrieve drawing elements by id
 
-        Returns a paginated list of [`AnchorExtensions`](ref:content#anchorextension) for a given anchorId.
+        Returns a [`DrawingElementListResult`](ref:content#drawingelementlistresult) given its id
 
-        :param request: The request object to send.
+        :param drawing_id: The unique identifier of a drawing
+        :param revision: Returns resources at a specific revision
+        :param maxpagesize: The maximum number of results to retrieve
+        :param next: Pagination cursor for next set of results.
         :param retries: Override the default retry configuration for this method
         :param server_url: Override the default server URL for this method
         :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
@@ -1308,13 +825,16 @@ class Content(BaseSDK):
         else:
             base_url = self._get_url(base_url, url_variables)
 
-        if not isinstance(request, BaseModel):
-            request = utils.unmarshal(request, models.GetDrawingAnchorExtensionsRequest)
-        request = cast(models.GetDrawingAnchorExtensionsRequest, request)
+        request = models.GetDrawingElementsByIDRequest(
+            drawing_id=drawing_id,
+            revision=revision,
+            maxpagesize=maxpagesize,
+            next=next,
+        )
 
         req = self._build_request_async(
             method="GET",
-            path="/content/drawings/{drawingId}/anchors/{anchorId}/extensions",
+            path="/content/drawings/{drawingId}/elements",
             base_url=base_url,
             url_variables=url_variables,
             request=request,
@@ -1341,7 +861,7 @@ class Content(BaseSDK):
             hook_ctx=HookContext(
                 config=self.sdk_configuration,
                 base_url=base_url or "",
-                operation_id="getDrawingAnchorExtensions",
+                operation_id="getDrawingElementsById",
                 oauth2_scopes=["file:read"],
                 security_source=self.sdk_configuration.security,
             ),
@@ -1361,9 +881,7 @@ class Content(BaseSDK):
             retry_config=retry_config,
         )
 
-        def next_func() -> (
-            Awaitable[Optional[models.GetDrawingAnchorExtensionsResponse]]
-        ):
+        def next_func() -> Awaitable[Optional[models.GetDrawingElementsByIDResponse]]:
             body = utils.unmarshal_json(http_res.text, Union[Dict[Any, Any], List[Any]])
 
             async def empty_result():
@@ -1378,22 +896,19 @@ class Content(BaseSDK):
             if next_cursor is None or str(next_cursor).strip() == "":
                 return empty_result()
 
-            return self.get_drawing_anchor_extensions_async(
-                request=models.GetDrawingAnchorExtensionsRequest(
-                    anchor_id=request.anchor_id,
-                    drawing_id=request.drawing_id,
-                    maxpagesize=request.maxpagesize,
-                    next=request.next,
-                    revision=request.revision,
-                ),
+            return self.get_drawing_elements_by_id_async(
+                drawing_id=drawing_id,
+                revision=revision,
+                maxpagesize=maxpagesize,
+                next=next,
                 retries=retries,
             )
 
         response_data: Any = None
         if utils.match_response(http_res, "200", "application/json"):
-            return models.GetDrawingAnchorExtensionsResponse(
+            return models.GetDrawingElementsByIDResponse(
                 result=unmarshal_json_response(
-                    models.AnchorExtensionsListResult, http_res
+                    models.DrawingElementListResult, http_res
                 ),
                 next=next_func,
             )
@@ -1685,1248 +1200,23 @@ class Content(BaseSDK):
 
         raise errors.SDKError("Unexpected response received", http_res)
 
-    def get_drawing_elements_by_id(
+    def get_drawing_anchor_by_id(
         self,
         *,
         drawing_id: str,
-        maxpagesize: Optional[int] = 1000,
-        next: Optional[str] = None,
-        revision: Optional[str] = None,
-        retries: OptionalNullable[utils.RetryConfig] = UNSET,
-        server_url: Optional[str] = None,
-        timeout_ms: Optional[int] = None,
-        http_headers: Optional[Mapping[str, str]] = None,
-    ) -> Optional[models.GetDrawingElementsByIDResponse]:
-        r"""Retrieve drawing elements by id
-
-        Returns a [`DrawingElementListResult`](ref:content#drawingelementlistresult) given its id
-
-        :param drawing_id: The unique identifier of a drawing
-        :param maxpagesize: The maximum number of results to retrieve
-        :param next: Pagination cursor for next set of results.
-        :param revision: Returns resources at a specific revision
-        :param retries: Override the default retry configuration for this method
-        :param server_url: Override the default server URL for this method
-        :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
-        :param http_headers: Additional headers to set or replace on requests.
-        """
-        base_url = None
-        url_variables = None
-        if timeout_ms is None:
-            timeout_ms = self.sdk_configuration.timeout_ms
-
-        if server_url is not None:
-            base_url = server_url
-        else:
-            base_url = self._get_url(base_url, url_variables)
-
-        request = models.GetDrawingElementsByIDRequest(
-            drawing_id=drawing_id,
-            maxpagesize=maxpagesize,
-            next=next,
-            revision=revision,
-        )
-
-        req = self._build_request(
-            method="GET",
-            path="/content/drawings/{drawingId}/elements",
-            base_url=base_url,
-            url_variables=url_variables,
-            request=request,
-            request_body_required=False,
-            request_has_path_params=True,
-            request_has_query_params=True,
-            user_agent_header="user-agent",
-            accept_header_value="application/json",
-            http_headers=http_headers,
-            security=self.sdk_configuration.security,
-            allow_empty_value=None,
-            timeout_ms=timeout_ms,
-        )
-
-        if retries == UNSET:
-            if self.sdk_configuration.retry_config is not UNSET:
-                retries = self.sdk_configuration.retry_config
-
-        retry_config = None
-        if isinstance(retries, utils.RetryConfig):
-            retry_config = (retries, ["429", "500", "502", "503", "504"])
-
-        http_res = self.do_request(
-            hook_ctx=HookContext(
-                config=self.sdk_configuration,
-                base_url=base_url or "",
-                operation_id="getDrawingElementsById",
-                oauth2_scopes=["file:read"],
-                security_source=self.sdk_configuration.security,
-            ),
-            request=req,
-            error_status_codes=[
-                "400",
-                "401",
-                "403",
-                "404",
-                "409",
-                "429",
-                "4XX",
-                "500",
-                "503",
-                "5XX",
-            ],
-            retry_config=retry_config,
-        )
-
-        def next_func() -> Optional[models.GetDrawingElementsByIDResponse]:
-            body = utils.unmarshal_json(http_res.text, Union[Dict[Any, Any], List[Any]])
-
-            next_cursor = JSONPath("$['@nextLink']").parse(body)
-
-            if len(next_cursor) == 0:
-                return None
-
-            next_cursor = next_cursor[0]
-            if next_cursor is None or str(next_cursor).strip() == "":
-                return None
-
-            return self.get_drawing_elements_by_id(
-                drawing_id=drawing_id,
-                maxpagesize=maxpagesize,
-                next=next,
-                revision=revision,
-                retries=retries,
-            )
-
-        response_data: Any = None
-        if utils.match_response(http_res, "200", "application/json"):
-            return models.GetDrawingElementsByIDResponse(
-                result=unmarshal_json_response(
-                    models.DrawingElementListResult, http_res
-                ),
-                next=next_func,
-            )
-        if utils.match_response(
-            http_res, ["400", "401", "403", "404", "409", "429"], "application/json"
-        ):
-            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
-            raise errors.ErrorResponse(response_data, http_res)
-        if utils.match_response(http_res, ["500", "503"], "application/json"):
-            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
-            raise errors.ErrorResponse(response_data, http_res)
-        if utils.match_response(http_res, "4XX", "*"):
-            http_res_text = utils.stream_to_text(http_res)
-            raise errors.SDKError("API error occurred", http_res, http_res_text)
-        if utils.match_response(http_res, "5XX", "*"):
-            http_res_text = utils.stream_to_text(http_res)
-            raise errors.SDKError("API error occurred", http_res, http_res_text)
-
-        raise errors.SDKError("Unexpected response received", http_res)
-
-    async def get_drawing_elements_by_id_async(
-        self,
-        *,
-        drawing_id: str,
-        maxpagesize: Optional[int] = 1000,
-        next: Optional[str] = None,
-        revision: Optional[str] = None,
-        retries: OptionalNullable[utils.RetryConfig] = UNSET,
-        server_url: Optional[str] = None,
-        timeout_ms: Optional[int] = None,
-        http_headers: Optional[Mapping[str, str]] = None,
-    ) -> Optional[models.GetDrawingElementsByIDResponse]:
-        r"""Retrieve drawing elements by id
-
-        Returns a [`DrawingElementListResult`](ref:content#drawingelementlistresult) given its id
-
-        :param drawing_id: The unique identifier of a drawing
-        :param maxpagesize: The maximum number of results to retrieve
-        :param next: Pagination cursor for next set of results.
-        :param revision: Returns resources at a specific revision
-        :param retries: Override the default retry configuration for this method
-        :param server_url: Override the default server URL for this method
-        :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
-        :param http_headers: Additional headers to set or replace on requests.
-        """
-        base_url = None
-        url_variables = None
-        if timeout_ms is None:
-            timeout_ms = self.sdk_configuration.timeout_ms
-
-        if server_url is not None:
-            base_url = server_url
-        else:
-            base_url = self._get_url(base_url, url_variables)
-
-        request = models.GetDrawingElementsByIDRequest(
-            drawing_id=drawing_id,
-            maxpagesize=maxpagesize,
-            next=next,
-            revision=revision,
-        )
-
-        req = self._build_request_async(
-            method="GET",
-            path="/content/drawings/{drawingId}/elements",
-            base_url=base_url,
-            url_variables=url_variables,
-            request=request,
-            request_body_required=False,
-            request_has_path_params=True,
-            request_has_query_params=True,
-            user_agent_header="user-agent",
-            accept_header_value="application/json",
-            http_headers=http_headers,
-            security=self.sdk_configuration.security,
-            allow_empty_value=None,
-            timeout_ms=timeout_ms,
-        )
-
-        if retries == UNSET:
-            if self.sdk_configuration.retry_config is not UNSET:
-                retries = self.sdk_configuration.retry_config
-
-        retry_config = None
-        if isinstance(retries, utils.RetryConfig):
-            retry_config = (retries, ["429", "500", "502", "503", "504"])
-
-        http_res = await self.do_request_async(
-            hook_ctx=HookContext(
-                config=self.sdk_configuration,
-                base_url=base_url or "",
-                operation_id="getDrawingElementsById",
-                oauth2_scopes=["file:read"],
-                security_source=self.sdk_configuration.security,
-            ),
-            request=req,
-            error_status_codes=[
-                "400",
-                "401",
-                "403",
-                "404",
-                "409",
-                "429",
-                "4XX",
-                "500",
-                "503",
-                "5XX",
-            ],
-            retry_config=retry_config,
-        )
-
-        def next_func() -> Awaitable[Optional[models.GetDrawingElementsByIDResponse]]:
-            body = utils.unmarshal_json(http_res.text, Union[Dict[Any, Any], List[Any]])
-
-            async def empty_result():
-                return None
-
-            next_cursor = JSONPath("$['@nextLink']").parse(body)
-
-            if len(next_cursor) == 0:
-                return empty_result()
-
-            next_cursor = next_cursor[0]
-            if next_cursor is None or str(next_cursor).strip() == "":
-                return empty_result()
-
-            return self.get_drawing_elements_by_id_async(
-                drawing_id=drawing_id,
-                maxpagesize=maxpagesize,
-                next=next,
-                revision=revision,
-                retries=retries,
-            )
-
-        response_data: Any = None
-        if utils.match_response(http_res, "200", "application/json"):
-            return models.GetDrawingElementsByIDResponse(
-                result=unmarshal_json_response(
-                    models.DrawingElementListResult, http_res
-                ),
-                next=next_func,
-            )
-        if utils.match_response(
-            http_res, ["400", "401", "403", "404", "409", "429"], "application/json"
-        ):
-            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
-            raise errors.ErrorResponse(response_data, http_res)
-        if utils.match_response(http_res, ["500", "503"], "application/json"):
-            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
-            raise errors.ErrorResponse(response_data, http_res)
-        if utils.match_response(http_res, "4XX", "*"):
-            http_res_text = await utils.stream_to_text_async(http_res)
-            raise errors.SDKError("API error occurred", http_res, http_res_text)
-        if utils.match_response(http_res, "5XX", "*"):
-            http_res_text = await utils.stream_to_text_async(http_res)
-            raise errors.SDKError("API error occurred", http_res, http_res_text)
-
-        raise errors.SDKError("Unexpected response received", http_res)
-
-    def get_image_by_id(
-        self,
-        *,
-        image_id: str,
-        retries: OptionalNullable[utils.RetryConfig] = UNSET,
-        server_url: Optional[str] = None,
-        timeout_ms: Optional[int] = None,
-        http_headers: Optional[Mapping[str, str]] = None,
-    ) -> models.Image:
-        r"""Retrieve an image by id
-
-        Returns a [`Image`](ref:content#image) given its id
-
-        :param image_id: The unique identifier of the image
-        :param retries: Override the default retry configuration for this method
-        :param server_url: Override the default server URL for this method
-        :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
-        :param http_headers: Additional headers to set or replace on requests.
-        """
-        base_url = None
-        url_variables = None
-        if timeout_ms is None:
-            timeout_ms = self.sdk_configuration.timeout_ms
-
-        if server_url is not None:
-            base_url = server_url
-        else:
-            base_url = self._get_url(base_url, url_variables)
-
-        request = models.GetImageByIDRequest(
-            image_id=image_id,
-        )
-
-        req = self._build_request(
-            method="GET",
-            path="/content/images/{imageId}",
-            base_url=base_url,
-            url_variables=url_variables,
-            request=request,
-            request_body_required=False,
-            request_has_path_params=True,
-            request_has_query_params=True,
-            user_agent_header="user-agent",
-            accept_header_value="application/json",
-            http_headers=http_headers,
-            security=self.sdk_configuration.security,
-            allow_empty_value=None,
-            timeout_ms=timeout_ms,
-        )
-
-        if retries == UNSET:
-            if self.sdk_configuration.retry_config is not UNSET:
-                retries = self.sdk_configuration.retry_config
-
-        retry_config = None
-        if isinstance(retries, utils.RetryConfig):
-            retry_config = (retries, ["429", "500", "502", "503", "504"])
-
-        http_res = self.do_request(
-            hook_ctx=HookContext(
-                config=self.sdk_configuration,
-                base_url=base_url or "",
-                operation_id="getImageById",
-                oauth2_scopes=["file:read"],
-                security_source=self.sdk_configuration.security,
-            ),
-            request=req,
-            error_status_codes=[
-                "400",
-                "401",
-                "403",
-                "404",
-                "409",
-                "429",
-                "4XX",
-                "500",
-                "503",
-                "5XX",
-            ],
-            retry_config=retry_config,
-        )
-
-        response_data: Any = None
-        if utils.match_response(http_res, "200", "application/json"):
-            return unmarshal_json_response(models.Image, http_res)
-        if utils.match_response(
-            http_res, ["400", "401", "403", "404", "409", "429"], "application/json"
-        ):
-            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
-            raise errors.ErrorResponse(response_data, http_res)
-        if utils.match_response(http_res, ["500", "503"], "application/json"):
-            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
-            raise errors.ErrorResponse(response_data, http_res)
-        if utils.match_response(http_res, "4XX", "*"):
-            http_res_text = utils.stream_to_text(http_res)
-            raise errors.SDKError("API error occurred", http_res, http_res_text)
-        if utils.match_response(http_res, "5XX", "*"):
-            http_res_text = utils.stream_to_text(http_res)
-            raise errors.SDKError("API error occurred", http_res, http_res_text)
-
-        raise errors.SDKError("Unexpected response received", http_res)
-
-    async def get_image_by_id_async(
-        self,
-        *,
-        image_id: str,
-        retries: OptionalNullable[utils.RetryConfig] = UNSET,
-        server_url: Optional[str] = None,
-        timeout_ms: Optional[int] = None,
-        http_headers: Optional[Mapping[str, str]] = None,
-    ) -> models.Image:
-        r"""Retrieve an image by id
-
-        Returns a [`Image`](ref:content#image) given its id
-
-        :param image_id: The unique identifier of the image
-        :param retries: Override the default retry configuration for this method
-        :param server_url: Override the default server URL for this method
-        :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
-        :param http_headers: Additional headers to set or replace on requests.
-        """
-        base_url = None
-        url_variables = None
-        if timeout_ms is None:
-            timeout_ms = self.sdk_configuration.timeout_ms
-
-        if server_url is not None:
-            base_url = server_url
-        else:
-            base_url = self._get_url(base_url, url_variables)
-
-        request = models.GetImageByIDRequest(
-            image_id=image_id,
-        )
-
-        req = self._build_request_async(
-            method="GET",
-            path="/content/images/{imageId}",
-            base_url=base_url,
-            url_variables=url_variables,
-            request=request,
-            request_body_required=False,
-            request_has_path_params=True,
-            request_has_query_params=True,
-            user_agent_header="user-agent",
-            accept_header_value="application/json",
-            http_headers=http_headers,
-            security=self.sdk_configuration.security,
-            allow_empty_value=None,
-            timeout_ms=timeout_ms,
-        )
-
-        if retries == UNSET:
-            if self.sdk_configuration.retry_config is not UNSET:
-                retries = self.sdk_configuration.retry_config
-
-        retry_config = None
-        if isinstance(retries, utils.RetryConfig):
-            retry_config = (retries, ["429", "500", "502", "503", "504"])
-
-        http_res = await self.do_request_async(
-            hook_ctx=HookContext(
-                config=self.sdk_configuration,
-                base_url=base_url or "",
-                operation_id="getImageById",
-                oauth2_scopes=["file:read"],
-                security_source=self.sdk_configuration.security,
-            ),
-            request=req,
-            error_status_codes=[
-                "400",
-                "401",
-                "403",
-                "404",
-                "409",
-                "429",
-                "4XX",
-                "500",
-                "503",
-                "5XX",
-            ],
-            retry_config=retry_config,
-        )
-
-        response_data: Any = None
-        if utils.match_response(http_res, "200", "application/json"):
-            return unmarshal_json_response(models.Image, http_res)
-        if utils.match_response(
-            http_res, ["400", "401", "403", "404", "409", "429"], "application/json"
-        ):
-            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
-            raise errors.ErrorResponse(response_data, http_res)
-        if utils.match_response(http_res, ["500", "503"], "application/json"):
-            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
-            raise errors.ErrorResponse(response_data, http_res)
-        if utils.match_response(http_res, "4XX", "*"):
-            http_res_text = await utils.stream_to_text_async(http_res)
-            raise errors.SDKError("API error occurred", http_res, http_res_text)
-        if utils.match_response(http_res, "5XX", "*"):
-            http_res_text = await utils.stream_to_text_async(http_res)
-            raise errors.SDKError("API error occurred", http_res, http_res_text)
-
-        raise errors.SDKError("Unexpected response received", http_res)
-
-    def get_range_link_by_id(
-        self,
-        *,
-        range_link_id: str,
-        table_id: str,
-        revision: Optional[str] = None,
-        retries: OptionalNullable[utils.RetryConfig] = UNSET,
-        server_url: Optional[str] = None,
-        timeout_ms: Optional[int] = None,
-        http_headers: Optional[Mapping[str, str]] = None,
-    ) -> models.RangeLink:
-        r"""Retrieve a range link by id
-
-        Returns a [`RangeLink`](ref:content#rangelink) given its id
-
-        :param range_link_id: The unique identifier of a range link.
-        :param table_id: The unique identifier for the table
-        :param revision: Returns resources at a specific revision
-        :param retries: Override the default retry configuration for this method
-        :param server_url: Override the default server URL for this method
-        :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
-        :param http_headers: Additional headers to set or replace on requests.
-        """
-        base_url = None
-        url_variables = None
-        if timeout_ms is None:
-            timeout_ms = self.sdk_configuration.timeout_ms
-
-        if server_url is not None:
-            base_url = server_url
-        else:
-            base_url = self._get_url(base_url, url_variables)
-
-        request = models.GetRangeLinkByIDRequest(
-            range_link_id=range_link_id,
-            revision=revision,
-            table_id=table_id,
-        )
-
-        req = self._build_request(
-            method="GET",
-            path="/content/tables/{tableId}/rangeLinks/{rangeLinkId}",
-            base_url=base_url,
-            url_variables=url_variables,
-            request=request,
-            request_body_required=False,
-            request_has_path_params=True,
-            request_has_query_params=True,
-            user_agent_header="user-agent",
-            accept_header_value="application/json",
-            http_headers=http_headers,
-            security=self.sdk_configuration.security,
-            allow_empty_value=None,
-            timeout_ms=timeout_ms,
-        )
-
-        if retries == UNSET:
-            if self.sdk_configuration.retry_config is not UNSET:
-                retries = self.sdk_configuration.retry_config
-
-        retry_config = None
-        if isinstance(retries, utils.RetryConfig):
-            retry_config = (retries, ["429", "500", "502", "503", "504"])
-
-        http_res = self.do_request(
-            hook_ctx=HookContext(
-                config=self.sdk_configuration,
-                base_url=base_url or "",
-                operation_id="getRangeLinkById",
-                oauth2_scopes=["file:read"],
-                security_source=self.sdk_configuration.security,
-            ),
-            request=req,
-            error_status_codes=[
-                "400",
-                "401",
-                "403",
-                "404",
-                "429",
-                "4XX",
-                "500",
-                "503",
-                "5XX",
-            ],
-            retry_config=retry_config,
-        )
-
-        response_data: Any = None
-        if utils.match_response(http_res, "200", "application/json"):
-            return unmarshal_json_response(models.RangeLink, http_res)
-        if utils.match_response(
-            http_res, ["400", "401", "403", "404", "429"], "application/json"
-        ):
-            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
-            raise errors.ErrorResponse(response_data, http_res)
-        if utils.match_response(http_res, ["500", "503"], "application/json"):
-            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
-            raise errors.ErrorResponse(response_data, http_res)
-        if utils.match_response(http_res, "4XX", "*"):
-            http_res_text = utils.stream_to_text(http_res)
-            raise errors.SDKError("API error occurred", http_res, http_res_text)
-        if utils.match_response(http_res, "5XX", "*"):
-            http_res_text = utils.stream_to_text(http_res)
-            raise errors.SDKError("API error occurred", http_res, http_res_text)
-
-        raise errors.SDKError("Unexpected response received", http_res)
-
-    async def get_range_link_by_id_async(
-        self,
-        *,
-        range_link_id: str,
-        table_id: str,
-        revision: Optional[str] = None,
-        retries: OptionalNullable[utils.RetryConfig] = UNSET,
-        server_url: Optional[str] = None,
-        timeout_ms: Optional[int] = None,
-        http_headers: Optional[Mapping[str, str]] = None,
-    ) -> models.RangeLink:
-        r"""Retrieve a range link by id
-
-        Returns a [`RangeLink`](ref:content#rangelink) given its id
-
-        :param range_link_id: The unique identifier of a range link.
-        :param table_id: The unique identifier for the table
-        :param revision: Returns resources at a specific revision
-        :param retries: Override the default retry configuration for this method
-        :param server_url: Override the default server URL for this method
-        :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
-        :param http_headers: Additional headers to set or replace on requests.
-        """
-        base_url = None
-        url_variables = None
-        if timeout_ms is None:
-            timeout_ms = self.sdk_configuration.timeout_ms
-
-        if server_url is not None:
-            base_url = server_url
-        else:
-            base_url = self._get_url(base_url, url_variables)
-
-        request = models.GetRangeLinkByIDRequest(
-            range_link_id=range_link_id,
-            revision=revision,
-            table_id=table_id,
-        )
-
-        req = self._build_request_async(
-            method="GET",
-            path="/content/tables/{tableId}/rangeLinks/{rangeLinkId}",
-            base_url=base_url,
-            url_variables=url_variables,
-            request=request,
-            request_body_required=False,
-            request_has_path_params=True,
-            request_has_query_params=True,
-            user_agent_header="user-agent",
-            accept_header_value="application/json",
-            http_headers=http_headers,
-            security=self.sdk_configuration.security,
-            allow_empty_value=None,
-            timeout_ms=timeout_ms,
-        )
-
-        if retries == UNSET:
-            if self.sdk_configuration.retry_config is not UNSET:
-                retries = self.sdk_configuration.retry_config
-
-        retry_config = None
-        if isinstance(retries, utils.RetryConfig):
-            retry_config = (retries, ["429", "500", "502", "503", "504"])
-
-        http_res = await self.do_request_async(
-            hook_ctx=HookContext(
-                config=self.sdk_configuration,
-                base_url=base_url or "",
-                operation_id="getRangeLinkById",
-                oauth2_scopes=["file:read"],
-                security_source=self.sdk_configuration.security,
-            ),
-            request=req,
-            error_status_codes=[
-                "400",
-                "401",
-                "403",
-                "404",
-                "429",
-                "4XX",
-                "500",
-                "503",
-                "5XX",
-            ],
-            retry_config=retry_config,
-        )
-
-        response_data: Any = None
-        if utils.match_response(http_res, "200", "application/json"):
-            return unmarshal_json_response(models.RangeLink, http_res)
-        if utils.match_response(
-            http_res, ["400", "401", "403", "404", "429"], "application/json"
-        ):
-            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
-            raise errors.ErrorResponse(response_data, http_res)
-        if utils.match_response(http_res, ["500", "503"], "application/json"):
-            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
-            raise errors.ErrorResponse(response_data, http_res)
-        if utils.match_response(http_res, "4XX", "*"):
-            http_res_text = await utils.stream_to_text_async(http_res)
-            raise errors.SDKError("API error occurred", http_res, http_res_text)
-        if utils.match_response(http_res, "5XX", "*"):
-            http_res_text = await utils.stream_to_text_async(http_res)
-            raise errors.SDKError("API error occurred", http_res, http_res_text)
-
-        raise errors.SDKError("Unexpected response received", http_res)
-
-    def get_range_link_destinations(
-        self,
-        *,
-        request: Union[
-            models.GetRangeLinkDestinationsRequest,
-            models.GetRangeLinkDestinationsRequestTypedDict,
-        ],
-        retries: OptionalNullable[utils.RetryConfig] = UNSET,
-        server_url: Optional[str] = None,
-        timeout_ms: Optional[int] = None,
-        http_headers: Optional[Mapping[str, str]] = None,
-    ) -> Optional[models.GetRangeLinkDestinationsResponse]:
-        r"""Retrieve range link destinations for a source
-
-        Returns a [`RangeLinkListResult`](ref:content#rangelinklistresult) of destinations for a given source range link.
-
-        :param request: The request object to send.
-        :param retries: Override the default retry configuration for this method
-        :param server_url: Override the default server URL for this method
-        :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
-        :param http_headers: Additional headers to set or replace on requests.
-        """
-        base_url = None
-        url_variables = None
-        if timeout_ms is None:
-            timeout_ms = self.sdk_configuration.timeout_ms
-
-        if server_url is not None:
-            base_url = server_url
-        else:
-            base_url = self._get_url(base_url, url_variables)
-
-        if not isinstance(request, BaseModel):
-            request = utils.unmarshal(request, models.GetRangeLinkDestinationsRequest)
-        request = cast(models.GetRangeLinkDestinationsRequest, request)
-
-        req = self._build_request(
-            method="GET",
-            path="/content/tables/{tableId}/rangeLinks/{rangeLinkId}/destinations",
-            base_url=base_url,
-            url_variables=url_variables,
-            request=request,
-            request_body_required=False,
-            request_has_path_params=True,
-            request_has_query_params=True,
-            user_agent_header="user-agent",
-            accept_header_value="application/json",
-            http_headers=http_headers,
-            security=self.sdk_configuration.security,
-            allow_empty_value=None,
-            timeout_ms=timeout_ms,
-        )
-
-        if retries == UNSET:
-            if self.sdk_configuration.retry_config is not UNSET:
-                retries = self.sdk_configuration.retry_config
-
-        retry_config = None
-        if isinstance(retries, utils.RetryConfig):
-            retry_config = (retries, ["429", "500", "502", "503", "504"])
-
-        http_res = self.do_request(
-            hook_ctx=HookContext(
-                config=self.sdk_configuration,
-                base_url=base_url or "",
-                operation_id="getRangeLinkDestinations",
-                oauth2_scopes=["file:read"],
-                security_source=self.sdk_configuration.security,
-            ),
-            request=req,
-            error_status_codes=[
-                "400",
-                "401",
-                "403",
-                "404",
-                "429",
-                "4XX",
-                "500",
-                "503",
-                "5XX",
-            ],
-            retry_config=retry_config,
-        )
-
-        def next_func() -> Optional[models.GetRangeLinkDestinationsResponse]:
-            body = utils.unmarshal_json(http_res.text, Union[Dict[Any, Any], List[Any]])
-
-            next_cursor = JSONPath("$['@nextLink']").parse(body)
-
-            if len(next_cursor) == 0:
-                return None
-
-            next_cursor = next_cursor[0]
-            if next_cursor is None or str(next_cursor).strip() == "":
-                return None
-
-            return self.get_range_link_destinations(
-                request=models.GetRangeLinkDestinationsRequest(
-                    range_link_id=request.range_link_id,
-                    table_id=request.table_id,
-                    maxpagesize=request.maxpagesize,
-                    next=request.next,
-                    revision=request.revision,
-                ),
-                retries=retries,
-            )
-
-        response_data: Any = None
-        if utils.match_response(http_res, "200", "application/json"):
-            return models.GetRangeLinkDestinationsResponse(
-                result=unmarshal_json_response(models.RangeLinkListResult, http_res),
-                next=next_func,
-            )
-        if utils.match_response(
-            http_res, ["400", "401", "403", "404", "429"], "application/json"
-        ):
-            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
-            raise errors.ErrorResponse(response_data, http_res)
-        if utils.match_response(http_res, ["500", "503"], "application/json"):
-            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
-            raise errors.ErrorResponse(response_data, http_res)
-        if utils.match_response(http_res, "4XX", "*"):
-            http_res_text = utils.stream_to_text(http_res)
-            raise errors.SDKError("API error occurred", http_res, http_res_text)
-        if utils.match_response(http_res, "5XX", "*"):
-            http_res_text = utils.stream_to_text(http_res)
-            raise errors.SDKError("API error occurred", http_res, http_res_text)
-
-        raise errors.SDKError("Unexpected response received", http_res)
-
-    async def get_range_link_destinations_async(
-        self,
-        *,
-        request: Union[
-            models.GetRangeLinkDestinationsRequest,
-            models.GetRangeLinkDestinationsRequestTypedDict,
-        ],
-        retries: OptionalNullable[utils.RetryConfig] = UNSET,
-        server_url: Optional[str] = None,
-        timeout_ms: Optional[int] = None,
-        http_headers: Optional[Mapping[str, str]] = None,
-    ) -> Optional[models.GetRangeLinkDestinationsResponse]:
-        r"""Retrieve range link destinations for a source
-
-        Returns a [`RangeLinkListResult`](ref:content#rangelinklistresult) of destinations for a given source range link.
-
-        :param request: The request object to send.
-        :param retries: Override the default retry configuration for this method
-        :param server_url: Override the default server URL for this method
-        :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
-        :param http_headers: Additional headers to set or replace on requests.
-        """
-        base_url = None
-        url_variables = None
-        if timeout_ms is None:
-            timeout_ms = self.sdk_configuration.timeout_ms
-
-        if server_url is not None:
-            base_url = server_url
-        else:
-            base_url = self._get_url(base_url, url_variables)
-
-        if not isinstance(request, BaseModel):
-            request = utils.unmarshal(request, models.GetRangeLinkDestinationsRequest)
-        request = cast(models.GetRangeLinkDestinationsRequest, request)
-
-        req = self._build_request_async(
-            method="GET",
-            path="/content/tables/{tableId}/rangeLinks/{rangeLinkId}/destinations",
-            base_url=base_url,
-            url_variables=url_variables,
-            request=request,
-            request_body_required=False,
-            request_has_path_params=True,
-            request_has_query_params=True,
-            user_agent_header="user-agent",
-            accept_header_value="application/json",
-            http_headers=http_headers,
-            security=self.sdk_configuration.security,
-            allow_empty_value=None,
-            timeout_ms=timeout_ms,
-        )
-
-        if retries == UNSET:
-            if self.sdk_configuration.retry_config is not UNSET:
-                retries = self.sdk_configuration.retry_config
-
-        retry_config = None
-        if isinstance(retries, utils.RetryConfig):
-            retry_config = (retries, ["429", "500", "502", "503", "504"])
-
-        http_res = await self.do_request_async(
-            hook_ctx=HookContext(
-                config=self.sdk_configuration,
-                base_url=base_url or "",
-                operation_id="getRangeLinkDestinations",
-                oauth2_scopes=["file:read"],
-                security_source=self.sdk_configuration.security,
-            ),
-            request=req,
-            error_status_codes=[
-                "400",
-                "401",
-                "403",
-                "404",
-                "429",
-                "4XX",
-                "500",
-                "503",
-                "5XX",
-            ],
-            retry_config=retry_config,
-        )
-
-        def next_func() -> Awaitable[Optional[models.GetRangeLinkDestinationsResponse]]:
-            body = utils.unmarshal_json(http_res.text, Union[Dict[Any, Any], List[Any]])
-
-            async def empty_result():
-                return None
-
-            next_cursor = JSONPath("$['@nextLink']").parse(body)
-
-            if len(next_cursor) == 0:
-                return empty_result()
-
-            next_cursor = next_cursor[0]
-            if next_cursor is None or str(next_cursor).strip() == "":
-                return empty_result()
-
-            return self.get_range_link_destinations_async(
-                request=models.GetRangeLinkDestinationsRequest(
-                    range_link_id=request.range_link_id,
-                    table_id=request.table_id,
-                    maxpagesize=request.maxpagesize,
-                    next=request.next,
-                    revision=request.revision,
-                ),
-                retries=retries,
-            )
-
-        response_data: Any = None
-        if utils.match_response(http_res, "200", "application/json"):
-            return models.GetRangeLinkDestinationsResponse(
-                result=unmarshal_json_response(models.RangeLinkListResult, http_res),
-                next=next_func,
-            )
-        if utils.match_response(
-            http_res, ["400", "401", "403", "404", "429"], "application/json"
-        ):
-            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
-            raise errors.ErrorResponse(response_data, http_res)
-        if utils.match_response(http_res, ["500", "503"], "application/json"):
-            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
-            raise errors.ErrorResponse(response_data, http_res)
-        if utils.match_response(http_res, "4XX", "*"):
-            http_res_text = await utils.stream_to_text_async(http_res)
-            raise errors.SDKError("API error occurred", http_res, http_res_text)
-        if utils.match_response(http_res, "5XX", "*"):
-            http_res_text = await utils.stream_to_text_async(http_res)
-            raise errors.SDKError("API error occurred", http_res, http_res_text)
-
-        raise errors.SDKError("Unexpected response received", http_res)
-
-    def get_range_links(
-        self,
-        *,
-        table_id: str,
-        maxpagesize: Optional[int] = 1000,
-        next: Optional[str] = None,
-        revision: Optional[str] = None,
-        retries: OptionalNullable[utils.RetryConfig] = UNSET,
-        server_url: Optional[str] = None,
-        timeout_ms: Optional[int] = None,
-        http_headers: Optional[Mapping[str, str]] = None,
-    ) -> Optional[models.GetRangeLinksResponse]:
-        r"""Retrieve a list of range links
-
-        Returns a [`RangeLinkListResult`](ref:content#rangelinklistresult) for a given tableId.
-
-        :param table_id: The unique identifier for the table
-        :param maxpagesize: The maximum number of results to retrieve
-        :param next: Pagination cursor for next set of results.
-        :param revision: Returns resources at a specific revision
-        :param retries: Override the default retry configuration for this method
-        :param server_url: Override the default server URL for this method
-        :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
-        :param http_headers: Additional headers to set or replace on requests.
-        """
-        base_url = None
-        url_variables = None
-        if timeout_ms is None:
-            timeout_ms = self.sdk_configuration.timeout_ms
-
-        if server_url is not None:
-            base_url = server_url
-        else:
-            base_url = self._get_url(base_url, url_variables)
-
-        request = models.GetRangeLinksRequest(
-            maxpagesize=maxpagesize,
-            next=next,
-            revision=revision,
-            table_id=table_id,
-        )
-
-        req = self._build_request(
-            method="GET",
-            path="/content/tables/{tableId}/rangeLinks",
-            base_url=base_url,
-            url_variables=url_variables,
-            request=request,
-            request_body_required=False,
-            request_has_path_params=True,
-            request_has_query_params=True,
-            user_agent_header="user-agent",
-            accept_header_value="application/json",
-            http_headers=http_headers,
-            security=self.sdk_configuration.security,
-            allow_empty_value=None,
-            timeout_ms=timeout_ms,
-        )
-
-        if retries == UNSET:
-            if self.sdk_configuration.retry_config is not UNSET:
-                retries = self.sdk_configuration.retry_config
-
-        retry_config = None
-        if isinstance(retries, utils.RetryConfig):
-            retry_config = (retries, ["429", "500", "502", "503", "504"])
-
-        http_res = self.do_request(
-            hook_ctx=HookContext(
-                config=self.sdk_configuration,
-                base_url=base_url or "",
-                operation_id="getRangeLinks",
-                oauth2_scopes=["file:read"],
-                security_source=self.sdk_configuration.security,
-            ),
-            request=req,
-            error_status_codes=[
-                "400",
-                "401",
-                "403",
-                "404",
-                "429",
-                "4XX",
-                "500",
-                "503",
-                "5XX",
-            ],
-            retry_config=retry_config,
-        )
-
-        def next_func() -> Optional[models.GetRangeLinksResponse]:
-            body = utils.unmarshal_json(http_res.text, Union[Dict[Any, Any], List[Any]])
-
-            next_cursor = JSONPath("$['@nextLink']").parse(body)
-
-            if len(next_cursor) == 0:
-                return None
-
-            next_cursor = next_cursor[0]
-            if next_cursor is None or str(next_cursor).strip() == "":
-                return None
-
-            return self.get_range_links(
-                table_id=table_id,
-                maxpagesize=maxpagesize,
-                next=next,
-                revision=revision,
-                retries=retries,
-            )
-
-        response_data: Any = None
-        if utils.match_response(http_res, "200", "application/json"):
-            return models.GetRangeLinksResponse(
-                result=unmarshal_json_response(models.RangeLinkListResult, http_res),
-                next=next_func,
-            )
-        if utils.match_response(
-            http_res, ["400", "401", "403", "404", "429"], "application/json"
-        ):
-            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
-            raise errors.ErrorResponse(response_data, http_res)
-        if utils.match_response(http_res, ["500", "503"], "application/json"):
-            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
-            raise errors.ErrorResponse(response_data, http_res)
-        if utils.match_response(http_res, "4XX", "*"):
-            http_res_text = utils.stream_to_text(http_res)
-            raise errors.SDKError("API error occurred", http_res, http_res_text)
-        if utils.match_response(http_res, "5XX", "*"):
-            http_res_text = utils.stream_to_text(http_res)
-            raise errors.SDKError("API error occurred", http_res, http_res_text)
-
-        raise errors.SDKError("Unexpected response received", http_res)
-
-    async def get_range_links_async(
-        self,
-        *,
-        table_id: str,
-        maxpagesize: Optional[int] = 1000,
-        next: Optional[str] = None,
-        revision: Optional[str] = None,
-        retries: OptionalNullable[utils.RetryConfig] = UNSET,
-        server_url: Optional[str] = None,
-        timeout_ms: Optional[int] = None,
-        http_headers: Optional[Mapping[str, str]] = None,
-    ) -> Optional[models.GetRangeLinksResponse]:
-        r"""Retrieve a list of range links
-
-        Returns a [`RangeLinkListResult`](ref:content#rangelinklistresult) for a given tableId.
-
-        :param table_id: The unique identifier for the table
-        :param maxpagesize: The maximum number of results to retrieve
-        :param next: Pagination cursor for next set of results.
-        :param revision: Returns resources at a specific revision
-        :param retries: Override the default retry configuration for this method
-        :param server_url: Override the default server URL for this method
-        :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
-        :param http_headers: Additional headers to set or replace on requests.
-        """
-        base_url = None
-        url_variables = None
-        if timeout_ms is None:
-            timeout_ms = self.sdk_configuration.timeout_ms
-
-        if server_url is not None:
-            base_url = server_url
-        else:
-            base_url = self._get_url(base_url, url_variables)
-
-        request = models.GetRangeLinksRequest(
-            maxpagesize=maxpagesize,
-            next=next,
-            revision=revision,
-            table_id=table_id,
-        )
-
-        req = self._build_request_async(
-            method="GET",
-            path="/content/tables/{tableId}/rangeLinks",
-            base_url=base_url,
-            url_variables=url_variables,
-            request=request,
-            request_body_required=False,
-            request_has_path_params=True,
-            request_has_query_params=True,
-            user_agent_header="user-agent",
-            accept_header_value="application/json",
-            http_headers=http_headers,
-            security=self.sdk_configuration.security,
-            allow_empty_value=None,
-            timeout_ms=timeout_ms,
-        )
-
-        if retries == UNSET:
-            if self.sdk_configuration.retry_config is not UNSET:
-                retries = self.sdk_configuration.retry_config
-
-        retry_config = None
-        if isinstance(retries, utils.RetryConfig):
-            retry_config = (retries, ["429", "500", "502", "503", "504"])
-
-        http_res = await self.do_request_async(
-            hook_ctx=HookContext(
-                config=self.sdk_configuration,
-                base_url=base_url or "",
-                operation_id="getRangeLinks",
-                oauth2_scopes=["file:read"],
-                security_source=self.sdk_configuration.security,
-            ),
-            request=req,
-            error_status_codes=[
-                "400",
-                "401",
-                "403",
-                "404",
-                "429",
-                "4XX",
-                "500",
-                "503",
-                "5XX",
-            ],
-            retry_config=retry_config,
-        )
-
-        def next_func() -> Awaitable[Optional[models.GetRangeLinksResponse]]:
-            body = utils.unmarshal_json(http_res.text, Union[Dict[Any, Any], List[Any]])
-
-            async def empty_result():
-                return None
-
-            next_cursor = JSONPath("$['@nextLink']").parse(body)
-
-            if len(next_cursor) == 0:
-                return empty_result()
-
-            next_cursor = next_cursor[0]
-            if next_cursor is None or str(next_cursor).strip() == "":
-                return empty_result()
-
-            return self.get_range_links_async(
-                table_id=table_id,
-                maxpagesize=maxpagesize,
-                next=next,
-                revision=revision,
-                retries=retries,
-            )
-
-        response_data: Any = None
-        if utils.match_response(http_res, "200", "application/json"):
-            return models.GetRangeLinksResponse(
-                result=unmarshal_json_response(models.RangeLinkListResult, http_res),
-                next=next_func,
-            )
-        if utils.match_response(
-            http_res, ["400", "401", "403", "404", "429"], "application/json"
-        ):
-            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
-            raise errors.ErrorResponse(response_data, http_res)
-        if utils.match_response(http_res, ["500", "503"], "application/json"):
-            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
-            raise errors.ErrorResponse(response_data, http_res)
-        if utils.match_response(http_res, "4XX", "*"):
-            http_res_text = await utils.stream_to_text_async(http_res)
-            raise errors.SDKError("API error occurred", http_res, http_res_text)
-        if utils.match_response(http_res, "5XX", "*"):
-            http_res_text = await utils.stream_to_text_async(http_res)
-            raise errors.SDKError("API error occurred", http_res, http_res_text)
-
-        raise errors.SDKError("Unexpected response received", http_res)
-
-    def get_rich_text_anchor_by_id(
-        self,
-        *,
         anchor_id: str,
-        rich_text_id: str,
         revision: Optional[str] = None,
         retries: OptionalNullable[utils.RetryConfig] = UNSET,
         server_url: Optional[str] = None,
         timeout_ms: Optional[int] = None,
         http_headers: Optional[Mapping[str, str]] = None,
     ) -> models.Anchor:
-        r"""Retrieve a rich text anchor by id
+        r"""Retrieve a drawing anchor by ID
 
         Returns an [`Anchor`](ref:content#anchor) given its id.
 
+        :param drawing_id: The unique identifier of a drawing
         :param anchor_id: The unique identifier of the anchor
-        :param rich_text_id: The unique identifier of the rich text content
         :param revision: Returns resources at a specific revision
         :param retries: Override the default retry configuration for this method
         :param server_url: Override the default server URL for this method
@@ -2943,15 +1233,15 @@ class Content(BaseSDK):
         else:
             base_url = self._get_url(base_url, url_variables)
 
-        request = models.GetRichTextAnchorByIDRequest(
+        request = models.GetDrawingAnchorByIDRequest(
+            drawing_id=drawing_id,
             anchor_id=anchor_id,
             revision=revision,
-            rich_text_id=rich_text_id,
         )
 
         req = self._build_request(
             method="GET",
-            path="/content/richText/{richTextId}/anchors/{anchorId}",
+            path="/content/drawings/{drawingId}/anchors/{anchorId}",
             base_url=base_url,
             url_variables=url_variables,
             request=request,
@@ -2978,7 +1268,7 @@ class Content(BaseSDK):
             hook_ctx=HookContext(
                 config=self.sdk_configuration,
                 base_url=base_url or "",
-                operation_id="getRichTextAnchorById",
+                operation_id="getDrawingAnchorById",
                 oauth2_scopes=["file:read"],
                 security_source=self.sdk_configuration.security,
             ),
@@ -3018,23 +1308,23 @@ class Content(BaseSDK):
 
         raise errors.SDKError("Unexpected response received", http_res)
 
-    async def get_rich_text_anchor_by_id_async(
+    async def get_drawing_anchor_by_id_async(
         self,
         *,
+        drawing_id: str,
         anchor_id: str,
-        rich_text_id: str,
         revision: Optional[str] = None,
         retries: OptionalNullable[utils.RetryConfig] = UNSET,
         server_url: Optional[str] = None,
         timeout_ms: Optional[int] = None,
         http_headers: Optional[Mapping[str, str]] = None,
     ) -> models.Anchor:
-        r"""Retrieve a rich text anchor by id
+        r"""Retrieve a drawing anchor by ID
 
         Returns an [`Anchor`](ref:content#anchor) given its id.
 
+        :param drawing_id: The unique identifier of a drawing
         :param anchor_id: The unique identifier of the anchor
-        :param rich_text_id: The unique identifier of the rich text content
         :param revision: Returns resources at a specific revision
         :param retries: Override the default retry configuration for this method
         :param server_url: Override the default server URL for this method
@@ -3051,15 +1341,15 @@ class Content(BaseSDK):
         else:
             base_url = self._get_url(base_url, url_variables)
 
-        request = models.GetRichTextAnchorByIDRequest(
+        request = models.GetDrawingAnchorByIDRequest(
+            drawing_id=drawing_id,
             anchor_id=anchor_id,
             revision=revision,
-            rich_text_id=rich_text_id,
         )
 
         req = self._build_request_async(
             method="GET",
-            path="/content/richText/{richTextId}/anchors/{anchorId}",
+            path="/content/drawings/{drawingId}/anchors/{anchorId}",
             base_url=base_url,
             url_variables=url_variables,
             request=request,
@@ -3086,7 +1376,7 @@ class Content(BaseSDK):
             hook_ctx=HookContext(
                 config=self.sdk_configuration,
                 base_url=base_url or "",
-                operation_id="getRichTextAnchorById",
+                operation_id="getDrawingAnchorById",
                 oauth2_scopes=["file:read"],
                 security_source=self.sdk_configuration.security,
             ),
@@ -3126,19 +1416,19 @@ class Content(BaseSDK):
 
         raise errors.SDKError("Unexpected response received", http_res)
 
-    def get_rich_text_anchor_extensions(
+    def get_drawing_anchor_extensions(
         self,
         *,
         request: Union[
-            models.GetRichTextAnchorExtensionsRequest,
-            models.GetRichTextAnchorExtensionsRequestTypedDict,
+            models.GetDrawingAnchorExtensionsRequest,
+            models.GetDrawingAnchorExtensionsRequestTypedDict,
         ],
         retries: OptionalNullable[utils.RetryConfig] = UNSET,
         server_url: Optional[str] = None,
         timeout_ms: Optional[int] = None,
         http_headers: Optional[Mapping[str, str]] = None,
-    ) -> Optional[models.GetRichTextAnchorExtensionsResponse]:
-        r"""Retrieve a list of rich text anchor extensions
+    ) -> Optional[models.GetDrawingAnchorExtensionsResponse]:
+        r"""Retrieve a list of drawing anchor extensions
 
         Returns a paginated list of [`AnchorExtensions`](ref:content#anchorextension) for a given anchorId.
 
@@ -3159,14 +1449,12 @@ class Content(BaseSDK):
             base_url = self._get_url(base_url, url_variables)
 
         if not isinstance(request, BaseModel):
-            request = utils.unmarshal(
-                request, models.GetRichTextAnchorExtensionsRequest
-            )
-        request = cast(models.GetRichTextAnchorExtensionsRequest, request)
+            request = utils.unmarshal(request, models.GetDrawingAnchorExtensionsRequest)
+        request = cast(models.GetDrawingAnchorExtensionsRequest, request)
 
         req = self._build_request(
             method="GET",
-            path="/content/richText/{richTextId}/anchors/{anchorId}/extensions",
+            path="/content/drawings/{drawingId}/anchors/{anchorId}/extensions",
             base_url=base_url,
             url_variables=url_variables,
             request=request,
@@ -3193,7 +1481,7 @@ class Content(BaseSDK):
             hook_ctx=HookContext(
                 config=self.sdk_configuration,
                 base_url=base_url or "",
-                operation_id="getRichTextAnchorExtensions",
+                operation_id="getDrawingAnchorExtensions",
                 oauth2_scopes=["file:read"],
                 security_source=self.sdk_configuration.security,
             ),
@@ -3213,7 +1501,7 @@ class Content(BaseSDK):
             retry_config=retry_config,
         )
 
-        def next_func() -> Optional[models.GetRichTextAnchorExtensionsResponse]:
+        def next_func() -> Optional[models.GetDrawingAnchorExtensionsResponse]:
             body = utils.unmarshal_json(http_res.text, Union[Dict[Any, Any], List[Any]])
 
             next_cursor = JSONPath("$['@nextLink']").parse(body)
@@ -3225,10 +1513,10 @@ class Content(BaseSDK):
             if next_cursor is None or str(next_cursor).strip() == "":
                 return None
 
-            return self.get_rich_text_anchor_extensions(
-                request=models.GetRichTextAnchorExtensionsRequest(
+            return self.get_drawing_anchor_extensions(
+                request=models.GetDrawingAnchorExtensionsRequest(
+                    drawing_id=request.drawing_id,
                     anchor_id=request.anchor_id,
-                    rich_text_id=request.rich_text_id,
                     maxpagesize=request.maxpagesize,
                     next=request.next,
                     revision=request.revision,
@@ -3238,7 +1526,7 @@ class Content(BaseSDK):
 
         response_data: Any = None
         if utils.match_response(http_res, "200", "application/json"):
-            return models.GetRichTextAnchorExtensionsResponse(
+            return models.GetDrawingAnchorExtensionsResponse(
                 result=unmarshal_json_response(
                     models.AnchorExtensionsListResult, http_res
                 ),
@@ -3261,19 +1549,19 @@ class Content(BaseSDK):
 
         raise errors.SDKError("Unexpected response received", http_res)
 
-    async def get_rich_text_anchor_extensions_async(
+    async def get_drawing_anchor_extensions_async(
         self,
         *,
         request: Union[
-            models.GetRichTextAnchorExtensionsRequest,
-            models.GetRichTextAnchorExtensionsRequestTypedDict,
+            models.GetDrawingAnchorExtensionsRequest,
+            models.GetDrawingAnchorExtensionsRequestTypedDict,
         ],
         retries: OptionalNullable[utils.RetryConfig] = UNSET,
         server_url: Optional[str] = None,
         timeout_ms: Optional[int] = None,
         http_headers: Optional[Mapping[str, str]] = None,
-    ) -> Optional[models.GetRichTextAnchorExtensionsResponse]:
-        r"""Retrieve a list of rich text anchor extensions
+    ) -> Optional[models.GetDrawingAnchorExtensionsResponse]:
+        r"""Retrieve a list of drawing anchor extensions
 
         Returns a paginated list of [`AnchorExtensions`](ref:content#anchorextension) for a given anchorId.
 
@@ -3294,14 +1582,12 @@ class Content(BaseSDK):
             base_url = self._get_url(base_url, url_variables)
 
         if not isinstance(request, BaseModel):
-            request = utils.unmarshal(
-                request, models.GetRichTextAnchorExtensionsRequest
-            )
-        request = cast(models.GetRichTextAnchorExtensionsRequest, request)
+            request = utils.unmarshal(request, models.GetDrawingAnchorExtensionsRequest)
+        request = cast(models.GetDrawingAnchorExtensionsRequest, request)
 
         req = self._build_request_async(
             method="GET",
-            path="/content/richText/{richTextId}/anchors/{anchorId}/extensions",
+            path="/content/drawings/{drawingId}/anchors/{anchorId}/extensions",
             base_url=base_url,
             url_variables=url_variables,
             request=request,
@@ -3328,7 +1614,7 @@ class Content(BaseSDK):
             hook_ctx=HookContext(
                 config=self.sdk_configuration,
                 base_url=base_url or "",
-                operation_id="getRichTextAnchorExtensions",
+                operation_id="getDrawingAnchorExtensions",
                 oauth2_scopes=["file:read"],
                 security_source=self.sdk_configuration.security,
             ),
@@ -3349,7 +1635,7 @@ class Content(BaseSDK):
         )
 
         def next_func() -> (
-            Awaitable[Optional[models.GetRichTextAnchorExtensionsResponse]]
+            Awaitable[Optional[models.GetDrawingAnchorExtensionsResponse]]
         ):
             body = utils.unmarshal_json(http_res.text, Union[Dict[Any, Any], List[Any]])
 
@@ -3365,10 +1651,10 @@ class Content(BaseSDK):
             if next_cursor is None or str(next_cursor).strip() == "":
                 return empty_result()
 
-            return self.get_rich_text_anchor_extensions_async(
-                request=models.GetRichTextAnchorExtensionsRequest(
+            return self.get_drawing_anchor_extensions_async(
+                request=models.GetDrawingAnchorExtensionsRequest(
+                    drawing_id=request.drawing_id,
                     anchor_id=request.anchor_id,
-                    rich_text_id=request.rich_text_id,
                     maxpagesize=request.maxpagesize,
                     next=request.next,
                     revision=request.revision,
@@ -3378,2274 +1664,12 @@ class Content(BaseSDK):
 
         response_data: Any = None
         if utils.match_response(http_res, "200", "application/json"):
-            return models.GetRichTextAnchorExtensionsResponse(
+            return models.GetDrawingAnchorExtensionsResponse(
                 result=unmarshal_json_response(
                     models.AnchorExtensionsListResult, http_res
                 ),
                 next=next_func,
             )
-        if utils.match_response(
-            http_res, ["400", "401", "403", "404", "409", "429"], "application/json"
-        ):
-            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
-            raise errors.ErrorResponse(response_data, http_res)
-        if utils.match_response(http_res, ["500", "503"], "application/json"):
-            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
-            raise errors.ErrorResponse(response_data, http_res)
-        if utils.match_response(http_res, "4XX", "*"):
-            http_res_text = await utils.stream_to_text_async(http_res)
-            raise errors.SDKError("API error occurred", http_res, http_res_text)
-        if utils.match_response(http_res, "5XX", "*"):
-            http_res_text = await utils.stream_to_text_async(http_res)
-            raise errors.SDKError("API error occurred", http_res, http_res_text)
-
-        raise errors.SDKError("Unexpected response received", http_res)
-
-    def get_rich_text_anchors(
-        self,
-        *,
-        rich_text_id: str,
-        maxpagesize: Optional[int] = 1000,
-        next: Optional[str] = None,
-        revision: Optional[str] = None,
-        retries: OptionalNullable[utils.RetryConfig] = UNSET,
-        server_url: Optional[str] = None,
-        timeout_ms: Optional[int] = None,
-        http_headers: Optional[Mapping[str, str]] = None,
-    ) -> Optional[models.GetRichTextAnchorsResponse]:
-        r"""Retrieve a list of rich text anchors
-
-        Returns an [`AnchorsListResult`](ref:content#anchorslistresult) for a given richTextId.
-
-        :param rich_text_id: The unique identifier of the rich text content
-        :param maxpagesize: The maximum number of results to retrieve
-        :param next: Pagination cursor for next set of results.
-        :param revision: Returns resources at a specific revision
-        :param retries: Override the default retry configuration for this method
-        :param server_url: Override the default server URL for this method
-        :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
-        :param http_headers: Additional headers to set or replace on requests.
-        """
-        base_url = None
-        url_variables = None
-        if timeout_ms is None:
-            timeout_ms = self.sdk_configuration.timeout_ms
-
-        if server_url is not None:
-            base_url = server_url
-        else:
-            base_url = self._get_url(base_url, url_variables)
-
-        request = models.GetRichTextAnchorsRequest(
-            maxpagesize=maxpagesize,
-            next=next,
-            revision=revision,
-            rich_text_id=rich_text_id,
-        )
-
-        req = self._build_request(
-            method="GET",
-            path="/content/richText/{richTextId}/anchors",
-            base_url=base_url,
-            url_variables=url_variables,
-            request=request,
-            request_body_required=False,
-            request_has_path_params=True,
-            request_has_query_params=True,
-            user_agent_header="user-agent",
-            accept_header_value="application/json",
-            http_headers=http_headers,
-            security=self.sdk_configuration.security,
-            allow_empty_value=None,
-            timeout_ms=timeout_ms,
-        )
-
-        if retries == UNSET:
-            if self.sdk_configuration.retry_config is not UNSET:
-                retries = self.sdk_configuration.retry_config
-
-        retry_config = None
-        if isinstance(retries, utils.RetryConfig):
-            retry_config = (retries, ["429", "500", "502", "503", "504"])
-
-        http_res = self.do_request(
-            hook_ctx=HookContext(
-                config=self.sdk_configuration,
-                base_url=base_url or "",
-                operation_id="getRichTextAnchors",
-                oauth2_scopes=["file:read"],
-                security_source=self.sdk_configuration.security,
-            ),
-            request=req,
-            error_status_codes=[
-                "400",
-                "401",
-                "403",
-                "404",
-                "409",
-                "429",
-                "4XX",
-                "500",
-                "503",
-                "5XX",
-            ],
-            retry_config=retry_config,
-        )
-
-        def next_func() -> Optional[models.GetRichTextAnchorsResponse]:
-            body = utils.unmarshal_json(http_res.text, Union[Dict[Any, Any], List[Any]])
-
-            next_cursor = JSONPath("$['@nextLink']").parse(body)
-
-            if len(next_cursor) == 0:
-                return None
-
-            next_cursor = next_cursor[0]
-            if next_cursor is None or str(next_cursor).strip() == "":
-                return None
-
-            return self.get_rich_text_anchors(
-                rich_text_id=rich_text_id,
-                maxpagesize=maxpagesize,
-                next=next,
-                revision=revision,
-                retries=retries,
-            )
-
-        response_data: Any = None
-        if utils.match_response(http_res, "200", "application/json"):
-            return models.GetRichTextAnchorsResponse(
-                result=unmarshal_json_response(models.AnchorsListResult, http_res),
-                next=next_func,
-            )
-        if utils.match_response(
-            http_res, ["400", "401", "403", "404", "409", "429"], "application/json"
-        ):
-            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
-            raise errors.ErrorResponse(response_data, http_res)
-        if utils.match_response(http_res, ["500", "503"], "application/json"):
-            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
-            raise errors.ErrorResponse(response_data, http_res)
-        if utils.match_response(http_res, "4XX", "*"):
-            http_res_text = utils.stream_to_text(http_res)
-            raise errors.SDKError("API error occurred", http_res, http_res_text)
-        if utils.match_response(http_res, "5XX", "*"):
-            http_res_text = utils.stream_to_text(http_res)
-            raise errors.SDKError("API error occurred", http_res, http_res_text)
-
-        raise errors.SDKError("Unexpected response received", http_res)
-
-    async def get_rich_text_anchors_async(
-        self,
-        *,
-        rich_text_id: str,
-        maxpagesize: Optional[int] = 1000,
-        next: Optional[str] = None,
-        revision: Optional[str] = None,
-        retries: OptionalNullable[utils.RetryConfig] = UNSET,
-        server_url: Optional[str] = None,
-        timeout_ms: Optional[int] = None,
-        http_headers: Optional[Mapping[str, str]] = None,
-    ) -> Optional[models.GetRichTextAnchorsResponse]:
-        r"""Retrieve a list of rich text anchors
-
-        Returns an [`AnchorsListResult`](ref:content#anchorslistresult) for a given richTextId.
-
-        :param rich_text_id: The unique identifier of the rich text content
-        :param maxpagesize: The maximum number of results to retrieve
-        :param next: Pagination cursor for next set of results.
-        :param revision: Returns resources at a specific revision
-        :param retries: Override the default retry configuration for this method
-        :param server_url: Override the default server URL for this method
-        :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
-        :param http_headers: Additional headers to set or replace on requests.
-        """
-        base_url = None
-        url_variables = None
-        if timeout_ms is None:
-            timeout_ms = self.sdk_configuration.timeout_ms
-
-        if server_url is not None:
-            base_url = server_url
-        else:
-            base_url = self._get_url(base_url, url_variables)
-
-        request = models.GetRichTextAnchorsRequest(
-            maxpagesize=maxpagesize,
-            next=next,
-            revision=revision,
-            rich_text_id=rich_text_id,
-        )
-
-        req = self._build_request_async(
-            method="GET",
-            path="/content/richText/{richTextId}/anchors",
-            base_url=base_url,
-            url_variables=url_variables,
-            request=request,
-            request_body_required=False,
-            request_has_path_params=True,
-            request_has_query_params=True,
-            user_agent_header="user-agent",
-            accept_header_value="application/json",
-            http_headers=http_headers,
-            security=self.sdk_configuration.security,
-            allow_empty_value=None,
-            timeout_ms=timeout_ms,
-        )
-
-        if retries == UNSET:
-            if self.sdk_configuration.retry_config is not UNSET:
-                retries = self.sdk_configuration.retry_config
-
-        retry_config = None
-        if isinstance(retries, utils.RetryConfig):
-            retry_config = (retries, ["429", "500", "502", "503", "504"])
-
-        http_res = await self.do_request_async(
-            hook_ctx=HookContext(
-                config=self.sdk_configuration,
-                base_url=base_url or "",
-                operation_id="getRichTextAnchors",
-                oauth2_scopes=["file:read"],
-                security_source=self.sdk_configuration.security,
-            ),
-            request=req,
-            error_status_codes=[
-                "400",
-                "401",
-                "403",
-                "404",
-                "409",
-                "429",
-                "4XX",
-                "500",
-                "503",
-                "5XX",
-            ],
-            retry_config=retry_config,
-        )
-
-        def next_func() -> Awaitable[Optional[models.GetRichTextAnchorsResponse]]:
-            body = utils.unmarshal_json(http_res.text, Union[Dict[Any, Any], List[Any]])
-
-            async def empty_result():
-                return None
-
-            next_cursor = JSONPath("$['@nextLink']").parse(body)
-
-            if len(next_cursor) == 0:
-                return empty_result()
-
-            next_cursor = next_cursor[0]
-            if next_cursor is None or str(next_cursor).strip() == "":
-                return empty_result()
-
-            return self.get_rich_text_anchors_async(
-                rich_text_id=rich_text_id,
-                maxpagesize=maxpagesize,
-                next=next,
-                revision=revision,
-                retries=retries,
-            )
-
-        response_data: Any = None
-        if utils.match_response(http_res, "200", "application/json"):
-            return models.GetRichTextAnchorsResponse(
-                result=unmarshal_json_response(models.AnchorsListResult, http_res),
-                next=next_func,
-            )
-        if utils.match_response(
-            http_res, ["400", "401", "403", "404", "409", "429"], "application/json"
-        ):
-            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
-            raise errors.ErrorResponse(response_data, http_res)
-        if utils.match_response(http_res, ["500", "503"], "application/json"):
-            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
-            raise errors.ErrorResponse(response_data, http_res)
-        if utils.match_response(http_res, "4XX", "*"):
-            http_res_text = await utils.stream_to_text_async(http_res)
-            raise errors.SDKError("API error occurred", http_res, http_res_text)
-        if utils.match_response(http_res, "5XX", "*"):
-            http_res_text = await utils.stream_to_text_async(http_res)
-            raise errors.SDKError("API error occurred", http_res, http_res_text)
-
-        raise errors.SDKError("Unexpected response received", http_res)
-
-    def get_rich_text_paragraphs(
-        self,
-        *,
-        rich_text_id: str,
-        maxpagesize: Optional[int] = 1000,
-        next: Optional[str] = None,
-        revision: Optional[str] = None,
-        retries: OptionalNullable[utils.RetryConfig] = UNSET,
-        server_url: Optional[str] = None,
-        timeout_ms: Optional[int] = None,
-        http_headers: Optional[Mapping[str, str]] = None,
-    ) -> Optional[models.GetRichTextParagraphsResponse]:
-        r"""Retrieve rich text paragraphs
-
-        Returns a [`ParagraphsListResult`](ref:content#paragraphslistresult) for a rich text object, given its id.
-
-        :param rich_text_id: The unique identifier of the rich text content
-        :param maxpagesize: The maximum number of results to retrieve
-        :param next: Pagination cursor for next set of results.
-        :param revision: Returns resources at a specific revision
-        :param retries: Override the default retry configuration for this method
-        :param server_url: Override the default server URL for this method
-        :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
-        :param http_headers: Additional headers to set or replace on requests.
-        """
-        base_url = None
-        url_variables = None
-        if timeout_ms is None:
-            timeout_ms = self.sdk_configuration.timeout_ms
-
-        if server_url is not None:
-            base_url = server_url
-        else:
-            base_url = self._get_url(base_url, url_variables)
-
-        request = models.GetRichTextParagraphsRequest(
-            maxpagesize=maxpagesize,
-            next=next,
-            revision=revision,
-            rich_text_id=rich_text_id,
-        )
-
-        req = self._build_request(
-            method="GET",
-            path="/content/richText/{richTextId}/paragraphs",
-            base_url=base_url,
-            url_variables=url_variables,
-            request=request,
-            request_body_required=False,
-            request_has_path_params=True,
-            request_has_query_params=True,
-            user_agent_header="user-agent",
-            accept_header_value="application/json",
-            http_headers=http_headers,
-            security=self.sdk_configuration.security,
-            allow_empty_value=None,
-            timeout_ms=timeout_ms,
-        )
-
-        if retries == UNSET:
-            if self.sdk_configuration.retry_config is not UNSET:
-                retries = self.sdk_configuration.retry_config
-
-        retry_config = None
-        if isinstance(retries, utils.RetryConfig):
-            retry_config = (retries, ["429", "500", "502", "503", "504"])
-
-        http_res = self.do_request(
-            hook_ctx=HookContext(
-                config=self.sdk_configuration,
-                base_url=base_url or "",
-                operation_id="getRichTextParagraphs",
-                oauth2_scopes=["file:read"],
-                security_source=self.sdk_configuration.security,
-            ),
-            request=req,
-            error_status_codes=[
-                "400",
-                "401",
-                "403",
-                "404",
-                "409",
-                "429",
-                "4XX",
-                "500",
-                "503",
-                "5XX",
-            ],
-            retry_config=retry_config,
-        )
-
-        def next_func() -> Optional[models.GetRichTextParagraphsResponse]:
-            body = utils.unmarshal_json(http_res.text, Union[Dict[Any, Any], List[Any]])
-
-            next_cursor = JSONPath("$['@nextLink']").parse(body)
-
-            if len(next_cursor) == 0:
-                return None
-
-            next_cursor = next_cursor[0]
-            if next_cursor is None or str(next_cursor).strip() == "":
-                return None
-
-            return self.get_rich_text_paragraphs(
-                rich_text_id=rich_text_id,
-                maxpagesize=maxpagesize,
-                next=next,
-                revision=revision,
-                retries=retries,
-            )
-
-        response_data: Any = None
-        if utils.match_response(http_res, "200", "application/json"):
-            return models.GetRichTextParagraphsResponse(
-                result=unmarshal_json_response(models.ParagraphsListResult, http_res),
-                next=next_func,
-            )
-        if utils.match_response(
-            http_res, ["400", "401", "403", "404", "409", "429"], "application/json"
-        ):
-            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
-            raise errors.ErrorResponse(response_data, http_res)
-        if utils.match_response(http_res, ["500", "503"], "application/json"):
-            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
-            raise errors.ErrorResponse(response_data, http_res)
-        if utils.match_response(http_res, "4XX", "*"):
-            http_res_text = utils.stream_to_text(http_res)
-            raise errors.SDKError("API error occurred", http_res, http_res_text)
-        if utils.match_response(http_res, "5XX", "*"):
-            http_res_text = utils.stream_to_text(http_res)
-            raise errors.SDKError("API error occurred", http_res, http_res_text)
-
-        raise errors.SDKError("Unexpected response received", http_res)
-
-    async def get_rich_text_paragraphs_async(
-        self,
-        *,
-        rich_text_id: str,
-        maxpagesize: Optional[int] = 1000,
-        next: Optional[str] = None,
-        revision: Optional[str] = None,
-        retries: OptionalNullable[utils.RetryConfig] = UNSET,
-        server_url: Optional[str] = None,
-        timeout_ms: Optional[int] = None,
-        http_headers: Optional[Mapping[str, str]] = None,
-    ) -> Optional[models.GetRichTextParagraphsResponse]:
-        r"""Retrieve rich text paragraphs
-
-        Returns a [`ParagraphsListResult`](ref:content#paragraphslistresult) for a rich text object, given its id.
-
-        :param rich_text_id: The unique identifier of the rich text content
-        :param maxpagesize: The maximum number of results to retrieve
-        :param next: Pagination cursor for next set of results.
-        :param revision: Returns resources at a specific revision
-        :param retries: Override the default retry configuration for this method
-        :param server_url: Override the default server URL for this method
-        :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
-        :param http_headers: Additional headers to set or replace on requests.
-        """
-        base_url = None
-        url_variables = None
-        if timeout_ms is None:
-            timeout_ms = self.sdk_configuration.timeout_ms
-
-        if server_url is not None:
-            base_url = server_url
-        else:
-            base_url = self._get_url(base_url, url_variables)
-
-        request = models.GetRichTextParagraphsRequest(
-            maxpagesize=maxpagesize,
-            next=next,
-            revision=revision,
-            rich_text_id=rich_text_id,
-        )
-
-        req = self._build_request_async(
-            method="GET",
-            path="/content/richText/{richTextId}/paragraphs",
-            base_url=base_url,
-            url_variables=url_variables,
-            request=request,
-            request_body_required=False,
-            request_has_path_params=True,
-            request_has_query_params=True,
-            user_agent_header="user-agent",
-            accept_header_value="application/json",
-            http_headers=http_headers,
-            security=self.sdk_configuration.security,
-            allow_empty_value=None,
-            timeout_ms=timeout_ms,
-        )
-
-        if retries == UNSET:
-            if self.sdk_configuration.retry_config is not UNSET:
-                retries = self.sdk_configuration.retry_config
-
-        retry_config = None
-        if isinstance(retries, utils.RetryConfig):
-            retry_config = (retries, ["429", "500", "502", "503", "504"])
-
-        http_res = await self.do_request_async(
-            hook_ctx=HookContext(
-                config=self.sdk_configuration,
-                base_url=base_url or "",
-                operation_id="getRichTextParagraphs",
-                oauth2_scopes=["file:read"],
-                security_source=self.sdk_configuration.security,
-            ),
-            request=req,
-            error_status_codes=[
-                "400",
-                "401",
-                "403",
-                "404",
-                "409",
-                "429",
-                "4XX",
-                "500",
-                "503",
-                "5XX",
-            ],
-            retry_config=retry_config,
-        )
-
-        def next_func() -> Awaitable[Optional[models.GetRichTextParagraphsResponse]]:
-            body = utils.unmarshal_json(http_res.text, Union[Dict[Any, Any], List[Any]])
-
-            async def empty_result():
-                return None
-
-            next_cursor = JSONPath("$['@nextLink']").parse(body)
-
-            if len(next_cursor) == 0:
-                return empty_result()
-
-            next_cursor = next_cursor[0]
-            if next_cursor is None or str(next_cursor).strip() == "":
-                return empty_result()
-
-            return self.get_rich_text_paragraphs_async(
-                rich_text_id=rich_text_id,
-                maxpagesize=maxpagesize,
-                next=next,
-                revision=revision,
-                retries=retries,
-            )
-
-        response_data: Any = None
-        if utils.match_response(http_res, "200", "application/json"):
-            return models.GetRichTextParagraphsResponse(
-                result=unmarshal_json_response(models.ParagraphsListResult, http_res),
-                next=next_func,
-            )
-        if utils.match_response(
-            http_res, ["400", "401", "403", "404", "409", "429"], "application/json"
-        ):
-            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
-            raise errors.ErrorResponse(response_data, http_res)
-        if utils.match_response(http_res, ["500", "503"], "application/json"):
-            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
-            raise errors.ErrorResponse(response_data, http_res)
-        if utils.match_response(http_res, "4XX", "*"):
-            http_res_text = await utils.stream_to_text_async(http_res)
-            raise errors.SDKError("API error occurred", http_res, http_res_text)
-        if utils.match_response(http_res, "5XX", "*"):
-            http_res_text = await utils.stream_to_text_async(http_res)
-            raise errors.SDKError("API error occurred", http_res, http_res_text)
-
-        raise errors.SDKError("Unexpected response received", http_res)
-
-    def get_row_properties(
-        self,
-        *,
-        request: Union[
-            models.GetRowPropertiesRequest, models.GetRowPropertiesRequestTypedDict
-        ],
-        retries: OptionalNullable[utils.RetryConfig] = UNSET,
-        server_url: Optional[str] = None,
-        timeout_ms: Optional[int] = None,
-        http_headers: Optional[Mapping[str, str]] = None,
-    ) -> Optional[models.GetRowPropertiesResponse]:
-        r"""Retrieve table row properties
-
-        Returns a [`RowPropertiesListResult`](ref:content#rowpropertieslistresult) for a table
-
-
-        :param request: The request object to send.
-        :param retries: Override the default retry configuration for this method
-        :param server_url: Override the default server URL for this method
-        :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
-        :param http_headers: Additional headers to set or replace on requests.
-        """
-        base_url = None
-        url_variables = None
-        if timeout_ms is None:
-            timeout_ms = self.sdk_configuration.timeout_ms
-
-        if server_url is not None:
-            base_url = server_url
-        else:
-            base_url = self._get_url(base_url, url_variables)
-
-        if not isinstance(request, BaseModel):
-            request = utils.unmarshal(request, models.GetRowPropertiesRequest)
-        request = cast(models.GetRowPropertiesRequest, request)
-
-        req = self._build_request(
-            method="GET",
-            path="/content/tables/{tableId}/properties/rows",
-            base_url=base_url,
-            url_variables=url_variables,
-            request=request,
-            request_body_required=False,
-            request_has_path_params=True,
-            request_has_query_params=True,
-            user_agent_header="user-agent",
-            accept_header_value="application/json",
-            http_headers=http_headers,
-            security=self.sdk_configuration.security,
-            allow_empty_value=None,
-            timeout_ms=timeout_ms,
-        )
-
-        if retries == UNSET:
-            if self.sdk_configuration.retry_config is not UNSET:
-                retries = self.sdk_configuration.retry_config
-
-        retry_config = None
-        if isinstance(retries, utils.RetryConfig):
-            retry_config = (retries, ["429", "500", "502", "503", "504"])
-
-        http_res = self.do_request(
-            hook_ctx=HookContext(
-                config=self.sdk_configuration,
-                base_url=base_url or "",
-                operation_id="getRowProperties",
-                oauth2_scopes=["file:read"],
-                security_source=self.sdk_configuration.security,
-            ),
-            request=req,
-            error_status_codes=[
-                "400",
-                "401",
-                "403",
-                "404",
-                "409",
-                "429",
-                "4XX",
-                "500",
-                "503",
-                "5XX",
-            ],
-            retry_config=retry_config,
-        )
-
-        def next_func() -> Optional[models.GetRowPropertiesResponse]:
-            body = utils.unmarshal_json(http_res.text, Union[Dict[Any, Any], List[Any]])
-
-            next_cursor = JSONPath("$['@nextLink']").parse(body)
-
-            if len(next_cursor) == 0:
-                return None
-
-            next_cursor = next_cursor[0]
-            if next_cursor is None or str(next_cursor).strip() == "":
-                return None
-
-            return self.get_row_properties(
-                request=models.GetRowPropertiesRequest(
-                    table_id=request.table_id,
-                    maxpagesize=request.maxpagesize,
-                    next=request.next,
-                    revision=request.revision,
-                    start_row=request.start_row,
-                    stop_row=request.stop_row,
-                ),
-                retries=retries,
-            )
-
-        response_data: Any = None
-        if utils.match_response(http_res, "200", "application/json"):
-            return models.GetRowPropertiesResponse(
-                result=unmarshal_json_response(
-                    models.RowPropertiesListResult, http_res
-                ),
-                next=next_func,
-            )
-        if utils.match_response(
-            http_res, ["400", "401", "403", "404", "409", "429"], "application/json"
-        ):
-            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
-            raise errors.ErrorResponse(response_data, http_res)
-        if utils.match_response(http_res, ["500", "503"], "application/json"):
-            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
-            raise errors.ErrorResponse(response_data, http_res)
-        if utils.match_response(http_res, "4XX", "*"):
-            http_res_text = utils.stream_to_text(http_res)
-            raise errors.SDKError("API error occurred", http_res, http_res_text)
-        if utils.match_response(http_res, "5XX", "*"):
-            http_res_text = utils.stream_to_text(http_res)
-            raise errors.SDKError("API error occurred", http_res, http_res_text)
-
-        raise errors.SDKError("Unexpected response received", http_res)
-
-    async def get_row_properties_async(
-        self,
-        *,
-        request: Union[
-            models.GetRowPropertiesRequest, models.GetRowPropertiesRequestTypedDict
-        ],
-        retries: OptionalNullable[utils.RetryConfig] = UNSET,
-        server_url: Optional[str] = None,
-        timeout_ms: Optional[int] = None,
-        http_headers: Optional[Mapping[str, str]] = None,
-    ) -> Optional[models.GetRowPropertiesResponse]:
-        r"""Retrieve table row properties
-
-        Returns a [`RowPropertiesListResult`](ref:content#rowpropertieslistresult) for a table
-
-
-        :param request: The request object to send.
-        :param retries: Override the default retry configuration for this method
-        :param server_url: Override the default server URL for this method
-        :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
-        :param http_headers: Additional headers to set or replace on requests.
-        """
-        base_url = None
-        url_variables = None
-        if timeout_ms is None:
-            timeout_ms = self.sdk_configuration.timeout_ms
-
-        if server_url is not None:
-            base_url = server_url
-        else:
-            base_url = self._get_url(base_url, url_variables)
-
-        if not isinstance(request, BaseModel):
-            request = utils.unmarshal(request, models.GetRowPropertiesRequest)
-        request = cast(models.GetRowPropertiesRequest, request)
-
-        req = self._build_request_async(
-            method="GET",
-            path="/content/tables/{tableId}/properties/rows",
-            base_url=base_url,
-            url_variables=url_variables,
-            request=request,
-            request_body_required=False,
-            request_has_path_params=True,
-            request_has_query_params=True,
-            user_agent_header="user-agent",
-            accept_header_value="application/json",
-            http_headers=http_headers,
-            security=self.sdk_configuration.security,
-            allow_empty_value=None,
-            timeout_ms=timeout_ms,
-        )
-
-        if retries == UNSET:
-            if self.sdk_configuration.retry_config is not UNSET:
-                retries = self.sdk_configuration.retry_config
-
-        retry_config = None
-        if isinstance(retries, utils.RetryConfig):
-            retry_config = (retries, ["429", "500", "502", "503", "504"])
-
-        http_res = await self.do_request_async(
-            hook_ctx=HookContext(
-                config=self.sdk_configuration,
-                base_url=base_url or "",
-                operation_id="getRowProperties",
-                oauth2_scopes=["file:read"],
-                security_source=self.sdk_configuration.security,
-            ),
-            request=req,
-            error_status_codes=[
-                "400",
-                "401",
-                "403",
-                "404",
-                "409",
-                "429",
-                "4XX",
-                "500",
-                "503",
-                "5XX",
-            ],
-            retry_config=retry_config,
-        )
-
-        def next_func() -> Awaitable[Optional[models.GetRowPropertiesResponse]]:
-            body = utils.unmarshal_json(http_res.text, Union[Dict[Any, Any], List[Any]])
-
-            async def empty_result():
-                return None
-
-            next_cursor = JSONPath("$['@nextLink']").parse(body)
-
-            if len(next_cursor) == 0:
-                return empty_result()
-
-            next_cursor = next_cursor[0]
-            if next_cursor is None or str(next_cursor).strip() == "":
-                return empty_result()
-
-            return self.get_row_properties_async(
-                request=models.GetRowPropertiesRequest(
-                    table_id=request.table_id,
-                    maxpagesize=request.maxpagesize,
-                    next=request.next,
-                    revision=request.revision,
-                    start_row=request.start_row,
-                    stop_row=request.stop_row,
-                ),
-                retries=retries,
-            )
-
-        response_data: Any = None
-        if utils.match_response(http_res, "200", "application/json"):
-            return models.GetRowPropertiesResponse(
-                result=unmarshal_json_response(
-                    models.RowPropertiesListResult, http_res
-                ),
-                next=next_func,
-            )
-        if utils.match_response(
-            http_res, ["400", "401", "403", "404", "409", "429"], "application/json"
-        ):
-            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
-            raise errors.ErrorResponse(response_data, http_res)
-        if utils.match_response(http_res, ["500", "503"], "application/json"):
-            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
-            raise errors.ErrorResponse(response_data, http_res)
-        if utils.match_response(http_res, "4XX", "*"):
-            http_res_text = await utils.stream_to_text_async(http_res)
-            raise errors.SDKError("API error occurred", http_res, http_res_text)
-        if utils.match_response(http_res, "5XX", "*"):
-            http_res_text = await utils.stream_to_text_async(http_res)
-            raise errors.SDKError("API error occurred", http_res, http_res_text)
-
-        raise errors.SDKError("Unexpected response received", http_res)
-
-    def get_style_guide_by_id(
-        self,
-        *,
-        style_guide_id: str,
-        revision: Optional[str] = None,
-        retries: OptionalNullable[utils.RetryConfig] = UNSET,
-        server_url: Optional[str] = None,
-        timeout_ms: Optional[int] = None,
-        http_headers: Optional[Mapping[str, str]] = None,
-    ) -> models.StyleGuide:
-        r"""Retrieve a style guide by id
-
-        Returns the [`StyleGuide`](ref:content#styleguide) populated with the text styles, list styles, etc. The revision will ensure a static content.
-
-
-        :param style_guide_id: The unique identifier of the style guide
-        :param revision: Returns resources at a specific revision
-        :param retries: Override the default retry configuration for this method
-        :param server_url: Override the default server URL for this method
-        :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
-        :param http_headers: Additional headers to set or replace on requests.
-        """
-        base_url = None
-        url_variables = None
-        if timeout_ms is None:
-            timeout_ms = self.sdk_configuration.timeout_ms
-
-        if server_url is not None:
-            base_url = server_url
-        else:
-            base_url = self._get_url(base_url, url_variables)
-
-        request = models.GetStyleGuideByIDRequest(
-            revision=revision,
-            style_guide_id=style_guide_id,
-        )
-
-        req = self._build_request(
-            method="GET",
-            path="/content/styleGuides/{styleGuideId}",
-            base_url=base_url,
-            url_variables=url_variables,
-            request=request,
-            request_body_required=False,
-            request_has_path_params=True,
-            request_has_query_params=True,
-            user_agent_header="user-agent",
-            accept_header_value="application/json",
-            http_headers=http_headers,
-            security=self.sdk_configuration.security,
-            allow_empty_value=None,
-            timeout_ms=timeout_ms,
-        )
-
-        if retries == UNSET:
-            if self.sdk_configuration.retry_config is not UNSET:
-                retries = self.sdk_configuration.retry_config
-
-        retry_config = None
-        if isinstance(retries, utils.RetryConfig):
-            retry_config = (retries, ["429", "500", "502", "503", "504"])
-
-        http_res = self.do_request(
-            hook_ctx=HookContext(
-                config=self.sdk_configuration,
-                base_url=base_url or "",
-                operation_id="getStyleGuideById",
-                oauth2_scopes=["file:read"],
-                security_source=self.sdk_configuration.security,
-            ),
-            request=req,
-            error_status_codes=[
-                "400",
-                "401",
-                "403",
-                "404",
-                "409",
-                "429",
-                "4XX",
-                "500",
-                "503",
-                "5XX",
-            ],
-            retry_config=retry_config,
-        )
-
-        response_data: Any = None
-        if utils.match_response(http_res, "200", "application/json"):
-            return unmarshal_json_response(models.StyleGuide, http_res)
-        if utils.match_response(
-            http_res, ["400", "401", "403", "404", "409", "429"], "application/json"
-        ):
-            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
-            raise errors.ErrorResponse(response_data, http_res)
-        if utils.match_response(http_res, ["500", "503"], "application/json"):
-            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
-            raise errors.ErrorResponse(response_data, http_res)
-        if utils.match_response(http_res, "4XX", "*"):
-            http_res_text = utils.stream_to_text(http_res)
-            raise errors.SDKError("API error occurred", http_res, http_res_text)
-        if utils.match_response(http_res, "5XX", "*"):
-            http_res_text = utils.stream_to_text(http_res)
-            raise errors.SDKError("API error occurred", http_res, http_res_text)
-
-        raise errors.SDKError("Unexpected response received", http_res)
-
-    async def get_style_guide_by_id_async(
-        self,
-        *,
-        style_guide_id: str,
-        revision: Optional[str] = None,
-        retries: OptionalNullable[utils.RetryConfig] = UNSET,
-        server_url: Optional[str] = None,
-        timeout_ms: Optional[int] = None,
-        http_headers: Optional[Mapping[str, str]] = None,
-    ) -> models.StyleGuide:
-        r"""Retrieve a style guide by id
-
-        Returns the [`StyleGuide`](ref:content#styleguide) populated with the text styles, list styles, etc. The revision will ensure a static content.
-
-
-        :param style_guide_id: The unique identifier of the style guide
-        :param revision: Returns resources at a specific revision
-        :param retries: Override the default retry configuration for this method
-        :param server_url: Override the default server URL for this method
-        :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
-        :param http_headers: Additional headers to set or replace on requests.
-        """
-        base_url = None
-        url_variables = None
-        if timeout_ms is None:
-            timeout_ms = self.sdk_configuration.timeout_ms
-
-        if server_url is not None:
-            base_url = server_url
-        else:
-            base_url = self._get_url(base_url, url_variables)
-
-        request = models.GetStyleGuideByIDRequest(
-            revision=revision,
-            style_guide_id=style_guide_id,
-        )
-
-        req = self._build_request_async(
-            method="GET",
-            path="/content/styleGuides/{styleGuideId}",
-            base_url=base_url,
-            url_variables=url_variables,
-            request=request,
-            request_body_required=False,
-            request_has_path_params=True,
-            request_has_query_params=True,
-            user_agent_header="user-agent",
-            accept_header_value="application/json",
-            http_headers=http_headers,
-            security=self.sdk_configuration.security,
-            allow_empty_value=None,
-            timeout_ms=timeout_ms,
-        )
-
-        if retries == UNSET:
-            if self.sdk_configuration.retry_config is not UNSET:
-                retries = self.sdk_configuration.retry_config
-
-        retry_config = None
-        if isinstance(retries, utils.RetryConfig):
-            retry_config = (retries, ["429", "500", "502", "503", "504"])
-
-        http_res = await self.do_request_async(
-            hook_ctx=HookContext(
-                config=self.sdk_configuration,
-                base_url=base_url or "",
-                operation_id="getStyleGuideById",
-                oauth2_scopes=["file:read"],
-                security_source=self.sdk_configuration.security,
-            ),
-            request=req,
-            error_status_codes=[
-                "400",
-                "401",
-                "403",
-                "404",
-                "409",
-                "429",
-                "4XX",
-                "500",
-                "503",
-                "5XX",
-            ],
-            retry_config=retry_config,
-        )
-
-        response_data: Any = None
-        if utils.match_response(http_res, "200", "application/json"):
-            return unmarshal_json_response(models.StyleGuide, http_res)
-        if utils.match_response(
-            http_res, ["400", "401", "403", "404", "409", "429"], "application/json"
-        ):
-            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
-            raise errors.ErrorResponse(response_data, http_res)
-        if utils.match_response(http_res, ["500", "503"], "application/json"):
-            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
-            raise errors.ErrorResponse(response_data, http_res)
-        if utils.match_response(http_res, "4XX", "*"):
-            http_res_text = await utils.stream_to_text_async(http_res)
-            raise errors.SDKError("API error occurred", http_res, http_res_text)
-        if utils.match_response(http_res, "5XX", "*"):
-            http_res_text = await utils.stream_to_text_async(http_res)
-            raise errors.SDKError("API error occurred", http_res, http_res_text)
-
-        raise errors.SDKError("Unexpected response received", http_res)
-
-    def get_table_anchor_by_id(
-        self,
-        *,
-        anchor_id: str,
-        table_id: str,
-        revision: Optional[str] = None,
-        retries: OptionalNullable[utils.RetryConfig] = UNSET,
-        server_url: Optional[str] = None,
-        timeout_ms: Optional[int] = None,
-        http_headers: Optional[Mapping[str, str]] = None,
-    ) -> models.Anchor:
-        r"""Retrieve a table anchor by ID
-
-        Returns an [`Anchor`](ref:content#anchor) given its id.
-
-        :param anchor_id: The unique identifier of the anchor
-        :param table_id: The unique identifier for the table
-        :param revision: Returns resources at a specific revision
-        :param retries: Override the default retry configuration for this method
-        :param server_url: Override the default server URL for this method
-        :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
-        :param http_headers: Additional headers to set or replace on requests.
-        """
-        base_url = None
-        url_variables = None
-        if timeout_ms is None:
-            timeout_ms = self.sdk_configuration.timeout_ms
-
-        if server_url is not None:
-            base_url = server_url
-        else:
-            base_url = self._get_url(base_url, url_variables)
-
-        request = models.GetTableAnchorByIDRequest(
-            anchor_id=anchor_id,
-            revision=revision,
-            table_id=table_id,
-        )
-
-        req = self._build_request(
-            method="GET",
-            path="/content/tables/{tableId}/anchors/{anchorId}",
-            base_url=base_url,
-            url_variables=url_variables,
-            request=request,
-            request_body_required=False,
-            request_has_path_params=True,
-            request_has_query_params=True,
-            user_agent_header="user-agent",
-            accept_header_value="application/json",
-            http_headers=http_headers,
-            security=self.sdk_configuration.security,
-            allow_empty_value=None,
-            timeout_ms=timeout_ms,
-        )
-
-        if retries == UNSET:
-            if self.sdk_configuration.retry_config is not UNSET:
-                retries = self.sdk_configuration.retry_config
-
-        retry_config = None
-        if isinstance(retries, utils.RetryConfig):
-            retry_config = (retries, ["429", "500", "502", "503", "504"])
-
-        http_res = self.do_request(
-            hook_ctx=HookContext(
-                config=self.sdk_configuration,
-                base_url=base_url or "",
-                operation_id="getTableAnchorById",
-                oauth2_scopes=["file:read"],
-                security_source=self.sdk_configuration.security,
-            ),
-            request=req,
-            error_status_codes=[
-                "400",
-                "401",
-                "403",
-                "404",
-                "409",
-                "429",
-                "4XX",
-                "500",
-                "503",
-                "5XX",
-            ],
-            retry_config=retry_config,
-        )
-
-        response_data: Any = None
-        if utils.match_response(http_res, "200", "application/json"):
-            return unmarshal_json_response(models.Anchor, http_res)
-        if utils.match_response(
-            http_res, ["400", "401", "403", "404", "409", "429"], "application/json"
-        ):
-            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
-            raise errors.ErrorResponse(response_data, http_res)
-        if utils.match_response(http_res, ["500", "503"], "application/json"):
-            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
-            raise errors.ErrorResponse(response_data, http_res)
-        if utils.match_response(http_res, "4XX", "*"):
-            http_res_text = utils.stream_to_text(http_res)
-            raise errors.SDKError("API error occurred", http_res, http_res_text)
-        if utils.match_response(http_res, "5XX", "*"):
-            http_res_text = utils.stream_to_text(http_res)
-            raise errors.SDKError("API error occurred", http_res, http_res_text)
-
-        raise errors.SDKError("Unexpected response received", http_res)
-
-    async def get_table_anchor_by_id_async(
-        self,
-        *,
-        anchor_id: str,
-        table_id: str,
-        revision: Optional[str] = None,
-        retries: OptionalNullable[utils.RetryConfig] = UNSET,
-        server_url: Optional[str] = None,
-        timeout_ms: Optional[int] = None,
-        http_headers: Optional[Mapping[str, str]] = None,
-    ) -> models.Anchor:
-        r"""Retrieve a table anchor by ID
-
-        Returns an [`Anchor`](ref:content#anchor) given its id.
-
-        :param anchor_id: The unique identifier of the anchor
-        :param table_id: The unique identifier for the table
-        :param revision: Returns resources at a specific revision
-        :param retries: Override the default retry configuration for this method
-        :param server_url: Override the default server URL for this method
-        :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
-        :param http_headers: Additional headers to set or replace on requests.
-        """
-        base_url = None
-        url_variables = None
-        if timeout_ms is None:
-            timeout_ms = self.sdk_configuration.timeout_ms
-
-        if server_url is not None:
-            base_url = server_url
-        else:
-            base_url = self._get_url(base_url, url_variables)
-
-        request = models.GetTableAnchorByIDRequest(
-            anchor_id=anchor_id,
-            revision=revision,
-            table_id=table_id,
-        )
-
-        req = self._build_request_async(
-            method="GET",
-            path="/content/tables/{tableId}/anchors/{anchorId}",
-            base_url=base_url,
-            url_variables=url_variables,
-            request=request,
-            request_body_required=False,
-            request_has_path_params=True,
-            request_has_query_params=True,
-            user_agent_header="user-agent",
-            accept_header_value="application/json",
-            http_headers=http_headers,
-            security=self.sdk_configuration.security,
-            allow_empty_value=None,
-            timeout_ms=timeout_ms,
-        )
-
-        if retries == UNSET:
-            if self.sdk_configuration.retry_config is not UNSET:
-                retries = self.sdk_configuration.retry_config
-
-        retry_config = None
-        if isinstance(retries, utils.RetryConfig):
-            retry_config = (retries, ["429", "500", "502", "503", "504"])
-
-        http_res = await self.do_request_async(
-            hook_ctx=HookContext(
-                config=self.sdk_configuration,
-                base_url=base_url or "",
-                operation_id="getTableAnchorById",
-                oauth2_scopes=["file:read"],
-                security_source=self.sdk_configuration.security,
-            ),
-            request=req,
-            error_status_codes=[
-                "400",
-                "401",
-                "403",
-                "404",
-                "409",
-                "429",
-                "4XX",
-                "500",
-                "503",
-                "5XX",
-            ],
-            retry_config=retry_config,
-        )
-
-        response_data: Any = None
-        if utils.match_response(http_res, "200", "application/json"):
-            return unmarshal_json_response(models.Anchor, http_res)
-        if utils.match_response(
-            http_res, ["400", "401", "403", "404", "409", "429"], "application/json"
-        ):
-            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
-            raise errors.ErrorResponse(response_data, http_res)
-        if utils.match_response(http_res, ["500", "503"], "application/json"):
-            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
-            raise errors.ErrorResponse(response_data, http_res)
-        if utils.match_response(http_res, "4XX", "*"):
-            http_res_text = await utils.stream_to_text_async(http_res)
-            raise errors.SDKError("API error occurred", http_res, http_res_text)
-        if utils.match_response(http_res, "5XX", "*"):
-            http_res_text = await utils.stream_to_text_async(http_res)
-            raise errors.SDKError("API error occurred", http_res, http_res_text)
-
-        raise errors.SDKError("Unexpected response received", http_res)
-
-    def get_table_anchor_extensions(
-        self,
-        *,
-        request: Union[
-            models.GetTableAnchorExtensionsRequest,
-            models.GetTableAnchorExtensionsRequestTypedDict,
-        ],
-        retries: OptionalNullable[utils.RetryConfig] = UNSET,
-        server_url: Optional[str] = None,
-        timeout_ms: Optional[int] = None,
-        http_headers: Optional[Mapping[str, str]] = None,
-    ) -> Optional[models.GetTableAnchorExtensionsResponse]:
-        r"""Retrieve a list of table anchor extensions
-
-        Returns a paginated list of [`AnchorExtensions`](ref:content#anchorextension) for a given anchorId.
-
-        :param request: The request object to send.
-        :param retries: Override the default retry configuration for this method
-        :param server_url: Override the default server URL for this method
-        :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
-        :param http_headers: Additional headers to set or replace on requests.
-        """
-        base_url = None
-        url_variables = None
-        if timeout_ms is None:
-            timeout_ms = self.sdk_configuration.timeout_ms
-
-        if server_url is not None:
-            base_url = server_url
-        else:
-            base_url = self._get_url(base_url, url_variables)
-
-        if not isinstance(request, BaseModel):
-            request = utils.unmarshal(request, models.GetTableAnchorExtensionsRequest)
-        request = cast(models.GetTableAnchorExtensionsRequest, request)
-
-        req = self._build_request(
-            method="GET",
-            path="/content/tables/{tableId}/anchors/{anchorId}/extensions",
-            base_url=base_url,
-            url_variables=url_variables,
-            request=request,
-            request_body_required=False,
-            request_has_path_params=True,
-            request_has_query_params=True,
-            user_agent_header="user-agent",
-            accept_header_value="application/json",
-            http_headers=http_headers,
-            security=self.sdk_configuration.security,
-            allow_empty_value=None,
-            timeout_ms=timeout_ms,
-        )
-
-        if retries == UNSET:
-            if self.sdk_configuration.retry_config is not UNSET:
-                retries = self.sdk_configuration.retry_config
-
-        retry_config = None
-        if isinstance(retries, utils.RetryConfig):
-            retry_config = (retries, ["429", "500", "502", "503", "504"])
-
-        http_res = self.do_request(
-            hook_ctx=HookContext(
-                config=self.sdk_configuration,
-                base_url=base_url or "",
-                operation_id="getTableAnchorExtensions",
-                oauth2_scopes=["file:read"],
-                security_source=self.sdk_configuration.security,
-            ),
-            request=req,
-            error_status_codes=[
-                "400",
-                "401",
-                "403",
-                "404",
-                "409",
-                "429",
-                "4XX",
-                "500",
-                "503",
-                "5XX",
-            ],
-            retry_config=retry_config,
-        )
-
-        def next_func() -> Optional[models.GetTableAnchorExtensionsResponse]:
-            body = utils.unmarshal_json(http_res.text, Union[Dict[Any, Any], List[Any]])
-
-            next_cursor = JSONPath("$['@nextLink']").parse(body)
-
-            if len(next_cursor) == 0:
-                return None
-
-            next_cursor = next_cursor[0]
-            if next_cursor is None or str(next_cursor).strip() == "":
-                return None
-
-            return self.get_table_anchor_extensions(
-                request=models.GetTableAnchorExtensionsRequest(
-                    anchor_id=request.anchor_id,
-                    table_id=request.table_id,
-                    maxpagesize=request.maxpagesize,
-                    next=request.next,
-                    revision=request.revision,
-                ),
-                retries=retries,
-            )
-
-        response_data: Any = None
-        if utils.match_response(http_res, "200", "application/json"):
-            return models.GetTableAnchorExtensionsResponse(
-                result=unmarshal_json_response(
-                    models.AnchorExtensionsListResult, http_res
-                ),
-                next=next_func,
-            )
-        if utils.match_response(
-            http_res, ["400", "401", "403", "404", "409", "429"], "application/json"
-        ):
-            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
-            raise errors.ErrorResponse(response_data, http_res)
-        if utils.match_response(http_res, ["500", "503"], "application/json"):
-            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
-            raise errors.ErrorResponse(response_data, http_res)
-        if utils.match_response(http_res, "4XX", "*"):
-            http_res_text = utils.stream_to_text(http_res)
-            raise errors.SDKError("API error occurred", http_res, http_res_text)
-        if utils.match_response(http_res, "5XX", "*"):
-            http_res_text = utils.stream_to_text(http_res)
-            raise errors.SDKError("API error occurred", http_res, http_res_text)
-
-        raise errors.SDKError("Unexpected response received", http_res)
-
-    async def get_table_anchor_extensions_async(
-        self,
-        *,
-        request: Union[
-            models.GetTableAnchorExtensionsRequest,
-            models.GetTableAnchorExtensionsRequestTypedDict,
-        ],
-        retries: OptionalNullable[utils.RetryConfig] = UNSET,
-        server_url: Optional[str] = None,
-        timeout_ms: Optional[int] = None,
-        http_headers: Optional[Mapping[str, str]] = None,
-    ) -> Optional[models.GetTableAnchorExtensionsResponse]:
-        r"""Retrieve a list of table anchor extensions
-
-        Returns a paginated list of [`AnchorExtensions`](ref:content#anchorextension) for a given anchorId.
-
-        :param request: The request object to send.
-        :param retries: Override the default retry configuration for this method
-        :param server_url: Override the default server URL for this method
-        :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
-        :param http_headers: Additional headers to set or replace on requests.
-        """
-        base_url = None
-        url_variables = None
-        if timeout_ms is None:
-            timeout_ms = self.sdk_configuration.timeout_ms
-
-        if server_url is not None:
-            base_url = server_url
-        else:
-            base_url = self._get_url(base_url, url_variables)
-
-        if not isinstance(request, BaseModel):
-            request = utils.unmarshal(request, models.GetTableAnchorExtensionsRequest)
-        request = cast(models.GetTableAnchorExtensionsRequest, request)
-
-        req = self._build_request_async(
-            method="GET",
-            path="/content/tables/{tableId}/anchors/{anchorId}/extensions",
-            base_url=base_url,
-            url_variables=url_variables,
-            request=request,
-            request_body_required=False,
-            request_has_path_params=True,
-            request_has_query_params=True,
-            user_agent_header="user-agent",
-            accept_header_value="application/json",
-            http_headers=http_headers,
-            security=self.sdk_configuration.security,
-            allow_empty_value=None,
-            timeout_ms=timeout_ms,
-        )
-
-        if retries == UNSET:
-            if self.sdk_configuration.retry_config is not UNSET:
-                retries = self.sdk_configuration.retry_config
-
-        retry_config = None
-        if isinstance(retries, utils.RetryConfig):
-            retry_config = (retries, ["429", "500", "502", "503", "504"])
-
-        http_res = await self.do_request_async(
-            hook_ctx=HookContext(
-                config=self.sdk_configuration,
-                base_url=base_url or "",
-                operation_id="getTableAnchorExtensions",
-                oauth2_scopes=["file:read"],
-                security_source=self.sdk_configuration.security,
-            ),
-            request=req,
-            error_status_codes=[
-                "400",
-                "401",
-                "403",
-                "404",
-                "409",
-                "429",
-                "4XX",
-                "500",
-                "503",
-                "5XX",
-            ],
-            retry_config=retry_config,
-        )
-
-        def next_func() -> Awaitable[Optional[models.GetTableAnchorExtensionsResponse]]:
-            body = utils.unmarshal_json(http_res.text, Union[Dict[Any, Any], List[Any]])
-
-            async def empty_result():
-                return None
-
-            next_cursor = JSONPath("$['@nextLink']").parse(body)
-
-            if len(next_cursor) == 0:
-                return empty_result()
-
-            next_cursor = next_cursor[0]
-            if next_cursor is None or str(next_cursor).strip() == "":
-                return empty_result()
-
-            return self.get_table_anchor_extensions_async(
-                request=models.GetTableAnchorExtensionsRequest(
-                    anchor_id=request.anchor_id,
-                    table_id=request.table_id,
-                    maxpagesize=request.maxpagesize,
-                    next=request.next,
-                    revision=request.revision,
-                ),
-                retries=retries,
-            )
-
-        response_data: Any = None
-        if utils.match_response(http_res, "200", "application/json"):
-            return models.GetTableAnchorExtensionsResponse(
-                result=unmarshal_json_response(
-                    models.AnchorExtensionsListResult, http_res
-                ),
-                next=next_func,
-            )
-        if utils.match_response(
-            http_res, ["400", "401", "403", "404", "409", "429"], "application/json"
-        ):
-            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
-            raise errors.ErrorResponse(response_data, http_res)
-        if utils.match_response(http_res, ["500", "503"], "application/json"):
-            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
-            raise errors.ErrorResponse(response_data, http_res)
-        if utils.match_response(http_res, "4XX", "*"):
-            http_res_text = await utils.stream_to_text_async(http_res)
-            raise errors.SDKError("API error occurred", http_res, http_res_text)
-        if utils.match_response(http_res, "5XX", "*"):
-            http_res_text = await utils.stream_to_text_async(http_res)
-            raise errors.SDKError("API error occurred", http_res, http_res_text)
-
-        raise errors.SDKError("Unexpected response received", http_res)
-
-    def get_table_anchors(
-        self,
-        *,
-        table_id: str,
-        maxpagesize: Optional[int] = 1000,
-        next: Optional[str] = None,
-        revision: Optional[str] = None,
-        retries: OptionalNullable[utils.RetryConfig] = UNSET,
-        server_url: Optional[str] = None,
-        timeout_ms: Optional[int] = None,
-        http_headers: Optional[Mapping[str, str]] = None,
-    ) -> Optional[models.GetTableAnchorsResponse]:
-        r"""Retrieve a list of table anchors
-
-        Returns an [`AnchorsListResult`](ref:content#anchorslistresult) given tableId.
-
-        :param table_id: The unique identifier for the table
-        :param maxpagesize: The maximum number of results to retrieve
-        :param next: Pagination cursor for next set of results.
-        :param revision: Returns resources at a specific revision
-        :param retries: Override the default retry configuration for this method
-        :param server_url: Override the default server URL for this method
-        :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
-        :param http_headers: Additional headers to set or replace on requests.
-        """
-        base_url = None
-        url_variables = None
-        if timeout_ms is None:
-            timeout_ms = self.sdk_configuration.timeout_ms
-
-        if server_url is not None:
-            base_url = server_url
-        else:
-            base_url = self._get_url(base_url, url_variables)
-
-        request = models.GetTableAnchorsRequest(
-            maxpagesize=maxpagesize,
-            next=next,
-            revision=revision,
-            table_id=table_id,
-        )
-
-        req = self._build_request(
-            method="GET",
-            path="/content/tables/{tableId}/anchors",
-            base_url=base_url,
-            url_variables=url_variables,
-            request=request,
-            request_body_required=False,
-            request_has_path_params=True,
-            request_has_query_params=True,
-            user_agent_header="user-agent",
-            accept_header_value="application/json",
-            http_headers=http_headers,
-            security=self.sdk_configuration.security,
-            allow_empty_value=None,
-            timeout_ms=timeout_ms,
-        )
-
-        if retries == UNSET:
-            if self.sdk_configuration.retry_config is not UNSET:
-                retries = self.sdk_configuration.retry_config
-
-        retry_config = None
-        if isinstance(retries, utils.RetryConfig):
-            retry_config = (retries, ["429", "500", "502", "503", "504"])
-
-        http_res = self.do_request(
-            hook_ctx=HookContext(
-                config=self.sdk_configuration,
-                base_url=base_url or "",
-                operation_id="getTableAnchors",
-                oauth2_scopes=["file:read"],
-                security_source=self.sdk_configuration.security,
-            ),
-            request=req,
-            error_status_codes=[
-                "400",
-                "401",
-                "403",
-                "404",
-                "409",
-                "429",
-                "4XX",
-                "500",
-                "503",
-                "5XX",
-            ],
-            retry_config=retry_config,
-        )
-
-        def next_func() -> Optional[models.GetTableAnchorsResponse]:
-            body = utils.unmarshal_json(http_res.text, Union[Dict[Any, Any], List[Any]])
-
-            next_cursor = JSONPath("$['@nextLink']").parse(body)
-
-            if len(next_cursor) == 0:
-                return None
-
-            next_cursor = next_cursor[0]
-            if next_cursor is None or str(next_cursor).strip() == "":
-                return None
-
-            return self.get_table_anchors(
-                table_id=table_id,
-                maxpagesize=maxpagesize,
-                next=next,
-                revision=revision,
-                retries=retries,
-            )
-
-        response_data: Any = None
-        if utils.match_response(http_res, "200", "application/json"):
-            return models.GetTableAnchorsResponse(
-                result=unmarshal_json_response(models.AnchorsListResult, http_res),
-                next=next_func,
-            )
-        if utils.match_response(
-            http_res, ["400", "401", "403", "404", "409", "429"], "application/json"
-        ):
-            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
-            raise errors.ErrorResponse(response_data, http_res)
-        if utils.match_response(http_res, ["500", "503"], "application/json"):
-            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
-            raise errors.ErrorResponse(response_data, http_res)
-        if utils.match_response(http_res, "4XX", "*"):
-            http_res_text = utils.stream_to_text(http_res)
-            raise errors.SDKError("API error occurred", http_res, http_res_text)
-        if utils.match_response(http_res, "5XX", "*"):
-            http_res_text = utils.stream_to_text(http_res)
-            raise errors.SDKError("API error occurred", http_res, http_res_text)
-
-        raise errors.SDKError("Unexpected response received", http_res)
-
-    async def get_table_anchors_async(
-        self,
-        *,
-        table_id: str,
-        maxpagesize: Optional[int] = 1000,
-        next: Optional[str] = None,
-        revision: Optional[str] = None,
-        retries: OptionalNullable[utils.RetryConfig] = UNSET,
-        server_url: Optional[str] = None,
-        timeout_ms: Optional[int] = None,
-        http_headers: Optional[Mapping[str, str]] = None,
-    ) -> Optional[models.GetTableAnchorsResponse]:
-        r"""Retrieve a list of table anchors
-
-        Returns an [`AnchorsListResult`](ref:content#anchorslistresult) given tableId.
-
-        :param table_id: The unique identifier for the table
-        :param maxpagesize: The maximum number of results to retrieve
-        :param next: Pagination cursor for next set of results.
-        :param revision: Returns resources at a specific revision
-        :param retries: Override the default retry configuration for this method
-        :param server_url: Override the default server URL for this method
-        :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
-        :param http_headers: Additional headers to set or replace on requests.
-        """
-        base_url = None
-        url_variables = None
-        if timeout_ms is None:
-            timeout_ms = self.sdk_configuration.timeout_ms
-
-        if server_url is not None:
-            base_url = server_url
-        else:
-            base_url = self._get_url(base_url, url_variables)
-
-        request = models.GetTableAnchorsRequest(
-            maxpagesize=maxpagesize,
-            next=next,
-            revision=revision,
-            table_id=table_id,
-        )
-
-        req = self._build_request_async(
-            method="GET",
-            path="/content/tables/{tableId}/anchors",
-            base_url=base_url,
-            url_variables=url_variables,
-            request=request,
-            request_body_required=False,
-            request_has_path_params=True,
-            request_has_query_params=True,
-            user_agent_header="user-agent",
-            accept_header_value="application/json",
-            http_headers=http_headers,
-            security=self.sdk_configuration.security,
-            allow_empty_value=None,
-            timeout_ms=timeout_ms,
-        )
-
-        if retries == UNSET:
-            if self.sdk_configuration.retry_config is not UNSET:
-                retries = self.sdk_configuration.retry_config
-
-        retry_config = None
-        if isinstance(retries, utils.RetryConfig):
-            retry_config = (retries, ["429", "500", "502", "503", "504"])
-
-        http_res = await self.do_request_async(
-            hook_ctx=HookContext(
-                config=self.sdk_configuration,
-                base_url=base_url or "",
-                operation_id="getTableAnchors",
-                oauth2_scopes=["file:read"],
-                security_source=self.sdk_configuration.security,
-            ),
-            request=req,
-            error_status_codes=[
-                "400",
-                "401",
-                "403",
-                "404",
-                "409",
-                "429",
-                "4XX",
-                "500",
-                "503",
-                "5XX",
-            ],
-            retry_config=retry_config,
-        )
-
-        def next_func() -> Awaitable[Optional[models.GetTableAnchorsResponse]]:
-            body = utils.unmarshal_json(http_res.text, Union[Dict[Any, Any], List[Any]])
-
-            async def empty_result():
-                return None
-
-            next_cursor = JSONPath("$['@nextLink']").parse(body)
-
-            if len(next_cursor) == 0:
-                return empty_result()
-
-            next_cursor = next_cursor[0]
-            if next_cursor is None or str(next_cursor).strip() == "":
-                return empty_result()
-
-            return self.get_table_anchors_async(
-                table_id=table_id,
-                maxpagesize=maxpagesize,
-                next=next,
-                revision=revision,
-                retries=retries,
-            )
-
-        response_data: Any = None
-        if utils.match_response(http_res, "200", "application/json"):
-            return models.GetTableAnchorsResponse(
-                result=unmarshal_json_response(models.AnchorsListResult, http_res),
-                next=next_func,
-            )
-        if utils.match_response(
-            http_res, ["400", "401", "403", "404", "409", "429"], "application/json"
-        ):
-            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
-            raise errors.ErrorResponse(response_data, http_res)
-        if utils.match_response(http_res, ["500", "503"], "application/json"):
-            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
-            raise errors.ErrorResponse(response_data, http_res)
-        if utils.match_response(http_res, "4XX", "*"):
-            http_res_text = await utils.stream_to_text_async(http_res)
-            raise errors.SDKError("API error occurred", http_res, http_res_text)
-        if utils.match_response(http_res, "5XX", "*"):
-            http_res_text = await utils.stream_to_text_async(http_res)
-            raise errors.SDKError("API error occurred", http_res, http_res_text)
-
-        raise errors.SDKError("Unexpected response received", http_res)
-
-    def get_table_cells(
-        self,
-        *,
-        request: Union[
-            models.GetTableCellsRequest, models.GetTableCellsRequestTypedDict
-        ],
-        retries: OptionalNullable[utils.RetryConfig] = UNSET,
-        server_url: Optional[str] = None,
-        timeout_ms: Optional[int] = None,
-        http_headers: Optional[Mapping[str, str]] = None,
-    ) -> Optional[models.GetTableCellsResponse]:
-        r"""Retrieve table cell content
-
-        Returns a [`TableCellsResult`](ref:content#tablecellsresult) for a given tableId.
-
-        :param request: The request object to send.
-        :param retries: Override the default retry configuration for this method
-        :param server_url: Override the default server URL for this method
-        :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
-        :param http_headers: Additional headers to set or replace on requests.
-        """
-        base_url = None
-        url_variables = None
-        if timeout_ms is None:
-            timeout_ms = self.sdk_configuration.timeout_ms
-
-        if server_url is not None:
-            base_url = server_url
-        else:
-            base_url = self._get_url(base_url, url_variables)
-
-        if not isinstance(request, BaseModel):
-            request = utils.unmarshal(request, models.GetTableCellsRequest)
-        request = cast(models.GetTableCellsRequest, request)
-
-        req = self._build_request(
-            method="GET",
-            path="/content/tables/{tableId}/cells",
-            base_url=base_url,
-            url_variables=url_variables,
-            request=request,
-            request_body_required=False,
-            request_has_path_params=True,
-            request_has_query_params=True,
-            user_agent_header="user-agent",
-            accept_header_value="application/json",
-            http_headers=http_headers,
-            security=self.sdk_configuration.security,
-            allow_empty_value=None,
-            timeout_ms=timeout_ms,
-        )
-
-        if retries == UNSET:
-            if self.sdk_configuration.retry_config is not UNSET:
-                retries = self.sdk_configuration.retry_config
-
-        retry_config = None
-        if isinstance(retries, utils.RetryConfig):
-            retry_config = (retries, ["429", "500", "502", "503", "504"])
-
-        http_res = self.do_request(
-            hook_ctx=HookContext(
-                config=self.sdk_configuration,
-                base_url=base_url or "",
-                operation_id="getTableCells",
-                oauth2_scopes=["file:read"],
-                security_source=self.sdk_configuration.security,
-            ),
-            request=req,
-            error_status_codes=[
-                "400",
-                "401",
-                "403",
-                "404",
-                "409",
-                "429",
-                "4XX",
-                "500",
-                "503",
-                "5XX",
-            ],
-            retry_config=retry_config,
-        )
-
-        def next_func() -> Optional[models.GetTableCellsResponse]:
-            body = utils.unmarshal_json(http_res.text, Union[Dict[Any, Any], List[Any]])
-
-            next_cursor = JSONPath("$['@nextLink']").parse(body)
-
-            if len(next_cursor) == 0:
-                return None
-
-            next_cursor = next_cursor[0]
-            if next_cursor is None or str(next_cursor).strip() == "":
-                return None
-
-            return self.get_table_cells(
-                request=models.GetTableCellsRequest(
-                    table_id=request.table_id,
-                    maxcellsperpage=request.maxcellsperpage,
-                    next=request.next,
-                    revision=request.revision,
-                    start_column=request.start_column,
-                    start_row=request.start_row,
-                    stop_column=request.stop_column,
-                    stop_row=request.stop_row,
-                ),
-                retries=retries,
-            )
-
-        response_data: Any = None
-        if utils.match_response(http_res, "200", "application/json"):
-            return models.GetTableCellsResponse(
-                result=unmarshal_json_response(models.TableCellsResult, http_res),
-                next=next_func,
-            )
-        if utils.match_response(
-            http_res, ["400", "401", "403", "404", "409", "429"], "application/json"
-        ):
-            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
-            raise errors.ErrorResponse(response_data, http_res)
-        if utils.match_response(http_res, ["500", "503"], "application/json"):
-            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
-            raise errors.ErrorResponse(response_data, http_res)
-        if utils.match_response(http_res, "4XX", "*"):
-            http_res_text = utils.stream_to_text(http_res)
-            raise errors.SDKError("API error occurred", http_res, http_res_text)
-        if utils.match_response(http_res, "5XX", "*"):
-            http_res_text = utils.stream_to_text(http_res)
-            raise errors.SDKError("API error occurred", http_res, http_res_text)
-
-        raise errors.SDKError("Unexpected response received", http_res)
-
-    async def get_table_cells_async(
-        self,
-        *,
-        request: Union[
-            models.GetTableCellsRequest, models.GetTableCellsRequestTypedDict
-        ],
-        retries: OptionalNullable[utils.RetryConfig] = UNSET,
-        server_url: Optional[str] = None,
-        timeout_ms: Optional[int] = None,
-        http_headers: Optional[Mapping[str, str]] = None,
-    ) -> Optional[models.GetTableCellsResponse]:
-        r"""Retrieve table cell content
-
-        Returns a [`TableCellsResult`](ref:content#tablecellsresult) for a given tableId.
-
-        :param request: The request object to send.
-        :param retries: Override the default retry configuration for this method
-        :param server_url: Override the default server URL for this method
-        :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
-        :param http_headers: Additional headers to set or replace on requests.
-        """
-        base_url = None
-        url_variables = None
-        if timeout_ms is None:
-            timeout_ms = self.sdk_configuration.timeout_ms
-
-        if server_url is not None:
-            base_url = server_url
-        else:
-            base_url = self._get_url(base_url, url_variables)
-
-        if not isinstance(request, BaseModel):
-            request = utils.unmarshal(request, models.GetTableCellsRequest)
-        request = cast(models.GetTableCellsRequest, request)
-
-        req = self._build_request_async(
-            method="GET",
-            path="/content/tables/{tableId}/cells",
-            base_url=base_url,
-            url_variables=url_variables,
-            request=request,
-            request_body_required=False,
-            request_has_path_params=True,
-            request_has_query_params=True,
-            user_agent_header="user-agent",
-            accept_header_value="application/json",
-            http_headers=http_headers,
-            security=self.sdk_configuration.security,
-            allow_empty_value=None,
-            timeout_ms=timeout_ms,
-        )
-
-        if retries == UNSET:
-            if self.sdk_configuration.retry_config is not UNSET:
-                retries = self.sdk_configuration.retry_config
-
-        retry_config = None
-        if isinstance(retries, utils.RetryConfig):
-            retry_config = (retries, ["429", "500", "502", "503", "504"])
-
-        http_res = await self.do_request_async(
-            hook_ctx=HookContext(
-                config=self.sdk_configuration,
-                base_url=base_url or "",
-                operation_id="getTableCells",
-                oauth2_scopes=["file:read"],
-                security_source=self.sdk_configuration.security,
-            ),
-            request=req,
-            error_status_codes=[
-                "400",
-                "401",
-                "403",
-                "404",
-                "409",
-                "429",
-                "4XX",
-                "500",
-                "503",
-                "5XX",
-            ],
-            retry_config=retry_config,
-        )
-
-        def next_func() -> Awaitable[Optional[models.GetTableCellsResponse]]:
-            body = utils.unmarshal_json(http_res.text, Union[Dict[Any, Any], List[Any]])
-
-            async def empty_result():
-                return None
-
-            next_cursor = JSONPath("$['@nextLink']").parse(body)
-
-            if len(next_cursor) == 0:
-                return empty_result()
-
-            next_cursor = next_cursor[0]
-            if next_cursor is None or str(next_cursor).strip() == "":
-                return empty_result()
-
-            return self.get_table_cells_async(
-                request=models.GetTableCellsRequest(
-                    table_id=request.table_id,
-                    maxcellsperpage=request.maxcellsperpage,
-                    next=request.next,
-                    revision=request.revision,
-                    start_column=request.start_column,
-                    start_row=request.start_row,
-                    stop_column=request.stop_column,
-                    stop_row=request.stop_row,
-                ),
-                retries=retries,
-            )
-
-        response_data: Any = None
-        if utils.match_response(http_res, "200", "application/json"):
-            return models.GetTableCellsResponse(
-                result=unmarshal_json_response(models.TableCellsResult, http_res),
-                next=next_func,
-            )
-        if utils.match_response(
-            http_res, ["400", "401", "403", "404", "409", "429"], "application/json"
-        ):
-            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
-            raise errors.ErrorResponse(response_data, http_res)
-        if utils.match_response(http_res, ["500", "503"], "application/json"):
-            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
-            raise errors.ErrorResponse(response_data, http_res)
-        if utils.match_response(http_res, "4XX", "*"):
-            http_res_text = await utils.stream_to_text_async(http_res)
-            raise errors.SDKError("API error occurred", http_res, http_res_text)
-        if utils.match_response(http_res, "5XX", "*"):
-            http_res_text = await utils.stream_to_text_async(http_res)
-            raise errors.SDKError("API error occurred", http_res, http_res_text)
-
-        raise errors.SDKError("Unexpected response received", http_res)
-
-    def get_table_properties(
-        self,
-        *,
-        table_id: str,
-        revision: Optional[str] = None,
-        retries: OptionalNullable[utils.RetryConfig] = UNSET,
-        server_url: Optional[str] = None,
-        timeout_ms: Optional[int] = None,
-        http_headers: Optional[Mapping[str, str]] = None,
-    ) -> models.TableProperties:
-        r"""Retrieve a table's properties by id
-
-        Returns a [`TableProperties`](ref:content#tableproperties) for a table
-
-
-        :param table_id: The unique identifier for the table
-        :param revision: Returns resources at a specific revision
-        :param retries: Override the default retry configuration for this method
-        :param server_url: Override the default server URL for this method
-        :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
-        :param http_headers: Additional headers to set or replace on requests.
-        """
-        base_url = None
-        url_variables = None
-        if timeout_ms is None:
-            timeout_ms = self.sdk_configuration.timeout_ms
-
-        if server_url is not None:
-            base_url = server_url
-        else:
-            base_url = self._get_url(base_url, url_variables)
-
-        request = models.GetTablePropertiesRequest(
-            revision=revision,
-            table_id=table_id,
-        )
-
-        req = self._build_request(
-            method="GET",
-            path="/content/tables/{tableId}/properties",
-            base_url=base_url,
-            url_variables=url_variables,
-            request=request,
-            request_body_required=False,
-            request_has_path_params=True,
-            request_has_query_params=True,
-            user_agent_header="user-agent",
-            accept_header_value="application/json",
-            http_headers=http_headers,
-            security=self.sdk_configuration.security,
-            allow_empty_value=None,
-            timeout_ms=timeout_ms,
-        )
-
-        if retries == UNSET:
-            if self.sdk_configuration.retry_config is not UNSET:
-                retries = self.sdk_configuration.retry_config
-
-        retry_config = None
-        if isinstance(retries, utils.RetryConfig):
-            retry_config = (retries, ["429", "500", "502", "503", "504"])
-
-        http_res = self.do_request(
-            hook_ctx=HookContext(
-                config=self.sdk_configuration,
-                base_url=base_url or "",
-                operation_id="getTableProperties",
-                oauth2_scopes=["file:read"],
-                security_source=self.sdk_configuration.security,
-            ),
-            request=req,
-            error_status_codes=[
-                "400",
-                "401",
-                "403",
-                "404",
-                "409",
-                "429",
-                "4XX",
-                "500",
-                "503",
-                "5XX",
-            ],
-            retry_config=retry_config,
-        )
-
-        response_data: Any = None
-        if utils.match_response(http_res, "200", "application/json"):
-            return unmarshal_json_response(models.TableProperties, http_res)
-        if utils.match_response(
-            http_res, ["400", "401", "403", "404", "409", "429"], "application/json"
-        ):
-            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
-            raise errors.ErrorResponse(response_data, http_res)
-        if utils.match_response(http_res, ["500", "503"], "application/json"):
-            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
-            raise errors.ErrorResponse(response_data, http_res)
-        if utils.match_response(http_res, "4XX", "*"):
-            http_res_text = utils.stream_to_text(http_res)
-            raise errors.SDKError("API error occurred", http_res, http_res_text)
-        if utils.match_response(http_res, "5XX", "*"):
-            http_res_text = utils.stream_to_text(http_res)
-            raise errors.SDKError("API error occurred", http_res, http_res_text)
-
-        raise errors.SDKError("Unexpected response received", http_res)
-
-    async def get_table_properties_async(
-        self,
-        *,
-        table_id: str,
-        revision: Optional[str] = None,
-        retries: OptionalNullable[utils.RetryConfig] = UNSET,
-        server_url: Optional[str] = None,
-        timeout_ms: Optional[int] = None,
-        http_headers: Optional[Mapping[str, str]] = None,
-    ) -> models.TableProperties:
-        r"""Retrieve a table's properties by id
-
-        Returns a [`TableProperties`](ref:content#tableproperties) for a table
-
-
-        :param table_id: The unique identifier for the table
-        :param revision: Returns resources at a specific revision
-        :param retries: Override the default retry configuration for this method
-        :param server_url: Override the default server URL for this method
-        :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
-        :param http_headers: Additional headers to set or replace on requests.
-        """
-        base_url = None
-        url_variables = None
-        if timeout_ms is None:
-            timeout_ms = self.sdk_configuration.timeout_ms
-
-        if server_url is not None:
-            base_url = server_url
-        else:
-            base_url = self._get_url(base_url, url_variables)
-
-        request = models.GetTablePropertiesRequest(
-            revision=revision,
-            table_id=table_id,
-        )
-
-        req = self._build_request_async(
-            method="GET",
-            path="/content/tables/{tableId}/properties",
-            base_url=base_url,
-            url_variables=url_variables,
-            request=request,
-            request_body_required=False,
-            request_has_path_params=True,
-            request_has_query_params=True,
-            user_agent_header="user-agent",
-            accept_header_value="application/json",
-            http_headers=http_headers,
-            security=self.sdk_configuration.security,
-            allow_empty_value=None,
-            timeout_ms=timeout_ms,
-        )
-
-        if retries == UNSET:
-            if self.sdk_configuration.retry_config is not UNSET:
-                retries = self.sdk_configuration.retry_config
-
-        retry_config = None
-        if isinstance(retries, utils.RetryConfig):
-            retry_config = (retries, ["429", "500", "502", "503", "504"])
-
-        http_res = await self.do_request_async(
-            hook_ctx=HookContext(
-                config=self.sdk_configuration,
-                base_url=base_url or "",
-                operation_id="getTableProperties",
-                oauth2_scopes=["file:read"],
-                security_source=self.sdk_configuration.security,
-            ),
-            request=req,
-            error_status_codes=[
-                "400",
-                "401",
-                "403",
-                "404",
-                "409",
-                "429",
-                "4XX",
-                "500",
-                "503",
-                "5XX",
-            ],
-            retry_config=retry_config,
-        )
-
-        response_data: Any = None
-        if utils.match_response(http_res, "200", "application/json"):
-            return unmarshal_json_response(models.TableProperties, http_res)
         if utils.match_response(
             http_res, ["400", "401", "403", "404", "409", "429"], "application/json"
         ):
@@ -5915,35 +1939,20 @@ class Content(BaseSDK):
 
         raise errors.SDKError("Unexpected response received", http_res)
 
-    def partially_update_table_properties(
+    def get_image_by_id(
         self,
         *,
-        table_id: str,
-        request_body: Union[
-            List[models.JSONPatchOperation], List[models.JSONPatchOperationTypedDict]
-        ],
+        image_id: str,
         retries: OptionalNullable[utils.RetryConfig] = UNSET,
         server_url: Optional[str] = None,
         timeout_ms: Optional[int] = None,
         http_headers: Optional[Mapping[str, str]] = None,
-    ) -> models.PartiallyUpdateTablePropertiesResponse:
-        r"""Partially update a table's properties
+    ) -> models.Image:
+        r"""Retrieve an image by id
 
-        Partially updates a table's properties given its ID.
+        Returns a [`Image`](ref:content#image) given its id
 
-        This is a long running operation. Responses include a `Location` header, which indicates where to poll for results.
-        For more details on long-running job polling, see [Operations endpoint](ref:getoperationbyid).
-
-        ### Options
-        | Path               | PATCH Operations Supported |
-        |--------------------|----------------------------|
-        | `/name`            | `replace`                  |
-        | `/resizeRowsToFit` | `replace`                  |
-        | `/lock`            | `replace`                  |
-
-
-        :param table_id: The unique identifier for the table
-        :param request_body: Patch document representing the changes to be made to the table's properties
+        :param image_id: The unique identifier of the image
         :param retries: Override the default retry configuration for this method
         :param server_url: Override the default server URL for this method
         :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
@@ -5959,33 +1968,23 @@ class Content(BaseSDK):
         else:
             base_url = self._get_url(base_url, url_variables)
 
-        request = models.PartiallyUpdateTablePropertiesRequest(
-            table_id=table_id,
-            request_body=utils.get_pydantic_model(
-                request_body, List[models.JSONPatchOperation]
-            ),
+        request = models.GetImageByIDRequest(
+            image_id=image_id,
         )
 
         req = self._build_request(
-            method="PATCH",
-            path="/content/tables/{tableId}/properties",
+            method="GET",
+            path="/content/images/{imageId}",
             base_url=base_url,
             url_variables=url_variables,
             request=request,
-            request_body_required=True,
+            request_body_required=False,
             request_has_path_params=True,
             request_has_query_params=True,
             user_agent_header="user-agent",
             accept_header_value="application/json",
             http_headers=http_headers,
             security=self.sdk_configuration.security,
-            get_serialized_body=lambda: utils.serialize_request_body(
-                request.request_body,
-                False,
-                False,
-                "json",
-                List[models.JSONPatchOperation],
-            ),
             allow_empty_value=None,
             timeout_ms=timeout_ms,
         )
@@ -6002,8 +2001,8 @@ class Content(BaseSDK):
             hook_ctx=HookContext(
                 config=self.sdk_configuration,
                 base_url=base_url or "",
-                operation_id="partiallyUpdateTableProperties",
-                oauth2_scopes=["file:write"],
+                operation_id="getImageById",
+                oauth2_scopes=["file:read"],
                 security_source=self.sdk_configuration.security,
             ),
             request=req,
@@ -6023,9 +2022,243 @@ class Content(BaseSDK):
         )
 
         response_data: Any = None
-        if utils.match_response(http_res, "202", "*"):
-            return models.PartiallyUpdateTablePropertiesResponse(
-                headers=utils.get_response_headers(http_res.headers)
+        if utils.match_response(http_res, "200", "application/json"):
+            return unmarshal_json_response(models.Image, http_res)
+        if utils.match_response(
+            http_res, ["400", "401", "403", "404", "409", "429"], "application/json"
+        ):
+            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
+            raise errors.ErrorResponse(response_data, http_res)
+        if utils.match_response(http_res, ["500", "503"], "application/json"):
+            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
+            raise errors.ErrorResponse(response_data, http_res)
+        if utils.match_response(http_res, "4XX", "*"):
+            http_res_text = utils.stream_to_text(http_res)
+            raise errors.SDKError("API error occurred", http_res, http_res_text)
+        if utils.match_response(http_res, "5XX", "*"):
+            http_res_text = utils.stream_to_text(http_res)
+            raise errors.SDKError("API error occurred", http_res, http_res_text)
+
+        raise errors.SDKError("Unexpected response received", http_res)
+
+    async def get_image_by_id_async(
+        self,
+        *,
+        image_id: str,
+        retries: OptionalNullable[utils.RetryConfig] = UNSET,
+        server_url: Optional[str] = None,
+        timeout_ms: Optional[int] = None,
+        http_headers: Optional[Mapping[str, str]] = None,
+    ) -> models.Image:
+        r"""Retrieve an image by id
+
+        Returns a [`Image`](ref:content#image) given its id
+
+        :param image_id: The unique identifier of the image
+        :param retries: Override the default retry configuration for this method
+        :param server_url: Override the default server URL for this method
+        :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
+        :param http_headers: Additional headers to set or replace on requests.
+        """
+        base_url = None
+        url_variables = None
+        if timeout_ms is None:
+            timeout_ms = self.sdk_configuration.timeout_ms
+
+        if server_url is not None:
+            base_url = server_url
+        else:
+            base_url = self._get_url(base_url, url_variables)
+
+        request = models.GetImageByIDRequest(
+            image_id=image_id,
+        )
+
+        req = self._build_request_async(
+            method="GET",
+            path="/content/images/{imageId}",
+            base_url=base_url,
+            url_variables=url_variables,
+            request=request,
+            request_body_required=False,
+            request_has_path_params=True,
+            request_has_query_params=True,
+            user_agent_header="user-agent",
+            accept_header_value="application/json",
+            http_headers=http_headers,
+            security=self.sdk_configuration.security,
+            allow_empty_value=None,
+            timeout_ms=timeout_ms,
+        )
+
+        if retries == UNSET:
+            if self.sdk_configuration.retry_config is not UNSET:
+                retries = self.sdk_configuration.retry_config
+
+        retry_config = None
+        if isinstance(retries, utils.RetryConfig):
+            retry_config = (retries, ["429", "500", "502", "503", "504"])
+
+        http_res = await self.do_request_async(
+            hook_ctx=HookContext(
+                config=self.sdk_configuration,
+                base_url=base_url or "",
+                operation_id="getImageById",
+                oauth2_scopes=["file:read"],
+                security_source=self.sdk_configuration.security,
+            ),
+            request=req,
+            error_status_codes=[
+                "400",
+                "401",
+                "403",
+                "404",
+                "409",
+                "429",
+                "4XX",
+                "500",
+                "503",
+                "5XX",
+            ],
+            retry_config=retry_config,
+        )
+
+        response_data: Any = None
+        if utils.match_response(http_res, "200", "application/json"):
+            return unmarshal_json_response(models.Image, http_res)
+        if utils.match_response(
+            http_res, ["400", "401", "403", "404", "409", "429"], "application/json"
+        ):
+            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
+            raise errors.ErrorResponse(response_data, http_res)
+        if utils.match_response(http_res, ["500", "503"], "application/json"):
+            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
+            raise errors.ErrorResponse(response_data, http_res)
+        if utils.match_response(http_res, "4XX", "*"):
+            http_res_text = await utils.stream_to_text_async(http_res)
+            raise errors.SDKError("API error occurred", http_res, http_res_text)
+        if utils.match_response(http_res, "5XX", "*"):
+            http_res_text = await utils.stream_to_text_async(http_res)
+            raise errors.SDKError("API error occurred", http_res, http_res_text)
+
+        raise errors.SDKError("Unexpected response received", http_res)
+
+    def get_rich_text_anchors(
+        self,
+        *,
+        rich_text_id: str,
+        maxpagesize: Optional[int] = 1000,
+        next: Optional[str] = None,
+        revision: Optional[str] = None,
+        retries: OptionalNullable[utils.RetryConfig] = UNSET,
+        server_url: Optional[str] = None,
+        timeout_ms: Optional[int] = None,
+        http_headers: Optional[Mapping[str, str]] = None,
+    ) -> Optional[models.GetRichTextAnchorsResponse]:
+        r"""Retrieve a list of rich text anchors
+
+        Returns an [`AnchorsListResult`](ref:content#anchorslistresult) for a given richTextId.
+
+        :param rich_text_id: The unique identifier of the rich text content
+        :param maxpagesize: The maximum number of results to retrieve
+        :param next: Pagination cursor for next set of results.
+        :param revision: Returns resources at a specific revision
+        :param retries: Override the default retry configuration for this method
+        :param server_url: Override the default server URL for this method
+        :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
+        :param http_headers: Additional headers to set or replace on requests.
+        """
+        base_url = None
+        url_variables = None
+        if timeout_ms is None:
+            timeout_ms = self.sdk_configuration.timeout_ms
+
+        if server_url is not None:
+            base_url = server_url
+        else:
+            base_url = self._get_url(base_url, url_variables)
+
+        request = models.GetRichTextAnchorsRequest(
+            rich_text_id=rich_text_id,
+            maxpagesize=maxpagesize,
+            next=next,
+            revision=revision,
+        )
+
+        req = self._build_request(
+            method="GET",
+            path="/content/richText/{richTextId}/anchors",
+            base_url=base_url,
+            url_variables=url_variables,
+            request=request,
+            request_body_required=False,
+            request_has_path_params=True,
+            request_has_query_params=True,
+            user_agent_header="user-agent",
+            accept_header_value="application/json",
+            http_headers=http_headers,
+            security=self.sdk_configuration.security,
+            allow_empty_value=None,
+            timeout_ms=timeout_ms,
+        )
+
+        if retries == UNSET:
+            if self.sdk_configuration.retry_config is not UNSET:
+                retries = self.sdk_configuration.retry_config
+
+        retry_config = None
+        if isinstance(retries, utils.RetryConfig):
+            retry_config = (retries, ["429", "500", "502", "503", "504"])
+
+        http_res = self.do_request(
+            hook_ctx=HookContext(
+                config=self.sdk_configuration,
+                base_url=base_url or "",
+                operation_id="getRichTextAnchors",
+                oauth2_scopes=["file:read"],
+                security_source=self.sdk_configuration.security,
+            ),
+            request=req,
+            error_status_codes=[
+                "400",
+                "401",
+                "403",
+                "404",
+                "409",
+                "429",
+                "4XX",
+                "500",
+                "503",
+                "5XX",
+            ],
+            retry_config=retry_config,
+        )
+
+        def next_func() -> Optional[models.GetRichTextAnchorsResponse]:
+            body = utils.unmarshal_json(http_res.text, Union[Dict[Any, Any], List[Any]])
+
+            next_cursor = JSONPath("$['@nextLink']").parse(body)
+
+            if len(next_cursor) == 0:
+                return None
+
+            next_cursor = next_cursor[0]
+            if next_cursor is None or str(next_cursor).strip() == "":
+                return None
+
+            return self.get_rich_text_anchors(
+                rich_text_id=rich_text_id,
+                maxpagesize=maxpagesize,
+                next=next,
+                revision=revision,
+                retries=retries,
+            )
+
+        response_data: Any = None
+        if utils.match_response(http_res, "200", "application/json"):
+            return models.GetRichTextAnchorsResponse(
+                result=unmarshal_json_response(models.AnchorsListResult, http_res),
+                next=next_func,
             )
         if utils.match_response(
             http_res, ["400", "401", "403", "404", "409", "429"], "application/json"
@@ -6044,35 +2277,26 @@ class Content(BaseSDK):
 
         raise errors.SDKError("Unexpected response received", http_res)
 
-    async def partially_update_table_properties_async(
+    async def get_rich_text_anchors_async(
         self,
         *,
-        table_id: str,
-        request_body: Union[
-            List[models.JSONPatchOperation], List[models.JSONPatchOperationTypedDict]
-        ],
+        rich_text_id: str,
+        maxpagesize: Optional[int] = 1000,
+        next: Optional[str] = None,
+        revision: Optional[str] = None,
         retries: OptionalNullable[utils.RetryConfig] = UNSET,
         server_url: Optional[str] = None,
         timeout_ms: Optional[int] = None,
         http_headers: Optional[Mapping[str, str]] = None,
-    ) -> models.PartiallyUpdateTablePropertiesResponse:
-        r"""Partially update a table's properties
+    ) -> Optional[models.GetRichTextAnchorsResponse]:
+        r"""Retrieve a list of rich text anchors
 
-        Partially updates a table's properties given its ID.
+        Returns an [`AnchorsListResult`](ref:content#anchorslistresult) for a given richTextId.
 
-        This is a long running operation. Responses include a `Location` header, which indicates where to poll for results.
-        For more details on long-running job polling, see [Operations endpoint](ref:getoperationbyid).
-
-        ### Options
-        | Path               | PATCH Operations Supported |
-        |--------------------|----------------------------|
-        | `/name`            | `replace`                  |
-        | `/resizeRowsToFit` | `replace`                  |
-        | `/lock`            | `replace`                  |
-
-
-        :param table_id: The unique identifier for the table
-        :param request_body: Patch document representing the changes to be made to the table's properties
+        :param rich_text_id: The unique identifier of the rich text content
+        :param maxpagesize: The maximum number of results to retrieve
+        :param next: Pagination cursor for next set of results.
+        :param revision: Returns resources at a specific revision
         :param retries: Override the default retry configuration for this method
         :param server_url: Override the default server URL for this method
         :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
@@ -6088,33 +2312,26 @@ class Content(BaseSDK):
         else:
             base_url = self._get_url(base_url, url_variables)
 
-        request = models.PartiallyUpdateTablePropertiesRequest(
-            table_id=table_id,
-            request_body=utils.get_pydantic_model(
-                request_body, List[models.JSONPatchOperation]
-            ),
+        request = models.GetRichTextAnchorsRequest(
+            rich_text_id=rich_text_id,
+            maxpagesize=maxpagesize,
+            next=next,
+            revision=revision,
         )
 
         req = self._build_request_async(
-            method="PATCH",
-            path="/content/tables/{tableId}/properties",
+            method="GET",
+            path="/content/richText/{richTextId}/anchors",
             base_url=base_url,
             url_variables=url_variables,
             request=request,
-            request_body_required=True,
+            request_body_required=False,
             request_has_path_params=True,
             request_has_query_params=True,
             user_agent_header="user-agent",
             accept_header_value="application/json",
             http_headers=http_headers,
             security=self.sdk_configuration.security,
-            get_serialized_body=lambda: utils.serialize_request_body(
-                request.request_body,
-                False,
-                False,
-                "json",
-                List[models.JSONPatchOperation],
-            ),
             allow_empty_value=None,
             timeout_ms=timeout_ms,
         )
@@ -6131,8 +2348,8 @@ class Content(BaseSDK):
             hook_ctx=HookContext(
                 config=self.sdk_configuration,
                 base_url=base_url or "",
-                operation_id="partiallyUpdateTableProperties",
-                oauth2_scopes=["file:write"],
+                operation_id="getRichTextAnchors",
+                oauth2_scopes=["file:read"],
                 security_source=self.sdk_configuration.security,
             ),
             request=req,
@@ -6151,10 +2368,34 @@ class Content(BaseSDK):
             retry_config=retry_config,
         )
 
+        def next_func() -> Awaitable[Optional[models.GetRichTextAnchorsResponse]]:
+            body = utils.unmarshal_json(http_res.text, Union[Dict[Any, Any], List[Any]])
+
+            async def empty_result():
+                return None
+
+            next_cursor = JSONPath("$['@nextLink']").parse(body)
+
+            if len(next_cursor) == 0:
+                return empty_result()
+
+            next_cursor = next_cursor[0]
+            if next_cursor is None or str(next_cursor).strip() == "":
+                return empty_result()
+
+            return self.get_rich_text_anchors_async(
+                rich_text_id=rich_text_id,
+                maxpagesize=maxpagesize,
+                next=next,
+                revision=revision,
+                retries=retries,
+            )
+
         response_data: Any = None
-        if utils.match_response(http_res, "202", "*"):
-            return models.PartiallyUpdateTablePropertiesResponse(
-                headers=utils.get_response_headers(http_res.headers)
+        if utils.match_response(http_res, "200", "application/json"):
+            return models.GetRichTextAnchorsResponse(
+                result=unmarshal_json_response(models.AnchorsListResult, http_res),
+                next=next_func,
             )
         if utils.match_response(
             http_res, ["400", "401", "403", "404", "409", "429"], "application/json"
@@ -6429,27 +2670,24 @@ class Content(BaseSDK):
 
         raise errors.SDKError("Unexpected response received", http_res)
 
-    def rich_text_batch_edit(
+    def get_rich_text_anchor_by_id(
         self,
         *,
         rich_text_id: str,
-        rich_text_batch_edit: Union[
-            models.RichTextBatchEdit, models.RichTextBatchEditTypedDict
-        ],
+        anchor_id: str,
+        revision: Optional[str] = None,
         retries: OptionalNullable[utils.RetryConfig] = UNSET,
         server_url: Optional[str] = None,
         timeout_ms: Optional[int] = None,
         http_headers: Optional[Mapping[str, str]] = None,
-    ) -> models.RichTextBatchEditResponse:
-        r"""Initiate edits to rich text
+    ) -> models.Anchor:
+        r"""Retrieve a rich text anchor by id
 
-        Sends a [`RichTextBatchEdit`](ref:content#richtextbatchedit) to perform as a batch on the rich text.
-        The optional revision property can be used to identify a stable version of the text to use for selections. The latest revision is used if not specified.
-        This is a long running operation. Responses include a `Location` header, which indicates where to poll for results. For more details on long-running job polling, see [Operations endpoint](ref:getoperationbyid).
-        If the batch edit creates any new resources such as embedded tables, the `resourceUrl` field will be populated with a link to the [Rich Text Batch Edit Results endpoint](ref:getrichtextbatcheditresults) to retrieve the IDs of the new resources.
+        Returns an [`Anchor`](ref:content#anchor) given its id.
 
         :param rich_text_id: The unique identifier of the rich text content
-        :param rich_text_batch_edit: The rich text edits to apply
+        :param anchor_id: The unique identifier of the anchor
+        :param revision: Returns resources at a specific revision
         :param retries: Override the default retry configuration for this method
         :param server_url: Override the default server URL for this method
         :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
@@ -6465,33 +2703,25 @@ class Content(BaseSDK):
         else:
             base_url = self._get_url(base_url, url_variables)
 
-        request = models.RichTextBatchEditRequest(
+        request = models.GetRichTextAnchorByIDRequest(
             rich_text_id=rich_text_id,
-            rich_text_batch_edit=utils.get_pydantic_model(
-                rich_text_batch_edit, models.RichTextBatchEdit
-            ),
+            anchor_id=anchor_id,
+            revision=revision,
         )
 
         req = self._build_request(
-            method="POST",
-            path="/content/richText/{richTextId}/edit",
+            method="GET",
+            path="/content/richText/{richTextId}/anchors/{anchorId}",
             base_url=base_url,
             url_variables=url_variables,
             request=request,
-            request_body_required=True,
+            request_body_required=False,
             request_has_path_params=True,
             request_has_query_params=True,
             user_agent_header="user-agent",
             accept_header_value="application/json",
             http_headers=http_headers,
             security=self.sdk_configuration.security,
-            get_serialized_body=lambda: utils.serialize_request_body(
-                request.rich_text_batch_edit,
-                False,
-                False,
-                "json",
-                models.RichTextBatchEdit,
-            ),
             allow_empty_value=None,
             timeout_ms=timeout_ms,
         )
@@ -6508,8 +2738,8 @@ class Content(BaseSDK):
             hook_ctx=HookContext(
                 config=self.sdk_configuration,
                 base_url=base_url or "",
-                operation_id="richTextBatchEdit",
-                oauth2_scopes=["file:write"],
+                operation_id="getRichTextAnchorById",
+                oauth2_scopes=["file:read"],
                 security_source=self.sdk_configuration.security,
             ),
             request=req,
@@ -6529,9 +2759,250 @@ class Content(BaseSDK):
         )
 
         response_data: Any = None
-        if utils.match_response(http_res, "202", "*"):
-            return models.RichTextBatchEditResponse(
-                headers=utils.get_response_headers(http_res.headers)
+        if utils.match_response(http_res, "200", "application/json"):
+            return unmarshal_json_response(models.Anchor, http_res)
+        if utils.match_response(
+            http_res, ["400", "401", "403", "404", "409", "429"], "application/json"
+        ):
+            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
+            raise errors.ErrorResponse(response_data, http_res)
+        if utils.match_response(http_res, ["500", "503"], "application/json"):
+            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
+            raise errors.ErrorResponse(response_data, http_res)
+        if utils.match_response(http_res, "4XX", "*"):
+            http_res_text = utils.stream_to_text(http_res)
+            raise errors.SDKError("API error occurred", http_res, http_res_text)
+        if utils.match_response(http_res, "5XX", "*"):
+            http_res_text = utils.stream_to_text(http_res)
+            raise errors.SDKError("API error occurred", http_res, http_res_text)
+
+        raise errors.SDKError("Unexpected response received", http_res)
+
+    async def get_rich_text_anchor_by_id_async(
+        self,
+        *,
+        rich_text_id: str,
+        anchor_id: str,
+        revision: Optional[str] = None,
+        retries: OptionalNullable[utils.RetryConfig] = UNSET,
+        server_url: Optional[str] = None,
+        timeout_ms: Optional[int] = None,
+        http_headers: Optional[Mapping[str, str]] = None,
+    ) -> models.Anchor:
+        r"""Retrieve a rich text anchor by id
+
+        Returns an [`Anchor`](ref:content#anchor) given its id.
+
+        :param rich_text_id: The unique identifier of the rich text content
+        :param anchor_id: The unique identifier of the anchor
+        :param revision: Returns resources at a specific revision
+        :param retries: Override the default retry configuration for this method
+        :param server_url: Override the default server URL for this method
+        :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
+        :param http_headers: Additional headers to set or replace on requests.
+        """
+        base_url = None
+        url_variables = None
+        if timeout_ms is None:
+            timeout_ms = self.sdk_configuration.timeout_ms
+
+        if server_url is not None:
+            base_url = server_url
+        else:
+            base_url = self._get_url(base_url, url_variables)
+
+        request = models.GetRichTextAnchorByIDRequest(
+            rich_text_id=rich_text_id,
+            anchor_id=anchor_id,
+            revision=revision,
+        )
+
+        req = self._build_request_async(
+            method="GET",
+            path="/content/richText/{richTextId}/anchors/{anchorId}",
+            base_url=base_url,
+            url_variables=url_variables,
+            request=request,
+            request_body_required=False,
+            request_has_path_params=True,
+            request_has_query_params=True,
+            user_agent_header="user-agent",
+            accept_header_value="application/json",
+            http_headers=http_headers,
+            security=self.sdk_configuration.security,
+            allow_empty_value=None,
+            timeout_ms=timeout_ms,
+        )
+
+        if retries == UNSET:
+            if self.sdk_configuration.retry_config is not UNSET:
+                retries = self.sdk_configuration.retry_config
+
+        retry_config = None
+        if isinstance(retries, utils.RetryConfig):
+            retry_config = (retries, ["429", "500", "502", "503", "504"])
+
+        http_res = await self.do_request_async(
+            hook_ctx=HookContext(
+                config=self.sdk_configuration,
+                base_url=base_url or "",
+                operation_id="getRichTextAnchorById",
+                oauth2_scopes=["file:read"],
+                security_source=self.sdk_configuration.security,
+            ),
+            request=req,
+            error_status_codes=[
+                "400",
+                "401",
+                "403",
+                "404",
+                "409",
+                "429",
+                "4XX",
+                "500",
+                "503",
+                "5XX",
+            ],
+            retry_config=retry_config,
+        )
+
+        response_data: Any = None
+        if utils.match_response(http_res, "200", "application/json"):
+            return unmarshal_json_response(models.Anchor, http_res)
+        if utils.match_response(
+            http_res, ["400", "401", "403", "404", "409", "429"], "application/json"
+        ):
+            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
+            raise errors.ErrorResponse(response_data, http_res)
+        if utils.match_response(http_res, ["500", "503"], "application/json"):
+            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
+            raise errors.ErrorResponse(response_data, http_res)
+        if utils.match_response(http_res, "4XX", "*"):
+            http_res_text = await utils.stream_to_text_async(http_res)
+            raise errors.SDKError("API error occurred", http_res, http_res_text)
+        if utils.match_response(http_res, "5XX", "*"):
+            http_res_text = await utils.stream_to_text_async(http_res)
+            raise errors.SDKError("API error occurred", http_res, http_res_text)
+
+        raise errors.SDKError("Unexpected response received", http_res)
+
+    def get_rich_text_anchor_extensions(
+        self,
+        *,
+        request: Union[
+            models.GetRichTextAnchorExtensionsRequest,
+            models.GetRichTextAnchorExtensionsRequestTypedDict,
+        ],
+        retries: OptionalNullable[utils.RetryConfig] = UNSET,
+        server_url: Optional[str] = None,
+        timeout_ms: Optional[int] = None,
+        http_headers: Optional[Mapping[str, str]] = None,
+    ) -> Optional[models.GetRichTextAnchorExtensionsResponse]:
+        r"""Retrieve a list of rich text anchor extensions
+
+        Returns a paginated list of [`AnchorExtensions`](ref:content#anchorextension) for a given anchorId.
+
+        :param request: The request object to send.
+        :param retries: Override the default retry configuration for this method
+        :param server_url: Override the default server URL for this method
+        :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
+        :param http_headers: Additional headers to set or replace on requests.
+        """
+        base_url = None
+        url_variables = None
+        if timeout_ms is None:
+            timeout_ms = self.sdk_configuration.timeout_ms
+
+        if server_url is not None:
+            base_url = server_url
+        else:
+            base_url = self._get_url(base_url, url_variables)
+
+        if not isinstance(request, BaseModel):
+            request = utils.unmarshal(
+                request, models.GetRichTextAnchorExtensionsRequest
+            )
+        request = cast(models.GetRichTextAnchorExtensionsRequest, request)
+
+        req = self._build_request(
+            method="GET",
+            path="/content/richText/{richTextId}/anchors/{anchorId}/extensions",
+            base_url=base_url,
+            url_variables=url_variables,
+            request=request,
+            request_body_required=False,
+            request_has_path_params=True,
+            request_has_query_params=True,
+            user_agent_header="user-agent",
+            accept_header_value="application/json",
+            http_headers=http_headers,
+            security=self.sdk_configuration.security,
+            allow_empty_value=None,
+            timeout_ms=timeout_ms,
+        )
+
+        if retries == UNSET:
+            if self.sdk_configuration.retry_config is not UNSET:
+                retries = self.sdk_configuration.retry_config
+
+        retry_config = None
+        if isinstance(retries, utils.RetryConfig):
+            retry_config = (retries, ["429", "500", "502", "503", "504"])
+
+        http_res = self.do_request(
+            hook_ctx=HookContext(
+                config=self.sdk_configuration,
+                base_url=base_url or "",
+                operation_id="getRichTextAnchorExtensions",
+                oauth2_scopes=["file:read"],
+                security_source=self.sdk_configuration.security,
+            ),
+            request=req,
+            error_status_codes=[
+                "400",
+                "401",
+                "403",
+                "404",
+                "409",
+                "429",
+                "4XX",
+                "500",
+                "503",
+                "5XX",
+            ],
+            retry_config=retry_config,
+        )
+
+        def next_func() -> Optional[models.GetRichTextAnchorExtensionsResponse]:
+            body = utils.unmarshal_json(http_res.text, Union[Dict[Any, Any], List[Any]])
+
+            next_cursor = JSONPath("$['@nextLink']").parse(body)
+
+            if len(next_cursor) == 0:
+                return None
+
+            next_cursor = next_cursor[0]
+            if next_cursor is None or str(next_cursor).strip() == "":
+                return None
+
+            return self.get_rich_text_anchor_extensions(
+                request=models.GetRichTextAnchorExtensionsRequest(
+                    rich_text_id=request.rich_text_id,
+                    anchor_id=request.anchor_id,
+                    maxpagesize=request.maxpagesize,
+                    next=request.next,
+                    revision=request.revision,
+                ),
+                retries=retries,
+            )
+
+        response_data: Any = None
+        if utils.match_response(http_res, "200", "application/json"):
+            return models.GetRichTextAnchorExtensionsResponse(
+                result=unmarshal_json_response(
+                    models.AnchorExtensionsListResult, http_res
+                ),
+                next=next_func,
             )
         if utils.match_response(
             http_res, ["400", "401", "403", "404", "409", "429"], "application/json"
@@ -6550,27 +3021,23 @@ class Content(BaseSDK):
 
         raise errors.SDKError("Unexpected response received", http_res)
 
-    async def rich_text_batch_edit_async(
+    async def get_rich_text_anchor_extensions_async(
         self,
         *,
-        rich_text_id: str,
-        rich_text_batch_edit: Union[
-            models.RichTextBatchEdit, models.RichTextBatchEditTypedDict
+        request: Union[
+            models.GetRichTextAnchorExtensionsRequest,
+            models.GetRichTextAnchorExtensionsRequestTypedDict,
         ],
         retries: OptionalNullable[utils.RetryConfig] = UNSET,
         server_url: Optional[str] = None,
         timeout_ms: Optional[int] = None,
         http_headers: Optional[Mapping[str, str]] = None,
-    ) -> models.RichTextBatchEditResponse:
-        r"""Initiate edits to rich text
+    ) -> Optional[models.GetRichTextAnchorExtensionsResponse]:
+        r"""Retrieve a list of rich text anchor extensions
 
-        Sends a [`RichTextBatchEdit`](ref:content#richtextbatchedit) to perform as a batch on the rich text.
-        The optional revision property can be used to identify a stable version of the text to use for selections. The latest revision is used if not specified.
-        This is a long running operation. Responses include a `Location` header, which indicates where to poll for results. For more details on long-running job polling, see [Operations endpoint](ref:getoperationbyid).
-        If the batch edit creates any new resources such as embedded tables, the `resourceUrl` field will be populated with a link to the [Rich Text Batch Edit Results endpoint](ref:getrichtextbatcheditresults) to retrieve the IDs of the new resources.
+        Returns a paginated list of [`AnchorExtensions`](ref:content#anchorextension) for a given anchorId.
 
-        :param rich_text_id: The unique identifier of the rich text content
-        :param rich_text_batch_edit: The rich text edits to apply
+        :param request: The request object to send.
         :param retries: Override the default retry configuration for this method
         :param server_url: Override the default server URL for this method
         :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
@@ -6586,33 +3053,25 @@ class Content(BaseSDK):
         else:
             base_url = self._get_url(base_url, url_variables)
 
-        request = models.RichTextBatchEditRequest(
-            rich_text_id=rich_text_id,
-            rich_text_batch_edit=utils.get_pydantic_model(
-                rich_text_batch_edit, models.RichTextBatchEdit
-            ),
-        )
+        if not isinstance(request, BaseModel):
+            request = utils.unmarshal(
+                request, models.GetRichTextAnchorExtensionsRequest
+            )
+        request = cast(models.GetRichTextAnchorExtensionsRequest, request)
 
         req = self._build_request_async(
-            method="POST",
-            path="/content/richText/{richTextId}/edit",
+            method="GET",
+            path="/content/richText/{richTextId}/anchors/{anchorId}/extensions",
             base_url=base_url,
             url_variables=url_variables,
             request=request,
-            request_body_required=True,
+            request_body_required=False,
             request_has_path_params=True,
             request_has_query_params=True,
             user_agent_header="user-agent",
             accept_header_value="application/json",
             http_headers=http_headers,
             security=self.sdk_configuration.security,
-            get_serialized_body=lambda: utils.serialize_request_body(
-                request.rich_text_batch_edit,
-                False,
-                False,
-                "json",
-                models.RichTextBatchEdit,
-            ),
             allow_empty_value=None,
             timeout_ms=timeout_ms,
         )
@@ -6629,8 +3088,8 @@ class Content(BaseSDK):
             hook_ctx=HookContext(
                 config=self.sdk_configuration,
                 base_url=base_url or "",
-                operation_id="richTextBatchEdit",
-                oauth2_scopes=["file:write"],
+                operation_id="getRichTextAnchorExtensions",
+                oauth2_scopes=["file:read"],
                 security_source=self.sdk_configuration.security,
             ),
             request=req,
@@ -6649,10 +3108,41 @@ class Content(BaseSDK):
             retry_config=retry_config,
         )
 
+        def next_func() -> (
+            Awaitable[Optional[models.GetRichTextAnchorExtensionsResponse]]
+        ):
+            body = utils.unmarshal_json(http_res.text, Union[Dict[Any, Any], List[Any]])
+
+            async def empty_result():
+                return None
+
+            next_cursor = JSONPath("$['@nextLink']").parse(body)
+
+            if len(next_cursor) == 0:
+                return empty_result()
+
+            next_cursor = next_cursor[0]
+            if next_cursor is None or str(next_cursor).strip() == "":
+                return empty_result()
+
+            return self.get_rich_text_anchor_extensions_async(
+                request=models.GetRichTextAnchorExtensionsRequest(
+                    rich_text_id=request.rich_text_id,
+                    anchor_id=request.anchor_id,
+                    maxpagesize=request.maxpagesize,
+                    next=request.next,
+                    revision=request.revision,
+                ),
+                retries=retries,
+            )
+
         response_data: Any = None
-        if utils.match_response(http_res, "202", "*"):
-            return models.RichTextBatchEditResponse(
-                headers=utils.get_response_headers(http_res.headers)
+        if utils.match_response(http_res, "200", "application/json"):
+            return models.GetRichTextAnchorExtensionsResponse(
+                result=unmarshal_json_response(
+                    models.AnchorExtensionsListResult, http_res
+                ),
+                next=next_func,
             )
         if utils.match_response(
             http_res, ["400", "401", "403", "404", "409", "429"], "application/json"
@@ -6913,6 +3403,248 @@ class Content(BaseSDK):
 
         raise errors.SDKError("Unexpected response received", http_res)
 
+    def rich_text_batch_edit(
+        self,
+        *,
+        rich_text_id: str,
+        rich_text_batch_edit: Union[
+            models.RichTextBatchEdit, models.RichTextBatchEditTypedDict
+        ],
+        retries: OptionalNullable[utils.RetryConfig] = UNSET,
+        server_url: Optional[str] = None,
+        timeout_ms: Optional[int] = None,
+        http_headers: Optional[Mapping[str, str]] = None,
+    ) -> models.RichTextBatchEditResponse:
+        r"""Initiate edits to rich text
+
+        Sends a [`RichTextBatchEdit`](ref:content#richtextbatchedit) to perform as a batch on the rich text.
+        The optional revision property can be used to identify a stable version of the text to use for selections. The latest revision is used if not specified.
+        This is a long running operation. Responses include a `Location` header, which indicates where to poll for results. For more details on long-running job polling, see [Operations endpoint](ref:getoperationbyid).
+        If the batch edit creates any new resources such as embedded tables, the `resourceUrl` field will be populated with a link to the [Rich Text Batch Edit Results endpoint](ref:getrichtextbatcheditresults) to retrieve the IDs of the new resources.
+
+        :param rich_text_id: The unique identifier of the rich text content
+        :param rich_text_batch_edit: The rich text edits to apply
+        :param retries: Override the default retry configuration for this method
+        :param server_url: Override the default server URL for this method
+        :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
+        :param http_headers: Additional headers to set or replace on requests.
+        """
+        base_url = None
+        url_variables = None
+        if timeout_ms is None:
+            timeout_ms = self.sdk_configuration.timeout_ms
+
+        if server_url is not None:
+            base_url = server_url
+        else:
+            base_url = self._get_url(base_url, url_variables)
+
+        request = models.RichTextBatchEditRequest(
+            rich_text_id=rich_text_id,
+            rich_text_batch_edit=utils.get_pydantic_model(
+                rich_text_batch_edit, models.RichTextBatchEdit
+            ),
+        )
+
+        req = self._build_request(
+            method="POST",
+            path="/content/richText/{richTextId}/edit",
+            base_url=base_url,
+            url_variables=url_variables,
+            request=request,
+            request_body_required=True,
+            request_has_path_params=True,
+            request_has_query_params=True,
+            user_agent_header="user-agent",
+            accept_header_value="application/json",
+            http_headers=http_headers,
+            security=self.sdk_configuration.security,
+            get_serialized_body=lambda: utils.serialize_request_body(
+                request.rich_text_batch_edit,
+                False,
+                False,
+                "json",
+                models.RichTextBatchEdit,
+            ),
+            allow_empty_value=None,
+            timeout_ms=timeout_ms,
+        )
+
+        if retries == UNSET:
+            if self.sdk_configuration.retry_config is not UNSET:
+                retries = self.sdk_configuration.retry_config
+
+        retry_config = None
+        if isinstance(retries, utils.RetryConfig):
+            retry_config = (retries, ["429", "500", "502", "503", "504"])
+
+        http_res = self.do_request(
+            hook_ctx=HookContext(
+                config=self.sdk_configuration,
+                base_url=base_url or "",
+                operation_id="richTextBatchEdit",
+                oauth2_scopes=["file:write"],
+                security_source=self.sdk_configuration.security,
+            ),
+            request=req,
+            error_status_codes=[
+                "400",
+                "401",
+                "403",
+                "404",
+                "409",
+                "429",
+                "4XX",
+                "500",
+                "503",
+                "5XX",
+            ],
+            retry_config=retry_config,
+        )
+
+        response_data: Any = None
+        if utils.match_response(http_res, "202", "*"):
+            return models.RichTextBatchEditResponse(
+                headers=utils.get_response_headers(http_res.headers)
+            )
+        if utils.match_response(
+            http_res, ["400", "401", "403", "404", "409", "429"], "application/json"
+        ):
+            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
+            raise errors.ErrorResponse(response_data, http_res)
+        if utils.match_response(http_res, ["500", "503"], "application/json"):
+            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
+            raise errors.ErrorResponse(response_data, http_res)
+        if utils.match_response(http_res, "4XX", "*"):
+            http_res_text = utils.stream_to_text(http_res)
+            raise errors.SDKError("API error occurred", http_res, http_res_text)
+        if utils.match_response(http_res, "5XX", "*"):
+            http_res_text = utils.stream_to_text(http_res)
+            raise errors.SDKError("API error occurred", http_res, http_res_text)
+
+        raise errors.SDKError("Unexpected response received", http_res)
+
+    async def rich_text_batch_edit_async(
+        self,
+        *,
+        rich_text_id: str,
+        rich_text_batch_edit: Union[
+            models.RichTextBatchEdit, models.RichTextBatchEditTypedDict
+        ],
+        retries: OptionalNullable[utils.RetryConfig] = UNSET,
+        server_url: Optional[str] = None,
+        timeout_ms: Optional[int] = None,
+        http_headers: Optional[Mapping[str, str]] = None,
+    ) -> models.RichTextBatchEditResponse:
+        r"""Initiate edits to rich text
+
+        Sends a [`RichTextBatchEdit`](ref:content#richtextbatchedit) to perform as a batch on the rich text.
+        The optional revision property can be used to identify a stable version of the text to use for selections. The latest revision is used if not specified.
+        This is a long running operation. Responses include a `Location` header, which indicates where to poll for results. For more details on long-running job polling, see [Operations endpoint](ref:getoperationbyid).
+        If the batch edit creates any new resources such as embedded tables, the `resourceUrl` field will be populated with a link to the [Rich Text Batch Edit Results endpoint](ref:getrichtextbatcheditresults) to retrieve the IDs of the new resources.
+
+        :param rich_text_id: The unique identifier of the rich text content
+        :param rich_text_batch_edit: The rich text edits to apply
+        :param retries: Override the default retry configuration for this method
+        :param server_url: Override the default server URL for this method
+        :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
+        :param http_headers: Additional headers to set or replace on requests.
+        """
+        base_url = None
+        url_variables = None
+        if timeout_ms is None:
+            timeout_ms = self.sdk_configuration.timeout_ms
+
+        if server_url is not None:
+            base_url = server_url
+        else:
+            base_url = self._get_url(base_url, url_variables)
+
+        request = models.RichTextBatchEditRequest(
+            rich_text_id=rich_text_id,
+            rich_text_batch_edit=utils.get_pydantic_model(
+                rich_text_batch_edit, models.RichTextBatchEdit
+            ),
+        )
+
+        req = self._build_request_async(
+            method="POST",
+            path="/content/richText/{richTextId}/edit",
+            base_url=base_url,
+            url_variables=url_variables,
+            request=request,
+            request_body_required=True,
+            request_has_path_params=True,
+            request_has_query_params=True,
+            user_agent_header="user-agent",
+            accept_header_value="application/json",
+            http_headers=http_headers,
+            security=self.sdk_configuration.security,
+            get_serialized_body=lambda: utils.serialize_request_body(
+                request.rich_text_batch_edit,
+                False,
+                False,
+                "json",
+                models.RichTextBatchEdit,
+            ),
+            allow_empty_value=None,
+            timeout_ms=timeout_ms,
+        )
+
+        if retries == UNSET:
+            if self.sdk_configuration.retry_config is not UNSET:
+                retries = self.sdk_configuration.retry_config
+
+        retry_config = None
+        if isinstance(retries, utils.RetryConfig):
+            retry_config = (retries, ["429", "500", "502", "503", "504"])
+
+        http_res = await self.do_request_async(
+            hook_ctx=HookContext(
+                config=self.sdk_configuration,
+                base_url=base_url or "",
+                operation_id="richTextBatchEdit",
+                oauth2_scopes=["file:write"],
+                security_source=self.sdk_configuration.security,
+            ),
+            request=req,
+            error_status_codes=[
+                "400",
+                "401",
+                "403",
+                "404",
+                "409",
+                "429",
+                "4XX",
+                "500",
+                "503",
+                "5XX",
+            ],
+            retry_config=retry_config,
+        )
+
+        response_data: Any = None
+        if utils.match_response(http_res, "202", "*"):
+            return models.RichTextBatchEditResponse(
+                headers=utils.get_response_headers(http_res.headers)
+            )
+        if utils.match_response(
+            http_res, ["400", "401", "403", "404", "409", "429"], "application/json"
+        ):
+            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
+            raise errors.ErrorResponse(response_data, http_res)
+        if utils.match_response(http_res, ["500", "503"], "application/json"):
+            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
+            raise errors.ErrorResponse(response_data, http_res)
+        if utils.match_response(http_res, "4XX", "*"):
+            http_res_text = await utils.stream_to_text_async(http_res)
+            raise errors.SDKError("API error occurred", http_res, http_res_text)
+        if utils.match_response(http_res, "5XX", "*"):
+            http_res_text = await utils.stream_to_text_async(http_res)
+            raise errors.SDKError("API error occurred", http_res, http_res_text)
+
+        raise errors.SDKError("Unexpected response received", http_res)
+
     def rich_text_links_batch_edit(
         self,
         *,
@@ -7138,6 +3870,489 @@ class Content(BaseSDK):
             return models.RichTextLinksBatchEditResponse(
                 headers=utils.get_response_headers(http_res.headers)
             )
+        if utils.match_response(
+            http_res, ["400", "401", "403", "404", "409", "429"], "application/json"
+        ):
+            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
+            raise errors.ErrorResponse(response_data, http_res)
+        if utils.match_response(http_res, ["500", "503"], "application/json"):
+            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
+            raise errors.ErrorResponse(response_data, http_res)
+        if utils.match_response(http_res, "4XX", "*"):
+            http_res_text = await utils.stream_to_text_async(http_res)
+            raise errors.SDKError("API error occurred", http_res, http_res_text)
+        if utils.match_response(http_res, "5XX", "*"):
+            http_res_text = await utils.stream_to_text_async(http_res)
+            raise errors.SDKError("API error occurred", http_res, http_res_text)
+
+        raise errors.SDKError("Unexpected response received", http_res)
+
+    def get_rich_text_paragraphs(
+        self,
+        *,
+        rich_text_id: str,
+        maxpagesize: Optional[int] = 1000,
+        next: Optional[str] = None,
+        revision: Optional[str] = None,
+        retries: OptionalNullable[utils.RetryConfig] = UNSET,
+        server_url: Optional[str] = None,
+        timeout_ms: Optional[int] = None,
+        http_headers: Optional[Mapping[str, str]] = None,
+    ) -> Optional[models.GetRichTextParagraphsResponse]:
+        r"""Retrieve rich text paragraphs
+
+        Returns a [`ParagraphsListResult`](ref:content#paragraphslistresult) for a rich text object, given its id.
+
+        :param rich_text_id: The unique identifier of the rich text content
+        :param maxpagesize: The maximum number of results to retrieve
+        :param next: Pagination cursor for next set of results.
+        :param revision: Returns resources at a specific revision
+        :param retries: Override the default retry configuration for this method
+        :param server_url: Override the default server URL for this method
+        :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
+        :param http_headers: Additional headers to set or replace on requests.
+        """
+        base_url = None
+        url_variables = None
+        if timeout_ms is None:
+            timeout_ms = self.sdk_configuration.timeout_ms
+
+        if server_url is not None:
+            base_url = server_url
+        else:
+            base_url = self._get_url(base_url, url_variables)
+
+        request = models.GetRichTextParagraphsRequest(
+            rich_text_id=rich_text_id,
+            maxpagesize=maxpagesize,
+            next=next,
+            revision=revision,
+        )
+
+        req = self._build_request(
+            method="GET",
+            path="/content/richText/{richTextId}/paragraphs",
+            base_url=base_url,
+            url_variables=url_variables,
+            request=request,
+            request_body_required=False,
+            request_has_path_params=True,
+            request_has_query_params=True,
+            user_agent_header="user-agent",
+            accept_header_value="application/json",
+            http_headers=http_headers,
+            security=self.sdk_configuration.security,
+            allow_empty_value=None,
+            timeout_ms=timeout_ms,
+        )
+
+        if retries == UNSET:
+            if self.sdk_configuration.retry_config is not UNSET:
+                retries = self.sdk_configuration.retry_config
+
+        retry_config = None
+        if isinstance(retries, utils.RetryConfig):
+            retry_config = (retries, ["429", "500", "502", "503", "504"])
+
+        http_res = self.do_request(
+            hook_ctx=HookContext(
+                config=self.sdk_configuration,
+                base_url=base_url or "",
+                operation_id="getRichTextParagraphs",
+                oauth2_scopes=["file:read"],
+                security_source=self.sdk_configuration.security,
+            ),
+            request=req,
+            error_status_codes=[
+                "400",
+                "401",
+                "403",
+                "404",
+                "409",
+                "429",
+                "4XX",
+                "500",
+                "503",
+                "5XX",
+            ],
+            retry_config=retry_config,
+        )
+
+        def next_func() -> Optional[models.GetRichTextParagraphsResponse]:
+            body = utils.unmarshal_json(http_res.text, Union[Dict[Any, Any], List[Any]])
+
+            next_cursor = JSONPath("$['@nextLink']").parse(body)
+
+            if len(next_cursor) == 0:
+                return None
+
+            next_cursor = next_cursor[0]
+            if next_cursor is None or str(next_cursor).strip() == "":
+                return None
+
+            return self.get_rich_text_paragraphs(
+                rich_text_id=rich_text_id,
+                maxpagesize=maxpagesize,
+                next=next,
+                revision=revision,
+                retries=retries,
+            )
+
+        response_data: Any = None
+        if utils.match_response(http_res, "200", "application/json"):
+            return models.GetRichTextParagraphsResponse(
+                result=unmarshal_json_response(models.ParagraphsListResult, http_res),
+                next=next_func,
+            )
+        if utils.match_response(
+            http_res, ["400", "401", "403", "404", "409", "429"], "application/json"
+        ):
+            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
+            raise errors.ErrorResponse(response_data, http_res)
+        if utils.match_response(http_res, ["500", "503"], "application/json"):
+            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
+            raise errors.ErrorResponse(response_data, http_res)
+        if utils.match_response(http_res, "4XX", "*"):
+            http_res_text = utils.stream_to_text(http_res)
+            raise errors.SDKError("API error occurred", http_res, http_res_text)
+        if utils.match_response(http_res, "5XX", "*"):
+            http_res_text = utils.stream_to_text(http_res)
+            raise errors.SDKError("API error occurred", http_res, http_res_text)
+
+        raise errors.SDKError("Unexpected response received", http_res)
+
+    async def get_rich_text_paragraphs_async(
+        self,
+        *,
+        rich_text_id: str,
+        maxpagesize: Optional[int] = 1000,
+        next: Optional[str] = None,
+        revision: Optional[str] = None,
+        retries: OptionalNullable[utils.RetryConfig] = UNSET,
+        server_url: Optional[str] = None,
+        timeout_ms: Optional[int] = None,
+        http_headers: Optional[Mapping[str, str]] = None,
+    ) -> Optional[models.GetRichTextParagraphsResponse]:
+        r"""Retrieve rich text paragraphs
+
+        Returns a [`ParagraphsListResult`](ref:content#paragraphslistresult) for a rich text object, given its id.
+
+        :param rich_text_id: The unique identifier of the rich text content
+        :param maxpagesize: The maximum number of results to retrieve
+        :param next: Pagination cursor for next set of results.
+        :param revision: Returns resources at a specific revision
+        :param retries: Override the default retry configuration for this method
+        :param server_url: Override the default server URL for this method
+        :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
+        :param http_headers: Additional headers to set or replace on requests.
+        """
+        base_url = None
+        url_variables = None
+        if timeout_ms is None:
+            timeout_ms = self.sdk_configuration.timeout_ms
+
+        if server_url is not None:
+            base_url = server_url
+        else:
+            base_url = self._get_url(base_url, url_variables)
+
+        request = models.GetRichTextParagraphsRequest(
+            rich_text_id=rich_text_id,
+            maxpagesize=maxpagesize,
+            next=next,
+            revision=revision,
+        )
+
+        req = self._build_request_async(
+            method="GET",
+            path="/content/richText/{richTextId}/paragraphs",
+            base_url=base_url,
+            url_variables=url_variables,
+            request=request,
+            request_body_required=False,
+            request_has_path_params=True,
+            request_has_query_params=True,
+            user_agent_header="user-agent",
+            accept_header_value="application/json",
+            http_headers=http_headers,
+            security=self.sdk_configuration.security,
+            allow_empty_value=None,
+            timeout_ms=timeout_ms,
+        )
+
+        if retries == UNSET:
+            if self.sdk_configuration.retry_config is not UNSET:
+                retries = self.sdk_configuration.retry_config
+
+        retry_config = None
+        if isinstance(retries, utils.RetryConfig):
+            retry_config = (retries, ["429", "500", "502", "503", "504"])
+
+        http_res = await self.do_request_async(
+            hook_ctx=HookContext(
+                config=self.sdk_configuration,
+                base_url=base_url or "",
+                operation_id="getRichTextParagraphs",
+                oauth2_scopes=["file:read"],
+                security_source=self.sdk_configuration.security,
+            ),
+            request=req,
+            error_status_codes=[
+                "400",
+                "401",
+                "403",
+                "404",
+                "409",
+                "429",
+                "4XX",
+                "500",
+                "503",
+                "5XX",
+            ],
+            retry_config=retry_config,
+        )
+
+        def next_func() -> Awaitable[Optional[models.GetRichTextParagraphsResponse]]:
+            body = utils.unmarshal_json(http_res.text, Union[Dict[Any, Any], List[Any]])
+
+            async def empty_result():
+                return None
+
+            next_cursor = JSONPath("$['@nextLink']").parse(body)
+
+            if len(next_cursor) == 0:
+                return empty_result()
+
+            next_cursor = next_cursor[0]
+            if next_cursor is None or str(next_cursor).strip() == "":
+                return empty_result()
+
+            return self.get_rich_text_paragraphs_async(
+                rich_text_id=rich_text_id,
+                maxpagesize=maxpagesize,
+                next=next,
+                revision=revision,
+                retries=retries,
+            )
+
+        response_data: Any = None
+        if utils.match_response(http_res, "200", "application/json"):
+            return models.GetRichTextParagraphsResponse(
+                result=unmarshal_json_response(models.ParagraphsListResult, http_res),
+                next=next_func,
+            )
+        if utils.match_response(
+            http_res, ["400", "401", "403", "404", "409", "429"], "application/json"
+        ):
+            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
+            raise errors.ErrorResponse(response_data, http_res)
+        if utils.match_response(http_res, ["500", "503"], "application/json"):
+            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
+            raise errors.ErrorResponse(response_data, http_res)
+        if utils.match_response(http_res, "4XX", "*"):
+            http_res_text = await utils.stream_to_text_async(http_res)
+            raise errors.SDKError("API error occurred", http_res, http_res_text)
+        if utils.match_response(http_res, "5XX", "*"):
+            http_res_text = await utils.stream_to_text_async(http_res)
+            raise errors.SDKError("API error occurred", http_res, http_res_text)
+
+        raise errors.SDKError("Unexpected response received", http_res)
+
+    def get_style_guide_by_id(
+        self,
+        *,
+        style_guide_id: str,
+        revision: Optional[str] = None,
+        retries: OptionalNullable[utils.RetryConfig] = UNSET,
+        server_url: Optional[str] = None,
+        timeout_ms: Optional[int] = None,
+        http_headers: Optional[Mapping[str, str]] = None,
+    ) -> models.StyleGuide:
+        r"""Retrieve a style guide by id
+
+        Returns the [`StyleGuide`](ref:content#styleguide) populated with the text styles, list styles, etc. The revision will ensure a static content.
+
+
+        :param style_guide_id: The unique identifier of the style guide
+        :param revision: Returns resources at a specific revision
+        :param retries: Override the default retry configuration for this method
+        :param server_url: Override the default server URL for this method
+        :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
+        :param http_headers: Additional headers to set or replace on requests.
+        """
+        base_url = None
+        url_variables = None
+        if timeout_ms is None:
+            timeout_ms = self.sdk_configuration.timeout_ms
+
+        if server_url is not None:
+            base_url = server_url
+        else:
+            base_url = self._get_url(base_url, url_variables)
+
+        request = models.GetStyleGuideByIDRequest(
+            style_guide_id=style_guide_id,
+            revision=revision,
+        )
+
+        req = self._build_request(
+            method="GET",
+            path="/content/styleGuides/{styleGuideId}",
+            base_url=base_url,
+            url_variables=url_variables,
+            request=request,
+            request_body_required=False,
+            request_has_path_params=True,
+            request_has_query_params=True,
+            user_agent_header="user-agent",
+            accept_header_value="application/json",
+            http_headers=http_headers,
+            security=self.sdk_configuration.security,
+            allow_empty_value=None,
+            timeout_ms=timeout_ms,
+        )
+
+        if retries == UNSET:
+            if self.sdk_configuration.retry_config is not UNSET:
+                retries = self.sdk_configuration.retry_config
+
+        retry_config = None
+        if isinstance(retries, utils.RetryConfig):
+            retry_config = (retries, ["429", "500", "502", "503", "504"])
+
+        http_res = self.do_request(
+            hook_ctx=HookContext(
+                config=self.sdk_configuration,
+                base_url=base_url or "",
+                operation_id="getStyleGuideById",
+                oauth2_scopes=["file:read"],
+                security_source=self.sdk_configuration.security,
+            ),
+            request=req,
+            error_status_codes=[
+                "400",
+                "401",
+                "403",
+                "404",
+                "409",
+                "429",
+                "4XX",
+                "500",
+                "503",
+                "5XX",
+            ],
+            retry_config=retry_config,
+        )
+
+        response_data: Any = None
+        if utils.match_response(http_res, "200", "application/json"):
+            return unmarshal_json_response(models.StyleGuide, http_res)
+        if utils.match_response(
+            http_res, ["400", "401", "403", "404", "409", "429"], "application/json"
+        ):
+            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
+            raise errors.ErrorResponse(response_data, http_res)
+        if utils.match_response(http_res, ["500", "503"], "application/json"):
+            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
+            raise errors.ErrorResponse(response_data, http_res)
+        if utils.match_response(http_res, "4XX", "*"):
+            http_res_text = utils.stream_to_text(http_res)
+            raise errors.SDKError("API error occurred", http_res, http_res_text)
+        if utils.match_response(http_res, "5XX", "*"):
+            http_res_text = utils.stream_to_text(http_res)
+            raise errors.SDKError("API error occurred", http_res, http_res_text)
+
+        raise errors.SDKError("Unexpected response received", http_res)
+
+    async def get_style_guide_by_id_async(
+        self,
+        *,
+        style_guide_id: str,
+        revision: Optional[str] = None,
+        retries: OptionalNullable[utils.RetryConfig] = UNSET,
+        server_url: Optional[str] = None,
+        timeout_ms: Optional[int] = None,
+        http_headers: Optional[Mapping[str, str]] = None,
+    ) -> models.StyleGuide:
+        r"""Retrieve a style guide by id
+
+        Returns the [`StyleGuide`](ref:content#styleguide) populated with the text styles, list styles, etc. The revision will ensure a static content.
+
+
+        :param style_guide_id: The unique identifier of the style guide
+        :param revision: Returns resources at a specific revision
+        :param retries: Override the default retry configuration for this method
+        :param server_url: Override the default server URL for this method
+        :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
+        :param http_headers: Additional headers to set or replace on requests.
+        """
+        base_url = None
+        url_variables = None
+        if timeout_ms is None:
+            timeout_ms = self.sdk_configuration.timeout_ms
+
+        if server_url is not None:
+            base_url = server_url
+        else:
+            base_url = self._get_url(base_url, url_variables)
+
+        request = models.GetStyleGuideByIDRequest(
+            style_guide_id=style_guide_id,
+            revision=revision,
+        )
+
+        req = self._build_request_async(
+            method="GET",
+            path="/content/styleGuides/{styleGuideId}",
+            base_url=base_url,
+            url_variables=url_variables,
+            request=request,
+            request_body_required=False,
+            request_has_path_params=True,
+            request_has_query_params=True,
+            user_agent_header="user-agent",
+            accept_header_value="application/json",
+            http_headers=http_headers,
+            security=self.sdk_configuration.security,
+            allow_empty_value=None,
+            timeout_ms=timeout_ms,
+        )
+
+        if retries == UNSET:
+            if self.sdk_configuration.retry_config is not UNSET:
+                retries = self.sdk_configuration.retry_config
+
+        retry_config = None
+        if isinstance(retries, utils.RetryConfig):
+            retry_config = (retries, ["429", "500", "502", "503", "504"])
+
+        http_res = await self.do_request_async(
+            hook_ctx=HookContext(
+                config=self.sdk_configuration,
+                base_url=base_url or "",
+                operation_id="getStyleGuideById",
+                oauth2_scopes=["file:read"],
+                security_source=self.sdk_configuration.security,
+            ),
+            request=req,
+            error_status_codes=[
+                "400",
+                "401",
+                "403",
+                "404",
+                "409",
+                "429",
+                "4XX",
+                "500",
+                "503",
+                "5XX",
+            ],
+            retry_config=retry_config,
+        )
+
+        response_data: Any = None
+        if utils.match_response(http_res, "200", "application/json"):
+            return unmarshal_json_response(models.StyleGuide, http_res)
         if utils.match_response(
             http_res, ["400", "401", "403", "404", "409", "429"], "application/json"
         ):
@@ -7649,6 +4864,277 @@ class Content(BaseSDK):
 
         raise errors.SDKError("Unexpected response received", http_res)
 
+    def get_table_anchors(
+        self,
+        *,
+        table_id: str,
+        maxpagesize: Optional[int] = 1000,
+        next: Optional[str] = None,
+        revision: Optional[str] = None,
+        retries: OptionalNullable[utils.RetryConfig] = UNSET,
+        server_url: Optional[str] = None,
+        timeout_ms: Optional[int] = None,
+        http_headers: Optional[Mapping[str, str]] = None,
+    ) -> Optional[models.GetTableAnchorsResponse]:
+        r"""Retrieve a list of table anchors
+
+        Returns an [`AnchorsListResult`](ref:content#anchorslistresult) given tableId.
+
+        :param table_id: The unique identifier for the table
+        :param maxpagesize: The maximum number of results to retrieve
+        :param next: Pagination cursor for next set of results.
+        :param revision: Returns resources at a specific revision
+        :param retries: Override the default retry configuration for this method
+        :param server_url: Override the default server URL for this method
+        :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
+        :param http_headers: Additional headers to set or replace on requests.
+        """
+        base_url = None
+        url_variables = None
+        if timeout_ms is None:
+            timeout_ms = self.sdk_configuration.timeout_ms
+
+        if server_url is not None:
+            base_url = server_url
+        else:
+            base_url = self._get_url(base_url, url_variables)
+
+        request = models.GetTableAnchorsRequest(
+            table_id=table_id,
+            maxpagesize=maxpagesize,
+            next=next,
+            revision=revision,
+        )
+
+        req = self._build_request(
+            method="GET",
+            path="/content/tables/{tableId}/anchors",
+            base_url=base_url,
+            url_variables=url_variables,
+            request=request,
+            request_body_required=False,
+            request_has_path_params=True,
+            request_has_query_params=True,
+            user_agent_header="user-agent",
+            accept_header_value="application/json",
+            http_headers=http_headers,
+            security=self.sdk_configuration.security,
+            allow_empty_value=None,
+            timeout_ms=timeout_ms,
+        )
+
+        if retries == UNSET:
+            if self.sdk_configuration.retry_config is not UNSET:
+                retries = self.sdk_configuration.retry_config
+
+        retry_config = None
+        if isinstance(retries, utils.RetryConfig):
+            retry_config = (retries, ["429", "500", "502", "503", "504"])
+
+        http_res = self.do_request(
+            hook_ctx=HookContext(
+                config=self.sdk_configuration,
+                base_url=base_url or "",
+                operation_id="getTableAnchors",
+                oauth2_scopes=["file:read"],
+                security_source=self.sdk_configuration.security,
+            ),
+            request=req,
+            error_status_codes=[
+                "400",
+                "401",
+                "403",
+                "404",
+                "409",
+                "429",
+                "4XX",
+                "500",
+                "503",
+                "5XX",
+            ],
+            retry_config=retry_config,
+        )
+
+        def next_func() -> Optional[models.GetTableAnchorsResponse]:
+            body = utils.unmarshal_json(http_res.text, Union[Dict[Any, Any], List[Any]])
+
+            next_cursor = JSONPath("$['@nextLink']").parse(body)
+
+            if len(next_cursor) == 0:
+                return None
+
+            next_cursor = next_cursor[0]
+            if next_cursor is None or str(next_cursor).strip() == "":
+                return None
+
+            return self.get_table_anchors(
+                table_id=table_id,
+                maxpagesize=maxpagesize,
+                next=next,
+                revision=revision,
+                retries=retries,
+            )
+
+        response_data: Any = None
+        if utils.match_response(http_res, "200", "application/json"):
+            return models.GetTableAnchorsResponse(
+                result=unmarshal_json_response(models.AnchorsListResult, http_res),
+                next=next_func,
+            )
+        if utils.match_response(
+            http_res, ["400", "401", "403", "404", "409", "429"], "application/json"
+        ):
+            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
+            raise errors.ErrorResponse(response_data, http_res)
+        if utils.match_response(http_res, ["500", "503"], "application/json"):
+            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
+            raise errors.ErrorResponse(response_data, http_res)
+        if utils.match_response(http_res, "4XX", "*"):
+            http_res_text = utils.stream_to_text(http_res)
+            raise errors.SDKError("API error occurred", http_res, http_res_text)
+        if utils.match_response(http_res, "5XX", "*"):
+            http_res_text = utils.stream_to_text(http_res)
+            raise errors.SDKError("API error occurred", http_res, http_res_text)
+
+        raise errors.SDKError("Unexpected response received", http_res)
+
+    async def get_table_anchors_async(
+        self,
+        *,
+        table_id: str,
+        maxpagesize: Optional[int] = 1000,
+        next: Optional[str] = None,
+        revision: Optional[str] = None,
+        retries: OptionalNullable[utils.RetryConfig] = UNSET,
+        server_url: Optional[str] = None,
+        timeout_ms: Optional[int] = None,
+        http_headers: Optional[Mapping[str, str]] = None,
+    ) -> Optional[models.GetTableAnchorsResponse]:
+        r"""Retrieve a list of table anchors
+
+        Returns an [`AnchorsListResult`](ref:content#anchorslistresult) given tableId.
+
+        :param table_id: The unique identifier for the table
+        :param maxpagesize: The maximum number of results to retrieve
+        :param next: Pagination cursor for next set of results.
+        :param revision: Returns resources at a specific revision
+        :param retries: Override the default retry configuration for this method
+        :param server_url: Override the default server URL for this method
+        :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
+        :param http_headers: Additional headers to set or replace on requests.
+        """
+        base_url = None
+        url_variables = None
+        if timeout_ms is None:
+            timeout_ms = self.sdk_configuration.timeout_ms
+
+        if server_url is not None:
+            base_url = server_url
+        else:
+            base_url = self._get_url(base_url, url_variables)
+
+        request = models.GetTableAnchorsRequest(
+            table_id=table_id,
+            maxpagesize=maxpagesize,
+            next=next,
+            revision=revision,
+        )
+
+        req = self._build_request_async(
+            method="GET",
+            path="/content/tables/{tableId}/anchors",
+            base_url=base_url,
+            url_variables=url_variables,
+            request=request,
+            request_body_required=False,
+            request_has_path_params=True,
+            request_has_query_params=True,
+            user_agent_header="user-agent",
+            accept_header_value="application/json",
+            http_headers=http_headers,
+            security=self.sdk_configuration.security,
+            allow_empty_value=None,
+            timeout_ms=timeout_ms,
+        )
+
+        if retries == UNSET:
+            if self.sdk_configuration.retry_config is not UNSET:
+                retries = self.sdk_configuration.retry_config
+
+        retry_config = None
+        if isinstance(retries, utils.RetryConfig):
+            retry_config = (retries, ["429", "500", "502", "503", "504"])
+
+        http_res = await self.do_request_async(
+            hook_ctx=HookContext(
+                config=self.sdk_configuration,
+                base_url=base_url or "",
+                operation_id="getTableAnchors",
+                oauth2_scopes=["file:read"],
+                security_source=self.sdk_configuration.security,
+            ),
+            request=req,
+            error_status_codes=[
+                "400",
+                "401",
+                "403",
+                "404",
+                "409",
+                "429",
+                "4XX",
+                "500",
+                "503",
+                "5XX",
+            ],
+            retry_config=retry_config,
+        )
+
+        def next_func() -> Awaitable[Optional[models.GetTableAnchorsResponse]]:
+            body = utils.unmarshal_json(http_res.text, Union[Dict[Any, Any], List[Any]])
+
+            async def empty_result():
+                return None
+
+            next_cursor = JSONPath("$['@nextLink']").parse(body)
+
+            if len(next_cursor) == 0:
+                return empty_result()
+
+            next_cursor = next_cursor[0]
+            if next_cursor is None or str(next_cursor).strip() == "":
+                return empty_result()
+
+            return self.get_table_anchors_async(
+                table_id=table_id,
+                maxpagesize=maxpagesize,
+                next=next,
+                revision=revision,
+                retries=retries,
+            )
+
+        response_data: Any = None
+        if utils.match_response(http_res, "200", "application/json"):
+            return models.GetTableAnchorsResponse(
+                result=unmarshal_json_response(models.AnchorsListResult, http_res),
+                next=next_func,
+            )
+        if utils.match_response(
+            http_res, ["400", "401", "403", "404", "409", "429"], "application/json"
+        ):
+            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
+            raise errors.ErrorResponse(response_data, http_res)
+        if utils.match_response(http_res, ["500", "503"], "application/json"):
+            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
+            raise errors.ErrorResponse(response_data, http_res)
+        if utils.match_response(http_res, "4XX", "*"):
+            http_res_text = await utils.stream_to_text_async(http_res)
+            raise errors.SDKError("API error occurred", http_res, http_res_text)
+        if utils.match_response(http_res, "5XX", "*"):
+            http_res_text = await utils.stream_to_text_async(http_res)
+            raise errors.SDKError("API error occurred", http_res, http_res_text)
+
+        raise errors.SDKError("Unexpected response received", http_res)
+
     def table_anchor_creation(
         self,
         *,
@@ -7905,6 +5391,760 @@ class Content(BaseSDK):
 
         raise errors.SDKError("Unexpected response received", http_res)
 
+    def get_table_anchor_by_id(
+        self,
+        *,
+        table_id: str,
+        anchor_id: str,
+        revision: Optional[str] = None,
+        retries: OptionalNullable[utils.RetryConfig] = UNSET,
+        server_url: Optional[str] = None,
+        timeout_ms: Optional[int] = None,
+        http_headers: Optional[Mapping[str, str]] = None,
+    ) -> models.Anchor:
+        r"""Retrieve a table anchor by ID
+
+        Returns an [`Anchor`](ref:content#anchor) given its id.
+
+        :param table_id: The unique identifier for the table
+        :param anchor_id: The unique identifier of the anchor
+        :param revision: Returns resources at a specific revision
+        :param retries: Override the default retry configuration for this method
+        :param server_url: Override the default server URL for this method
+        :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
+        :param http_headers: Additional headers to set or replace on requests.
+        """
+        base_url = None
+        url_variables = None
+        if timeout_ms is None:
+            timeout_ms = self.sdk_configuration.timeout_ms
+
+        if server_url is not None:
+            base_url = server_url
+        else:
+            base_url = self._get_url(base_url, url_variables)
+
+        request = models.GetTableAnchorByIDRequest(
+            table_id=table_id,
+            anchor_id=anchor_id,
+            revision=revision,
+        )
+
+        req = self._build_request(
+            method="GET",
+            path="/content/tables/{tableId}/anchors/{anchorId}",
+            base_url=base_url,
+            url_variables=url_variables,
+            request=request,
+            request_body_required=False,
+            request_has_path_params=True,
+            request_has_query_params=True,
+            user_agent_header="user-agent",
+            accept_header_value="application/json",
+            http_headers=http_headers,
+            security=self.sdk_configuration.security,
+            allow_empty_value=None,
+            timeout_ms=timeout_ms,
+        )
+
+        if retries == UNSET:
+            if self.sdk_configuration.retry_config is not UNSET:
+                retries = self.sdk_configuration.retry_config
+
+        retry_config = None
+        if isinstance(retries, utils.RetryConfig):
+            retry_config = (retries, ["429", "500", "502", "503", "504"])
+
+        http_res = self.do_request(
+            hook_ctx=HookContext(
+                config=self.sdk_configuration,
+                base_url=base_url or "",
+                operation_id="getTableAnchorById",
+                oauth2_scopes=["file:read"],
+                security_source=self.sdk_configuration.security,
+            ),
+            request=req,
+            error_status_codes=[
+                "400",
+                "401",
+                "403",
+                "404",
+                "409",
+                "429",
+                "4XX",
+                "500",
+                "503",
+                "5XX",
+            ],
+            retry_config=retry_config,
+        )
+
+        response_data: Any = None
+        if utils.match_response(http_res, "200", "application/json"):
+            return unmarshal_json_response(models.Anchor, http_res)
+        if utils.match_response(
+            http_res, ["400", "401", "403", "404", "409", "429"], "application/json"
+        ):
+            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
+            raise errors.ErrorResponse(response_data, http_res)
+        if utils.match_response(http_res, ["500", "503"], "application/json"):
+            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
+            raise errors.ErrorResponse(response_data, http_res)
+        if utils.match_response(http_res, "4XX", "*"):
+            http_res_text = utils.stream_to_text(http_res)
+            raise errors.SDKError("API error occurred", http_res, http_res_text)
+        if utils.match_response(http_res, "5XX", "*"):
+            http_res_text = utils.stream_to_text(http_res)
+            raise errors.SDKError("API error occurred", http_res, http_res_text)
+
+        raise errors.SDKError("Unexpected response received", http_res)
+
+    async def get_table_anchor_by_id_async(
+        self,
+        *,
+        table_id: str,
+        anchor_id: str,
+        revision: Optional[str] = None,
+        retries: OptionalNullable[utils.RetryConfig] = UNSET,
+        server_url: Optional[str] = None,
+        timeout_ms: Optional[int] = None,
+        http_headers: Optional[Mapping[str, str]] = None,
+    ) -> models.Anchor:
+        r"""Retrieve a table anchor by ID
+
+        Returns an [`Anchor`](ref:content#anchor) given its id.
+
+        :param table_id: The unique identifier for the table
+        :param anchor_id: The unique identifier of the anchor
+        :param revision: Returns resources at a specific revision
+        :param retries: Override the default retry configuration for this method
+        :param server_url: Override the default server URL for this method
+        :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
+        :param http_headers: Additional headers to set or replace on requests.
+        """
+        base_url = None
+        url_variables = None
+        if timeout_ms is None:
+            timeout_ms = self.sdk_configuration.timeout_ms
+
+        if server_url is not None:
+            base_url = server_url
+        else:
+            base_url = self._get_url(base_url, url_variables)
+
+        request = models.GetTableAnchorByIDRequest(
+            table_id=table_id,
+            anchor_id=anchor_id,
+            revision=revision,
+        )
+
+        req = self._build_request_async(
+            method="GET",
+            path="/content/tables/{tableId}/anchors/{anchorId}",
+            base_url=base_url,
+            url_variables=url_variables,
+            request=request,
+            request_body_required=False,
+            request_has_path_params=True,
+            request_has_query_params=True,
+            user_agent_header="user-agent",
+            accept_header_value="application/json",
+            http_headers=http_headers,
+            security=self.sdk_configuration.security,
+            allow_empty_value=None,
+            timeout_ms=timeout_ms,
+        )
+
+        if retries == UNSET:
+            if self.sdk_configuration.retry_config is not UNSET:
+                retries = self.sdk_configuration.retry_config
+
+        retry_config = None
+        if isinstance(retries, utils.RetryConfig):
+            retry_config = (retries, ["429", "500", "502", "503", "504"])
+
+        http_res = await self.do_request_async(
+            hook_ctx=HookContext(
+                config=self.sdk_configuration,
+                base_url=base_url or "",
+                operation_id="getTableAnchorById",
+                oauth2_scopes=["file:read"],
+                security_source=self.sdk_configuration.security,
+            ),
+            request=req,
+            error_status_codes=[
+                "400",
+                "401",
+                "403",
+                "404",
+                "409",
+                "429",
+                "4XX",
+                "500",
+                "503",
+                "5XX",
+            ],
+            retry_config=retry_config,
+        )
+
+        response_data: Any = None
+        if utils.match_response(http_res, "200", "application/json"):
+            return unmarshal_json_response(models.Anchor, http_res)
+        if utils.match_response(
+            http_res, ["400", "401", "403", "404", "409", "429"], "application/json"
+        ):
+            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
+            raise errors.ErrorResponse(response_data, http_res)
+        if utils.match_response(http_res, ["500", "503"], "application/json"):
+            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
+            raise errors.ErrorResponse(response_data, http_res)
+        if utils.match_response(http_res, "4XX", "*"):
+            http_res_text = await utils.stream_to_text_async(http_res)
+            raise errors.SDKError("API error occurred", http_res, http_res_text)
+        if utils.match_response(http_res, "5XX", "*"):
+            http_res_text = await utils.stream_to_text_async(http_res)
+            raise errors.SDKError("API error occurred", http_res, http_res_text)
+
+        raise errors.SDKError("Unexpected response received", http_res)
+
+    def get_table_anchor_extensions(
+        self,
+        *,
+        request: Union[
+            models.GetTableAnchorExtensionsRequest,
+            models.GetTableAnchorExtensionsRequestTypedDict,
+        ],
+        retries: OptionalNullable[utils.RetryConfig] = UNSET,
+        server_url: Optional[str] = None,
+        timeout_ms: Optional[int] = None,
+        http_headers: Optional[Mapping[str, str]] = None,
+    ) -> Optional[models.GetTableAnchorExtensionsResponse]:
+        r"""Retrieve a list of table anchor extensions
+
+        Returns a paginated list of [`AnchorExtensions`](ref:content#anchorextension) for a given anchorId.
+
+        :param request: The request object to send.
+        :param retries: Override the default retry configuration for this method
+        :param server_url: Override the default server URL for this method
+        :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
+        :param http_headers: Additional headers to set or replace on requests.
+        """
+        base_url = None
+        url_variables = None
+        if timeout_ms is None:
+            timeout_ms = self.sdk_configuration.timeout_ms
+
+        if server_url is not None:
+            base_url = server_url
+        else:
+            base_url = self._get_url(base_url, url_variables)
+
+        if not isinstance(request, BaseModel):
+            request = utils.unmarshal(request, models.GetTableAnchorExtensionsRequest)
+        request = cast(models.GetTableAnchorExtensionsRequest, request)
+
+        req = self._build_request(
+            method="GET",
+            path="/content/tables/{tableId}/anchors/{anchorId}/extensions",
+            base_url=base_url,
+            url_variables=url_variables,
+            request=request,
+            request_body_required=False,
+            request_has_path_params=True,
+            request_has_query_params=True,
+            user_agent_header="user-agent",
+            accept_header_value="application/json",
+            http_headers=http_headers,
+            security=self.sdk_configuration.security,
+            allow_empty_value=None,
+            timeout_ms=timeout_ms,
+        )
+
+        if retries == UNSET:
+            if self.sdk_configuration.retry_config is not UNSET:
+                retries = self.sdk_configuration.retry_config
+
+        retry_config = None
+        if isinstance(retries, utils.RetryConfig):
+            retry_config = (retries, ["429", "500", "502", "503", "504"])
+
+        http_res = self.do_request(
+            hook_ctx=HookContext(
+                config=self.sdk_configuration,
+                base_url=base_url or "",
+                operation_id="getTableAnchorExtensions",
+                oauth2_scopes=["file:read"],
+                security_source=self.sdk_configuration.security,
+            ),
+            request=req,
+            error_status_codes=[
+                "400",
+                "401",
+                "403",
+                "404",
+                "409",
+                "429",
+                "4XX",
+                "500",
+                "503",
+                "5XX",
+            ],
+            retry_config=retry_config,
+        )
+
+        def next_func() -> Optional[models.GetTableAnchorExtensionsResponse]:
+            body = utils.unmarshal_json(http_res.text, Union[Dict[Any, Any], List[Any]])
+
+            next_cursor = JSONPath("$['@nextLink']").parse(body)
+
+            if len(next_cursor) == 0:
+                return None
+
+            next_cursor = next_cursor[0]
+            if next_cursor is None or str(next_cursor).strip() == "":
+                return None
+
+            return self.get_table_anchor_extensions(
+                request=models.GetTableAnchorExtensionsRequest(
+                    table_id=request.table_id,
+                    anchor_id=request.anchor_id,
+                    maxpagesize=request.maxpagesize,
+                    next=request.next,
+                    revision=request.revision,
+                ),
+                retries=retries,
+            )
+
+        response_data: Any = None
+        if utils.match_response(http_res, "200", "application/json"):
+            return models.GetTableAnchorExtensionsResponse(
+                result=unmarshal_json_response(
+                    models.AnchorExtensionsListResult, http_res
+                ),
+                next=next_func,
+            )
+        if utils.match_response(
+            http_res, ["400", "401", "403", "404", "409", "429"], "application/json"
+        ):
+            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
+            raise errors.ErrorResponse(response_data, http_res)
+        if utils.match_response(http_res, ["500", "503"], "application/json"):
+            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
+            raise errors.ErrorResponse(response_data, http_res)
+        if utils.match_response(http_res, "4XX", "*"):
+            http_res_text = utils.stream_to_text(http_res)
+            raise errors.SDKError("API error occurred", http_res, http_res_text)
+        if utils.match_response(http_res, "5XX", "*"):
+            http_res_text = utils.stream_to_text(http_res)
+            raise errors.SDKError("API error occurred", http_res, http_res_text)
+
+        raise errors.SDKError("Unexpected response received", http_res)
+
+    async def get_table_anchor_extensions_async(
+        self,
+        *,
+        request: Union[
+            models.GetTableAnchorExtensionsRequest,
+            models.GetTableAnchorExtensionsRequestTypedDict,
+        ],
+        retries: OptionalNullable[utils.RetryConfig] = UNSET,
+        server_url: Optional[str] = None,
+        timeout_ms: Optional[int] = None,
+        http_headers: Optional[Mapping[str, str]] = None,
+    ) -> Optional[models.GetTableAnchorExtensionsResponse]:
+        r"""Retrieve a list of table anchor extensions
+
+        Returns a paginated list of [`AnchorExtensions`](ref:content#anchorextension) for a given anchorId.
+
+        :param request: The request object to send.
+        :param retries: Override the default retry configuration for this method
+        :param server_url: Override the default server URL for this method
+        :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
+        :param http_headers: Additional headers to set or replace on requests.
+        """
+        base_url = None
+        url_variables = None
+        if timeout_ms is None:
+            timeout_ms = self.sdk_configuration.timeout_ms
+
+        if server_url is not None:
+            base_url = server_url
+        else:
+            base_url = self._get_url(base_url, url_variables)
+
+        if not isinstance(request, BaseModel):
+            request = utils.unmarshal(request, models.GetTableAnchorExtensionsRequest)
+        request = cast(models.GetTableAnchorExtensionsRequest, request)
+
+        req = self._build_request_async(
+            method="GET",
+            path="/content/tables/{tableId}/anchors/{anchorId}/extensions",
+            base_url=base_url,
+            url_variables=url_variables,
+            request=request,
+            request_body_required=False,
+            request_has_path_params=True,
+            request_has_query_params=True,
+            user_agent_header="user-agent",
+            accept_header_value="application/json",
+            http_headers=http_headers,
+            security=self.sdk_configuration.security,
+            allow_empty_value=None,
+            timeout_ms=timeout_ms,
+        )
+
+        if retries == UNSET:
+            if self.sdk_configuration.retry_config is not UNSET:
+                retries = self.sdk_configuration.retry_config
+
+        retry_config = None
+        if isinstance(retries, utils.RetryConfig):
+            retry_config = (retries, ["429", "500", "502", "503", "504"])
+
+        http_res = await self.do_request_async(
+            hook_ctx=HookContext(
+                config=self.sdk_configuration,
+                base_url=base_url or "",
+                operation_id="getTableAnchorExtensions",
+                oauth2_scopes=["file:read"],
+                security_source=self.sdk_configuration.security,
+            ),
+            request=req,
+            error_status_codes=[
+                "400",
+                "401",
+                "403",
+                "404",
+                "409",
+                "429",
+                "4XX",
+                "500",
+                "503",
+                "5XX",
+            ],
+            retry_config=retry_config,
+        )
+
+        def next_func() -> Awaitable[Optional[models.GetTableAnchorExtensionsResponse]]:
+            body = utils.unmarshal_json(http_res.text, Union[Dict[Any, Any], List[Any]])
+
+            async def empty_result():
+                return None
+
+            next_cursor = JSONPath("$['@nextLink']").parse(body)
+
+            if len(next_cursor) == 0:
+                return empty_result()
+
+            next_cursor = next_cursor[0]
+            if next_cursor is None or str(next_cursor).strip() == "":
+                return empty_result()
+
+            return self.get_table_anchor_extensions_async(
+                request=models.GetTableAnchorExtensionsRequest(
+                    table_id=request.table_id,
+                    anchor_id=request.anchor_id,
+                    maxpagesize=request.maxpagesize,
+                    next=request.next,
+                    revision=request.revision,
+                ),
+                retries=retries,
+            )
+
+        response_data: Any = None
+        if utils.match_response(http_res, "200", "application/json"):
+            return models.GetTableAnchorExtensionsResponse(
+                result=unmarshal_json_response(
+                    models.AnchorExtensionsListResult, http_res
+                ),
+                next=next_func,
+            )
+        if utils.match_response(
+            http_res, ["400", "401", "403", "404", "409", "429"], "application/json"
+        ):
+            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
+            raise errors.ErrorResponse(response_data, http_res)
+        if utils.match_response(http_res, ["500", "503"], "application/json"):
+            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
+            raise errors.ErrorResponse(response_data, http_res)
+        if utils.match_response(http_res, "4XX", "*"):
+            http_res_text = await utils.stream_to_text_async(http_res)
+            raise errors.SDKError("API error occurred", http_res, http_res_text)
+        if utils.match_response(http_res, "5XX", "*"):
+            http_res_text = await utils.stream_to_text_async(http_res)
+            raise errors.SDKError("API error occurred", http_res, http_res_text)
+
+        raise errors.SDKError("Unexpected response received", http_res)
+
+    def get_table_cells(
+        self,
+        *,
+        request: Union[
+            models.GetTableCellsRequest, models.GetTableCellsRequestTypedDict
+        ],
+        retries: OptionalNullable[utils.RetryConfig] = UNSET,
+        server_url: Optional[str] = None,
+        timeout_ms: Optional[int] = None,
+        http_headers: Optional[Mapping[str, str]] = None,
+    ) -> Optional[models.GetTableCellsResponse]:
+        r"""Retrieve table cell content
+
+        Returns a [`TableCellsResult`](ref:content#tablecellsresult) for a given tableId.
+
+        :param request: The request object to send.
+        :param retries: Override the default retry configuration for this method
+        :param server_url: Override the default server URL for this method
+        :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
+        :param http_headers: Additional headers to set or replace on requests.
+        """
+        base_url = None
+        url_variables = None
+        if timeout_ms is None:
+            timeout_ms = self.sdk_configuration.timeout_ms
+
+        if server_url is not None:
+            base_url = server_url
+        else:
+            base_url = self._get_url(base_url, url_variables)
+
+        if not isinstance(request, BaseModel):
+            request = utils.unmarshal(request, models.GetTableCellsRequest)
+        request = cast(models.GetTableCellsRequest, request)
+
+        req = self._build_request(
+            method="GET",
+            path="/content/tables/{tableId}/cells",
+            base_url=base_url,
+            url_variables=url_variables,
+            request=request,
+            request_body_required=False,
+            request_has_path_params=True,
+            request_has_query_params=True,
+            user_agent_header="user-agent",
+            accept_header_value="application/json",
+            http_headers=http_headers,
+            security=self.sdk_configuration.security,
+            allow_empty_value=None,
+            timeout_ms=timeout_ms,
+        )
+
+        if retries == UNSET:
+            if self.sdk_configuration.retry_config is not UNSET:
+                retries = self.sdk_configuration.retry_config
+
+        retry_config = None
+        if isinstance(retries, utils.RetryConfig):
+            retry_config = (retries, ["429", "500", "502", "503", "504"])
+
+        http_res = self.do_request(
+            hook_ctx=HookContext(
+                config=self.sdk_configuration,
+                base_url=base_url or "",
+                operation_id="getTableCells",
+                oauth2_scopes=["file:read"],
+                security_source=self.sdk_configuration.security,
+            ),
+            request=req,
+            error_status_codes=[
+                "400",
+                "401",
+                "403",
+                "404",
+                "409",
+                "429",
+                "4XX",
+                "500",
+                "503",
+                "5XX",
+            ],
+            retry_config=retry_config,
+        )
+
+        def next_func() -> Optional[models.GetTableCellsResponse]:
+            body = utils.unmarshal_json(http_res.text, Union[Dict[Any, Any], List[Any]])
+
+            next_cursor = JSONPath("$['@nextLink']").parse(body)
+
+            if len(next_cursor) == 0:
+                return None
+
+            next_cursor = next_cursor[0]
+            if next_cursor is None or str(next_cursor).strip() == "":
+                return None
+
+            return self.get_table_cells(
+                request=models.GetTableCellsRequest(
+                    table_id=request.table_id,
+                    revision=request.revision,
+                    maxcellsperpage=request.maxcellsperpage,
+                    next=request.next,
+                    start_row=request.start_row,
+                    stop_row=request.stop_row,
+                    start_column=request.start_column,
+                    stop_column=request.stop_column,
+                ),
+                retries=retries,
+            )
+
+        response_data: Any = None
+        if utils.match_response(http_res, "200", "application/json"):
+            return models.GetTableCellsResponse(
+                result=unmarshal_json_response(models.TableCellsResult, http_res),
+                next=next_func,
+            )
+        if utils.match_response(
+            http_res, ["400", "401", "403", "404", "409", "429"], "application/json"
+        ):
+            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
+            raise errors.ErrorResponse(response_data, http_res)
+        if utils.match_response(http_res, ["500", "503"], "application/json"):
+            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
+            raise errors.ErrorResponse(response_data, http_res)
+        if utils.match_response(http_res, "4XX", "*"):
+            http_res_text = utils.stream_to_text(http_res)
+            raise errors.SDKError("API error occurred", http_res, http_res_text)
+        if utils.match_response(http_res, "5XX", "*"):
+            http_res_text = utils.stream_to_text(http_res)
+            raise errors.SDKError("API error occurred", http_res, http_res_text)
+
+        raise errors.SDKError("Unexpected response received", http_res)
+
+    async def get_table_cells_async(
+        self,
+        *,
+        request: Union[
+            models.GetTableCellsRequest, models.GetTableCellsRequestTypedDict
+        ],
+        retries: OptionalNullable[utils.RetryConfig] = UNSET,
+        server_url: Optional[str] = None,
+        timeout_ms: Optional[int] = None,
+        http_headers: Optional[Mapping[str, str]] = None,
+    ) -> Optional[models.GetTableCellsResponse]:
+        r"""Retrieve table cell content
+
+        Returns a [`TableCellsResult`](ref:content#tablecellsresult) for a given tableId.
+
+        :param request: The request object to send.
+        :param retries: Override the default retry configuration for this method
+        :param server_url: Override the default server URL for this method
+        :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
+        :param http_headers: Additional headers to set or replace on requests.
+        """
+        base_url = None
+        url_variables = None
+        if timeout_ms is None:
+            timeout_ms = self.sdk_configuration.timeout_ms
+
+        if server_url is not None:
+            base_url = server_url
+        else:
+            base_url = self._get_url(base_url, url_variables)
+
+        if not isinstance(request, BaseModel):
+            request = utils.unmarshal(request, models.GetTableCellsRequest)
+        request = cast(models.GetTableCellsRequest, request)
+
+        req = self._build_request_async(
+            method="GET",
+            path="/content/tables/{tableId}/cells",
+            base_url=base_url,
+            url_variables=url_variables,
+            request=request,
+            request_body_required=False,
+            request_has_path_params=True,
+            request_has_query_params=True,
+            user_agent_header="user-agent",
+            accept_header_value="application/json",
+            http_headers=http_headers,
+            security=self.sdk_configuration.security,
+            allow_empty_value=None,
+            timeout_ms=timeout_ms,
+        )
+
+        if retries == UNSET:
+            if self.sdk_configuration.retry_config is not UNSET:
+                retries = self.sdk_configuration.retry_config
+
+        retry_config = None
+        if isinstance(retries, utils.RetryConfig):
+            retry_config = (retries, ["429", "500", "502", "503", "504"])
+
+        http_res = await self.do_request_async(
+            hook_ctx=HookContext(
+                config=self.sdk_configuration,
+                base_url=base_url or "",
+                operation_id="getTableCells",
+                oauth2_scopes=["file:read"],
+                security_source=self.sdk_configuration.security,
+            ),
+            request=req,
+            error_status_codes=[
+                "400",
+                "401",
+                "403",
+                "404",
+                "409",
+                "429",
+                "4XX",
+                "500",
+                "503",
+                "5XX",
+            ],
+            retry_config=retry_config,
+        )
+
+        def next_func() -> Awaitable[Optional[models.GetTableCellsResponse]]:
+            body = utils.unmarshal_json(http_res.text, Union[Dict[Any, Any], List[Any]])
+
+            async def empty_result():
+                return None
+
+            next_cursor = JSONPath("$['@nextLink']").parse(body)
+
+            if len(next_cursor) == 0:
+                return empty_result()
+
+            next_cursor = next_cursor[0]
+            if next_cursor is None or str(next_cursor).strip() == "":
+                return empty_result()
+
+            return self.get_table_cells_async(
+                request=models.GetTableCellsRequest(
+                    table_id=request.table_id,
+                    revision=request.revision,
+                    maxcellsperpage=request.maxcellsperpage,
+                    next=request.next,
+                    start_row=request.start_row,
+                    stop_row=request.stop_row,
+                    start_column=request.start_column,
+                    stop_column=request.stop_column,
+                ),
+                retries=retries,
+            )
+
+        response_data: Any = None
+        if utils.match_response(http_res, "200", "application/json"):
+            return models.GetTableCellsResponse(
+                result=unmarshal_json_response(models.TableCellsResult, http_res),
+                next=next_func,
+            )
+        if utils.match_response(
+            http_res, ["400", "401", "403", "404", "409", "429"], "application/json"
+        ):
+            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
+            raise errors.ErrorResponse(response_data, http_res)
+        if utils.match_response(http_res, ["500", "503"], "application/json"):
+            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
+            raise errors.ErrorResponse(response_data, http_res)
+        if utils.match_response(http_res, "4XX", "*"):
+            http_res_text = await utils.stream_to_text_async(http_res)
+            raise errors.SDKError("API error occurred", http_res, http_res_text)
+        if utils.match_response(http_res, "5XX", "*"):
+            http_res_text = await utils.stream_to_text_async(http_res)
+            raise errors.SDKError("API error occurred", http_res, http_res_text)
+
+        raise errors.SDKError("Unexpected response received", http_res)
+
     def table_cells_batch_edit(
         self,
         *,
@@ -8133,6 +6373,279 @@ class Content(BaseSDK):
         if utils.match_response(http_res, "202", "*"):
             return models.TableCellsBatchEditResponse(
                 headers=utils.get_response_headers(http_res.headers)
+            )
+        if utils.match_response(
+            http_res, ["400", "401", "403", "404", "409", "429"], "application/json"
+        ):
+            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
+            raise errors.ErrorResponse(response_data, http_res)
+        if utils.match_response(http_res, ["500", "503"], "application/json"):
+            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
+            raise errors.ErrorResponse(response_data, http_res)
+        if utils.match_response(http_res, "4XX", "*"):
+            http_res_text = await utils.stream_to_text_async(http_res)
+            raise errors.SDKError("API error occurred", http_res, http_res_text)
+        if utils.match_response(http_res, "5XX", "*"):
+            http_res_text = await utils.stream_to_text_async(http_res)
+            raise errors.SDKError("API error occurred", http_res, http_res_text)
+
+        raise errors.SDKError("Unexpected response received", http_res)
+
+    def get_column_properties(
+        self,
+        *,
+        request: Union[
+            models.GetColumnPropertiesRequest,
+            models.GetColumnPropertiesRequestTypedDict,
+        ],
+        retries: OptionalNullable[utils.RetryConfig] = UNSET,
+        server_url: Optional[str] = None,
+        timeout_ms: Optional[int] = None,
+        http_headers: Optional[Mapping[str, str]] = None,
+    ) -> Optional[models.GetColumnPropertiesResponse]:
+        r"""Retrieve table column properties
+
+        Returns a [`ColumnPropertiesListResult`](ref:content#columnpropertieslistresult) for a table
+
+
+        :param request: The request object to send.
+        :param retries: Override the default retry configuration for this method
+        :param server_url: Override the default server URL for this method
+        :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
+        :param http_headers: Additional headers to set or replace on requests.
+        """
+        base_url = None
+        url_variables = None
+        if timeout_ms is None:
+            timeout_ms = self.sdk_configuration.timeout_ms
+
+        if server_url is not None:
+            base_url = server_url
+        else:
+            base_url = self._get_url(base_url, url_variables)
+
+        if not isinstance(request, BaseModel):
+            request = utils.unmarshal(request, models.GetColumnPropertiesRequest)
+        request = cast(models.GetColumnPropertiesRequest, request)
+
+        req = self._build_request(
+            method="GET",
+            path="/content/tables/{tableId}/properties/columns",
+            base_url=base_url,
+            url_variables=url_variables,
+            request=request,
+            request_body_required=False,
+            request_has_path_params=True,
+            request_has_query_params=True,
+            user_agent_header="user-agent",
+            accept_header_value="application/json",
+            http_headers=http_headers,
+            security=self.sdk_configuration.security,
+            allow_empty_value=None,
+            timeout_ms=timeout_ms,
+        )
+
+        if retries == UNSET:
+            if self.sdk_configuration.retry_config is not UNSET:
+                retries = self.sdk_configuration.retry_config
+
+        retry_config = None
+        if isinstance(retries, utils.RetryConfig):
+            retry_config = (retries, ["429", "500", "502", "503", "504"])
+
+        http_res = self.do_request(
+            hook_ctx=HookContext(
+                config=self.sdk_configuration,
+                base_url=base_url or "",
+                operation_id="getColumnProperties",
+                oauth2_scopes=["file:read"],
+                security_source=self.sdk_configuration.security,
+            ),
+            request=req,
+            error_status_codes=[
+                "400",
+                "401",
+                "403",
+                "404",
+                "409",
+                "429",
+                "4XX",
+                "500",
+                "503",
+                "5XX",
+            ],
+            retry_config=retry_config,
+        )
+
+        def next_func() -> Optional[models.GetColumnPropertiesResponse]:
+            body = utils.unmarshal_json(http_res.text, Union[Dict[Any, Any], List[Any]])
+
+            next_cursor = JSONPath("$['@nextLink']").parse(body)
+
+            if len(next_cursor) == 0:
+                return None
+
+            next_cursor = next_cursor[0]
+            if next_cursor is None or str(next_cursor).strip() == "":
+                return None
+
+            return self.get_column_properties(
+                request=models.GetColumnPropertiesRequest(
+                    table_id=request.table_id,
+                    revision=request.revision,
+                    maxpagesize=request.maxpagesize,
+                    next=request.next,
+                    start_column=request.start_column,
+                    stop_column=request.stop_column,
+                ),
+                retries=retries,
+            )
+
+        response_data: Any = None
+        if utils.match_response(http_res, "200", "application/json"):
+            return models.GetColumnPropertiesResponse(
+                result=unmarshal_json_response(
+                    models.ColumnPropertiesListResult, http_res
+                ),
+                next=next_func,
+            )
+        if utils.match_response(
+            http_res, ["400", "401", "403", "404", "409", "429"], "application/json"
+        ):
+            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
+            raise errors.ErrorResponse(response_data, http_res)
+        if utils.match_response(http_res, ["500", "503"], "application/json"):
+            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
+            raise errors.ErrorResponse(response_data, http_res)
+        if utils.match_response(http_res, "4XX", "*"):
+            http_res_text = utils.stream_to_text(http_res)
+            raise errors.SDKError("API error occurred", http_res, http_res_text)
+        if utils.match_response(http_res, "5XX", "*"):
+            http_res_text = utils.stream_to_text(http_res)
+            raise errors.SDKError("API error occurred", http_res, http_res_text)
+
+        raise errors.SDKError("Unexpected response received", http_res)
+
+    async def get_column_properties_async(
+        self,
+        *,
+        request: Union[
+            models.GetColumnPropertiesRequest,
+            models.GetColumnPropertiesRequestTypedDict,
+        ],
+        retries: OptionalNullable[utils.RetryConfig] = UNSET,
+        server_url: Optional[str] = None,
+        timeout_ms: Optional[int] = None,
+        http_headers: Optional[Mapping[str, str]] = None,
+    ) -> Optional[models.GetColumnPropertiesResponse]:
+        r"""Retrieve table column properties
+
+        Returns a [`ColumnPropertiesListResult`](ref:content#columnpropertieslistresult) for a table
+
+
+        :param request: The request object to send.
+        :param retries: Override the default retry configuration for this method
+        :param server_url: Override the default server URL for this method
+        :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
+        :param http_headers: Additional headers to set or replace on requests.
+        """
+        base_url = None
+        url_variables = None
+        if timeout_ms is None:
+            timeout_ms = self.sdk_configuration.timeout_ms
+
+        if server_url is not None:
+            base_url = server_url
+        else:
+            base_url = self._get_url(base_url, url_variables)
+
+        if not isinstance(request, BaseModel):
+            request = utils.unmarshal(request, models.GetColumnPropertiesRequest)
+        request = cast(models.GetColumnPropertiesRequest, request)
+
+        req = self._build_request_async(
+            method="GET",
+            path="/content/tables/{tableId}/properties/columns",
+            base_url=base_url,
+            url_variables=url_variables,
+            request=request,
+            request_body_required=False,
+            request_has_path_params=True,
+            request_has_query_params=True,
+            user_agent_header="user-agent",
+            accept_header_value="application/json",
+            http_headers=http_headers,
+            security=self.sdk_configuration.security,
+            allow_empty_value=None,
+            timeout_ms=timeout_ms,
+        )
+
+        if retries == UNSET:
+            if self.sdk_configuration.retry_config is not UNSET:
+                retries = self.sdk_configuration.retry_config
+
+        retry_config = None
+        if isinstance(retries, utils.RetryConfig):
+            retry_config = (retries, ["429", "500", "502", "503", "504"])
+
+        http_res = await self.do_request_async(
+            hook_ctx=HookContext(
+                config=self.sdk_configuration,
+                base_url=base_url or "",
+                operation_id="getColumnProperties",
+                oauth2_scopes=["file:read"],
+                security_source=self.sdk_configuration.security,
+            ),
+            request=req,
+            error_status_codes=[
+                "400",
+                "401",
+                "403",
+                "404",
+                "409",
+                "429",
+                "4XX",
+                "500",
+                "503",
+                "5XX",
+            ],
+            retry_config=retry_config,
+        )
+
+        def next_func() -> Awaitable[Optional[models.GetColumnPropertiesResponse]]:
+            body = utils.unmarshal_json(http_res.text, Union[Dict[Any, Any], List[Any]])
+
+            async def empty_result():
+                return None
+
+            next_cursor = JSONPath("$['@nextLink']").parse(body)
+
+            if len(next_cursor) == 0:
+                return empty_result()
+
+            next_cursor = next_cursor[0]
+            if next_cursor is None or str(next_cursor).strip() == "":
+                return empty_result()
+
+            return self.get_column_properties_async(
+                request=models.GetColumnPropertiesRequest(
+                    table_id=request.table_id,
+                    revision=request.revision,
+                    maxpagesize=request.maxpagesize,
+                    next=request.next,
+                    start_column=request.start_column,
+                    stop_column=request.stop_column,
+                ),
+                retries=retries,
+            )
+
+        response_data: Any = None
+        if utils.match_response(http_res, "200", "application/json"):
+            return models.GetColumnPropertiesResponse(
+                result=unmarshal_json_response(
+                    models.ColumnPropertiesListResult, http_res
+                ),
+                next=next_func,
             )
         if utils.match_response(
             http_res, ["400", "401", "403", "404", "409", "429"], "application/json"
@@ -8873,6 +7386,752 @@ class Content(BaseSDK):
 
         raise errors.SDKError("Unexpected response received", http_res)
 
+    def get_range_links(
+        self,
+        *,
+        table_id: str,
+        maxpagesize: Optional[int] = 1000,
+        next: Optional[str] = None,
+        revision: Optional[str] = None,
+        retries: OptionalNullable[utils.RetryConfig] = UNSET,
+        server_url: Optional[str] = None,
+        timeout_ms: Optional[int] = None,
+        http_headers: Optional[Mapping[str, str]] = None,
+    ) -> Optional[models.GetRangeLinksResponse]:
+        r"""Retrieve a list of range links
+
+        Returns a [`RangeLinkListResult`](ref:content#rangelinklistresult) for a given tableId.
+
+        :param table_id: The unique identifier for the table
+        :param maxpagesize: The maximum number of results to retrieve
+        :param next: Pagination cursor for next set of results.
+        :param revision: Returns resources at a specific revision
+        :param retries: Override the default retry configuration for this method
+        :param server_url: Override the default server URL for this method
+        :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
+        :param http_headers: Additional headers to set or replace on requests.
+        """
+        base_url = None
+        url_variables = None
+        if timeout_ms is None:
+            timeout_ms = self.sdk_configuration.timeout_ms
+
+        if server_url is not None:
+            base_url = server_url
+        else:
+            base_url = self._get_url(base_url, url_variables)
+
+        request = models.GetRangeLinksRequest(
+            table_id=table_id,
+            maxpagesize=maxpagesize,
+            next=next,
+            revision=revision,
+        )
+
+        req = self._build_request(
+            method="GET",
+            path="/content/tables/{tableId}/rangeLinks",
+            base_url=base_url,
+            url_variables=url_variables,
+            request=request,
+            request_body_required=False,
+            request_has_path_params=True,
+            request_has_query_params=True,
+            user_agent_header="user-agent",
+            accept_header_value="application/json",
+            http_headers=http_headers,
+            security=self.sdk_configuration.security,
+            allow_empty_value=None,
+            timeout_ms=timeout_ms,
+        )
+
+        if retries == UNSET:
+            if self.sdk_configuration.retry_config is not UNSET:
+                retries = self.sdk_configuration.retry_config
+
+        retry_config = None
+        if isinstance(retries, utils.RetryConfig):
+            retry_config = (retries, ["429", "500", "502", "503", "504"])
+
+        http_res = self.do_request(
+            hook_ctx=HookContext(
+                config=self.sdk_configuration,
+                base_url=base_url or "",
+                operation_id="getRangeLinks",
+                oauth2_scopes=["file:read"],
+                security_source=self.sdk_configuration.security,
+            ),
+            request=req,
+            error_status_codes=[
+                "400",
+                "401",
+                "403",
+                "404",
+                "429",
+                "4XX",
+                "500",
+                "503",
+                "5XX",
+            ],
+            retry_config=retry_config,
+        )
+
+        def next_func() -> Optional[models.GetRangeLinksResponse]:
+            body = utils.unmarshal_json(http_res.text, Union[Dict[Any, Any], List[Any]])
+
+            next_cursor = JSONPath("$['@nextLink']").parse(body)
+
+            if len(next_cursor) == 0:
+                return None
+
+            next_cursor = next_cursor[0]
+            if next_cursor is None or str(next_cursor).strip() == "":
+                return None
+
+            return self.get_range_links(
+                table_id=table_id,
+                maxpagesize=maxpagesize,
+                next=next,
+                revision=revision,
+                retries=retries,
+            )
+
+        response_data: Any = None
+        if utils.match_response(http_res, "200", "application/json"):
+            return models.GetRangeLinksResponse(
+                result=unmarshal_json_response(models.RangeLinkListResult, http_res),
+                next=next_func,
+            )
+        if utils.match_response(
+            http_res, ["400", "401", "403", "404", "429"], "application/json"
+        ):
+            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
+            raise errors.ErrorResponse(response_data, http_res)
+        if utils.match_response(http_res, ["500", "503"], "application/json"):
+            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
+            raise errors.ErrorResponse(response_data, http_res)
+        if utils.match_response(http_res, "4XX", "*"):
+            http_res_text = utils.stream_to_text(http_res)
+            raise errors.SDKError("API error occurred", http_res, http_res_text)
+        if utils.match_response(http_res, "5XX", "*"):
+            http_res_text = utils.stream_to_text(http_res)
+            raise errors.SDKError("API error occurred", http_res, http_res_text)
+
+        raise errors.SDKError("Unexpected response received", http_res)
+
+    async def get_range_links_async(
+        self,
+        *,
+        table_id: str,
+        maxpagesize: Optional[int] = 1000,
+        next: Optional[str] = None,
+        revision: Optional[str] = None,
+        retries: OptionalNullable[utils.RetryConfig] = UNSET,
+        server_url: Optional[str] = None,
+        timeout_ms: Optional[int] = None,
+        http_headers: Optional[Mapping[str, str]] = None,
+    ) -> Optional[models.GetRangeLinksResponse]:
+        r"""Retrieve a list of range links
+
+        Returns a [`RangeLinkListResult`](ref:content#rangelinklistresult) for a given tableId.
+
+        :param table_id: The unique identifier for the table
+        :param maxpagesize: The maximum number of results to retrieve
+        :param next: Pagination cursor for next set of results.
+        :param revision: Returns resources at a specific revision
+        :param retries: Override the default retry configuration for this method
+        :param server_url: Override the default server URL for this method
+        :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
+        :param http_headers: Additional headers to set or replace on requests.
+        """
+        base_url = None
+        url_variables = None
+        if timeout_ms is None:
+            timeout_ms = self.sdk_configuration.timeout_ms
+
+        if server_url is not None:
+            base_url = server_url
+        else:
+            base_url = self._get_url(base_url, url_variables)
+
+        request = models.GetRangeLinksRequest(
+            table_id=table_id,
+            maxpagesize=maxpagesize,
+            next=next,
+            revision=revision,
+        )
+
+        req = self._build_request_async(
+            method="GET",
+            path="/content/tables/{tableId}/rangeLinks",
+            base_url=base_url,
+            url_variables=url_variables,
+            request=request,
+            request_body_required=False,
+            request_has_path_params=True,
+            request_has_query_params=True,
+            user_agent_header="user-agent",
+            accept_header_value="application/json",
+            http_headers=http_headers,
+            security=self.sdk_configuration.security,
+            allow_empty_value=None,
+            timeout_ms=timeout_ms,
+        )
+
+        if retries == UNSET:
+            if self.sdk_configuration.retry_config is not UNSET:
+                retries = self.sdk_configuration.retry_config
+
+        retry_config = None
+        if isinstance(retries, utils.RetryConfig):
+            retry_config = (retries, ["429", "500", "502", "503", "504"])
+
+        http_res = await self.do_request_async(
+            hook_ctx=HookContext(
+                config=self.sdk_configuration,
+                base_url=base_url or "",
+                operation_id="getRangeLinks",
+                oauth2_scopes=["file:read"],
+                security_source=self.sdk_configuration.security,
+            ),
+            request=req,
+            error_status_codes=[
+                "400",
+                "401",
+                "403",
+                "404",
+                "429",
+                "4XX",
+                "500",
+                "503",
+                "5XX",
+            ],
+            retry_config=retry_config,
+        )
+
+        def next_func() -> Awaitable[Optional[models.GetRangeLinksResponse]]:
+            body = utils.unmarshal_json(http_res.text, Union[Dict[Any, Any], List[Any]])
+
+            async def empty_result():
+                return None
+
+            next_cursor = JSONPath("$['@nextLink']").parse(body)
+
+            if len(next_cursor) == 0:
+                return empty_result()
+
+            next_cursor = next_cursor[0]
+            if next_cursor is None or str(next_cursor).strip() == "":
+                return empty_result()
+
+            return self.get_range_links_async(
+                table_id=table_id,
+                maxpagesize=maxpagesize,
+                next=next,
+                revision=revision,
+                retries=retries,
+            )
+
+        response_data: Any = None
+        if utils.match_response(http_res, "200", "application/json"):
+            return models.GetRangeLinksResponse(
+                result=unmarshal_json_response(models.RangeLinkListResult, http_res),
+                next=next_func,
+            )
+        if utils.match_response(
+            http_res, ["400", "401", "403", "404", "429"], "application/json"
+        ):
+            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
+            raise errors.ErrorResponse(response_data, http_res)
+        if utils.match_response(http_res, ["500", "503"], "application/json"):
+            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
+            raise errors.ErrorResponse(response_data, http_res)
+        if utils.match_response(http_res, "4XX", "*"):
+            http_res_text = await utils.stream_to_text_async(http_res)
+            raise errors.SDKError("API error occurred", http_res, http_res_text)
+        if utils.match_response(http_res, "5XX", "*"):
+            http_res_text = await utils.stream_to_text_async(http_res)
+            raise errors.SDKError("API error occurred", http_res, http_res_text)
+
+        raise errors.SDKError("Unexpected response received", http_res)
+
+    def get_range_link_by_id(
+        self,
+        *,
+        table_id: str,
+        range_link_id: str,
+        revision: Optional[str] = None,
+        retries: OptionalNullable[utils.RetryConfig] = UNSET,
+        server_url: Optional[str] = None,
+        timeout_ms: Optional[int] = None,
+        http_headers: Optional[Mapping[str, str]] = None,
+    ) -> models.RangeLink:
+        r"""Retrieve a range link by id
+
+        Returns a [`RangeLink`](ref:content#rangelink) given its id
+
+        :param table_id: The unique identifier for the table
+        :param range_link_id: The unique identifier of a range link.
+        :param revision: Returns resources at a specific revision
+        :param retries: Override the default retry configuration for this method
+        :param server_url: Override the default server URL for this method
+        :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
+        :param http_headers: Additional headers to set or replace on requests.
+        """
+        base_url = None
+        url_variables = None
+        if timeout_ms is None:
+            timeout_ms = self.sdk_configuration.timeout_ms
+
+        if server_url is not None:
+            base_url = server_url
+        else:
+            base_url = self._get_url(base_url, url_variables)
+
+        request = models.GetRangeLinkByIDRequest(
+            table_id=table_id,
+            range_link_id=range_link_id,
+            revision=revision,
+        )
+
+        req = self._build_request(
+            method="GET",
+            path="/content/tables/{tableId}/rangeLinks/{rangeLinkId}",
+            base_url=base_url,
+            url_variables=url_variables,
+            request=request,
+            request_body_required=False,
+            request_has_path_params=True,
+            request_has_query_params=True,
+            user_agent_header="user-agent",
+            accept_header_value="application/json",
+            http_headers=http_headers,
+            security=self.sdk_configuration.security,
+            allow_empty_value=None,
+            timeout_ms=timeout_ms,
+        )
+
+        if retries == UNSET:
+            if self.sdk_configuration.retry_config is not UNSET:
+                retries = self.sdk_configuration.retry_config
+
+        retry_config = None
+        if isinstance(retries, utils.RetryConfig):
+            retry_config = (retries, ["429", "500", "502", "503", "504"])
+
+        http_res = self.do_request(
+            hook_ctx=HookContext(
+                config=self.sdk_configuration,
+                base_url=base_url or "",
+                operation_id="getRangeLinkById",
+                oauth2_scopes=["file:read"],
+                security_source=self.sdk_configuration.security,
+            ),
+            request=req,
+            error_status_codes=[
+                "400",
+                "401",
+                "403",
+                "404",
+                "429",
+                "4XX",
+                "500",
+                "503",
+                "5XX",
+            ],
+            retry_config=retry_config,
+        )
+
+        response_data: Any = None
+        if utils.match_response(http_res, "200", "application/json"):
+            return unmarshal_json_response(models.RangeLink, http_res)
+        if utils.match_response(
+            http_res, ["400", "401", "403", "404", "429"], "application/json"
+        ):
+            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
+            raise errors.ErrorResponse(response_data, http_res)
+        if utils.match_response(http_res, ["500", "503"], "application/json"):
+            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
+            raise errors.ErrorResponse(response_data, http_res)
+        if utils.match_response(http_res, "4XX", "*"):
+            http_res_text = utils.stream_to_text(http_res)
+            raise errors.SDKError("API error occurred", http_res, http_res_text)
+        if utils.match_response(http_res, "5XX", "*"):
+            http_res_text = utils.stream_to_text(http_res)
+            raise errors.SDKError("API error occurred", http_res, http_res_text)
+
+        raise errors.SDKError("Unexpected response received", http_res)
+
+    async def get_range_link_by_id_async(
+        self,
+        *,
+        table_id: str,
+        range_link_id: str,
+        revision: Optional[str] = None,
+        retries: OptionalNullable[utils.RetryConfig] = UNSET,
+        server_url: Optional[str] = None,
+        timeout_ms: Optional[int] = None,
+        http_headers: Optional[Mapping[str, str]] = None,
+    ) -> models.RangeLink:
+        r"""Retrieve a range link by id
+
+        Returns a [`RangeLink`](ref:content#rangelink) given its id
+
+        :param table_id: The unique identifier for the table
+        :param range_link_id: The unique identifier of a range link.
+        :param revision: Returns resources at a specific revision
+        :param retries: Override the default retry configuration for this method
+        :param server_url: Override the default server URL for this method
+        :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
+        :param http_headers: Additional headers to set or replace on requests.
+        """
+        base_url = None
+        url_variables = None
+        if timeout_ms is None:
+            timeout_ms = self.sdk_configuration.timeout_ms
+
+        if server_url is not None:
+            base_url = server_url
+        else:
+            base_url = self._get_url(base_url, url_variables)
+
+        request = models.GetRangeLinkByIDRequest(
+            table_id=table_id,
+            range_link_id=range_link_id,
+            revision=revision,
+        )
+
+        req = self._build_request_async(
+            method="GET",
+            path="/content/tables/{tableId}/rangeLinks/{rangeLinkId}",
+            base_url=base_url,
+            url_variables=url_variables,
+            request=request,
+            request_body_required=False,
+            request_has_path_params=True,
+            request_has_query_params=True,
+            user_agent_header="user-agent",
+            accept_header_value="application/json",
+            http_headers=http_headers,
+            security=self.sdk_configuration.security,
+            allow_empty_value=None,
+            timeout_ms=timeout_ms,
+        )
+
+        if retries == UNSET:
+            if self.sdk_configuration.retry_config is not UNSET:
+                retries = self.sdk_configuration.retry_config
+
+        retry_config = None
+        if isinstance(retries, utils.RetryConfig):
+            retry_config = (retries, ["429", "500", "502", "503", "504"])
+
+        http_res = await self.do_request_async(
+            hook_ctx=HookContext(
+                config=self.sdk_configuration,
+                base_url=base_url or "",
+                operation_id="getRangeLinkById",
+                oauth2_scopes=["file:read"],
+                security_source=self.sdk_configuration.security,
+            ),
+            request=req,
+            error_status_codes=[
+                "400",
+                "401",
+                "403",
+                "404",
+                "429",
+                "4XX",
+                "500",
+                "503",
+                "5XX",
+            ],
+            retry_config=retry_config,
+        )
+
+        response_data: Any = None
+        if utils.match_response(http_res, "200", "application/json"):
+            return unmarshal_json_response(models.RangeLink, http_res)
+        if utils.match_response(
+            http_res, ["400", "401", "403", "404", "429"], "application/json"
+        ):
+            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
+            raise errors.ErrorResponse(response_data, http_res)
+        if utils.match_response(http_res, ["500", "503"], "application/json"):
+            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
+            raise errors.ErrorResponse(response_data, http_res)
+        if utils.match_response(http_res, "4XX", "*"):
+            http_res_text = await utils.stream_to_text_async(http_res)
+            raise errors.SDKError("API error occurred", http_res, http_res_text)
+        if utils.match_response(http_res, "5XX", "*"):
+            http_res_text = await utils.stream_to_text_async(http_res)
+            raise errors.SDKError("API error occurred", http_res, http_res_text)
+
+        raise errors.SDKError("Unexpected response received", http_res)
+
+    def get_range_link_destinations(
+        self,
+        *,
+        request: Union[
+            models.GetRangeLinkDestinationsRequest,
+            models.GetRangeLinkDestinationsRequestTypedDict,
+        ],
+        retries: OptionalNullable[utils.RetryConfig] = UNSET,
+        server_url: Optional[str] = None,
+        timeout_ms: Optional[int] = None,
+        http_headers: Optional[Mapping[str, str]] = None,
+    ) -> Optional[models.GetRangeLinkDestinationsResponse]:
+        r"""Retrieve range link destinations for a source
+
+        Returns a [`RangeLinkListResult`](ref:content#rangelinklistresult) of destinations for a given source range link.
+
+        :param request: The request object to send.
+        :param retries: Override the default retry configuration for this method
+        :param server_url: Override the default server URL for this method
+        :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
+        :param http_headers: Additional headers to set or replace on requests.
+        """
+        base_url = None
+        url_variables = None
+        if timeout_ms is None:
+            timeout_ms = self.sdk_configuration.timeout_ms
+
+        if server_url is not None:
+            base_url = server_url
+        else:
+            base_url = self._get_url(base_url, url_variables)
+
+        if not isinstance(request, BaseModel):
+            request = utils.unmarshal(request, models.GetRangeLinkDestinationsRequest)
+        request = cast(models.GetRangeLinkDestinationsRequest, request)
+
+        req = self._build_request(
+            method="GET",
+            path="/content/tables/{tableId}/rangeLinks/{rangeLinkId}/destinations",
+            base_url=base_url,
+            url_variables=url_variables,
+            request=request,
+            request_body_required=False,
+            request_has_path_params=True,
+            request_has_query_params=True,
+            user_agent_header="user-agent",
+            accept_header_value="application/json",
+            http_headers=http_headers,
+            security=self.sdk_configuration.security,
+            allow_empty_value=None,
+            timeout_ms=timeout_ms,
+        )
+
+        if retries == UNSET:
+            if self.sdk_configuration.retry_config is not UNSET:
+                retries = self.sdk_configuration.retry_config
+
+        retry_config = None
+        if isinstance(retries, utils.RetryConfig):
+            retry_config = (retries, ["429", "500", "502", "503", "504"])
+
+        http_res = self.do_request(
+            hook_ctx=HookContext(
+                config=self.sdk_configuration,
+                base_url=base_url or "",
+                operation_id="getRangeLinkDestinations",
+                oauth2_scopes=["file:read"],
+                security_source=self.sdk_configuration.security,
+            ),
+            request=req,
+            error_status_codes=[
+                "400",
+                "401",
+                "403",
+                "404",
+                "429",
+                "4XX",
+                "500",
+                "503",
+                "5XX",
+            ],
+            retry_config=retry_config,
+        )
+
+        def next_func() -> Optional[models.GetRangeLinkDestinationsResponse]:
+            body = utils.unmarshal_json(http_res.text, Union[Dict[Any, Any], List[Any]])
+
+            next_cursor = JSONPath("$['@nextLink']").parse(body)
+
+            if len(next_cursor) == 0:
+                return None
+
+            next_cursor = next_cursor[0]
+            if next_cursor is None or str(next_cursor).strip() == "":
+                return None
+
+            return self.get_range_link_destinations(
+                request=models.GetRangeLinkDestinationsRequest(
+                    table_id=request.table_id,
+                    range_link_id=request.range_link_id,
+                    maxpagesize=request.maxpagesize,
+                    next=request.next,
+                    revision=request.revision,
+                ),
+                retries=retries,
+            )
+
+        response_data: Any = None
+        if utils.match_response(http_res, "200", "application/json"):
+            return models.GetRangeLinkDestinationsResponse(
+                result=unmarshal_json_response(models.RangeLinkListResult, http_res),
+                next=next_func,
+            )
+        if utils.match_response(
+            http_res, ["400", "401", "403", "404", "429"], "application/json"
+        ):
+            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
+            raise errors.ErrorResponse(response_data, http_res)
+        if utils.match_response(http_res, ["500", "503"], "application/json"):
+            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
+            raise errors.ErrorResponse(response_data, http_res)
+        if utils.match_response(http_res, "4XX", "*"):
+            http_res_text = utils.stream_to_text(http_res)
+            raise errors.SDKError("API error occurred", http_res, http_res_text)
+        if utils.match_response(http_res, "5XX", "*"):
+            http_res_text = utils.stream_to_text(http_res)
+            raise errors.SDKError("API error occurred", http_res, http_res_text)
+
+        raise errors.SDKError("Unexpected response received", http_res)
+
+    async def get_range_link_destinations_async(
+        self,
+        *,
+        request: Union[
+            models.GetRangeLinkDestinationsRequest,
+            models.GetRangeLinkDestinationsRequestTypedDict,
+        ],
+        retries: OptionalNullable[utils.RetryConfig] = UNSET,
+        server_url: Optional[str] = None,
+        timeout_ms: Optional[int] = None,
+        http_headers: Optional[Mapping[str, str]] = None,
+    ) -> Optional[models.GetRangeLinkDestinationsResponse]:
+        r"""Retrieve range link destinations for a source
+
+        Returns a [`RangeLinkListResult`](ref:content#rangelinklistresult) of destinations for a given source range link.
+
+        :param request: The request object to send.
+        :param retries: Override the default retry configuration for this method
+        :param server_url: Override the default server URL for this method
+        :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
+        :param http_headers: Additional headers to set or replace on requests.
+        """
+        base_url = None
+        url_variables = None
+        if timeout_ms is None:
+            timeout_ms = self.sdk_configuration.timeout_ms
+
+        if server_url is not None:
+            base_url = server_url
+        else:
+            base_url = self._get_url(base_url, url_variables)
+
+        if not isinstance(request, BaseModel):
+            request = utils.unmarshal(request, models.GetRangeLinkDestinationsRequest)
+        request = cast(models.GetRangeLinkDestinationsRequest, request)
+
+        req = self._build_request_async(
+            method="GET",
+            path="/content/tables/{tableId}/rangeLinks/{rangeLinkId}/destinations",
+            base_url=base_url,
+            url_variables=url_variables,
+            request=request,
+            request_body_required=False,
+            request_has_path_params=True,
+            request_has_query_params=True,
+            user_agent_header="user-agent",
+            accept_header_value="application/json",
+            http_headers=http_headers,
+            security=self.sdk_configuration.security,
+            allow_empty_value=None,
+            timeout_ms=timeout_ms,
+        )
+
+        if retries == UNSET:
+            if self.sdk_configuration.retry_config is not UNSET:
+                retries = self.sdk_configuration.retry_config
+
+        retry_config = None
+        if isinstance(retries, utils.RetryConfig):
+            retry_config = (retries, ["429", "500", "502", "503", "504"])
+
+        http_res = await self.do_request_async(
+            hook_ctx=HookContext(
+                config=self.sdk_configuration,
+                base_url=base_url or "",
+                operation_id="getRangeLinkDestinations",
+                oauth2_scopes=["file:read"],
+                security_source=self.sdk_configuration.security,
+            ),
+            request=req,
+            error_status_codes=[
+                "400",
+                "401",
+                "403",
+                "404",
+                "429",
+                "4XX",
+                "500",
+                "503",
+                "5XX",
+            ],
+            retry_config=retry_config,
+        )
+
+        def next_func() -> Awaitable[Optional[models.GetRangeLinkDestinationsResponse]]:
+            body = utils.unmarshal_json(http_res.text, Union[Dict[Any, Any], List[Any]])
+
+            async def empty_result():
+                return None
+
+            next_cursor = JSONPath("$['@nextLink']").parse(body)
+
+            if len(next_cursor) == 0:
+                return empty_result()
+
+            next_cursor = next_cursor[0]
+            if next_cursor is None or str(next_cursor).strip() == "":
+                return empty_result()
+
+            return self.get_range_link_destinations_async(
+                request=models.GetRangeLinkDestinationsRequest(
+                    table_id=request.table_id,
+                    range_link_id=request.range_link_id,
+                    maxpagesize=request.maxpagesize,
+                    next=request.next,
+                    revision=request.revision,
+                ),
+                retries=retries,
+            )
+
+        response_data: Any = None
+        if utils.match_response(http_res, "200", "application/json"):
+            return models.GetRangeLinkDestinationsResponse(
+                result=unmarshal_json_response(models.RangeLinkListResult, http_res),
+                next=next_func,
+            )
+        if utils.match_response(
+            http_res, ["400", "401", "403", "404", "429"], "application/json"
+        ):
+            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
+            raise errors.ErrorResponse(response_data, http_res)
+        if utils.match_response(http_res, ["500", "503"], "application/json"):
+            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
+            raise errors.ErrorResponse(response_data, http_res)
+        if utils.match_response(http_res, "4XX", "*"):
+            http_res_text = await utils.stream_to_text_async(http_res)
+            raise errors.SDKError("API error occurred", http_res, http_res_text)
+        if utils.match_response(http_res, "5XX", "*"):
+            http_res_text = await utils.stream_to_text_async(http_res)
+            raise errors.SDKError("API error occurred", http_res, http_res_text)
+
+        raise errors.SDKError("Unexpected response received", http_res)
+
     def table_range_links_edit(
         self,
         *,
@@ -9083,6 +8342,747 @@ class Content(BaseSDK):
         if utils.match_response(http_res, "202", "*"):
             return models.TableRangeLinksEditResponse(
                 headers=utils.get_response_headers(http_res.headers)
+            )
+        if utils.match_response(
+            http_res, ["400", "401", "403", "404", "409", "429"], "application/json"
+        ):
+            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
+            raise errors.ErrorResponse(response_data, http_res)
+        if utils.match_response(http_res, ["500", "503"], "application/json"):
+            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
+            raise errors.ErrorResponse(response_data, http_res)
+        if utils.match_response(http_res, "4XX", "*"):
+            http_res_text = await utils.stream_to_text_async(http_res)
+            raise errors.SDKError("API error occurred", http_res, http_res_text)
+        if utils.match_response(http_res, "5XX", "*"):
+            http_res_text = await utils.stream_to_text_async(http_res)
+            raise errors.SDKError("API error occurred", http_res, http_res_text)
+
+        raise errors.SDKError("Unexpected response received", http_res)
+
+    def get_table_properties(
+        self,
+        *,
+        table_id: str,
+        revision: Optional[str] = None,
+        retries: OptionalNullable[utils.RetryConfig] = UNSET,
+        server_url: Optional[str] = None,
+        timeout_ms: Optional[int] = None,
+        http_headers: Optional[Mapping[str, str]] = None,
+    ) -> models.TableProperties:
+        r"""Retrieve a table's properties by id
+
+        Returns a [`TableProperties`](ref:content#tableproperties) for a table
+
+
+        :param table_id: The unique identifier for the table
+        :param revision: Returns resources at a specific revision
+        :param retries: Override the default retry configuration for this method
+        :param server_url: Override the default server URL for this method
+        :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
+        :param http_headers: Additional headers to set or replace on requests.
+        """
+        base_url = None
+        url_variables = None
+        if timeout_ms is None:
+            timeout_ms = self.sdk_configuration.timeout_ms
+
+        if server_url is not None:
+            base_url = server_url
+        else:
+            base_url = self._get_url(base_url, url_variables)
+
+        request = models.GetTablePropertiesRequest(
+            table_id=table_id,
+            revision=revision,
+        )
+
+        req = self._build_request(
+            method="GET",
+            path="/content/tables/{tableId}/properties",
+            base_url=base_url,
+            url_variables=url_variables,
+            request=request,
+            request_body_required=False,
+            request_has_path_params=True,
+            request_has_query_params=True,
+            user_agent_header="user-agent",
+            accept_header_value="application/json",
+            http_headers=http_headers,
+            security=self.sdk_configuration.security,
+            allow_empty_value=None,
+            timeout_ms=timeout_ms,
+        )
+
+        if retries == UNSET:
+            if self.sdk_configuration.retry_config is not UNSET:
+                retries = self.sdk_configuration.retry_config
+
+        retry_config = None
+        if isinstance(retries, utils.RetryConfig):
+            retry_config = (retries, ["429", "500", "502", "503", "504"])
+
+        http_res = self.do_request(
+            hook_ctx=HookContext(
+                config=self.sdk_configuration,
+                base_url=base_url or "",
+                operation_id="getTableProperties",
+                oauth2_scopes=["file:read"],
+                security_source=self.sdk_configuration.security,
+            ),
+            request=req,
+            error_status_codes=[
+                "400",
+                "401",
+                "403",
+                "404",
+                "409",
+                "429",
+                "4XX",
+                "500",
+                "503",
+                "5XX",
+            ],
+            retry_config=retry_config,
+        )
+
+        response_data: Any = None
+        if utils.match_response(http_res, "200", "application/json"):
+            return unmarshal_json_response(models.TableProperties, http_res)
+        if utils.match_response(
+            http_res, ["400", "401", "403", "404", "409", "429"], "application/json"
+        ):
+            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
+            raise errors.ErrorResponse(response_data, http_res)
+        if utils.match_response(http_res, ["500", "503"], "application/json"):
+            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
+            raise errors.ErrorResponse(response_data, http_res)
+        if utils.match_response(http_res, "4XX", "*"):
+            http_res_text = utils.stream_to_text(http_res)
+            raise errors.SDKError("API error occurred", http_res, http_res_text)
+        if utils.match_response(http_res, "5XX", "*"):
+            http_res_text = utils.stream_to_text(http_res)
+            raise errors.SDKError("API error occurred", http_res, http_res_text)
+
+        raise errors.SDKError("Unexpected response received", http_res)
+
+    async def get_table_properties_async(
+        self,
+        *,
+        table_id: str,
+        revision: Optional[str] = None,
+        retries: OptionalNullable[utils.RetryConfig] = UNSET,
+        server_url: Optional[str] = None,
+        timeout_ms: Optional[int] = None,
+        http_headers: Optional[Mapping[str, str]] = None,
+    ) -> models.TableProperties:
+        r"""Retrieve a table's properties by id
+
+        Returns a [`TableProperties`](ref:content#tableproperties) for a table
+
+
+        :param table_id: The unique identifier for the table
+        :param revision: Returns resources at a specific revision
+        :param retries: Override the default retry configuration for this method
+        :param server_url: Override the default server URL for this method
+        :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
+        :param http_headers: Additional headers to set or replace on requests.
+        """
+        base_url = None
+        url_variables = None
+        if timeout_ms is None:
+            timeout_ms = self.sdk_configuration.timeout_ms
+
+        if server_url is not None:
+            base_url = server_url
+        else:
+            base_url = self._get_url(base_url, url_variables)
+
+        request = models.GetTablePropertiesRequest(
+            table_id=table_id,
+            revision=revision,
+        )
+
+        req = self._build_request_async(
+            method="GET",
+            path="/content/tables/{tableId}/properties",
+            base_url=base_url,
+            url_variables=url_variables,
+            request=request,
+            request_body_required=False,
+            request_has_path_params=True,
+            request_has_query_params=True,
+            user_agent_header="user-agent",
+            accept_header_value="application/json",
+            http_headers=http_headers,
+            security=self.sdk_configuration.security,
+            allow_empty_value=None,
+            timeout_ms=timeout_ms,
+        )
+
+        if retries == UNSET:
+            if self.sdk_configuration.retry_config is not UNSET:
+                retries = self.sdk_configuration.retry_config
+
+        retry_config = None
+        if isinstance(retries, utils.RetryConfig):
+            retry_config = (retries, ["429", "500", "502", "503", "504"])
+
+        http_res = await self.do_request_async(
+            hook_ctx=HookContext(
+                config=self.sdk_configuration,
+                base_url=base_url or "",
+                operation_id="getTableProperties",
+                oauth2_scopes=["file:read"],
+                security_source=self.sdk_configuration.security,
+            ),
+            request=req,
+            error_status_codes=[
+                "400",
+                "401",
+                "403",
+                "404",
+                "409",
+                "429",
+                "4XX",
+                "500",
+                "503",
+                "5XX",
+            ],
+            retry_config=retry_config,
+        )
+
+        response_data: Any = None
+        if utils.match_response(http_res, "200", "application/json"):
+            return unmarshal_json_response(models.TableProperties, http_res)
+        if utils.match_response(
+            http_res, ["400", "401", "403", "404", "409", "429"], "application/json"
+        ):
+            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
+            raise errors.ErrorResponse(response_data, http_res)
+        if utils.match_response(http_res, ["500", "503"], "application/json"):
+            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
+            raise errors.ErrorResponse(response_data, http_res)
+        if utils.match_response(http_res, "4XX", "*"):
+            http_res_text = await utils.stream_to_text_async(http_res)
+            raise errors.SDKError("API error occurred", http_res, http_res_text)
+        if utils.match_response(http_res, "5XX", "*"):
+            http_res_text = await utils.stream_to_text_async(http_res)
+            raise errors.SDKError("API error occurred", http_res, http_res_text)
+
+        raise errors.SDKError("Unexpected response received", http_res)
+
+    def partially_update_table_properties(
+        self,
+        *,
+        table_id: str,
+        request_body: Union[
+            List[models.JSONPatchOperation], List[models.JSONPatchOperationTypedDict]
+        ],
+        retries: OptionalNullable[utils.RetryConfig] = UNSET,
+        server_url: Optional[str] = None,
+        timeout_ms: Optional[int] = None,
+        http_headers: Optional[Mapping[str, str]] = None,
+    ) -> models.PartiallyUpdateTablePropertiesResponse:
+        r"""Partially update a table's properties
+
+        Partially updates a table's properties given its ID.
+
+        This is a long running operation. Responses include a `Location` header, which indicates where to poll for results.
+        For more details on long-running job polling, see [Operations endpoint](ref:getoperationbyid).
+
+        ### Options
+        | Path               | PATCH Operations Supported |
+        |--------------------|----------------------------|
+        | `/name`            | `replace`                  |
+        | `/resizeRowsToFit` | `replace`                  |
+        | `/lock`            | `replace`                  |
+
+
+        :param table_id: The unique identifier for the table
+        :param request_body: Patch document representing the changes to be made to the table's properties
+        :param retries: Override the default retry configuration for this method
+        :param server_url: Override the default server URL for this method
+        :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
+        :param http_headers: Additional headers to set or replace on requests.
+        """
+        base_url = None
+        url_variables = None
+        if timeout_ms is None:
+            timeout_ms = self.sdk_configuration.timeout_ms
+
+        if server_url is not None:
+            base_url = server_url
+        else:
+            base_url = self._get_url(base_url, url_variables)
+
+        request = models.PartiallyUpdateTablePropertiesRequest(
+            table_id=table_id,
+            request_body=utils.get_pydantic_model(
+                request_body, List[models.JSONPatchOperation]
+            ),
+        )
+
+        req = self._build_request(
+            method="PATCH",
+            path="/content/tables/{tableId}/properties",
+            base_url=base_url,
+            url_variables=url_variables,
+            request=request,
+            request_body_required=True,
+            request_has_path_params=True,
+            request_has_query_params=True,
+            user_agent_header="user-agent",
+            accept_header_value="application/json",
+            http_headers=http_headers,
+            security=self.sdk_configuration.security,
+            get_serialized_body=lambda: utils.serialize_request_body(
+                request.request_body,
+                False,
+                False,
+                "json",
+                List[models.JSONPatchOperation],
+            ),
+            allow_empty_value=None,
+            timeout_ms=timeout_ms,
+        )
+
+        if retries == UNSET:
+            if self.sdk_configuration.retry_config is not UNSET:
+                retries = self.sdk_configuration.retry_config
+
+        retry_config = None
+        if isinstance(retries, utils.RetryConfig):
+            retry_config = (retries, ["429", "500", "502", "503", "504"])
+
+        http_res = self.do_request(
+            hook_ctx=HookContext(
+                config=self.sdk_configuration,
+                base_url=base_url or "",
+                operation_id="partiallyUpdateTableProperties",
+                oauth2_scopes=["file:write"],
+                security_source=self.sdk_configuration.security,
+            ),
+            request=req,
+            error_status_codes=[
+                "400",
+                "401",
+                "403",
+                "404",
+                "409",
+                "429",
+                "4XX",
+                "500",
+                "503",
+                "5XX",
+            ],
+            retry_config=retry_config,
+        )
+
+        response_data: Any = None
+        if utils.match_response(http_res, "202", "*"):
+            return models.PartiallyUpdateTablePropertiesResponse(
+                headers=utils.get_response_headers(http_res.headers)
+            )
+        if utils.match_response(
+            http_res, ["400", "401", "403", "404", "409", "429"], "application/json"
+        ):
+            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
+            raise errors.ErrorResponse(response_data, http_res)
+        if utils.match_response(http_res, ["500", "503"], "application/json"):
+            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
+            raise errors.ErrorResponse(response_data, http_res)
+        if utils.match_response(http_res, "4XX", "*"):
+            http_res_text = utils.stream_to_text(http_res)
+            raise errors.SDKError("API error occurred", http_res, http_res_text)
+        if utils.match_response(http_res, "5XX", "*"):
+            http_res_text = utils.stream_to_text(http_res)
+            raise errors.SDKError("API error occurred", http_res, http_res_text)
+
+        raise errors.SDKError("Unexpected response received", http_res)
+
+    async def partially_update_table_properties_async(
+        self,
+        *,
+        table_id: str,
+        request_body: Union[
+            List[models.JSONPatchOperation], List[models.JSONPatchOperationTypedDict]
+        ],
+        retries: OptionalNullable[utils.RetryConfig] = UNSET,
+        server_url: Optional[str] = None,
+        timeout_ms: Optional[int] = None,
+        http_headers: Optional[Mapping[str, str]] = None,
+    ) -> models.PartiallyUpdateTablePropertiesResponse:
+        r"""Partially update a table's properties
+
+        Partially updates a table's properties given its ID.
+
+        This is a long running operation. Responses include a `Location` header, which indicates where to poll for results.
+        For more details on long-running job polling, see [Operations endpoint](ref:getoperationbyid).
+
+        ### Options
+        | Path               | PATCH Operations Supported |
+        |--------------------|----------------------------|
+        | `/name`            | `replace`                  |
+        | `/resizeRowsToFit` | `replace`                  |
+        | `/lock`            | `replace`                  |
+
+
+        :param table_id: The unique identifier for the table
+        :param request_body: Patch document representing the changes to be made to the table's properties
+        :param retries: Override the default retry configuration for this method
+        :param server_url: Override the default server URL for this method
+        :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
+        :param http_headers: Additional headers to set or replace on requests.
+        """
+        base_url = None
+        url_variables = None
+        if timeout_ms is None:
+            timeout_ms = self.sdk_configuration.timeout_ms
+
+        if server_url is not None:
+            base_url = server_url
+        else:
+            base_url = self._get_url(base_url, url_variables)
+
+        request = models.PartiallyUpdateTablePropertiesRequest(
+            table_id=table_id,
+            request_body=utils.get_pydantic_model(
+                request_body, List[models.JSONPatchOperation]
+            ),
+        )
+
+        req = self._build_request_async(
+            method="PATCH",
+            path="/content/tables/{tableId}/properties",
+            base_url=base_url,
+            url_variables=url_variables,
+            request=request,
+            request_body_required=True,
+            request_has_path_params=True,
+            request_has_query_params=True,
+            user_agent_header="user-agent",
+            accept_header_value="application/json",
+            http_headers=http_headers,
+            security=self.sdk_configuration.security,
+            get_serialized_body=lambda: utils.serialize_request_body(
+                request.request_body,
+                False,
+                False,
+                "json",
+                List[models.JSONPatchOperation],
+            ),
+            allow_empty_value=None,
+            timeout_ms=timeout_ms,
+        )
+
+        if retries == UNSET:
+            if self.sdk_configuration.retry_config is not UNSET:
+                retries = self.sdk_configuration.retry_config
+
+        retry_config = None
+        if isinstance(retries, utils.RetryConfig):
+            retry_config = (retries, ["429", "500", "502", "503", "504"])
+
+        http_res = await self.do_request_async(
+            hook_ctx=HookContext(
+                config=self.sdk_configuration,
+                base_url=base_url or "",
+                operation_id="partiallyUpdateTableProperties",
+                oauth2_scopes=["file:write"],
+                security_source=self.sdk_configuration.security,
+            ),
+            request=req,
+            error_status_codes=[
+                "400",
+                "401",
+                "403",
+                "404",
+                "409",
+                "429",
+                "4XX",
+                "500",
+                "503",
+                "5XX",
+            ],
+            retry_config=retry_config,
+        )
+
+        response_data: Any = None
+        if utils.match_response(http_res, "202", "*"):
+            return models.PartiallyUpdateTablePropertiesResponse(
+                headers=utils.get_response_headers(http_res.headers)
+            )
+        if utils.match_response(
+            http_res, ["400", "401", "403", "404", "409", "429"], "application/json"
+        ):
+            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
+            raise errors.ErrorResponse(response_data, http_res)
+        if utils.match_response(http_res, ["500", "503"], "application/json"):
+            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
+            raise errors.ErrorResponse(response_data, http_res)
+        if utils.match_response(http_res, "4XX", "*"):
+            http_res_text = await utils.stream_to_text_async(http_res)
+            raise errors.SDKError("API error occurred", http_res, http_res_text)
+        if utils.match_response(http_res, "5XX", "*"):
+            http_res_text = await utils.stream_to_text_async(http_res)
+            raise errors.SDKError("API error occurred", http_res, http_res_text)
+
+        raise errors.SDKError("Unexpected response received", http_res)
+
+    def get_row_properties(
+        self,
+        *,
+        request: Union[
+            models.GetRowPropertiesRequest, models.GetRowPropertiesRequestTypedDict
+        ],
+        retries: OptionalNullable[utils.RetryConfig] = UNSET,
+        server_url: Optional[str] = None,
+        timeout_ms: Optional[int] = None,
+        http_headers: Optional[Mapping[str, str]] = None,
+    ) -> Optional[models.GetRowPropertiesResponse]:
+        r"""Retrieve table row properties
+
+        Returns a [`RowPropertiesListResult`](ref:content#rowpropertieslistresult) for a table
+
+
+        :param request: The request object to send.
+        :param retries: Override the default retry configuration for this method
+        :param server_url: Override the default server URL for this method
+        :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
+        :param http_headers: Additional headers to set or replace on requests.
+        """
+        base_url = None
+        url_variables = None
+        if timeout_ms is None:
+            timeout_ms = self.sdk_configuration.timeout_ms
+
+        if server_url is not None:
+            base_url = server_url
+        else:
+            base_url = self._get_url(base_url, url_variables)
+
+        if not isinstance(request, BaseModel):
+            request = utils.unmarshal(request, models.GetRowPropertiesRequest)
+        request = cast(models.GetRowPropertiesRequest, request)
+
+        req = self._build_request(
+            method="GET",
+            path="/content/tables/{tableId}/properties/rows",
+            base_url=base_url,
+            url_variables=url_variables,
+            request=request,
+            request_body_required=False,
+            request_has_path_params=True,
+            request_has_query_params=True,
+            user_agent_header="user-agent",
+            accept_header_value="application/json",
+            http_headers=http_headers,
+            security=self.sdk_configuration.security,
+            allow_empty_value=None,
+            timeout_ms=timeout_ms,
+        )
+
+        if retries == UNSET:
+            if self.sdk_configuration.retry_config is not UNSET:
+                retries = self.sdk_configuration.retry_config
+
+        retry_config = None
+        if isinstance(retries, utils.RetryConfig):
+            retry_config = (retries, ["429", "500", "502", "503", "504"])
+
+        http_res = self.do_request(
+            hook_ctx=HookContext(
+                config=self.sdk_configuration,
+                base_url=base_url or "",
+                operation_id="getRowProperties",
+                oauth2_scopes=["file:read"],
+                security_source=self.sdk_configuration.security,
+            ),
+            request=req,
+            error_status_codes=[
+                "400",
+                "401",
+                "403",
+                "404",
+                "409",
+                "429",
+                "4XX",
+                "500",
+                "503",
+                "5XX",
+            ],
+            retry_config=retry_config,
+        )
+
+        def next_func() -> Optional[models.GetRowPropertiesResponse]:
+            body = utils.unmarshal_json(http_res.text, Union[Dict[Any, Any], List[Any]])
+
+            next_cursor = JSONPath("$['@nextLink']").parse(body)
+
+            if len(next_cursor) == 0:
+                return None
+
+            next_cursor = next_cursor[0]
+            if next_cursor is None or str(next_cursor).strip() == "":
+                return None
+
+            return self.get_row_properties(
+                request=models.GetRowPropertiesRequest(
+                    table_id=request.table_id,
+                    revision=request.revision,
+                    maxpagesize=request.maxpagesize,
+                    next=request.next,
+                    start_row=request.start_row,
+                    stop_row=request.stop_row,
+                ),
+                retries=retries,
+            )
+
+        response_data: Any = None
+        if utils.match_response(http_res, "200", "application/json"):
+            return models.GetRowPropertiesResponse(
+                result=unmarshal_json_response(
+                    models.RowPropertiesListResult, http_res
+                ),
+                next=next_func,
+            )
+        if utils.match_response(
+            http_res, ["400", "401", "403", "404", "409", "429"], "application/json"
+        ):
+            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
+            raise errors.ErrorResponse(response_data, http_res)
+        if utils.match_response(http_res, ["500", "503"], "application/json"):
+            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
+            raise errors.ErrorResponse(response_data, http_res)
+        if utils.match_response(http_res, "4XX", "*"):
+            http_res_text = utils.stream_to_text(http_res)
+            raise errors.SDKError("API error occurred", http_res, http_res_text)
+        if utils.match_response(http_res, "5XX", "*"):
+            http_res_text = utils.stream_to_text(http_res)
+            raise errors.SDKError("API error occurred", http_res, http_res_text)
+
+        raise errors.SDKError("Unexpected response received", http_res)
+
+    async def get_row_properties_async(
+        self,
+        *,
+        request: Union[
+            models.GetRowPropertiesRequest, models.GetRowPropertiesRequestTypedDict
+        ],
+        retries: OptionalNullable[utils.RetryConfig] = UNSET,
+        server_url: Optional[str] = None,
+        timeout_ms: Optional[int] = None,
+        http_headers: Optional[Mapping[str, str]] = None,
+    ) -> Optional[models.GetRowPropertiesResponse]:
+        r"""Retrieve table row properties
+
+        Returns a [`RowPropertiesListResult`](ref:content#rowpropertieslistresult) for a table
+
+
+        :param request: The request object to send.
+        :param retries: Override the default retry configuration for this method
+        :param server_url: Override the default server URL for this method
+        :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
+        :param http_headers: Additional headers to set or replace on requests.
+        """
+        base_url = None
+        url_variables = None
+        if timeout_ms is None:
+            timeout_ms = self.sdk_configuration.timeout_ms
+
+        if server_url is not None:
+            base_url = server_url
+        else:
+            base_url = self._get_url(base_url, url_variables)
+
+        if not isinstance(request, BaseModel):
+            request = utils.unmarshal(request, models.GetRowPropertiesRequest)
+        request = cast(models.GetRowPropertiesRequest, request)
+
+        req = self._build_request_async(
+            method="GET",
+            path="/content/tables/{tableId}/properties/rows",
+            base_url=base_url,
+            url_variables=url_variables,
+            request=request,
+            request_body_required=False,
+            request_has_path_params=True,
+            request_has_query_params=True,
+            user_agent_header="user-agent",
+            accept_header_value="application/json",
+            http_headers=http_headers,
+            security=self.sdk_configuration.security,
+            allow_empty_value=None,
+            timeout_ms=timeout_ms,
+        )
+
+        if retries == UNSET:
+            if self.sdk_configuration.retry_config is not UNSET:
+                retries = self.sdk_configuration.retry_config
+
+        retry_config = None
+        if isinstance(retries, utils.RetryConfig):
+            retry_config = (retries, ["429", "500", "502", "503", "504"])
+
+        http_res = await self.do_request_async(
+            hook_ctx=HookContext(
+                config=self.sdk_configuration,
+                base_url=base_url or "",
+                operation_id="getRowProperties",
+                oauth2_scopes=["file:read"],
+                security_source=self.sdk_configuration.security,
+            ),
+            request=req,
+            error_status_codes=[
+                "400",
+                "401",
+                "403",
+                "404",
+                "409",
+                "429",
+                "4XX",
+                "500",
+                "503",
+                "5XX",
+            ],
+            retry_config=retry_config,
+        )
+
+        def next_func() -> Awaitable[Optional[models.GetRowPropertiesResponse]]:
+            body = utils.unmarshal_json(http_res.text, Union[Dict[Any, Any], List[Any]])
+
+            async def empty_result():
+                return None
+
+            next_cursor = JSONPath("$['@nextLink']").parse(body)
+
+            if len(next_cursor) == 0:
+                return empty_result()
+
+            next_cursor = next_cursor[0]
+            if next_cursor is None or str(next_cursor).strip() == "":
+                return empty_result()
+
+            return self.get_row_properties_async(
+                request=models.GetRowPropertiesRequest(
+                    table_id=request.table_id,
+                    revision=request.revision,
+                    maxpagesize=request.maxpagesize,
+                    next=request.next,
+                    start_row=request.start_row,
+                    stop_row=request.stop_row,
+                ),
+                retries=retries,
+            )
+
+        response_data: Any = None
+        if utils.match_response(http_res, "200", "application/json"):
+            return models.GetRowPropertiesResponse(
+                result=unmarshal_json_response(
+                    models.RowPropertiesListResult, http_res
+                ),
+                next=next_func,
             )
         if utils.match_response(
             http_res, ["400", "401", "403", "404", "409", "429"], "application/json"

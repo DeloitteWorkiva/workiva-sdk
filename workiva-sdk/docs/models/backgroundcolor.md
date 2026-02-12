@@ -1,6 +1,6 @@
 # BackgroundColor
 
-Represents a color.
+The background color in RGB format
 
 
 ## Fields

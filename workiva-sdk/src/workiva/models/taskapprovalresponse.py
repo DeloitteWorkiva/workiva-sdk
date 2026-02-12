@@ -4,16 +4,11 @@ from __future__ import annotations
 from datetime import datetime
 from enum import Enum
 import pydantic
-from pydantic import model_serializer
+from pydantic import field_serializer, model_serializer
 from typing import Optional
 from typing_extensions import Annotated, NotRequired, TypedDict
+from workiva import models, utils
 from workiva.types import BaseModel, Nullable, OptionalNullable, UNSET, UNSET_SENTINEL
-
-
-class TaskApprovalResponseAction(str, Enum):
-    SKIP = "SKIP"
-    APPROVE = "APPROVE"
-    REJECT = "REJECT"
 
 
 class TaskApprovalResponseUserTypedDict(TypedDict):
@@ -88,11 +83,17 @@ class TaskApprovalResponseCreated(BaseModel):
         return m
 
 
+class TaskApprovalResponseAction(str, Enum, metaclass=utils.OpenEnumMeta):
+    SKIP = "SKIP"
+    APPROVE = "APPROVE"
+    REJECT = "REJECT"
+
+
 class TaskApprovalResponseTypedDict(TypedDict):
     r"""A response to an approval step, including the user, action taken, timestamp, and optional comment."""
 
-    action: TaskApprovalResponseAction
     created: TaskApprovalResponseCreatedTypedDict
+    action: TaskApprovalResponseAction
     comment: NotRequired[Nullable[str]]
     r"""An optional comment left by the user."""
 
@@ -100,12 +101,21 @@ class TaskApprovalResponseTypedDict(TypedDict):
 class TaskApprovalResponse(BaseModel):
     r"""A response to an approval step, including the user, action taken, timestamp, and optional comment."""
 
-    action: TaskApprovalResponseAction
-
     created: TaskApprovalResponseCreated
+
+    action: TaskApprovalResponseAction
 
     comment: OptionalNullable[str] = UNSET
     r"""An optional comment left by the user."""
+
+    @field_serializer("action")
+    def serialize_action(self, value):
+        if isinstance(value, str):
+            try:
+                return models.TaskApprovalResponseAction(value)
+            except ValueError:
+                return value
+        return value
 
     @model_serializer(mode="wrap")
     def serialize_model(self, handler):

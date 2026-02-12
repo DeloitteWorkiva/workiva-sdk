@@ -12,253 +12,24 @@ from workiva.utils.unmarshal_json_response import unmarshal_json_response
 class Admin(BaseSDK):
     r"""Endpoints to manage organizations, workspaces, groups, and users"""
 
-    def assign_organization_user_roles(
+    def get_organizations(
         self,
         *,
-        organization_id: str,
-        user_id: str,
-        request_body: List[str],
-        retries: OptionalNullable[utils.RetryConfig] = UNSET,
-        server_url: Optional[str] = None,
-        timeout_ms: Optional[int] = None,
-        http_headers: Optional[Mapping[str, str]] = None,
-    ) -> models.AssignOrganizationUserRolesResponse:
-        r"""Assign roles for an Organization User
-
-        Assign a User's roles within an Organization. If one assignment fails, all assignments fail.
-
-
-        :param organization_id: The unique identifier of the organization
-        :param user_id: The unique identifier of the user
-        :param request_body: Editable details about the user's roles.
-        :param retries: Override the default retry configuration for this method
-        :param server_url: Override the default server URL for this method
-        :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
-        :param http_headers: Additional headers to set or replace on requests.
-        """
-        base_url = None
-        url_variables = None
-        if timeout_ms is None:
-            timeout_ms = self.sdk_configuration.timeout_ms
-
-        if server_url is not None:
-            base_url = server_url
-        else:
-            base_url = self._get_url(base_url, url_variables)
-
-        request = models.AssignOrganizationUserRolesRequest(
-            organization_id=organization_id,
-            user_id=user_id,
-            request_body=request_body,
-        )
-
-        req = self._build_request(
-            method="POST",
-            path="/organizations/{organizationId}/users/{userId}/roles/assignment",
-            base_url=base_url,
-            url_variables=url_variables,
-            request=request,
-            request_body_required=True,
-            request_has_path_params=True,
-            request_has_query_params=True,
-            user_agent_header="user-agent",
-            accept_header_value="application/json",
-            http_headers=http_headers,
-            security=self.sdk_configuration.security,
-            get_serialized_body=lambda: utils.serialize_request_body(
-                request.request_body, False, False, "json", List[str]
-            ),
-            allow_empty_value=None,
-            timeout_ms=timeout_ms,
-        )
-
-        if retries == UNSET:
-            if self.sdk_configuration.retry_config is not UNSET:
-                retries = self.sdk_configuration.retry_config
-
-        retry_config = None
-        if isinstance(retries, utils.RetryConfig):
-            retry_config = (retries, ["429", "500", "502", "503", "504"])
-
-        http_res = self.do_request(
-            hook_ctx=HookContext(
-                config=self.sdk_configuration,
-                base_url=base_url or "",
-                operation_id="assignOrganizationUserRoles",
-                oauth2_scopes=["organization:write"],
-                security_source=self.sdk_configuration.security,
-            ),
-            request=req,
-            error_status_codes=[
-                "400",
-                "401",
-                "403",
-                "404",
-                "409",
-                "429",
-                "4XX",
-                "500",
-                "503",
-                "5XX",
-            ],
-            retry_config=retry_config,
-        )
-
-        response_data: Any = None
-        if utils.match_response(http_res, "202", "*"):
-            return models.AssignOrganizationUserRolesResponse(
-                headers=utils.get_response_headers(http_res.headers)
-            )
-        if utils.match_response(
-            http_res, ["400", "401", "403", "404", "409", "429"], "application/json"
-        ):
-            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
-            raise errors.ErrorResponse(response_data, http_res)
-        if utils.match_response(http_res, ["500", "503"], "application/json"):
-            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
-            raise errors.ErrorResponse(response_data, http_res)
-        if utils.match_response(http_res, "4XX", "*"):
-            http_res_text = utils.stream_to_text(http_res)
-            raise errors.SDKError("API error occurred", http_res, http_res_text)
-        if utils.match_response(http_res, "5XX", "*"):
-            http_res_text = utils.stream_to_text(http_res)
-            raise errors.SDKError("API error occurred", http_res, http_res_text)
-
-        raise errors.SDKError("Unexpected response received", http_res)
-
-    async def assign_organization_user_roles_async(
-        self,
-        *,
-        organization_id: str,
-        user_id: str,
-        request_body: List[str],
-        retries: OptionalNullable[utils.RetryConfig] = UNSET,
-        server_url: Optional[str] = None,
-        timeout_ms: Optional[int] = None,
-        http_headers: Optional[Mapping[str, str]] = None,
-    ) -> models.AssignOrganizationUserRolesResponse:
-        r"""Assign roles for an Organization User
-
-        Assign a User's roles within an Organization. If one assignment fails, all assignments fail.
-
-
-        :param organization_id: The unique identifier of the organization
-        :param user_id: The unique identifier of the user
-        :param request_body: Editable details about the user's roles.
-        :param retries: Override the default retry configuration for this method
-        :param server_url: Override the default server URL for this method
-        :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
-        :param http_headers: Additional headers to set or replace on requests.
-        """
-        base_url = None
-        url_variables = None
-        if timeout_ms is None:
-            timeout_ms = self.sdk_configuration.timeout_ms
-
-        if server_url is not None:
-            base_url = server_url
-        else:
-            base_url = self._get_url(base_url, url_variables)
-
-        request = models.AssignOrganizationUserRolesRequest(
-            organization_id=organization_id,
-            user_id=user_id,
-            request_body=request_body,
-        )
-
-        req = self._build_request_async(
-            method="POST",
-            path="/organizations/{organizationId}/users/{userId}/roles/assignment",
-            base_url=base_url,
-            url_variables=url_variables,
-            request=request,
-            request_body_required=True,
-            request_has_path_params=True,
-            request_has_query_params=True,
-            user_agent_header="user-agent",
-            accept_header_value="application/json",
-            http_headers=http_headers,
-            security=self.sdk_configuration.security,
-            get_serialized_body=lambda: utils.serialize_request_body(
-                request.request_body, False, False, "json", List[str]
-            ),
-            allow_empty_value=None,
-            timeout_ms=timeout_ms,
-        )
-
-        if retries == UNSET:
-            if self.sdk_configuration.retry_config is not UNSET:
-                retries = self.sdk_configuration.retry_config
-
-        retry_config = None
-        if isinstance(retries, utils.RetryConfig):
-            retry_config = (retries, ["429", "500", "502", "503", "504"])
-
-        http_res = await self.do_request_async(
-            hook_ctx=HookContext(
-                config=self.sdk_configuration,
-                base_url=base_url or "",
-                operation_id="assignOrganizationUserRoles",
-                oauth2_scopes=["organization:write"],
-                security_source=self.sdk_configuration.security,
-            ),
-            request=req,
-            error_status_codes=[
-                "400",
-                "401",
-                "403",
-                "404",
-                "409",
-                "429",
-                "4XX",
-                "500",
-                "503",
-                "5XX",
-            ],
-            retry_config=retry_config,
-        )
-
-        response_data: Any = None
-        if utils.match_response(http_res, "202", "*"):
-            return models.AssignOrganizationUserRolesResponse(
-                headers=utils.get_response_headers(http_res.headers)
-            )
-        if utils.match_response(
-            http_res, ["400", "401", "403", "404", "409", "429"], "application/json"
-        ):
-            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
-            raise errors.ErrorResponse(response_data, http_res)
-        if utils.match_response(http_res, ["500", "503"], "application/json"):
-            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
-            raise errors.ErrorResponse(response_data, http_res)
-        if utils.match_response(http_res, "4XX", "*"):
-            http_res_text = await utils.stream_to_text_async(http_res)
-            raise errors.SDKError("API error occurred", http_res, http_res_text)
-        if utils.match_response(http_res, "5XX", "*"):
-            http_res_text = await utils.stream_to_text_async(http_res)
-            raise errors.SDKError("API error occurred", http_res, http_res_text)
-
-        raise errors.SDKError("Unexpected response received", http_res)
-
-    def assign_user_to_organization(
-        self,
-        *,
-        organization_id: str,
-        organization_user_assignment: Union[
-            models.OrganizationUserAssignment,
-            models.OrganizationUserAssignmentTypedDict,
+        request: Union[
+            models.GetOrganizationsRequest, models.GetOrganizationsRequestTypedDict
         ],
         retries: OptionalNullable[utils.RetryConfig] = UNSET,
         server_url: Optional[str] = None,
         timeout_ms: Optional[int] = None,
         http_headers: Optional[Mapping[str, str]] = None,
-    ) -> models.OrganizationUser:
-        r"""Assign existing user to organization
+    ) -> Optional[models.GetOrganizationsResponse]:
+        r"""Retrieve a list of organizations
 
-        Assign an existing organization user to an organization
+        Returns a paginated list of [organizations](ref:admin#organization).
+        This functionality is only available to Managed Service Provider Applications. Contact your CSM for assistance.
 
-        :param organization_id: The unique identifier of the organization
-        :param organization_user_assignment: Configuration options for the assignment
+
+        :param request: The request object to send.
         :param retries: Override the default retry configuration for this method
         :param server_url: Override the default server URL for this method
         :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
@@ -274,33 +45,22 @@ class Admin(BaseSDK):
         else:
             base_url = self._get_url(base_url, url_variables)
 
-        request = models.AssignUserToOrganizationRequest(
-            organization_id=organization_id,
-            organization_user_assignment=utils.get_pydantic_model(
-                organization_user_assignment, models.OrganizationUserAssignment
-            ),
-        )
+        if not isinstance(request, BaseModel):
+            request = utils.unmarshal(request, models.GetOrganizationsRequest)
+        request = cast(models.GetOrganizationsRequest, request)
 
         req = self._build_request(
-            method="POST",
-            path="/organizations/{organizationId}/users/assignment",
+            method="GET",
+            path="/organizations",
             base_url=base_url,
             url_variables=url_variables,
             request=request,
-            request_body_required=True,
-            request_has_path_params=True,
+            request_body_required=False,
+            request_has_path_params=False,
             request_has_query_params=True,
             user_agent_header="user-agent",
             accept_header_value="application/json",
             http_headers=http_headers,
-            security=self.sdk_configuration.security,
-            get_serialized_body=lambda: utils.serialize_request_body(
-                request.organization_user_assignment,
-                False,
-                False,
-                "json",
-                models.OrganizationUserAssignment,
-            ),
             allow_empty_value=None,
             timeout_ms=timeout_ms,
         )
@@ -317,9 +77,9 @@ class Admin(BaseSDK):
             hook_ctx=HookContext(
                 config=self.sdk_configuration,
                 base_url=base_url or "",
-                operation_id="assignUserToOrganization",
-                oauth2_scopes=["organization:write"],
-                security_source=self.sdk_configuration.security,
+                operation_id="getOrganizations",
+                oauth2_scopes=[],
+                security_source=None,
             ),
             request=req,
             error_status_codes=[
@@ -336,10 +96,38 @@ class Admin(BaseSDK):
             ],
             retry_config=retry_config,
         )
+
+        def next_func() -> Optional[models.GetOrganizationsResponse]:
+            body = utils.unmarshal_json(http_res.text, Union[Dict[Any, Any], List[Any]])
+
+            next_cursor = JSONPath("$['@nextLink']").parse(body)
+
+            if len(next_cursor) == 0:
+                return None
+
+            next_cursor = next_cursor[0]
+            if next_cursor is None or str(next_cursor).strip() == "":
+                return None
+
+            return self.get_organizations(
+                request=models.GetOrganizationsRequest(
+                    wk_service_provider=request.wk_service_provider,
+                    maxpagesize=request.maxpagesize,
+                    next=request.next,
+                    filter_=request.filter_,
+                    order_by=request.order_by,
+                ),
+                retries=retries,
+            )
 
         response_data: Any = None
         if utils.match_response(http_res, "200", "application/json"):
-            return unmarshal_json_response(models.OrganizationUser, http_res)
+            return models.GetOrganizationsResponse(
+                result=unmarshal_json_response(
+                    models.OrganizationsListResult, http_res
+                ),
+                next=next_func,
+            )
         if utils.match_response(
             http_res, ["400", "401", "403", "404", "409", "429"], "application/json"
         ):
@@ -357,25 +145,24 @@ class Admin(BaseSDK):
 
         raise errors.SDKError("Unexpected response received", http_res)
 
-    async def assign_user_to_organization_async(
+    async def get_organizations_async(
         self,
         *,
-        organization_id: str,
-        organization_user_assignment: Union[
-            models.OrganizationUserAssignment,
-            models.OrganizationUserAssignmentTypedDict,
+        request: Union[
+            models.GetOrganizationsRequest, models.GetOrganizationsRequestTypedDict
         ],
         retries: OptionalNullable[utils.RetryConfig] = UNSET,
         server_url: Optional[str] = None,
         timeout_ms: Optional[int] = None,
         http_headers: Optional[Mapping[str, str]] = None,
-    ) -> models.OrganizationUser:
-        r"""Assign existing user to organization
+    ) -> Optional[models.GetOrganizationsResponse]:
+        r"""Retrieve a list of organizations
 
-        Assign an existing organization user to an organization
+        Returns a paginated list of [organizations](ref:admin#organization).
+        This functionality is only available to Managed Service Provider Applications. Contact your CSM for assistance.
 
-        :param organization_id: The unique identifier of the organization
-        :param organization_user_assignment: Configuration options for the assignment
+
+        :param request: The request object to send.
         :param retries: Override the default retry configuration for this method
         :param server_url: Override the default server URL for this method
         :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
@@ -391,33 +178,22 @@ class Admin(BaseSDK):
         else:
             base_url = self._get_url(base_url, url_variables)
 
-        request = models.AssignUserToOrganizationRequest(
-            organization_id=organization_id,
-            organization_user_assignment=utils.get_pydantic_model(
-                organization_user_assignment, models.OrganizationUserAssignment
-            ),
-        )
+        if not isinstance(request, BaseModel):
+            request = utils.unmarshal(request, models.GetOrganizationsRequest)
+        request = cast(models.GetOrganizationsRequest, request)
 
         req = self._build_request_async(
-            method="POST",
-            path="/organizations/{organizationId}/users/assignment",
+            method="GET",
+            path="/organizations",
             base_url=base_url,
             url_variables=url_variables,
             request=request,
-            request_body_required=True,
-            request_has_path_params=True,
+            request_body_required=False,
+            request_has_path_params=False,
             request_has_query_params=True,
             user_agent_header="user-agent",
             accept_header_value="application/json",
             http_headers=http_headers,
-            security=self.sdk_configuration.security,
-            get_serialized_body=lambda: utils.serialize_request_body(
-                request.organization_user_assignment,
-                False,
-                False,
-                "json",
-                models.OrganizationUserAssignment,
-            ),
             allow_empty_value=None,
             timeout_ms=timeout_ms,
         )
@@ -434,9 +210,9 @@ class Admin(BaseSDK):
             hook_ctx=HookContext(
                 config=self.sdk_configuration,
                 base_url=base_url or "",
-                operation_id="assignUserToOrganization",
-                oauth2_scopes=["organization:write"],
-                security_source=self.sdk_configuration.security,
+                operation_id="getOrganizations",
+                oauth2_scopes=[],
+                security_source=None,
             ),
             request=req,
             error_status_codes=[
@@ -453,1824 +229,41 @@ class Admin(BaseSDK):
             ],
             retry_config=retry_config,
         )
+
+        def next_func() -> Awaitable[Optional[models.GetOrganizationsResponse]]:
+            body = utils.unmarshal_json(http_res.text, Union[Dict[Any, Any], List[Any]])
+
+            async def empty_result():
+                return None
+
+            next_cursor = JSONPath("$['@nextLink']").parse(body)
+
+            if len(next_cursor) == 0:
+                return empty_result()
+
+            next_cursor = next_cursor[0]
+            if next_cursor is None or str(next_cursor).strip() == "":
+                return empty_result()
+
+            return self.get_organizations_async(
+                request=models.GetOrganizationsRequest(
+                    wk_service_provider=request.wk_service_provider,
+                    maxpagesize=request.maxpagesize,
+                    next=request.next,
+                    filter_=request.filter_,
+                    order_by=request.order_by,
+                ),
+                retries=retries,
+            )
 
         response_data: Any = None
         if utils.match_response(http_res, "200", "application/json"):
-            return unmarshal_json_response(models.OrganizationUser, http_res)
-        if utils.match_response(
-            http_res, ["400", "401", "403", "404", "409", "429"], "application/json"
-        ):
-            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
-            raise errors.ErrorResponse(response_data, http_res)
-        if utils.match_response(http_res, ["500", "503"], "application/json"):
-            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
-            raise errors.ErrorResponse(response_data, http_res)
-        if utils.match_response(http_res, "4XX", "*"):
-            http_res_text = await utils.stream_to_text_async(http_res)
-            raise errors.SDKError("API error occurred", http_res, http_res_text)
-        if utils.match_response(http_res, "5XX", "*"):
-            http_res_text = await utils.stream_to_text_async(http_res)
-            raise errors.SDKError("API error occurred", http_res, http_res_text)
-
-        raise errors.SDKError("Unexpected response received", http_res)
-
-    def assign_workspace_membership_roles(
-        self,
-        *,
-        organization_id: str,
-        workspace_id: str,
-        workspace_membership_id: str,
-        request_body: List[str],
-        retries: OptionalNullable[utils.RetryConfig] = UNSET,
-        server_url: Optional[str] = None,
-        timeout_ms: Optional[int] = None,
-        http_headers: Optional[Mapping[str, str]] = None,
-    ) -> models.AssignWorkspaceMembershipRolesResponse:
-        r"""Assign roles for a Workspace Membership
-
-        Assign a member's roles within a Workspace. If one assignment fails, all assignments fail.
-
-
-        :param organization_id: The unique identifier of the organization
-        :param workspace_id: The unique identifier of the workspace
-        :param workspace_membership_id: The unique identifier of the workspace membership
-        :param request_body: Editable details about the workspace member's roles.
-        :param retries: Override the default retry configuration for this method
-        :param server_url: Override the default server URL for this method
-        :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
-        :param http_headers: Additional headers to set or replace on requests.
-        """
-        base_url = None
-        url_variables = None
-        if timeout_ms is None:
-            timeout_ms = self.sdk_configuration.timeout_ms
-
-        if server_url is not None:
-            base_url = server_url
-        else:
-            base_url = self._get_url(base_url, url_variables)
-
-        request = models.AssignWorkspaceMembershipRolesRequest(
-            organization_id=organization_id,
-            workspace_id=workspace_id,
-            workspace_membership_id=workspace_membership_id,
-            request_body=request_body,
-        )
-
-        req = self._build_request(
-            method="POST",
-            path="/organizations/{organizationId}/workspaces/{workspaceId}/memberships/{workspaceMembershipId}/roles/assignment",
-            base_url=base_url,
-            url_variables=url_variables,
-            request=request,
-            request_body_required=True,
-            request_has_path_params=True,
-            request_has_query_params=True,
-            user_agent_header="user-agent",
-            accept_header_value="application/json",
-            http_headers=http_headers,
-            security=self.sdk_configuration.security,
-            get_serialized_body=lambda: utils.serialize_request_body(
-                request.request_body, False, False, "json", List[str]
-            ),
-            allow_empty_value=None,
-            timeout_ms=timeout_ms,
-        )
-
-        if retries == UNSET:
-            if self.sdk_configuration.retry_config is not UNSET:
-                retries = self.sdk_configuration.retry_config
-
-        retry_config = None
-        if isinstance(retries, utils.RetryConfig):
-            retry_config = (retries, ["429", "500", "502", "503", "504"])
-
-        http_res = self.do_request(
-            hook_ctx=HookContext(
-                config=self.sdk_configuration,
-                base_url=base_url or "",
-                operation_id="assignWorkspaceMembershipRoles",
-                oauth2_scopes=["organization:write"],
-                security_source=self.sdk_configuration.security,
-            ),
-            request=req,
-            error_status_codes=[
-                "400",
-                "401",
-                "403",
-                "404",
-                "409",
-                "429",
-                "4XX",
-                "500",
-                "503",
-                "5XX",
-            ],
-            retry_config=retry_config,
-        )
-
-        response_data: Any = None
-        if utils.match_response(http_res, "202", "*"):
-            return models.AssignWorkspaceMembershipRolesResponse(
-                headers=utils.get_response_headers(http_res.headers)
+            return models.GetOrganizationsResponse(
+                result=unmarshal_json_response(
+                    models.OrganizationsListResult, http_res
+                ),
+                next=next_func,
             )
-        if utils.match_response(
-            http_res, ["400", "401", "403", "404", "409", "429"], "application/json"
-        ):
-            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
-            raise errors.ErrorResponse(response_data, http_res)
-        if utils.match_response(http_res, ["500", "503"], "application/json"):
-            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
-            raise errors.ErrorResponse(response_data, http_res)
-        if utils.match_response(http_res, "4XX", "*"):
-            http_res_text = utils.stream_to_text(http_res)
-            raise errors.SDKError("API error occurred", http_res, http_res_text)
-        if utils.match_response(http_res, "5XX", "*"):
-            http_res_text = utils.stream_to_text(http_res)
-            raise errors.SDKError("API error occurred", http_res, http_res_text)
-
-        raise errors.SDKError("Unexpected response received", http_res)
-
-    async def assign_workspace_membership_roles_async(
-        self,
-        *,
-        organization_id: str,
-        workspace_id: str,
-        workspace_membership_id: str,
-        request_body: List[str],
-        retries: OptionalNullable[utils.RetryConfig] = UNSET,
-        server_url: Optional[str] = None,
-        timeout_ms: Optional[int] = None,
-        http_headers: Optional[Mapping[str, str]] = None,
-    ) -> models.AssignWorkspaceMembershipRolesResponse:
-        r"""Assign roles for a Workspace Membership
-
-        Assign a member's roles within a Workspace. If one assignment fails, all assignments fail.
-
-
-        :param organization_id: The unique identifier of the organization
-        :param workspace_id: The unique identifier of the workspace
-        :param workspace_membership_id: The unique identifier of the workspace membership
-        :param request_body: Editable details about the workspace member's roles.
-        :param retries: Override the default retry configuration for this method
-        :param server_url: Override the default server URL for this method
-        :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
-        :param http_headers: Additional headers to set or replace on requests.
-        """
-        base_url = None
-        url_variables = None
-        if timeout_ms is None:
-            timeout_ms = self.sdk_configuration.timeout_ms
-
-        if server_url is not None:
-            base_url = server_url
-        else:
-            base_url = self._get_url(base_url, url_variables)
-
-        request = models.AssignWorkspaceMembershipRolesRequest(
-            organization_id=organization_id,
-            workspace_id=workspace_id,
-            workspace_membership_id=workspace_membership_id,
-            request_body=request_body,
-        )
-
-        req = self._build_request_async(
-            method="POST",
-            path="/organizations/{organizationId}/workspaces/{workspaceId}/memberships/{workspaceMembershipId}/roles/assignment",
-            base_url=base_url,
-            url_variables=url_variables,
-            request=request,
-            request_body_required=True,
-            request_has_path_params=True,
-            request_has_query_params=True,
-            user_agent_header="user-agent",
-            accept_header_value="application/json",
-            http_headers=http_headers,
-            security=self.sdk_configuration.security,
-            get_serialized_body=lambda: utils.serialize_request_body(
-                request.request_body, False, False, "json", List[str]
-            ),
-            allow_empty_value=None,
-            timeout_ms=timeout_ms,
-        )
-
-        if retries == UNSET:
-            if self.sdk_configuration.retry_config is not UNSET:
-                retries = self.sdk_configuration.retry_config
-
-        retry_config = None
-        if isinstance(retries, utils.RetryConfig):
-            retry_config = (retries, ["429", "500", "502", "503", "504"])
-
-        http_res = await self.do_request_async(
-            hook_ctx=HookContext(
-                config=self.sdk_configuration,
-                base_url=base_url or "",
-                operation_id="assignWorkspaceMembershipRoles",
-                oauth2_scopes=["organization:write"],
-                security_source=self.sdk_configuration.security,
-            ),
-            request=req,
-            error_status_codes=[
-                "400",
-                "401",
-                "403",
-                "404",
-                "409",
-                "429",
-                "4XX",
-                "500",
-                "503",
-                "5XX",
-            ],
-            retry_config=retry_config,
-        )
-
-        response_data: Any = None
-        if utils.match_response(http_res, "202", "*"):
-            return models.AssignWorkspaceMembershipRolesResponse(
-                headers=utils.get_response_headers(http_res.headers)
-            )
-        if utils.match_response(
-            http_res, ["400", "401", "403", "404", "409", "429"], "application/json"
-        ):
-            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
-            raise errors.ErrorResponse(response_data, http_res)
-        if utils.match_response(http_res, ["500", "503"], "application/json"):
-            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
-            raise errors.ErrorResponse(response_data, http_res)
-        if utils.match_response(http_res, "4XX", "*"):
-            http_res_text = await utils.stream_to_text_async(http_res)
-            raise errors.SDKError("API error occurred", http_res, http_res_text)
-        if utils.match_response(http_res, "5XX", "*"):
-            http_res_text = await utils.stream_to_text_async(http_res)
-            raise errors.SDKError("API error occurred", http_res, http_res_text)
-
-        raise errors.SDKError("Unexpected response received", http_res)
-
-    def create_organization_user(
-        self,
-        *,
-        organization_id: str,
-        organization_user: Union[
-            models.OrganizationUserInput, models.OrganizationUserInputTypedDict
-        ],
-        retries: OptionalNullable[utils.RetryConfig] = UNSET,
-        server_url: Optional[str] = None,
-        timeout_ms: Optional[int] = None,
-        http_headers: Optional[Mapping[str, str]] = None,
-    ) -> models.OrganizationUser:
-        r"""Create a new organization User
-
-        Creates a new OrganizationUser resource
-
-
-        :param organization_id: The unique identifier of the organization
-        :param organization_user: The properties of the user to create
-        :param retries: Override the default retry configuration for this method
-        :param server_url: Override the default server URL for this method
-        :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
-        :param http_headers: Additional headers to set or replace on requests.
-        """
-        base_url = None
-        url_variables = None
-        if timeout_ms is None:
-            timeout_ms = self.sdk_configuration.timeout_ms
-
-        if server_url is not None:
-            base_url = server_url
-        else:
-            base_url = self._get_url(base_url, url_variables)
-
-        request = models.CreateOrganizationUserRequest(
-            organization_id=organization_id,
-            organization_user=utils.get_pydantic_model(
-                organization_user, models.OrganizationUserInput
-            ),
-        )
-
-        req = self._build_request(
-            method="POST",
-            path="/organizations/{organizationId}/users",
-            base_url=base_url,
-            url_variables=url_variables,
-            request=request,
-            request_body_required=True,
-            request_has_path_params=True,
-            request_has_query_params=True,
-            user_agent_header="user-agent",
-            accept_header_value="application/json",
-            http_headers=http_headers,
-            security=self.sdk_configuration.security,
-            get_serialized_body=lambda: utils.serialize_request_body(
-                request.organization_user,
-                False,
-                False,
-                "json",
-                models.OrganizationUserInput,
-            ),
-            allow_empty_value=None,
-            timeout_ms=timeout_ms,
-        )
-
-        if retries == UNSET:
-            if self.sdk_configuration.retry_config is not UNSET:
-                retries = self.sdk_configuration.retry_config
-
-        retry_config = None
-        if isinstance(retries, utils.RetryConfig):
-            retry_config = (retries, ["429", "500", "502", "503", "504"])
-
-        http_res = self.do_request(
-            hook_ctx=HookContext(
-                config=self.sdk_configuration,
-                base_url=base_url or "",
-                operation_id="createOrganizationUser",
-                oauth2_scopes=["organization:write"],
-                security_source=self.sdk_configuration.security,
-            ),
-            request=req,
-            error_status_codes=[
-                "400",
-                "401",
-                "403",
-                "404",
-                "409",
-                "429",
-                "4XX",
-                "500",
-                "503",
-                "5XX",
-            ],
-            retry_config=retry_config,
-        )
-
-        response_data: Any = None
-        if utils.match_response(http_res, "201", "application/json"):
-            return unmarshal_json_response(models.OrganizationUser, http_res)
-        if utils.match_response(
-            http_res, ["400", "401", "403", "404", "409", "429"], "application/json"
-        ):
-            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
-            raise errors.ErrorResponse(response_data, http_res)
-        if utils.match_response(http_res, ["500", "503"], "application/json"):
-            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
-            raise errors.ErrorResponse(response_data, http_res)
-        if utils.match_response(http_res, "4XX", "*"):
-            http_res_text = utils.stream_to_text(http_res)
-            raise errors.SDKError("API error occurred", http_res, http_res_text)
-        if utils.match_response(http_res, "5XX", "*"):
-            http_res_text = utils.stream_to_text(http_res)
-            raise errors.SDKError("API error occurred", http_res, http_res_text)
-
-        raise errors.SDKError("Unexpected response received", http_res)
-
-    async def create_organization_user_async(
-        self,
-        *,
-        organization_id: str,
-        organization_user: Union[
-            models.OrganizationUserInput, models.OrganizationUserInputTypedDict
-        ],
-        retries: OptionalNullable[utils.RetryConfig] = UNSET,
-        server_url: Optional[str] = None,
-        timeout_ms: Optional[int] = None,
-        http_headers: Optional[Mapping[str, str]] = None,
-    ) -> models.OrganizationUser:
-        r"""Create a new organization User
-
-        Creates a new OrganizationUser resource
-
-
-        :param organization_id: The unique identifier of the organization
-        :param organization_user: The properties of the user to create
-        :param retries: Override the default retry configuration for this method
-        :param server_url: Override the default server URL for this method
-        :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
-        :param http_headers: Additional headers to set or replace on requests.
-        """
-        base_url = None
-        url_variables = None
-        if timeout_ms is None:
-            timeout_ms = self.sdk_configuration.timeout_ms
-
-        if server_url is not None:
-            base_url = server_url
-        else:
-            base_url = self._get_url(base_url, url_variables)
-
-        request = models.CreateOrganizationUserRequest(
-            organization_id=organization_id,
-            organization_user=utils.get_pydantic_model(
-                organization_user, models.OrganizationUserInput
-            ),
-        )
-
-        req = self._build_request_async(
-            method="POST",
-            path="/organizations/{organizationId}/users",
-            base_url=base_url,
-            url_variables=url_variables,
-            request=request,
-            request_body_required=True,
-            request_has_path_params=True,
-            request_has_query_params=True,
-            user_agent_header="user-agent",
-            accept_header_value="application/json",
-            http_headers=http_headers,
-            security=self.sdk_configuration.security,
-            get_serialized_body=lambda: utils.serialize_request_body(
-                request.organization_user,
-                False,
-                False,
-                "json",
-                models.OrganizationUserInput,
-            ),
-            allow_empty_value=None,
-            timeout_ms=timeout_ms,
-        )
-
-        if retries == UNSET:
-            if self.sdk_configuration.retry_config is not UNSET:
-                retries = self.sdk_configuration.retry_config
-
-        retry_config = None
-        if isinstance(retries, utils.RetryConfig):
-            retry_config = (retries, ["429", "500", "502", "503", "504"])
-
-        http_res = await self.do_request_async(
-            hook_ctx=HookContext(
-                config=self.sdk_configuration,
-                base_url=base_url or "",
-                operation_id="createOrganizationUser",
-                oauth2_scopes=["organization:write"],
-                security_source=self.sdk_configuration.security,
-            ),
-            request=req,
-            error_status_codes=[
-                "400",
-                "401",
-                "403",
-                "404",
-                "409",
-                "429",
-                "4XX",
-                "500",
-                "503",
-                "5XX",
-            ],
-            retry_config=retry_config,
-        )
-
-        response_data: Any = None
-        if utils.match_response(http_res, "201", "application/json"):
-            return unmarshal_json_response(models.OrganizationUser, http_res)
-        if utils.match_response(
-            http_res, ["400", "401", "403", "404", "409", "429"], "application/json"
-        ):
-            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
-            raise errors.ErrorResponse(response_data, http_res)
-        if utils.match_response(http_res, ["500", "503"], "application/json"):
-            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
-            raise errors.ErrorResponse(response_data, http_res)
-        if utils.match_response(http_res, "4XX", "*"):
-            http_res_text = await utils.stream_to_text_async(http_res)
-            raise errors.SDKError("API error occurred", http_res, http_res_text)
-        if utils.match_response(http_res, "5XX", "*"):
-            http_res_text = await utils.stream_to_text_async(http_res)
-            raise errors.SDKError("API error occurred", http_res, http_res_text)
-
-        raise errors.SDKError("Unexpected response received", http_res)
-
-    def create_workspace(
-        self,
-        *,
-        organization_id: str,
-        workspace: Union[models.WorkspaceInput, models.WorkspaceInputTypedDict],
-        retries: OptionalNullable[utils.RetryConfig] = UNSET,
-        server_url: Optional[str] = None,
-        timeout_ms: Optional[int] = None,
-        http_headers: Optional[Mapping[str, str]] = None,
-    ) -> models.Workspace:
-        r"""Create a new workspace
-
-        Creates a new workspace resource
-
-
-        :param organization_id: The unique identifier of the organization
-        :param workspace: The properties of the workspace to create
-        :param retries: Override the default retry configuration for this method
-        :param server_url: Override the default server URL for this method
-        :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
-        :param http_headers: Additional headers to set or replace on requests.
-        """
-        base_url = None
-        url_variables = None
-        if timeout_ms is None:
-            timeout_ms = self.sdk_configuration.timeout_ms
-
-        if server_url is not None:
-            base_url = server_url
-        else:
-            base_url = self._get_url(base_url, url_variables)
-
-        request = models.CreateWorkspaceRequest(
-            organization_id=organization_id,
-            workspace=utils.get_pydantic_model(workspace, models.WorkspaceInput),
-        )
-
-        req = self._build_request(
-            method="POST",
-            path="/organizations/{organizationId}/workspaces",
-            base_url=base_url,
-            url_variables=url_variables,
-            request=request,
-            request_body_required=True,
-            request_has_path_params=True,
-            request_has_query_params=True,
-            user_agent_header="user-agent",
-            accept_header_value="application/json",
-            http_headers=http_headers,
-            security=self.sdk_configuration.security,
-            get_serialized_body=lambda: utils.serialize_request_body(
-                request.workspace, False, False, "json", models.WorkspaceInput
-            ),
-            allow_empty_value=None,
-            timeout_ms=timeout_ms,
-        )
-
-        if retries == UNSET:
-            if self.sdk_configuration.retry_config is not UNSET:
-                retries = self.sdk_configuration.retry_config
-
-        retry_config = None
-        if isinstance(retries, utils.RetryConfig):
-            retry_config = (retries, ["429", "500", "502", "503", "504"])
-
-        http_res = self.do_request(
-            hook_ctx=HookContext(
-                config=self.sdk_configuration,
-                base_url=base_url or "",
-                operation_id="createWorkspace",
-                oauth2_scopes=["organization:write"],
-                security_source=self.sdk_configuration.security,
-            ),
-            request=req,
-            error_status_codes=[
-                "400",
-                "401",
-                "403",
-                "404",
-                "409",
-                "429",
-                "4XX",
-                "500",
-                "503",
-                "5XX",
-            ],
-            retry_config=retry_config,
-        )
-
-        response_data: Any = None
-        if utils.match_response(http_res, "201", "application/json"):
-            return unmarshal_json_response(models.Workspace, http_res)
-        if utils.match_response(
-            http_res, ["400", "401", "403", "404", "409", "429"], "application/json"
-        ):
-            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
-            raise errors.ErrorResponse(response_data, http_res)
-        if utils.match_response(http_res, ["500", "503"], "application/json"):
-            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
-            raise errors.ErrorResponse(response_data, http_res)
-        if utils.match_response(http_res, "4XX", "*"):
-            http_res_text = utils.stream_to_text(http_res)
-            raise errors.SDKError("API error occurred", http_res, http_res_text)
-        if utils.match_response(http_res, "5XX", "*"):
-            http_res_text = utils.stream_to_text(http_res)
-            raise errors.SDKError("API error occurred", http_res, http_res_text)
-
-        raise errors.SDKError("Unexpected response received", http_res)
-
-    async def create_workspace_async(
-        self,
-        *,
-        organization_id: str,
-        workspace: Union[models.WorkspaceInput, models.WorkspaceInputTypedDict],
-        retries: OptionalNullable[utils.RetryConfig] = UNSET,
-        server_url: Optional[str] = None,
-        timeout_ms: Optional[int] = None,
-        http_headers: Optional[Mapping[str, str]] = None,
-    ) -> models.Workspace:
-        r"""Create a new workspace
-
-        Creates a new workspace resource
-
-
-        :param organization_id: The unique identifier of the organization
-        :param workspace: The properties of the workspace to create
-        :param retries: Override the default retry configuration for this method
-        :param server_url: Override the default server URL for this method
-        :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
-        :param http_headers: Additional headers to set or replace on requests.
-        """
-        base_url = None
-        url_variables = None
-        if timeout_ms is None:
-            timeout_ms = self.sdk_configuration.timeout_ms
-
-        if server_url is not None:
-            base_url = server_url
-        else:
-            base_url = self._get_url(base_url, url_variables)
-
-        request = models.CreateWorkspaceRequest(
-            organization_id=organization_id,
-            workspace=utils.get_pydantic_model(workspace, models.WorkspaceInput),
-        )
-
-        req = self._build_request_async(
-            method="POST",
-            path="/organizations/{organizationId}/workspaces",
-            base_url=base_url,
-            url_variables=url_variables,
-            request=request,
-            request_body_required=True,
-            request_has_path_params=True,
-            request_has_query_params=True,
-            user_agent_header="user-agent",
-            accept_header_value="application/json",
-            http_headers=http_headers,
-            security=self.sdk_configuration.security,
-            get_serialized_body=lambda: utils.serialize_request_body(
-                request.workspace, False, False, "json", models.WorkspaceInput
-            ),
-            allow_empty_value=None,
-            timeout_ms=timeout_ms,
-        )
-
-        if retries == UNSET:
-            if self.sdk_configuration.retry_config is not UNSET:
-                retries = self.sdk_configuration.retry_config
-
-        retry_config = None
-        if isinstance(retries, utils.RetryConfig):
-            retry_config = (retries, ["429", "500", "502", "503", "504"])
-
-        http_res = await self.do_request_async(
-            hook_ctx=HookContext(
-                config=self.sdk_configuration,
-                base_url=base_url or "",
-                operation_id="createWorkspace",
-                oauth2_scopes=["organization:write"],
-                security_source=self.sdk_configuration.security,
-            ),
-            request=req,
-            error_status_codes=[
-                "400",
-                "401",
-                "403",
-                "404",
-                "409",
-                "429",
-                "4XX",
-                "500",
-                "503",
-                "5XX",
-            ],
-            retry_config=retry_config,
-        )
-
-        response_data: Any = None
-        if utils.match_response(http_res, "201", "application/json"):
-            return unmarshal_json_response(models.Workspace, http_res)
-        if utils.match_response(
-            http_res, ["400", "401", "403", "404", "409", "429"], "application/json"
-        ):
-            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
-            raise errors.ErrorResponse(response_data, http_res)
-        if utils.match_response(http_res, ["500", "503"], "application/json"):
-            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
-            raise errors.ErrorResponse(response_data, http_res)
-        if utils.match_response(http_res, "4XX", "*"):
-            http_res_text = await utils.stream_to_text_async(http_res)
-            raise errors.SDKError("API error occurred", http_res, http_res_text)
-        if utils.match_response(http_res, "5XX", "*"):
-            http_res_text = await utils.stream_to_text_async(http_res)
-            raise errors.SDKError("API error occurred", http_res, http_res_text)
-
-        raise errors.SDKError("Unexpected response received", http_res)
-
-    def create_workspace_group(
-        self,
-        *,
-        organization_id: str,
-        workspace_id: str,
-        workspace_group: Union[
-            models.WorkspaceGroupInput, models.WorkspaceGroupInputTypedDict
-        ],
-        retries: OptionalNullable[utils.RetryConfig] = UNSET,
-        server_url: Optional[str] = None,
-        timeout_ms: Optional[int] = None,
-        http_headers: Optional[Mapping[str, str]] = None,
-    ) -> models.WorkspaceGroup:
-        r"""Create a new group in a workspace
-
-        Creates a new group resource
-
-
-        :param organization_id: The unique identifier of the organization
-        :param workspace_id: The unique identifier of the workspace
-        :param workspace_group: The properties of the group to create
-        :param retries: Override the default retry configuration for this method
-        :param server_url: Override the default server URL for this method
-        :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
-        :param http_headers: Additional headers to set or replace on requests.
-        """
-        base_url = None
-        url_variables = None
-        if timeout_ms is None:
-            timeout_ms = self.sdk_configuration.timeout_ms
-
-        if server_url is not None:
-            base_url = server_url
-        else:
-            base_url = self._get_url(base_url, url_variables)
-
-        request = models.CreateWorkspaceGroupRequest(
-            organization_id=organization_id,
-            workspace_id=workspace_id,
-            workspace_group=utils.get_pydantic_model(
-                workspace_group, models.WorkspaceGroupInput
-            ),
-        )
-
-        req = self._build_request(
-            method="POST",
-            path="/organizations/{organizationId}/workspaces/{workspaceId}/groups",
-            base_url=base_url,
-            url_variables=url_variables,
-            request=request,
-            request_body_required=True,
-            request_has_path_params=True,
-            request_has_query_params=True,
-            user_agent_header="user-agent",
-            accept_header_value="application/json",
-            http_headers=http_headers,
-            security=self.sdk_configuration.security,
-            get_serialized_body=lambda: utils.serialize_request_body(
-                request.workspace_group,
-                False,
-                False,
-                "json",
-                models.WorkspaceGroupInput,
-            ),
-            allow_empty_value=None,
-            timeout_ms=timeout_ms,
-        )
-
-        if retries == UNSET:
-            if self.sdk_configuration.retry_config is not UNSET:
-                retries = self.sdk_configuration.retry_config
-
-        retry_config = None
-        if isinstance(retries, utils.RetryConfig):
-            retry_config = (retries, ["429", "500", "502", "503", "504"])
-
-        http_res = self.do_request(
-            hook_ctx=HookContext(
-                config=self.sdk_configuration,
-                base_url=base_url or "",
-                operation_id="createWorkspaceGroup",
-                oauth2_scopes=["organization:write"],
-                security_source=self.sdk_configuration.security,
-            ),
-            request=req,
-            error_status_codes=[
-                "400",
-                "401",
-                "403",
-                "404",
-                "409",
-                "429",
-                "4XX",
-                "500",
-                "503",
-                "5XX",
-            ],
-            retry_config=retry_config,
-        )
-
-        response_data: Any = None
-        if utils.match_response(http_res, "201", "application/json"):
-            return unmarshal_json_response(models.WorkspaceGroup, http_res)
-        if utils.match_response(
-            http_res, ["400", "401", "403", "404", "409", "429"], "application/json"
-        ):
-            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
-            raise errors.ErrorResponse(response_data, http_res)
-        if utils.match_response(http_res, ["500", "503"], "application/json"):
-            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
-            raise errors.ErrorResponse(response_data, http_res)
-        if utils.match_response(http_res, "4XX", "*"):
-            http_res_text = utils.stream_to_text(http_res)
-            raise errors.SDKError("API error occurred", http_res, http_res_text)
-        if utils.match_response(http_res, "5XX", "*"):
-            http_res_text = utils.stream_to_text(http_res)
-            raise errors.SDKError("API error occurred", http_res, http_res_text)
-
-        raise errors.SDKError("Unexpected response received", http_res)
-
-    async def create_workspace_group_async(
-        self,
-        *,
-        organization_id: str,
-        workspace_id: str,
-        workspace_group: Union[
-            models.WorkspaceGroupInput, models.WorkspaceGroupInputTypedDict
-        ],
-        retries: OptionalNullable[utils.RetryConfig] = UNSET,
-        server_url: Optional[str] = None,
-        timeout_ms: Optional[int] = None,
-        http_headers: Optional[Mapping[str, str]] = None,
-    ) -> models.WorkspaceGroup:
-        r"""Create a new group in a workspace
-
-        Creates a new group resource
-
-
-        :param organization_id: The unique identifier of the organization
-        :param workspace_id: The unique identifier of the workspace
-        :param workspace_group: The properties of the group to create
-        :param retries: Override the default retry configuration for this method
-        :param server_url: Override the default server URL for this method
-        :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
-        :param http_headers: Additional headers to set or replace on requests.
-        """
-        base_url = None
-        url_variables = None
-        if timeout_ms is None:
-            timeout_ms = self.sdk_configuration.timeout_ms
-
-        if server_url is not None:
-            base_url = server_url
-        else:
-            base_url = self._get_url(base_url, url_variables)
-
-        request = models.CreateWorkspaceGroupRequest(
-            organization_id=organization_id,
-            workspace_id=workspace_id,
-            workspace_group=utils.get_pydantic_model(
-                workspace_group, models.WorkspaceGroupInput
-            ),
-        )
-
-        req = self._build_request_async(
-            method="POST",
-            path="/organizations/{organizationId}/workspaces/{workspaceId}/groups",
-            base_url=base_url,
-            url_variables=url_variables,
-            request=request,
-            request_body_required=True,
-            request_has_path_params=True,
-            request_has_query_params=True,
-            user_agent_header="user-agent",
-            accept_header_value="application/json",
-            http_headers=http_headers,
-            security=self.sdk_configuration.security,
-            get_serialized_body=lambda: utils.serialize_request_body(
-                request.workspace_group,
-                False,
-                False,
-                "json",
-                models.WorkspaceGroupInput,
-            ),
-            allow_empty_value=None,
-            timeout_ms=timeout_ms,
-        )
-
-        if retries == UNSET:
-            if self.sdk_configuration.retry_config is not UNSET:
-                retries = self.sdk_configuration.retry_config
-
-        retry_config = None
-        if isinstance(retries, utils.RetryConfig):
-            retry_config = (retries, ["429", "500", "502", "503", "504"])
-
-        http_res = await self.do_request_async(
-            hook_ctx=HookContext(
-                config=self.sdk_configuration,
-                base_url=base_url or "",
-                operation_id="createWorkspaceGroup",
-                oauth2_scopes=["organization:write"],
-                security_source=self.sdk_configuration.security,
-            ),
-            request=req,
-            error_status_codes=[
-                "400",
-                "401",
-                "403",
-                "404",
-                "409",
-                "429",
-                "4XX",
-                "500",
-                "503",
-                "5XX",
-            ],
-            retry_config=retry_config,
-        )
-
-        response_data: Any = None
-        if utils.match_response(http_res, "201", "application/json"):
-            return unmarshal_json_response(models.WorkspaceGroup, http_res)
-        if utils.match_response(
-            http_res, ["400", "401", "403", "404", "409", "429"], "application/json"
-        ):
-            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
-            raise errors.ErrorResponse(response_data, http_res)
-        if utils.match_response(http_res, ["500", "503"], "application/json"):
-            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
-            raise errors.ErrorResponse(response_data, http_res)
-        if utils.match_response(http_res, "4XX", "*"):
-            http_res_text = await utils.stream_to_text_async(http_res)
-            raise errors.SDKError("API error occurred", http_res, http_res_text)
-        if utils.match_response(http_res, "5XX", "*"):
-            http_res_text = await utils.stream_to_text_async(http_res)
-            raise errors.SDKError("API error occurred", http_res, http_res_text)
-
-        raise errors.SDKError("Unexpected response received", http_res)
-
-    def create_workspace_membership(
-        self,
-        *,
-        organization_id: str,
-        workspace_id: str,
-        workspace_membership: Union[
-            models.WorkspaceMembershipInput, models.WorkspaceMembershipInputTypedDict
-        ],
-        retries: OptionalNullable[utils.RetryConfig] = UNSET,
-        server_url: Optional[str] = None,
-        timeout_ms: Optional[int] = None,
-        http_headers: Optional[Mapping[str, str]] = None,
-    ) -> models.WorkspaceMembership:
-        r"""Create a new workspace membership
-
-        Creates a new `WorkspaceMembership` resource
-
-
-        :param organization_id: The unique identifier of the organization
-        :param workspace_id: The unique identifier of the workspace
-        :param workspace_membership: The properties of the workspace membership to create
-        :param retries: Override the default retry configuration for this method
-        :param server_url: Override the default server URL for this method
-        :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
-        :param http_headers: Additional headers to set or replace on requests.
-        """
-        base_url = None
-        url_variables = None
-        if timeout_ms is None:
-            timeout_ms = self.sdk_configuration.timeout_ms
-
-        if server_url is not None:
-            base_url = server_url
-        else:
-            base_url = self._get_url(base_url, url_variables)
-
-        request = models.CreateWorkspaceMembershipRequest(
-            organization_id=organization_id,
-            workspace_id=workspace_id,
-            workspace_membership=utils.get_pydantic_model(
-                workspace_membership, models.WorkspaceMembershipInput
-            ),
-        )
-
-        req = self._build_request(
-            method="POST",
-            path="/organizations/{organizationId}/workspaces/{workspaceId}/memberships",
-            base_url=base_url,
-            url_variables=url_variables,
-            request=request,
-            request_body_required=True,
-            request_has_path_params=True,
-            request_has_query_params=True,
-            user_agent_header="user-agent",
-            accept_header_value="application/json",
-            http_headers=http_headers,
-            security=self.sdk_configuration.security,
-            get_serialized_body=lambda: utils.serialize_request_body(
-                request.workspace_membership,
-                False,
-                False,
-                "json",
-                models.WorkspaceMembershipInput,
-            ),
-            allow_empty_value=None,
-            timeout_ms=timeout_ms,
-        )
-
-        if retries == UNSET:
-            if self.sdk_configuration.retry_config is not UNSET:
-                retries = self.sdk_configuration.retry_config
-
-        retry_config = None
-        if isinstance(retries, utils.RetryConfig):
-            retry_config = (retries, ["429", "500", "502", "503", "504"])
-
-        http_res = self.do_request(
-            hook_ctx=HookContext(
-                config=self.sdk_configuration,
-                base_url=base_url or "",
-                operation_id="createWorkspaceMembership",
-                oauth2_scopes=["organization:write"],
-                security_source=self.sdk_configuration.security,
-            ),
-            request=req,
-            error_status_codes=[
-                "400",
-                "401",
-                "403",
-                "404",
-                "409",
-                "429",
-                "4XX",
-                "500",
-                "503",
-                "5XX",
-            ],
-            retry_config=retry_config,
-        )
-
-        response_data: Any = None
-        if utils.match_response(http_res, "201", "application/json"):
-            return unmarshal_json_response(models.WorkspaceMembership, http_res)
-        if utils.match_response(
-            http_res, ["400", "401", "403", "404", "409", "429"], "application/json"
-        ):
-            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
-            raise errors.ErrorResponse(response_data, http_res)
-        if utils.match_response(http_res, ["500", "503"], "application/json"):
-            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
-            raise errors.ErrorResponse(response_data, http_res)
-        if utils.match_response(http_res, "4XX", "*"):
-            http_res_text = utils.stream_to_text(http_res)
-            raise errors.SDKError("API error occurred", http_res, http_res_text)
-        if utils.match_response(http_res, "5XX", "*"):
-            http_res_text = utils.stream_to_text(http_res)
-            raise errors.SDKError("API error occurred", http_res, http_res_text)
-
-        raise errors.SDKError("Unexpected response received", http_res)
-
-    async def create_workspace_membership_async(
-        self,
-        *,
-        organization_id: str,
-        workspace_id: str,
-        workspace_membership: Union[
-            models.WorkspaceMembershipInput, models.WorkspaceMembershipInputTypedDict
-        ],
-        retries: OptionalNullable[utils.RetryConfig] = UNSET,
-        server_url: Optional[str] = None,
-        timeout_ms: Optional[int] = None,
-        http_headers: Optional[Mapping[str, str]] = None,
-    ) -> models.WorkspaceMembership:
-        r"""Create a new workspace membership
-
-        Creates a new `WorkspaceMembership` resource
-
-
-        :param organization_id: The unique identifier of the organization
-        :param workspace_id: The unique identifier of the workspace
-        :param workspace_membership: The properties of the workspace membership to create
-        :param retries: Override the default retry configuration for this method
-        :param server_url: Override the default server URL for this method
-        :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
-        :param http_headers: Additional headers to set or replace on requests.
-        """
-        base_url = None
-        url_variables = None
-        if timeout_ms is None:
-            timeout_ms = self.sdk_configuration.timeout_ms
-
-        if server_url is not None:
-            base_url = server_url
-        else:
-            base_url = self._get_url(base_url, url_variables)
-
-        request = models.CreateWorkspaceMembershipRequest(
-            organization_id=organization_id,
-            workspace_id=workspace_id,
-            workspace_membership=utils.get_pydantic_model(
-                workspace_membership, models.WorkspaceMembershipInput
-            ),
-        )
-
-        req = self._build_request_async(
-            method="POST",
-            path="/organizations/{organizationId}/workspaces/{workspaceId}/memberships",
-            base_url=base_url,
-            url_variables=url_variables,
-            request=request,
-            request_body_required=True,
-            request_has_path_params=True,
-            request_has_query_params=True,
-            user_agent_header="user-agent",
-            accept_header_value="application/json",
-            http_headers=http_headers,
-            security=self.sdk_configuration.security,
-            get_serialized_body=lambda: utils.serialize_request_body(
-                request.workspace_membership,
-                False,
-                False,
-                "json",
-                models.WorkspaceMembershipInput,
-            ),
-            allow_empty_value=None,
-            timeout_ms=timeout_ms,
-        )
-
-        if retries == UNSET:
-            if self.sdk_configuration.retry_config is not UNSET:
-                retries = self.sdk_configuration.retry_config
-
-        retry_config = None
-        if isinstance(retries, utils.RetryConfig):
-            retry_config = (retries, ["429", "500", "502", "503", "504"])
-
-        http_res = await self.do_request_async(
-            hook_ctx=HookContext(
-                config=self.sdk_configuration,
-                base_url=base_url or "",
-                operation_id="createWorkspaceMembership",
-                oauth2_scopes=["organization:write"],
-                security_source=self.sdk_configuration.security,
-            ),
-            request=req,
-            error_status_codes=[
-                "400",
-                "401",
-                "403",
-                "404",
-                "409",
-                "429",
-                "4XX",
-                "500",
-                "503",
-                "5XX",
-            ],
-            retry_config=retry_config,
-        )
-
-        response_data: Any = None
-        if utils.match_response(http_res, "201", "application/json"):
-            return unmarshal_json_response(models.WorkspaceMembership, http_res)
-        if utils.match_response(
-            http_res, ["400", "401", "403", "404", "409", "429"], "application/json"
-        ):
-            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
-            raise errors.ErrorResponse(response_data, http_res)
-        if utils.match_response(http_res, ["500", "503"], "application/json"):
-            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
-            raise errors.ErrorResponse(response_data, http_res)
-        if utils.match_response(http_res, "4XX", "*"):
-            http_res_text = await utils.stream_to_text_async(http_res)
-            raise errors.SDKError("API error occurred", http_res, http_res_text)
-        if utils.match_response(http_res, "5XX", "*"):
-            http_res_text = await utils.stream_to_text_async(http_res)
-            raise errors.SDKError("API error occurred", http_res, http_res_text)
-
-        raise errors.SDKError("Unexpected response received", http_res)
-
-    def delete_organization_user_by_id(
-        self,
-        *,
-        organization_id: str,
-        user_id: str,
-        retries: OptionalNullable[utils.RetryConfig] = UNSET,
-        server_url: Optional[str] = None,
-        timeout_ms: Optional[int] = None,
-        http_headers: Optional[Mapping[str, str]] = None,
-    ):
-        r"""Delete an organization user
-
-        Delete a user from an organization
-
-
-        :param organization_id: The unique identifier of the organization
-        :param user_id: The unique identifier of the user
-        :param retries: Override the default retry configuration for this method
-        :param server_url: Override the default server URL for this method
-        :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
-        :param http_headers: Additional headers to set or replace on requests.
-        """
-        base_url = None
-        url_variables = None
-        if timeout_ms is None:
-            timeout_ms = self.sdk_configuration.timeout_ms
-
-        if server_url is not None:
-            base_url = server_url
-        else:
-            base_url = self._get_url(base_url, url_variables)
-
-        request = models.DeleteOrganizationUserByIDRequest(
-            organization_id=organization_id,
-            user_id=user_id,
-        )
-
-        req = self._build_request(
-            method="DELETE",
-            path="/organizations/{organizationId}/users/{userId}",
-            base_url=base_url,
-            url_variables=url_variables,
-            request=request,
-            request_body_required=False,
-            request_has_path_params=True,
-            request_has_query_params=True,
-            user_agent_header="user-agent",
-            accept_header_value="application/json",
-            http_headers=http_headers,
-            security=self.sdk_configuration.security,
-            allow_empty_value=None,
-            timeout_ms=timeout_ms,
-        )
-
-        if retries == UNSET:
-            if self.sdk_configuration.retry_config is not UNSET:
-                retries = self.sdk_configuration.retry_config
-
-        retry_config = None
-        if isinstance(retries, utils.RetryConfig):
-            retry_config = (retries, ["429", "500", "502", "503", "504"])
-
-        http_res = self.do_request(
-            hook_ctx=HookContext(
-                config=self.sdk_configuration,
-                base_url=base_url or "",
-                operation_id="deleteOrganizationUserById",
-                oauth2_scopes=["organization:write"],
-                security_source=self.sdk_configuration.security,
-            ),
-            request=req,
-            error_status_codes=[
-                "400",
-                "401",
-                "403",
-                "404",
-                "409",
-                "429",
-                "4XX",
-                "500",
-                "503",
-                "5XX",
-            ],
-            retry_config=retry_config,
-        )
-
-        response_data: Any = None
-        if utils.match_response(http_res, "204", "*"):
-            return
-        if utils.match_response(
-            http_res, ["400", "401", "403", "404", "409", "429"], "application/json"
-        ):
-            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
-            raise errors.ErrorResponse(response_data, http_res)
-        if utils.match_response(http_res, ["500", "503"], "application/json"):
-            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
-            raise errors.ErrorResponse(response_data, http_res)
-        if utils.match_response(http_res, "4XX", "*"):
-            http_res_text = utils.stream_to_text(http_res)
-            raise errors.SDKError("API error occurred", http_res, http_res_text)
-        if utils.match_response(http_res, "5XX", "*"):
-            http_res_text = utils.stream_to_text(http_res)
-            raise errors.SDKError("API error occurred", http_res, http_res_text)
-
-        raise errors.SDKError("Unexpected response received", http_res)
-
-    async def delete_organization_user_by_id_async(
-        self,
-        *,
-        organization_id: str,
-        user_id: str,
-        retries: OptionalNullable[utils.RetryConfig] = UNSET,
-        server_url: Optional[str] = None,
-        timeout_ms: Optional[int] = None,
-        http_headers: Optional[Mapping[str, str]] = None,
-    ):
-        r"""Delete an organization user
-
-        Delete a user from an organization
-
-
-        :param organization_id: The unique identifier of the organization
-        :param user_id: The unique identifier of the user
-        :param retries: Override the default retry configuration for this method
-        :param server_url: Override the default server URL for this method
-        :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
-        :param http_headers: Additional headers to set or replace on requests.
-        """
-        base_url = None
-        url_variables = None
-        if timeout_ms is None:
-            timeout_ms = self.sdk_configuration.timeout_ms
-
-        if server_url is not None:
-            base_url = server_url
-        else:
-            base_url = self._get_url(base_url, url_variables)
-
-        request = models.DeleteOrganizationUserByIDRequest(
-            organization_id=organization_id,
-            user_id=user_id,
-        )
-
-        req = self._build_request_async(
-            method="DELETE",
-            path="/organizations/{organizationId}/users/{userId}",
-            base_url=base_url,
-            url_variables=url_variables,
-            request=request,
-            request_body_required=False,
-            request_has_path_params=True,
-            request_has_query_params=True,
-            user_agent_header="user-agent",
-            accept_header_value="application/json",
-            http_headers=http_headers,
-            security=self.sdk_configuration.security,
-            allow_empty_value=None,
-            timeout_ms=timeout_ms,
-        )
-
-        if retries == UNSET:
-            if self.sdk_configuration.retry_config is not UNSET:
-                retries = self.sdk_configuration.retry_config
-
-        retry_config = None
-        if isinstance(retries, utils.RetryConfig):
-            retry_config = (retries, ["429", "500", "502", "503", "504"])
-
-        http_res = await self.do_request_async(
-            hook_ctx=HookContext(
-                config=self.sdk_configuration,
-                base_url=base_url or "",
-                operation_id="deleteOrganizationUserById",
-                oauth2_scopes=["organization:write"],
-                security_source=self.sdk_configuration.security,
-            ),
-            request=req,
-            error_status_codes=[
-                "400",
-                "401",
-                "403",
-                "404",
-                "409",
-                "429",
-                "4XX",
-                "500",
-                "503",
-                "5XX",
-            ],
-            retry_config=retry_config,
-        )
-
-        response_data: Any = None
-        if utils.match_response(http_res, "204", "*"):
-            return
-        if utils.match_response(
-            http_res, ["400", "401", "403", "404", "409", "429"], "application/json"
-        ):
-            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
-            raise errors.ErrorResponse(response_data, http_res)
-        if utils.match_response(http_res, ["500", "503"], "application/json"):
-            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
-            raise errors.ErrorResponse(response_data, http_res)
-        if utils.match_response(http_res, "4XX", "*"):
-            http_res_text = await utils.stream_to_text_async(http_res)
-            raise errors.SDKError("API error occurred", http_res, http_res_text)
-        if utils.match_response(http_res, "5XX", "*"):
-            http_res_text = await utils.stream_to_text_async(http_res)
-            raise errors.SDKError("API error occurred", http_res, http_res_text)
-
-        raise errors.SDKError("Unexpected response received", http_res)
-
-    def delete_workspace_group_by_id(
-        self,
-        *,
-        group_id: str,
-        organization_id: str,
-        workspace_id: str,
-        retries: OptionalNullable[utils.RetryConfig] = UNSET,
-        server_url: Optional[str] = None,
-        timeout_ms: Optional[int] = None,
-        http_headers: Optional[Mapping[str, str]] = None,
-    ):
-        r"""Delete a single group
-
-        Deletes a group given its ID.
-
-
-        :param group_id: The unique identifier of the group
-        :param organization_id: The unique identifier of the organization
-        :param workspace_id: The unique identifier of the workspace
-        :param retries: Override the default retry configuration for this method
-        :param server_url: Override the default server URL for this method
-        :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
-        :param http_headers: Additional headers to set or replace on requests.
-        """
-        base_url = None
-        url_variables = None
-        if timeout_ms is None:
-            timeout_ms = self.sdk_configuration.timeout_ms
-
-        if server_url is not None:
-            base_url = server_url
-        else:
-            base_url = self._get_url(base_url, url_variables)
-
-        request = models.DeleteWorkspaceGroupByIDRequest(
-            group_id=group_id,
-            organization_id=organization_id,
-            workspace_id=workspace_id,
-        )
-
-        req = self._build_request(
-            method="DELETE",
-            path="/organizations/{organizationId}/workspaces/{workspaceId}/groups/{groupId}",
-            base_url=base_url,
-            url_variables=url_variables,
-            request=request,
-            request_body_required=False,
-            request_has_path_params=True,
-            request_has_query_params=True,
-            user_agent_header="user-agent",
-            accept_header_value="application/json",
-            http_headers=http_headers,
-            security=self.sdk_configuration.security,
-            allow_empty_value=None,
-            timeout_ms=timeout_ms,
-        )
-
-        if retries == UNSET:
-            if self.sdk_configuration.retry_config is not UNSET:
-                retries = self.sdk_configuration.retry_config
-
-        retry_config = None
-        if isinstance(retries, utils.RetryConfig):
-            retry_config = (retries, ["429", "500", "502", "503", "504"])
-
-        http_res = self.do_request(
-            hook_ctx=HookContext(
-                config=self.sdk_configuration,
-                base_url=base_url or "",
-                operation_id="deleteWorkspaceGroupById",
-                oauth2_scopes=["organization:write"],
-                security_source=self.sdk_configuration.security,
-            ),
-            request=req,
-            error_status_codes=[
-                "400",
-                "401",
-                "403",
-                "404",
-                "409",
-                "429",
-                "4XX",
-                "500",
-                "503",
-                "5XX",
-            ],
-            retry_config=retry_config,
-        )
-
-        response_data: Any = None
-        if utils.match_response(http_res, "204", "*"):
-            return
-        if utils.match_response(
-            http_res, ["400", "401", "403", "404", "409", "429"], "application/json"
-        ):
-            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
-            raise errors.ErrorResponse(response_data, http_res)
-        if utils.match_response(http_res, ["500", "503"], "application/json"):
-            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
-            raise errors.ErrorResponse(response_data, http_res)
-        if utils.match_response(http_res, "4XX", "*"):
-            http_res_text = utils.stream_to_text(http_res)
-            raise errors.SDKError("API error occurred", http_res, http_res_text)
-        if utils.match_response(http_res, "5XX", "*"):
-            http_res_text = utils.stream_to_text(http_res)
-            raise errors.SDKError("API error occurred", http_res, http_res_text)
-
-        raise errors.SDKError("Unexpected response received", http_res)
-
-    async def delete_workspace_group_by_id_async(
-        self,
-        *,
-        group_id: str,
-        organization_id: str,
-        workspace_id: str,
-        retries: OptionalNullable[utils.RetryConfig] = UNSET,
-        server_url: Optional[str] = None,
-        timeout_ms: Optional[int] = None,
-        http_headers: Optional[Mapping[str, str]] = None,
-    ):
-        r"""Delete a single group
-
-        Deletes a group given its ID.
-
-
-        :param group_id: The unique identifier of the group
-        :param organization_id: The unique identifier of the organization
-        :param workspace_id: The unique identifier of the workspace
-        :param retries: Override the default retry configuration for this method
-        :param server_url: Override the default server URL for this method
-        :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
-        :param http_headers: Additional headers to set or replace on requests.
-        """
-        base_url = None
-        url_variables = None
-        if timeout_ms is None:
-            timeout_ms = self.sdk_configuration.timeout_ms
-
-        if server_url is not None:
-            base_url = server_url
-        else:
-            base_url = self._get_url(base_url, url_variables)
-
-        request = models.DeleteWorkspaceGroupByIDRequest(
-            group_id=group_id,
-            organization_id=organization_id,
-            workspace_id=workspace_id,
-        )
-
-        req = self._build_request_async(
-            method="DELETE",
-            path="/organizations/{organizationId}/workspaces/{workspaceId}/groups/{groupId}",
-            base_url=base_url,
-            url_variables=url_variables,
-            request=request,
-            request_body_required=False,
-            request_has_path_params=True,
-            request_has_query_params=True,
-            user_agent_header="user-agent",
-            accept_header_value="application/json",
-            http_headers=http_headers,
-            security=self.sdk_configuration.security,
-            allow_empty_value=None,
-            timeout_ms=timeout_ms,
-        )
-
-        if retries == UNSET:
-            if self.sdk_configuration.retry_config is not UNSET:
-                retries = self.sdk_configuration.retry_config
-
-        retry_config = None
-        if isinstance(retries, utils.RetryConfig):
-            retry_config = (retries, ["429", "500", "502", "503", "504"])
-
-        http_res = await self.do_request_async(
-            hook_ctx=HookContext(
-                config=self.sdk_configuration,
-                base_url=base_url or "",
-                operation_id="deleteWorkspaceGroupById",
-                oauth2_scopes=["organization:write"],
-                security_source=self.sdk_configuration.security,
-            ),
-            request=req,
-            error_status_codes=[
-                "400",
-                "401",
-                "403",
-                "404",
-                "409",
-                "429",
-                "4XX",
-                "500",
-                "503",
-                "5XX",
-            ],
-            retry_config=retry_config,
-        )
-
-        response_data: Any = None
-        if utils.match_response(http_res, "204", "*"):
-            return
-        if utils.match_response(
-            http_res, ["400", "401", "403", "404", "409", "429"], "application/json"
-        ):
-            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
-            raise errors.ErrorResponse(response_data, http_res)
-        if utils.match_response(http_res, ["500", "503"], "application/json"):
-            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
-            raise errors.ErrorResponse(response_data, http_res)
-        if utils.match_response(http_res, "4XX", "*"):
-            http_res_text = await utils.stream_to_text_async(http_res)
-            raise errors.SDKError("API error occurred", http_res, http_res_text)
-        if utils.match_response(http_res, "5XX", "*"):
-            http_res_text = await utils.stream_to_text_async(http_res)
-            raise errors.SDKError("API error occurred", http_res, http_res_text)
-
-        raise errors.SDKError("Unexpected response received", http_res)
-
-    def delete_workspace_membership_by_id(
-        self,
-        *,
-        organization_id: str,
-        workspace_id: str,
-        workspace_membership_id: str,
-        retries: OptionalNullable[utils.RetryConfig] = UNSET,
-        server_url: Optional[str] = None,
-        timeout_ms: Optional[int] = None,
-        http_headers: Optional[Mapping[str, str]] = None,
-    ):
-        r"""Delete a workspace membership
-
-        Revoke a user's membership to a `Workspace`.
-
-
-        :param organization_id: The unique identifier of the organization
-        :param workspace_id: The unique identifier of the workspace
-        :param workspace_membership_id: The unique identifier of the workspace membership
-        :param retries: Override the default retry configuration for this method
-        :param server_url: Override the default server URL for this method
-        :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
-        :param http_headers: Additional headers to set or replace on requests.
-        """
-        base_url = None
-        url_variables = None
-        if timeout_ms is None:
-            timeout_ms = self.sdk_configuration.timeout_ms
-
-        if server_url is not None:
-            base_url = server_url
-        else:
-            base_url = self._get_url(base_url, url_variables)
-
-        request = models.DeleteWorkspaceMembershipByIDRequest(
-            organization_id=organization_id,
-            workspace_id=workspace_id,
-            workspace_membership_id=workspace_membership_id,
-        )
-
-        req = self._build_request(
-            method="DELETE",
-            path="/organizations/{organizationId}/workspaces/{workspaceId}/memberships/{workspaceMembershipId}",
-            base_url=base_url,
-            url_variables=url_variables,
-            request=request,
-            request_body_required=False,
-            request_has_path_params=True,
-            request_has_query_params=True,
-            user_agent_header="user-agent",
-            accept_header_value="application/json",
-            http_headers=http_headers,
-            security=self.sdk_configuration.security,
-            allow_empty_value=None,
-            timeout_ms=timeout_ms,
-        )
-
-        if retries == UNSET:
-            if self.sdk_configuration.retry_config is not UNSET:
-                retries = self.sdk_configuration.retry_config
-
-        retry_config = None
-        if isinstance(retries, utils.RetryConfig):
-            retry_config = (retries, ["429", "500", "502", "503", "504"])
-
-        http_res = self.do_request(
-            hook_ctx=HookContext(
-                config=self.sdk_configuration,
-                base_url=base_url or "",
-                operation_id="deleteWorkspaceMembershipById",
-                oauth2_scopes=["organization:write"],
-                security_source=self.sdk_configuration.security,
-            ),
-            request=req,
-            error_status_codes=[
-                "400",
-                "401",
-                "403",
-                "404",
-                "409",
-                "429",
-                "4XX",
-                "500",
-                "503",
-                "5XX",
-            ],
-            retry_config=retry_config,
-        )
-
-        response_data: Any = None
-        if utils.match_response(http_res, "204", "*"):
-            return
-        if utils.match_response(
-            http_res, ["400", "401", "403", "404", "409", "429"], "application/json"
-        ):
-            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
-            raise errors.ErrorResponse(response_data, http_res)
-        if utils.match_response(http_res, ["500", "503"], "application/json"):
-            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
-            raise errors.ErrorResponse(response_data, http_res)
-        if utils.match_response(http_res, "4XX", "*"):
-            http_res_text = utils.stream_to_text(http_res)
-            raise errors.SDKError("API error occurred", http_res, http_res_text)
-        if utils.match_response(http_res, "5XX", "*"):
-            http_res_text = utils.stream_to_text(http_res)
-            raise errors.SDKError("API error occurred", http_res, http_res_text)
-
-        raise errors.SDKError("Unexpected response received", http_res)
-
-    async def delete_workspace_membership_by_id_async(
-        self,
-        *,
-        organization_id: str,
-        workspace_id: str,
-        workspace_membership_id: str,
-        retries: OptionalNullable[utils.RetryConfig] = UNSET,
-        server_url: Optional[str] = None,
-        timeout_ms: Optional[int] = None,
-        http_headers: Optional[Mapping[str, str]] = None,
-    ):
-        r"""Delete a workspace membership
-
-        Revoke a user's membership to a `Workspace`.
-
-
-        :param organization_id: The unique identifier of the organization
-        :param workspace_id: The unique identifier of the workspace
-        :param workspace_membership_id: The unique identifier of the workspace membership
-        :param retries: Override the default retry configuration for this method
-        :param server_url: Override the default server URL for this method
-        :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
-        :param http_headers: Additional headers to set or replace on requests.
-        """
-        base_url = None
-        url_variables = None
-        if timeout_ms is None:
-            timeout_ms = self.sdk_configuration.timeout_ms
-
-        if server_url is not None:
-            base_url = server_url
-        else:
-            base_url = self._get_url(base_url, url_variables)
-
-        request = models.DeleteWorkspaceMembershipByIDRequest(
-            organization_id=organization_id,
-            workspace_id=workspace_id,
-            workspace_membership_id=workspace_membership_id,
-        )
-
-        req = self._build_request_async(
-            method="DELETE",
-            path="/organizations/{organizationId}/workspaces/{workspaceId}/memberships/{workspaceMembershipId}",
-            base_url=base_url,
-            url_variables=url_variables,
-            request=request,
-            request_body_required=False,
-            request_has_path_params=True,
-            request_has_query_params=True,
-            user_agent_header="user-agent",
-            accept_header_value="application/json",
-            http_headers=http_headers,
-            security=self.sdk_configuration.security,
-            allow_empty_value=None,
-            timeout_ms=timeout_ms,
-        )
-
-        if retries == UNSET:
-            if self.sdk_configuration.retry_config is not UNSET:
-                retries = self.sdk_configuration.retry_config
-
-        retry_config = None
-        if isinstance(retries, utils.RetryConfig):
-            retry_config = (retries, ["429", "500", "502", "503", "504"])
-
-        http_res = await self.do_request_async(
-            hook_ctx=HookContext(
-                config=self.sdk_configuration,
-                base_url=base_url or "",
-                operation_id="deleteWorkspaceMembershipById",
-                oauth2_scopes=["organization:write"],
-                security_source=self.sdk_configuration.security,
-            ),
-            request=req,
-            error_status_codes=[
-                "400",
-                "401",
-                "403",
-                "404",
-                "409",
-                "429",
-                "4XX",
-                "500",
-                "503",
-                "5XX",
-            ],
-            retry_config=retry_config,
-        )
-
-        response_data: Any = None
-        if utils.match_response(http_res, "204", "*"):
-            return
         if utils.match_response(
             http_res, ["400", "401", "403", "404", "409", "429"], "application/json"
         ):
@@ -2456,6 +449,248 @@ class Admin(BaseSDK):
                 base_url=base_url or "",
                 operation_id="getOrganizationById",
                 oauth2_scopes=["organization:read"],
+                security_source=self.sdk_configuration.security,
+            ),
+            request=req,
+            error_status_codes=[
+                "400",
+                "401",
+                "403",
+                "404",
+                "409",
+                "429",
+                "4XX",
+                "500",
+                "503",
+                "5XX",
+            ],
+            retry_config=retry_config,
+        )
+
+        response_data: Any = None
+        if utils.match_response(http_res, "200", "application/json"):
+            return unmarshal_json_response(models.Organization, http_res)
+        if utils.match_response(
+            http_res, ["400", "401", "403", "404", "409", "429"], "application/json"
+        ):
+            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
+            raise errors.ErrorResponse(response_data, http_res)
+        if utils.match_response(http_res, ["500", "503"], "application/json"):
+            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
+            raise errors.ErrorResponse(response_data, http_res)
+        if utils.match_response(http_res, "4XX", "*"):
+            http_res_text = await utils.stream_to_text_async(http_res)
+            raise errors.SDKError("API error occurred", http_res, http_res_text)
+        if utils.match_response(http_res, "5XX", "*"):
+            http_res_text = await utils.stream_to_text_async(http_res)
+            raise errors.SDKError("API error occurred", http_res, http_res_text)
+
+        raise errors.SDKError("Unexpected response received", http_res)
+
+    def partially_update_organization_by_id(
+        self,
+        *,
+        organization_id: str,
+        request_body: Union[
+            List[models.JSONPatchOperation], List[models.JSONPatchOperationTypedDict]
+        ],
+        retries: OptionalNullable[utils.RetryConfig] = UNSET,
+        server_url: Optional[str] = None,
+        timeout_ms: Optional[int] = None,
+        http_headers: Optional[Mapping[str, str]] = None,
+    ) -> models.Organization:
+        r"""Update a single organization
+
+        Updates the properties of an organization.
+        ### Options
+        |Path|PATCH Operations Supported|
+        |---|---|
+        |`/name`|`replace`|
+
+
+        :param organization_id: The unique identifier of the organization
+        :param request_body: A collection of patch operations to apply to the organization.
+        :param retries: Override the default retry configuration for this method
+        :param server_url: Override the default server URL for this method
+        :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
+        :param http_headers: Additional headers to set or replace on requests.
+        """
+        base_url = None
+        url_variables = None
+        if timeout_ms is None:
+            timeout_ms = self.sdk_configuration.timeout_ms
+
+        if server_url is not None:
+            base_url = server_url
+        else:
+            base_url = self._get_url(base_url, url_variables)
+
+        request = models.PartiallyUpdateOrganizationByIDRequest(
+            organization_id=organization_id,
+            request_body=utils.get_pydantic_model(
+                request_body, List[models.JSONPatchOperation]
+            ),
+        )
+
+        req = self._build_request(
+            method="PATCH",
+            path="/organizations/{organizationId}",
+            base_url=base_url,
+            url_variables=url_variables,
+            request=request,
+            request_body_required=True,
+            request_has_path_params=True,
+            request_has_query_params=True,
+            user_agent_header="user-agent",
+            accept_header_value="application/json",
+            http_headers=http_headers,
+            security=self.sdk_configuration.security,
+            get_serialized_body=lambda: utils.serialize_request_body(
+                request.request_body,
+                False,
+                False,
+                "json",
+                List[models.JSONPatchOperation],
+            ),
+            allow_empty_value=None,
+            timeout_ms=timeout_ms,
+        )
+
+        if retries == UNSET:
+            if self.sdk_configuration.retry_config is not UNSET:
+                retries = self.sdk_configuration.retry_config
+
+        retry_config = None
+        if isinstance(retries, utils.RetryConfig):
+            retry_config = (retries, ["429", "500", "502", "503", "504"])
+
+        http_res = self.do_request(
+            hook_ctx=HookContext(
+                config=self.sdk_configuration,
+                base_url=base_url or "",
+                operation_id="partiallyUpdateOrganizationById",
+                oauth2_scopes=["organization:write"],
+                security_source=self.sdk_configuration.security,
+            ),
+            request=req,
+            error_status_codes=[
+                "400",
+                "401",
+                "403",
+                "404",
+                "409",
+                "429",
+                "4XX",
+                "500",
+                "503",
+                "5XX",
+            ],
+            retry_config=retry_config,
+        )
+
+        response_data: Any = None
+        if utils.match_response(http_res, "200", "application/json"):
+            return unmarshal_json_response(models.Organization, http_res)
+        if utils.match_response(
+            http_res, ["400", "401", "403", "404", "409", "429"], "application/json"
+        ):
+            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
+            raise errors.ErrorResponse(response_data, http_res)
+        if utils.match_response(http_res, ["500", "503"], "application/json"):
+            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
+            raise errors.ErrorResponse(response_data, http_res)
+        if utils.match_response(http_res, "4XX", "*"):
+            http_res_text = utils.stream_to_text(http_res)
+            raise errors.SDKError("API error occurred", http_res, http_res_text)
+        if utils.match_response(http_res, "5XX", "*"):
+            http_res_text = utils.stream_to_text(http_res)
+            raise errors.SDKError("API error occurred", http_res, http_res_text)
+
+        raise errors.SDKError("Unexpected response received", http_res)
+
+    async def partially_update_organization_by_id_async(
+        self,
+        *,
+        organization_id: str,
+        request_body: Union[
+            List[models.JSONPatchOperation], List[models.JSONPatchOperationTypedDict]
+        ],
+        retries: OptionalNullable[utils.RetryConfig] = UNSET,
+        server_url: Optional[str] = None,
+        timeout_ms: Optional[int] = None,
+        http_headers: Optional[Mapping[str, str]] = None,
+    ) -> models.Organization:
+        r"""Update a single organization
+
+        Updates the properties of an organization.
+        ### Options
+        |Path|PATCH Operations Supported|
+        |---|---|
+        |`/name`|`replace`|
+
+
+        :param organization_id: The unique identifier of the organization
+        :param request_body: A collection of patch operations to apply to the organization.
+        :param retries: Override the default retry configuration for this method
+        :param server_url: Override the default server URL for this method
+        :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
+        :param http_headers: Additional headers to set or replace on requests.
+        """
+        base_url = None
+        url_variables = None
+        if timeout_ms is None:
+            timeout_ms = self.sdk_configuration.timeout_ms
+
+        if server_url is not None:
+            base_url = server_url
+        else:
+            base_url = self._get_url(base_url, url_variables)
+
+        request = models.PartiallyUpdateOrganizationByIDRequest(
+            organization_id=organization_id,
+            request_body=utils.get_pydantic_model(
+                request_body, List[models.JSONPatchOperation]
+            ),
+        )
+
+        req = self._build_request_async(
+            method="PATCH",
+            path="/organizations/{organizationId}",
+            base_url=base_url,
+            url_variables=url_variables,
+            request=request,
+            request_body_required=True,
+            request_has_path_params=True,
+            request_has_query_params=True,
+            user_agent_header="user-agent",
+            accept_header_value="application/json",
+            http_headers=http_headers,
+            security=self.sdk_configuration.security,
+            get_serialized_body=lambda: utils.serialize_request_body(
+                request.request_body,
+                False,
+                False,
+                "json",
+                List[models.JSONPatchOperation],
+            ),
+            allow_empty_value=None,
+            timeout_ms=timeout_ms,
+        )
+
+        if retries == UNSET:
+            if self.sdk_configuration.retry_config is not UNSET:
+                retries = self.sdk_configuration.retry_config
+
+        retry_config = None
+        if isinstance(retries, utils.RetryConfig):
+            retry_config = (retries, ["429", "500", "502", "503", "504"])
+
+        http_res = await self.do_request_async(
+            hook_ctx=HookContext(
+                config=self.sdk_configuration,
+                base_url=base_url or "",
+                operation_id="partiallyUpdateOrganizationById",
+                oauth2_scopes=["organization:write"],
                 security_source=self.sdk_configuration.security,
             ),
             request=req,
@@ -2910,6 +1145,961 @@ class Admin(BaseSDK):
 
         raise errors.SDKError("Unexpected response received", http_res)
 
+    def get_organization_users(
+        self,
+        *,
+        organization_id: str,
+        maxpagesize: Optional[int] = 1000,
+        next: Optional[str] = None,
+        filter_: Optional[str] = None,
+        retries: OptionalNullable[utils.RetryConfig] = UNSET,
+        server_url: Optional[str] = None,
+        timeout_ms: Optional[int] = None,
+        http_headers: Optional[Mapping[str, str]] = None,
+    ) -> Optional[models.GetOrganizationUsersResponse]:
+        r"""Retrieve list of an organizations users
+
+        Retrieve users in an organization.
+
+        :param organization_id: The unique identifier of the organization
+        :param maxpagesize: The maximum number of results to retrieve
+        :param next: Pagination cursor for next set of results.
+        :param filter_: The properties to filter the results by.
+        :param retries: Override the default retry configuration for this method
+        :param server_url: Override the default server URL for this method
+        :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
+        :param http_headers: Additional headers to set or replace on requests.
+        """
+        base_url = None
+        url_variables = None
+        if timeout_ms is None:
+            timeout_ms = self.sdk_configuration.timeout_ms
+
+        if server_url is not None:
+            base_url = server_url
+        else:
+            base_url = self._get_url(base_url, url_variables)
+
+        request = models.GetOrganizationUsersRequest(
+            organization_id=organization_id,
+            maxpagesize=maxpagesize,
+            next=next,
+            filter_=filter_,
+        )
+
+        req = self._build_request(
+            method="GET",
+            path="/organizations/{organizationId}/users",
+            base_url=base_url,
+            url_variables=url_variables,
+            request=request,
+            request_body_required=False,
+            request_has_path_params=True,
+            request_has_query_params=True,
+            user_agent_header="user-agent",
+            accept_header_value="application/json",
+            http_headers=http_headers,
+            security=self.sdk_configuration.security,
+            allow_empty_value=None,
+            timeout_ms=timeout_ms,
+        )
+
+        if retries == UNSET:
+            if self.sdk_configuration.retry_config is not UNSET:
+                retries = self.sdk_configuration.retry_config
+
+        retry_config = None
+        if isinstance(retries, utils.RetryConfig):
+            retry_config = (retries, ["429", "500", "502", "503", "504"])
+
+        http_res = self.do_request(
+            hook_ctx=HookContext(
+                config=self.sdk_configuration,
+                base_url=base_url or "",
+                operation_id="getOrganizationUsers",
+                oauth2_scopes=["organization:read"],
+                security_source=self.sdk_configuration.security,
+            ),
+            request=req,
+            error_status_codes=[
+                "400",
+                "401",
+                "403",
+                "404",
+                "409",
+                "429",
+                "4XX",
+                "500",
+                "503",
+                "5XX",
+            ],
+            retry_config=retry_config,
+        )
+
+        def next_func() -> Optional[models.GetOrganizationUsersResponse]:
+            body = utils.unmarshal_json(http_res.text, Union[Dict[Any, Any], List[Any]])
+
+            next_cursor = JSONPath("$['@nextLink']").parse(body)
+
+            if len(next_cursor) == 0:
+                return None
+
+            next_cursor = next_cursor[0]
+            if next_cursor is None or str(next_cursor).strip() == "":
+                return None
+
+            return self.get_organization_users(
+                organization_id=organization_id,
+                maxpagesize=maxpagesize,
+                next=next,
+                filter_=filter_,
+                retries=retries,
+            )
+
+        response_data: Any = None
+        if utils.match_response(http_res, "200", "application/json"):
+            return models.GetOrganizationUsersResponse(
+                result=unmarshal_json_response(
+                    models.OrganizationUsersListResult, http_res
+                ),
+                next=next_func,
+            )
+        if utils.match_response(
+            http_res, ["400", "401", "403", "404", "409", "429"], "application/json"
+        ):
+            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
+            raise errors.ErrorResponse(response_data, http_res)
+        if utils.match_response(http_res, ["500", "503"], "application/json"):
+            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
+            raise errors.ErrorResponse(response_data, http_res)
+        if utils.match_response(http_res, "4XX", "*"):
+            http_res_text = utils.stream_to_text(http_res)
+            raise errors.SDKError("API error occurred", http_res, http_res_text)
+        if utils.match_response(http_res, "5XX", "*"):
+            http_res_text = utils.stream_to_text(http_res)
+            raise errors.SDKError("API error occurred", http_res, http_res_text)
+
+        raise errors.SDKError("Unexpected response received", http_res)
+
+    async def get_organization_users_async(
+        self,
+        *,
+        organization_id: str,
+        maxpagesize: Optional[int] = 1000,
+        next: Optional[str] = None,
+        filter_: Optional[str] = None,
+        retries: OptionalNullable[utils.RetryConfig] = UNSET,
+        server_url: Optional[str] = None,
+        timeout_ms: Optional[int] = None,
+        http_headers: Optional[Mapping[str, str]] = None,
+    ) -> Optional[models.GetOrganizationUsersResponse]:
+        r"""Retrieve list of an organizations users
+
+        Retrieve users in an organization.
+
+        :param organization_id: The unique identifier of the organization
+        :param maxpagesize: The maximum number of results to retrieve
+        :param next: Pagination cursor for next set of results.
+        :param filter_: The properties to filter the results by.
+        :param retries: Override the default retry configuration for this method
+        :param server_url: Override the default server URL for this method
+        :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
+        :param http_headers: Additional headers to set or replace on requests.
+        """
+        base_url = None
+        url_variables = None
+        if timeout_ms is None:
+            timeout_ms = self.sdk_configuration.timeout_ms
+
+        if server_url is not None:
+            base_url = server_url
+        else:
+            base_url = self._get_url(base_url, url_variables)
+
+        request = models.GetOrganizationUsersRequest(
+            organization_id=organization_id,
+            maxpagesize=maxpagesize,
+            next=next,
+            filter_=filter_,
+        )
+
+        req = self._build_request_async(
+            method="GET",
+            path="/organizations/{organizationId}/users",
+            base_url=base_url,
+            url_variables=url_variables,
+            request=request,
+            request_body_required=False,
+            request_has_path_params=True,
+            request_has_query_params=True,
+            user_agent_header="user-agent",
+            accept_header_value="application/json",
+            http_headers=http_headers,
+            security=self.sdk_configuration.security,
+            allow_empty_value=None,
+            timeout_ms=timeout_ms,
+        )
+
+        if retries == UNSET:
+            if self.sdk_configuration.retry_config is not UNSET:
+                retries = self.sdk_configuration.retry_config
+
+        retry_config = None
+        if isinstance(retries, utils.RetryConfig):
+            retry_config = (retries, ["429", "500", "502", "503", "504"])
+
+        http_res = await self.do_request_async(
+            hook_ctx=HookContext(
+                config=self.sdk_configuration,
+                base_url=base_url or "",
+                operation_id="getOrganizationUsers",
+                oauth2_scopes=["organization:read"],
+                security_source=self.sdk_configuration.security,
+            ),
+            request=req,
+            error_status_codes=[
+                "400",
+                "401",
+                "403",
+                "404",
+                "409",
+                "429",
+                "4XX",
+                "500",
+                "503",
+                "5XX",
+            ],
+            retry_config=retry_config,
+        )
+
+        def next_func() -> Awaitable[Optional[models.GetOrganizationUsersResponse]]:
+            body = utils.unmarshal_json(http_res.text, Union[Dict[Any, Any], List[Any]])
+
+            async def empty_result():
+                return None
+
+            next_cursor = JSONPath("$['@nextLink']").parse(body)
+
+            if len(next_cursor) == 0:
+                return empty_result()
+
+            next_cursor = next_cursor[0]
+            if next_cursor is None or str(next_cursor).strip() == "":
+                return empty_result()
+
+            return self.get_organization_users_async(
+                organization_id=organization_id,
+                maxpagesize=maxpagesize,
+                next=next,
+                filter_=filter_,
+                retries=retries,
+            )
+
+        response_data: Any = None
+        if utils.match_response(http_res, "200", "application/json"):
+            return models.GetOrganizationUsersResponse(
+                result=unmarshal_json_response(
+                    models.OrganizationUsersListResult, http_res
+                ),
+                next=next_func,
+            )
+        if utils.match_response(
+            http_res, ["400", "401", "403", "404", "409", "429"], "application/json"
+        ):
+            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
+            raise errors.ErrorResponse(response_data, http_res)
+        if utils.match_response(http_res, ["500", "503"], "application/json"):
+            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
+            raise errors.ErrorResponse(response_data, http_res)
+        if utils.match_response(http_res, "4XX", "*"):
+            http_res_text = await utils.stream_to_text_async(http_res)
+            raise errors.SDKError("API error occurred", http_res, http_res_text)
+        if utils.match_response(http_res, "5XX", "*"):
+            http_res_text = await utils.stream_to_text_async(http_res)
+            raise errors.SDKError("API error occurred", http_res, http_res_text)
+
+        raise errors.SDKError("Unexpected response received", http_res)
+
+    def create_organization_user(
+        self,
+        *,
+        organization_id: str,
+        organization_user: Union[
+            models.OrganizationUserInput, models.OrganizationUserInputTypedDict
+        ],
+        retries: OptionalNullable[utils.RetryConfig] = UNSET,
+        server_url: Optional[str] = None,
+        timeout_ms: Optional[int] = None,
+        http_headers: Optional[Mapping[str, str]] = None,
+    ) -> models.OrganizationUser:
+        r"""Create a new organization User
+
+        Creates a new OrganizationUser resource
+
+
+        :param organization_id: The unique identifier of the organization
+        :param organization_user: The properties of the user to create
+        :param retries: Override the default retry configuration for this method
+        :param server_url: Override the default server URL for this method
+        :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
+        :param http_headers: Additional headers to set or replace on requests.
+        """
+        base_url = None
+        url_variables = None
+        if timeout_ms is None:
+            timeout_ms = self.sdk_configuration.timeout_ms
+
+        if server_url is not None:
+            base_url = server_url
+        else:
+            base_url = self._get_url(base_url, url_variables)
+
+        request = models.CreateOrganizationUserRequest(
+            organization_id=organization_id,
+            organization_user=utils.get_pydantic_model(
+                organization_user, models.OrganizationUserInput
+            ),
+        )
+
+        req = self._build_request(
+            method="POST",
+            path="/organizations/{organizationId}/users",
+            base_url=base_url,
+            url_variables=url_variables,
+            request=request,
+            request_body_required=True,
+            request_has_path_params=True,
+            request_has_query_params=True,
+            user_agent_header="user-agent",
+            accept_header_value="application/json",
+            http_headers=http_headers,
+            security=self.sdk_configuration.security,
+            get_serialized_body=lambda: utils.serialize_request_body(
+                request.organization_user,
+                False,
+                False,
+                "json",
+                models.OrganizationUserInput,
+            ),
+            allow_empty_value=None,
+            timeout_ms=timeout_ms,
+        )
+
+        if retries == UNSET:
+            if self.sdk_configuration.retry_config is not UNSET:
+                retries = self.sdk_configuration.retry_config
+
+        retry_config = None
+        if isinstance(retries, utils.RetryConfig):
+            retry_config = (retries, ["429", "500", "502", "503", "504"])
+
+        http_res = self.do_request(
+            hook_ctx=HookContext(
+                config=self.sdk_configuration,
+                base_url=base_url or "",
+                operation_id="createOrganizationUser",
+                oauth2_scopes=["organization:write"],
+                security_source=self.sdk_configuration.security,
+            ),
+            request=req,
+            error_status_codes=[
+                "400",
+                "401",
+                "403",
+                "404",
+                "409",
+                "429",
+                "4XX",
+                "500",
+                "503",
+                "5XX",
+            ],
+            retry_config=retry_config,
+        )
+
+        response_data: Any = None
+        if utils.match_response(http_res, "201", "application/json"):
+            return unmarshal_json_response(models.OrganizationUser, http_res)
+        if utils.match_response(
+            http_res, ["400", "401", "403", "404", "409", "429"], "application/json"
+        ):
+            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
+            raise errors.ErrorResponse(response_data, http_res)
+        if utils.match_response(http_res, ["500", "503"], "application/json"):
+            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
+            raise errors.ErrorResponse(response_data, http_res)
+        if utils.match_response(http_res, "4XX", "*"):
+            http_res_text = utils.stream_to_text(http_res)
+            raise errors.SDKError("API error occurred", http_res, http_res_text)
+        if utils.match_response(http_res, "5XX", "*"):
+            http_res_text = utils.stream_to_text(http_res)
+            raise errors.SDKError("API error occurred", http_res, http_res_text)
+
+        raise errors.SDKError("Unexpected response received", http_res)
+
+    async def create_organization_user_async(
+        self,
+        *,
+        organization_id: str,
+        organization_user: Union[
+            models.OrganizationUserInput, models.OrganizationUserInputTypedDict
+        ],
+        retries: OptionalNullable[utils.RetryConfig] = UNSET,
+        server_url: Optional[str] = None,
+        timeout_ms: Optional[int] = None,
+        http_headers: Optional[Mapping[str, str]] = None,
+    ) -> models.OrganizationUser:
+        r"""Create a new organization User
+
+        Creates a new OrganizationUser resource
+
+
+        :param organization_id: The unique identifier of the organization
+        :param organization_user: The properties of the user to create
+        :param retries: Override the default retry configuration for this method
+        :param server_url: Override the default server URL for this method
+        :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
+        :param http_headers: Additional headers to set or replace on requests.
+        """
+        base_url = None
+        url_variables = None
+        if timeout_ms is None:
+            timeout_ms = self.sdk_configuration.timeout_ms
+
+        if server_url is not None:
+            base_url = server_url
+        else:
+            base_url = self._get_url(base_url, url_variables)
+
+        request = models.CreateOrganizationUserRequest(
+            organization_id=organization_id,
+            organization_user=utils.get_pydantic_model(
+                organization_user, models.OrganizationUserInput
+            ),
+        )
+
+        req = self._build_request_async(
+            method="POST",
+            path="/organizations/{organizationId}/users",
+            base_url=base_url,
+            url_variables=url_variables,
+            request=request,
+            request_body_required=True,
+            request_has_path_params=True,
+            request_has_query_params=True,
+            user_agent_header="user-agent",
+            accept_header_value="application/json",
+            http_headers=http_headers,
+            security=self.sdk_configuration.security,
+            get_serialized_body=lambda: utils.serialize_request_body(
+                request.organization_user,
+                False,
+                False,
+                "json",
+                models.OrganizationUserInput,
+            ),
+            allow_empty_value=None,
+            timeout_ms=timeout_ms,
+        )
+
+        if retries == UNSET:
+            if self.sdk_configuration.retry_config is not UNSET:
+                retries = self.sdk_configuration.retry_config
+
+        retry_config = None
+        if isinstance(retries, utils.RetryConfig):
+            retry_config = (retries, ["429", "500", "502", "503", "504"])
+
+        http_res = await self.do_request_async(
+            hook_ctx=HookContext(
+                config=self.sdk_configuration,
+                base_url=base_url or "",
+                operation_id="createOrganizationUser",
+                oauth2_scopes=["organization:write"],
+                security_source=self.sdk_configuration.security,
+            ),
+            request=req,
+            error_status_codes=[
+                "400",
+                "401",
+                "403",
+                "404",
+                "409",
+                "429",
+                "4XX",
+                "500",
+                "503",
+                "5XX",
+            ],
+            retry_config=retry_config,
+        )
+
+        response_data: Any = None
+        if utils.match_response(http_res, "201", "application/json"):
+            return unmarshal_json_response(models.OrganizationUser, http_res)
+        if utils.match_response(
+            http_res, ["400", "401", "403", "404", "409", "429"], "application/json"
+        ):
+            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
+            raise errors.ErrorResponse(response_data, http_res)
+        if utils.match_response(http_res, ["500", "503"], "application/json"):
+            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
+            raise errors.ErrorResponse(response_data, http_res)
+        if utils.match_response(http_res, "4XX", "*"):
+            http_res_text = await utils.stream_to_text_async(http_res)
+            raise errors.SDKError("API error occurred", http_res, http_res_text)
+        if utils.match_response(http_res, "5XX", "*"):
+            http_res_text = await utils.stream_to_text_async(http_res)
+            raise errors.SDKError("API error occurred", http_res, http_res_text)
+
+        raise errors.SDKError("Unexpected response received", http_res)
+
+    def assign_user_to_organization(
+        self,
+        *,
+        organization_id: str,
+        organization_user_assignment: Union[
+            models.OrganizationUserAssignment,
+            models.OrganizationUserAssignmentTypedDict,
+        ],
+        retries: OptionalNullable[utils.RetryConfig] = UNSET,
+        server_url: Optional[str] = None,
+        timeout_ms: Optional[int] = None,
+        http_headers: Optional[Mapping[str, str]] = None,
+    ) -> models.OrganizationUser:
+        r"""Assign existing user to organization
+
+        Assign an existing organization user to an organization
+
+        :param organization_id: The unique identifier of the organization
+        :param organization_user_assignment: Configuration options for the assignment
+        :param retries: Override the default retry configuration for this method
+        :param server_url: Override the default server URL for this method
+        :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
+        :param http_headers: Additional headers to set or replace on requests.
+        """
+        base_url = None
+        url_variables = None
+        if timeout_ms is None:
+            timeout_ms = self.sdk_configuration.timeout_ms
+
+        if server_url is not None:
+            base_url = server_url
+        else:
+            base_url = self._get_url(base_url, url_variables)
+
+        request = models.AssignUserToOrganizationRequest(
+            organization_id=organization_id,
+            organization_user_assignment=utils.get_pydantic_model(
+                organization_user_assignment, models.OrganizationUserAssignment
+            ),
+        )
+
+        req = self._build_request(
+            method="POST",
+            path="/organizations/{organizationId}/users/assignment",
+            base_url=base_url,
+            url_variables=url_variables,
+            request=request,
+            request_body_required=True,
+            request_has_path_params=True,
+            request_has_query_params=True,
+            user_agent_header="user-agent",
+            accept_header_value="application/json",
+            http_headers=http_headers,
+            security=self.sdk_configuration.security,
+            get_serialized_body=lambda: utils.serialize_request_body(
+                request.organization_user_assignment,
+                False,
+                False,
+                "json",
+                models.OrganizationUserAssignment,
+            ),
+            allow_empty_value=None,
+            timeout_ms=timeout_ms,
+        )
+
+        if retries == UNSET:
+            if self.sdk_configuration.retry_config is not UNSET:
+                retries = self.sdk_configuration.retry_config
+
+        retry_config = None
+        if isinstance(retries, utils.RetryConfig):
+            retry_config = (retries, ["429", "500", "502", "503", "504"])
+
+        http_res = self.do_request(
+            hook_ctx=HookContext(
+                config=self.sdk_configuration,
+                base_url=base_url or "",
+                operation_id="assignUserToOrganization",
+                oauth2_scopes=["organization:write"],
+                security_source=self.sdk_configuration.security,
+            ),
+            request=req,
+            error_status_codes=[
+                "400",
+                "401",
+                "403",
+                "404",
+                "409",
+                "429",
+                "4XX",
+                "500",
+                "503",
+                "5XX",
+            ],
+            retry_config=retry_config,
+        )
+
+        response_data: Any = None
+        if utils.match_response(http_res, "200", "application/json"):
+            return unmarshal_json_response(models.OrganizationUser, http_res)
+        if utils.match_response(
+            http_res, ["400", "401", "403", "404", "409", "429"], "application/json"
+        ):
+            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
+            raise errors.ErrorResponse(response_data, http_res)
+        if utils.match_response(http_res, ["500", "503"], "application/json"):
+            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
+            raise errors.ErrorResponse(response_data, http_res)
+        if utils.match_response(http_res, "4XX", "*"):
+            http_res_text = utils.stream_to_text(http_res)
+            raise errors.SDKError("API error occurred", http_res, http_res_text)
+        if utils.match_response(http_res, "5XX", "*"):
+            http_res_text = utils.stream_to_text(http_res)
+            raise errors.SDKError("API error occurred", http_res, http_res_text)
+
+        raise errors.SDKError("Unexpected response received", http_res)
+
+    async def assign_user_to_organization_async(
+        self,
+        *,
+        organization_id: str,
+        organization_user_assignment: Union[
+            models.OrganizationUserAssignment,
+            models.OrganizationUserAssignmentTypedDict,
+        ],
+        retries: OptionalNullable[utils.RetryConfig] = UNSET,
+        server_url: Optional[str] = None,
+        timeout_ms: Optional[int] = None,
+        http_headers: Optional[Mapping[str, str]] = None,
+    ) -> models.OrganizationUser:
+        r"""Assign existing user to organization
+
+        Assign an existing organization user to an organization
+
+        :param organization_id: The unique identifier of the organization
+        :param organization_user_assignment: Configuration options for the assignment
+        :param retries: Override the default retry configuration for this method
+        :param server_url: Override the default server URL for this method
+        :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
+        :param http_headers: Additional headers to set or replace on requests.
+        """
+        base_url = None
+        url_variables = None
+        if timeout_ms is None:
+            timeout_ms = self.sdk_configuration.timeout_ms
+
+        if server_url is not None:
+            base_url = server_url
+        else:
+            base_url = self._get_url(base_url, url_variables)
+
+        request = models.AssignUserToOrganizationRequest(
+            organization_id=organization_id,
+            organization_user_assignment=utils.get_pydantic_model(
+                organization_user_assignment, models.OrganizationUserAssignment
+            ),
+        )
+
+        req = self._build_request_async(
+            method="POST",
+            path="/organizations/{organizationId}/users/assignment",
+            base_url=base_url,
+            url_variables=url_variables,
+            request=request,
+            request_body_required=True,
+            request_has_path_params=True,
+            request_has_query_params=True,
+            user_agent_header="user-agent",
+            accept_header_value="application/json",
+            http_headers=http_headers,
+            security=self.sdk_configuration.security,
+            get_serialized_body=lambda: utils.serialize_request_body(
+                request.organization_user_assignment,
+                False,
+                False,
+                "json",
+                models.OrganizationUserAssignment,
+            ),
+            allow_empty_value=None,
+            timeout_ms=timeout_ms,
+        )
+
+        if retries == UNSET:
+            if self.sdk_configuration.retry_config is not UNSET:
+                retries = self.sdk_configuration.retry_config
+
+        retry_config = None
+        if isinstance(retries, utils.RetryConfig):
+            retry_config = (retries, ["429", "500", "502", "503", "504"])
+
+        http_res = await self.do_request_async(
+            hook_ctx=HookContext(
+                config=self.sdk_configuration,
+                base_url=base_url or "",
+                operation_id="assignUserToOrganization",
+                oauth2_scopes=["organization:write"],
+                security_source=self.sdk_configuration.security,
+            ),
+            request=req,
+            error_status_codes=[
+                "400",
+                "401",
+                "403",
+                "404",
+                "409",
+                "429",
+                "4XX",
+                "500",
+                "503",
+                "5XX",
+            ],
+            retry_config=retry_config,
+        )
+
+        response_data: Any = None
+        if utils.match_response(http_res, "200", "application/json"):
+            return unmarshal_json_response(models.OrganizationUser, http_res)
+        if utils.match_response(
+            http_res, ["400", "401", "403", "404", "409", "429"], "application/json"
+        ):
+            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
+            raise errors.ErrorResponse(response_data, http_res)
+        if utils.match_response(http_res, ["500", "503"], "application/json"):
+            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
+            raise errors.ErrorResponse(response_data, http_res)
+        if utils.match_response(http_res, "4XX", "*"):
+            http_res_text = await utils.stream_to_text_async(http_res)
+            raise errors.SDKError("API error occurred", http_res, http_res_text)
+        if utils.match_response(http_res, "5XX", "*"):
+            http_res_text = await utils.stream_to_text_async(http_res)
+            raise errors.SDKError("API error occurred", http_res, http_res_text)
+
+        raise errors.SDKError("Unexpected response received", http_res)
+
+    def delete_organization_user_by_id(
+        self,
+        *,
+        organization_id: str,
+        user_id: str,
+        retries: OptionalNullable[utils.RetryConfig] = UNSET,
+        server_url: Optional[str] = None,
+        timeout_ms: Optional[int] = None,
+        http_headers: Optional[Mapping[str, str]] = None,
+    ):
+        r"""Delete an organization user
+
+        Delete a user from an organization
+
+
+        :param organization_id: The unique identifier of the organization
+        :param user_id: The unique identifier of the user
+        :param retries: Override the default retry configuration for this method
+        :param server_url: Override the default server URL for this method
+        :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
+        :param http_headers: Additional headers to set or replace on requests.
+        """
+        base_url = None
+        url_variables = None
+        if timeout_ms is None:
+            timeout_ms = self.sdk_configuration.timeout_ms
+
+        if server_url is not None:
+            base_url = server_url
+        else:
+            base_url = self._get_url(base_url, url_variables)
+
+        request = models.DeleteOrganizationUserByIDRequest(
+            organization_id=organization_id,
+            user_id=user_id,
+        )
+
+        req = self._build_request(
+            method="DELETE",
+            path="/organizations/{organizationId}/users/{userId}",
+            base_url=base_url,
+            url_variables=url_variables,
+            request=request,
+            request_body_required=False,
+            request_has_path_params=True,
+            request_has_query_params=True,
+            user_agent_header="user-agent",
+            accept_header_value="application/json",
+            http_headers=http_headers,
+            security=self.sdk_configuration.security,
+            allow_empty_value=None,
+            timeout_ms=timeout_ms,
+        )
+
+        if retries == UNSET:
+            if self.sdk_configuration.retry_config is not UNSET:
+                retries = self.sdk_configuration.retry_config
+
+        retry_config = None
+        if isinstance(retries, utils.RetryConfig):
+            retry_config = (retries, ["429", "500", "502", "503", "504"])
+
+        http_res = self.do_request(
+            hook_ctx=HookContext(
+                config=self.sdk_configuration,
+                base_url=base_url or "",
+                operation_id="deleteOrganizationUserById",
+                oauth2_scopes=["organization:write"],
+                security_source=self.sdk_configuration.security,
+            ),
+            request=req,
+            error_status_codes=[
+                "400",
+                "401",
+                "403",
+                "404",
+                "409",
+                "429",
+                "4XX",
+                "500",
+                "503",
+                "5XX",
+            ],
+            retry_config=retry_config,
+        )
+
+        response_data: Any = None
+        if utils.match_response(http_res, "204", "*"):
+            return
+        if utils.match_response(
+            http_res, ["400", "401", "403", "404", "409", "429"], "application/json"
+        ):
+            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
+            raise errors.ErrorResponse(response_data, http_res)
+        if utils.match_response(http_res, ["500", "503"], "application/json"):
+            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
+            raise errors.ErrorResponse(response_data, http_res)
+        if utils.match_response(http_res, "4XX", "*"):
+            http_res_text = utils.stream_to_text(http_res)
+            raise errors.SDKError("API error occurred", http_res, http_res_text)
+        if utils.match_response(http_res, "5XX", "*"):
+            http_res_text = utils.stream_to_text(http_res)
+            raise errors.SDKError("API error occurred", http_res, http_res_text)
+
+        raise errors.SDKError("Unexpected response received", http_res)
+
+    async def delete_organization_user_by_id_async(
+        self,
+        *,
+        organization_id: str,
+        user_id: str,
+        retries: OptionalNullable[utils.RetryConfig] = UNSET,
+        server_url: Optional[str] = None,
+        timeout_ms: Optional[int] = None,
+        http_headers: Optional[Mapping[str, str]] = None,
+    ):
+        r"""Delete an organization user
+
+        Delete a user from an organization
+
+
+        :param organization_id: The unique identifier of the organization
+        :param user_id: The unique identifier of the user
+        :param retries: Override the default retry configuration for this method
+        :param server_url: Override the default server URL for this method
+        :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
+        :param http_headers: Additional headers to set or replace on requests.
+        """
+        base_url = None
+        url_variables = None
+        if timeout_ms is None:
+            timeout_ms = self.sdk_configuration.timeout_ms
+
+        if server_url is not None:
+            base_url = server_url
+        else:
+            base_url = self._get_url(base_url, url_variables)
+
+        request = models.DeleteOrganizationUserByIDRequest(
+            organization_id=organization_id,
+            user_id=user_id,
+        )
+
+        req = self._build_request_async(
+            method="DELETE",
+            path="/organizations/{organizationId}/users/{userId}",
+            base_url=base_url,
+            url_variables=url_variables,
+            request=request,
+            request_body_required=False,
+            request_has_path_params=True,
+            request_has_query_params=True,
+            user_agent_header="user-agent",
+            accept_header_value="application/json",
+            http_headers=http_headers,
+            security=self.sdk_configuration.security,
+            allow_empty_value=None,
+            timeout_ms=timeout_ms,
+        )
+
+        if retries == UNSET:
+            if self.sdk_configuration.retry_config is not UNSET:
+                retries = self.sdk_configuration.retry_config
+
+        retry_config = None
+        if isinstance(retries, utils.RetryConfig):
+            retry_config = (retries, ["429", "500", "502", "503", "504"])
+
+        http_res = await self.do_request_async(
+            hook_ctx=HookContext(
+                config=self.sdk_configuration,
+                base_url=base_url or "",
+                operation_id="deleteOrganizationUserById",
+                oauth2_scopes=["organization:write"],
+                security_source=self.sdk_configuration.security,
+            ),
+            request=req,
+            error_status_codes=[
+                "400",
+                "401",
+                "403",
+                "404",
+                "409",
+                "429",
+                "4XX",
+                "500",
+                "503",
+                "5XX",
+            ],
+            retry_config=retry_config,
+        )
+
+        response_data: Any = None
+        if utils.match_response(http_res, "204", "*"):
+            return
+        if utils.match_response(
+            http_res, ["400", "401", "403", "404", "409", "429"], "application/json"
+        ):
+            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
+            raise errors.ErrorResponse(response_data, http_res)
+        if utils.match_response(http_res, ["500", "503"], "application/json"):
+            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
+            raise errors.ErrorResponse(response_data, http_res)
+        if utils.match_response(http_res, "4XX", "*"):
+            http_res_text = await utils.stream_to_text_async(http_res)
+            raise errors.SDKError("API error occurred", http_res, http_res_text)
+        if utils.match_response(http_res, "5XX", "*"):
+            http_res_text = await utils.stream_to_text_async(http_res)
+            raise errors.SDKError("API error occurred", http_res, http_res_text)
+
+        raise errors.SDKError("Unexpected response received", http_res)
+
     def get_organization_user_by_id(
         self,
         *,
@@ -3084,6 +2274,262 @@ class Admin(BaseSDK):
                 base_url=base_url or "",
                 operation_id="getOrganizationUserById",
                 oauth2_scopes=["organization:read"],
+                security_source=self.sdk_configuration.security,
+            ),
+            request=req,
+            error_status_codes=[
+                "400",
+                "401",
+                "403",
+                "404",
+                "409",
+                "429",
+                "4XX",
+                "500",
+                "503",
+                "5XX",
+            ],
+            retry_config=retry_config,
+        )
+
+        response_data: Any = None
+        if utils.match_response(http_res, "200", "application/json"):
+            return unmarshal_json_response(models.OrganizationUser, http_res)
+        if utils.match_response(
+            http_res, ["400", "401", "403", "404", "409", "429"], "application/json"
+        ):
+            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
+            raise errors.ErrorResponse(response_data, http_res)
+        if utils.match_response(http_res, ["500", "503"], "application/json"):
+            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
+            raise errors.ErrorResponse(response_data, http_res)
+        if utils.match_response(http_res, "4XX", "*"):
+            http_res_text = await utils.stream_to_text_async(http_res)
+            raise errors.SDKError("API error occurred", http_res, http_res_text)
+        if utils.match_response(http_res, "5XX", "*"):
+            http_res_text = await utils.stream_to_text_async(http_res)
+            raise errors.SDKError("API error occurred", http_res, http_res_text)
+
+        raise errors.SDKError("Unexpected response received", http_res)
+
+    def partially_update_organization_user_by_id(
+        self,
+        *,
+        organization_id: str,
+        user_id: str,
+        request_body: Union[
+            List[models.JSONPatchOperation], List[models.JSONPatchOperationTypedDict]
+        ],
+        retries: OptionalNullable[utils.RetryConfig] = UNSET,
+        server_url: Optional[str] = None,
+        timeout_ms: Optional[int] = None,
+        http_headers: Optional[Mapping[str, str]] = None,
+    ) -> models.OrganizationUser:
+        r"""Partially update a single user in an organization
+
+        Partially update the properties of a [User](ref:admin#user) within an Organization.
+        ### Options
+        |Path|PATCH Operations Supported|
+        |---|---|
+        |`/givenName`|`replace`|
+        |`/familyName`|`replace`|
+        |`/displayName`|`replace`|
+        |`/username`|`replace`|
+        |`/email`|`replace`|
+
+
+        :param organization_id: The unique identifier of the organization
+        :param user_id: The unique identifier of the user
+        :param request_body: Editable details about the User.
+        :param retries: Override the default retry configuration for this method
+        :param server_url: Override the default server URL for this method
+        :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
+        :param http_headers: Additional headers to set or replace on requests.
+        """
+        base_url = None
+        url_variables = None
+        if timeout_ms is None:
+            timeout_ms = self.sdk_configuration.timeout_ms
+
+        if server_url is not None:
+            base_url = server_url
+        else:
+            base_url = self._get_url(base_url, url_variables)
+
+        request = models.PartiallyUpdateOrganizationUserByIDRequest(
+            organization_id=organization_id,
+            user_id=user_id,
+            request_body=utils.get_pydantic_model(
+                request_body, List[models.JSONPatchOperation]
+            ),
+        )
+
+        req = self._build_request(
+            method="PATCH",
+            path="/organizations/{organizationId}/users/{userId}",
+            base_url=base_url,
+            url_variables=url_variables,
+            request=request,
+            request_body_required=True,
+            request_has_path_params=True,
+            request_has_query_params=True,
+            user_agent_header="user-agent",
+            accept_header_value="application/json",
+            http_headers=http_headers,
+            security=self.sdk_configuration.security,
+            get_serialized_body=lambda: utils.serialize_request_body(
+                request.request_body,
+                False,
+                False,
+                "json",
+                List[models.JSONPatchOperation],
+            ),
+            allow_empty_value=None,
+            timeout_ms=timeout_ms,
+        )
+
+        if retries == UNSET:
+            if self.sdk_configuration.retry_config is not UNSET:
+                retries = self.sdk_configuration.retry_config
+
+        retry_config = None
+        if isinstance(retries, utils.RetryConfig):
+            retry_config = (retries, ["429", "500", "502", "503", "504"])
+
+        http_res = self.do_request(
+            hook_ctx=HookContext(
+                config=self.sdk_configuration,
+                base_url=base_url or "",
+                operation_id="partiallyUpdateOrganizationUserById",
+                oauth2_scopes=["organization:write"],
+                security_source=self.sdk_configuration.security,
+            ),
+            request=req,
+            error_status_codes=[
+                "400",
+                "401",
+                "403",
+                "404",
+                "409",
+                "429",
+                "4XX",
+                "500",
+                "503",
+                "5XX",
+            ],
+            retry_config=retry_config,
+        )
+
+        response_data: Any = None
+        if utils.match_response(http_res, "200", "application/json"):
+            return unmarshal_json_response(models.OrganizationUser, http_res)
+        if utils.match_response(
+            http_res, ["400", "401", "403", "404", "409", "429"], "application/json"
+        ):
+            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
+            raise errors.ErrorResponse(response_data, http_res)
+        if utils.match_response(http_res, ["500", "503"], "application/json"):
+            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
+            raise errors.ErrorResponse(response_data, http_res)
+        if utils.match_response(http_res, "4XX", "*"):
+            http_res_text = utils.stream_to_text(http_res)
+            raise errors.SDKError("API error occurred", http_res, http_res_text)
+        if utils.match_response(http_res, "5XX", "*"):
+            http_res_text = utils.stream_to_text(http_res)
+            raise errors.SDKError("API error occurred", http_res, http_res_text)
+
+        raise errors.SDKError("Unexpected response received", http_res)
+
+    async def partially_update_organization_user_by_id_async(
+        self,
+        *,
+        organization_id: str,
+        user_id: str,
+        request_body: Union[
+            List[models.JSONPatchOperation], List[models.JSONPatchOperationTypedDict]
+        ],
+        retries: OptionalNullable[utils.RetryConfig] = UNSET,
+        server_url: Optional[str] = None,
+        timeout_ms: Optional[int] = None,
+        http_headers: Optional[Mapping[str, str]] = None,
+    ) -> models.OrganizationUser:
+        r"""Partially update a single user in an organization
+
+        Partially update the properties of a [User](ref:admin#user) within an Organization.
+        ### Options
+        |Path|PATCH Operations Supported|
+        |---|---|
+        |`/givenName`|`replace`|
+        |`/familyName`|`replace`|
+        |`/displayName`|`replace`|
+        |`/username`|`replace`|
+        |`/email`|`replace`|
+
+
+        :param organization_id: The unique identifier of the organization
+        :param user_id: The unique identifier of the user
+        :param request_body: Editable details about the User.
+        :param retries: Override the default retry configuration for this method
+        :param server_url: Override the default server URL for this method
+        :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
+        :param http_headers: Additional headers to set or replace on requests.
+        """
+        base_url = None
+        url_variables = None
+        if timeout_ms is None:
+            timeout_ms = self.sdk_configuration.timeout_ms
+
+        if server_url is not None:
+            base_url = server_url
+        else:
+            base_url = self._get_url(base_url, url_variables)
+
+        request = models.PartiallyUpdateOrganizationUserByIDRequest(
+            organization_id=organization_id,
+            user_id=user_id,
+            request_body=utils.get_pydantic_model(
+                request_body, List[models.JSONPatchOperation]
+            ),
+        )
+
+        req = self._build_request_async(
+            method="PATCH",
+            path="/organizations/{organizationId}/users/{userId}",
+            base_url=base_url,
+            url_variables=url_variables,
+            request=request,
+            request_body_required=True,
+            request_has_path_params=True,
+            request_has_query_params=True,
+            user_agent_header="user-agent",
+            accept_header_value="application/json",
+            http_headers=http_headers,
+            security=self.sdk_configuration.security,
+            get_serialized_body=lambda: utils.serialize_request_body(
+                request.request_body,
+                False,
+                False,
+                "json",
+                List[models.JSONPatchOperation],
+            ),
+            allow_empty_value=None,
+            timeout_ms=timeout_ms,
+        )
+
+        if retries == UNSET:
+            if self.sdk_configuration.retry_config is not UNSET:
+                retries = self.sdk_configuration.retry_config
+
+        retry_config = None
+        if isinstance(retries, utils.RetryConfig):
+            retry_config = (retries, ["429", "500", "502", "503", "504"])
+
+        http_res = await self.do_request_async(
+            hook_ctx=HookContext(
+                config=self.sdk_configuration,
+                base_url=base_url or "",
+                operation_id="partiallyUpdateOrganizationUserById",
+                oauth2_scopes=["organization:write"],
                 security_source=self.sdk_configuration.security,
             ),
             request=req,
@@ -3334,26 +2780,25 @@ class Admin(BaseSDK):
 
         raise errors.SDKError("Unexpected response received", http_res)
 
-    def get_organization_users(
+    def assign_organization_user_roles(
         self,
         *,
         organization_id: str,
-        filter_: Optional[str] = None,
-        maxpagesize: Optional[int] = 1000,
-        next: Optional[str] = None,
+        user_id: str,
+        request_body: List[str],
         retries: OptionalNullable[utils.RetryConfig] = UNSET,
         server_url: Optional[str] = None,
         timeout_ms: Optional[int] = None,
         http_headers: Optional[Mapping[str, str]] = None,
-    ) -> Optional[models.GetOrganizationUsersResponse]:
-        r"""Retrieve list of an organizations users
+    ) -> models.AssignOrganizationUserRolesResponse:
+        r"""Assign roles for an Organization User
 
-        Retrieve users in an organization.
+        Assign a User's roles within an Organization. If one assignment fails, all assignments fail.
+
 
         :param organization_id: The unique identifier of the organization
-        :param filter_: The properties to filter the results by.
-        :param maxpagesize: The maximum number of results to retrieve
-        :param next: Pagination cursor for next set of results.
+        :param user_id: The unique identifier of the user
+        :param request_body: Editable details about the user's roles.
         :param retries: Override the default retry configuration for this method
         :param server_url: Override the default server URL for this method
         :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
@@ -3369,16 +2814,473 @@ class Admin(BaseSDK):
         else:
             base_url = self._get_url(base_url, url_variables)
 
-        request = models.GetOrganizationUsersRequest(
-            filter_=filter_,
+        request = models.AssignOrganizationUserRolesRequest(
+            organization_id=organization_id,
+            user_id=user_id,
+            request_body=request_body,
+        )
+
+        req = self._build_request(
+            method="POST",
+            path="/organizations/{organizationId}/users/{userId}/roles/assignment",
+            base_url=base_url,
+            url_variables=url_variables,
+            request=request,
+            request_body_required=True,
+            request_has_path_params=True,
+            request_has_query_params=True,
+            user_agent_header="user-agent",
+            accept_header_value="application/json",
+            http_headers=http_headers,
+            security=self.sdk_configuration.security,
+            get_serialized_body=lambda: utils.serialize_request_body(
+                request.request_body, False, False, "json", List[str]
+            ),
+            allow_empty_value=None,
+            timeout_ms=timeout_ms,
+        )
+
+        if retries == UNSET:
+            if self.sdk_configuration.retry_config is not UNSET:
+                retries = self.sdk_configuration.retry_config
+
+        retry_config = None
+        if isinstance(retries, utils.RetryConfig):
+            retry_config = (retries, ["429", "500", "502", "503", "504"])
+
+        http_res = self.do_request(
+            hook_ctx=HookContext(
+                config=self.sdk_configuration,
+                base_url=base_url or "",
+                operation_id="assignOrganizationUserRoles",
+                oauth2_scopes=["organization:write"],
+                security_source=self.sdk_configuration.security,
+            ),
+            request=req,
+            error_status_codes=[
+                "400",
+                "401",
+                "403",
+                "404",
+                "409",
+                "429",
+                "4XX",
+                "500",
+                "503",
+                "5XX",
+            ],
+            retry_config=retry_config,
+        )
+
+        response_data: Any = None
+        if utils.match_response(http_res, "202", "*"):
+            return models.AssignOrganizationUserRolesResponse(
+                headers=utils.get_response_headers(http_res.headers)
+            )
+        if utils.match_response(
+            http_res, ["400", "401", "403", "404", "409", "429"], "application/json"
+        ):
+            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
+            raise errors.ErrorResponse(response_data, http_res)
+        if utils.match_response(http_res, ["500", "503"], "application/json"):
+            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
+            raise errors.ErrorResponse(response_data, http_res)
+        if utils.match_response(http_res, "4XX", "*"):
+            http_res_text = utils.stream_to_text(http_res)
+            raise errors.SDKError("API error occurred", http_res, http_res_text)
+        if utils.match_response(http_res, "5XX", "*"):
+            http_res_text = utils.stream_to_text(http_res)
+            raise errors.SDKError("API error occurred", http_res, http_res_text)
+
+        raise errors.SDKError("Unexpected response received", http_res)
+
+    async def assign_organization_user_roles_async(
+        self,
+        *,
+        organization_id: str,
+        user_id: str,
+        request_body: List[str],
+        retries: OptionalNullable[utils.RetryConfig] = UNSET,
+        server_url: Optional[str] = None,
+        timeout_ms: Optional[int] = None,
+        http_headers: Optional[Mapping[str, str]] = None,
+    ) -> models.AssignOrganizationUserRolesResponse:
+        r"""Assign roles for an Organization User
+
+        Assign a User's roles within an Organization. If one assignment fails, all assignments fail.
+
+
+        :param organization_id: The unique identifier of the organization
+        :param user_id: The unique identifier of the user
+        :param request_body: Editable details about the user's roles.
+        :param retries: Override the default retry configuration for this method
+        :param server_url: Override the default server URL for this method
+        :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
+        :param http_headers: Additional headers to set or replace on requests.
+        """
+        base_url = None
+        url_variables = None
+        if timeout_ms is None:
+            timeout_ms = self.sdk_configuration.timeout_ms
+
+        if server_url is not None:
+            base_url = server_url
+        else:
+            base_url = self._get_url(base_url, url_variables)
+
+        request = models.AssignOrganizationUserRolesRequest(
+            organization_id=organization_id,
+            user_id=user_id,
+            request_body=request_body,
+        )
+
+        req = self._build_request_async(
+            method="POST",
+            path="/organizations/{organizationId}/users/{userId}/roles/assignment",
+            base_url=base_url,
+            url_variables=url_variables,
+            request=request,
+            request_body_required=True,
+            request_has_path_params=True,
+            request_has_query_params=True,
+            user_agent_header="user-agent",
+            accept_header_value="application/json",
+            http_headers=http_headers,
+            security=self.sdk_configuration.security,
+            get_serialized_body=lambda: utils.serialize_request_body(
+                request.request_body, False, False, "json", List[str]
+            ),
+            allow_empty_value=None,
+            timeout_ms=timeout_ms,
+        )
+
+        if retries == UNSET:
+            if self.sdk_configuration.retry_config is not UNSET:
+                retries = self.sdk_configuration.retry_config
+
+        retry_config = None
+        if isinstance(retries, utils.RetryConfig):
+            retry_config = (retries, ["429", "500", "502", "503", "504"])
+
+        http_res = await self.do_request_async(
+            hook_ctx=HookContext(
+                config=self.sdk_configuration,
+                base_url=base_url or "",
+                operation_id="assignOrganizationUserRoles",
+                oauth2_scopes=["organization:write"],
+                security_source=self.sdk_configuration.security,
+            ),
+            request=req,
+            error_status_codes=[
+                "400",
+                "401",
+                "403",
+                "404",
+                "409",
+                "429",
+                "4XX",
+                "500",
+                "503",
+                "5XX",
+            ],
+            retry_config=retry_config,
+        )
+
+        response_data: Any = None
+        if utils.match_response(http_res, "202", "*"):
+            return models.AssignOrganizationUserRolesResponse(
+                headers=utils.get_response_headers(http_res.headers)
+            )
+        if utils.match_response(
+            http_res, ["400", "401", "403", "404", "409", "429"], "application/json"
+        ):
+            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
+            raise errors.ErrorResponse(response_data, http_res)
+        if utils.match_response(http_res, ["500", "503"], "application/json"):
+            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
+            raise errors.ErrorResponse(response_data, http_res)
+        if utils.match_response(http_res, "4XX", "*"):
+            http_res_text = await utils.stream_to_text_async(http_res)
+            raise errors.SDKError("API error occurred", http_res, http_res_text)
+        if utils.match_response(http_res, "5XX", "*"):
+            http_res_text = await utils.stream_to_text_async(http_res)
+            raise errors.SDKError("API error occurred", http_res, http_res_text)
+
+        raise errors.SDKError("Unexpected response received", http_res)
+
+    def revoke_organization_user_roles(
+        self,
+        *,
+        organization_id: str,
+        user_id: str,
+        request_body: List[str],
+        retries: OptionalNullable[utils.RetryConfig] = UNSET,
+        server_url: Optional[str] = None,
+        timeout_ms: Optional[int] = None,
+        http_headers: Optional[Mapping[str, str]] = None,
+    ) -> models.RevokeOrganizationUserRolesResponse:
+        r"""Revoke roles for an Organization User
+
+        Revoke a User's roles within an Organization. If one revocation fails, all revocations fail.
+
+
+        :param organization_id: The unique identifier of the organization
+        :param user_id: The unique identifier of the user
+        :param request_body: Editable details about the user's roles.
+        :param retries: Override the default retry configuration for this method
+        :param server_url: Override the default server URL for this method
+        :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
+        :param http_headers: Additional headers to set or replace on requests.
+        """
+        base_url = None
+        url_variables = None
+        if timeout_ms is None:
+            timeout_ms = self.sdk_configuration.timeout_ms
+
+        if server_url is not None:
+            base_url = server_url
+        else:
+            base_url = self._get_url(base_url, url_variables)
+
+        request = models.RevokeOrganizationUserRolesRequest(
+            organization_id=organization_id,
+            user_id=user_id,
+            request_body=request_body,
+        )
+
+        req = self._build_request(
+            method="POST",
+            path="/organizations/{organizationId}/users/{userId}/roles/revocation",
+            base_url=base_url,
+            url_variables=url_variables,
+            request=request,
+            request_body_required=True,
+            request_has_path_params=True,
+            request_has_query_params=True,
+            user_agent_header="user-agent",
+            accept_header_value="application/json",
+            http_headers=http_headers,
+            security=self.sdk_configuration.security,
+            get_serialized_body=lambda: utils.serialize_request_body(
+                request.request_body, False, False, "json", List[str]
+            ),
+            allow_empty_value=None,
+            timeout_ms=timeout_ms,
+        )
+
+        if retries == UNSET:
+            if self.sdk_configuration.retry_config is not UNSET:
+                retries = self.sdk_configuration.retry_config
+
+        retry_config = None
+        if isinstance(retries, utils.RetryConfig):
+            retry_config = (retries, ["429", "500", "502", "503", "504"])
+
+        http_res = self.do_request(
+            hook_ctx=HookContext(
+                config=self.sdk_configuration,
+                base_url=base_url or "",
+                operation_id="revokeOrganizationUserRoles",
+                oauth2_scopes=["organization:write"],
+                security_source=self.sdk_configuration.security,
+            ),
+            request=req,
+            error_status_codes=[
+                "400",
+                "401",
+                "403",
+                "404",
+                "409",
+                "429",
+                "4XX",
+                "500",
+                "503",
+                "5XX",
+            ],
+            retry_config=retry_config,
+        )
+
+        response_data: Any = None
+        if utils.match_response(http_res, "202", "*"):
+            return models.RevokeOrganizationUserRolesResponse(
+                headers=utils.get_response_headers(http_res.headers)
+            )
+        if utils.match_response(
+            http_res, ["400", "401", "403", "404", "409", "429"], "application/json"
+        ):
+            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
+            raise errors.ErrorResponse(response_data, http_res)
+        if utils.match_response(http_res, ["500", "503"], "application/json"):
+            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
+            raise errors.ErrorResponse(response_data, http_res)
+        if utils.match_response(http_res, "4XX", "*"):
+            http_res_text = utils.stream_to_text(http_res)
+            raise errors.SDKError("API error occurred", http_res, http_res_text)
+        if utils.match_response(http_res, "5XX", "*"):
+            http_res_text = utils.stream_to_text(http_res)
+            raise errors.SDKError("API error occurred", http_res, http_res_text)
+
+        raise errors.SDKError("Unexpected response received", http_res)
+
+    async def revoke_organization_user_roles_async(
+        self,
+        *,
+        organization_id: str,
+        user_id: str,
+        request_body: List[str],
+        retries: OptionalNullable[utils.RetryConfig] = UNSET,
+        server_url: Optional[str] = None,
+        timeout_ms: Optional[int] = None,
+        http_headers: Optional[Mapping[str, str]] = None,
+    ) -> models.RevokeOrganizationUserRolesResponse:
+        r"""Revoke roles for an Organization User
+
+        Revoke a User's roles within an Organization. If one revocation fails, all revocations fail.
+
+
+        :param organization_id: The unique identifier of the organization
+        :param user_id: The unique identifier of the user
+        :param request_body: Editable details about the user's roles.
+        :param retries: Override the default retry configuration for this method
+        :param server_url: Override the default server URL for this method
+        :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
+        :param http_headers: Additional headers to set or replace on requests.
+        """
+        base_url = None
+        url_variables = None
+        if timeout_ms is None:
+            timeout_ms = self.sdk_configuration.timeout_ms
+
+        if server_url is not None:
+            base_url = server_url
+        else:
+            base_url = self._get_url(base_url, url_variables)
+
+        request = models.RevokeOrganizationUserRolesRequest(
+            organization_id=organization_id,
+            user_id=user_id,
+            request_body=request_body,
+        )
+
+        req = self._build_request_async(
+            method="POST",
+            path="/organizations/{organizationId}/users/{userId}/roles/revocation",
+            base_url=base_url,
+            url_variables=url_variables,
+            request=request,
+            request_body_required=True,
+            request_has_path_params=True,
+            request_has_query_params=True,
+            user_agent_header="user-agent",
+            accept_header_value="application/json",
+            http_headers=http_headers,
+            security=self.sdk_configuration.security,
+            get_serialized_body=lambda: utils.serialize_request_body(
+                request.request_body, False, False, "json", List[str]
+            ),
+            allow_empty_value=None,
+            timeout_ms=timeout_ms,
+        )
+
+        if retries == UNSET:
+            if self.sdk_configuration.retry_config is not UNSET:
+                retries = self.sdk_configuration.retry_config
+
+        retry_config = None
+        if isinstance(retries, utils.RetryConfig):
+            retry_config = (retries, ["429", "500", "502", "503", "504"])
+
+        http_res = await self.do_request_async(
+            hook_ctx=HookContext(
+                config=self.sdk_configuration,
+                base_url=base_url or "",
+                operation_id="revokeOrganizationUserRoles",
+                oauth2_scopes=["organization:write"],
+                security_source=self.sdk_configuration.security,
+            ),
+            request=req,
+            error_status_codes=[
+                "400",
+                "401",
+                "403",
+                "404",
+                "409",
+                "429",
+                "4XX",
+                "500",
+                "503",
+                "5XX",
+            ],
+            retry_config=retry_config,
+        )
+
+        response_data: Any = None
+        if utils.match_response(http_res, "202", "*"):
+            return models.RevokeOrganizationUserRolesResponse(
+                headers=utils.get_response_headers(http_res.headers)
+            )
+        if utils.match_response(
+            http_res, ["400", "401", "403", "404", "409", "429"], "application/json"
+        ):
+            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
+            raise errors.ErrorResponse(response_data, http_res)
+        if utils.match_response(http_res, ["500", "503"], "application/json"):
+            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
+            raise errors.ErrorResponse(response_data, http_res)
+        if utils.match_response(http_res, "4XX", "*"):
+            http_res_text = await utils.stream_to_text_async(http_res)
+            raise errors.SDKError("API error occurred", http_res, http_res_text)
+        if utils.match_response(http_res, "5XX", "*"):
+            http_res_text = await utils.stream_to_text_async(http_res)
+            raise errors.SDKError("API error occurred", http_res, http_res_text)
+
+        raise errors.SDKError("Unexpected response received", http_res)
+
+    def get_workspaces(
+        self,
+        *,
+        organization_id: str,
+        maxpagesize: Optional[int] = 1000,
+        next: Optional[str] = None,
+        expand: Optional[str] = None,
+        retries: OptionalNullable[utils.RetryConfig] = UNSET,
+        server_url: Optional[str] = None,
+        timeout_ms: Optional[int] = None,
+        http_headers: Optional[Mapping[str, str]] = None,
+    ) -> Optional[models.GetWorkspacesResponse]:
+        r"""Retrieve list of workspaces
+
+        Retrieve a list of workspaces in an organization.
+
+        :param organization_id: The unique identifier of the organization
+        :param maxpagesize: The maximum number of results to retrieve
+        :param next: Pagination cursor for next set of results.
+        :param expand: Returns related resources inline with the main resource
+        :param retries: Override the default retry configuration for this method
+        :param server_url: Override the default server URL for this method
+        :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
+        :param http_headers: Additional headers to set or replace on requests.
+        """
+        base_url = None
+        url_variables = None
+        if timeout_ms is None:
+            timeout_ms = self.sdk_configuration.timeout_ms
+
+        if server_url is not None:
+            base_url = server_url
+        else:
+            base_url = self._get_url(base_url, url_variables)
+
+        request = models.GetWorkspacesRequest(
+            organization_id=organization_id,
             maxpagesize=maxpagesize,
             next=next,
-            organization_id=organization_id,
+            expand=expand,
         )
 
         req = self._build_request(
             method="GET",
-            path="/organizations/{organizationId}/users",
+            path="/organizations/{organizationId}/workspaces",
             base_url=base_url,
             url_variables=url_variables,
             request=request,
@@ -3405,7 +3307,7 @@ class Admin(BaseSDK):
             hook_ctx=HookContext(
                 config=self.sdk_configuration,
                 base_url=base_url or "",
-                operation_id="getOrganizationUsers",
+                operation_id="getWorkspaces",
                 oauth2_scopes=["organization:read"],
                 security_source=self.sdk_configuration.security,
             ),
@@ -3425,7 +3327,7 @@ class Admin(BaseSDK):
             retry_config=retry_config,
         )
 
-        def next_func() -> Optional[models.GetOrganizationUsersResponse]:
+        def next_func() -> Optional[models.GetWorkspacesResponse]:
             body = utils.unmarshal_json(http_res.text, Union[Dict[Any, Any], List[Any]])
 
             next_cursor = JSONPath("$['@nextLink']").parse(body)
@@ -3437,20 +3339,18 @@ class Admin(BaseSDK):
             if next_cursor is None or str(next_cursor).strip() == "":
                 return None
 
-            return self.get_organization_users(
+            return self.get_workspaces(
                 organization_id=organization_id,
-                filter_=filter_,
                 maxpagesize=maxpagesize,
                 next=next,
+                expand=expand,
                 retries=retries,
             )
 
         response_data: Any = None
         if utils.match_response(http_res, "200", "application/json"):
-            return models.GetOrganizationUsersResponse(
-                result=unmarshal_json_response(
-                    models.OrganizationUsersListResult, http_res
-                ),
+            return models.GetWorkspacesResponse(
+                result=unmarshal_json_response(models.WorkspacesListResult, http_res),
                 next=next_func,
             )
         if utils.match_response(
@@ -3470,26 +3370,26 @@ class Admin(BaseSDK):
 
         raise errors.SDKError("Unexpected response received", http_res)
 
-    async def get_organization_users_async(
+    async def get_workspaces_async(
         self,
         *,
         organization_id: str,
-        filter_: Optional[str] = None,
         maxpagesize: Optional[int] = 1000,
         next: Optional[str] = None,
+        expand: Optional[str] = None,
         retries: OptionalNullable[utils.RetryConfig] = UNSET,
         server_url: Optional[str] = None,
         timeout_ms: Optional[int] = None,
         http_headers: Optional[Mapping[str, str]] = None,
-    ) -> Optional[models.GetOrganizationUsersResponse]:
-        r"""Retrieve list of an organizations users
+    ) -> Optional[models.GetWorkspacesResponse]:
+        r"""Retrieve list of workspaces
 
-        Retrieve users in an organization.
+        Retrieve a list of workspaces in an organization.
 
         :param organization_id: The unique identifier of the organization
-        :param filter_: The properties to filter the results by.
         :param maxpagesize: The maximum number of results to retrieve
         :param next: Pagination cursor for next set of results.
+        :param expand: Returns related resources inline with the main resource
         :param retries: Override the default retry configuration for this method
         :param server_url: Override the default server URL for this method
         :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
@@ -3505,16 +3405,16 @@ class Admin(BaseSDK):
         else:
             base_url = self._get_url(base_url, url_variables)
 
-        request = models.GetOrganizationUsersRequest(
-            filter_=filter_,
+        request = models.GetWorkspacesRequest(
+            organization_id=organization_id,
             maxpagesize=maxpagesize,
             next=next,
-            organization_id=organization_id,
+            expand=expand,
         )
 
         req = self._build_request_async(
             method="GET",
-            path="/organizations/{organizationId}/users",
+            path="/organizations/{organizationId}/workspaces",
             base_url=base_url,
             url_variables=url_variables,
             request=request,
@@ -3541,7 +3441,7 @@ class Admin(BaseSDK):
             hook_ctx=HookContext(
                 config=self.sdk_configuration,
                 base_url=base_url or "",
-                operation_id="getOrganizationUsers",
+                operation_id="getWorkspaces",
                 oauth2_scopes=["organization:read"],
                 security_source=self.sdk_configuration.security,
             ),
@@ -3561,7 +3461,7 @@ class Admin(BaseSDK):
             retry_config=retry_config,
         )
 
-        def next_func() -> Awaitable[Optional[models.GetOrganizationUsersResponse]]:
+        def next_func() -> Awaitable[Optional[models.GetWorkspacesResponse]]:
             body = utils.unmarshal_json(http_res.text, Union[Dict[Any, Any], List[Any]])
 
             async def empty_result():
@@ -3576,20 +3476,18 @@ class Admin(BaseSDK):
             if next_cursor is None or str(next_cursor).strip() == "":
                 return empty_result()
 
-            return self.get_organization_users_async(
+            return self.get_workspaces_async(
                 organization_id=organization_id,
-                filter_=filter_,
                 maxpagesize=maxpagesize,
                 next=next,
+                expand=expand,
                 retries=retries,
             )
 
         response_data: Any = None
         if utils.match_response(http_res, "200", "application/json"):
-            return models.GetOrganizationUsersResponse(
-                result=unmarshal_json_response(
-                    models.OrganizationUsersListResult, http_res
-                ),
+            return models.GetWorkspacesResponse(
+                result=unmarshal_json_response(models.WorkspacesListResult, http_res),
                 next=next_func,
             )
         if utils.match_response(
@@ -3609,25 +3507,23 @@ class Admin(BaseSDK):
 
         raise errors.SDKError("Unexpected response received", http_res)
 
-    def get_organization_workspace_membership_roles(
+    def create_workspace(
         self,
         *,
         organization_id: str,
-        workspace_id: str,
-        workspace_membership_id: str,
+        workspace: Union[models.WorkspaceInput, models.WorkspaceInputTypedDict],
         retries: OptionalNullable[utils.RetryConfig] = UNSET,
         server_url: Optional[str] = None,
         timeout_ms: Optional[int] = None,
         http_headers: Optional[Mapping[str, str]] = None,
-    ) -> models.WorkspaceMembershipRolesListResult:
-        r"""Retrieve available roles for a workspace membership
+    ) -> models.Workspace:
+        r"""Create a new workspace
 
-        Retrieves available roles for a workspace membership
+        Creates a new workspace resource
 
 
         :param organization_id: The unique identifier of the organization
-        :param workspace_id: The unique identifier of the workspace
-        :param workspace_membership_id: The unique identifier of the workspace membership
+        :param workspace: The properties of the workspace to create
         :param retries: Override the default retry configuration for this method
         :param server_url: Override the default server URL for this method
         :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
@@ -3643,25 +3539,27 @@ class Admin(BaseSDK):
         else:
             base_url = self._get_url(base_url, url_variables)
 
-        request = models.GetOrganizationWorkspaceMembershipRolesRequest(
+        request = models.CreateWorkspaceRequest(
             organization_id=organization_id,
-            workspace_id=workspace_id,
-            workspace_membership_id=workspace_membership_id,
+            workspace=utils.get_pydantic_model(workspace, models.WorkspaceInput),
         )
 
         req = self._build_request(
-            method="GET",
-            path="/organizations/{organizationId}/workspaces/{workspaceId}/memberships/{workspaceMembershipId}/roles",
+            method="POST",
+            path="/organizations/{organizationId}/workspaces",
             base_url=base_url,
             url_variables=url_variables,
             request=request,
-            request_body_required=False,
+            request_body_required=True,
             request_has_path_params=True,
             request_has_query_params=True,
             user_agent_header="user-agent",
             accept_header_value="application/json",
             http_headers=http_headers,
             security=self.sdk_configuration.security,
+            get_serialized_body=lambda: utils.serialize_request_body(
+                request.workspace, False, False, "json", models.WorkspaceInput
+            ),
             allow_empty_value=None,
             timeout_ms=timeout_ms,
         )
@@ -3678,8 +3576,8 @@ class Admin(BaseSDK):
             hook_ctx=HookContext(
                 config=self.sdk_configuration,
                 base_url=base_url or "",
-                operation_id="getOrganizationWorkspaceMembershipRoles",
-                oauth2_scopes=["organization:read"],
+                operation_id="createWorkspace",
+                oauth2_scopes=["organization:write"],
                 security_source=self.sdk_configuration.security,
             ),
             request=req,
@@ -3699,10 +3597,8 @@ class Admin(BaseSDK):
         )
 
         response_data: Any = None
-        if utils.match_response(http_res, "200", "application/json"):
-            return unmarshal_json_response(
-                models.WorkspaceMembershipRolesListResult, http_res
-            )
+        if utils.match_response(http_res, "201", "application/json"):
+            return unmarshal_json_response(models.Workspace, http_res)
         if utils.match_response(
             http_res, ["400", "401", "403", "404", "409", "429"], "application/json"
         ):
@@ -3720,25 +3616,23 @@ class Admin(BaseSDK):
 
         raise errors.SDKError("Unexpected response received", http_res)
 
-    async def get_organization_workspace_membership_roles_async(
+    async def create_workspace_async(
         self,
         *,
         organization_id: str,
-        workspace_id: str,
-        workspace_membership_id: str,
+        workspace: Union[models.WorkspaceInput, models.WorkspaceInputTypedDict],
         retries: OptionalNullable[utils.RetryConfig] = UNSET,
         server_url: Optional[str] = None,
         timeout_ms: Optional[int] = None,
         http_headers: Optional[Mapping[str, str]] = None,
-    ) -> models.WorkspaceMembershipRolesListResult:
-        r"""Retrieve available roles for a workspace membership
+    ) -> models.Workspace:
+        r"""Create a new workspace
 
-        Retrieves available roles for a workspace membership
+        Creates a new workspace resource
 
 
         :param organization_id: The unique identifier of the organization
-        :param workspace_id: The unique identifier of the workspace
-        :param workspace_membership_id: The unique identifier of the workspace membership
+        :param workspace: The properties of the workspace to create
         :param retries: Override the default retry configuration for this method
         :param server_url: Override the default server URL for this method
         :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
@@ -3754,25 +3648,27 @@ class Admin(BaseSDK):
         else:
             base_url = self._get_url(base_url, url_variables)
 
-        request = models.GetOrganizationWorkspaceMembershipRolesRequest(
+        request = models.CreateWorkspaceRequest(
             organization_id=organization_id,
-            workspace_id=workspace_id,
-            workspace_membership_id=workspace_membership_id,
+            workspace=utils.get_pydantic_model(workspace, models.WorkspaceInput),
         )
 
         req = self._build_request_async(
-            method="GET",
-            path="/organizations/{organizationId}/workspaces/{workspaceId}/memberships/{workspaceMembershipId}/roles",
+            method="POST",
+            path="/organizations/{organizationId}/workspaces",
             base_url=base_url,
             url_variables=url_variables,
             request=request,
-            request_body_required=False,
+            request_body_required=True,
             request_has_path_params=True,
             request_has_query_params=True,
             user_agent_header="user-agent",
             accept_header_value="application/json",
             http_headers=http_headers,
             security=self.sdk_configuration.security,
+            get_serialized_body=lambda: utils.serialize_request_body(
+                request.workspace, False, False, "json", models.WorkspaceInput
+            ),
             allow_empty_value=None,
             timeout_ms=timeout_ms,
         )
@@ -3789,8 +3685,8 @@ class Admin(BaseSDK):
             hook_ctx=HookContext(
                 config=self.sdk_configuration,
                 base_url=base_url or "",
-                operation_id="getOrganizationWorkspaceMembershipRoles",
-                oauth2_scopes=["organization:read"],
+                operation_id="createWorkspace",
+                oauth2_scopes=["organization:write"],
                 security_source=self.sdk_configuration.security,
             ),
             request=req,
@@ -3810,491 +3706,8 @@ class Admin(BaseSDK):
         )
 
         response_data: Any = None
-        if utils.match_response(http_res, "200", "application/json"):
-            return unmarshal_json_response(
-                models.WorkspaceMembershipRolesListResult, http_res
-            )
-        if utils.match_response(
-            http_res, ["400", "401", "403", "404", "409", "429"], "application/json"
-        ):
-            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
-            raise errors.ErrorResponse(response_data, http_res)
-        if utils.match_response(http_res, ["500", "503"], "application/json"):
-            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
-            raise errors.ErrorResponse(response_data, http_res)
-        if utils.match_response(http_res, "4XX", "*"):
-            http_res_text = await utils.stream_to_text_async(http_res)
-            raise errors.SDKError("API error occurred", http_res, http_res_text)
-        if utils.match_response(http_res, "5XX", "*"):
-            http_res_text = await utils.stream_to_text_async(http_res)
-            raise errors.SDKError("API error occurred", http_res, http_res_text)
-
-        raise errors.SDKError("Unexpected response received", http_res)
-
-    def get_organization_workspace_roles(
-        self,
-        *,
-        organization_id: str,
-        workspace_id: str,
-        retries: OptionalNullable[utils.RetryConfig] = UNSET,
-        server_url: Optional[str] = None,
-        timeout_ms: Optional[int] = None,
-        http_headers: Optional[Mapping[str, str]] = None,
-    ) -> models.WorkspaceRolesListResult:
-        r"""Retrieve available roles within a workspace
-
-        Retrieves available roles within a workspace given an organization and workspace ID
-
-
-        :param organization_id: The unique identifier of the organization
-        :param workspace_id: The unique identifier of the workspace
-        :param retries: Override the default retry configuration for this method
-        :param server_url: Override the default server URL for this method
-        :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
-        :param http_headers: Additional headers to set or replace on requests.
-        """
-        base_url = None
-        url_variables = None
-        if timeout_ms is None:
-            timeout_ms = self.sdk_configuration.timeout_ms
-
-        if server_url is not None:
-            base_url = server_url
-        else:
-            base_url = self._get_url(base_url, url_variables)
-
-        request = models.GetOrganizationWorkspaceRolesRequest(
-            organization_id=organization_id,
-            workspace_id=workspace_id,
-        )
-
-        req = self._build_request(
-            method="GET",
-            path="/organizations/{organizationId}/workspaces/{workspaceId}/roles",
-            base_url=base_url,
-            url_variables=url_variables,
-            request=request,
-            request_body_required=False,
-            request_has_path_params=True,
-            request_has_query_params=True,
-            user_agent_header="user-agent",
-            accept_header_value="application/json",
-            http_headers=http_headers,
-            security=self.sdk_configuration.security,
-            allow_empty_value=None,
-            timeout_ms=timeout_ms,
-        )
-
-        if retries == UNSET:
-            if self.sdk_configuration.retry_config is not UNSET:
-                retries = self.sdk_configuration.retry_config
-
-        retry_config = None
-        if isinstance(retries, utils.RetryConfig):
-            retry_config = (retries, ["429", "500", "502", "503", "504"])
-
-        http_res = self.do_request(
-            hook_ctx=HookContext(
-                config=self.sdk_configuration,
-                base_url=base_url or "",
-                operation_id="getOrganizationWorkspaceRoles",
-                oauth2_scopes=["organization:read"],
-                security_source=self.sdk_configuration.security,
-            ),
-            request=req,
-            error_status_codes=[
-                "400",
-                "401",
-                "403",
-                "404",
-                "409",
-                "429",
-                "4XX",
-                "500",
-                "503",
-                "5XX",
-            ],
-            retry_config=retry_config,
-        )
-
-        response_data: Any = None
-        if utils.match_response(http_res, "200", "application/json"):
-            return unmarshal_json_response(models.WorkspaceRolesListResult, http_res)
-        if utils.match_response(
-            http_res, ["400", "401", "403", "404", "409", "429"], "application/json"
-        ):
-            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
-            raise errors.ErrorResponse(response_data, http_res)
-        if utils.match_response(http_res, ["500", "503"], "application/json"):
-            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
-            raise errors.ErrorResponse(response_data, http_res)
-        if utils.match_response(http_res, "4XX", "*"):
-            http_res_text = utils.stream_to_text(http_res)
-            raise errors.SDKError("API error occurred", http_res, http_res_text)
-        if utils.match_response(http_res, "5XX", "*"):
-            http_res_text = utils.stream_to_text(http_res)
-            raise errors.SDKError("API error occurred", http_res, http_res_text)
-
-        raise errors.SDKError("Unexpected response received", http_res)
-
-    async def get_organization_workspace_roles_async(
-        self,
-        *,
-        organization_id: str,
-        workspace_id: str,
-        retries: OptionalNullable[utils.RetryConfig] = UNSET,
-        server_url: Optional[str] = None,
-        timeout_ms: Optional[int] = None,
-        http_headers: Optional[Mapping[str, str]] = None,
-    ) -> models.WorkspaceRolesListResult:
-        r"""Retrieve available roles within a workspace
-
-        Retrieves available roles within a workspace given an organization and workspace ID
-
-
-        :param organization_id: The unique identifier of the organization
-        :param workspace_id: The unique identifier of the workspace
-        :param retries: Override the default retry configuration for this method
-        :param server_url: Override the default server URL for this method
-        :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
-        :param http_headers: Additional headers to set or replace on requests.
-        """
-        base_url = None
-        url_variables = None
-        if timeout_ms is None:
-            timeout_ms = self.sdk_configuration.timeout_ms
-
-        if server_url is not None:
-            base_url = server_url
-        else:
-            base_url = self._get_url(base_url, url_variables)
-
-        request = models.GetOrganizationWorkspaceRolesRequest(
-            organization_id=organization_id,
-            workspace_id=workspace_id,
-        )
-
-        req = self._build_request_async(
-            method="GET",
-            path="/organizations/{organizationId}/workspaces/{workspaceId}/roles",
-            base_url=base_url,
-            url_variables=url_variables,
-            request=request,
-            request_body_required=False,
-            request_has_path_params=True,
-            request_has_query_params=True,
-            user_agent_header="user-agent",
-            accept_header_value="application/json",
-            http_headers=http_headers,
-            security=self.sdk_configuration.security,
-            allow_empty_value=None,
-            timeout_ms=timeout_ms,
-        )
-
-        if retries == UNSET:
-            if self.sdk_configuration.retry_config is not UNSET:
-                retries = self.sdk_configuration.retry_config
-
-        retry_config = None
-        if isinstance(retries, utils.RetryConfig):
-            retry_config = (retries, ["429", "500", "502", "503", "504"])
-
-        http_res = await self.do_request_async(
-            hook_ctx=HookContext(
-                config=self.sdk_configuration,
-                base_url=base_url or "",
-                operation_id="getOrganizationWorkspaceRoles",
-                oauth2_scopes=["organization:read"],
-                security_source=self.sdk_configuration.security,
-            ),
-            request=req,
-            error_status_codes=[
-                "400",
-                "401",
-                "403",
-                "404",
-                "409",
-                "429",
-                "4XX",
-                "500",
-                "503",
-                "5XX",
-            ],
-            retry_config=retry_config,
-        )
-
-        response_data: Any = None
-        if utils.match_response(http_res, "200", "application/json"):
-            return unmarshal_json_response(models.WorkspaceRolesListResult, http_res)
-        if utils.match_response(
-            http_res, ["400", "401", "403", "404", "409", "429"], "application/json"
-        ):
-            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
-            raise errors.ErrorResponse(response_data, http_res)
-        if utils.match_response(http_res, ["500", "503"], "application/json"):
-            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
-            raise errors.ErrorResponse(response_data, http_res)
-        if utils.match_response(http_res, "4XX", "*"):
-            http_res_text = await utils.stream_to_text_async(http_res)
-            raise errors.SDKError("API error occurred", http_res, http_res_text)
-        if utils.match_response(http_res, "5XX", "*"):
-            http_res_text = await utils.stream_to_text_async(http_res)
-            raise errors.SDKError("API error occurred", http_res, http_res_text)
-
-        raise errors.SDKError("Unexpected response received", http_res)
-
-    def get_organizations(
-        self,
-        *,
-        request: Union[
-            models.GetOrganizationsRequest, models.GetOrganizationsRequestTypedDict
-        ],
-        retries: OptionalNullable[utils.RetryConfig] = UNSET,
-        server_url: Optional[str] = None,
-        timeout_ms: Optional[int] = None,
-        http_headers: Optional[Mapping[str, str]] = None,
-    ) -> Optional[models.GetOrganizationsResponse]:
-        r"""Retrieve a list of organizations
-
-        Returns a paginated list of [organizations](ref:admin#organization).
-        This functionality is only available to Managed Service Provider Applications. Contact your CSM for assistance.
-
-
-        :param request: The request object to send.
-        :param retries: Override the default retry configuration for this method
-        :param server_url: Override the default server URL for this method
-        :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
-        :param http_headers: Additional headers to set or replace on requests.
-        """
-        base_url = None
-        url_variables = None
-        if timeout_ms is None:
-            timeout_ms = self.sdk_configuration.timeout_ms
-
-        if server_url is not None:
-            base_url = server_url
-        else:
-            base_url = self._get_url(base_url, url_variables)
-
-        if not isinstance(request, BaseModel):
-            request = utils.unmarshal(request, models.GetOrganizationsRequest)
-        request = cast(models.GetOrganizationsRequest, request)
-
-        req = self._build_request(
-            method="GET",
-            path="/organizations",
-            base_url=base_url,
-            url_variables=url_variables,
-            request=request,
-            request_body_required=False,
-            request_has_path_params=False,
-            request_has_query_params=True,
-            user_agent_header="user-agent",
-            accept_header_value="application/json",
-            http_headers=http_headers,
-            allow_empty_value=None,
-            timeout_ms=timeout_ms,
-        )
-
-        if retries == UNSET:
-            if self.sdk_configuration.retry_config is not UNSET:
-                retries = self.sdk_configuration.retry_config
-
-        retry_config = None
-        if isinstance(retries, utils.RetryConfig):
-            retry_config = (retries, ["429", "500", "502", "503", "504"])
-
-        http_res = self.do_request(
-            hook_ctx=HookContext(
-                config=self.sdk_configuration,
-                base_url=base_url or "",
-                operation_id="getOrganizations",
-                oauth2_scopes=["activity:read"],
-                security_source=None,
-            ),
-            request=req,
-            error_status_codes=[
-                "400",
-                "401",
-                "403",
-                "404",
-                "409",
-                "429",
-                "4XX",
-                "500",
-                "503",
-                "5XX",
-            ],
-            retry_config=retry_config,
-        )
-
-        def next_func() -> Optional[models.GetOrganizationsResponse]:
-            body = utils.unmarshal_json(http_res.text, Union[Dict[Any, Any], List[Any]])
-
-            next_cursor = JSONPath("$['@nextLink']").parse(body)
-
-            if len(next_cursor) == 0:
-                return None
-
-            next_cursor = next_cursor[0]
-            if next_cursor is None or str(next_cursor).strip() == "":
-                return None
-
-            return self.get_organizations(
-                request=models.GetOrganizationsRequest(
-                    wk_service_provider=request.wk_service_provider,
-                    filter_=request.filter_,
-                    maxpagesize=request.maxpagesize,
-                    next=request.next,
-                    order_by=request.order_by,
-                ),
-                retries=retries,
-            )
-
-        response_data: Any = None
-        if utils.match_response(http_res, "200", "application/json"):
-            return models.GetOrganizationsResponse(
-                result=unmarshal_json_response(
-                    models.OrganizationsListResult, http_res
-                ),
-                next=next_func,
-            )
-        if utils.match_response(
-            http_res, ["400", "401", "403", "404", "409", "429"], "application/json"
-        ):
-            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
-            raise errors.ErrorResponse(response_data, http_res)
-        if utils.match_response(http_res, ["500", "503"], "application/json"):
-            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
-            raise errors.ErrorResponse(response_data, http_res)
-        if utils.match_response(http_res, "4XX", "*"):
-            http_res_text = utils.stream_to_text(http_res)
-            raise errors.SDKError("API error occurred", http_res, http_res_text)
-        if utils.match_response(http_res, "5XX", "*"):
-            http_res_text = utils.stream_to_text(http_res)
-            raise errors.SDKError("API error occurred", http_res, http_res_text)
-
-        raise errors.SDKError("Unexpected response received", http_res)
-
-    async def get_organizations_async(
-        self,
-        *,
-        request: Union[
-            models.GetOrganizationsRequest, models.GetOrganizationsRequestTypedDict
-        ],
-        retries: OptionalNullable[utils.RetryConfig] = UNSET,
-        server_url: Optional[str] = None,
-        timeout_ms: Optional[int] = None,
-        http_headers: Optional[Mapping[str, str]] = None,
-    ) -> Optional[models.GetOrganizationsResponse]:
-        r"""Retrieve a list of organizations
-
-        Returns a paginated list of [organizations](ref:admin#organization).
-        This functionality is only available to Managed Service Provider Applications. Contact your CSM for assistance.
-
-
-        :param request: The request object to send.
-        :param retries: Override the default retry configuration for this method
-        :param server_url: Override the default server URL for this method
-        :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
-        :param http_headers: Additional headers to set or replace on requests.
-        """
-        base_url = None
-        url_variables = None
-        if timeout_ms is None:
-            timeout_ms = self.sdk_configuration.timeout_ms
-
-        if server_url is not None:
-            base_url = server_url
-        else:
-            base_url = self._get_url(base_url, url_variables)
-
-        if not isinstance(request, BaseModel):
-            request = utils.unmarshal(request, models.GetOrganizationsRequest)
-        request = cast(models.GetOrganizationsRequest, request)
-
-        req = self._build_request_async(
-            method="GET",
-            path="/organizations",
-            base_url=base_url,
-            url_variables=url_variables,
-            request=request,
-            request_body_required=False,
-            request_has_path_params=False,
-            request_has_query_params=True,
-            user_agent_header="user-agent",
-            accept_header_value="application/json",
-            http_headers=http_headers,
-            allow_empty_value=None,
-            timeout_ms=timeout_ms,
-        )
-
-        if retries == UNSET:
-            if self.sdk_configuration.retry_config is not UNSET:
-                retries = self.sdk_configuration.retry_config
-
-        retry_config = None
-        if isinstance(retries, utils.RetryConfig):
-            retry_config = (retries, ["429", "500", "502", "503", "504"])
-
-        http_res = await self.do_request_async(
-            hook_ctx=HookContext(
-                config=self.sdk_configuration,
-                base_url=base_url or "",
-                operation_id="getOrganizations",
-                oauth2_scopes=["activity:read"],
-                security_source=None,
-            ),
-            request=req,
-            error_status_codes=[
-                "400",
-                "401",
-                "403",
-                "404",
-                "409",
-                "429",
-                "4XX",
-                "500",
-                "503",
-                "5XX",
-            ],
-            retry_config=retry_config,
-        )
-
-        def next_func() -> Awaitable[Optional[models.GetOrganizationsResponse]]:
-            body = utils.unmarshal_json(http_res.text, Union[Dict[Any, Any], List[Any]])
-
-            async def empty_result():
-                return None
-
-            next_cursor = JSONPath("$['@nextLink']").parse(body)
-
-            if len(next_cursor) == 0:
-                return empty_result()
-
-            next_cursor = next_cursor[0]
-            if next_cursor is None or str(next_cursor).strip() == "":
-                return empty_result()
-
-            return self.get_organizations_async(
-                request=models.GetOrganizationsRequest(
-                    wk_service_provider=request.wk_service_provider,
-                    filter_=request.filter_,
-                    maxpagesize=request.maxpagesize,
-                    next=request.next,
-                    order_by=request.order_by,
-                ),
-                retries=retries,
-            )
-
-        response_data: Any = None
-        if utils.match_response(http_res, "200", "application/json"):
-            return models.GetOrganizationsResponse(
-                result=unmarshal_json_response(
-                    models.OrganizationsListResult, http_res
-                ),
-                next=next_func,
-            )
+        if utils.match_response(http_res, "201", "application/json"):
+            return unmarshal_json_response(models.Workspace, http_res)
         if utils.match_response(
             http_res, ["400", "401", "403", "404", "409", "429"], "application/json"
         ):
@@ -4347,9 +3760,9 @@ class Admin(BaseSDK):
             base_url = self._get_url(base_url, url_variables)
 
         request = models.GetWorkspaceByIDRequest(
-            expand=expand,
             organization_id=organization_id,
             workspace_id=workspace_id,
+            expand=expand,
         )
 
         req = self._build_request(
@@ -4456,9 +3869,9 @@ class Admin(BaseSDK):
             base_url = self._get_url(base_url, url_variables)
 
         request = models.GetWorkspaceByIDRequest(
-            expand=expand,
             organization_id=organization_id,
             workspace_id=workspace_id,
+            expand=expand,
         )
 
         req = self._build_request_async(
@@ -4530,12 +3943,985 @@ class Admin(BaseSDK):
 
         raise errors.SDKError("Unexpected response received", http_res)
 
+    def partially_update_workspace_by_id(
+        self,
+        *,
+        organization_id: str,
+        workspace_id: str,
+        request_body: Union[
+            List[models.JSONPatchOperation], List[models.JSONPatchOperationTypedDict]
+        ],
+        retries: OptionalNullable[utils.RetryConfig] = UNSET,
+        server_url: Optional[str] = None,
+        timeout_ms: Optional[int] = None,
+        http_headers: Optional[Mapping[str, str]] = None,
+    ) -> models.Workspace:
+        r"""Update a single workspace
+
+        Updates the properties of a workspace.
+        ### Options
+        |Path|PATCH Operations Supported|
+        |---|---|
+        |`/name`|`replace`|
+
+
+        :param organization_id: The unique identifier of the organization
+        :param workspace_id: The unique identifier of the workspace
+        :param request_body: A collection of patch operations to apply to the workspace.
+        :param retries: Override the default retry configuration for this method
+        :param server_url: Override the default server URL for this method
+        :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
+        :param http_headers: Additional headers to set or replace on requests.
+        """
+        base_url = None
+        url_variables = None
+        if timeout_ms is None:
+            timeout_ms = self.sdk_configuration.timeout_ms
+
+        if server_url is not None:
+            base_url = server_url
+        else:
+            base_url = self._get_url(base_url, url_variables)
+
+        request = models.PartiallyUpdateWorkspaceByIDRequest(
+            organization_id=organization_id,
+            workspace_id=workspace_id,
+            request_body=utils.get_pydantic_model(
+                request_body, List[models.JSONPatchOperation]
+            ),
+        )
+
+        req = self._build_request(
+            method="PATCH",
+            path="/organizations/{organizationId}/workspaces/{workspaceId}",
+            base_url=base_url,
+            url_variables=url_variables,
+            request=request,
+            request_body_required=True,
+            request_has_path_params=True,
+            request_has_query_params=True,
+            user_agent_header="user-agent",
+            accept_header_value="application/json",
+            http_headers=http_headers,
+            security=self.sdk_configuration.security,
+            get_serialized_body=lambda: utils.serialize_request_body(
+                request.request_body,
+                False,
+                False,
+                "json",
+                List[models.JSONPatchOperation],
+            ),
+            allow_empty_value=None,
+            timeout_ms=timeout_ms,
+        )
+
+        if retries == UNSET:
+            if self.sdk_configuration.retry_config is not UNSET:
+                retries = self.sdk_configuration.retry_config
+
+        retry_config = None
+        if isinstance(retries, utils.RetryConfig):
+            retry_config = (retries, ["429", "500", "502", "503", "504"])
+
+        http_res = self.do_request(
+            hook_ctx=HookContext(
+                config=self.sdk_configuration,
+                base_url=base_url or "",
+                operation_id="partiallyUpdateWorkspaceById",
+                oauth2_scopes=["organization:write"],
+                security_source=self.sdk_configuration.security,
+            ),
+            request=req,
+            error_status_codes=[
+                "400",
+                "401",
+                "403",
+                "404",
+                "409",
+                "429",
+                "4XX",
+                "500",
+                "503",
+                "5XX",
+            ],
+            retry_config=retry_config,
+        )
+
+        response_data: Any = None
+        if utils.match_response(http_res, "200", "application/json"):
+            return unmarshal_json_response(models.Workspace, http_res)
+        if utils.match_response(
+            http_res, ["400", "401", "403", "404", "409", "429"], "application/json"
+        ):
+            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
+            raise errors.ErrorResponse(response_data, http_res)
+        if utils.match_response(http_res, ["500", "503"], "application/json"):
+            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
+            raise errors.ErrorResponse(response_data, http_res)
+        if utils.match_response(http_res, "4XX", "*"):
+            http_res_text = utils.stream_to_text(http_res)
+            raise errors.SDKError("API error occurred", http_res, http_res_text)
+        if utils.match_response(http_res, "5XX", "*"):
+            http_res_text = utils.stream_to_text(http_res)
+            raise errors.SDKError("API error occurred", http_res, http_res_text)
+
+        raise errors.SDKError("Unexpected response received", http_res)
+
+    async def partially_update_workspace_by_id_async(
+        self,
+        *,
+        organization_id: str,
+        workspace_id: str,
+        request_body: Union[
+            List[models.JSONPatchOperation], List[models.JSONPatchOperationTypedDict]
+        ],
+        retries: OptionalNullable[utils.RetryConfig] = UNSET,
+        server_url: Optional[str] = None,
+        timeout_ms: Optional[int] = None,
+        http_headers: Optional[Mapping[str, str]] = None,
+    ) -> models.Workspace:
+        r"""Update a single workspace
+
+        Updates the properties of a workspace.
+        ### Options
+        |Path|PATCH Operations Supported|
+        |---|---|
+        |`/name`|`replace`|
+
+
+        :param organization_id: The unique identifier of the organization
+        :param workspace_id: The unique identifier of the workspace
+        :param request_body: A collection of patch operations to apply to the workspace.
+        :param retries: Override the default retry configuration for this method
+        :param server_url: Override the default server URL for this method
+        :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
+        :param http_headers: Additional headers to set or replace on requests.
+        """
+        base_url = None
+        url_variables = None
+        if timeout_ms is None:
+            timeout_ms = self.sdk_configuration.timeout_ms
+
+        if server_url is not None:
+            base_url = server_url
+        else:
+            base_url = self._get_url(base_url, url_variables)
+
+        request = models.PartiallyUpdateWorkspaceByIDRequest(
+            organization_id=organization_id,
+            workspace_id=workspace_id,
+            request_body=utils.get_pydantic_model(
+                request_body, List[models.JSONPatchOperation]
+            ),
+        )
+
+        req = self._build_request_async(
+            method="PATCH",
+            path="/organizations/{organizationId}/workspaces/{workspaceId}",
+            base_url=base_url,
+            url_variables=url_variables,
+            request=request,
+            request_body_required=True,
+            request_has_path_params=True,
+            request_has_query_params=True,
+            user_agent_header="user-agent",
+            accept_header_value="application/json",
+            http_headers=http_headers,
+            security=self.sdk_configuration.security,
+            get_serialized_body=lambda: utils.serialize_request_body(
+                request.request_body,
+                False,
+                False,
+                "json",
+                List[models.JSONPatchOperation],
+            ),
+            allow_empty_value=None,
+            timeout_ms=timeout_ms,
+        )
+
+        if retries == UNSET:
+            if self.sdk_configuration.retry_config is not UNSET:
+                retries = self.sdk_configuration.retry_config
+
+        retry_config = None
+        if isinstance(retries, utils.RetryConfig):
+            retry_config = (retries, ["429", "500", "502", "503", "504"])
+
+        http_res = await self.do_request_async(
+            hook_ctx=HookContext(
+                config=self.sdk_configuration,
+                base_url=base_url or "",
+                operation_id="partiallyUpdateWorkspaceById",
+                oauth2_scopes=["organization:write"],
+                security_source=self.sdk_configuration.security,
+            ),
+            request=req,
+            error_status_codes=[
+                "400",
+                "401",
+                "403",
+                "404",
+                "409",
+                "429",
+                "4XX",
+                "500",
+                "503",
+                "5XX",
+            ],
+            retry_config=retry_config,
+        )
+
+        response_data: Any = None
+        if utils.match_response(http_res, "200", "application/json"):
+            return unmarshal_json_response(models.Workspace, http_res)
+        if utils.match_response(
+            http_res, ["400", "401", "403", "404", "409", "429"], "application/json"
+        ):
+            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
+            raise errors.ErrorResponse(response_data, http_res)
+        if utils.match_response(http_res, ["500", "503"], "application/json"):
+            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
+            raise errors.ErrorResponse(response_data, http_res)
+        if utils.match_response(http_res, "4XX", "*"):
+            http_res_text = await utils.stream_to_text_async(http_res)
+            raise errors.SDKError("API error occurred", http_res, http_res_text)
+        if utils.match_response(http_res, "5XX", "*"):
+            http_res_text = await utils.stream_to_text_async(http_res)
+            raise errors.SDKError("API error occurred", http_res, http_res_text)
+
+        raise errors.SDKError("Unexpected response received", http_res)
+
+    def get_workspace_groups(
+        self,
+        *,
+        request: Union[
+            models.GetWorkspaceGroupsRequest, models.GetWorkspaceGroupsRequestTypedDict
+        ],
+        retries: OptionalNullable[utils.RetryConfig] = UNSET,
+        server_url: Optional[str] = None,
+        timeout_ms: Optional[int] = None,
+        http_headers: Optional[Mapping[str, str]] = None,
+    ) -> Optional[models.GetWorkspaceGroupsResponse]:
+        r"""Retrieve list of groups
+
+        Retrieve a list of groups in a workspace
+
+        :param request: The request object to send.
+        :param retries: Override the default retry configuration for this method
+        :param server_url: Override the default server URL for this method
+        :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
+        :param http_headers: Additional headers to set or replace on requests.
+        """
+        base_url = None
+        url_variables = None
+        if timeout_ms is None:
+            timeout_ms = self.sdk_configuration.timeout_ms
+
+        if server_url is not None:
+            base_url = server_url
+        else:
+            base_url = self._get_url(base_url, url_variables)
+
+        if not isinstance(request, BaseModel):
+            request = utils.unmarshal(request, models.GetWorkspaceGroupsRequest)
+        request = cast(models.GetWorkspaceGroupsRequest, request)
+
+        req = self._build_request(
+            method="GET",
+            path="/organizations/{organizationId}/workspaces/{workspaceId}/groups",
+            base_url=base_url,
+            url_variables=url_variables,
+            request=request,
+            request_body_required=False,
+            request_has_path_params=True,
+            request_has_query_params=True,
+            user_agent_header="user-agent",
+            accept_header_value="application/json",
+            http_headers=http_headers,
+            security=self.sdk_configuration.security,
+            allow_empty_value=None,
+            timeout_ms=timeout_ms,
+        )
+
+        if retries == UNSET:
+            if self.sdk_configuration.retry_config is not UNSET:
+                retries = self.sdk_configuration.retry_config
+
+        retry_config = None
+        if isinstance(retries, utils.RetryConfig):
+            retry_config = (retries, ["429", "500", "502", "503", "504"])
+
+        http_res = self.do_request(
+            hook_ctx=HookContext(
+                config=self.sdk_configuration,
+                base_url=base_url or "",
+                operation_id="getWorkspaceGroups",
+                oauth2_scopes=["organization:read"],
+                security_source=self.sdk_configuration.security,
+            ),
+            request=req,
+            error_status_codes=[
+                "400",
+                "401",
+                "403",
+                "404",
+                "409",
+                "429",
+                "4XX",
+                "500",
+                "503",
+                "5XX",
+            ],
+            retry_config=retry_config,
+        )
+
+        def next_func() -> Optional[models.GetWorkspaceGroupsResponse]:
+            body = utils.unmarshal_json(http_res.text, Union[Dict[Any, Any], List[Any]])
+
+            next_cursor = JSONPath("$['@nextLink']").parse(body)
+
+            if len(next_cursor) == 0:
+                return None
+
+            next_cursor = next_cursor[0]
+            if next_cursor is None or str(next_cursor).strip() == "":
+                return None
+
+            return self.get_workspace_groups(
+                request=models.GetWorkspaceGroupsRequest(
+                    organization_id=request.organization_id,
+                    workspace_id=request.workspace_id,
+                    maxpagesize=request.maxpagesize,
+                    next=request.next,
+                    filter_=request.filter_,
+                ),
+                retries=retries,
+            )
+
+        response_data: Any = None
+        if utils.match_response(http_res, "200", "application/json"):
+            return models.GetWorkspaceGroupsResponse(
+                result=unmarshal_json_response(
+                    models.WorkspaceGroupsListResult, http_res
+                ),
+                next=next_func,
+            )
+        if utils.match_response(
+            http_res, ["400", "401", "403", "404", "409", "429"], "application/json"
+        ):
+            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
+            raise errors.ErrorResponse(response_data, http_res)
+        if utils.match_response(http_res, ["500", "503"], "application/json"):
+            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
+            raise errors.ErrorResponse(response_data, http_res)
+        if utils.match_response(http_res, "4XX", "*"):
+            http_res_text = utils.stream_to_text(http_res)
+            raise errors.SDKError("API error occurred", http_res, http_res_text)
+        if utils.match_response(http_res, "5XX", "*"):
+            http_res_text = utils.stream_to_text(http_res)
+            raise errors.SDKError("API error occurred", http_res, http_res_text)
+
+        raise errors.SDKError("Unexpected response received", http_res)
+
+    async def get_workspace_groups_async(
+        self,
+        *,
+        request: Union[
+            models.GetWorkspaceGroupsRequest, models.GetWorkspaceGroupsRequestTypedDict
+        ],
+        retries: OptionalNullable[utils.RetryConfig] = UNSET,
+        server_url: Optional[str] = None,
+        timeout_ms: Optional[int] = None,
+        http_headers: Optional[Mapping[str, str]] = None,
+    ) -> Optional[models.GetWorkspaceGroupsResponse]:
+        r"""Retrieve list of groups
+
+        Retrieve a list of groups in a workspace
+
+        :param request: The request object to send.
+        :param retries: Override the default retry configuration for this method
+        :param server_url: Override the default server URL for this method
+        :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
+        :param http_headers: Additional headers to set or replace on requests.
+        """
+        base_url = None
+        url_variables = None
+        if timeout_ms is None:
+            timeout_ms = self.sdk_configuration.timeout_ms
+
+        if server_url is not None:
+            base_url = server_url
+        else:
+            base_url = self._get_url(base_url, url_variables)
+
+        if not isinstance(request, BaseModel):
+            request = utils.unmarshal(request, models.GetWorkspaceGroupsRequest)
+        request = cast(models.GetWorkspaceGroupsRequest, request)
+
+        req = self._build_request_async(
+            method="GET",
+            path="/organizations/{organizationId}/workspaces/{workspaceId}/groups",
+            base_url=base_url,
+            url_variables=url_variables,
+            request=request,
+            request_body_required=False,
+            request_has_path_params=True,
+            request_has_query_params=True,
+            user_agent_header="user-agent",
+            accept_header_value="application/json",
+            http_headers=http_headers,
+            security=self.sdk_configuration.security,
+            allow_empty_value=None,
+            timeout_ms=timeout_ms,
+        )
+
+        if retries == UNSET:
+            if self.sdk_configuration.retry_config is not UNSET:
+                retries = self.sdk_configuration.retry_config
+
+        retry_config = None
+        if isinstance(retries, utils.RetryConfig):
+            retry_config = (retries, ["429", "500", "502", "503", "504"])
+
+        http_res = await self.do_request_async(
+            hook_ctx=HookContext(
+                config=self.sdk_configuration,
+                base_url=base_url or "",
+                operation_id="getWorkspaceGroups",
+                oauth2_scopes=["organization:read"],
+                security_source=self.sdk_configuration.security,
+            ),
+            request=req,
+            error_status_codes=[
+                "400",
+                "401",
+                "403",
+                "404",
+                "409",
+                "429",
+                "4XX",
+                "500",
+                "503",
+                "5XX",
+            ],
+            retry_config=retry_config,
+        )
+
+        def next_func() -> Awaitable[Optional[models.GetWorkspaceGroupsResponse]]:
+            body = utils.unmarshal_json(http_res.text, Union[Dict[Any, Any], List[Any]])
+
+            async def empty_result():
+                return None
+
+            next_cursor = JSONPath("$['@nextLink']").parse(body)
+
+            if len(next_cursor) == 0:
+                return empty_result()
+
+            next_cursor = next_cursor[0]
+            if next_cursor is None or str(next_cursor).strip() == "":
+                return empty_result()
+
+            return self.get_workspace_groups_async(
+                request=models.GetWorkspaceGroupsRequest(
+                    organization_id=request.organization_id,
+                    workspace_id=request.workspace_id,
+                    maxpagesize=request.maxpagesize,
+                    next=request.next,
+                    filter_=request.filter_,
+                ),
+                retries=retries,
+            )
+
+        response_data: Any = None
+        if utils.match_response(http_res, "200", "application/json"):
+            return models.GetWorkspaceGroupsResponse(
+                result=unmarshal_json_response(
+                    models.WorkspaceGroupsListResult, http_res
+                ),
+                next=next_func,
+            )
+        if utils.match_response(
+            http_res, ["400", "401", "403", "404", "409", "429"], "application/json"
+        ):
+            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
+            raise errors.ErrorResponse(response_data, http_res)
+        if utils.match_response(http_res, ["500", "503"], "application/json"):
+            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
+            raise errors.ErrorResponse(response_data, http_res)
+        if utils.match_response(http_res, "4XX", "*"):
+            http_res_text = await utils.stream_to_text_async(http_res)
+            raise errors.SDKError("API error occurred", http_res, http_res_text)
+        if utils.match_response(http_res, "5XX", "*"):
+            http_res_text = await utils.stream_to_text_async(http_res)
+            raise errors.SDKError("API error occurred", http_res, http_res_text)
+
+        raise errors.SDKError("Unexpected response received", http_res)
+
+    def create_workspace_group(
+        self,
+        *,
+        organization_id: str,
+        workspace_id: str,
+        workspace_group: Union[
+            models.WorkspaceGroupInput, models.WorkspaceGroupInputTypedDict
+        ],
+        retries: OptionalNullable[utils.RetryConfig] = UNSET,
+        server_url: Optional[str] = None,
+        timeout_ms: Optional[int] = None,
+        http_headers: Optional[Mapping[str, str]] = None,
+    ) -> models.WorkspaceGroup:
+        r"""Create a new group in a workspace
+
+        Creates a new group resource
+
+
+        :param organization_id: The unique identifier of the organization
+        :param workspace_id: The unique identifier of the workspace
+        :param workspace_group: The properties of the group to create
+        :param retries: Override the default retry configuration for this method
+        :param server_url: Override the default server URL for this method
+        :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
+        :param http_headers: Additional headers to set or replace on requests.
+        """
+        base_url = None
+        url_variables = None
+        if timeout_ms is None:
+            timeout_ms = self.sdk_configuration.timeout_ms
+
+        if server_url is not None:
+            base_url = server_url
+        else:
+            base_url = self._get_url(base_url, url_variables)
+
+        request = models.CreateWorkspaceGroupRequest(
+            organization_id=organization_id,
+            workspace_id=workspace_id,
+            workspace_group=utils.get_pydantic_model(
+                workspace_group, models.WorkspaceGroupInput
+            ),
+        )
+
+        req = self._build_request(
+            method="POST",
+            path="/organizations/{organizationId}/workspaces/{workspaceId}/groups",
+            base_url=base_url,
+            url_variables=url_variables,
+            request=request,
+            request_body_required=True,
+            request_has_path_params=True,
+            request_has_query_params=True,
+            user_agent_header="user-agent",
+            accept_header_value="application/json",
+            http_headers=http_headers,
+            security=self.sdk_configuration.security,
+            get_serialized_body=lambda: utils.serialize_request_body(
+                request.workspace_group,
+                False,
+                False,
+                "json",
+                models.WorkspaceGroupInput,
+            ),
+            allow_empty_value=None,
+            timeout_ms=timeout_ms,
+        )
+
+        if retries == UNSET:
+            if self.sdk_configuration.retry_config is not UNSET:
+                retries = self.sdk_configuration.retry_config
+
+        retry_config = None
+        if isinstance(retries, utils.RetryConfig):
+            retry_config = (retries, ["429", "500", "502", "503", "504"])
+
+        http_res = self.do_request(
+            hook_ctx=HookContext(
+                config=self.sdk_configuration,
+                base_url=base_url or "",
+                operation_id="createWorkspaceGroup",
+                oauth2_scopes=["organization:write"],
+                security_source=self.sdk_configuration.security,
+            ),
+            request=req,
+            error_status_codes=[
+                "400",
+                "401",
+                "403",
+                "404",
+                "409",
+                "429",
+                "4XX",
+                "500",
+                "503",
+                "5XX",
+            ],
+            retry_config=retry_config,
+        )
+
+        response_data: Any = None
+        if utils.match_response(http_res, "201", "application/json"):
+            return unmarshal_json_response(models.WorkspaceGroup, http_res)
+        if utils.match_response(
+            http_res, ["400", "401", "403", "404", "409", "429"], "application/json"
+        ):
+            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
+            raise errors.ErrorResponse(response_data, http_res)
+        if utils.match_response(http_res, ["500", "503"], "application/json"):
+            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
+            raise errors.ErrorResponse(response_data, http_res)
+        if utils.match_response(http_res, "4XX", "*"):
+            http_res_text = utils.stream_to_text(http_res)
+            raise errors.SDKError("API error occurred", http_res, http_res_text)
+        if utils.match_response(http_res, "5XX", "*"):
+            http_res_text = utils.stream_to_text(http_res)
+            raise errors.SDKError("API error occurred", http_res, http_res_text)
+
+        raise errors.SDKError("Unexpected response received", http_res)
+
+    async def create_workspace_group_async(
+        self,
+        *,
+        organization_id: str,
+        workspace_id: str,
+        workspace_group: Union[
+            models.WorkspaceGroupInput, models.WorkspaceGroupInputTypedDict
+        ],
+        retries: OptionalNullable[utils.RetryConfig] = UNSET,
+        server_url: Optional[str] = None,
+        timeout_ms: Optional[int] = None,
+        http_headers: Optional[Mapping[str, str]] = None,
+    ) -> models.WorkspaceGroup:
+        r"""Create a new group in a workspace
+
+        Creates a new group resource
+
+
+        :param organization_id: The unique identifier of the organization
+        :param workspace_id: The unique identifier of the workspace
+        :param workspace_group: The properties of the group to create
+        :param retries: Override the default retry configuration for this method
+        :param server_url: Override the default server URL for this method
+        :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
+        :param http_headers: Additional headers to set or replace on requests.
+        """
+        base_url = None
+        url_variables = None
+        if timeout_ms is None:
+            timeout_ms = self.sdk_configuration.timeout_ms
+
+        if server_url is not None:
+            base_url = server_url
+        else:
+            base_url = self._get_url(base_url, url_variables)
+
+        request = models.CreateWorkspaceGroupRequest(
+            organization_id=organization_id,
+            workspace_id=workspace_id,
+            workspace_group=utils.get_pydantic_model(
+                workspace_group, models.WorkspaceGroupInput
+            ),
+        )
+
+        req = self._build_request_async(
+            method="POST",
+            path="/organizations/{organizationId}/workspaces/{workspaceId}/groups",
+            base_url=base_url,
+            url_variables=url_variables,
+            request=request,
+            request_body_required=True,
+            request_has_path_params=True,
+            request_has_query_params=True,
+            user_agent_header="user-agent",
+            accept_header_value="application/json",
+            http_headers=http_headers,
+            security=self.sdk_configuration.security,
+            get_serialized_body=lambda: utils.serialize_request_body(
+                request.workspace_group,
+                False,
+                False,
+                "json",
+                models.WorkspaceGroupInput,
+            ),
+            allow_empty_value=None,
+            timeout_ms=timeout_ms,
+        )
+
+        if retries == UNSET:
+            if self.sdk_configuration.retry_config is not UNSET:
+                retries = self.sdk_configuration.retry_config
+
+        retry_config = None
+        if isinstance(retries, utils.RetryConfig):
+            retry_config = (retries, ["429", "500", "502", "503", "504"])
+
+        http_res = await self.do_request_async(
+            hook_ctx=HookContext(
+                config=self.sdk_configuration,
+                base_url=base_url or "",
+                operation_id="createWorkspaceGroup",
+                oauth2_scopes=["organization:write"],
+                security_source=self.sdk_configuration.security,
+            ),
+            request=req,
+            error_status_codes=[
+                "400",
+                "401",
+                "403",
+                "404",
+                "409",
+                "429",
+                "4XX",
+                "500",
+                "503",
+                "5XX",
+            ],
+            retry_config=retry_config,
+        )
+
+        response_data: Any = None
+        if utils.match_response(http_res, "201", "application/json"):
+            return unmarshal_json_response(models.WorkspaceGroup, http_res)
+        if utils.match_response(
+            http_res, ["400", "401", "403", "404", "409", "429"], "application/json"
+        ):
+            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
+            raise errors.ErrorResponse(response_data, http_res)
+        if utils.match_response(http_res, ["500", "503"], "application/json"):
+            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
+            raise errors.ErrorResponse(response_data, http_res)
+        if utils.match_response(http_res, "4XX", "*"):
+            http_res_text = await utils.stream_to_text_async(http_res)
+            raise errors.SDKError("API error occurred", http_res, http_res_text)
+        if utils.match_response(http_res, "5XX", "*"):
+            http_res_text = await utils.stream_to_text_async(http_res)
+            raise errors.SDKError("API error occurred", http_res, http_res_text)
+
+        raise errors.SDKError("Unexpected response received", http_res)
+
+    def delete_workspace_group_by_id(
+        self,
+        *,
+        organization_id: str,
+        workspace_id: str,
+        group_id: str,
+        retries: OptionalNullable[utils.RetryConfig] = UNSET,
+        server_url: Optional[str] = None,
+        timeout_ms: Optional[int] = None,
+        http_headers: Optional[Mapping[str, str]] = None,
+    ):
+        r"""Delete a single group
+
+        Deletes a group given its ID.
+
+
+        :param organization_id: The unique identifier of the organization
+        :param workspace_id: The unique identifier of the workspace
+        :param group_id: The unique identifier of the group
+        :param retries: Override the default retry configuration for this method
+        :param server_url: Override the default server URL for this method
+        :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
+        :param http_headers: Additional headers to set or replace on requests.
+        """
+        base_url = None
+        url_variables = None
+        if timeout_ms is None:
+            timeout_ms = self.sdk_configuration.timeout_ms
+
+        if server_url is not None:
+            base_url = server_url
+        else:
+            base_url = self._get_url(base_url, url_variables)
+
+        request = models.DeleteWorkspaceGroupByIDRequest(
+            organization_id=organization_id,
+            workspace_id=workspace_id,
+            group_id=group_id,
+        )
+
+        req = self._build_request(
+            method="DELETE",
+            path="/organizations/{organizationId}/workspaces/{workspaceId}/groups/{groupId}",
+            base_url=base_url,
+            url_variables=url_variables,
+            request=request,
+            request_body_required=False,
+            request_has_path_params=True,
+            request_has_query_params=True,
+            user_agent_header="user-agent",
+            accept_header_value="application/json",
+            http_headers=http_headers,
+            security=self.sdk_configuration.security,
+            allow_empty_value=None,
+            timeout_ms=timeout_ms,
+        )
+
+        if retries == UNSET:
+            if self.sdk_configuration.retry_config is not UNSET:
+                retries = self.sdk_configuration.retry_config
+
+        retry_config = None
+        if isinstance(retries, utils.RetryConfig):
+            retry_config = (retries, ["429", "500", "502", "503", "504"])
+
+        http_res = self.do_request(
+            hook_ctx=HookContext(
+                config=self.sdk_configuration,
+                base_url=base_url or "",
+                operation_id="deleteWorkspaceGroupById",
+                oauth2_scopes=["organization:write"],
+                security_source=self.sdk_configuration.security,
+            ),
+            request=req,
+            error_status_codes=[
+                "400",
+                "401",
+                "403",
+                "404",
+                "409",
+                "429",
+                "4XX",
+                "500",
+                "503",
+                "5XX",
+            ],
+            retry_config=retry_config,
+        )
+
+        response_data: Any = None
+        if utils.match_response(http_res, "204", "*"):
+            return
+        if utils.match_response(
+            http_res, ["400", "401", "403", "404", "409", "429"], "application/json"
+        ):
+            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
+            raise errors.ErrorResponse(response_data, http_res)
+        if utils.match_response(http_res, ["500", "503"], "application/json"):
+            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
+            raise errors.ErrorResponse(response_data, http_res)
+        if utils.match_response(http_res, "4XX", "*"):
+            http_res_text = utils.stream_to_text(http_res)
+            raise errors.SDKError("API error occurred", http_res, http_res_text)
+        if utils.match_response(http_res, "5XX", "*"):
+            http_res_text = utils.stream_to_text(http_res)
+            raise errors.SDKError("API error occurred", http_res, http_res_text)
+
+        raise errors.SDKError("Unexpected response received", http_res)
+
+    async def delete_workspace_group_by_id_async(
+        self,
+        *,
+        organization_id: str,
+        workspace_id: str,
+        group_id: str,
+        retries: OptionalNullable[utils.RetryConfig] = UNSET,
+        server_url: Optional[str] = None,
+        timeout_ms: Optional[int] = None,
+        http_headers: Optional[Mapping[str, str]] = None,
+    ):
+        r"""Delete a single group
+
+        Deletes a group given its ID.
+
+
+        :param organization_id: The unique identifier of the organization
+        :param workspace_id: The unique identifier of the workspace
+        :param group_id: The unique identifier of the group
+        :param retries: Override the default retry configuration for this method
+        :param server_url: Override the default server URL for this method
+        :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
+        :param http_headers: Additional headers to set or replace on requests.
+        """
+        base_url = None
+        url_variables = None
+        if timeout_ms is None:
+            timeout_ms = self.sdk_configuration.timeout_ms
+
+        if server_url is not None:
+            base_url = server_url
+        else:
+            base_url = self._get_url(base_url, url_variables)
+
+        request = models.DeleteWorkspaceGroupByIDRequest(
+            organization_id=organization_id,
+            workspace_id=workspace_id,
+            group_id=group_id,
+        )
+
+        req = self._build_request_async(
+            method="DELETE",
+            path="/organizations/{organizationId}/workspaces/{workspaceId}/groups/{groupId}",
+            base_url=base_url,
+            url_variables=url_variables,
+            request=request,
+            request_body_required=False,
+            request_has_path_params=True,
+            request_has_query_params=True,
+            user_agent_header="user-agent",
+            accept_header_value="application/json",
+            http_headers=http_headers,
+            security=self.sdk_configuration.security,
+            allow_empty_value=None,
+            timeout_ms=timeout_ms,
+        )
+
+        if retries == UNSET:
+            if self.sdk_configuration.retry_config is not UNSET:
+                retries = self.sdk_configuration.retry_config
+
+        retry_config = None
+        if isinstance(retries, utils.RetryConfig):
+            retry_config = (retries, ["429", "500", "502", "503", "504"])
+
+        http_res = await self.do_request_async(
+            hook_ctx=HookContext(
+                config=self.sdk_configuration,
+                base_url=base_url or "",
+                operation_id="deleteWorkspaceGroupById",
+                oauth2_scopes=["organization:write"],
+                security_source=self.sdk_configuration.security,
+            ),
+            request=req,
+            error_status_codes=[
+                "400",
+                "401",
+                "403",
+                "404",
+                "409",
+                "429",
+                "4XX",
+                "500",
+                "503",
+                "5XX",
+            ],
+            retry_config=retry_config,
+        )
+
+        response_data: Any = None
+        if utils.match_response(http_res, "204", "*"):
+            return
+        if utils.match_response(
+            http_res, ["400", "401", "403", "404", "409", "429"], "application/json"
+        ):
+            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
+            raise errors.ErrorResponse(response_data, http_res)
+        if utils.match_response(http_res, ["500", "503"], "application/json"):
+            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
+            raise errors.ErrorResponse(response_data, http_res)
+        if utils.match_response(http_res, "4XX", "*"):
+            http_res_text = await utils.stream_to_text_async(http_res)
+            raise errors.SDKError("API error occurred", http_res, http_res_text)
+        if utils.match_response(http_res, "5XX", "*"):
+            http_res_text = await utils.stream_to_text_async(http_res)
+            raise errors.SDKError("API error occurred", http_res, http_res_text)
+
+        raise errors.SDKError("Unexpected response received", http_res)
+
     def get_workspace_group_by_id(
         self,
         *,
-        group_id: str,
         organization_id: str,
         workspace_id: str,
+        group_id: str,
         expand: Optional[str] = None,
         retries: OptionalNullable[utils.RetryConfig] = UNSET,
         server_url: Optional[str] = None,
@@ -4547,9 +4933,9 @@ class Admin(BaseSDK):
         Retrieves a group given its ID
 
 
-        :param group_id: The unique identifier of the group
         :param organization_id: The unique identifier of the organization
         :param workspace_id: The unique identifier of the workspace
+        :param group_id: The unique identifier of the group
         :param expand: Returns related resources inline with the main resource
         :param retries: Override the default retry configuration for this method
         :param server_url: Override the default server URL for this method
@@ -4567,10 +4953,10 @@ class Admin(BaseSDK):
             base_url = self._get_url(base_url, url_variables)
 
         request = models.GetWorkspaceGroupByIDRequest(
-            expand=expand,
-            group_id=group_id,
             organization_id=organization_id,
             workspace_id=workspace_id,
+            group_id=group_id,
+            expand=expand,
         )
 
         req = self._build_request(
@@ -4645,9 +5031,9 @@ class Admin(BaseSDK):
     async def get_workspace_group_by_id_async(
         self,
         *,
-        group_id: str,
         organization_id: str,
         workspace_id: str,
+        group_id: str,
         expand: Optional[str] = None,
         retries: OptionalNullable[utils.RetryConfig] = UNSET,
         server_url: Optional[str] = None,
@@ -4659,9 +5045,9 @@ class Admin(BaseSDK):
         Retrieves a group given its ID
 
 
-        :param group_id: The unique identifier of the group
         :param organization_id: The unique identifier of the organization
         :param workspace_id: The unique identifier of the workspace
+        :param group_id: The unique identifier of the group
         :param expand: Returns related resources inline with the main resource
         :param retries: Override the default retry configuration for this method
         :param server_url: Override the default server URL for this method
@@ -4679,10 +5065,10 @@ class Admin(BaseSDK):
             base_url = self._get_url(base_url, url_variables)
 
         request = models.GetWorkspaceGroupByIDRequest(
-            expand=expand,
-            group_id=group_id,
             organization_id=organization_id,
             workspace_id=workspace_id,
+            group_id=group_id,
+            expand=expand,
         )
 
         req = self._build_request_async(
@@ -4716,6 +5102,260 @@ class Admin(BaseSDK):
                 base_url=base_url or "",
                 operation_id="getWorkspaceGroupById",
                 oauth2_scopes=["organization:read"],
+                security_source=self.sdk_configuration.security,
+            ),
+            request=req,
+            error_status_codes=[
+                "400",
+                "401",
+                "403",
+                "404",
+                "409",
+                "429",
+                "4XX",
+                "500",
+                "503",
+                "5XX",
+            ],
+            retry_config=retry_config,
+        )
+
+        response_data: Any = None
+        if utils.match_response(http_res, "200", "application/json"):
+            return unmarshal_json_response(models.WorkspaceGroup, http_res)
+        if utils.match_response(
+            http_res, ["400", "401", "403", "404", "409", "429"], "application/json"
+        ):
+            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
+            raise errors.ErrorResponse(response_data, http_res)
+        if utils.match_response(http_res, ["500", "503"], "application/json"):
+            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
+            raise errors.ErrorResponse(response_data, http_res)
+        if utils.match_response(http_res, "4XX", "*"):
+            http_res_text = await utils.stream_to_text_async(http_res)
+            raise errors.SDKError("API error occurred", http_res, http_res_text)
+        if utils.match_response(http_res, "5XX", "*"):
+            http_res_text = await utils.stream_to_text_async(http_res)
+            raise errors.SDKError("API error occurred", http_res, http_res_text)
+
+        raise errors.SDKError("Unexpected response received", http_res)
+
+    def partially_update_workspace_group_by_id(
+        self,
+        *,
+        organization_id: str,
+        workspace_id: str,
+        group_id: str,
+        request_body: Union[
+            List[models.JSONPatchOperation], List[models.JSONPatchOperationTypedDict]
+        ],
+        retries: OptionalNullable[utils.RetryConfig] = UNSET,
+        server_url: Optional[str] = None,
+        timeout_ms: Optional[int] = None,
+        http_headers: Optional[Mapping[str, str]] = None,
+    ) -> models.WorkspaceGroup:
+        r"""Update a single group
+
+        Updates the properties of a group.
+        ### Options
+        |Path|PATCH Operations Supported|
+        |---|---|
+        |`/name`|`replace`|
+
+
+        :param organization_id: The unique identifier of the organization
+        :param workspace_id: The unique identifier of the workspace
+        :param group_id: The unique identifier of the group
+        :param request_body: A collection of patch operations to apply to the group.
+        :param retries: Override the default retry configuration for this method
+        :param server_url: Override the default server URL for this method
+        :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
+        :param http_headers: Additional headers to set or replace on requests.
+        """
+        base_url = None
+        url_variables = None
+        if timeout_ms is None:
+            timeout_ms = self.sdk_configuration.timeout_ms
+
+        if server_url is not None:
+            base_url = server_url
+        else:
+            base_url = self._get_url(base_url, url_variables)
+
+        request = models.PartiallyUpdateWorkspaceGroupByIDRequest(
+            organization_id=organization_id,
+            workspace_id=workspace_id,
+            group_id=group_id,
+            request_body=utils.get_pydantic_model(
+                request_body, List[models.JSONPatchOperation]
+            ),
+        )
+
+        req = self._build_request(
+            method="PATCH",
+            path="/organizations/{organizationId}/workspaces/{workspaceId}/groups/{groupId}",
+            base_url=base_url,
+            url_variables=url_variables,
+            request=request,
+            request_body_required=True,
+            request_has_path_params=True,
+            request_has_query_params=True,
+            user_agent_header="user-agent",
+            accept_header_value="application/json",
+            http_headers=http_headers,
+            security=self.sdk_configuration.security,
+            get_serialized_body=lambda: utils.serialize_request_body(
+                request.request_body,
+                False,
+                False,
+                "json",
+                List[models.JSONPatchOperation],
+            ),
+            allow_empty_value=None,
+            timeout_ms=timeout_ms,
+        )
+
+        if retries == UNSET:
+            if self.sdk_configuration.retry_config is not UNSET:
+                retries = self.sdk_configuration.retry_config
+
+        retry_config = None
+        if isinstance(retries, utils.RetryConfig):
+            retry_config = (retries, ["429", "500", "502", "503", "504"])
+
+        http_res = self.do_request(
+            hook_ctx=HookContext(
+                config=self.sdk_configuration,
+                base_url=base_url or "",
+                operation_id="partiallyUpdateWorkspaceGroupById",
+                oauth2_scopes=["organization:write"],
+                security_source=self.sdk_configuration.security,
+            ),
+            request=req,
+            error_status_codes=[
+                "400",
+                "401",
+                "403",
+                "404",
+                "409",
+                "429",
+                "4XX",
+                "500",
+                "503",
+                "5XX",
+            ],
+            retry_config=retry_config,
+        )
+
+        response_data: Any = None
+        if utils.match_response(http_res, "200", "application/json"):
+            return unmarshal_json_response(models.WorkspaceGroup, http_res)
+        if utils.match_response(
+            http_res, ["400", "401", "403", "404", "409", "429"], "application/json"
+        ):
+            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
+            raise errors.ErrorResponse(response_data, http_res)
+        if utils.match_response(http_res, ["500", "503"], "application/json"):
+            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
+            raise errors.ErrorResponse(response_data, http_res)
+        if utils.match_response(http_res, "4XX", "*"):
+            http_res_text = utils.stream_to_text(http_res)
+            raise errors.SDKError("API error occurred", http_res, http_res_text)
+        if utils.match_response(http_res, "5XX", "*"):
+            http_res_text = utils.stream_to_text(http_res)
+            raise errors.SDKError("API error occurred", http_res, http_res_text)
+
+        raise errors.SDKError("Unexpected response received", http_res)
+
+    async def partially_update_workspace_group_by_id_async(
+        self,
+        *,
+        organization_id: str,
+        workspace_id: str,
+        group_id: str,
+        request_body: Union[
+            List[models.JSONPatchOperation], List[models.JSONPatchOperationTypedDict]
+        ],
+        retries: OptionalNullable[utils.RetryConfig] = UNSET,
+        server_url: Optional[str] = None,
+        timeout_ms: Optional[int] = None,
+        http_headers: Optional[Mapping[str, str]] = None,
+    ) -> models.WorkspaceGroup:
+        r"""Update a single group
+
+        Updates the properties of a group.
+        ### Options
+        |Path|PATCH Operations Supported|
+        |---|---|
+        |`/name`|`replace`|
+
+
+        :param organization_id: The unique identifier of the organization
+        :param workspace_id: The unique identifier of the workspace
+        :param group_id: The unique identifier of the group
+        :param request_body: A collection of patch operations to apply to the group.
+        :param retries: Override the default retry configuration for this method
+        :param server_url: Override the default server URL for this method
+        :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
+        :param http_headers: Additional headers to set or replace on requests.
+        """
+        base_url = None
+        url_variables = None
+        if timeout_ms is None:
+            timeout_ms = self.sdk_configuration.timeout_ms
+
+        if server_url is not None:
+            base_url = server_url
+        else:
+            base_url = self._get_url(base_url, url_variables)
+
+        request = models.PartiallyUpdateWorkspaceGroupByIDRequest(
+            organization_id=organization_id,
+            workspace_id=workspace_id,
+            group_id=group_id,
+            request_body=utils.get_pydantic_model(
+                request_body, List[models.JSONPatchOperation]
+            ),
+        )
+
+        req = self._build_request_async(
+            method="PATCH",
+            path="/organizations/{organizationId}/workspaces/{workspaceId}/groups/{groupId}",
+            base_url=base_url,
+            url_variables=url_variables,
+            request=request,
+            request_body_required=True,
+            request_has_path_params=True,
+            request_has_query_params=True,
+            user_agent_header="user-agent",
+            accept_header_value="application/json",
+            http_headers=http_headers,
+            security=self.sdk_configuration.security,
+            get_serialized_body=lambda: utils.serialize_request_body(
+                request.request_body,
+                False,
+                False,
+                "json",
+                List[models.JSONPatchOperation],
+            ),
+            allow_empty_value=None,
+            timeout_ms=timeout_ms,
+        )
+
+        if retries == UNSET:
+            if self.sdk_configuration.retry_config is not UNSET:
+                retries = self.sdk_configuration.retry_config
+
+        retry_config = None
+        if isinstance(retries, utils.RetryConfig):
+            retry_config = (retries, ["429", "500", "502", "503", "504"])
+
+        http_res = await self.do_request_async(
+            hook_ctx=HookContext(
+                config=self.sdk_configuration,
+                base_url=base_url or "",
+                operation_id="partiallyUpdateWorkspaceGroupById",
+                oauth2_scopes=["organization:write"],
                 security_source=self.sdk_configuration.security,
             ),
             request=req,
@@ -4853,9 +5493,9 @@ class Admin(BaseSDK):
 
             return self.get_workspace_group_members(
                 request=models.GetWorkspaceGroupMembersRequest(
-                    group_id=request.group_id,
                     organization_id=request.organization_id,
                     workspace_id=request.workspace_id,
+                    group_id=request.group_id,
                     maxpagesize=request.maxpagesize,
                     next=request.next,
                 ),
@@ -4989,9 +5629,9 @@ class Admin(BaseSDK):
 
             return self.get_workspace_group_members_async(
                 request=models.GetWorkspaceGroupMembersRequest(
-                    group_id=request.group_id,
                     organization_id=request.organization_id,
                     workspace_id=request.workspace_id,
+                    group_id=request.group_id,
                     maxpagesize=request.maxpagesize,
                     next=request.next,
                 ),
@@ -5023,22 +5663,30 @@ class Admin(BaseSDK):
 
         raise errors.SDKError("Unexpected response received", http_res)
 
-    def get_workspace_groups(
+    def modify_workspace_group_members(
         self,
         *,
-        request: Union[
-            models.GetWorkspaceGroupsRequest, models.GetWorkspaceGroupsRequestTypedDict
+        organization_id: str,
+        workspace_id: str,
+        group_id: str,
+        bulk_workspace_group_members_modification: Union[
+            models.BulkWorkspaceGroupMembersModification,
+            models.BulkWorkspaceGroupMembersModificationTypedDict,
         ],
         retries: OptionalNullable[utils.RetryConfig] = UNSET,
         server_url: Optional[str] = None,
         timeout_ms: Optional[int] = None,
         http_headers: Optional[Mapping[str, str]] = None,
-    ) -> Optional[models.GetWorkspaceGroupsResponse]:
-        r"""Retrieve list of groups
+    ):
+        r"""Modify members in a group
 
-        Retrieve a list of groups in a workspace
+        Add and/or remove members from a group. When failures are encountered for particular members, error responses are returned for each.
 
-        :param request: The request object to send.
+
+        :param organization_id: The unique identifier of the organization
+        :param workspace_id: The unique identifier of the workspace
+        :param group_id: The unique identifier of the group
+        :param bulk_workspace_group_members_modification: Details about the group member modification.
         :param retries: Override the default retry configuration for this method
         :param server_url: Override the default server URL for this method
         :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
@@ -5054,23 +5702,36 @@ class Admin(BaseSDK):
         else:
             base_url = self._get_url(base_url, url_variables)
 
-        if not isinstance(request, BaseModel):
-            request = utils.unmarshal(request, models.GetWorkspaceGroupsRequest)
-        request = cast(models.GetWorkspaceGroupsRequest, request)
+        request = models.ModifyWorkspaceGroupMembersRequest(
+            organization_id=organization_id,
+            workspace_id=workspace_id,
+            group_id=group_id,
+            bulk_workspace_group_members_modification=utils.get_pydantic_model(
+                bulk_workspace_group_members_modification,
+                models.BulkWorkspaceGroupMembersModification,
+            ),
+        )
 
         req = self._build_request(
-            method="GET",
-            path="/organizations/{organizationId}/workspaces/{workspaceId}/groups",
+            method="POST",
+            path="/organizations/{organizationId}/workspaces/{workspaceId}/groups/{groupId}/members/modification",
             base_url=base_url,
             url_variables=url_variables,
             request=request,
-            request_body_required=False,
+            request_body_required=True,
             request_has_path_params=True,
             request_has_query_params=True,
             user_agent_header="user-agent",
             accept_header_value="application/json",
             http_headers=http_headers,
             security=self.sdk_configuration.security,
+            get_serialized_body=lambda: utils.serialize_request_body(
+                request.bulk_workspace_group_members_modification,
+                False,
+                False,
+                "json",
+                models.BulkWorkspaceGroupMembersModification,
+            ),
             allow_empty_value=None,
             timeout_ms=timeout_ms,
         )
@@ -5087,8 +5748,8 @@ class Admin(BaseSDK):
             hook_ctx=HookContext(
                 config=self.sdk_configuration,
                 base_url=base_url or "",
-                operation_id="getWorkspaceGroups",
-                oauth2_scopes=["organization:read"],
+                operation_id="modifyWorkspaceGroupMembers",
+                oauth2_scopes=["organization:write"],
                 security_source=self.sdk_configuration.security,
             ),
             request=req,
@@ -5107,37 +5768,9 @@ class Admin(BaseSDK):
             retry_config=retry_config,
         )
 
-        def next_func() -> Optional[models.GetWorkspaceGroupsResponse]:
-            body = utils.unmarshal_json(http_res.text, Union[Dict[Any, Any], List[Any]])
-
-            next_cursor = JSONPath("$['@nextLink']").parse(body)
-
-            if len(next_cursor) == 0:
-                return None
-
-            next_cursor = next_cursor[0]
-            if next_cursor is None or str(next_cursor).strip() == "":
-                return None
-
-            return self.get_workspace_groups(
-                request=models.GetWorkspaceGroupsRequest(
-                    organization_id=request.organization_id,
-                    workspace_id=request.workspace_id,
-                    filter_=request.filter_,
-                    maxpagesize=request.maxpagesize,
-                    next=request.next,
-                ),
-                retries=retries,
-            )
-
         response_data: Any = None
-        if utils.match_response(http_res, "200", "application/json"):
-            return models.GetWorkspaceGroupsResponse(
-                result=unmarshal_json_response(
-                    models.WorkspaceGroupsListResult, http_res
-                ),
-                next=next_func,
-            )
+        if utils.match_response(http_res, "204", "*"):
+            return
         if utils.match_response(
             http_res, ["400", "401", "403", "404", "409", "429"], "application/json"
         ):
@@ -5155,22 +5788,30 @@ class Admin(BaseSDK):
 
         raise errors.SDKError("Unexpected response received", http_res)
 
-    async def get_workspace_groups_async(
+    async def modify_workspace_group_members_async(
         self,
         *,
-        request: Union[
-            models.GetWorkspaceGroupsRequest, models.GetWorkspaceGroupsRequestTypedDict
+        organization_id: str,
+        workspace_id: str,
+        group_id: str,
+        bulk_workspace_group_members_modification: Union[
+            models.BulkWorkspaceGroupMembersModification,
+            models.BulkWorkspaceGroupMembersModificationTypedDict,
         ],
         retries: OptionalNullable[utils.RetryConfig] = UNSET,
         server_url: Optional[str] = None,
         timeout_ms: Optional[int] = None,
         http_headers: Optional[Mapping[str, str]] = None,
-    ) -> Optional[models.GetWorkspaceGroupsResponse]:
-        r"""Retrieve list of groups
+    ):
+        r"""Modify members in a group
 
-        Retrieve a list of groups in a workspace
+        Add and/or remove members from a group. When failures are encountered for particular members, error responses are returned for each.
 
-        :param request: The request object to send.
+
+        :param organization_id: The unique identifier of the organization
+        :param workspace_id: The unique identifier of the workspace
+        :param group_id: The unique identifier of the group
+        :param bulk_workspace_group_members_modification: Details about the group member modification.
         :param retries: Override the default retry configuration for this method
         :param server_url: Override the default server URL for this method
         :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
@@ -5186,23 +5827,36 @@ class Admin(BaseSDK):
         else:
             base_url = self._get_url(base_url, url_variables)
 
-        if not isinstance(request, BaseModel):
-            request = utils.unmarshal(request, models.GetWorkspaceGroupsRequest)
-        request = cast(models.GetWorkspaceGroupsRequest, request)
+        request = models.ModifyWorkspaceGroupMembersRequest(
+            organization_id=organization_id,
+            workspace_id=workspace_id,
+            group_id=group_id,
+            bulk_workspace_group_members_modification=utils.get_pydantic_model(
+                bulk_workspace_group_members_modification,
+                models.BulkWorkspaceGroupMembersModification,
+            ),
+        )
 
         req = self._build_request_async(
-            method="GET",
-            path="/organizations/{organizationId}/workspaces/{workspaceId}/groups",
+            method="POST",
+            path="/organizations/{organizationId}/workspaces/{workspaceId}/groups/{groupId}/members/modification",
             base_url=base_url,
             url_variables=url_variables,
             request=request,
-            request_body_required=False,
+            request_body_required=True,
             request_has_path_params=True,
             request_has_query_params=True,
             user_agent_header="user-agent",
             accept_header_value="application/json",
             http_headers=http_headers,
             security=self.sdk_configuration.security,
+            get_serialized_body=lambda: utils.serialize_request_body(
+                request.bulk_workspace_group_members_modification,
+                False,
+                False,
+                "json",
+                models.BulkWorkspaceGroupMembersModification,
+            ),
             allow_empty_value=None,
             timeout_ms=timeout_ms,
         )
@@ -5219,148 +5873,8 @@ class Admin(BaseSDK):
             hook_ctx=HookContext(
                 config=self.sdk_configuration,
                 base_url=base_url or "",
-                operation_id="getWorkspaceGroups",
-                oauth2_scopes=["organization:read"],
-                security_source=self.sdk_configuration.security,
-            ),
-            request=req,
-            error_status_codes=[
-                "400",
-                "401",
-                "403",
-                "404",
-                "409",
-                "429",
-                "4XX",
-                "500",
-                "503",
-                "5XX",
-            ],
-            retry_config=retry_config,
-        )
-
-        def next_func() -> Awaitable[Optional[models.GetWorkspaceGroupsResponse]]:
-            body = utils.unmarshal_json(http_res.text, Union[Dict[Any, Any], List[Any]])
-
-            async def empty_result():
-                return None
-
-            next_cursor = JSONPath("$['@nextLink']").parse(body)
-
-            if len(next_cursor) == 0:
-                return empty_result()
-
-            next_cursor = next_cursor[0]
-            if next_cursor is None or str(next_cursor).strip() == "":
-                return empty_result()
-
-            return self.get_workspace_groups_async(
-                request=models.GetWorkspaceGroupsRequest(
-                    organization_id=request.organization_id,
-                    workspace_id=request.workspace_id,
-                    filter_=request.filter_,
-                    maxpagesize=request.maxpagesize,
-                    next=request.next,
-                ),
-                retries=retries,
-            )
-
-        response_data: Any = None
-        if utils.match_response(http_res, "200", "application/json"):
-            return models.GetWorkspaceGroupsResponse(
-                result=unmarshal_json_response(
-                    models.WorkspaceGroupsListResult, http_res
-                ),
-                next=next_func,
-            )
-        if utils.match_response(
-            http_res, ["400", "401", "403", "404", "409", "429"], "application/json"
-        ):
-            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
-            raise errors.ErrorResponse(response_data, http_res)
-        if utils.match_response(http_res, ["500", "503"], "application/json"):
-            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
-            raise errors.ErrorResponse(response_data, http_res)
-        if utils.match_response(http_res, "4XX", "*"):
-            http_res_text = await utils.stream_to_text_async(http_res)
-            raise errors.SDKError("API error occurred", http_res, http_res_text)
-        if utils.match_response(http_res, "5XX", "*"):
-            http_res_text = await utils.stream_to_text_async(http_res)
-            raise errors.SDKError("API error occurred", http_res, http_res_text)
-
-        raise errors.SDKError("Unexpected response received", http_res)
-
-    def get_workspace_membership_by_id(
-        self,
-        *,
-        organization_id: str,
-        workspace_id: str,
-        workspace_membership_id: str,
-        retries: OptionalNullable[utils.RetryConfig] = UNSET,
-        server_url: Optional[str] = None,
-        timeout_ms: Optional[int] = None,
-        http_headers: Optional[Mapping[str, str]] = None,
-    ) -> models.WorkspaceMembership:
-        r"""Retrieve a single workspace membership
-
-        Retrieves a workspace membership given its ID
-
-
-        :param organization_id: The unique identifier of the organization
-        :param workspace_id: The unique identifier of the workspace
-        :param workspace_membership_id: The unique identifier of the workspace membership
-        :param retries: Override the default retry configuration for this method
-        :param server_url: Override the default server URL for this method
-        :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
-        :param http_headers: Additional headers to set or replace on requests.
-        """
-        base_url = None
-        url_variables = None
-        if timeout_ms is None:
-            timeout_ms = self.sdk_configuration.timeout_ms
-
-        if server_url is not None:
-            base_url = server_url
-        else:
-            base_url = self._get_url(base_url, url_variables)
-
-        request = models.GetWorkspaceMembershipByIDRequest(
-            organization_id=organization_id,
-            workspace_id=workspace_id,
-            workspace_membership_id=workspace_membership_id,
-        )
-
-        req = self._build_request(
-            method="GET",
-            path="/organizations/{organizationId}/workspaces/{workspaceId}/memberships/{workspaceMembershipId}",
-            base_url=base_url,
-            url_variables=url_variables,
-            request=request,
-            request_body_required=False,
-            request_has_path_params=True,
-            request_has_query_params=True,
-            user_agent_header="user-agent",
-            accept_header_value="application/json",
-            http_headers=http_headers,
-            security=self.sdk_configuration.security,
-            allow_empty_value=None,
-            timeout_ms=timeout_ms,
-        )
-
-        if retries == UNSET:
-            if self.sdk_configuration.retry_config is not UNSET:
-                retries = self.sdk_configuration.retry_config
-
-        retry_config = None
-        if isinstance(retries, utils.RetryConfig):
-            retry_config = (retries, ["429", "500", "502", "503", "504"])
-
-        http_res = self.do_request(
-            hook_ctx=HookContext(
-                config=self.sdk_configuration,
-                base_url=base_url or "",
-                operation_id="getWorkspaceMembershipById",
-                oauth2_scopes=["organization:read"],
+                operation_id="modifyWorkspaceGroupMembers",
+                oauth2_scopes=["organization:write"],
                 security_source=self.sdk_configuration.security,
             ),
             request=req,
@@ -5380,117 +5894,8 @@ class Admin(BaseSDK):
         )
 
         response_data: Any = None
-        if utils.match_response(http_res, "200", "application/json"):
-            return unmarshal_json_response(models.WorkspaceMembership, http_res)
-        if utils.match_response(
-            http_res, ["400", "401", "403", "404", "409", "429"], "application/json"
-        ):
-            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
-            raise errors.ErrorResponse(response_data, http_res)
-        if utils.match_response(http_res, ["500", "503"], "application/json"):
-            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
-            raise errors.ErrorResponse(response_data, http_res)
-        if utils.match_response(http_res, "4XX", "*"):
-            http_res_text = utils.stream_to_text(http_res)
-            raise errors.SDKError("API error occurred", http_res, http_res_text)
-        if utils.match_response(http_res, "5XX", "*"):
-            http_res_text = utils.stream_to_text(http_res)
-            raise errors.SDKError("API error occurred", http_res, http_res_text)
-
-        raise errors.SDKError("Unexpected response received", http_res)
-
-    async def get_workspace_membership_by_id_async(
-        self,
-        *,
-        organization_id: str,
-        workspace_id: str,
-        workspace_membership_id: str,
-        retries: OptionalNullable[utils.RetryConfig] = UNSET,
-        server_url: Optional[str] = None,
-        timeout_ms: Optional[int] = None,
-        http_headers: Optional[Mapping[str, str]] = None,
-    ) -> models.WorkspaceMembership:
-        r"""Retrieve a single workspace membership
-
-        Retrieves a workspace membership given its ID
-
-
-        :param organization_id: The unique identifier of the organization
-        :param workspace_id: The unique identifier of the workspace
-        :param workspace_membership_id: The unique identifier of the workspace membership
-        :param retries: Override the default retry configuration for this method
-        :param server_url: Override the default server URL for this method
-        :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
-        :param http_headers: Additional headers to set or replace on requests.
-        """
-        base_url = None
-        url_variables = None
-        if timeout_ms is None:
-            timeout_ms = self.sdk_configuration.timeout_ms
-
-        if server_url is not None:
-            base_url = server_url
-        else:
-            base_url = self._get_url(base_url, url_variables)
-
-        request = models.GetWorkspaceMembershipByIDRequest(
-            organization_id=organization_id,
-            workspace_id=workspace_id,
-            workspace_membership_id=workspace_membership_id,
-        )
-
-        req = self._build_request_async(
-            method="GET",
-            path="/organizations/{organizationId}/workspaces/{workspaceId}/memberships/{workspaceMembershipId}",
-            base_url=base_url,
-            url_variables=url_variables,
-            request=request,
-            request_body_required=False,
-            request_has_path_params=True,
-            request_has_query_params=True,
-            user_agent_header="user-agent",
-            accept_header_value="application/json",
-            http_headers=http_headers,
-            security=self.sdk_configuration.security,
-            allow_empty_value=None,
-            timeout_ms=timeout_ms,
-        )
-
-        if retries == UNSET:
-            if self.sdk_configuration.retry_config is not UNSET:
-                retries = self.sdk_configuration.retry_config
-
-        retry_config = None
-        if isinstance(retries, utils.RetryConfig):
-            retry_config = (retries, ["429", "500", "502", "503", "504"])
-
-        http_res = await self.do_request_async(
-            hook_ctx=HookContext(
-                config=self.sdk_configuration,
-                base_url=base_url or "",
-                operation_id="getWorkspaceMembershipById",
-                oauth2_scopes=["organization:read"],
-                security_source=self.sdk_configuration.security,
-            ),
-            request=req,
-            error_status_codes=[
-                "400",
-                "401",
-                "403",
-                "404",
-                "409",
-                "429",
-                "4XX",
-                "500",
-                "503",
-                "5XX",
-            ],
-            retry_config=retry_config,
-        )
-
-        response_data: Any = None
-        if utils.match_response(http_res, "200", "application/json"):
-            return unmarshal_json_response(models.WorkspaceMembership, http_res)
+        if utils.match_response(http_res, "204", "*"):
+            return
         if utils.match_response(
             http_res, ["400", "401", "403", "404", "409", "429"], "application/json"
         ):
@@ -5777,735 +6182,27 @@ class Admin(BaseSDK):
 
         raise errors.SDKError("Unexpected response received", http_res)
 
-    def get_workspace_solutions(
+    def create_workspace_membership(
         self,
         *,
         organization_id: str,
         workspace_id: str,
-        retries: OptionalNullable[utils.RetryConfig] = UNSET,
-        server_url: Optional[str] = None,
-        timeout_ms: Optional[int] = None,
-        http_headers: Optional[Mapping[str, str]] = None,
-    ) -> models.WorkspaceSolutionsListResult:
-        r"""Retrieve available solutions within a workspace
-
-        Retrieves available solutions within a workspace given its ID
-
-
-        :param organization_id: The unique identifier of the organization
-        :param workspace_id: The unique identifier of the workspace
-        :param retries: Override the default retry configuration for this method
-        :param server_url: Override the default server URL for this method
-        :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
-        :param http_headers: Additional headers to set or replace on requests.
-        """
-        base_url = None
-        url_variables = None
-        if timeout_ms is None:
-            timeout_ms = self.sdk_configuration.timeout_ms
-
-        if server_url is not None:
-            base_url = server_url
-        else:
-            base_url = self._get_url(base_url, url_variables)
-
-        request = models.GetWorkspaceSolutionsRequest(
-            organization_id=organization_id,
-            workspace_id=workspace_id,
-        )
-
-        req = self._build_request(
-            method="GET",
-            path="/organizations/{organizationId}/workspaces/{workspaceId}/solutions",
-            base_url=base_url,
-            url_variables=url_variables,
-            request=request,
-            request_body_required=False,
-            request_has_path_params=True,
-            request_has_query_params=True,
-            user_agent_header="user-agent",
-            accept_header_value="application/json",
-            http_headers=http_headers,
-            security=self.sdk_configuration.security,
-            allow_empty_value=None,
-            timeout_ms=timeout_ms,
-        )
-
-        if retries == UNSET:
-            if self.sdk_configuration.retry_config is not UNSET:
-                retries = self.sdk_configuration.retry_config
-
-        retry_config = None
-        if isinstance(retries, utils.RetryConfig):
-            retry_config = (retries, ["429", "500", "502", "503", "504"])
-
-        http_res = self.do_request(
-            hook_ctx=HookContext(
-                config=self.sdk_configuration,
-                base_url=base_url or "",
-                operation_id="getWorkspaceSolutions",
-                oauth2_scopes=["organization:read"],
-                security_source=self.sdk_configuration.security,
-            ),
-            request=req,
-            error_status_codes=[
-                "400",
-                "401",
-                "403",
-                "404",
-                "409",
-                "429",
-                "4XX",
-                "500",
-                "503",
-                "5XX",
-            ],
-            retry_config=retry_config,
-        )
-
-        response_data: Any = None
-        if utils.match_response(http_res, "200", "application/json"):
-            return unmarshal_json_response(
-                models.WorkspaceSolutionsListResult, http_res
-            )
-        if utils.match_response(
-            http_res, ["400", "401", "403", "404", "409", "429"], "application/json"
-        ):
-            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
-            raise errors.ErrorResponse(response_data, http_res)
-        if utils.match_response(http_res, ["500", "503"], "application/json"):
-            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
-            raise errors.ErrorResponse(response_data, http_res)
-        if utils.match_response(http_res, "4XX", "*"):
-            http_res_text = utils.stream_to_text(http_res)
-            raise errors.SDKError("API error occurred", http_res, http_res_text)
-        if utils.match_response(http_res, "5XX", "*"):
-            http_res_text = utils.stream_to_text(http_res)
-            raise errors.SDKError("API error occurred", http_res, http_res_text)
-
-        raise errors.SDKError("Unexpected response received", http_res)
-
-    async def get_workspace_solutions_async(
-        self,
-        *,
-        organization_id: str,
-        workspace_id: str,
-        retries: OptionalNullable[utils.RetryConfig] = UNSET,
-        server_url: Optional[str] = None,
-        timeout_ms: Optional[int] = None,
-        http_headers: Optional[Mapping[str, str]] = None,
-    ) -> models.WorkspaceSolutionsListResult:
-        r"""Retrieve available solutions within a workspace
-
-        Retrieves available solutions within a workspace given its ID
-
-
-        :param organization_id: The unique identifier of the organization
-        :param workspace_id: The unique identifier of the workspace
-        :param retries: Override the default retry configuration for this method
-        :param server_url: Override the default server URL for this method
-        :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
-        :param http_headers: Additional headers to set or replace on requests.
-        """
-        base_url = None
-        url_variables = None
-        if timeout_ms is None:
-            timeout_ms = self.sdk_configuration.timeout_ms
-
-        if server_url is not None:
-            base_url = server_url
-        else:
-            base_url = self._get_url(base_url, url_variables)
-
-        request = models.GetWorkspaceSolutionsRequest(
-            organization_id=organization_id,
-            workspace_id=workspace_id,
-        )
-
-        req = self._build_request_async(
-            method="GET",
-            path="/organizations/{organizationId}/workspaces/{workspaceId}/solutions",
-            base_url=base_url,
-            url_variables=url_variables,
-            request=request,
-            request_body_required=False,
-            request_has_path_params=True,
-            request_has_query_params=True,
-            user_agent_header="user-agent",
-            accept_header_value="application/json",
-            http_headers=http_headers,
-            security=self.sdk_configuration.security,
-            allow_empty_value=None,
-            timeout_ms=timeout_ms,
-        )
-
-        if retries == UNSET:
-            if self.sdk_configuration.retry_config is not UNSET:
-                retries = self.sdk_configuration.retry_config
-
-        retry_config = None
-        if isinstance(retries, utils.RetryConfig):
-            retry_config = (retries, ["429", "500", "502", "503", "504"])
-
-        http_res = await self.do_request_async(
-            hook_ctx=HookContext(
-                config=self.sdk_configuration,
-                base_url=base_url or "",
-                operation_id="getWorkspaceSolutions",
-                oauth2_scopes=["organization:read"],
-                security_source=self.sdk_configuration.security,
-            ),
-            request=req,
-            error_status_codes=[
-                "400",
-                "401",
-                "403",
-                "404",
-                "409",
-                "429",
-                "4XX",
-                "500",
-                "503",
-                "5XX",
-            ],
-            retry_config=retry_config,
-        )
-
-        response_data: Any = None
-        if utils.match_response(http_res, "200", "application/json"):
-            return unmarshal_json_response(
-                models.WorkspaceSolutionsListResult, http_res
-            )
-        if utils.match_response(
-            http_res, ["400", "401", "403", "404", "409", "429"], "application/json"
-        ):
-            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
-            raise errors.ErrorResponse(response_data, http_res)
-        if utils.match_response(http_res, ["500", "503"], "application/json"):
-            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
-            raise errors.ErrorResponse(response_data, http_res)
-        if utils.match_response(http_res, "4XX", "*"):
-            http_res_text = await utils.stream_to_text_async(http_res)
-            raise errors.SDKError("API error occurred", http_res, http_res_text)
-        if utils.match_response(http_res, "5XX", "*"):
-            http_res_text = await utils.stream_to_text_async(http_res)
-            raise errors.SDKError("API error occurred", http_res, http_res_text)
-
-        raise errors.SDKError("Unexpected response received", http_res)
-
-    def get_workspace_solutions_by_id(
-        self,
-        *,
-        organization_id: str,
-        solution_id: str,
-        workspace_id: str,
-        retries: OptionalNullable[utils.RetryConfig] = UNSET,
-        server_url: Optional[str] = None,
-        timeout_ms: Optional[int] = None,
-        http_headers: Optional[Mapping[str, str]] = None,
-    ) -> models.Solution:
-        r"""Retrieve a solution by id
-
-        Retrieve a solutions within a workspace given its ID
-
-
-        :param organization_id: The unique identifier of the organization
-        :param solution_id: The unique identifier of the solution
-        :param workspace_id: The unique identifier of the workspace
-        :param retries: Override the default retry configuration for this method
-        :param server_url: Override the default server URL for this method
-        :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
-        :param http_headers: Additional headers to set or replace on requests.
-        """
-        base_url = None
-        url_variables = None
-        if timeout_ms is None:
-            timeout_ms = self.sdk_configuration.timeout_ms
-
-        if server_url is not None:
-            base_url = server_url
-        else:
-            base_url = self._get_url(base_url, url_variables)
-
-        request = models.GetWorkspaceSolutionsByIDRequest(
-            organization_id=organization_id,
-            solution_id=solution_id,
-            workspace_id=workspace_id,
-        )
-
-        req = self._build_request(
-            method="GET",
-            path="/organizations/{organizationId}/workspaces/{workspaceId}/solutions/{solutionId}",
-            base_url=base_url,
-            url_variables=url_variables,
-            request=request,
-            request_body_required=False,
-            request_has_path_params=True,
-            request_has_query_params=True,
-            user_agent_header="user-agent",
-            accept_header_value="application/json",
-            http_headers=http_headers,
-            security=self.sdk_configuration.security,
-            allow_empty_value=None,
-            timeout_ms=timeout_ms,
-        )
-
-        if retries == UNSET:
-            if self.sdk_configuration.retry_config is not UNSET:
-                retries = self.sdk_configuration.retry_config
-
-        retry_config = None
-        if isinstance(retries, utils.RetryConfig):
-            retry_config = (retries, ["429", "500", "502", "503", "504"])
-
-        http_res = self.do_request(
-            hook_ctx=HookContext(
-                config=self.sdk_configuration,
-                base_url=base_url or "",
-                operation_id="getWorkspaceSolutionsByID",
-                oauth2_scopes=["organization:read"],
-                security_source=self.sdk_configuration.security,
-            ),
-            request=req,
-            error_status_codes=[
-                "400",
-                "401",
-                "403",
-                "404",
-                "409",
-                "429",
-                "4XX",
-                "500",
-                "503",
-                "5XX",
-            ],
-            retry_config=retry_config,
-        )
-
-        response_data: Any = None
-        if utils.match_response(http_res, "200", "application/json"):
-            return unmarshal_json_response(models.Solution, http_res)
-        if utils.match_response(
-            http_res, ["400", "401", "403", "404", "409", "429"], "application/json"
-        ):
-            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
-            raise errors.ErrorResponse(response_data, http_res)
-        if utils.match_response(http_res, ["500", "503"], "application/json"):
-            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
-            raise errors.ErrorResponse(response_data, http_res)
-        if utils.match_response(http_res, "4XX", "*"):
-            http_res_text = utils.stream_to_text(http_res)
-            raise errors.SDKError("API error occurred", http_res, http_res_text)
-        if utils.match_response(http_res, "5XX", "*"):
-            http_res_text = utils.stream_to_text(http_res)
-            raise errors.SDKError("API error occurred", http_res, http_res_text)
-
-        raise errors.SDKError("Unexpected response received", http_res)
-
-    async def get_workspace_solutions_by_id_async(
-        self,
-        *,
-        organization_id: str,
-        solution_id: str,
-        workspace_id: str,
-        retries: OptionalNullable[utils.RetryConfig] = UNSET,
-        server_url: Optional[str] = None,
-        timeout_ms: Optional[int] = None,
-        http_headers: Optional[Mapping[str, str]] = None,
-    ) -> models.Solution:
-        r"""Retrieve a solution by id
-
-        Retrieve a solutions within a workspace given its ID
-
-
-        :param organization_id: The unique identifier of the organization
-        :param solution_id: The unique identifier of the solution
-        :param workspace_id: The unique identifier of the workspace
-        :param retries: Override the default retry configuration for this method
-        :param server_url: Override the default server URL for this method
-        :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
-        :param http_headers: Additional headers to set or replace on requests.
-        """
-        base_url = None
-        url_variables = None
-        if timeout_ms is None:
-            timeout_ms = self.sdk_configuration.timeout_ms
-
-        if server_url is not None:
-            base_url = server_url
-        else:
-            base_url = self._get_url(base_url, url_variables)
-
-        request = models.GetWorkspaceSolutionsByIDRequest(
-            organization_id=organization_id,
-            solution_id=solution_id,
-            workspace_id=workspace_id,
-        )
-
-        req = self._build_request_async(
-            method="GET",
-            path="/organizations/{organizationId}/workspaces/{workspaceId}/solutions/{solutionId}",
-            base_url=base_url,
-            url_variables=url_variables,
-            request=request,
-            request_body_required=False,
-            request_has_path_params=True,
-            request_has_query_params=True,
-            user_agent_header="user-agent",
-            accept_header_value="application/json",
-            http_headers=http_headers,
-            security=self.sdk_configuration.security,
-            allow_empty_value=None,
-            timeout_ms=timeout_ms,
-        )
-
-        if retries == UNSET:
-            if self.sdk_configuration.retry_config is not UNSET:
-                retries = self.sdk_configuration.retry_config
-
-        retry_config = None
-        if isinstance(retries, utils.RetryConfig):
-            retry_config = (retries, ["429", "500", "502", "503", "504"])
-
-        http_res = await self.do_request_async(
-            hook_ctx=HookContext(
-                config=self.sdk_configuration,
-                base_url=base_url or "",
-                operation_id="getWorkspaceSolutionsByID",
-                oauth2_scopes=["organization:read"],
-                security_source=self.sdk_configuration.security,
-            ),
-            request=req,
-            error_status_codes=[
-                "400",
-                "401",
-                "403",
-                "404",
-                "409",
-                "429",
-                "4XX",
-                "500",
-                "503",
-                "5XX",
-            ],
-            retry_config=retry_config,
-        )
-
-        response_data: Any = None
-        if utils.match_response(http_res, "200", "application/json"):
-            return unmarshal_json_response(models.Solution, http_res)
-        if utils.match_response(
-            http_res, ["400", "401", "403", "404", "409", "429"], "application/json"
-        ):
-            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
-            raise errors.ErrorResponse(response_data, http_res)
-        if utils.match_response(http_res, ["500", "503"], "application/json"):
-            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
-            raise errors.ErrorResponse(response_data, http_res)
-        if utils.match_response(http_res, "4XX", "*"):
-            http_res_text = await utils.stream_to_text_async(http_res)
-            raise errors.SDKError("API error occurred", http_res, http_res_text)
-        if utils.match_response(http_res, "5XX", "*"):
-            http_res_text = await utils.stream_to_text_async(http_res)
-            raise errors.SDKError("API error occurred", http_res, http_res_text)
-
-        raise errors.SDKError("Unexpected response received", http_res)
-
-    def get_workspaces(
-        self,
-        *,
-        organization_id: str,
-        expand: Optional[str] = None,
-        maxpagesize: Optional[int] = 1000,
-        next: Optional[str] = None,
-        retries: OptionalNullable[utils.RetryConfig] = UNSET,
-        server_url: Optional[str] = None,
-        timeout_ms: Optional[int] = None,
-        http_headers: Optional[Mapping[str, str]] = None,
-    ) -> Optional[models.GetWorkspacesResponse]:
-        r"""Retrieve list of workspaces
-
-        Retrieve a list of workspaces in an organization.
-
-        :param organization_id: The unique identifier of the organization
-        :param expand: Returns related resources inline with the main resource
-        :param maxpagesize: The maximum number of results to retrieve
-        :param next: Pagination cursor for next set of results.
-        :param retries: Override the default retry configuration for this method
-        :param server_url: Override the default server URL for this method
-        :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
-        :param http_headers: Additional headers to set or replace on requests.
-        """
-        base_url = None
-        url_variables = None
-        if timeout_ms is None:
-            timeout_ms = self.sdk_configuration.timeout_ms
-
-        if server_url is not None:
-            base_url = server_url
-        else:
-            base_url = self._get_url(base_url, url_variables)
-
-        request = models.GetWorkspacesRequest(
-            expand=expand,
-            maxpagesize=maxpagesize,
-            next=next,
-            organization_id=organization_id,
-        )
-
-        req = self._build_request(
-            method="GET",
-            path="/organizations/{organizationId}/workspaces",
-            base_url=base_url,
-            url_variables=url_variables,
-            request=request,
-            request_body_required=False,
-            request_has_path_params=True,
-            request_has_query_params=True,
-            user_agent_header="user-agent",
-            accept_header_value="application/json",
-            http_headers=http_headers,
-            security=self.sdk_configuration.security,
-            allow_empty_value=None,
-            timeout_ms=timeout_ms,
-        )
-
-        if retries == UNSET:
-            if self.sdk_configuration.retry_config is not UNSET:
-                retries = self.sdk_configuration.retry_config
-
-        retry_config = None
-        if isinstance(retries, utils.RetryConfig):
-            retry_config = (retries, ["429", "500", "502", "503", "504"])
-
-        http_res = self.do_request(
-            hook_ctx=HookContext(
-                config=self.sdk_configuration,
-                base_url=base_url or "",
-                operation_id="getWorkspaces",
-                oauth2_scopes=["organization:read"],
-                security_source=self.sdk_configuration.security,
-            ),
-            request=req,
-            error_status_codes=[
-                "400",
-                "401",
-                "403",
-                "404",
-                "409",
-                "429",
-                "4XX",
-                "500",
-                "503",
-                "5XX",
-            ],
-            retry_config=retry_config,
-        )
-
-        def next_func() -> Optional[models.GetWorkspacesResponse]:
-            body = utils.unmarshal_json(http_res.text, Union[Dict[Any, Any], List[Any]])
-
-            next_cursor = JSONPath("$['@nextLink']").parse(body)
-
-            if len(next_cursor) == 0:
-                return None
-
-            next_cursor = next_cursor[0]
-            if next_cursor is None or str(next_cursor).strip() == "":
-                return None
-
-            return self.get_workspaces(
-                organization_id=organization_id,
-                expand=expand,
-                maxpagesize=maxpagesize,
-                next=next,
-                retries=retries,
-            )
-
-        response_data: Any = None
-        if utils.match_response(http_res, "200", "application/json"):
-            return models.GetWorkspacesResponse(
-                result=unmarshal_json_response(models.WorkspacesListResult, http_res),
-                next=next_func,
-            )
-        if utils.match_response(
-            http_res, ["400", "401", "403", "404", "409", "429"], "application/json"
-        ):
-            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
-            raise errors.ErrorResponse(response_data, http_res)
-        if utils.match_response(http_res, ["500", "503"], "application/json"):
-            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
-            raise errors.ErrorResponse(response_data, http_res)
-        if utils.match_response(http_res, "4XX", "*"):
-            http_res_text = utils.stream_to_text(http_res)
-            raise errors.SDKError("API error occurred", http_res, http_res_text)
-        if utils.match_response(http_res, "5XX", "*"):
-            http_res_text = utils.stream_to_text(http_res)
-            raise errors.SDKError("API error occurred", http_res, http_res_text)
-
-        raise errors.SDKError("Unexpected response received", http_res)
-
-    async def get_workspaces_async(
-        self,
-        *,
-        organization_id: str,
-        expand: Optional[str] = None,
-        maxpagesize: Optional[int] = 1000,
-        next: Optional[str] = None,
-        retries: OptionalNullable[utils.RetryConfig] = UNSET,
-        server_url: Optional[str] = None,
-        timeout_ms: Optional[int] = None,
-        http_headers: Optional[Mapping[str, str]] = None,
-    ) -> Optional[models.GetWorkspacesResponse]:
-        r"""Retrieve list of workspaces
-
-        Retrieve a list of workspaces in an organization.
-
-        :param organization_id: The unique identifier of the organization
-        :param expand: Returns related resources inline with the main resource
-        :param maxpagesize: The maximum number of results to retrieve
-        :param next: Pagination cursor for next set of results.
-        :param retries: Override the default retry configuration for this method
-        :param server_url: Override the default server URL for this method
-        :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
-        :param http_headers: Additional headers to set or replace on requests.
-        """
-        base_url = None
-        url_variables = None
-        if timeout_ms is None:
-            timeout_ms = self.sdk_configuration.timeout_ms
-
-        if server_url is not None:
-            base_url = server_url
-        else:
-            base_url = self._get_url(base_url, url_variables)
-
-        request = models.GetWorkspacesRequest(
-            expand=expand,
-            maxpagesize=maxpagesize,
-            next=next,
-            organization_id=organization_id,
-        )
-
-        req = self._build_request_async(
-            method="GET",
-            path="/organizations/{organizationId}/workspaces",
-            base_url=base_url,
-            url_variables=url_variables,
-            request=request,
-            request_body_required=False,
-            request_has_path_params=True,
-            request_has_query_params=True,
-            user_agent_header="user-agent",
-            accept_header_value="application/json",
-            http_headers=http_headers,
-            security=self.sdk_configuration.security,
-            allow_empty_value=None,
-            timeout_ms=timeout_ms,
-        )
-
-        if retries == UNSET:
-            if self.sdk_configuration.retry_config is not UNSET:
-                retries = self.sdk_configuration.retry_config
-
-        retry_config = None
-        if isinstance(retries, utils.RetryConfig):
-            retry_config = (retries, ["429", "500", "502", "503", "504"])
-
-        http_res = await self.do_request_async(
-            hook_ctx=HookContext(
-                config=self.sdk_configuration,
-                base_url=base_url or "",
-                operation_id="getWorkspaces",
-                oauth2_scopes=["organization:read"],
-                security_source=self.sdk_configuration.security,
-            ),
-            request=req,
-            error_status_codes=[
-                "400",
-                "401",
-                "403",
-                "404",
-                "409",
-                "429",
-                "4XX",
-                "500",
-                "503",
-                "5XX",
-            ],
-            retry_config=retry_config,
-        )
-
-        def next_func() -> Awaitable[Optional[models.GetWorkspacesResponse]]:
-            body = utils.unmarshal_json(http_res.text, Union[Dict[Any, Any], List[Any]])
-
-            async def empty_result():
-                return None
-
-            next_cursor = JSONPath("$['@nextLink']").parse(body)
-
-            if len(next_cursor) == 0:
-                return empty_result()
-
-            next_cursor = next_cursor[0]
-            if next_cursor is None or str(next_cursor).strip() == "":
-                return empty_result()
-
-            return self.get_workspaces_async(
-                organization_id=organization_id,
-                expand=expand,
-                maxpagesize=maxpagesize,
-                next=next,
-                retries=retries,
-            )
-
-        response_data: Any = None
-        if utils.match_response(http_res, "200", "application/json"):
-            return models.GetWorkspacesResponse(
-                result=unmarshal_json_response(models.WorkspacesListResult, http_res),
-                next=next_func,
-            )
-        if utils.match_response(
-            http_res, ["400", "401", "403", "404", "409", "429"], "application/json"
-        ):
-            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
-            raise errors.ErrorResponse(response_data, http_res)
-        if utils.match_response(http_res, ["500", "503"], "application/json"):
-            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
-            raise errors.ErrorResponse(response_data, http_res)
-        if utils.match_response(http_res, "4XX", "*"):
-            http_res_text = await utils.stream_to_text_async(http_res)
-            raise errors.SDKError("API error occurred", http_res, http_res_text)
-        if utils.match_response(http_res, "5XX", "*"):
-            http_res_text = await utils.stream_to_text_async(http_res)
-            raise errors.SDKError("API error occurred", http_res, http_res_text)
-
-        raise errors.SDKError("Unexpected response received", http_res)
-
-    def modify_workspace_group_members(
-        self,
-        *,
-        group_id: str,
-        organization_id: str,
-        workspace_id: str,
-        bulk_workspace_group_members_modification: Union[
-            models.BulkWorkspaceGroupMembersModification,
-            models.BulkWorkspaceGroupMembersModificationTypedDict,
+        workspace_membership: Union[
+            models.WorkspaceMembershipInput, models.WorkspaceMembershipInputTypedDict
         ],
         retries: OptionalNullable[utils.RetryConfig] = UNSET,
         server_url: Optional[str] = None,
         timeout_ms: Optional[int] = None,
         http_headers: Optional[Mapping[str, str]] = None,
-    ):
-        r"""Modify members in a group
+    ) -> models.WorkspaceMembership:
+        r"""Create a new workspace membership
 
-        Add and/or remove members from a group. When failures are encountered for particular members, error responses are returned for each.
+        Creates a new `WorkspaceMembership` resource
 
 
-        :param group_id: The unique identifier of the group
         :param organization_id: The unique identifier of the organization
         :param workspace_id: The unique identifier of the workspace
-        :param bulk_workspace_group_members_modification: Details about the group member modification.
+        :param workspace_membership: The properties of the workspace membership to create
         :param retries: Override the default retry configuration for this method
         :param server_url: Override the default server URL for this method
         :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
@@ -6521,19 +6218,17 @@ class Admin(BaseSDK):
         else:
             base_url = self._get_url(base_url, url_variables)
 
-        request = models.ModifyWorkspaceGroupMembersRequest(
-            group_id=group_id,
+        request = models.CreateWorkspaceMembershipRequest(
             organization_id=organization_id,
             workspace_id=workspace_id,
-            bulk_workspace_group_members_modification=utils.get_pydantic_model(
-                bulk_workspace_group_members_modification,
-                models.BulkWorkspaceGroupMembersModification,
+            workspace_membership=utils.get_pydantic_model(
+                workspace_membership, models.WorkspaceMembershipInput
             ),
         )
 
         req = self._build_request(
             method="POST",
-            path="/organizations/{organizationId}/workspaces/{workspaceId}/groups/{groupId}/members/modification",
+            path="/organizations/{organizationId}/workspaces/{workspaceId}/memberships",
             base_url=base_url,
             url_variables=url_variables,
             request=request,
@@ -6545,11 +6240,11 @@ class Admin(BaseSDK):
             http_headers=http_headers,
             security=self.sdk_configuration.security,
             get_serialized_body=lambda: utils.serialize_request_body(
-                request.bulk_workspace_group_members_modification,
+                request.workspace_membership,
                 False,
                 False,
                 "json",
-                models.BulkWorkspaceGroupMembersModification,
+                models.WorkspaceMembershipInput,
             ),
             allow_empty_value=None,
             timeout_ms=timeout_ms,
@@ -6567,7 +6262,478 @@ class Admin(BaseSDK):
             hook_ctx=HookContext(
                 config=self.sdk_configuration,
                 base_url=base_url or "",
-                operation_id="modifyWorkspaceGroupMembers",
+                operation_id="createWorkspaceMembership",
+                oauth2_scopes=["organization:write"],
+                security_source=self.sdk_configuration.security,
+            ),
+            request=req,
+            error_status_codes=[
+                "400",
+                "401",
+                "403",
+                "404",
+                "409",
+                "429",
+                "4XX",
+                "500",
+                "503",
+                "5XX",
+            ],
+            retry_config=retry_config,
+        )
+
+        response_data: Any = None
+        if utils.match_response(http_res, "201", "application/json"):
+            return unmarshal_json_response(models.WorkspaceMembership, http_res)
+        if utils.match_response(
+            http_res, ["400", "401", "403", "404", "409", "429"], "application/json"
+        ):
+            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
+            raise errors.ErrorResponse(response_data, http_res)
+        if utils.match_response(http_res, ["500", "503"], "application/json"):
+            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
+            raise errors.ErrorResponse(response_data, http_res)
+        if utils.match_response(http_res, "4XX", "*"):
+            http_res_text = utils.stream_to_text(http_res)
+            raise errors.SDKError("API error occurred", http_res, http_res_text)
+        if utils.match_response(http_res, "5XX", "*"):
+            http_res_text = utils.stream_to_text(http_res)
+            raise errors.SDKError("API error occurred", http_res, http_res_text)
+
+        raise errors.SDKError("Unexpected response received", http_res)
+
+    async def create_workspace_membership_async(
+        self,
+        *,
+        organization_id: str,
+        workspace_id: str,
+        workspace_membership: Union[
+            models.WorkspaceMembershipInput, models.WorkspaceMembershipInputTypedDict
+        ],
+        retries: OptionalNullable[utils.RetryConfig] = UNSET,
+        server_url: Optional[str] = None,
+        timeout_ms: Optional[int] = None,
+        http_headers: Optional[Mapping[str, str]] = None,
+    ) -> models.WorkspaceMembership:
+        r"""Create a new workspace membership
+
+        Creates a new `WorkspaceMembership` resource
+
+
+        :param organization_id: The unique identifier of the organization
+        :param workspace_id: The unique identifier of the workspace
+        :param workspace_membership: The properties of the workspace membership to create
+        :param retries: Override the default retry configuration for this method
+        :param server_url: Override the default server URL for this method
+        :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
+        :param http_headers: Additional headers to set or replace on requests.
+        """
+        base_url = None
+        url_variables = None
+        if timeout_ms is None:
+            timeout_ms = self.sdk_configuration.timeout_ms
+
+        if server_url is not None:
+            base_url = server_url
+        else:
+            base_url = self._get_url(base_url, url_variables)
+
+        request = models.CreateWorkspaceMembershipRequest(
+            organization_id=organization_id,
+            workspace_id=workspace_id,
+            workspace_membership=utils.get_pydantic_model(
+                workspace_membership, models.WorkspaceMembershipInput
+            ),
+        )
+
+        req = self._build_request_async(
+            method="POST",
+            path="/organizations/{organizationId}/workspaces/{workspaceId}/memberships",
+            base_url=base_url,
+            url_variables=url_variables,
+            request=request,
+            request_body_required=True,
+            request_has_path_params=True,
+            request_has_query_params=True,
+            user_agent_header="user-agent",
+            accept_header_value="application/json",
+            http_headers=http_headers,
+            security=self.sdk_configuration.security,
+            get_serialized_body=lambda: utils.serialize_request_body(
+                request.workspace_membership,
+                False,
+                False,
+                "json",
+                models.WorkspaceMembershipInput,
+            ),
+            allow_empty_value=None,
+            timeout_ms=timeout_ms,
+        )
+
+        if retries == UNSET:
+            if self.sdk_configuration.retry_config is not UNSET:
+                retries = self.sdk_configuration.retry_config
+
+        retry_config = None
+        if isinstance(retries, utils.RetryConfig):
+            retry_config = (retries, ["429", "500", "502", "503", "504"])
+
+        http_res = await self.do_request_async(
+            hook_ctx=HookContext(
+                config=self.sdk_configuration,
+                base_url=base_url or "",
+                operation_id="createWorkspaceMembership",
+                oauth2_scopes=["organization:write"],
+                security_source=self.sdk_configuration.security,
+            ),
+            request=req,
+            error_status_codes=[
+                "400",
+                "401",
+                "403",
+                "404",
+                "409",
+                "429",
+                "4XX",
+                "500",
+                "503",
+                "5XX",
+            ],
+            retry_config=retry_config,
+        )
+
+        response_data: Any = None
+        if utils.match_response(http_res, "201", "application/json"):
+            return unmarshal_json_response(models.WorkspaceMembership, http_res)
+        if utils.match_response(
+            http_res, ["400", "401", "403", "404", "409", "429"], "application/json"
+        ):
+            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
+            raise errors.ErrorResponse(response_data, http_res)
+        if utils.match_response(http_res, ["500", "503"], "application/json"):
+            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
+            raise errors.ErrorResponse(response_data, http_res)
+        if utils.match_response(http_res, "4XX", "*"):
+            http_res_text = await utils.stream_to_text_async(http_res)
+            raise errors.SDKError("API error occurred", http_res, http_res_text)
+        if utils.match_response(http_res, "5XX", "*"):
+            http_res_text = await utils.stream_to_text_async(http_res)
+            raise errors.SDKError("API error occurred", http_res, http_res_text)
+
+        raise errors.SDKError("Unexpected response received", http_res)
+
+    def workspace_membership_creation_with_options(
+        self,
+        *,
+        organization_id: str,
+        workspace_id: str,
+        workspace_membership_creation: Union[
+            models.WorkspaceMembershipCreation,
+            models.WorkspaceMembershipCreationTypedDict,
+        ],
+        retries: OptionalNullable[utils.RetryConfig] = UNSET,
+        server_url: Optional[str] = None,
+        timeout_ms: Optional[int] = None,
+        http_headers: Optional[Mapping[str, str]] = None,
+    ) -> models.WorkspaceMembership:
+        r"""Create a new workspace membership with options
+
+        Creates a new `WorkspaceMembership` and allows control over notification options.
+
+
+        :param organization_id: The unique identifier of the organization
+        :param workspace_id: The unique identifier of the workspace
+        :param workspace_membership_creation: Details about the workspace membership creation.
+        :param retries: Override the default retry configuration for this method
+        :param server_url: Override the default server URL for this method
+        :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
+        :param http_headers: Additional headers to set or replace on requests.
+        """
+        base_url = None
+        url_variables = None
+        if timeout_ms is None:
+            timeout_ms = self.sdk_configuration.timeout_ms
+
+        if server_url is not None:
+            base_url = server_url
+        else:
+            base_url = self._get_url(base_url, url_variables)
+
+        request = models.WorkspaceMembershipCreationWithOptionsRequest(
+            organization_id=organization_id,
+            workspace_id=workspace_id,
+            workspace_membership_creation=utils.get_pydantic_model(
+                workspace_membership_creation, models.WorkspaceMembershipCreation
+            ),
+        )
+
+        req = self._build_request(
+            method="POST",
+            path="/organizations/{organizationId}/workspaces/{workspaceId}/memberships/membershipCreation",
+            base_url=base_url,
+            url_variables=url_variables,
+            request=request,
+            request_body_required=True,
+            request_has_path_params=True,
+            request_has_query_params=True,
+            user_agent_header="user-agent",
+            accept_header_value="application/json",
+            http_headers=http_headers,
+            security=self.sdk_configuration.security,
+            get_serialized_body=lambda: utils.serialize_request_body(
+                request.workspace_membership_creation,
+                False,
+                False,
+                "json",
+                models.WorkspaceMembershipCreation,
+            ),
+            allow_empty_value=None,
+            timeout_ms=timeout_ms,
+        )
+
+        if retries == UNSET:
+            if self.sdk_configuration.retry_config is not UNSET:
+                retries = self.sdk_configuration.retry_config
+
+        retry_config = None
+        if isinstance(retries, utils.RetryConfig):
+            retry_config = (retries, ["429", "500", "502", "503", "504"])
+
+        http_res = self.do_request(
+            hook_ctx=HookContext(
+                config=self.sdk_configuration,
+                base_url=base_url or "",
+                operation_id="workspaceMembershipCreationWithOptions",
+                oauth2_scopes=["organization:write"],
+                security_source=self.sdk_configuration.security,
+            ),
+            request=req,
+            error_status_codes=[
+                "400",
+                "401",
+                "403",
+                "404",
+                "409",
+                "429",
+                "4XX",
+                "500",
+                "503",
+                "5XX",
+            ],
+            retry_config=retry_config,
+        )
+
+        response_data: Any = None
+        if utils.match_response(http_res, "201", "application/json"):
+            return unmarshal_json_response(models.WorkspaceMembership, http_res)
+        if utils.match_response(
+            http_res, ["400", "401", "403", "404", "409", "429"], "application/json"
+        ):
+            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
+            raise errors.ErrorResponse(response_data, http_res)
+        if utils.match_response(http_res, ["500", "503"], "application/json"):
+            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
+            raise errors.ErrorResponse(response_data, http_res)
+        if utils.match_response(http_res, "4XX", "*"):
+            http_res_text = utils.stream_to_text(http_res)
+            raise errors.SDKError("API error occurred", http_res, http_res_text)
+        if utils.match_response(http_res, "5XX", "*"):
+            http_res_text = utils.stream_to_text(http_res)
+            raise errors.SDKError("API error occurred", http_res, http_res_text)
+
+        raise errors.SDKError("Unexpected response received", http_res)
+
+    async def workspace_membership_creation_with_options_async(
+        self,
+        *,
+        organization_id: str,
+        workspace_id: str,
+        workspace_membership_creation: Union[
+            models.WorkspaceMembershipCreation,
+            models.WorkspaceMembershipCreationTypedDict,
+        ],
+        retries: OptionalNullable[utils.RetryConfig] = UNSET,
+        server_url: Optional[str] = None,
+        timeout_ms: Optional[int] = None,
+        http_headers: Optional[Mapping[str, str]] = None,
+    ) -> models.WorkspaceMembership:
+        r"""Create a new workspace membership with options
+
+        Creates a new `WorkspaceMembership` and allows control over notification options.
+
+
+        :param organization_id: The unique identifier of the organization
+        :param workspace_id: The unique identifier of the workspace
+        :param workspace_membership_creation: Details about the workspace membership creation.
+        :param retries: Override the default retry configuration for this method
+        :param server_url: Override the default server URL for this method
+        :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
+        :param http_headers: Additional headers to set or replace on requests.
+        """
+        base_url = None
+        url_variables = None
+        if timeout_ms is None:
+            timeout_ms = self.sdk_configuration.timeout_ms
+
+        if server_url is not None:
+            base_url = server_url
+        else:
+            base_url = self._get_url(base_url, url_variables)
+
+        request = models.WorkspaceMembershipCreationWithOptionsRequest(
+            organization_id=organization_id,
+            workspace_id=workspace_id,
+            workspace_membership_creation=utils.get_pydantic_model(
+                workspace_membership_creation, models.WorkspaceMembershipCreation
+            ),
+        )
+
+        req = self._build_request_async(
+            method="POST",
+            path="/organizations/{organizationId}/workspaces/{workspaceId}/memberships/membershipCreation",
+            base_url=base_url,
+            url_variables=url_variables,
+            request=request,
+            request_body_required=True,
+            request_has_path_params=True,
+            request_has_query_params=True,
+            user_agent_header="user-agent",
+            accept_header_value="application/json",
+            http_headers=http_headers,
+            security=self.sdk_configuration.security,
+            get_serialized_body=lambda: utils.serialize_request_body(
+                request.workspace_membership_creation,
+                False,
+                False,
+                "json",
+                models.WorkspaceMembershipCreation,
+            ),
+            allow_empty_value=None,
+            timeout_ms=timeout_ms,
+        )
+
+        if retries == UNSET:
+            if self.sdk_configuration.retry_config is not UNSET:
+                retries = self.sdk_configuration.retry_config
+
+        retry_config = None
+        if isinstance(retries, utils.RetryConfig):
+            retry_config = (retries, ["429", "500", "502", "503", "504"])
+
+        http_res = await self.do_request_async(
+            hook_ctx=HookContext(
+                config=self.sdk_configuration,
+                base_url=base_url or "",
+                operation_id="workspaceMembershipCreationWithOptions",
+                oauth2_scopes=["organization:write"],
+                security_source=self.sdk_configuration.security,
+            ),
+            request=req,
+            error_status_codes=[
+                "400",
+                "401",
+                "403",
+                "404",
+                "409",
+                "429",
+                "4XX",
+                "500",
+                "503",
+                "5XX",
+            ],
+            retry_config=retry_config,
+        )
+
+        response_data: Any = None
+        if utils.match_response(http_res, "201", "application/json"):
+            return unmarshal_json_response(models.WorkspaceMembership, http_res)
+        if utils.match_response(
+            http_res, ["400", "401", "403", "404", "409", "429"], "application/json"
+        ):
+            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
+            raise errors.ErrorResponse(response_data, http_res)
+        if utils.match_response(http_res, ["500", "503"], "application/json"):
+            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
+            raise errors.ErrorResponse(response_data, http_res)
+        if utils.match_response(http_res, "4XX", "*"):
+            http_res_text = await utils.stream_to_text_async(http_res)
+            raise errors.SDKError("API error occurred", http_res, http_res_text)
+        if utils.match_response(http_res, "5XX", "*"):
+            http_res_text = await utils.stream_to_text_async(http_res)
+            raise errors.SDKError("API error occurred", http_res, http_res_text)
+
+        raise errors.SDKError("Unexpected response received", http_res)
+
+    def delete_workspace_membership_by_id(
+        self,
+        *,
+        organization_id: str,
+        workspace_id: str,
+        workspace_membership_id: str,
+        retries: OptionalNullable[utils.RetryConfig] = UNSET,
+        server_url: Optional[str] = None,
+        timeout_ms: Optional[int] = None,
+        http_headers: Optional[Mapping[str, str]] = None,
+    ):
+        r"""Delete a workspace membership
+
+        Revoke a user's membership to a `Workspace`.
+
+
+        :param organization_id: The unique identifier of the organization
+        :param workspace_id: The unique identifier of the workspace
+        :param workspace_membership_id: The unique identifier of the workspace membership
+        :param retries: Override the default retry configuration for this method
+        :param server_url: Override the default server URL for this method
+        :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
+        :param http_headers: Additional headers to set or replace on requests.
+        """
+        base_url = None
+        url_variables = None
+        if timeout_ms is None:
+            timeout_ms = self.sdk_configuration.timeout_ms
+
+        if server_url is not None:
+            base_url = server_url
+        else:
+            base_url = self._get_url(base_url, url_variables)
+
+        request = models.DeleteWorkspaceMembershipByIDRequest(
+            organization_id=organization_id,
+            workspace_id=workspace_id,
+            workspace_membership_id=workspace_membership_id,
+        )
+
+        req = self._build_request(
+            method="DELETE",
+            path="/organizations/{organizationId}/workspaces/{workspaceId}/memberships/{workspaceMembershipId}",
+            base_url=base_url,
+            url_variables=url_variables,
+            request=request,
+            request_body_required=False,
+            request_has_path_params=True,
+            request_has_query_params=True,
+            user_agent_header="user-agent",
+            accept_header_value="application/json",
+            http_headers=http_headers,
+            security=self.sdk_configuration.security,
+            allow_empty_value=None,
+            timeout_ms=timeout_ms,
+        )
+
+        if retries == UNSET:
+            if self.sdk_configuration.retry_config is not UNSET:
+                retries = self.sdk_configuration.retry_config
+
+        retry_config = None
+        if isinstance(retries, utils.RetryConfig):
+            retry_config = (retries, ["429", "500", "502", "503", "504"])
+
+        http_res = self.do_request(
+            hook_ctx=HookContext(
+                config=self.sdk_configuration,
+                base_url=base_url or "",
+                operation_id="deleteWorkspaceMembershipById",
                 oauth2_scopes=["organization:write"],
                 security_source=self.sdk_configuration.security,
             ),
@@ -6607,30 +6773,25 @@ class Admin(BaseSDK):
 
         raise errors.SDKError("Unexpected response received", http_res)
 
-    async def modify_workspace_group_members_async(
+    async def delete_workspace_membership_by_id_async(
         self,
         *,
-        group_id: str,
         organization_id: str,
         workspace_id: str,
-        bulk_workspace_group_members_modification: Union[
-            models.BulkWorkspaceGroupMembersModification,
-            models.BulkWorkspaceGroupMembersModificationTypedDict,
-        ],
+        workspace_membership_id: str,
         retries: OptionalNullable[utils.RetryConfig] = UNSET,
         server_url: Optional[str] = None,
         timeout_ms: Optional[int] = None,
         http_headers: Optional[Mapping[str, str]] = None,
     ):
-        r"""Modify members in a group
+        r"""Delete a workspace membership
 
-        Add and/or remove members from a group. When failures are encountered for particular members, error responses are returned for each.
+        Revoke a user's membership to a `Workspace`.
 
 
-        :param group_id: The unique identifier of the group
         :param organization_id: The unique identifier of the organization
         :param workspace_id: The unique identifier of the workspace
-        :param bulk_workspace_group_members_modification: Details about the group member modification.
+        :param workspace_membership_id: The unique identifier of the workspace membership
         :param retries: Override the default retry configuration for this method
         :param server_url: Override the default server URL for this method
         :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
@@ -6646,36 +6807,25 @@ class Admin(BaseSDK):
         else:
             base_url = self._get_url(base_url, url_variables)
 
-        request = models.ModifyWorkspaceGroupMembersRequest(
-            group_id=group_id,
+        request = models.DeleteWorkspaceMembershipByIDRequest(
             organization_id=organization_id,
             workspace_id=workspace_id,
-            bulk_workspace_group_members_modification=utils.get_pydantic_model(
-                bulk_workspace_group_members_modification,
-                models.BulkWorkspaceGroupMembersModification,
-            ),
+            workspace_membership_id=workspace_membership_id,
         )
 
         req = self._build_request_async(
-            method="POST",
-            path="/organizations/{organizationId}/workspaces/{workspaceId}/groups/{groupId}/members/modification",
+            method="DELETE",
+            path="/organizations/{organizationId}/workspaces/{workspaceId}/memberships/{workspaceMembershipId}",
             base_url=base_url,
             url_variables=url_variables,
             request=request,
-            request_body_required=True,
+            request_body_required=False,
             request_has_path_params=True,
             request_has_query_params=True,
             user_agent_header="user-agent",
             accept_header_value="application/json",
             http_headers=http_headers,
             security=self.sdk_configuration.security,
-            get_serialized_body=lambda: utils.serialize_request_body(
-                request.bulk_workspace_group_members_modification,
-                False,
-                False,
-                "json",
-                models.BulkWorkspaceGroupMembersModification,
-            ),
             allow_empty_value=None,
             timeout_ms=timeout_ms,
         )
@@ -6692,7 +6842,7 @@ class Admin(BaseSDK):
             hook_ctx=HookContext(
                 config=self.sdk_configuration,
                 base_url=base_url or "",
-                operation_id="modifyWorkspaceGroupMembers",
+                operation_id="deleteWorkspaceMembershipById",
                 oauth2_scopes=["organization:write"],
                 security_source=self.sdk_configuration.security,
             ),
@@ -6732,29 +6882,25 @@ class Admin(BaseSDK):
 
         raise errors.SDKError("Unexpected response received", http_res)
 
-    def partially_update_organization_by_id(
+    def get_workspace_membership_by_id(
         self,
         *,
         organization_id: str,
-        request_body: Union[
-            List[models.JSONPatchOperation], List[models.JSONPatchOperationTypedDict]
-        ],
+        workspace_id: str,
+        workspace_membership_id: str,
         retries: OptionalNullable[utils.RetryConfig] = UNSET,
         server_url: Optional[str] = None,
         timeout_ms: Optional[int] = None,
         http_headers: Optional[Mapping[str, str]] = None,
-    ) -> models.Organization:
-        r"""Update a single organization
+    ) -> models.WorkspaceMembership:
+        r"""Retrieve a single workspace membership
 
-        Updates the properties of an organization.
-        ### Options
-        |Path|PATCH Operations Supported|
-        |---|---|
-        |`/name`|`replace`|
+        Retrieves a workspace membership given its ID
 
 
         :param organization_id: The unique identifier of the organization
-        :param request_body: A collection of patch operations to apply to the organization.
+        :param workspace_id: The unique identifier of the workspace
+        :param workspace_membership_id: The unique identifier of the workspace membership
         :param retries: Override the default retry configuration for this method
         :param server_url: Override the default server URL for this method
         :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
@@ -6770,33 +6916,25 @@ class Admin(BaseSDK):
         else:
             base_url = self._get_url(base_url, url_variables)
 
-        request = models.PartiallyUpdateOrganizationByIDRequest(
+        request = models.GetWorkspaceMembershipByIDRequest(
             organization_id=organization_id,
-            request_body=utils.get_pydantic_model(
-                request_body, List[models.JSONPatchOperation]
-            ),
+            workspace_id=workspace_id,
+            workspace_membership_id=workspace_membership_id,
         )
 
         req = self._build_request(
-            method="PATCH",
-            path="/organizations/{organizationId}",
+            method="GET",
+            path="/organizations/{organizationId}/workspaces/{workspaceId}/memberships/{workspaceMembershipId}",
             base_url=base_url,
             url_variables=url_variables,
             request=request,
-            request_body_required=True,
+            request_body_required=False,
             request_has_path_params=True,
             request_has_query_params=True,
             user_agent_header="user-agent",
             accept_header_value="application/json",
             http_headers=http_headers,
             security=self.sdk_configuration.security,
-            get_serialized_body=lambda: utils.serialize_request_body(
-                request.request_body,
-                False,
-                False,
-                "json",
-                List[models.JSONPatchOperation],
-            ),
             allow_empty_value=None,
             timeout_ms=timeout_ms,
         )
@@ -6813,8 +6951,8 @@ class Admin(BaseSDK):
             hook_ctx=HookContext(
                 config=self.sdk_configuration,
                 base_url=base_url or "",
-                operation_id="partiallyUpdateOrganizationById",
-                oauth2_scopes=["organization:write"],
+                operation_id="getWorkspaceMembershipById",
+                oauth2_scopes=["organization:read"],
                 security_source=self.sdk_configuration.security,
             ),
             request=req,
@@ -6835,7 +6973,7 @@ class Admin(BaseSDK):
 
         response_data: Any = None
         if utils.match_response(http_res, "200", "application/json"):
-            return unmarshal_json_response(models.Organization, http_res)
+            return unmarshal_json_response(models.WorkspaceMembership, http_res)
         if utils.match_response(
             http_res, ["400", "401", "403", "404", "409", "429"], "application/json"
         ):
@@ -6853,29 +6991,25 @@ class Admin(BaseSDK):
 
         raise errors.SDKError("Unexpected response received", http_res)
 
-    async def partially_update_organization_by_id_async(
+    async def get_workspace_membership_by_id_async(
         self,
         *,
         organization_id: str,
-        request_body: Union[
-            List[models.JSONPatchOperation], List[models.JSONPatchOperationTypedDict]
-        ],
+        workspace_id: str,
+        workspace_membership_id: str,
         retries: OptionalNullable[utils.RetryConfig] = UNSET,
         server_url: Optional[str] = None,
         timeout_ms: Optional[int] = None,
         http_headers: Optional[Mapping[str, str]] = None,
-    ) -> models.Organization:
-        r"""Update a single organization
+    ) -> models.WorkspaceMembership:
+        r"""Retrieve a single workspace membership
 
-        Updates the properties of an organization.
-        ### Options
-        |Path|PATCH Operations Supported|
-        |---|---|
-        |`/name`|`replace`|
+        Retrieves a workspace membership given its ID
 
 
         :param organization_id: The unique identifier of the organization
-        :param request_body: A collection of patch operations to apply to the organization.
+        :param workspace_id: The unique identifier of the workspace
+        :param workspace_membership_id: The unique identifier of the workspace membership
         :param retries: Override the default retry configuration for this method
         :param server_url: Override the default server URL for this method
         :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
@@ -6891,33 +7025,25 @@ class Admin(BaseSDK):
         else:
             base_url = self._get_url(base_url, url_variables)
 
-        request = models.PartiallyUpdateOrganizationByIDRequest(
+        request = models.GetWorkspaceMembershipByIDRequest(
             organization_id=organization_id,
-            request_body=utils.get_pydantic_model(
-                request_body, List[models.JSONPatchOperation]
-            ),
+            workspace_id=workspace_id,
+            workspace_membership_id=workspace_membership_id,
         )
 
         req = self._build_request_async(
-            method="PATCH",
-            path="/organizations/{organizationId}",
+            method="GET",
+            path="/organizations/{organizationId}/workspaces/{workspaceId}/memberships/{workspaceMembershipId}",
             base_url=base_url,
             url_variables=url_variables,
             request=request,
-            request_body_required=True,
+            request_body_required=False,
             request_has_path_params=True,
             request_has_query_params=True,
             user_agent_header="user-agent",
             accept_header_value="application/json",
             http_headers=http_headers,
             security=self.sdk_configuration.security,
-            get_serialized_body=lambda: utils.serialize_request_body(
-                request.request_body,
-                False,
-                False,
-                "json",
-                List[models.JSONPatchOperation],
-            ),
             allow_empty_value=None,
             timeout_ms=timeout_ms,
         )
@@ -6934,8 +7060,8 @@ class Admin(BaseSDK):
             hook_ctx=HookContext(
                 config=self.sdk_configuration,
                 base_url=base_url or "",
-                operation_id="partiallyUpdateOrganizationById",
-                oauth2_scopes=["organization:write"],
+                operation_id="getWorkspaceMembershipById",
+                oauth2_scopes=["organization:read"],
                 security_source=self.sdk_configuration.security,
             ),
             request=req,
@@ -6956,7 +7082,7 @@ class Admin(BaseSDK):
 
         response_data: Any = None
         if utils.match_response(http_res, "200", "application/json"):
-            return unmarshal_json_response(models.Organization, http_res)
+            return unmarshal_json_response(models.WorkspaceMembership, http_res)
         if utils.match_response(
             http_res, ["400", "401", "403", "404", "409", "429"], "application/json"
         ):
@@ -6974,35 +7100,25 @@ class Admin(BaseSDK):
 
         raise errors.SDKError("Unexpected response received", http_res)
 
-    def partially_update_organization_user_by_id(
+    def get_organization_workspace_membership_roles(
         self,
         *,
         organization_id: str,
-        user_id: str,
-        request_body: Union[
-            List[models.JSONPatchOperation], List[models.JSONPatchOperationTypedDict]
-        ],
+        workspace_id: str,
+        workspace_membership_id: str,
         retries: OptionalNullable[utils.RetryConfig] = UNSET,
         server_url: Optional[str] = None,
         timeout_ms: Optional[int] = None,
         http_headers: Optional[Mapping[str, str]] = None,
-    ) -> models.OrganizationUser:
-        r"""Partially update a single user in an organization
+    ) -> models.WorkspaceMembershipRolesListResult:
+        r"""Retrieve available roles for a workspace membership
 
-        Partially update the properties of a [User](ref:admin#user) within an Organization.
-        ### Options
-        |Path|PATCH Operations Supported|
-        |---|---|
-        |`/givenName`|`replace`|
-        |`/familyName`|`replace`|
-        |`/displayName`|`replace`|
-        |`/username`|`replace`|
-        |`/email`|`replace`|
+        Retrieves available roles for a workspace membership
 
 
         :param organization_id: The unique identifier of the organization
-        :param user_id: The unique identifier of the user
-        :param request_body: Editable details about the User.
+        :param workspace_id: The unique identifier of the workspace
+        :param workspace_membership_id: The unique identifier of the workspace membership
         :param retries: Override the default retry configuration for this method
         :param server_url: Override the default server URL for this method
         :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
@@ -7018,34 +7134,25 @@ class Admin(BaseSDK):
         else:
             base_url = self._get_url(base_url, url_variables)
 
-        request = models.PartiallyUpdateOrganizationUserByIDRequest(
+        request = models.GetOrganizationWorkspaceMembershipRolesRequest(
             organization_id=organization_id,
-            user_id=user_id,
-            request_body=utils.get_pydantic_model(
-                request_body, List[models.JSONPatchOperation]
-            ),
+            workspace_id=workspace_id,
+            workspace_membership_id=workspace_membership_id,
         )
 
         req = self._build_request(
-            method="PATCH",
-            path="/organizations/{organizationId}/users/{userId}",
+            method="GET",
+            path="/organizations/{organizationId}/workspaces/{workspaceId}/memberships/{workspaceMembershipId}/roles",
             base_url=base_url,
             url_variables=url_variables,
             request=request,
-            request_body_required=True,
+            request_body_required=False,
             request_has_path_params=True,
             request_has_query_params=True,
             user_agent_header="user-agent",
             accept_header_value="application/json",
             http_headers=http_headers,
             security=self.sdk_configuration.security,
-            get_serialized_body=lambda: utils.serialize_request_body(
-                request.request_body,
-                False,
-                False,
-                "json",
-                List[models.JSONPatchOperation],
-            ),
             allow_empty_value=None,
             timeout_ms=timeout_ms,
         )
@@ -7062,8 +7169,8 @@ class Admin(BaseSDK):
             hook_ctx=HookContext(
                 config=self.sdk_configuration,
                 base_url=base_url or "",
-                operation_id="partiallyUpdateOrganizationUserById",
-                oauth2_scopes=["organization:write"],
+                operation_id="getOrganizationWorkspaceMembershipRoles",
+                oauth2_scopes=["organization:read"],
                 security_source=self.sdk_configuration.security,
             ),
             request=req,
@@ -7084,7 +7191,9 @@ class Admin(BaseSDK):
 
         response_data: Any = None
         if utils.match_response(http_res, "200", "application/json"):
-            return unmarshal_json_response(models.OrganizationUser, http_res)
+            return unmarshal_json_response(
+                models.WorkspaceMembershipRolesListResult, http_res
+            )
         if utils.match_response(
             http_res, ["400", "401", "403", "404", "409", "429"], "application/json"
         ):
@@ -7102,35 +7211,25 @@ class Admin(BaseSDK):
 
         raise errors.SDKError("Unexpected response received", http_res)
 
-    async def partially_update_organization_user_by_id_async(
+    async def get_organization_workspace_membership_roles_async(
         self,
         *,
         organization_id: str,
-        user_id: str,
-        request_body: Union[
-            List[models.JSONPatchOperation], List[models.JSONPatchOperationTypedDict]
-        ],
+        workspace_id: str,
+        workspace_membership_id: str,
         retries: OptionalNullable[utils.RetryConfig] = UNSET,
         server_url: Optional[str] = None,
         timeout_ms: Optional[int] = None,
         http_headers: Optional[Mapping[str, str]] = None,
-    ) -> models.OrganizationUser:
-        r"""Partially update a single user in an organization
+    ) -> models.WorkspaceMembershipRolesListResult:
+        r"""Retrieve available roles for a workspace membership
 
-        Partially update the properties of a [User](ref:admin#user) within an Organization.
-        ### Options
-        |Path|PATCH Operations Supported|
-        |---|---|
-        |`/givenName`|`replace`|
-        |`/familyName`|`replace`|
-        |`/displayName`|`replace`|
-        |`/username`|`replace`|
-        |`/email`|`replace`|
+        Retrieves available roles for a workspace membership
 
 
         :param organization_id: The unique identifier of the organization
-        :param user_id: The unique identifier of the user
-        :param request_body: Editable details about the User.
+        :param workspace_id: The unique identifier of the workspace
+        :param workspace_membership_id: The unique identifier of the workspace membership
         :param retries: Override the default retry configuration for this method
         :param server_url: Override the default server URL for this method
         :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
@@ -7146,34 +7245,25 @@ class Admin(BaseSDK):
         else:
             base_url = self._get_url(base_url, url_variables)
 
-        request = models.PartiallyUpdateOrganizationUserByIDRequest(
+        request = models.GetOrganizationWorkspaceMembershipRolesRequest(
             organization_id=organization_id,
-            user_id=user_id,
-            request_body=utils.get_pydantic_model(
-                request_body, List[models.JSONPatchOperation]
-            ),
+            workspace_id=workspace_id,
+            workspace_membership_id=workspace_membership_id,
         )
 
         req = self._build_request_async(
-            method="PATCH",
-            path="/organizations/{organizationId}/users/{userId}",
+            method="GET",
+            path="/organizations/{organizationId}/workspaces/{workspaceId}/memberships/{workspaceMembershipId}/roles",
             base_url=base_url,
             url_variables=url_variables,
             request=request,
-            request_body_required=True,
+            request_body_required=False,
             request_has_path_params=True,
             request_has_query_params=True,
             user_agent_header="user-agent",
             accept_header_value="application/json",
             http_headers=http_headers,
             security=self.sdk_configuration.security,
-            get_serialized_body=lambda: utils.serialize_request_body(
-                request.request_body,
-                False,
-                False,
-                "json",
-                List[models.JSONPatchOperation],
-            ),
             allow_empty_value=None,
             timeout_ms=timeout_ms,
         )
@@ -7190,8 +7280,8 @@ class Admin(BaseSDK):
             hook_ctx=HookContext(
                 config=self.sdk_configuration,
                 base_url=base_url or "",
-                operation_id="partiallyUpdateOrganizationUserById",
-                oauth2_scopes=["organization:write"],
+                operation_id="getOrganizationWorkspaceMembershipRoles",
+                oauth2_scopes=["organization:read"],
                 security_source=self.sdk_configuration.security,
             ),
             request=req,
@@ -7212,7 +7302,9 @@ class Admin(BaseSDK):
 
         response_data: Any = None
         if utils.match_response(http_res, "200", "application/json"):
-            return unmarshal_json_response(models.OrganizationUser, http_res)
+            return unmarshal_json_response(
+                models.WorkspaceMembershipRolesListResult, http_res
+            )
         if utils.match_response(
             http_res, ["400", "401", "403", "404", "409", "429"], "application/json"
         ):
@@ -7230,527 +7322,27 @@ class Admin(BaseSDK):
 
         raise errors.SDKError("Unexpected response received", http_res)
 
-    def partially_update_workspace_by_id(
+    def assign_workspace_membership_roles(
         self,
         *,
         organization_id: str,
         workspace_id: str,
-        request_body: Union[
-            List[models.JSONPatchOperation], List[models.JSONPatchOperationTypedDict]
-        ],
-        retries: OptionalNullable[utils.RetryConfig] = UNSET,
-        server_url: Optional[str] = None,
-        timeout_ms: Optional[int] = None,
-        http_headers: Optional[Mapping[str, str]] = None,
-    ) -> models.Workspace:
-        r"""Update a single workspace
-
-        Updates the properties of a workspace.
-        ### Options
-        |Path|PATCH Operations Supported|
-        |---|---|
-        |`/name`|`replace`|
-
-
-        :param organization_id: The unique identifier of the organization
-        :param workspace_id: The unique identifier of the workspace
-        :param request_body: A collection of patch operations to apply to the workspace.
-        :param retries: Override the default retry configuration for this method
-        :param server_url: Override the default server URL for this method
-        :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
-        :param http_headers: Additional headers to set or replace on requests.
-        """
-        base_url = None
-        url_variables = None
-        if timeout_ms is None:
-            timeout_ms = self.sdk_configuration.timeout_ms
-
-        if server_url is not None:
-            base_url = server_url
-        else:
-            base_url = self._get_url(base_url, url_variables)
-
-        request = models.PartiallyUpdateWorkspaceByIDRequest(
-            organization_id=organization_id,
-            workspace_id=workspace_id,
-            request_body=utils.get_pydantic_model(
-                request_body, List[models.JSONPatchOperation]
-            ),
-        )
-
-        req = self._build_request(
-            method="PATCH",
-            path="/organizations/{organizationId}/workspaces/{workspaceId}",
-            base_url=base_url,
-            url_variables=url_variables,
-            request=request,
-            request_body_required=True,
-            request_has_path_params=True,
-            request_has_query_params=True,
-            user_agent_header="user-agent",
-            accept_header_value="application/json",
-            http_headers=http_headers,
-            security=self.sdk_configuration.security,
-            get_serialized_body=lambda: utils.serialize_request_body(
-                request.request_body,
-                False,
-                False,
-                "json",
-                List[models.JSONPatchOperation],
-            ),
-            allow_empty_value=None,
-            timeout_ms=timeout_ms,
-        )
-
-        if retries == UNSET:
-            if self.sdk_configuration.retry_config is not UNSET:
-                retries = self.sdk_configuration.retry_config
-
-        retry_config = None
-        if isinstance(retries, utils.RetryConfig):
-            retry_config = (retries, ["429", "500", "502", "503", "504"])
-
-        http_res = self.do_request(
-            hook_ctx=HookContext(
-                config=self.sdk_configuration,
-                base_url=base_url or "",
-                operation_id="partiallyUpdateWorkspaceById",
-                oauth2_scopes=["organization:write"],
-                security_source=self.sdk_configuration.security,
-            ),
-            request=req,
-            error_status_codes=[
-                "400",
-                "401",
-                "403",
-                "404",
-                "409",
-                "429",
-                "4XX",
-                "500",
-                "503",
-                "5XX",
-            ],
-            retry_config=retry_config,
-        )
-
-        response_data: Any = None
-        if utils.match_response(http_res, "200", "application/json"):
-            return unmarshal_json_response(models.Workspace, http_res)
-        if utils.match_response(
-            http_res, ["400", "401", "403", "404", "409", "429"], "application/json"
-        ):
-            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
-            raise errors.ErrorResponse(response_data, http_res)
-        if utils.match_response(http_res, ["500", "503"], "application/json"):
-            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
-            raise errors.ErrorResponse(response_data, http_res)
-        if utils.match_response(http_res, "4XX", "*"):
-            http_res_text = utils.stream_to_text(http_res)
-            raise errors.SDKError("API error occurred", http_res, http_res_text)
-        if utils.match_response(http_res, "5XX", "*"):
-            http_res_text = utils.stream_to_text(http_res)
-            raise errors.SDKError("API error occurred", http_res, http_res_text)
-
-        raise errors.SDKError("Unexpected response received", http_res)
-
-    async def partially_update_workspace_by_id_async(
-        self,
-        *,
-        organization_id: str,
-        workspace_id: str,
-        request_body: Union[
-            List[models.JSONPatchOperation], List[models.JSONPatchOperationTypedDict]
-        ],
-        retries: OptionalNullable[utils.RetryConfig] = UNSET,
-        server_url: Optional[str] = None,
-        timeout_ms: Optional[int] = None,
-        http_headers: Optional[Mapping[str, str]] = None,
-    ) -> models.Workspace:
-        r"""Update a single workspace
-
-        Updates the properties of a workspace.
-        ### Options
-        |Path|PATCH Operations Supported|
-        |---|---|
-        |`/name`|`replace`|
-
-
-        :param organization_id: The unique identifier of the organization
-        :param workspace_id: The unique identifier of the workspace
-        :param request_body: A collection of patch operations to apply to the workspace.
-        :param retries: Override the default retry configuration for this method
-        :param server_url: Override the default server URL for this method
-        :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
-        :param http_headers: Additional headers to set or replace on requests.
-        """
-        base_url = None
-        url_variables = None
-        if timeout_ms is None:
-            timeout_ms = self.sdk_configuration.timeout_ms
-
-        if server_url is not None:
-            base_url = server_url
-        else:
-            base_url = self._get_url(base_url, url_variables)
-
-        request = models.PartiallyUpdateWorkspaceByIDRequest(
-            organization_id=organization_id,
-            workspace_id=workspace_id,
-            request_body=utils.get_pydantic_model(
-                request_body, List[models.JSONPatchOperation]
-            ),
-        )
-
-        req = self._build_request_async(
-            method="PATCH",
-            path="/organizations/{organizationId}/workspaces/{workspaceId}",
-            base_url=base_url,
-            url_variables=url_variables,
-            request=request,
-            request_body_required=True,
-            request_has_path_params=True,
-            request_has_query_params=True,
-            user_agent_header="user-agent",
-            accept_header_value="application/json",
-            http_headers=http_headers,
-            security=self.sdk_configuration.security,
-            get_serialized_body=lambda: utils.serialize_request_body(
-                request.request_body,
-                False,
-                False,
-                "json",
-                List[models.JSONPatchOperation],
-            ),
-            allow_empty_value=None,
-            timeout_ms=timeout_ms,
-        )
-
-        if retries == UNSET:
-            if self.sdk_configuration.retry_config is not UNSET:
-                retries = self.sdk_configuration.retry_config
-
-        retry_config = None
-        if isinstance(retries, utils.RetryConfig):
-            retry_config = (retries, ["429", "500", "502", "503", "504"])
-
-        http_res = await self.do_request_async(
-            hook_ctx=HookContext(
-                config=self.sdk_configuration,
-                base_url=base_url or "",
-                operation_id="partiallyUpdateWorkspaceById",
-                oauth2_scopes=["organization:write"],
-                security_source=self.sdk_configuration.security,
-            ),
-            request=req,
-            error_status_codes=[
-                "400",
-                "401",
-                "403",
-                "404",
-                "409",
-                "429",
-                "4XX",
-                "500",
-                "503",
-                "5XX",
-            ],
-            retry_config=retry_config,
-        )
-
-        response_data: Any = None
-        if utils.match_response(http_res, "200", "application/json"):
-            return unmarshal_json_response(models.Workspace, http_res)
-        if utils.match_response(
-            http_res, ["400", "401", "403", "404", "409", "429"], "application/json"
-        ):
-            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
-            raise errors.ErrorResponse(response_data, http_res)
-        if utils.match_response(http_res, ["500", "503"], "application/json"):
-            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
-            raise errors.ErrorResponse(response_data, http_res)
-        if utils.match_response(http_res, "4XX", "*"):
-            http_res_text = await utils.stream_to_text_async(http_res)
-            raise errors.SDKError("API error occurred", http_res, http_res_text)
-        if utils.match_response(http_res, "5XX", "*"):
-            http_res_text = await utils.stream_to_text_async(http_res)
-            raise errors.SDKError("API error occurred", http_res, http_res_text)
-
-        raise errors.SDKError("Unexpected response received", http_res)
-
-    def partially_update_workspace_group_by_id(
-        self,
-        *,
-        group_id: str,
-        organization_id: str,
-        workspace_id: str,
-        request_body: Union[
-            List[models.JSONPatchOperation], List[models.JSONPatchOperationTypedDict]
-        ],
-        retries: OptionalNullable[utils.RetryConfig] = UNSET,
-        server_url: Optional[str] = None,
-        timeout_ms: Optional[int] = None,
-        http_headers: Optional[Mapping[str, str]] = None,
-    ) -> models.WorkspaceGroup:
-        r"""Update a single group
-
-        Updates the properties of a group.
-        ### Options
-        |Path|PATCH Operations Supported|
-        |---|---|
-        |`/name`|`replace`|
-
-
-        :param group_id: The unique identifier of the group
-        :param organization_id: The unique identifier of the organization
-        :param workspace_id: The unique identifier of the workspace
-        :param request_body: A collection of patch operations to apply to the group.
-        :param retries: Override the default retry configuration for this method
-        :param server_url: Override the default server URL for this method
-        :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
-        :param http_headers: Additional headers to set or replace on requests.
-        """
-        base_url = None
-        url_variables = None
-        if timeout_ms is None:
-            timeout_ms = self.sdk_configuration.timeout_ms
-
-        if server_url is not None:
-            base_url = server_url
-        else:
-            base_url = self._get_url(base_url, url_variables)
-
-        request = models.PartiallyUpdateWorkspaceGroupByIDRequest(
-            group_id=group_id,
-            organization_id=organization_id,
-            workspace_id=workspace_id,
-            request_body=utils.get_pydantic_model(
-                request_body, List[models.JSONPatchOperation]
-            ),
-        )
-
-        req = self._build_request(
-            method="PATCH",
-            path="/organizations/{organizationId}/workspaces/{workspaceId}/groups/{groupId}",
-            base_url=base_url,
-            url_variables=url_variables,
-            request=request,
-            request_body_required=True,
-            request_has_path_params=True,
-            request_has_query_params=True,
-            user_agent_header="user-agent",
-            accept_header_value="application/json",
-            http_headers=http_headers,
-            security=self.sdk_configuration.security,
-            get_serialized_body=lambda: utils.serialize_request_body(
-                request.request_body,
-                False,
-                False,
-                "json",
-                List[models.JSONPatchOperation],
-            ),
-            allow_empty_value=None,
-            timeout_ms=timeout_ms,
-        )
-
-        if retries == UNSET:
-            if self.sdk_configuration.retry_config is not UNSET:
-                retries = self.sdk_configuration.retry_config
-
-        retry_config = None
-        if isinstance(retries, utils.RetryConfig):
-            retry_config = (retries, ["429", "500", "502", "503", "504"])
-
-        http_res = self.do_request(
-            hook_ctx=HookContext(
-                config=self.sdk_configuration,
-                base_url=base_url or "",
-                operation_id="partiallyUpdateWorkspaceGroupById",
-                oauth2_scopes=["organization:write"],
-                security_source=self.sdk_configuration.security,
-            ),
-            request=req,
-            error_status_codes=[
-                "400",
-                "401",
-                "403",
-                "404",
-                "409",
-                "429",
-                "4XX",
-                "500",
-                "503",
-                "5XX",
-            ],
-            retry_config=retry_config,
-        )
-
-        response_data: Any = None
-        if utils.match_response(http_res, "200", "application/json"):
-            return unmarshal_json_response(models.WorkspaceGroup, http_res)
-        if utils.match_response(
-            http_res, ["400", "401", "403", "404", "409", "429"], "application/json"
-        ):
-            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
-            raise errors.ErrorResponse(response_data, http_res)
-        if utils.match_response(http_res, ["500", "503"], "application/json"):
-            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
-            raise errors.ErrorResponse(response_data, http_res)
-        if utils.match_response(http_res, "4XX", "*"):
-            http_res_text = utils.stream_to_text(http_res)
-            raise errors.SDKError("API error occurred", http_res, http_res_text)
-        if utils.match_response(http_res, "5XX", "*"):
-            http_res_text = utils.stream_to_text(http_res)
-            raise errors.SDKError("API error occurred", http_res, http_res_text)
-
-        raise errors.SDKError("Unexpected response received", http_res)
-
-    async def partially_update_workspace_group_by_id_async(
-        self,
-        *,
-        group_id: str,
-        organization_id: str,
-        workspace_id: str,
-        request_body: Union[
-            List[models.JSONPatchOperation], List[models.JSONPatchOperationTypedDict]
-        ],
-        retries: OptionalNullable[utils.RetryConfig] = UNSET,
-        server_url: Optional[str] = None,
-        timeout_ms: Optional[int] = None,
-        http_headers: Optional[Mapping[str, str]] = None,
-    ) -> models.WorkspaceGroup:
-        r"""Update a single group
-
-        Updates the properties of a group.
-        ### Options
-        |Path|PATCH Operations Supported|
-        |---|---|
-        |`/name`|`replace`|
-
-
-        :param group_id: The unique identifier of the group
-        :param organization_id: The unique identifier of the organization
-        :param workspace_id: The unique identifier of the workspace
-        :param request_body: A collection of patch operations to apply to the group.
-        :param retries: Override the default retry configuration for this method
-        :param server_url: Override the default server URL for this method
-        :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
-        :param http_headers: Additional headers to set or replace on requests.
-        """
-        base_url = None
-        url_variables = None
-        if timeout_ms is None:
-            timeout_ms = self.sdk_configuration.timeout_ms
-
-        if server_url is not None:
-            base_url = server_url
-        else:
-            base_url = self._get_url(base_url, url_variables)
-
-        request = models.PartiallyUpdateWorkspaceGroupByIDRequest(
-            group_id=group_id,
-            organization_id=organization_id,
-            workspace_id=workspace_id,
-            request_body=utils.get_pydantic_model(
-                request_body, List[models.JSONPatchOperation]
-            ),
-        )
-
-        req = self._build_request_async(
-            method="PATCH",
-            path="/organizations/{organizationId}/workspaces/{workspaceId}/groups/{groupId}",
-            base_url=base_url,
-            url_variables=url_variables,
-            request=request,
-            request_body_required=True,
-            request_has_path_params=True,
-            request_has_query_params=True,
-            user_agent_header="user-agent",
-            accept_header_value="application/json",
-            http_headers=http_headers,
-            security=self.sdk_configuration.security,
-            get_serialized_body=lambda: utils.serialize_request_body(
-                request.request_body,
-                False,
-                False,
-                "json",
-                List[models.JSONPatchOperation],
-            ),
-            allow_empty_value=None,
-            timeout_ms=timeout_ms,
-        )
-
-        if retries == UNSET:
-            if self.sdk_configuration.retry_config is not UNSET:
-                retries = self.sdk_configuration.retry_config
-
-        retry_config = None
-        if isinstance(retries, utils.RetryConfig):
-            retry_config = (retries, ["429", "500", "502", "503", "504"])
-
-        http_res = await self.do_request_async(
-            hook_ctx=HookContext(
-                config=self.sdk_configuration,
-                base_url=base_url or "",
-                operation_id="partiallyUpdateWorkspaceGroupById",
-                oauth2_scopes=["organization:write"],
-                security_source=self.sdk_configuration.security,
-            ),
-            request=req,
-            error_status_codes=[
-                "400",
-                "401",
-                "403",
-                "404",
-                "409",
-                "429",
-                "4XX",
-                "500",
-                "503",
-                "5XX",
-            ],
-            retry_config=retry_config,
-        )
-
-        response_data: Any = None
-        if utils.match_response(http_res, "200", "application/json"):
-            return unmarshal_json_response(models.WorkspaceGroup, http_res)
-        if utils.match_response(
-            http_res, ["400", "401", "403", "404", "409", "429"], "application/json"
-        ):
-            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
-            raise errors.ErrorResponse(response_data, http_res)
-        if utils.match_response(http_res, ["500", "503"], "application/json"):
-            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
-            raise errors.ErrorResponse(response_data, http_res)
-        if utils.match_response(http_res, "4XX", "*"):
-            http_res_text = await utils.stream_to_text_async(http_res)
-            raise errors.SDKError("API error occurred", http_res, http_res_text)
-        if utils.match_response(http_res, "5XX", "*"):
-            http_res_text = await utils.stream_to_text_async(http_res)
-            raise errors.SDKError("API error occurred", http_res, http_res_text)
-
-        raise errors.SDKError("Unexpected response received", http_res)
-
-    def revoke_organization_user_roles(
-        self,
-        *,
-        organization_id: str,
-        user_id: str,
+        workspace_membership_id: str,
         request_body: List[str],
         retries: OptionalNullable[utils.RetryConfig] = UNSET,
         server_url: Optional[str] = None,
         timeout_ms: Optional[int] = None,
         http_headers: Optional[Mapping[str, str]] = None,
-    ) -> models.RevokeOrganizationUserRolesResponse:
-        r"""Revoke roles for an Organization User
+    ) -> models.AssignWorkspaceMembershipRolesResponse:
+        r"""Assign roles for a Workspace Membership
 
-        Revoke a User's roles within an Organization. If one revocation fails, all revocations fail.
+        Assign a member's roles within a Workspace. If one assignment fails, all assignments fail.
 
 
         :param organization_id: The unique identifier of the organization
-        :param user_id: The unique identifier of the user
-        :param request_body: Editable details about the user's roles.
+        :param workspace_id: The unique identifier of the workspace
+        :param workspace_membership_id: The unique identifier of the workspace membership
+        :param request_body: Editable details about the workspace member's roles.
         :param retries: Override the default retry configuration for this method
         :param server_url: Override the default server URL for this method
         :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
@@ -7766,15 +7358,16 @@ class Admin(BaseSDK):
         else:
             base_url = self._get_url(base_url, url_variables)
 
-        request = models.RevokeOrganizationUserRolesRequest(
+        request = models.AssignWorkspaceMembershipRolesRequest(
             organization_id=organization_id,
-            user_id=user_id,
+            workspace_id=workspace_id,
+            workspace_membership_id=workspace_membership_id,
             request_body=request_body,
         )
 
         req = self._build_request(
             method="POST",
-            path="/organizations/{organizationId}/users/{userId}/roles/revocation",
+            path="/organizations/{organizationId}/workspaces/{workspaceId}/memberships/{workspaceMembershipId}/roles/assignment",
             base_url=base_url,
             url_variables=url_variables,
             request=request,
@@ -7804,7 +7397,7 @@ class Admin(BaseSDK):
             hook_ctx=HookContext(
                 config=self.sdk_configuration,
                 base_url=base_url or "",
-                operation_id="revokeOrganizationUserRoles",
+                operation_id="assignWorkspaceMembershipRoles",
                 oauth2_scopes=["organization:write"],
                 security_source=self.sdk_configuration.security,
             ),
@@ -7826,7 +7419,7 @@ class Admin(BaseSDK):
 
         response_data: Any = None
         if utils.match_response(http_res, "202", "*"):
-            return models.RevokeOrganizationUserRolesResponse(
+            return models.AssignWorkspaceMembershipRolesResponse(
                 headers=utils.get_response_headers(http_res.headers)
             )
         if utils.match_response(
@@ -7846,25 +7439,27 @@ class Admin(BaseSDK):
 
         raise errors.SDKError("Unexpected response received", http_res)
 
-    async def revoke_organization_user_roles_async(
+    async def assign_workspace_membership_roles_async(
         self,
         *,
         organization_id: str,
-        user_id: str,
+        workspace_id: str,
+        workspace_membership_id: str,
         request_body: List[str],
         retries: OptionalNullable[utils.RetryConfig] = UNSET,
         server_url: Optional[str] = None,
         timeout_ms: Optional[int] = None,
         http_headers: Optional[Mapping[str, str]] = None,
-    ) -> models.RevokeOrganizationUserRolesResponse:
-        r"""Revoke roles for an Organization User
+    ) -> models.AssignWorkspaceMembershipRolesResponse:
+        r"""Assign roles for a Workspace Membership
 
-        Revoke a User's roles within an Organization. If one revocation fails, all revocations fail.
+        Assign a member's roles within a Workspace. If one assignment fails, all assignments fail.
 
 
         :param organization_id: The unique identifier of the organization
-        :param user_id: The unique identifier of the user
-        :param request_body: Editable details about the user's roles.
+        :param workspace_id: The unique identifier of the workspace
+        :param workspace_membership_id: The unique identifier of the workspace membership
+        :param request_body: Editable details about the workspace member's roles.
         :param retries: Override the default retry configuration for this method
         :param server_url: Override the default server URL for this method
         :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
@@ -7880,15 +7475,16 @@ class Admin(BaseSDK):
         else:
             base_url = self._get_url(base_url, url_variables)
 
-        request = models.RevokeOrganizationUserRolesRequest(
+        request = models.AssignWorkspaceMembershipRolesRequest(
             organization_id=organization_id,
-            user_id=user_id,
+            workspace_id=workspace_id,
+            workspace_membership_id=workspace_membership_id,
             request_body=request_body,
         )
 
         req = self._build_request_async(
             method="POST",
-            path="/organizations/{organizationId}/users/{userId}/roles/revocation",
+            path="/organizations/{organizationId}/workspaces/{workspaceId}/memberships/{workspaceMembershipId}/roles/assignment",
             base_url=base_url,
             url_variables=url_variables,
             request=request,
@@ -7918,7 +7514,7 @@ class Admin(BaseSDK):
             hook_ctx=HookContext(
                 config=self.sdk_configuration,
                 base_url=base_url or "",
-                operation_id="revokeOrganizationUserRoles",
+                operation_id="assignWorkspaceMembershipRoles",
                 oauth2_scopes=["organization:write"],
                 security_source=self.sdk_configuration.security,
             ),
@@ -7940,7 +7536,7 @@ class Admin(BaseSDK):
 
         response_data: Any = None
         if utils.match_response(http_res, "202", "*"):
-            return models.RevokeOrganizationUserRolesResponse(
+            return models.AssignWorkspaceMembershipRolesResponse(
                 headers=utils.get_response_headers(http_res.headers)
             )
         if utils.match_response(
@@ -8194,28 +7790,23 @@ class Admin(BaseSDK):
 
         raise errors.SDKError("Unexpected response received", http_res)
 
-    def workspace_membership_creation_with_options(
+    def get_organization_workspace_roles(
         self,
         *,
         organization_id: str,
         workspace_id: str,
-        workspace_membership_creation: Union[
-            models.WorkspaceMembershipCreation,
-            models.WorkspaceMembershipCreationTypedDict,
-        ],
         retries: OptionalNullable[utils.RetryConfig] = UNSET,
         server_url: Optional[str] = None,
         timeout_ms: Optional[int] = None,
         http_headers: Optional[Mapping[str, str]] = None,
-    ) -> models.WorkspaceMembership:
-        r"""Create a new workspace membership with options
+    ) -> models.WorkspaceRolesListResult:
+        r"""Retrieve available roles within a workspace
 
-        Creates a new `WorkspaceMembership` and allows control over notification options.
+        Retrieves available roles within a workspace given an organization and workspace ID
 
 
         :param organization_id: The unique identifier of the organization
         :param workspace_id: The unique identifier of the workspace
-        :param workspace_membership_creation: Details about the workspace membership creation.
         :param retries: Override the default retry configuration for this method
         :param server_url: Override the default server URL for this method
         :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
@@ -8231,34 +7822,24 @@ class Admin(BaseSDK):
         else:
             base_url = self._get_url(base_url, url_variables)
 
-        request = models.WorkspaceMembershipCreationWithOptionsRequest(
+        request = models.GetOrganizationWorkspaceRolesRequest(
             organization_id=organization_id,
             workspace_id=workspace_id,
-            workspace_membership_creation=utils.get_pydantic_model(
-                workspace_membership_creation, models.WorkspaceMembershipCreation
-            ),
         )
 
         req = self._build_request(
-            method="POST",
-            path="/organizations/{organizationId}/workspaces/{workspaceId}/memberships/membershipCreation",
+            method="GET",
+            path="/organizations/{organizationId}/workspaces/{workspaceId}/roles",
             base_url=base_url,
             url_variables=url_variables,
             request=request,
-            request_body_required=True,
+            request_body_required=False,
             request_has_path_params=True,
             request_has_query_params=True,
             user_agent_header="user-agent",
             accept_header_value="application/json",
             http_headers=http_headers,
             security=self.sdk_configuration.security,
-            get_serialized_body=lambda: utils.serialize_request_body(
-                request.workspace_membership_creation,
-                False,
-                False,
-                "json",
-                models.WorkspaceMembershipCreation,
-            ),
             allow_empty_value=None,
             timeout_ms=timeout_ms,
         )
@@ -8275,8 +7856,8 @@ class Admin(BaseSDK):
             hook_ctx=HookContext(
                 config=self.sdk_configuration,
                 base_url=base_url or "",
-                operation_id="workspaceMembershipCreationWithOptions",
-                oauth2_scopes=["organization:write"],
+                operation_id="getOrganizationWorkspaceRoles",
+                oauth2_scopes=["organization:read"],
                 security_source=self.sdk_configuration.security,
             ),
             request=req,
@@ -8296,8 +7877,8 @@ class Admin(BaseSDK):
         )
 
         response_data: Any = None
-        if utils.match_response(http_res, "201", "application/json"):
-            return unmarshal_json_response(models.WorkspaceMembership, http_res)
+        if utils.match_response(http_res, "200", "application/json"):
+            return unmarshal_json_response(models.WorkspaceRolesListResult, http_res)
         if utils.match_response(
             http_res, ["400", "401", "403", "404", "409", "429"], "application/json"
         ):
@@ -8315,28 +7896,23 @@ class Admin(BaseSDK):
 
         raise errors.SDKError("Unexpected response received", http_res)
 
-    async def workspace_membership_creation_with_options_async(
+    async def get_organization_workspace_roles_async(
         self,
         *,
         organization_id: str,
         workspace_id: str,
-        workspace_membership_creation: Union[
-            models.WorkspaceMembershipCreation,
-            models.WorkspaceMembershipCreationTypedDict,
-        ],
         retries: OptionalNullable[utils.RetryConfig] = UNSET,
         server_url: Optional[str] = None,
         timeout_ms: Optional[int] = None,
         http_headers: Optional[Mapping[str, str]] = None,
-    ) -> models.WorkspaceMembership:
-        r"""Create a new workspace membership with options
+    ) -> models.WorkspaceRolesListResult:
+        r"""Retrieve available roles within a workspace
 
-        Creates a new `WorkspaceMembership` and allows control over notification options.
+        Retrieves available roles within a workspace given an organization and workspace ID
 
 
         :param organization_id: The unique identifier of the organization
         :param workspace_id: The unique identifier of the workspace
-        :param workspace_membership_creation: Details about the workspace membership creation.
         :param retries: Override the default retry configuration for this method
         :param server_url: Override the default server URL for this method
         :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
@@ -8352,34 +7928,24 @@ class Admin(BaseSDK):
         else:
             base_url = self._get_url(base_url, url_variables)
 
-        request = models.WorkspaceMembershipCreationWithOptionsRequest(
+        request = models.GetOrganizationWorkspaceRolesRequest(
             organization_id=organization_id,
             workspace_id=workspace_id,
-            workspace_membership_creation=utils.get_pydantic_model(
-                workspace_membership_creation, models.WorkspaceMembershipCreation
-            ),
         )
 
         req = self._build_request_async(
-            method="POST",
-            path="/organizations/{organizationId}/workspaces/{workspaceId}/memberships/membershipCreation",
+            method="GET",
+            path="/organizations/{organizationId}/workspaces/{workspaceId}/roles",
             base_url=base_url,
             url_variables=url_variables,
             request=request,
-            request_body_required=True,
+            request_body_required=False,
             request_has_path_params=True,
             request_has_query_params=True,
             user_agent_header="user-agent",
             accept_header_value="application/json",
             http_headers=http_headers,
             security=self.sdk_configuration.security,
-            get_serialized_body=lambda: utils.serialize_request_body(
-                request.workspace_membership_creation,
-                False,
-                False,
-                "json",
-                models.WorkspaceMembershipCreation,
-            ),
             allow_empty_value=None,
             timeout_ms=timeout_ms,
         )
@@ -8396,8 +7962,8 @@ class Admin(BaseSDK):
             hook_ctx=HookContext(
                 config=self.sdk_configuration,
                 base_url=base_url or "",
-                operation_id="workspaceMembershipCreationWithOptions",
-                oauth2_scopes=["organization:write"],
+                operation_id="getOrganizationWorkspaceRoles",
+                oauth2_scopes=["organization:read"],
                 security_source=self.sdk_configuration.security,
             ),
             request=req,
@@ -8417,8 +7983,442 @@ class Admin(BaseSDK):
         )
 
         response_data: Any = None
-        if utils.match_response(http_res, "201", "application/json"):
-            return unmarshal_json_response(models.WorkspaceMembership, http_res)
+        if utils.match_response(http_res, "200", "application/json"):
+            return unmarshal_json_response(models.WorkspaceRolesListResult, http_res)
+        if utils.match_response(
+            http_res, ["400", "401", "403", "404", "409", "429"], "application/json"
+        ):
+            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
+            raise errors.ErrorResponse(response_data, http_res)
+        if utils.match_response(http_res, ["500", "503"], "application/json"):
+            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
+            raise errors.ErrorResponse(response_data, http_res)
+        if utils.match_response(http_res, "4XX", "*"):
+            http_res_text = await utils.stream_to_text_async(http_res)
+            raise errors.SDKError("API error occurred", http_res, http_res_text)
+        if utils.match_response(http_res, "5XX", "*"):
+            http_res_text = await utils.stream_to_text_async(http_res)
+            raise errors.SDKError("API error occurred", http_res, http_res_text)
+
+        raise errors.SDKError("Unexpected response received", http_res)
+
+    def get_workspace_solutions(
+        self,
+        *,
+        organization_id: str,
+        workspace_id: str,
+        retries: OptionalNullable[utils.RetryConfig] = UNSET,
+        server_url: Optional[str] = None,
+        timeout_ms: Optional[int] = None,
+        http_headers: Optional[Mapping[str, str]] = None,
+    ) -> models.WorkspaceSolutionsListResult:
+        r"""Retrieve available solutions within a workspace
+
+        Retrieves available solutions within a workspace given its ID
+
+
+        :param organization_id: The unique identifier of the organization
+        :param workspace_id: The unique identifier of the workspace
+        :param retries: Override the default retry configuration for this method
+        :param server_url: Override the default server URL for this method
+        :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
+        :param http_headers: Additional headers to set or replace on requests.
+        """
+        base_url = None
+        url_variables = None
+        if timeout_ms is None:
+            timeout_ms = self.sdk_configuration.timeout_ms
+
+        if server_url is not None:
+            base_url = server_url
+        else:
+            base_url = self._get_url(base_url, url_variables)
+
+        request = models.GetWorkspaceSolutionsRequest(
+            organization_id=organization_id,
+            workspace_id=workspace_id,
+        )
+
+        req = self._build_request(
+            method="GET",
+            path="/organizations/{organizationId}/workspaces/{workspaceId}/solutions",
+            base_url=base_url,
+            url_variables=url_variables,
+            request=request,
+            request_body_required=False,
+            request_has_path_params=True,
+            request_has_query_params=True,
+            user_agent_header="user-agent",
+            accept_header_value="application/json",
+            http_headers=http_headers,
+            security=self.sdk_configuration.security,
+            allow_empty_value=None,
+            timeout_ms=timeout_ms,
+        )
+
+        if retries == UNSET:
+            if self.sdk_configuration.retry_config is not UNSET:
+                retries = self.sdk_configuration.retry_config
+
+        retry_config = None
+        if isinstance(retries, utils.RetryConfig):
+            retry_config = (retries, ["429", "500", "502", "503", "504"])
+
+        http_res = self.do_request(
+            hook_ctx=HookContext(
+                config=self.sdk_configuration,
+                base_url=base_url or "",
+                operation_id="getWorkspaceSolutions",
+                oauth2_scopes=["organization:read"],
+                security_source=self.sdk_configuration.security,
+            ),
+            request=req,
+            error_status_codes=[
+                "400",
+                "401",
+                "403",
+                "404",
+                "409",
+                "429",
+                "4XX",
+                "500",
+                "503",
+                "5XX",
+            ],
+            retry_config=retry_config,
+        )
+
+        response_data: Any = None
+        if utils.match_response(http_res, "200", "application/json"):
+            return unmarshal_json_response(
+                models.WorkspaceSolutionsListResult, http_res
+            )
+        if utils.match_response(
+            http_res, ["400", "401", "403", "404", "409", "429"], "application/json"
+        ):
+            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
+            raise errors.ErrorResponse(response_data, http_res)
+        if utils.match_response(http_res, ["500", "503"], "application/json"):
+            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
+            raise errors.ErrorResponse(response_data, http_res)
+        if utils.match_response(http_res, "4XX", "*"):
+            http_res_text = utils.stream_to_text(http_res)
+            raise errors.SDKError("API error occurred", http_res, http_res_text)
+        if utils.match_response(http_res, "5XX", "*"):
+            http_res_text = utils.stream_to_text(http_res)
+            raise errors.SDKError("API error occurred", http_res, http_res_text)
+
+        raise errors.SDKError("Unexpected response received", http_res)
+
+    async def get_workspace_solutions_async(
+        self,
+        *,
+        organization_id: str,
+        workspace_id: str,
+        retries: OptionalNullable[utils.RetryConfig] = UNSET,
+        server_url: Optional[str] = None,
+        timeout_ms: Optional[int] = None,
+        http_headers: Optional[Mapping[str, str]] = None,
+    ) -> models.WorkspaceSolutionsListResult:
+        r"""Retrieve available solutions within a workspace
+
+        Retrieves available solutions within a workspace given its ID
+
+
+        :param organization_id: The unique identifier of the organization
+        :param workspace_id: The unique identifier of the workspace
+        :param retries: Override the default retry configuration for this method
+        :param server_url: Override the default server URL for this method
+        :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
+        :param http_headers: Additional headers to set or replace on requests.
+        """
+        base_url = None
+        url_variables = None
+        if timeout_ms is None:
+            timeout_ms = self.sdk_configuration.timeout_ms
+
+        if server_url is not None:
+            base_url = server_url
+        else:
+            base_url = self._get_url(base_url, url_variables)
+
+        request = models.GetWorkspaceSolutionsRequest(
+            organization_id=organization_id,
+            workspace_id=workspace_id,
+        )
+
+        req = self._build_request_async(
+            method="GET",
+            path="/organizations/{organizationId}/workspaces/{workspaceId}/solutions",
+            base_url=base_url,
+            url_variables=url_variables,
+            request=request,
+            request_body_required=False,
+            request_has_path_params=True,
+            request_has_query_params=True,
+            user_agent_header="user-agent",
+            accept_header_value="application/json",
+            http_headers=http_headers,
+            security=self.sdk_configuration.security,
+            allow_empty_value=None,
+            timeout_ms=timeout_ms,
+        )
+
+        if retries == UNSET:
+            if self.sdk_configuration.retry_config is not UNSET:
+                retries = self.sdk_configuration.retry_config
+
+        retry_config = None
+        if isinstance(retries, utils.RetryConfig):
+            retry_config = (retries, ["429", "500", "502", "503", "504"])
+
+        http_res = await self.do_request_async(
+            hook_ctx=HookContext(
+                config=self.sdk_configuration,
+                base_url=base_url or "",
+                operation_id="getWorkspaceSolutions",
+                oauth2_scopes=["organization:read"],
+                security_source=self.sdk_configuration.security,
+            ),
+            request=req,
+            error_status_codes=[
+                "400",
+                "401",
+                "403",
+                "404",
+                "409",
+                "429",
+                "4XX",
+                "500",
+                "503",
+                "5XX",
+            ],
+            retry_config=retry_config,
+        )
+
+        response_data: Any = None
+        if utils.match_response(http_res, "200", "application/json"):
+            return unmarshal_json_response(
+                models.WorkspaceSolutionsListResult, http_res
+            )
+        if utils.match_response(
+            http_res, ["400", "401", "403", "404", "409", "429"], "application/json"
+        ):
+            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
+            raise errors.ErrorResponse(response_data, http_res)
+        if utils.match_response(http_res, ["500", "503"], "application/json"):
+            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
+            raise errors.ErrorResponse(response_data, http_res)
+        if utils.match_response(http_res, "4XX", "*"):
+            http_res_text = await utils.stream_to_text_async(http_res)
+            raise errors.SDKError("API error occurred", http_res, http_res_text)
+        if utils.match_response(http_res, "5XX", "*"):
+            http_res_text = await utils.stream_to_text_async(http_res)
+            raise errors.SDKError("API error occurred", http_res, http_res_text)
+
+        raise errors.SDKError("Unexpected response received", http_res)
+
+    def get_workspace_solutions_by_id(
+        self,
+        *,
+        organization_id: str,
+        workspace_id: str,
+        solution_id: str,
+        retries: OptionalNullable[utils.RetryConfig] = UNSET,
+        server_url: Optional[str] = None,
+        timeout_ms: Optional[int] = None,
+        http_headers: Optional[Mapping[str, str]] = None,
+    ) -> models.Solution:
+        r"""Retrieve a solution by id
+
+        Retrieve a solutions within a workspace given its ID
+
+
+        :param organization_id: The unique identifier of the organization
+        :param workspace_id: The unique identifier of the workspace
+        :param solution_id: The unique identifier of the solution
+        :param retries: Override the default retry configuration for this method
+        :param server_url: Override the default server URL for this method
+        :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
+        :param http_headers: Additional headers to set or replace on requests.
+        """
+        base_url = None
+        url_variables = None
+        if timeout_ms is None:
+            timeout_ms = self.sdk_configuration.timeout_ms
+
+        if server_url is not None:
+            base_url = server_url
+        else:
+            base_url = self._get_url(base_url, url_variables)
+
+        request = models.GetWorkspaceSolutionsByIDRequest(
+            organization_id=organization_id,
+            workspace_id=workspace_id,
+            solution_id=solution_id,
+        )
+
+        req = self._build_request(
+            method="GET",
+            path="/organizations/{organizationId}/workspaces/{workspaceId}/solutions/{solutionId}",
+            base_url=base_url,
+            url_variables=url_variables,
+            request=request,
+            request_body_required=False,
+            request_has_path_params=True,
+            request_has_query_params=True,
+            user_agent_header="user-agent",
+            accept_header_value="application/json",
+            http_headers=http_headers,
+            security=self.sdk_configuration.security,
+            allow_empty_value=None,
+            timeout_ms=timeout_ms,
+        )
+
+        if retries == UNSET:
+            if self.sdk_configuration.retry_config is not UNSET:
+                retries = self.sdk_configuration.retry_config
+
+        retry_config = None
+        if isinstance(retries, utils.RetryConfig):
+            retry_config = (retries, ["429", "500", "502", "503", "504"])
+
+        http_res = self.do_request(
+            hook_ctx=HookContext(
+                config=self.sdk_configuration,
+                base_url=base_url or "",
+                operation_id="getWorkspaceSolutionsByID",
+                oauth2_scopes=["organization:read"],
+                security_source=self.sdk_configuration.security,
+            ),
+            request=req,
+            error_status_codes=[
+                "400",
+                "401",
+                "403",
+                "404",
+                "409",
+                "429",
+                "4XX",
+                "500",
+                "503",
+                "5XX",
+            ],
+            retry_config=retry_config,
+        )
+
+        response_data: Any = None
+        if utils.match_response(http_res, "200", "application/json"):
+            return unmarshal_json_response(models.Solution, http_res)
+        if utils.match_response(
+            http_res, ["400", "401", "403", "404", "409", "429"], "application/json"
+        ):
+            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
+            raise errors.ErrorResponse(response_data, http_res)
+        if utils.match_response(http_res, ["500", "503"], "application/json"):
+            response_data = unmarshal_json_response(errors.ErrorResponseData, http_res)
+            raise errors.ErrorResponse(response_data, http_res)
+        if utils.match_response(http_res, "4XX", "*"):
+            http_res_text = utils.stream_to_text(http_res)
+            raise errors.SDKError("API error occurred", http_res, http_res_text)
+        if utils.match_response(http_res, "5XX", "*"):
+            http_res_text = utils.stream_to_text(http_res)
+            raise errors.SDKError("API error occurred", http_res, http_res_text)
+
+        raise errors.SDKError("Unexpected response received", http_res)
+
+    async def get_workspace_solutions_by_id_async(
+        self,
+        *,
+        organization_id: str,
+        workspace_id: str,
+        solution_id: str,
+        retries: OptionalNullable[utils.RetryConfig] = UNSET,
+        server_url: Optional[str] = None,
+        timeout_ms: Optional[int] = None,
+        http_headers: Optional[Mapping[str, str]] = None,
+    ) -> models.Solution:
+        r"""Retrieve a solution by id
+
+        Retrieve a solutions within a workspace given its ID
+
+
+        :param organization_id: The unique identifier of the organization
+        :param workspace_id: The unique identifier of the workspace
+        :param solution_id: The unique identifier of the solution
+        :param retries: Override the default retry configuration for this method
+        :param server_url: Override the default server URL for this method
+        :param timeout_ms: Override the default request timeout configuration for this method in milliseconds
+        :param http_headers: Additional headers to set or replace on requests.
+        """
+        base_url = None
+        url_variables = None
+        if timeout_ms is None:
+            timeout_ms = self.sdk_configuration.timeout_ms
+
+        if server_url is not None:
+            base_url = server_url
+        else:
+            base_url = self._get_url(base_url, url_variables)
+
+        request = models.GetWorkspaceSolutionsByIDRequest(
+            organization_id=organization_id,
+            workspace_id=workspace_id,
+            solution_id=solution_id,
+        )
+
+        req = self._build_request_async(
+            method="GET",
+            path="/organizations/{organizationId}/workspaces/{workspaceId}/solutions/{solutionId}",
+            base_url=base_url,
+            url_variables=url_variables,
+            request=request,
+            request_body_required=False,
+            request_has_path_params=True,
+            request_has_query_params=True,
+            user_agent_header="user-agent",
+            accept_header_value="application/json",
+            http_headers=http_headers,
+            security=self.sdk_configuration.security,
+            allow_empty_value=None,
+            timeout_ms=timeout_ms,
+        )
+
+        if retries == UNSET:
+            if self.sdk_configuration.retry_config is not UNSET:
+                retries = self.sdk_configuration.retry_config
+
+        retry_config = None
+        if isinstance(retries, utils.RetryConfig):
+            retry_config = (retries, ["429", "500", "502", "503", "504"])
+
+        http_res = await self.do_request_async(
+            hook_ctx=HookContext(
+                config=self.sdk_configuration,
+                base_url=base_url or "",
+                operation_id="getWorkspaceSolutionsByID",
+                oauth2_scopes=["organization:read"],
+                security_source=self.sdk_configuration.security,
+            ),
+            request=req,
+            error_status_codes=[
+                "400",
+                "401",
+                "403",
+                "404",
+                "409",
+                "429",
+                "4XX",
+                "500",
+                "503",
+                "5XX",
+            ],
+            retry_config=retry_config,
+        )
+
+        response_data: Any = None
+        if utils.match_response(http_res, "200", "application/json"):
+            return unmarshal_json_response(models.Solution, http_res)
         if utils.match_response(
             http_res, ["400", "401", "403", "404", "409", "429"], "application/json"
         ):

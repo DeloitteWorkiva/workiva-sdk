@@ -22,22 +22,22 @@ WDATA_IMPORT_FROM_SPREADSHEETS_OP_SERVERS = [
 
 
 class WdataImportFromSpreadsheetsRequestTypedDict(TypedDict):
-    import_from_spreadsheet_dto: ImportFromSpreadsheetDtoTypedDict
-    r"""The representation of the table to update"""
     table_id: str
     r"""The unique identifier of the table"""
+    import_from_spreadsheet_dto: ImportFromSpreadsheetDtoTypedDict
+    r"""The representation of the table to update"""
 
 
 class WdataImportFromSpreadsheetsRequest(BaseModel):
-    import_from_spreadsheet_dto: Annotated[
-        ImportFromSpreadsheetDto,
-        FieldMetadata(request=RequestMetadata(media_type="application/json")),
-    ]
-    r"""The representation of the table to update"""
-
     table_id: Annotated[
         str,
         pydantic.Field(alias="tableId"),
         FieldMetadata(path=PathParamMetadata(style="simple", explode=False)),
     ]
     r"""The unique identifier of the table"""
+
+    import_from_spreadsheet_dto: Annotated[
+        ImportFromSpreadsheetDto,
+        FieldMetadata(request=RequestMetadata(media_type="application/json")),
+    ]
+    r"""The representation of the table to update"""

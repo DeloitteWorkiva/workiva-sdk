@@ -19,22 +19,22 @@ WDATA_UPDATE_TAG_OP_SERVERS = [
 
 
 class WdataUpdateTagRequestTypedDict(TypedDict):
-    tag_dto: TagDtoInputTypedDict
-    r"""The representation of the tag to update"""
     tag_id: str
     r"""The unique identifier of the tag"""
+    tag_dto: TagDtoInputTypedDict
+    r"""The representation of the tag to update"""
 
 
 class WdataUpdateTagRequest(BaseModel):
-    tag_dto: Annotated[
-        TagDtoInput,
-        FieldMetadata(request=RequestMetadata(media_type="application/json")),
-    ]
-    r"""The representation of the tag to update"""
-
     tag_id: Annotated[
         str,
         pydantic.Field(alias="tagId"),
         FieldMetadata(path=PathParamMetadata(style="simple", explode=False)),
     ]
     r"""The unique identifier of the tag"""
+
+    tag_dto: Annotated[
+        TagDtoInput,
+        FieldMetadata(request=RequestMetadata(media_type="application/json")),
+    ]
+    r"""The representation of the tag to update"""

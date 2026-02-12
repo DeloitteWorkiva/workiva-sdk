@@ -2,9 +2,10 @@
 
 from __future__ import annotations
 from enum import Enum
+from workiva import utils
 
 
-class ListSequenceType(str, Enum):
+class ListSequenceType(str, Enum, metaclass=utils.OpenEnumMeta):
     r"""The type of list sequence. If the list style is unordered, the sequence type of the first list progression must be unordered. If the list style is ordered, the sequence type of the first list progression may not be unordered."""
 
     UNORDERED_SEQUENCE = "unorderedSequence"

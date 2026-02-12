@@ -2,9 +2,10 @@
 
 from __future__ import annotations
 from enum import Enum
+from workiva import utils
 
 
-class RangeLinkType(str, Enum):
+class RangeLinkType(str, Enum, metaclass=utils.OpenEnumMeta):
     r"""The type of range link."""
 
     SOURCE = "source"

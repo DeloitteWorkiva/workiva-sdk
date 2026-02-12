@@ -22,12 +22,12 @@ WDATA_LIST_QUERIES_OP_SERVERS = [
 class WdataListQueriesRequestTypedDict(TypedDict):
     cursor: NotRequired[str]
     r"""A paging cursor; if included, `limit` is ignored"""
-    ids: NotRequired[List[str]]
-    r"""A list of ids to filter the returned list by"""
     limit: NotRequired[int]
     r"""The number of queries to return, from 1 to 1000; by default, 1000"""
     offset: NotRequired[int]
     r"""The item to start with on the page, greater than or equal to 0; by default, 0"""
+    ids: NotRequired[List[str]]
+    r"""A list of ids to filter the returned list by"""
 
 
 class WdataListQueriesRequest(BaseModel):
@@ -36,12 +36,6 @@ class WdataListQueriesRequest(BaseModel):
         FieldMetadata(query=QueryParamMetadata(style="form", explode=True)),
     ] = None
     r"""A paging cursor; if included, `limit` is ignored"""
-
-    ids: Annotated[
-        Optional[List[str]],
-        FieldMetadata(query=QueryParamMetadata(style="form", explode=True)),
-    ] = None
-    r"""A list of ids to filter the returned list by"""
 
     limit: Annotated[
         Optional[int],
@@ -55,9 +49,15 @@ class WdataListQueriesRequest(BaseModel):
     ] = None
     r"""The item to start with on the page, greater than or equal to 0; by default, 0"""
 
+    ids: Annotated[
+        Optional[List[str]],
+        FieldMetadata(query=QueryParamMetadata(style="form", explode=True)),
+    ] = None
+    r"""A list of ids to filter the returned list by"""
+
     @model_serializer(mode="wrap")
     def serialize_model(self, handler):
-        optional_fields = set(["cursor", "ids", "limit", "offset"])
+        optional_fields = set(["cursor", "limit", "offset", "ids"])
         serialized = handler(self)
         m = {}
 

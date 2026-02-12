@@ -16,12 +16,12 @@ from workiva.utils import FieldMetadata, QueryParamMetadata
 class GetSpreadsheetsRequestTypedDict(TypedDict):
     filter_: NotRequired[str]
     r"""The properties to filter the results by."""
+    order_by: NotRequired[str]
+    r"""One or more comma-separated expressions to indicate the order in which to sort the results."""
     maxpagesize: NotRequired[int]
     r"""The maximum number of results to retrieve"""
     next: NotRequired[str]
     r"""Pagination cursor for next set of results."""
-    order_by: NotRequired[str]
-    r"""One or more comma-separated expressions to indicate the order in which to sort the results."""
 
 
 class GetSpreadsheetsRequest(BaseModel):
@@ -31,6 +31,13 @@ class GetSpreadsheetsRequest(BaseModel):
         FieldMetadata(query=QueryParamMetadata(style="form", explode=True)),
     ] = None
     r"""The properties to filter the results by."""
+
+    order_by: Annotated[
+        Optional[str],
+        pydantic.Field(alias="$orderBy"),
+        FieldMetadata(query=QueryParamMetadata(style="form", explode=True)),
+    ] = None
+    r"""One or more comma-separated expressions to indicate the order in which to sort the results."""
 
     maxpagesize: Annotated[
         Optional[int],
@@ -46,16 +53,9 @@ class GetSpreadsheetsRequest(BaseModel):
     ] = None
     r"""Pagination cursor for next set of results."""
 
-    order_by: Annotated[
-        Optional[str],
-        pydantic.Field(alias="$orderBy"),
-        FieldMetadata(query=QueryParamMetadata(style="form", explode=True)),
-    ] = None
-    r"""One or more comma-separated expressions to indicate the order in which to sort the results."""
-
     @model_serializer(mode="wrap")
     def serialize_model(self, handler):
-        optional_fields = set(["filter", "maxpagesize", "next", "orderBy"])
+        optional_fields = set(["filter", "orderBy", "maxpagesize", "next"])
         serialized = handler(self)
         m = {}
 

@@ -10,21 +10,21 @@ from workiva.types import BaseModel
 class SetSectionLockEditTypedDict(TypedDict):
     r"""Updates the selected section's lock to the set value"""
 
-    lock: SectionLockType
-    r"""A lock applied to a section."""
     selection: List[str]
     r"""A selection of one or more sections
 
     """
+    lock: SectionLockType
+    r"""A lock applied to a section."""
 
 
 class SetSectionLockEdit(BaseModel):
     r"""Updates the selected section's lock to the set value"""
 
-    lock: SectionLockType
-    r"""A lock applied to a section."""
-
     selection: List[str]
     r"""A selection of one or more sections
 
     """
+
+    lock: SectionLockType
+    r"""A lock applied to a section."""

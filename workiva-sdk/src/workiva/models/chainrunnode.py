@@ -4,18 +4,19 @@ from __future__ import annotations
 from .chainrunnoderesult import ChainRunNodeResult, ChainRunNodeResultTypedDict
 from enum import Enum
 import pydantic
-from pydantic import model_serializer
+from pydantic import field_serializer, model_serializer
 from typing import List, Optional
 from typing_extensions import Annotated, NotRequired, TypedDict
+from workiva import models, utils
 from workiva.types import BaseModel, UNSET_SENTINEL
 
 
-class NodeType(str, Enum):
+class NodeType(str, Enum, metaclass=utils.OpenEnumMeta):
     COMMAND = "command"
     EVENT = "event"
 
 
-class ChainRunNodeState(str, Enum):
+class ChainRunNodeState(str, Enum, metaclass=utils.OpenEnumMeta):
     SLEEPING = "sleeping"
     PAUSED = "paused"
     SKIPPED = "skipped"
@@ -58,6 +59,24 @@ class ChainRunNode(BaseModel):
     start_at: Annotated[Optional[str], pydantic.Field(alias="startAt")] = None
 
     state: Optional[ChainRunNodeState] = None
+
+    @field_serializer("node_type")
+    def serialize_node_type(self, value):
+        if isinstance(value, str):
+            try:
+                return models.NodeType(value)
+            except ValueError:
+                return value
+        return value
+
+    @field_serializer("state")
+    def serialize_state(self, value):
+        if isinstance(value, str):
+            try:
+                return models.ChainRunNodeState(value)
+            except ValueError:
+                return value
+        return value
 
     @model_serializer(mode="wrap")
     def serialize_model(self, handler):

@@ -2,9 +2,10 @@
 
 from __future__ import annotations
 from enum import Enum
+from workiva import utils
 
 
-class DestinationLinkSourceType(str, Enum):
+class DestinationLinkSourceType(str, Enum, metaclass=utils.OpenEnumMeta):
     r"""The type of the source for a destination link. Will be unidentified if the type of the source isn't currently supported."""
 
     UNIDENTIFIED = "unidentified"

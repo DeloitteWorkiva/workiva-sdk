@@ -3,13 +3,14 @@
 from __future__ import annotations
 from enum import Enum
 import pydantic
-from pydantic import model_serializer
+from pydantic import field_serializer, model_serializer
 from typing import Optional
 from typing_extensions import Annotated, NotRequired, TypedDict
+from workiva import models, utils
 from workiva.types import BaseModel, UNSET_SENTINEL
 
 
-class PrincipalType(str, Enum):
+class PrincipalType(str, Enum, metaclass=utils.OpenEnumMeta):
     r"""The type of the principal. Refer to the principalType field to see possible types."""
 
     USER = "user"
@@ -45,6 +46,15 @@ class ResourcePermission(BaseModel):
 
     resource: Optional[str] = None
     r"""The unique identifier of the resource"""
+
+    @field_serializer("principal_type")
+    def serialize_principal_type(self, value):
+        if isinstance(value, str):
+            try:
+                return models.PrincipalType(value)
+            except ValueError:
+                return value
+        return value
 
     @model_serializer(mode="wrap")
     def serialize_model(self, handler):

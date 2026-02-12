@@ -12,8 +12,9 @@ from .stroke import Stroke, StrokeTypedDict
 from .tableref import TableRef, TableRefTypedDict
 from .wrapstyletype import WrapStyleType
 import pydantic
-from pydantic import model_serializer
+from pydantic import field_serializer, model_serializer
 from typing_extensions import Annotated, NotRequired, TypedDict
+from workiva import models
 from workiva.types import BaseModel, Nullable, OptionalNullable, UNSET, UNSET_SENTINEL
 
 
@@ -32,12 +33,12 @@ class TableDrawingElementTypedDict(TypedDict):
     """
     position: DrawingRelativePositionTypedDict
     r"""The relative position of a drawing element."""
+    wrap_style: Nullable[WrapStyleType]
+    r"""The relative position type"""
     table: TableRefTypedDict
     r"""A reference to table content in a document, spreadsheet, or presentation
 
     """
-    wrap_style: Nullable[WrapStyleType]
-    r"""The relative position type"""
     fill: NotRequired[Nullable[FillTypedDict]]
     r"""A shape or box fill settings for things like shapes. Use a null to indicate no fill."""
     stroke: NotRequired[Nullable[StrokeTypedDict]]
@@ -63,19 +64,28 @@ class TableDrawingElement(BaseModel):
     position: DrawingRelativePosition
     r"""The relative position of a drawing element."""
 
+    wrap_style: Annotated[Nullable[WrapStyleType], pydantic.Field(alias="wrapStyle")]
+    r"""The relative position type"""
+
     table: TableRef
     r"""A reference to table content in a document, spreadsheet, or presentation
 
     """
-
-    wrap_style: Annotated[Nullable[WrapStyleType], pydantic.Field(alias="wrapStyle")]
-    r"""The relative position type"""
 
     fill: OptionalNullable[Fill] = UNSET
     r"""A shape or box fill settings for things like shapes. Use a null to indicate no fill."""
 
     stroke: OptionalNullable[Stroke] = UNSET
     r"""Line stroke setting for things like shape edges. Use a null to indicate no stroke line."""
+
+    @field_serializer("wrap_style")
+    def serialize_wrap_style(self, value):
+        if isinstance(value, str):
+            try:
+                return models.WrapStyleType(value)
+            except ValueError:
+                return value
+        return value
 
     @model_serializer(mode="wrap")
     def serialize_model(self, handler):

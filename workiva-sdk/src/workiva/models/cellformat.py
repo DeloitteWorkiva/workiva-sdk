@@ -4,8 +4,9 @@ from __future__ import annotations
 from .border import Border, BorderTypedDict
 from enum import Enum
 import pydantic
-from pydantic import model_serializer
+from pydantic import field_serializer, model_serializer
 from typing_extensions import Annotated, NotRequired, TypedDict
+from workiva import models, utils
 from workiva.types import BaseModel, Nullable, OptionalNullable, UNSET, UNSET_SENTINEL
 
 
@@ -63,7 +64,7 @@ class Borders(BaseModel):
         return m
 
 
-class HorizontalAlign(str, Enum):
+class HorizontalAlign(str, Enum, metaclass=utils.OpenEnumMeta):
     r"""The horizontal alignment of the content in the cell"""
 
     LEFT = "LEFT"
@@ -72,7 +73,7 @@ class HorizontalAlign(str, Enum):
     JUSTIFIED = "JUSTIFIED"
 
 
-class CellFormatUnit(str, Enum):
+class CellFormatUnit(str, Enum, metaclass=utils.OpenEnumMeta):
     r"""The unit of the size"""
 
     INCHES = "INCHES"
@@ -97,15 +98,24 @@ class Indent(BaseModel):
     value: float
     r"""The size of the indent"""
 
+    @field_serializer("unit")
+    def serialize_unit(self, value):
+        if isinstance(value, str):
+            try:
+                return models.CellFormatUnit(value)
+            except ValueError:
+                return value
+        return value
 
-class LeaderDots(str, Enum):
+
+class LeaderDots(str, Enum, metaclass=utils.OpenEnumMeta):
     r"""The leader dot pattern to show on the cell"""
 
     NARROW = "NARROW"
     WIDE = "WIDE"
 
 
-class TextRotation(str, Enum):
+class TextRotation(str, Enum, metaclass=utils.OpenEnumMeta):
     r"""The text orientation"""
 
     HORIZONTAL = "HORIZONTAL"
@@ -113,7 +123,7 @@ class TextRotation(str, Enum):
     DESCENDING = "DESCENDING"
 
 
-class VerticalAlign(str, Enum):
+class VerticalAlign(str, Enum, metaclass=utils.OpenEnumMeta):
     r"""The vertical alignment of the content in the cell"""
 
     TOP = "TOP"
@@ -173,6 +183,42 @@ class CellFormat(BaseModel):
         OptionalNullable[VerticalAlign], pydantic.Field(alias="verticalAlign")
     ] = UNSET
     r"""The vertical alignment of the content in the cell"""
+
+    @field_serializer("horizontal_align")
+    def serialize_horizontal_align(self, value):
+        if isinstance(value, str):
+            try:
+                return models.HorizontalAlign(value)
+            except ValueError:
+                return value
+        return value
+
+    @field_serializer("leader_dots")
+    def serialize_leader_dots(self, value):
+        if isinstance(value, str):
+            try:
+                return models.LeaderDots(value)
+            except ValueError:
+                return value
+        return value
+
+    @field_serializer("text_rotation")
+    def serialize_text_rotation(self, value):
+        if isinstance(value, str):
+            try:
+                return models.TextRotation(value)
+            except ValueError:
+                return value
+        return value
+
+    @field_serializer("vertical_align")
+    def serialize_vertical_align(self, value):
+        if isinstance(value, str):
+            try:
+                return models.VerticalAlign(value)
+            except ValueError:
+                return value
+        return value
 
     @model_serializer(mode="wrap")
     def serialize_model(self, handler):
@@ -267,6 +313,42 @@ class CellFormatInput(BaseModel):
         OptionalNullable[VerticalAlign], pydantic.Field(alias="verticalAlign")
     ] = UNSET
     r"""The vertical alignment of the content in the cell"""
+
+    @field_serializer("horizontal_align")
+    def serialize_horizontal_align(self, value):
+        if isinstance(value, str):
+            try:
+                return models.HorizontalAlign(value)
+            except ValueError:
+                return value
+        return value
+
+    @field_serializer("leader_dots")
+    def serialize_leader_dots(self, value):
+        if isinstance(value, str):
+            try:
+                return models.LeaderDots(value)
+            except ValueError:
+                return value
+        return value
+
+    @field_serializer("text_rotation")
+    def serialize_text_rotation(self, value):
+        if isinstance(value, str):
+            try:
+                return models.TextRotation(value)
+            except ValueError:
+                return value
+        return value
+
+    @field_serializer("vertical_align")
+    def serialize_vertical_align(self, value):
+        if isinstance(value, str):
+            try:
+                return models.VerticalAlign(value)
+            except ValueError:
+                return value
+        return value
 
     @model_serializer(mode="wrap")
     def serialize_model(self, handler):

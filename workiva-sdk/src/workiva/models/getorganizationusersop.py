@@ -16,12 +16,12 @@ from workiva.utils import FieldMetadata, PathParamMetadata, QueryParamMetadata
 class GetOrganizationUsersRequestTypedDict(TypedDict):
     organization_id: str
     r"""The unique identifier of the organization"""
-    filter_: NotRequired[str]
-    r"""The properties to filter the results by."""
     maxpagesize: NotRequired[int]
     r"""The maximum number of results to retrieve"""
     next: NotRequired[str]
     r"""Pagination cursor for next set of results."""
+    filter_: NotRequired[str]
+    r"""The properties to filter the results by."""
 
 
 class GetOrganizationUsersRequest(BaseModel):
@@ -31,13 +31,6 @@ class GetOrganizationUsersRequest(BaseModel):
         FieldMetadata(path=PathParamMetadata(style="simple", explode=False)),
     ]
     r"""The unique identifier of the organization"""
-
-    filter_: Annotated[
-        Optional[str],
-        pydantic.Field(alias="$filter"),
-        FieldMetadata(query=QueryParamMetadata(style="form", explode=True)),
-    ] = None
-    r"""The properties to filter the results by."""
 
     maxpagesize: Annotated[
         Optional[int],
@@ -53,9 +46,16 @@ class GetOrganizationUsersRequest(BaseModel):
     ] = None
     r"""Pagination cursor for next set of results."""
 
+    filter_: Annotated[
+        Optional[str],
+        pydantic.Field(alias="$filter"),
+        FieldMetadata(query=QueryParamMetadata(style="form", explode=True)),
+    ] = None
+    r"""The properties to filter the results by."""
+
     @model_serializer(mode="wrap")
     def serialize_model(self, handler):
-        optional_fields = set(["filter", "maxpagesize", "next"])
+        optional_fields = set(["maxpagesize", "next", "filter"])
         serialized = handler(self)
         m = {}
 

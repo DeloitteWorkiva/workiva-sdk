@@ -9,22 +9,17 @@ from workiva.utils import FieldMetadata, PathParamMetadata, RequestMetadata
 
 
 class AssignWorkspaceMembershipRolesRequestTypedDict(TypedDict):
-    request_body: List[str]
-    r"""Editable details about the workspace member's roles."""
     organization_id: str
     r"""The unique identifier of the organization"""
     workspace_id: str
     r"""The unique identifier of the workspace"""
     workspace_membership_id: str
     r"""The unique identifier of the workspace membership"""
+    request_body: List[str]
+    r"""Editable details about the workspace member's roles."""
 
 
 class AssignWorkspaceMembershipRolesRequest(BaseModel):
-    request_body: Annotated[
-        List[str], FieldMetadata(request=RequestMetadata(media_type="application/json"))
-    ]
-    r"""Editable details about the workspace member's roles."""
-
     organization_id: Annotated[
         str,
         pydantic.Field(alias="organizationId"),
@@ -45,6 +40,11 @@ class AssignWorkspaceMembershipRolesRequest(BaseModel):
         FieldMetadata(path=PathParamMetadata(style="simple", explode=False)),
     ]
     r"""The unique identifier of the workspace membership"""
+
+    request_body: Annotated[
+        List[str], FieldMetadata(request=RequestMetadata(media_type="application/json"))
+    ]
+    r"""Editable details about the workspace member's roles."""
 
 
 class AssignWorkspaceMembershipRolesResponseTypedDict(TypedDict):

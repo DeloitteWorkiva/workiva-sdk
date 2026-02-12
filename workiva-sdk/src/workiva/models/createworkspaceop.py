@@ -9,22 +9,22 @@ from workiva.utils import FieldMetadata, PathParamMetadata, RequestMetadata
 
 
 class CreateWorkspaceRequestTypedDict(TypedDict):
-    workspace: WorkspaceInputTypedDict
-    r"""The properties of the workspace to create"""
     organization_id: str
     r"""The unique identifier of the organization"""
+    workspace: WorkspaceInputTypedDict
+    r"""The properties of the workspace to create"""
 
 
 class CreateWorkspaceRequest(BaseModel):
-    workspace: Annotated[
-        WorkspaceInput,
-        FieldMetadata(request=RequestMetadata(media_type="application/json")),
-    ]
-    r"""The properties of the workspace to create"""
-
     organization_id: Annotated[
         str,
         pydantic.Field(alias="organizationId"),
         FieldMetadata(path=PathParamMetadata(style="simple", explode=False)),
     ]
     r"""The unique identifier of the organization"""
+
+    workspace: Annotated[
+        WorkspaceInput,
+        FieldMetadata(request=RequestMetadata(media_type="application/json")),
+    ]
+    r"""The properties of the workspace to create"""

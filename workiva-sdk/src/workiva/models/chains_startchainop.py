@@ -50,27 +50,27 @@ class ChainsStartChainRequestBody(BaseModel):
 
 
 class ChainsStartChainRequestTypedDict(TypedDict):
-    request_body: ChainsStartChainRequestBodyTypedDict
-    r"""The runtime variables that have been pre-defined for a Chain."""
-    chain_id: str
-    r"""The ID of the Chain."""
     environment_id: str
     r"""The ID of the Environment."""
+    chain_id: str
+    r"""The ID of the Chain."""
+    request_body: ChainsStartChainRequestBodyTypedDict
+    r"""The runtime variables that have been pre-defined for a Chain."""
 
 
 class ChainsStartChainRequest(BaseModel):
-    request_body: Annotated[
-        ChainsStartChainRequestBody,
-        FieldMetadata(request=RequestMetadata(media_type="application/json")),
+    environment_id: Annotated[
+        str, FieldMetadata(path=PathParamMetadata(style="simple", explode=False))
     ]
-    r"""The runtime variables that have been pre-defined for a Chain."""
+    r"""The ID of the Environment."""
 
     chain_id: Annotated[
         str, FieldMetadata(path=PathParamMetadata(style="simple", explode=False))
     ]
     r"""The ID of the Chain."""
 
-    environment_id: Annotated[
-        str, FieldMetadata(path=PathParamMetadata(style="simple", explode=False))
+    request_body: Annotated[
+        ChainsStartChainRequestBody,
+        FieldMetadata(request=RequestMetadata(media_type="application/json")),
     ]
-    r"""The ID of the Environment."""
+    r"""The runtime variables that have been pre-defined for a Chain."""

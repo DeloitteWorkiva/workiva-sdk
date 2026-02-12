@@ -27,20 +27,20 @@ CHAINS_UPDATE_RULES_OP_SERVERS = [
 
 
 class ChainsUpdateRulesFileTypedDict(TypedDict):
-    content: Union[bytes, IO[bytes], io.BufferedReader]
     file_name: str
+    content: Union[bytes, IO[bytes], io.BufferedReader]
     content_type: NotRequired[str]
 
 
 class ChainsUpdateRulesFile(BaseModel):
+    file_name: Annotated[
+        str, pydantic.Field(alias="fileName"), FieldMetadata(multipart=True)
+    ]
+
     content: Annotated[
         Union[bytes, IO[bytes], io.BufferedReader],
         pydantic.Field(alias=""),
         FieldMetadata(multipart=MultipartFormMetadata(content=True)),
-    ]
-
-    file_name: Annotated[
-        str, pydantic.Field(alias="fileName"), FieldMetadata(multipart=True)
     ]
 
     content_type: Annotated[
@@ -105,20 +105,20 @@ class ChainsUpdateRulesRequestBody(BaseModel):
 
 
 class ChainsUpdateRulesRequestTypedDict(TypedDict):
-    request_body: ChainsUpdateRulesRequestBodyTypedDict
     mapping_group_guid: str
     r"""The GUID of the Mapping Group."""
+    request_body: ChainsUpdateRulesRequestBodyTypedDict
 
 
 class ChainsUpdateRulesRequest(BaseModel):
-    request_body: Annotated[
-        ChainsUpdateRulesRequestBody,
-        FieldMetadata(request=RequestMetadata(media_type="multipart/form-data")),
-    ]
-
     mapping_group_guid: Annotated[
         str,
         pydantic.Field(alias="mappingGroupGuid"),
         FieldMetadata(path=PathParamMetadata(style="simple", explode=False)),
     ]
     r"""The GUID of the Mapping Group."""
+
+    request_body: Annotated[
+        ChainsUpdateRulesRequestBody,
+        FieldMetadata(request=RequestMetadata(media_type="multipart/form-data")),
+    ]

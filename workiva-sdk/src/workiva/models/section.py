@@ -682,14 +682,14 @@ class SectionTypedDict(TypedDict):
 
     body: NotRequired[Nullable[BodyTypedDict]]
     r"""Reference to the RichText content for this section"""
+    drawing_body: NotRequired[Nullable[DrawingBodyTypedDict]]
+    r"""Reference to the Drawing content for this section"""
     children: NotRequired[List[SectionTypedDict]]
     r"""An array of partial information about any sections within the section"""
     custom_fields: NotRequired[Any]
     r"""A map of ids to values representing Custom Fields on the section.
 
     """
-    drawing_body: NotRequired[Nullable[DrawingBodyTypedDict]]
-    r"""Reference to the Drawing content for this section"""
     footers: NotRequired[Nullable[FootersTypedDict]]
     r"""Footers for this section"""
     headers: NotRequired[Nullable[HeadersTypedDict]]
@@ -718,6 +718,11 @@ class Section(BaseModel):
     body: OptionalNullable[Body] = UNSET
     r"""Reference to the RichText content for this section"""
 
+    drawing_body: Annotated[
+        OptionalNullable[DrawingBody], pydantic.Field(alias="drawingBody")
+    ] = UNSET
+    r"""Reference to the Drawing content for this section"""
+
     children: Optional[List[Section]] = None
     r"""An array of partial information about any sections within the section"""
 
@@ -725,11 +730,6 @@ class Section(BaseModel):
     r"""A map of ids to values representing Custom Fields on the section.
 
     """
-
-    drawing_body: Annotated[
-        OptionalNullable[DrawingBody], pydantic.Field(alias="drawingBody")
-    ] = UNSET
-    r"""Reference to the Drawing content for this section"""
 
     footers: OptionalNullable[Footers] = UNSET
     r"""Footers for this section"""
@@ -766,9 +766,9 @@ class Section(BaseModel):
         optional_fields = set(
             [
                 "body",
+                "drawingBody",
                 "children",
                 "customFields",
-                "drawingBody",
                 "footers",
                 "headers",
                 "id",

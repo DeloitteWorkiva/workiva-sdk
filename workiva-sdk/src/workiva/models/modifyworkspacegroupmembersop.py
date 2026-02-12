@@ -12,32 +12,19 @@ from workiva.utils import FieldMetadata, PathParamMetadata, RequestMetadata
 
 
 class ModifyWorkspaceGroupMembersRequestTypedDict(TypedDict):
-    bulk_workspace_group_members_modification: (
-        BulkWorkspaceGroupMembersModificationTypedDict
-    )
-    r"""Details about the group member modification."""
-    group_id: str
-    r"""The unique identifier of the group"""
     organization_id: str
     r"""The unique identifier of the organization"""
     workspace_id: str
     r"""The unique identifier of the workspace"""
+    group_id: str
+    r"""The unique identifier of the group"""
+    bulk_workspace_group_members_modification: (
+        BulkWorkspaceGroupMembersModificationTypedDict
+    )
+    r"""Details about the group member modification."""
 
 
 class ModifyWorkspaceGroupMembersRequest(BaseModel):
-    bulk_workspace_group_members_modification: Annotated[
-        BulkWorkspaceGroupMembersModification,
-        FieldMetadata(request=RequestMetadata(media_type="application/json")),
-    ]
-    r"""Details about the group member modification."""
-
-    group_id: Annotated[
-        str,
-        pydantic.Field(alias="groupId"),
-        FieldMetadata(path=PathParamMetadata(style="simple", explode=False)),
-    ]
-    r"""The unique identifier of the group"""
-
     organization_id: Annotated[
         str,
         pydantic.Field(alias="organizationId"),
@@ -51,3 +38,16 @@ class ModifyWorkspaceGroupMembersRequest(BaseModel):
         FieldMetadata(path=PathParamMetadata(style="simple", explode=False)),
     ]
     r"""The unique identifier of the workspace"""
+
+    group_id: Annotated[
+        str,
+        pydantic.Field(alias="groupId"),
+        FieldMetadata(path=PathParamMetadata(style="simple", explode=False)),
+    ]
+    r"""The unique identifier of the group"""
+
+    bulk_workspace_group_members_modification: Annotated[
+        BulkWorkspaceGroupMembersModification,
+        FieldMetadata(request=RequestMetadata(media_type="application/json")),
+    ]
+    r"""Details about the group member modification."""

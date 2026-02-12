@@ -2,9 +2,10 @@
 
 from __future__ import annotations
 from enum import Enum
+from workiva import utils
 
 
-class CellHorizontalAlignment(str, Enum):
+class CellHorizontalAlignment(str, Enum, metaclass=utils.OpenEnumMeta):
     r"""The horizontal alignment of the content in the cell."""
 
     LEFT = "left"

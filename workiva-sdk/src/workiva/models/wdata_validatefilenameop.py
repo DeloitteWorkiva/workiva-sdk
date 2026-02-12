@@ -18,21 +18,21 @@ WDATA_VALIDATE_FILENAME_OP_SERVERS = [
 
 
 class WdataValidateFilenameRequestTypedDict(TypedDict):
-    filename: str
-    r"""The name of the file to upload"""
     table_id: str
     r"""The ID of the table to upload the file to"""
+    filename: str
+    r"""The name of the file to upload"""
 
 
 class WdataValidateFilenameRequest(BaseModel):
-    filename: Annotated[
-        str, FieldMetadata(query=QueryParamMetadata(style="form", explode=True))
-    ]
-    r"""The name of the file to upload"""
-
     table_id: Annotated[
         str,
         pydantic.Field(alias="tableId"),
         FieldMetadata(query=QueryParamMetadata(style="form", explode=True)),
     ]
     r"""The ID of the table to upload the file to"""
+
+    filename: Annotated[
+        str, FieldMetadata(query=QueryParamMetadata(style="form", explode=True))
+    ]
+    r"""The name of the file to upload"""

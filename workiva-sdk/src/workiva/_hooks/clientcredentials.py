@@ -15,6 +15,7 @@ from .types import (
 from typing import Any, ClassVar, Dict, List, Tuple, Union, Optional
 from urllib.parse import urlparse, urljoin
 from workiva.httpclient import HttpClient
+from workiva.sdkconfiguration import SDKConfiguration
 
 
 class Credentials:
@@ -72,10 +73,12 @@ class ClientCredentialsHook(SDKInitHook, BeforeRequestHook, AfterErrorHook):
                 cls._client_locks[client_key] = threading.Lock()
             return cls._client_locks[client_key]
 
-    def sdk_init(self, base_url: str, client: HttpClient) -> Tuple[str, HttpClient]:
-        self.client = client
+    def sdk_init(self, config: SDKConfiguration) -> SDKConfiguration:
+        if config.client is None:
+            raise Exception("Client is required")
 
-        return base_url, client
+        self.client = config.client
+        return config
 
     def before_request(
         self, hook_ctx: BeforeRequestContext, request: httpx.Request
