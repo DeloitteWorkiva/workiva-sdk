@@ -1,9 +1,0 @@
-# ChainsUpdateRulesRequest
-
-
-## Fields
-
-| Field                                                                            | Type                                                                             | Required                                                                         | Description                                                                      | Example                                                                          |
-| -------------------------------------------------------------------------------- | -------------------------------------------------------------------------------- | -------------------------------------------------------------------------------- | -------------------------------------------------------------------------------- | -------------------------------------------------------------------------------- |
-| `mapping_group_guid`                                                             | *str*                                                                            | :heavy_check_mark:                                                               | The GUID of the Mapping Group.                                                   | 4ef64a1e-55da-4071-8168-d3387d99035d                                             |
-| `request_body`                                                                   | [models.ChainsUpdateRulesRequestBody](../models/chainsupdaterulesrequestbody.md) | :heavy_check_mark:                                                               | N/A                                                                              |                                                                                  |

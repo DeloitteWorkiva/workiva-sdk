@@ -1,6 +1,4 @@
-# Specs procesados (se regeneran con make prepare)
-oas/*_processed.yaml
-oas/merged.yaml
+# Codegen artifacts
 .spec_checksums
 
 # Python
@@ -19,9 +17,6 @@ dist/
 
 # CI artifacts
 breaking_changes_report.md
-
-# Speakeasy
-.speakeasy/
 
 # MkDocs
 site/

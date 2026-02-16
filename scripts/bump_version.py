@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Bump the SDK patch version across all 4 version files atomically.
+"""Bump the SDK patch version across all version files atomically.
 
 Reads current version from pyproject.toml, increments the patch number,
 validates all files contain the expected old version, then writes all at once.
@@ -22,7 +22,6 @@ SDK_DIR = REPO_ROOT / "workiva-sdk"
 
 VERSION_FILES = {
     "pyproject": SDK_DIR / "pyproject.toml",
-    "gen_yaml": SDK_DIR / "gen.yaml",
     "version_py": SDK_DIR / "src" / "workiva" / "_version.py",
     "readme": REPO_ROOT / "README.md",
 }
@@ -64,16 +63,6 @@ def prepare_replacements(
         sys.exit(2)
     replacements["pyproject"] = (content, search, replacement)
 
-    # gen.yaml: "  version: X.Y.Z" (indented, no quotes)
-    content = VERSION_FILES["gen_yaml"].read_text()
-    search = f"  version: {old}"
-    replacement = f"  version: {new}"
-    if content.count(search) != 1:
-        print(f"ERROR: Expected exactly 1 occurrence of '{search}' in gen.yaml, "
-              f"found {content.count(search)}", file=sys.stderr)
-        sys.exit(2)
-    replacements["gen_yaml"] = (content, search, replacement)
-
     # _version.py: __version__ and __user_agent__
     content = VERSION_FILES["version_py"].read_text()
     search = f'__version__: str = "{old}"'
@@ -82,9 +71,9 @@ def prepare_replacements(
         print(f"ERROR: '{search}' not found in _version.py", file=sys.stderr)
         sys.exit(2)
     content = content.replace(search, replacement)
-    # Also update user_agent string: "speakeasy-sdk/python X.Y.Z ..."
-    ua_search = f"speakeasy-sdk/python {old}"
-    ua_replacement = f"speakeasy-sdk/python {new}"
+    # Also update user_agent string
+    ua_search = f"workiva-python-sdk/{old}"
+    ua_replacement = f"workiva-python-sdk/{new}"
     if ua_search not in content:
         print(f"ERROR: '{ua_search}' not found in _version.py", file=sys.stderr)
         sys.exit(2)

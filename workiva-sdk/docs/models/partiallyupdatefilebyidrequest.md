@@ -1,9 +1,0 @@
-# PartiallyUpdateFileByIDRequest
-
-
-## Fields
-
-| Field                                                                                                         | Type                                                                                                          | Required                                                                                                      | Description                                                                                                   |
-| ------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------- |
-| `file_id`                                                                                                     | *str*                                                                                                         | :heavy_check_mark:                                                                                            | The unique identifier of the file                                                                             |
-| `request_body`                                                                                                | List[[models.JSONPatchOperation](../models/jsonpatchoperation.md)]                                            | :heavy_check_mark:                                                                                            | A collection of patch operations to apply to the file. Currently only one operation may be applied at a time. |

@@ -24,4 +24,4 @@ jobs:
         run: cd workiva-sdk && uv sync
 
       - name: Run tests
-        run: make test
+        run: cd workiva-sdk && uv run python -m pytest tests/ -v

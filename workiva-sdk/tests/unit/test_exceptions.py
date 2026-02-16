@@ -1,42 +1,45 @@
-"""Tests for workiva._hooks.exceptions."""
+"""Tests for workiva.exceptions."""
 
 from __future__ import annotations
 
+from types import SimpleNamespace
+
 import pytest
 
-from workiva._hooks.exceptions import (
+from workiva.exceptions import (
     OperationCancelled,
     OperationFailed,
     OperationTimeout,
     _detail_str,
 )
-from workiva.models.operation import Operation, OperationStatus
-from workiva.models.operationdetail import OperationDetail
-from workiva.types import UNSET, UNSET_SENTINEL
+
+
+def _make_detail(**kwargs):
+    """Create a SimpleNamespace mimicking an OperationDetail."""
+    defaults = {"code": None, "target": None, "message": None}
+    defaults.update(kwargs)
+    return SimpleNamespace(**defaults)
+
+
+def _make_operation(op_id="op-123", status="completed", details=None):
+    """Create a SimpleNamespace mimicking an Operation."""
+    return SimpleNamespace(id=op_id, status=status, details=details)
 
 
 class TestDetailStr:
     def test_all_fields(self):
-        detail = OperationDetail(code="ERR_001", target="/files/1", message="not found")
+        detail = _make_detail(code="ERR_001", target="/files/1", message="not found")
         assert _detail_str(detail) == "[ERR_001] (/files/1) not found"
 
     def test_all_none(self):
-        detail = OperationDetail(code=None, target=None, message=None)
-        assert _detail_str(detail) == "<no detail>"
-
-    def test_none_and_sentinel(self):
-        detail = OperationDetail(code=None, target=UNSET_SENTINEL, message=None)
+        detail = _make_detail()
         assert _detail_str(detail) == "<no detail>"
 
 
 class TestOperationFailed:
     def test_with_details(self):
-        detail = OperationDetail(code="ERR", message="boom")
-        op = Operation(
-            id="op-fail",
-            status=OperationStatus.FAILED,
-            details=[detail],
-        )
+        detail = _make_detail(code="ERR", message="boom")
+        op = _make_operation(op_id="op-fail", status="failed", details=[detail])
         exc = OperationFailed(op)
         assert exc.operation is op
         assert len(exc.details) == 1
@@ -44,20 +47,20 @@ class TestOperationFailed:
         assert "boom" in str(exc)
 
     def test_without_details(self):
-        op = Operation(id="op-fail", status=OperationStatus.FAILED)
+        op = _make_operation(op_id="op-fail", status="failed")
         exc = OperationFailed(op)
         assert exc.details == []
         assert str(exc) == "Operation op-fail failed"
 
     def test_details_none(self):
-        op = Operation(id="op-x", status=OperationStatus.FAILED, details=None)
+        op = _make_operation(op_id="op-x", status="failed", details=None)
         exc = OperationFailed(op)
         assert exc.details == []
 
 
 class TestOperationCancelled:
     def test_message(self):
-        op = Operation(id="op-cancel", status=OperationStatus.CANCELLED)
+        op = _make_operation(op_id="op-cancel", status="cancelled")
         exc = OperationCancelled(op)
         assert exc.operation is op
         assert "op-cancel" in str(exc)

@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import pytest
 
-from workiva._hooks.polling import _extract_operation_id, _get_retry_after
+from workiva.polling import _extract_operation_id, _get_retry_after
 
 
 class TestExtractOperationId:

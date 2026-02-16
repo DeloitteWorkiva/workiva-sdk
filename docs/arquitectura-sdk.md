@@ -1,66 +1,55 @@
 # Arquitectura del SDK
 
-Cómo está construido el SDK internamente. Para contribuidores y curiosos.
+Como esta construido el SDK internamente. Para contribuidores y curiosos.
 
 ## Pipeline: Spec → SDK
 
 ```
 oas/platform.yaml ─┐
-oas/chains.yaml   ─┤→ prepare_specs.py → *_processed.yaml
+oas/chains.yaml   ─┤→ generate_sdk.py
 oas/wdata.yaml    ─┘         │
-                          ▼
-                  speakeasy merge → merged.yaml
-                          │
-                          ▼
-                speakeasy generate → workiva-sdk/src/workiva/
-                          │
-                          ▼
-                   patch_sdk.py → __init__.py exports + README cleanup
+                    ┌─────────┴──────────┐
+                    ▼                    ▼
+        datamodel-code-generator    Jinja2 codegen
+          (models/ per spec)      (_operations/ per tag)
 ```
 
-### Paso 1: Pre-procesamiento (`scripts/prepare_specs.py`)
+### Paso 1: Modelos (`scripts/codegen/models.py`)
 
-Speakeasy necesita un solo OpenAPI spec, pero tenemos 3 APIs con conflictos de nombres. `prepare_specs.py` resuelve:
-
-| Problema | Solución |
-|----------|----------|
-| Schemas duplicados (Activity, Permission, User, Workspace) | Renombrar con prefijo `Chain` |
-| OperationIds duplicados (getWorkspaces, getFiles, importFile) | Prefijo per-API + `x-speakeasy-name-override` |
-| Recursión de schemas (Section.parent, Slide.parent) | Reemplazar `allOf` con objetos inline |
-| Multi-base-URL (3 APIs, 3 servidores) | Path-level `servers` injection |
-| Namespaces de SDK | `x-speakeasy-group` por API |
-| Paginación (89 endpoints, 5 patrones) | `x-speakeasy-pagination` extensions |
-
-### Paso 2: Merge (`speakeasy merge`)
+Cada spec se pasa individualmente a `datamodel-code-generator`:
 
 ```bash
-speakeasy merge \
-  -s chains_processed.yaml \
-  -s wdata_processed.yaml \
-  -s platform_processed.yaml \  # ÚLTIMO: sus servers globales ganan
-  -o merged.yaml
+datamodel-codegen --input oas/platform.yaml --output models/platform/
+datamodel-codegen --input oas/chains.yaml   --output models/chains/
+datamodel-codegen --input oas/wdata.yaml    --output models/wdata/
 ```
 
-> El orden importa. El ÚLTIMO spec define los servers globales. Platform va último porque queremos EU/US/APAC como servers por defecto (EU es el default, index 0).
+Genera modelos Pydantic v2 con soporte para:
+- `Optional` fields con defaults
+- Enums con `OpenEnumMeta` para forward-compatibility
+- Self-referencing schemas (Section.parent, Slide.parent)
 
-### Paso 3: Generación (`speakeasy generate`)
+### Paso 2: Operaciones (`scripts/codegen/operations.py`)
 
-```bash
-speakeasy generate sdk --lang python --schema merged.yaml --out workiva-sdk
+Parsea cada spec, agrupa endpoints por tag OAS, y renderiza templates Jinja2:
+
+```
+platform.yaml → parse_spec() → {files: [get_files, copy_file, ...], admin: [...], ...}
+                                    ↓
+                            namespace.py.j2 → files.py, admin.py, ...
 ```
 
-Speakeasy genera:
-- 17 namespace modules (`files.py`, `admin.py`, `wdata.py`, etc.)
-- Modelos Pydantic para request/response
-- Hooks de autenticación (OAuth2 client_credentials)
-- Paginación automática con `.next()`
-- Métodos sync + async para cada operación
+Cada operación genera un metodo sync + async con:
+- Path params, query params, request body tipados
+- Pagination helpers (`get_files_all()` con generators)
+- Timeout override por operacion
 
-### Paso 4: Patch (`scripts/patch_sdk.py`)
+### Paso 3: Validacion y formato
 
-Post-generación idempotente:
-1. **`__init__.py`** — agrega exports de `Workiva`, `OperationPoller`, `OperationFailed`, etc.
-2. **`README.md`** — remueve scaffolding de Speakeasy, agrega instrucciones reales
+Todo codigo generado pasa por:
+1. `ast.parse()` — valida syntax Python
+2. `black` — formato consistente
+3. `isort` — imports ordenados
 
 ## 3 APIs, 1 SDK
 
@@ -70,135 +59,87 @@ client.wdata              # Wdata API    → https://h.app.wdesk.com/s/wdata/...
 client.chains             # Chains API   → https://h.app.wdesk.com/s/orchestration/...
 ```
 
-Cada operación se enruta al servidor correcto gracias a path-level `servers` inyectados en el pre-procesamiento. El usuario no necesita saber qué API está detrás.
+Cada namespace tiene un `_api: _API` que se resuelve al base URL correcto segun la region configurada.
 
-## Código generado vs custom
+## Codigo generado vs custom
 
-### Sobrevive `make force`
+### Infraestructura (hand-written)
 
-| Archivo | Descripción |
+| Archivo | Descripcion |
 |---------|-------------|
-| `_hooks/client.py` | Clase `Workiva(SDK)` con `wait()` |
-| `_hooks/polling.py` | `OperationPoller` con sync/async polling |
-| `_hooks/exceptions.py` | `OperationFailed`, `OperationCancelled`, `OperationTimeout` |
-| `_hooks/registration.py` | Registro de hooks (generado una vez, luego libre) |
-| `gen.yaml` | Configuración de Speakeasy |
-| `scripts/` | Pipeline scripts |
-| `tests/` | Tests (fuera de `src/`) |
-| `Makefile` | Build system |
+| `_auth.py` | OAuth2 client_credentials via `httpx.Auth` |
+| `_client.py` | BaseClient (httpx wrapper con retry, auth, headers) |
+| `_retry.py` | RetryTransport + AsyncRetryTransport |
+| `_errors.py` | WorkivaAPIError hierarchy |
+| `_pagination.py` | `paginate()` / `paginate_async()` generators |
+| `_config.py` | SDKConfig, RetryConfig |
+| `_constants.py` | Region enum, SERVERS, API_VERSION |
+| `client.py` | Clase `Workiva` con lazy-loading y `wait()` |
+| `polling.py` | `OperationPoller` con sync/async polling |
+| `exceptions.py` | `OperationFailed`, `OperationCancelled`, `OperationTimeout` |
 
-### Se regenera con `make force`
+### Generado (se regenera con `make generate`)
 
 | Archivo | Notas |
 |---------|-------|
-| Todos los `.py` en `src/workiva/` (excepto `_hooks/`) | Modelos, namespaces, utils |
-| `_hooks/clientcredentials.py` | Hook de OAuth2 |
-| `_hooks/sdkhooks.py` | Orquestación de hooks |
-| `_hooks/types.py` | Interfaces de hooks |
-| `__init__.py` | Regenerado, luego patcheado |
-| `pyproject.toml` | Regenerado desde `gen.yaml` |
-| `README.md` | Regenerado, luego patcheado |
+| `_operations/*.py` (excepto `_base.py`) | Namespace classes con metodos sync+async |
+| `models/platform/` | Pydantic models de Platform API |
+| `models/chains/` | Pydantic models de Chains API |
+| `models/wdata/` | Pydantic models de Wdata API |
 
-## Sistema de hooks
+## Autenticacion
 
-Speakeasy genera un sistema de hooks que permite interceptar el ciclo de vida HTTP:
+El flujo de autenticacion usa `httpx.Auth`:
 
-```
-SDKInit → BeforeRequest → [HTTP Request] → AfterSuccess / AfterError
-```
-
-### Hooks registrados
-
-1. **`ClientCredentialsHook`** (generado) — obtiene y cachea tokens OAuth2
-2. **`OAuth2Scopes`** (generado) — define scopes por operación
-
-Los hooks se registran en `_hooks/registration.py`:
-
-```python
-def init_hooks(base_url, hooks):
-    cc_hook = ClientCredentialsHook()
-    hooks.register_sdk_init_hook(cc_hook)
-    hooks.register_before_request_hook(cc_hook)
-    hooks.register_after_error_hook(cc_hook)
-```
-
-## Autenticación interna
-
-El flujo de autenticación:
-
-1. SDK se inicializa con `Security(client_id=..., client_secret=...)`
-2. `ClientCredentialsHook.before_request()` intercepta cada request
-3. Busca un token cacheado para esas credenciales + scopes
-4. Si no hay token válido, hace `POST /iam/v1/oauth2/token` (sync)
-5. Cachea el token en `_sessions` (ClassVar global)
+1. SDK se inicializa con `client_id` + `client_secret`
+2. `OAuth2ClientCredentials.auth_flow()` intercepta cada request
+3. Busca un token cacheado (cache global por `md5(client_id:secret)`)
+4. Si no hay token valido, hace `POST /iam/v1/oauth2/token` (siempre sync)
+5. Cachea el token con expiry buffer de 60s
 6. Agrega `Authorization: Bearer {token}` al request
-7. Si el server devuelve 401, `after_error()` invalida el token
+7. Si el server devuelve 401, invalida token y reintenta una vez
 
-```
-_sessions = {
-    "md5(client_id:client_secret)": {
-        "scope1 scope2": Session(token="...", expires_at=1234567890),
-    }
-}
-```
-
-## Configuración (`gen.yaml`)
-
-Campos clave que controlan la generación:
-
-```yaml
-python:
-  version: 0.4.0
-  packageName: workiva
-  asyncMode: both              # Genera sync + async
-  asyncPaginationSep2025: true # Paginación async
-  allOfMergeStrategy: shallowMerge  # Para el spec mergeado
-  additionalDependencies:      # → pyproject.toml
-    httpx: ">=0.28.1"
-```
-
-## Comandos útiles
+## Comandos utiles
 
 ```bash
 # Pipeline completo
-make all                  # Download → check → prepare → merge → generate → patch
+make all                  # Download → check → generate
 
-# Forzar regeneración
-make force                # prepare → merge → generate → patch (sin check)
+# Forzar regeneracion
+make force                # generate sin check
 
-# Solo un paso
-make prepare              # Pre-procesar specs
-make merge                # Speakeasy merge
-make generate             # Speakeasy generate + patch
+# Solo modelos o solo operaciones
+make generate-models
+make generate-operations
 
 # Tests
-make test                 # 58 tests (unit + integration)
+make test                 # 70 tests (unit + integration)
 make test-cov             # Coverage report
 
 # Build
-make build                # → dist/workiva-0.4.0-py3-none-any.whl
+make build                # → dist/workiva-X.Y.Z-py3-none-any.whl
 ```
 
 ## Para contribuidores
 
 ### Modificar el SDK
 
-1. **Código custom** → edita directamente en `_hooks/` (sobrevive regeneración)
-2. **Cambios en API** → modifica `prepare_specs.py`, luego `make force`
-3. **Nueva configuración** → edita `gen.yaml`, luego `make force`
+1. **Codigo de infraestructura** → edita `_auth.py`, `_client.py`, `_retry.py`, etc.
+2. **Codigo publico** → edita `client.py`, `polling.py`, `exceptions.py`
+3. **Cambios en API generada** → modifica templates o codegen, luego `make generate`
 4. **Tests** → `workiva-sdk/tests/` (fuera de `src/`, seguro)
 
 ### Agregar un nuevo endpoint
 
 Si Workiva agrega un nuevo endpoint:
 
-1. Descarga el spec actualizado
-2. Ejecuta `make all` (detecta cambios y regenera)
-3. Los nuevos métodos aparecen automáticamente en el SDK
+1. Descarga el spec actualizado a `oas/`
+2. Ejecuta `make generate` (regenera modelos + operaciones)
+3. Los nuevos metodos aparecen automaticamente en el SDK
 
 ### Agregar una nueva API
 
-1. Agrega el spec `.yaml` a la carpeta `oas/`
-2. Agrega el procesamiento en `prepare_specs.py` (resolución de conflictos)
-3. Agrega la línea en el `Makefile` (merge command)
-4. `make force`
+1. Agrega el spec `.yaml` a `oas/`
+2. Agrega la entrada en `API_SPECS` de `scripts/generate_sdk.py`
+3. Agrega la entrada en `API_MODEL_TARGETS` de `scripts/codegen/models.py`
+4. `make generate`

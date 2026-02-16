@@ -60,6 +60,6 @@ with Workiva(client_id="tu_client_id", client_secret="tu_client_secret") as clie
 
 ## Versión actual
 
-- **SDK**: 0.4.0
+- **SDK**: 0.6.0
 - **Python target**: 3.10+
-- **Generado con**: [Speakeasy](https://speakeasy.com)
+- **Codegen**: datamodel-code-generator + Jinja2

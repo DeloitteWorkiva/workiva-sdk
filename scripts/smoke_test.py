@@ -50,20 +50,20 @@ def smoke_test() -> None:
 
         # --- Wdata API ---
         try:
-            res = client.wdata.health_check()
-            print(f"  [PASS] Wdata     — wdata.health_check() → {type(res).__name__}")
+            res = client.api_health.health_check()
+            print(f"  [PASS] Wdata     — api_health.health_check() → {type(res).__name__}")
             passed += 1
         except Exception as e:
-            print(f"  [FAIL] Wdata     — wdata.health_check() → {e}")
+            print(f"  [FAIL] Wdata     — api_health.health_check() → {e}")
             failed += 1
 
         # --- Chains API ---
         try:
-            res = client.chains.get_workspaces()
-            print(f"  [PASS] Chains    — chains.get_workspaces() → {type(res).__name__}")
+            res = client.workspace.get_workspaces()
+            print(f"  [PASS] Chains    — workspace.get_workspaces() → {type(res).__name__}")
             passed += 1
         except Exception as e:
-            print(f"  [FAIL] Chains    — chains.get_workspaces() → {e}")
+            print(f"  [FAIL] Chains    — workspace.get_workspaces() → {e}")
             failed += 1
 
     print(f"\n{'='*50}")

@@ -6,8 +6,7 @@ src/*.egg-info/
 .python-version
 .DS_Store
 pyrightconfig.json
-**/.speakeasy/temp/
-**/.speakeasy/logs/
-.speakeasy/reports
+.speakeasy/
+dist/
 .env
 .env.local

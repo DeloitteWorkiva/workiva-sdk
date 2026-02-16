@@ -17,7 +17,7 @@ from __future__ import annotations
 
 import ast
 import sys
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from enum import Enum
 from pathlib import Path
 
@@ -66,8 +66,14 @@ class ModelInfo:
 
 @dataclass
 class ParsedModels:
-    enums: dict[str, EnumInfo] = field(default_factory=dict)
-    models: dict[str, ModelInfo] = field(default_factory=dict)
+    enums: dict[str, EnumInfo] | None = None
+    models: dict[str, ModelInfo] | None = None
+
+    def __post_init__(self) -> None:
+        if self.enums is None:
+            self.enums = {}
+        if self.models is None:
+            self.models = {}
 
 
 def _annotation_to_str(node: ast.expr | None) -> str:
@@ -120,7 +126,7 @@ def _extract_enum_members(class_node: ast.ClassDef) -> dict[str, str]:
     for stmt in class_node.body:
         if isinstance(stmt, ast.Assign) and len(stmt.targets) == 1:
             target = stmt.targets[0]
-            if isinstance(target, ast.Name) and target.id.isupper():
+            if isinstance(target, ast.Name) and not target.id.startswith("_"):
                 members[target.id] = ast.unparse(stmt.value)
     return members
 
