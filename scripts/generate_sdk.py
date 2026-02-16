@@ -45,6 +45,28 @@ API_SPECS = {
     "wdata": "wdata.yaml",
 }
 
+# Primitive types that don't need model imports
+_BUILTIN_TYPES = {"str", "int", "float", "bool", "bytes", "Any", "None", "dict", "list"}
+
+
+def _collect_model_types(type_str: str, out: set[str]) -> None:
+    """Extract model type names from a type annotation string.
+
+    Skips builtins like str, int, dict[str, Any], list[...], etc.
+    Handles nested types like list[ModelName].
+    """
+    # Strip list[...] wrapper
+    import re
+    inner = re.sub(r"^list\[(.+)\]$", r"\1", type_str)
+    # Strip dict[...] wrapper
+    inner = re.sub(r"^dict\[.+\]$", "", inner)
+    # Strip Optional[...] wrapper
+    inner = re.sub(r"^Optional\[(.+)\]$", r"\1", inner)
+    inner = inner.strip()
+    if inner and inner not in _BUILTIN_TYPES and inner.isidentifier():
+        out.add(inner)
+
+
 def _validate_python(source: str, filename: str) -> bool:
     """Validate that generated Python is syntactically correct."""
     try:
@@ -134,6 +156,12 @@ class BaseNamespace:
             )
             description = f"{class_name} operations."
 
+            # Collect model types used as body parameters
+            model_types: set[str] = set()
+            for op in operations:
+                if op.request_body and op.request_body.python_type:
+                    _collect_model_types(op.request_body.python_type, model_types)
+
             # Render template
             source = namespace_template.render(
                 api=api,
@@ -141,6 +169,7 @@ class BaseNamespace:
                 class_name=class_name,
                 description=description,
                 operations=operations,
+                model_imports=sorted(model_types),
             )
 
             # Validate syntax

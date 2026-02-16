@@ -11,6 +11,9 @@ import httpx
 
 from workiva._constants import _API
 from workiva._operations._base import BaseNamespace
+from workiva.models.wdata import (
+    TokenDto,
+)
 
 
 class TokenManagement(BaseNamespace):

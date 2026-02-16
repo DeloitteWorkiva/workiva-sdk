@@ -11,6 +11,20 @@ import httpx
 
 from workiva._constants import _API
 from workiva._operations._base import BaseNamespace
+from workiva.models.platform import (
+    ImageUpload,
+    RangeLinkEdit,
+    RichTextAnchorCreation,
+    RichTextBatchEdit,
+    RichTextDuplicationEdit,
+    RichTextLinksBatchEdit,
+    StyleGuideExport,
+    TableAnchorCreation,
+    TableCellsBatchEdit,
+    TableEdit,
+    TableFiltersReapplication,
+    TableLinksBatchEdit,
+)
 
 
 class Content(BaseNamespace):
@@ -2140,7 +2154,7 @@ class Content(BaseNamespace):
         self,
         *,
         table_id: str,
-        body: JSONPatchDocument,
+        body: list[Any],
         timeout: Optional[float] = None,
     ) -> httpx.Response:
         """Partially update a table's properties
@@ -2174,7 +2188,7 @@ class Content(BaseNamespace):
         self,
         *,
         table_id: str,
-        body: JSONPatchDocument,
+        body: list[Any],
         timeout: Optional[float] = None,
     ) -> httpx.Response:
         """Partially update a table's properties (async)

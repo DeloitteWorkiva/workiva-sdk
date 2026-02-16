@@ -11,6 +11,9 @@ import httpx
 
 from workiva._constants import _API
 from workiva._operations._base import BaseNamespace
+from workiva.models.platform import (
+    MilestoneCreation,
+)
 
 
 class Milestones(BaseNamespace):
@@ -72,46 +75,6 @@ class Milestones(BaseNamespace):
             timeout=timeout,
         )
 
-    def delete_milestone_by_id(
-        self,
-        *,
-        milestone_id: str,
-        timeout: Optional[float] = None,
-    ) -> httpx.Response:
-        """Deletes a milestone
-
-        Deletes the [`Milestone`](ref:milestones#milestone) with a given id.
-        """
-        return self._client.request(
-            "DELETE",
-            self._api,
-            "/milestones/{milestoneId}",
-            path_params={
-                "milestoneId": milestone_id,
-            },
-            timeout=timeout,
-        )
-
-    async def delete_milestone_by_id_async(
-        self,
-        *,
-        milestone_id: str,
-        timeout: Optional[float] = None,
-    ) -> httpx.Response:
-        """Deletes a milestone (async)
-
-        Deletes the [`Milestone`](ref:milestones#milestone) with a given id.
-        """
-        return await self._client.request_async(
-            "DELETE",
-            self._api,
-            "/milestones/{milestoneId}",
-            path_params={
-                "milestoneId": milestone_id,
-            },
-            timeout=timeout,
-        )
-
     def get_milestone_by_id(
         self,
         *,
@@ -152,11 +115,51 @@ class Milestones(BaseNamespace):
             timeout=timeout,
         )
 
+    def delete_milestone_by_id(
+        self,
+        *,
+        milestone_id: str,
+        timeout: Optional[float] = None,
+    ) -> httpx.Response:
+        """Deletes a milestone
+
+        Deletes the [`Milestone`](ref:milestones#milestone) with a given id.
+        """
+        return self._client.request(
+            "DELETE",
+            self._api,
+            "/milestones/{milestoneId}",
+            path_params={
+                "milestoneId": milestone_id,
+            },
+            timeout=timeout,
+        )
+
+    async def delete_milestone_by_id_async(
+        self,
+        *,
+        milestone_id: str,
+        timeout: Optional[float] = None,
+    ) -> httpx.Response:
+        """Deletes a milestone (async)
+
+        Deletes the [`Milestone`](ref:milestones#milestone) with a given id.
+        """
+        return await self._client.request_async(
+            "DELETE",
+            self._api,
+            "/milestones/{milestoneId}",
+            path_params={
+                "milestoneId": milestone_id,
+            },
+            timeout=timeout,
+        )
+
     def partially_update_milestone_by_id(
         self,
         *,
         milestone_id: str,
-        body: JSONPatchDocument,
+        body: list[Any],
         timeout: Optional[float] = None,
     ) -> httpx.Response:
         """Partially updates a milestone
@@ -189,7 +192,7 @@ class Milestones(BaseNamespace):
         self,
         *,
         milestone_id: str,
-        body: JSONPatchDocument,
+        body: list[Any],
         timeout: Optional[float] = None,
     ) -> httpx.Response:
         """Partially updates a milestone (async)

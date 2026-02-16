@@ -11,48 +11,22 @@ import httpx
 
 from workiva._constants import _API
 from workiva._operations._base import BaseNamespace
+from workiva.models.platform import (
+    Dimension,
+    Metric,
+    MetricValue,
+    MetricValueIdentifier,
+    MetricValueUpsertion,
+    Program,
+    ResourcePermissionsModification,
+    Topic,
+)
 
 
 class Sustainability(BaseNamespace):
     """Sustainability operations."""
 
     _api: _API = _API.PLATFORM
-
-    def create_program(
-        self,
-        *,
-        body: Program,
-        timeout: Optional[float] = None,
-    ) -> httpx.Response:
-        """Create a new program
-
-        Creates a new [program](ref:sustainability#program).
-        """
-        return self._client.request(
-            "POST",
-            self._api,
-            "/programs",
-            json_body=body,
-            timeout=timeout,
-        )
-
-    async def create_program_async(
-        self,
-        *,
-        body: Program,
-        timeout: Optional[float] = None,
-    ) -> httpx.Response:
-        """Create a new program (async)
-
-        Creates a new [program](ref:sustainability#program).
-        """
-        return await self._client.request_async(
-            "POST",
-            self._api,
-            "/programs",
-            json_body=body,
-            timeout=timeout,
-        )
 
     def get_programs(
         self,
@@ -106,6 +80,42 @@ class Sustainability(BaseNamespace):
             timeout=timeout,
         )
 
+    def create_program(
+        self,
+        *,
+        body: Program,
+        timeout: Optional[float] = None,
+    ) -> httpx.Response:
+        """Create a new program
+
+        Creates a new [program](ref:sustainability#program).
+        """
+        return self._client.request(
+            "POST",
+            self._api,
+            "/programs",
+            json_body=body,
+            timeout=timeout,
+        )
+
+    async def create_program_async(
+        self,
+        *,
+        body: Program,
+        timeout: Optional[float] = None,
+    ) -> httpx.Response:
+        """Create a new program (async)
+
+        Creates a new [program](ref:sustainability#program).
+        """
+        return await self._client.request_async(
+            "POST",
+            self._api,
+            "/programs",
+            json_body=body,
+            timeout=timeout,
+        )
+
     def get_program_by_id(
         self,
         *,
@@ -150,7 +160,7 @@ class Sustainability(BaseNamespace):
         self,
         *,
         program_id: str,
-        body: JSONPatchDocument,
+        body: list[Any],
         timeout: Optional[float] = None,
     ) -> httpx.Response:
         """Partially update a single program
@@ -178,7 +188,7 @@ class Sustainability(BaseNamespace):
         self,
         *,
         program_id: str,
-        body: JSONPatchDocument,
+        body: list[Any],
         timeout: Optional[float] = None,
     ) -> httpx.Response:
         """Partially update a single program (async)
@@ -195,50 +205,6 @@ class Sustainability(BaseNamespace):
             "PATCH",
             self._api,
             "/programs/{programId}",
-            path_params={
-                "programId": program_id,
-            },
-            json_body=body,
-            timeout=timeout,
-        )
-
-    def create_dimension(
-        self,
-        *,
-        program_id: str,
-        body: Dimension,
-        timeout: Optional[float] = None,
-    ) -> httpx.Response:
-        """Create a new dimension
-
-        Creates a new [dimension](ref:sustainability#dimension).
-        """
-        return self._client.request(
-            "POST",
-            self._api,
-            "/programs/{programId}/dimensions",
-            path_params={
-                "programId": program_id,
-            },
-            json_body=body,
-            timeout=timeout,
-        )
-
-    async def create_dimension_async(
-        self,
-        *,
-        program_id: str,
-        body: Dimension,
-        timeout: Optional[float] = None,
-    ) -> httpx.Response:
-        """Create a new dimension (async)
-
-        Creates a new [dimension](ref:sustainability#dimension).
-        """
-        return await self._client.request_async(
-            "POST",
-            self._api,
-            "/programs/{programId}/dimensions",
             path_params={
                 "programId": program_id,
             },
@@ -306,6 +272,50 @@ class Sustainability(BaseNamespace):
             timeout=timeout,
         )
 
+    def create_dimension(
+        self,
+        *,
+        program_id: str,
+        body: Dimension,
+        timeout: Optional[float] = None,
+    ) -> httpx.Response:
+        """Create a new dimension
+
+        Creates a new [dimension](ref:sustainability#dimension).
+        """
+        return self._client.request(
+            "POST",
+            self._api,
+            "/programs/{programId}/dimensions",
+            path_params={
+                "programId": program_id,
+            },
+            json_body=body,
+            timeout=timeout,
+        )
+
+    async def create_dimension_async(
+        self,
+        *,
+        program_id: str,
+        body: Dimension,
+        timeout: Optional[float] = None,
+    ) -> httpx.Response:
+        """Create a new dimension (async)
+
+        Creates a new [dimension](ref:sustainability#dimension).
+        """
+        return await self._client.request_async(
+            "POST",
+            self._api,
+            "/programs/{programId}/dimensions",
+            path_params={
+                "programId": program_id,
+            },
+            json_body=body,
+            timeout=timeout,
+        )
+
     def get_dimension_by_id(
         self,
         *,
@@ -355,7 +365,7 @@ class Sustainability(BaseNamespace):
         *,
         program_id: str,
         dimension_id: str,
-        body: JSONPatchDocument,
+        body: list[Any],
         timeout: Optional[float] = None,
     ) -> httpx.Response:
         """Partially update a single dimension
@@ -387,7 +397,7 @@ class Sustainability(BaseNamespace):
         *,
         program_id: str,
         dimension_id: str,
-        body: JSONPatchDocument,
+        body: list[Any],
         timeout: Optional[float] = None,
     ) -> httpx.Response:
         """Partially update a single dimension (async)
@@ -409,50 +419,6 @@ class Sustainability(BaseNamespace):
             path_params={
                 "programId": program_id,
                 "dimensionId": dimension_id,
-            },
-            json_body=body,
-            timeout=timeout,
-        )
-
-    def create_metric(
-        self,
-        *,
-        program_id: str,
-        body: Metric,
-        timeout: Optional[float] = None,
-    ) -> httpx.Response:
-        """Create a new metric
-
-        Creates a new [metric](ref:sustainability#metric).
-        """
-        return self._client.request(
-            "POST",
-            self._api,
-            "/programs/{programId}/metrics",
-            path_params={
-                "programId": program_id,
-            },
-            json_body=body,
-            timeout=timeout,
-        )
-
-    async def create_metric_async(
-        self,
-        *,
-        program_id: str,
-        body: Metric,
-        timeout: Optional[float] = None,
-    ) -> httpx.Response:
-        """Create a new metric (async)
-
-        Creates a new [metric](ref:sustainability#metric).
-        """
-        return await self._client.request_async(
-            "POST",
-            self._api,
-            "/programs/{programId}/metrics",
-            path_params={
-                "programId": program_id,
             },
             json_body=body,
             timeout=timeout,
@@ -518,47 +484,47 @@ class Sustainability(BaseNamespace):
             timeout=timeout,
         )
 
-    def delete_metric_by_id(
+    def create_metric(
         self,
         *,
         program_id: str,
-        metric_id: str,
+        body: Metric,
         timeout: Optional[float] = None,
     ) -> httpx.Response:
-        """Delete a single metric
+        """Create a new metric
 
-        Deletes a [metric](ref:sustainability#metric) given its ID
+        Creates a new [metric](ref:sustainability#metric).
         """
         return self._client.request(
-            "DELETE",
+            "POST",
             self._api,
-            "/programs/{programId}/metrics/{metricId}",
+            "/programs/{programId}/metrics",
             path_params={
                 "programId": program_id,
-                "metricId": metric_id,
             },
+            json_body=body,
             timeout=timeout,
         )
 
-    async def delete_metric_by_id_async(
+    async def create_metric_async(
         self,
         *,
         program_id: str,
-        metric_id: str,
+        body: Metric,
         timeout: Optional[float] = None,
     ) -> httpx.Response:
-        """Delete a single metric (async)
+        """Create a new metric (async)
 
-        Deletes a [metric](ref:sustainability#metric) given its ID
+        Creates a new [metric](ref:sustainability#metric).
         """
         return await self._client.request_async(
-            "DELETE",
+            "POST",
             self._api,
-            "/programs/{programId}/metrics/{metricId}",
+            "/programs/{programId}/metrics",
             path_params={
                 "programId": program_id,
-                "metricId": metric_id,
             },
+            json_body=body,
             timeout=timeout,
         )
 
@@ -606,12 +572,56 @@ class Sustainability(BaseNamespace):
             timeout=timeout,
         )
 
+    def delete_metric_by_id(
+        self,
+        *,
+        program_id: str,
+        metric_id: str,
+        timeout: Optional[float] = None,
+    ) -> httpx.Response:
+        """Delete a single metric
+
+        Deletes a [metric](ref:sustainability#metric) given its ID
+        """
+        return self._client.request(
+            "DELETE",
+            self._api,
+            "/programs/{programId}/metrics/{metricId}",
+            path_params={
+                "programId": program_id,
+                "metricId": metric_id,
+            },
+            timeout=timeout,
+        )
+
+    async def delete_metric_by_id_async(
+        self,
+        *,
+        program_id: str,
+        metric_id: str,
+        timeout: Optional[float] = None,
+    ) -> httpx.Response:
+        """Delete a single metric (async)
+
+        Deletes a [metric](ref:sustainability#metric) given its ID
+        """
+        return await self._client.request_async(
+            "DELETE",
+            self._api,
+            "/programs/{programId}/metrics/{metricId}",
+            path_params={
+                "programId": program_id,
+                "metricId": metric_id,
+            },
+            timeout=timeout,
+        )
+
     def partially_update_metric_by_id(
         self,
         *,
         program_id: str,
         metric_id: str,
-        body: JSONPatchDocument,
+        body: list[Any],
         timeout: Optional[float] = None,
     ) -> httpx.Response:
         """Partially update a single metric
@@ -648,7 +658,7 @@ class Sustainability(BaseNamespace):
         *,
         program_id: str,
         metric_id: str,
-        body: JSONPatchDocument,
+        body: list[Any],
         timeout: Optional[float] = None,
     ) -> httpx.Response:
         """Partially update a single metric (async)
@@ -672,54 +682,6 @@ class Sustainability(BaseNamespace):
             "PATCH",
             self._api,
             "/programs/{programId}/metrics/{metricId}",
-            path_params={
-                "programId": program_id,
-                "metricId": metric_id,
-            },
-            json_body=body,
-            timeout=timeout,
-        )
-
-    def create_value(
-        self,
-        *,
-        program_id: str,
-        metric_id: str,
-        body: MetricValue,
-        timeout: Optional[float] = None,
-    ) -> httpx.Response:
-        """Create a new metric value
-
-        Creates a new [metric value](ref:sustainability#metricvalue)
-        """
-        return self._client.request(
-            "POST",
-            self._api,
-            "/programs/{programId}/metrics/{metricId}/values",
-            path_params={
-                "programId": program_id,
-                "metricId": metric_id,
-            },
-            json_body=body,
-            timeout=timeout,
-        )
-
-    async def create_value_async(
-        self,
-        *,
-        program_id: str,
-        metric_id: str,
-        body: MetricValue,
-        timeout: Optional[float] = None,
-    ) -> httpx.Response:
-        """Create a new metric value (async)
-
-        Creates a new [metric value](ref:sustainability#metricvalue)
-        """
-        return await self._client.request_async(
-            "POST",
-            self._api,
-            "/programs/{programId}/metrics/{metricId}/values",
             path_params={
                 "programId": program_id,
                 "metricId": metric_id,
@@ -794,53 +756,51 @@ class Sustainability(BaseNamespace):
             timeout=timeout,
         )
 
-    def delete_metric_value_by_id(
+    def create_value(
         self,
         *,
         program_id: str,
         metric_id: str,
-        metric_value_id: str,
+        body: MetricValue,
         timeout: Optional[float] = None,
     ) -> httpx.Response:
-        """Delete a single metric value
+        """Create a new metric value
 
-        Deletes a [metric value](ref:sustainability#metricvalue) value given its
-        ID
+        Creates a new [metric value](ref:sustainability#metricvalue)
         """
         return self._client.request(
-            "DELETE",
+            "POST",
             self._api,
-            "/programs/{programId}/metrics/{metricId}/values/{metricValueId}",
+            "/programs/{programId}/metrics/{metricId}/values",
             path_params={
                 "programId": program_id,
                 "metricId": metric_id,
-                "metricValueId": metric_value_id,
             },
+            json_body=body,
             timeout=timeout,
         )
 
-    async def delete_metric_value_by_id_async(
+    async def create_value_async(
         self,
         *,
         program_id: str,
         metric_id: str,
-        metric_value_id: str,
+        body: MetricValue,
         timeout: Optional[float] = None,
     ) -> httpx.Response:
-        """Delete a single metric value (async)
+        """Create a new metric value (async)
 
-        Deletes a [metric value](ref:sustainability#metricvalue) value given its
-        ID
+        Creates a new [metric value](ref:sustainability#metricvalue)
         """
         return await self._client.request_async(
-            "DELETE",
+            "POST",
             self._api,
-            "/programs/{programId}/metrics/{metricId}/values/{metricValueId}",
+            "/programs/{programId}/metrics/{metricId}/values",
             path_params={
                 "programId": program_id,
                 "metricId": metric_id,
-                "metricValueId": metric_value_id,
             },
+            json_body=body,
             timeout=timeout,
         )
 
@@ -894,13 +854,63 @@ class Sustainability(BaseNamespace):
             timeout=timeout,
         )
 
+    def delete_metric_value_by_id(
+        self,
+        *,
+        program_id: str,
+        metric_id: str,
+        metric_value_id: str,
+        timeout: Optional[float] = None,
+    ) -> httpx.Response:
+        """Delete a single metric value
+
+        Deletes a [metric value](ref:sustainability#metricvalue) value given its
+        ID
+        """
+        return self._client.request(
+            "DELETE",
+            self._api,
+            "/programs/{programId}/metrics/{metricId}/values/{metricValueId}",
+            path_params={
+                "programId": program_id,
+                "metricId": metric_id,
+                "metricValueId": metric_value_id,
+            },
+            timeout=timeout,
+        )
+
+    async def delete_metric_value_by_id_async(
+        self,
+        *,
+        program_id: str,
+        metric_id: str,
+        metric_value_id: str,
+        timeout: Optional[float] = None,
+    ) -> httpx.Response:
+        """Delete a single metric value (async)
+
+        Deletes a [metric value](ref:sustainability#metricvalue) value given its
+        ID
+        """
+        return await self._client.request_async(
+            "DELETE",
+            self._api,
+            "/programs/{programId}/metrics/{metricId}/values/{metricValueId}",
+            path_params={
+                "programId": program_id,
+                "metricId": metric_id,
+                "metricValueId": metric_value_id,
+            },
+            timeout=timeout,
+        )
+
     def partially_update_metric_value_by_id(
         self,
         *,
         program_id: str,
         metric_id: str,
         metric_value_id: str,
-        body: JSONPatchDocument,
+        body: list[Any],
         timeout: Optional[float] = None,
     ) -> httpx.Response:
         """Partially update a single metric value
@@ -933,7 +943,7 @@ class Sustainability(BaseNamespace):
         program_id: str,
         metric_id: str,
         metric_value_id: str,
-        body: JSONPatchDocument,
+        body: list[Any],
         timeout: Optional[float] = None,
     ) -> httpx.Response:
         """Partially update a single metric value (async)
@@ -1204,50 +1214,6 @@ class Sustainability(BaseNamespace):
             timeout=timeout,
         )
 
-    def create_topic(
-        self,
-        *,
-        program_id: str,
-        body: Topic,
-        timeout: Optional[float] = None,
-    ) -> httpx.Response:
-        """Create a new topic
-
-        Creates a new [topic](ref:sustainability#topic).
-        """
-        return self._client.request(
-            "POST",
-            self._api,
-            "/programs/{programId}/topics",
-            path_params={
-                "programId": program_id,
-            },
-            json_body=body,
-            timeout=timeout,
-        )
-
-    async def create_topic_async(
-        self,
-        *,
-        program_id: str,
-        body: Topic,
-        timeout: Optional[float] = None,
-    ) -> httpx.Response:
-        """Create a new topic (async)
-
-        Creates a new [topic](ref:sustainability#topic).
-        """
-        return await self._client.request_async(
-            "POST",
-            self._api,
-            "/programs/{programId}/topics",
-            path_params={
-                "programId": program_id,
-            },
-            json_body=body,
-            timeout=timeout,
-        )
-
     def get_topics(
         self,
         *,
@@ -1308,47 +1274,47 @@ class Sustainability(BaseNamespace):
             timeout=timeout,
         )
 
-    def delete_topic_by_id(
+    def create_topic(
         self,
         *,
         program_id: str,
-        topic_id: str,
+        body: Topic,
         timeout: Optional[float] = None,
     ) -> httpx.Response:
-        """Delete a single topic
+        """Create a new topic
 
-        Deletes a [topic](ref:sustainability#topic) given its ID
+        Creates a new [topic](ref:sustainability#topic).
         """
         return self._client.request(
-            "DELETE",
+            "POST",
             self._api,
-            "/programs/{programId}/topics/{topicId}",
+            "/programs/{programId}/topics",
             path_params={
                 "programId": program_id,
-                "topicId": topic_id,
             },
+            json_body=body,
             timeout=timeout,
         )
 
-    async def delete_topic_by_id_async(
+    async def create_topic_async(
         self,
         *,
         program_id: str,
-        topic_id: str,
+        body: Topic,
         timeout: Optional[float] = None,
     ) -> httpx.Response:
-        """Delete a single topic (async)
+        """Create a new topic (async)
 
-        Deletes a [topic](ref:sustainability#topic) given its ID
+        Creates a new [topic](ref:sustainability#topic).
         """
         return await self._client.request_async(
-            "DELETE",
+            "POST",
             self._api,
-            "/programs/{programId}/topics/{topicId}",
+            "/programs/{programId}/topics",
             path_params={
                 "programId": program_id,
-                "topicId": topic_id,
             },
+            json_body=body,
             timeout=timeout,
         )
 
@@ -1396,12 +1362,56 @@ class Sustainability(BaseNamespace):
             timeout=timeout,
         )
 
+    def delete_topic_by_id(
+        self,
+        *,
+        program_id: str,
+        topic_id: str,
+        timeout: Optional[float] = None,
+    ) -> httpx.Response:
+        """Delete a single topic
+
+        Deletes a [topic](ref:sustainability#topic) given its ID
+        """
+        return self._client.request(
+            "DELETE",
+            self._api,
+            "/programs/{programId}/topics/{topicId}",
+            path_params={
+                "programId": program_id,
+                "topicId": topic_id,
+            },
+            timeout=timeout,
+        )
+
+    async def delete_topic_by_id_async(
+        self,
+        *,
+        program_id: str,
+        topic_id: str,
+        timeout: Optional[float] = None,
+    ) -> httpx.Response:
+        """Delete a single topic (async)
+
+        Deletes a [topic](ref:sustainability#topic) given its ID
+        """
+        return await self._client.request_async(
+            "DELETE",
+            self._api,
+            "/programs/{programId}/topics/{topicId}",
+            path_params={
+                "programId": program_id,
+                "topicId": topic_id,
+            },
+            timeout=timeout,
+        )
+
     def partially_update_topic_by_id(
         self,
         *,
         program_id: str,
         topic_id: str,
-        body: JSONPatchDocument,
+        body: list[Any],
         timeout: Optional[float] = None,
     ) -> httpx.Response:
         """Partially update a single topic
@@ -1432,7 +1442,7 @@ class Sustainability(BaseNamespace):
         *,
         program_id: str,
         topic_id: str,
-        body: JSONPatchDocument,
+        body: list[Any],
         timeout: Optional[float] = None,
     ) -> httpx.Response:
         """Partially update a single topic (async)

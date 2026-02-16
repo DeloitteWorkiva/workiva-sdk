@@ -11,12 +11,73 @@ import httpx
 
 from workiva._constants import _API
 from workiva._operations._base import BaseNamespace
+from workiva.models.platform import (
+    File,
+    FileCopy,
+    FileExportById,
+    FileImport,
+    FileRestoreOptions,
+    FileTrashOptions,
+    ResourcePermissionsModification,
+)
 
 
 class Files(BaseNamespace):
     """Files operations."""
 
     _api: _API = _API.PLATFORM
+
+    def get_files(
+        self,
+        *,
+        filter_: Optional[str] = None,
+        order_by: Optional[str] = None,
+        maxpagesize: Optional[int] = 1000,
+        next_: Optional[str] = None,
+        timeout: Optional[float] = None,
+    ) -> httpx.Response:
+        """Retrieve a list of files
+
+        Returns a paginated list of [files](ref:files#file).
+        """
+        return self._client.request(
+            "GET",
+            self._api,
+            "/files",
+            query_params={
+                "$filter": filter_,
+                "$orderBy": order_by,
+                "$maxpagesize": maxpagesize,
+                "$next": next_,
+            },
+            timeout=timeout,
+        )
+
+    async def get_files_async(
+        self,
+        *,
+        filter_: Optional[str] = None,
+        order_by: Optional[str] = None,
+        maxpagesize: Optional[int] = 1000,
+        next_: Optional[str] = None,
+        timeout: Optional[float] = None,
+    ) -> httpx.Response:
+        """Retrieve a list of files (async)
+
+        Returns a paginated list of [files](ref:files#file).
+        """
+        return await self._client.request_async(
+            "GET",
+            self._api,
+            "/files",
+            query_params={
+                "$filter": filter_,
+                "$orderBy": order_by,
+                "$maxpagesize": maxpagesize,
+                "$next": next_,
+            },
+            timeout=timeout,
+        )
 
     def create_file(
         self,
@@ -105,58 +166,6 @@ class Files(BaseNamespace):
             self._api,
             "/files",
             json_body=body,
-            timeout=timeout,
-        )
-
-    def get_files(
-        self,
-        *,
-        filter_: Optional[str] = None,
-        order_by: Optional[str] = None,
-        maxpagesize: Optional[int] = 1000,
-        next_: Optional[str] = None,
-        timeout: Optional[float] = None,
-    ) -> httpx.Response:
-        """Retrieve a list of files
-
-        Returns a paginated list of [files](ref:files#file).
-        """
-        return self._client.request(
-            "GET",
-            self._api,
-            "/files",
-            query_params={
-                "$filter": filter_,
-                "$orderBy": order_by,
-                "$maxpagesize": maxpagesize,
-                "$next": next_,
-            },
-            timeout=timeout,
-        )
-
-    async def get_files_async(
-        self,
-        *,
-        filter_: Optional[str] = None,
-        order_by: Optional[str] = None,
-        maxpagesize: Optional[int] = 1000,
-        next_: Optional[str] = None,
-        timeout: Optional[float] = None,
-    ) -> httpx.Response:
-        """Retrieve a list of files (async)
-
-        Returns a paginated list of [files](ref:files#file).
-        """
-        return await self._client.request_async(
-            "GET",
-            self._api,
-            "/files",
-            query_params={
-                "$filter": filter_,
-                "$orderBy": order_by,
-                "$maxpagesize": maxpagesize,
-                "$next": next_,
-            },
             timeout=timeout,
         )
 
@@ -296,7 +305,7 @@ class Files(BaseNamespace):
         self,
         *,
         file_id: str,
-        body: JSONPatchDocument,
+        body: list[Any],
         timeout: Optional[float] = None,
     ) -> httpx.Response:
         """Partially update a single file
@@ -326,7 +335,7 @@ class Files(BaseNamespace):
         self,
         *,
         file_id: str,
-        body: JSONPatchDocument,
+        body: list[Any],
         timeout: Optional[float] = None,
     ) -> httpx.Response:
         """Partially update a single file (async)

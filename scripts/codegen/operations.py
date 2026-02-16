@@ -126,6 +126,11 @@ def _get_python_type(schema: dict[str, Any], spec: dict[str, Any]) -> str:
     """Resolve a schema to a Python type annotation."""
     if "$ref" in schema:
         ref = schema["$ref"]
+        # Resolve the ref to check if it's a simple scalar type alias
+        resolved = _resolve_ref(ref, spec)
+        if resolved.get("type") in TYPE_MAP and "properties" not in resolved and "allOf" not in resolved:
+            # Simple scalar alias (e.g. ID → string) — use the primitive type
+            return TYPE_MAP[resolved["type"]]
         # Extract model name from #/components/schemas/ModelName
         parts = ref.split("/")
         return parts[-1] if parts else "Any"

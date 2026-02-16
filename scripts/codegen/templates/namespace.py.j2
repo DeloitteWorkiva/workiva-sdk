@@ -11,6 +11,13 @@ import httpx
 
 from workiva._constants import _API
 from workiva._operations._base import BaseNamespace
+{% if model_imports %}
+from workiva.models.{{ api }} import (
+{% for model in model_imports %}
+    {{ model }},
+{% endfor %}
+)
+{% endif %}
 
 
 class {{ class_name }}(BaseNamespace):

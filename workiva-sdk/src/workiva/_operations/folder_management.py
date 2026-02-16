@@ -11,6 +11,10 @@ import httpx
 
 from workiva._constants import _API
 from workiva._operations._base import BaseNamespace
+from workiva.models.wdata import (
+    FolderableDto,
+    FolderDto,
+)
 
 
 class FolderManagement(BaseNamespace):
@@ -90,44 +94,6 @@ class FolderManagement(BaseNamespace):
             timeout=timeout,
         )
 
-    def create_folder(
-        self,
-        *,
-        body: FolderDto,
-        timeout: Optional[float] = None,
-    ) -> httpx.Response:
-        """Create a new folder
-
-        Creates a folder using the provided information and returns the folder
-        meta.
-        """
-        return self._client.request(
-            "POST",
-            self._api,
-            "/api/v1/folder",
-            json_body=body,
-            timeout=timeout,
-        )
-
-    async def create_folder_async(
-        self,
-        *,
-        body: FolderDto,
-        timeout: Optional[float] = None,
-    ) -> httpx.Response:
-        """Create a new folder (async)
-
-        Creates a folder using the provided information and returns the folder
-        meta.
-        """
-        return await self._client.request_async(
-            "POST",
-            self._api,
-            "/api/v1/folder",
-            json_body=body,
-            timeout=timeout,
-        )
-
     def list_folders(
         self,
         *,
@@ -176,51 +142,83 @@ class FolderManagement(BaseNamespace):
             timeout=timeout,
         )
 
-    def update_folder(
+    def create_folder(
         self,
         *,
-        folder_id: str,
         body: FolderDto,
         timeout: Optional[float] = None,
     ) -> httpx.Response:
-        """Update a single folder
+        """Create a new folder
 
-        Updates the folder that matches the provided ID with the details
-        provided in the
-        body.
+        Creates a folder using the provided information and returns the folder
+        meta.
         """
         return self._client.request(
-            "PUT",
+            "POST",
             self._api,
-            "/api/v1/folder/{folderId}",
-            path_params={
-                "folderId": folder_id,
-            },
+            "/api/v1/folder",
             json_body=body,
             timeout=timeout,
         )
 
-    async def update_folder_async(
+    async def create_folder_async(
         self,
         *,
-        folder_id: str,
         body: FolderDto,
         timeout: Optional[float] = None,
     ) -> httpx.Response:
-        """Update a single folder (async)
+        """Create a new folder (async)
 
-        Updates the folder that matches the provided ID with the details
-        provided in the
-        body.
+        Creates a folder using the provided information and returns the folder
+        meta.
         """
         return await self._client.request_async(
-            "PUT",
+            "POST",
+            self._api,
+            "/api/v1/folder",
+            json_body=body,
+            timeout=timeout,
+        )
+
+    def get_folder(
+        self,
+        *,
+        folder_id: str,
+        timeout: Optional[float] = None,
+    ) -> httpx.Response:
+        """Retrieve a single folder
+
+        Returns a folder with the provided ID, or a 404 if no matching folder is
+        found.
+        """
+        return self._client.request(
+            "GET",
             self._api,
             "/api/v1/folder/{folderId}",
             path_params={
                 "folderId": folder_id,
             },
-            json_body=body,
+            timeout=timeout,
+        )
+
+    async def get_folder_async(
+        self,
+        *,
+        folder_id: str,
+        timeout: Optional[float] = None,
+    ) -> httpx.Response:
+        """Retrieve a single folder (async)
+
+        Returns a folder with the provided ID, or a 404 if no matching folder is
+        found.
+        """
+        return await self._client.request_async(
+            "GET",
+            self._api,
+            "/api/v1/folder/{folderId}",
+            path_params={
+                "folderId": folder_id,
+            },
             timeout=timeout,
         )
 
@@ -268,69 +266,23 @@ class FolderManagement(BaseNamespace):
             timeout=timeout,
         )
 
-    def get_folder(
+    def update_folder(
         self,
         *,
         folder_id: str,
+        body: FolderDto,
         timeout: Optional[float] = None,
     ) -> httpx.Response:
-        """Retrieve a single folder
+        """Update a single folder
 
-        Returns a folder with the provided ID, or a 404 if no matching folder is
-        found.
+        Updates the folder that matches the provided ID with the details
+        provided in the
+        body.
         """
         return self._client.request(
-            "GET",
+            "PUT",
             self._api,
             "/api/v1/folder/{folderId}",
-            path_params={
-                "folderId": folder_id,
-            },
-            timeout=timeout,
-        )
-
-    async def get_folder_async(
-        self,
-        *,
-        folder_id: str,
-        timeout: Optional[float] = None,
-    ) -> httpx.Response:
-        """Retrieve a single folder (async)
-
-        Returns a folder with the provided ID, or a 404 if no matching folder is
-        found.
-        """
-        return await self._client.request_async(
-            "GET",
-            self._api,
-            "/api/v1/folder/{folderId}",
-            path_params={
-                "folderId": folder_id,
-            },
-            timeout=timeout,
-        )
-
-    def set_children(
-        self,
-        *,
-        folder_id: str,
-        body: list[FolderableDto],
-        timeout: Optional[float] = None,
-    ) -> httpx.Response:
-        """Move content into a folder
-
-        Sets the children of a folder using the entities' types and IDs provided
-        in the
-        body. If the entities previously resided under a folder, including the
-        root,
-        they move to the folder with the provided ID. If the provided ID is
-        'null',
-        the entities move to the root folder.
-        """
-        return self._client.request(
-            "POST",
-            self._api,
-            "/api/v1/folder/{folderId}/children",
             path_params={
                 "folderId": folder_id,
             },
@@ -338,27 +290,23 @@ class FolderManagement(BaseNamespace):
             timeout=timeout,
         )
 
-    async def set_children_async(
+    async def update_folder_async(
         self,
         *,
         folder_id: str,
-        body: list[FolderableDto],
+        body: FolderDto,
         timeout: Optional[float] = None,
     ) -> httpx.Response:
-        """Move content into a folder (async)
+        """Update a single folder (async)
 
-        Sets the children of a folder using the entities' types and IDs provided
-        in the
-        body. If the entities previously resided under a folder, including the
-        root,
-        they move to the folder with the provided ID. If the provided ID is
-        'null',
-        the entities move to the root folder.
+        Updates the folder that matches the provided ID with the details
+        provided in the
+        body.
         """
         return await self._client.request_async(
-            "POST",
+            "PUT",
             self._api,
-            "/api/v1/folder/{folderId}/children",
+            "/api/v1/folder/{folderId}",
             path_params={
                 "folderId": folder_id,
             },
@@ -427,5 +375,61 @@ class FolderManagement(BaseNamespace):
                 "limit": limit,
                 "offset": offset,
             },
+            timeout=timeout,
+        )
+
+    def set_children(
+        self,
+        *,
+        folder_id: str,
+        body: list[FolderableDto],
+        timeout: Optional[float] = None,
+    ) -> httpx.Response:
+        """Move content into a folder
+
+        Sets the children of a folder using the entities' types and IDs provided
+        in the
+        body. If the entities previously resided under a folder, including the
+        root,
+        they move to the folder with the provided ID. If the provided ID is
+        'null',
+        the entities move to the root folder.
+        """
+        return self._client.request(
+            "POST",
+            self._api,
+            "/api/v1/folder/{folderId}/children",
+            path_params={
+                "folderId": folder_id,
+            },
+            json_body=body,
+            timeout=timeout,
+        )
+
+    async def set_children_async(
+        self,
+        *,
+        folder_id: str,
+        body: list[FolderableDto],
+        timeout: Optional[float] = None,
+    ) -> httpx.Response:
+        """Move content into a folder (async)
+
+        Sets the children of a folder using the entities' types and IDs provided
+        in the
+        body. If the entities previously resided under a folder, including the
+        root,
+        they move to the folder with the provided ID. If the provided ID is
+        'null',
+        the entities move to the root folder.
+        """
+        return await self._client.request_async(
+            "POST",
+            self._api,
+            "/api/v1/folder/{folderId}/children",
+            path_params={
+                "folderId": folder_id,
+            },
+            json_body=body,
             timeout=timeout,
         )

@@ -11,12 +11,83 @@ import httpx
 
 from workiva._constants import _API
 from workiva._operations._base import BaseNamespace
+from workiva.models.wdata import (
+    ExportFileDto,
+)
 
 
 class FileManagement(BaseNamespace):
     """FileManagement operations."""
 
     _api: _API = _API.WDATA
+
+    def get_files(
+        self,
+        *,
+        table_id: str,
+        cursor: Optional[str] = None,
+        limit: Optional[int] = None,
+        offset: Optional[int] = None,
+        sort_order: Optional[str] = None,
+        sort_by: Optional[str] = None,
+        search_text: Optional[str] = None,
+        timeout: Optional[float] = None,
+    ) -> httpx.Response:
+        """Retrieve a list of files
+
+        Returns a paged list of all files associated with the provided table ID,
+        as well
+        as metadata associated with each file.
+        """
+        return self._client.request(
+            "GET",
+            self._api,
+            "/api/v1/file",
+            query_params={
+                "tableId": table_id,
+                "cursor": cursor,
+                "limit": limit,
+                "offset": offset,
+                "sortOrder": sort_order,
+                "sortBy": sort_by,
+                "searchText": search_text,
+            },
+            timeout=timeout,
+        )
+
+    async def get_files_async(
+        self,
+        *,
+        table_id: str,
+        cursor: Optional[str] = None,
+        limit: Optional[int] = None,
+        offset: Optional[int] = None,
+        sort_order: Optional[str] = None,
+        sort_by: Optional[str] = None,
+        search_text: Optional[str] = None,
+        timeout: Optional[float] = None,
+    ) -> httpx.Response:
+        """Retrieve a list of files (async)
+
+        Returns a paged list of all files associated with the provided table ID,
+        as well
+        as metadata associated with each file.
+        """
+        return await self._client.request_async(
+            "GET",
+            self._api,
+            "/api/v1/file",
+            query_params={
+                "tableId": table_id,
+                "cursor": cursor,
+                "limit": limit,
+                "offset": offset,
+                "sortOrder": sort_order,
+                "sortBy": sort_by,
+                "searchText": search_text,
+            },
+            timeout=timeout,
+        )
 
     def upload_file(
         self,
@@ -102,74 +173,6 @@ class FileManagement(BaseNamespace):
             timeout=timeout,
         )
 
-    def get_files(
-        self,
-        *,
-        table_id: str,
-        cursor: Optional[str] = None,
-        limit: Optional[int] = None,
-        offset: Optional[int] = None,
-        sort_order: Optional[str] = None,
-        sort_by: Optional[str] = None,
-        search_text: Optional[str] = None,
-        timeout: Optional[float] = None,
-    ) -> httpx.Response:
-        """Retrieve a list of files
-
-        Returns a paged list of all files associated with the provided table ID,
-        as well
-        as metadata associated with each file.
-        """
-        return self._client.request(
-            "GET",
-            self._api,
-            "/api/v1/file",
-            query_params={
-                "tableId": table_id,
-                "cursor": cursor,
-                "limit": limit,
-                "offset": offset,
-                "sortOrder": sort_order,
-                "sortBy": sort_by,
-                "searchText": search_text,
-            },
-            timeout=timeout,
-        )
-
-    async def get_files_async(
-        self,
-        *,
-        table_id: str,
-        cursor: Optional[str] = None,
-        limit: Optional[int] = None,
-        offset: Optional[int] = None,
-        sort_order: Optional[str] = None,
-        sort_by: Optional[str] = None,
-        search_text: Optional[str] = None,
-        timeout: Optional[float] = None,
-    ) -> httpx.Response:
-        """Retrieve a list of files (async)
-
-        Returns a paged list of all files associated with the provided table ID,
-        as well
-        as metadata associated with each file.
-        """
-        return await self._client.request_async(
-            "GET",
-            self._api,
-            "/api/v1/file",
-            query_params={
-                "tableId": table_id,
-                "cursor": cursor,
-                "limit": limit,
-                "offset": offset,
-                "sortOrder": sort_order,
-                "sortBy": sort_by,
-                "searchText": search_text,
-            },
-            timeout=timeout,
-        )
-
     def validate_filename(
         self,
         *,
@@ -218,6 +221,50 @@ class FileManagement(BaseNamespace):
             timeout=timeout,
         )
 
+    def get_file(
+        self,
+        *,
+        file_id: str,
+        timeout: Optional[float] = None,
+    ) -> httpx.Response:
+        """Retrieve a single file
+
+        Returns the file meta that matches the provided ID, or a 404 if an
+        associated file
+        can't be found.
+        """
+        return self._client.request(
+            "GET",
+            self._api,
+            "/api/v1/file/{fileId}",
+            path_params={
+                "fileId": file_id,
+            },
+            timeout=timeout,
+        )
+
+    async def get_file_async(
+        self,
+        *,
+        file_id: str,
+        timeout: Optional[float] = None,
+    ) -> httpx.Response:
+        """Retrieve a single file (async)
+
+        Returns the file meta that matches the provided ID, or a 404 if an
+        associated file
+        can't be found.
+        """
+        return await self._client.request_async(
+            "GET",
+            self._api,
+            "/api/v1/file/{fileId}",
+            path_params={
+                "fileId": file_id,
+            },
+            timeout=timeout,
+        )
+
     def delete_file(
         self,
         *,
@@ -256,50 +303,6 @@ class FileManagement(BaseNamespace):
         """
         return await self._client.request_async(
             "DELETE",
-            self._api,
-            "/api/v1/file/{fileId}",
-            path_params={
-                "fileId": file_id,
-            },
-            timeout=timeout,
-        )
-
-    def get_file(
-        self,
-        *,
-        file_id: str,
-        timeout: Optional[float] = None,
-    ) -> httpx.Response:
-        """Retrieve a single file
-
-        Returns the file meta that matches the provided ID, or a 404 if an
-        associated file
-        can't be found.
-        """
-        return self._client.request(
-            "GET",
-            self._api,
-            "/api/v1/file/{fileId}",
-            path_params={
-                "fileId": file_id,
-            },
-            timeout=timeout,
-        )
-
-    async def get_file_async(
-        self,
-        *,
-        file_id: str,
-        timeout: Optional[float] = None,
-    ) -> httpx.Response:
-        """Retrieve a single file (async)
-
-        Returns the file meta that matches the provided ID, or a 404 if an
-        associated file
-        can't be found.
-        """
-        return await self._client.request_async(
-            "GET",
             self._api,
             "/api/v1/file/{fileId}",
             path_params={

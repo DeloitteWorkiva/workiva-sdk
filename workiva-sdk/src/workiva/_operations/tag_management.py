@@ -11,50 +11,15 @@ import httpx
 
 from workiva._constants import _API
 from workiva._operations._base import BaseNamespace
+from workiva.models.wdata import (
+    TagDto,
+)
 
 
 class TagManagement(BaseNamespace):
     """TagManagement operations."""
 
     _api: _API = _API.WDATA
-
-    def create_tag(
-        self,
-        *,
-        body: TagDto,
-        timeout: Optional[float] = None,
-    ) -> httpx.Response:
-        """Create a new tag
-
-        Creates a tag. If another tag already has the same key, returns a 409.
-        There is a limit of 300 values for a tag.
-        """
-        return self._client.request(
-            "POST",
-            self._api,
-            "/api/v1/tag",
-            json_body=body,
-            timeout=timeout,
-        )
-
-    async def create_tag_async(
-        self,
-        *,
-        body: TagDto,
-        timeout: Optional[float] = None,
-    ) -> httpx.Response:
-        """Create a new tag (async)
-
-        Creates a tag. If another tag already has the same key, returns a 409.
-        There is a limit of 300 values for a tag.
-        """
-        return await self._client.request_async(
-            "POST",
-            self._api,
-            "/api/v1/tag",
-            json_body=body,
-            timeout=timeout,
-        )
 
     def list_tags(
         self,
@@ -106,6 +71,86 @@ class TagManagement(BaseNamespace):
             timeout=timeout,
         )
 
+    def create_tag(
+        self,
+        *,
+        body: TagDto,
+        timeout: Optional[float] = None,
+    ) -> httpx.Response:
+        """Create a new tag
+
+        Creates a tag. If another tag already has the same key, returns a 409.
+        There is a limit of 300 values for a tag.
+        """
+        return self._client.request(
+            "POST",
+            self._api,
+            "/api/v1/tag",
+            json_body=body,
+            timeout=timeout,
+        )
+
+    async def create_tag_async(
+        self,
+        *,
+        body: TagDto,
+        timeout: Optional[float] = None,
+    ) -> httpx.Response:
+        """Create a new tag (async)
+
+        Creates a tag. If another tag already has the same key, returns a 409.
+        There is a limit of 300 values for a tag.
+        """
+        return await self._client.request_async(
+            "POST",
+            self._api,
+            "/api/v1/tag",
+            json_body=body,
+            timeout=timeout,
+        )
+
+    def delete_tag(
+        self,
+        *,
+        tag_id: str,
+        timeout: Optional[float] = None,
+    ) -> httpx.Response:
+        """Delete a single tag
+
+        Deletes the tag with the provided ID. If no such tag is found, this is a
+        no-op.
+        """
+        return self._client.request(
+            "DELETE",
+            self._api,
+            "/api/v1/tag/{tagId}",
+            path_params={
+                "tagId": tag_id,
+            },
+            timeout=timeout,
+        )
+
+    async def delete_tag_async(
+        self,
+        *,
+        tag_id: str,
+        timeout: Optional[float] = None,
+    ) -> httpx.Response:
+        """Delete a single tag (async)
+
+        Deletes the tag with the provided ID. If no such tag is found, this is a
+        no-op.
+        """
+        return await self._client.request_async(
+            "DELETE",
+            self._api,
+            "/api/v1/tag/{tagId}",
+            path_params={
+                "tagId": tag_id,
+            },
+            timeout=timeout,
+        )
+
     def update_tag(
         self,
         *,
@@ -153,47 +198,5 @@ class TagManagement(BaseNamespace):
                 "tagId": tag_id,
             },
             json_body=body,
-            timeout=timeout,
-        )
-
-    def delete_tag(
-        self,
-        *,
-        tag_id: str,
-        timeout: Optional[float] = None,
-    ) -> httpx.Response:
-        """Delete a single tag
-
-        Deletes the tag with the provided ID. If no such tag is found, this is a
-        no-op.
-        """
-        return self._client.request(
-            "DELETE",
-            self._api,
-            "/api/v1/tag/{tagId}",
-            path_params={
-                "tagId": tag_id,
-            },
-            timeout=timeout,
-        )
-
-    async def delete_tag_async(
-        self,
-        *,
-        tag_id: str,
-        timeout: Optional[float] = None,
-    ) -> httpx.Response:
-        """Delete a single tag (async)
-
-        Deletes the tag with the provided ID. If no such tag is found, this is a
-        no-op.
-        """
-        return await self._client.request_async(
-            "DELETE",
-            self._api,
-            "/api/v1/tag/{tagId}",
-            path_params={
-                "tagId": tag_id,
-            },
             timeout=timeout,
         )

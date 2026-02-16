@@ -2,10 +2,9 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Optional
+from typing import Optional
 
-if TYPE_CHECKING:
-    from workiva.models.platform.operation import Operation, OperationDetail
+from workiva.models.platform import Operation, OperationDetail
 
 
 def _detail_str(detail: OperationDetail) -> str:

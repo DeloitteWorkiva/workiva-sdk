@@ -21,8 +21,8 @@ class Execution(BaseNamespace):
     def chain_filter_search(
         self,
         *,
-        environment_id: Optional[list[ID]] = None,
-        chain_id: Optional[list[ID]] = None,
+        environment_id: Optional[list[str]] = None,
+        chain_id: Optional[list[str]] = None,
         start_date: Optional[str] = None,
         end_date: Optional[str] = None,
         state: Optional[str] = None,
@@ -58,8 +58,8 @@ class Execution(BaseNamespace):
     async def chain_filter_search_async(
         self,
         *,
-        environment_id: Optional[list[ID]] = None,
-        chain_id: Optional[list[ID]] = None,
+        environment_id: Optional[list[str]] = None,
+        chain_id: Optional[list[str]] = None,
         start_date: Optional[str] = None,
         end_date: Optional[str] = None,
         state: Optional[str] = None,

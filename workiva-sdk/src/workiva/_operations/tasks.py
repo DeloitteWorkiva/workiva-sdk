@@ -11,48 +11,16 @@ import httpx
 
 from workiva._constants import _API
 from workiva._operations._base import BaseNamespace
+from workiva.models.platform import (
+    Task,
+    TaskAction,
+)
 
 
 class Tasks(BaseNamespace):
     """Tasks operations."""
 
     _api: _API = _API.PLATFORM
-
-    def create_task(
-        self,
-        *,
-        body: Task,
-        timeout: Optional[float] = None,
-    ) -> httpx.Response:
-        """Create a new task
-
-        Creates a new [task](ref:tasks#task) given its properties.
-        """
-        return self._client.request(
-            "POST",
-            self._api,
-            "/tasks",
-            json_body=body,
-            timeout=timeout,
-        )
-
-    async def create_task_async(
-        self,
-        *,
-        body: Task,
-        timeout: Optional[float] = None,
-    ) -> httpx.Response:
-        """Create a new task (async)
-
-        Creates a new [task](ref:tasks#task) given its properties.
-        """
-        return await self._client.request_async(
-            "POST",
-            self._api,
-            "/tasks",
-            json_body=body,
-            timeout=timeout,
-        )
 
     def get_tasks(
         self,
@@ -116,43 +84,39 @@ class Tasks(BaseNamespace):
             timeout=timeout,
         )
 
-    def delete_task_by_id(
+    def create_task(
         self,
         *,
-        task_id: str,
+        body: Task,
         timeout: Optional[float] = None,
     ) -> httpx.Response:
-        """Delete a single task
+        """Create a new task
 
-        Deletes a [task](ref:tasks#task) given its ID
+        Creates a new [task](ref:tasks#task) given its properties.
         """
         return self._client.request(
-            "DELETE",
+            "POST",
             self._api,
-            "/tasks/{taskId}",
-            path_params={
-                "taskId": task_id,
-            },
+            "/tasks",
+            json_body=body,
             timeout=timeout,
         )
 
-    async def delete_task_by_id_async(
+    async def create_task_async(
         self,
         *,
-        task_id: str,
+        body: Task,
         timeout: Optional[float] = None,
     ) -> httpx.Response:
-        """Delete a single task (async)
+        """Create a new task (async)
 
-        Deletes a [task](ref:tasks#task) given its ID
+        Creates a new [task](ref:tasks#task) given its properties.
         """
         return await self._client.request_async(
-            "DELETE",
+            "POST",
             self._api,
-            "/tasks/{taskId}",
-            path_params={
-                "taskId": task_id,
-            },
+            "/tasks",
+            json_body=body,
             timeout=timeout,
         )
 
@@ -196,11 +160,51 @@ class Tasks(BaseNamespace):
             timeout=timeout,
         )
 
+    def delete_task_by_id(
+        self,
+        *,
+        task_id: str,
+        timeout: Optional[float] = None,
+    ) -> httpx.Response:
+        """Delete a single task
+
+        Deletes a [task](ref:tasks#task) given its ID
+        """
+        return self._client.request(
+            "DELETE",
+            self._api,
+            "/tasks/{taskId}",
+            path_params={
+                "taskId": task_id,
+            },
+            timeout=timeout,
+        )
+
+    async def delete_task_by_id_async(
+        self,
+        *,
+        task_id: str,
+        timeout: Optional[float] = None,
+    ) -> httpx.Response:
+        """Delete a single task (async)
+
+        Deletes a [task](ref:tasks#task) given its ID
+        """
+        return await self._client.request_async(
+            "DELETE",
+            self._api,
+            "/tasks/{taskId}",
+            path_params={
+                "taskId": task_id,
+            },
+            timeout=timeout,
+        )
+
     def partially_update_task_by_id(
         self,
         *,
         task_id: str,
-        body: JSONPatchDocument,
+        body: list[Any],
         timeout: Optional[float] = None,
     ) -> httpx.Response:
         """Partially update a single task
@@ -238,7 +242,7 @@ class Tasks(BaseNamespace):
         self,
         *,
         task_id: str,
-        body: JSONPatchDocument,
+        body: list[Any],
         timeout: Optional[float] = None,
     ) -> httpx.Response:
         """Partially update a single task (async)

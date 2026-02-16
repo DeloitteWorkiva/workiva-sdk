@@ -11,56 +11,18 @@ import httpx
 
 from workiva._constants import _API
 from workiva._operations._base import BaseNamespace
+from workiva.models.wdata import (
+    ExportQueryResultDto,
+    QueryDto,
+    QueryResultDto,
+    QueryTextDto,
+)
 
 
 class QueryManagement(BaseNamespace):
     """QueryManagement operations."""
 
     _api: _API = _API.WDATA
-
-    def create_query(
-        self,
-        *,
-        body: QueryDto,
-        timeout: Optional[float] = None,
-    ) -> httpx.Response:
-        """Create a new query
-
-        Creates a query object and validates full permissions to ensure the
-        requestor has
-        access to all data sources being queried. This endpoint _doesn't_
-        execute the query;
-        to execute, call the POST /queryresult method.
-        """
-        return self._client.request(
-            "POST",
-            self._api,
-            "/api/v1/query",
-            json_body=body,
-            timeout=timeout,
-        )
-
-    async def create_query_async(
-        self,
-        *,
-        body: QueryDto,
-        timeout: Optional[float] = None,
-    ) -> httpx.Response:
-        """Create a new query (async)
-
-        Creates a query object and validates full permissions to ensure the
-        requestor has
-        access to all data sources being queried. This endpoint _doesn't_
-        execute the query;
-        to execute, call the POST /queryresult method.
-        """
-        return await self._client.request_async(
-            "POST",
-            self._api,
-            "/api/v1/query",
-            json_body=body,
-            timeout=timeout,
-        )
 
     def list_queries(
         self,
@@ -115,6 +77,50 @@ class QueryManagement(BaseNamespace):
                 "offset": offset,
                 "ids": ids,
             },
+            timeout=timeout,
+        )
+
+    def create_query(
+        self,
+        *,
+        body: QueryDto,
+        timeout: Optional[float] = None,
+    ) -> httpx.Response:
+        """Create a new query
+
+        Creates a query object and validates full permissions to ensure the
+        requestor has
+        access to all data sources being queried. This endpoint _doesn't_
+        execute the query;
+        to execute, call the POST /queryresult method.
+        """
+        return self._client.request(
+            "POST",
+            self._api,
+            "/api/v1/query",
+            json_body=body,
+            timeout=timeout,
+        )
+
+    async def create_query_async(
+        self,
+        *,
+        body: QueryDto,
+        timeout: Optional[float] = None,
+    ) -> httpx.Response:
+        """Create a new query (async)
+
+        Creates a query object and validates full permissions to ensure the
+        requestor has
+        access to all data sources being queried. This endpoint _doesn't_
+        execute the query;
+        to execute, call the POST /queryresult method.
+        """
+        return await self._client.request_async(
+            "POST",
+            self._api,
+            "/api/v1/query",
+            json_body=body,
             timeout=timeout,
         )
 
@@ -194,51 +200,45 @@ class QueryManagement(BaseNamespace):
             timeout=timeout,
         )
 
-    def update_query(
+    def get_query(
         self,
         *,
         query_id: str,
-        body: QueryDto,
         timeout: Optional[float] = None,
     ) -> httpx.Response:
-        """Update a single query
+        """Retrieve a single query
 
-        Updates the query that matches the provided ID with the details provided
-        in the
-        body.
+        Returns a query that matches the provided ID, or a 404 if no matching
+        query is found.
         """
         return self._client.request(
-            "PUT",
+            "GET",
             self._api,
             "/api/v1/query/{queryId}",
             path_params={
                 "queryId": query_id,
             },
-            json_body=body,
             timeout=timeout,
         )
 
-    async def update_query_async(
+    async def get_query_async(
         self,
         *,
         query_id: str,
-        body: QueryDto,
         timeout: Optional[float] = None,
     ) -> httpx.Response:
-        """Update a single query (async)
+        """Retrieve a single query (async)
 
-        Updates the query that matches the provided ID with the details provided
-        in the
-        body.
+        Returns a query that matches the provided ID, or a 404 if no matching
+        query is found.
         """
         return await self._client.request_async(
-            "PUT",
+            "GET",
             self._api,
             "/api/v1/query/{queryId}",
             path_params={
                 "queryId": query_id,
             },
-            json_body=body,
             timeout=timeout,
         )
 
@@ -286,45 +286,51 @@ class QueryManagement(BaseNamespace):
             timeout=timeout,
         )
 
-    def get_query(
+    def update_query(
         self,
         *,
         query_id: str,
+        body: QueryDto,
         timeout: Optional[float] = None,
     ) -> httpx.Response:
-        """Retrieve a single query
+        """Update a single query
 
-        Returns a query that matches the provided ID, or a 404 if no matching
-        query is found.
+        Updates the query that matches the provided ID with the details provided
+        in the
+        body.
         """
         return self._client.request(
-            "GET",
+            "PUT",
             self._api,
             "/api/v1/query/{queryId}",
             path_params={
                 "queryId": query_id,
             },
+            json_body=body,
             timeout=timeout,
         )
 
-    async def get_query_async(
+    async def update_query_async(
         self,
         *,
         query_id: str,
+        body: QueryDto,
         timeout: Optional[float] = None,
     ) -> httpx.Response:
-        """Retrieve a single query (async)
+        """Update a single query (async)
 
-        Returns a query that matches the provided ID, or a 404 if no matching
-        query is found.
+        Updates the query that matches the provided ID with the details provided
+        in the
+        body.
         """
         return await self._client.request_async(
-            "GET",
+            "PUT",
             self._api,
             "/api/v1/query/{queryId}",
             path_params={
                 "queryId": query_id,
             },
+            json_body=body,
             timeout=timeout,
         )
 
@@ -494,50 +500,6 @@ class QueryManagement(BaseNamespace):
             timeout=timeout,
         )
 
-    def run_query(
-        self,
-        *,
-        body: QueryResultDto,
-        timeout: Optional[float] = None,
-    ) -> httpx.Response:
-        """Execute a query
-
-        Runs a query and immediately returns a query result entity, which has an
-        ID that
-        can be used to poll the status from the GET /queryresult method. A
-        status of
-        COMPLETED or ERROR indicates the query has completed.
-        """
-        return self._client.request(
-            "POST",
-            self._api,
-            "/api/v1/queryresult",
-            json_body=body,
-            timeout=timeout,
-        )
-
-    async def run_query_async(
-        self,
-        *,
-        body: QueryResultDto,
-        timeout: Optional[float] = None,
-    ) -> httpx.Response:
-        """Execute a query (async)
-
-        Runs a query and immediately returns a query result entity, which has an
-        ID that
-        can be used to poll the status from the GET /queryresult method. A
-        status of
-        COMPLETED or ERROR indicates the query has completed.
-        """
-        return await self._client.request_async(
-            "POST",
-            self._api,
-            "/api/v1/queryresult",
-            json_body=body,
-            timeout=timeout,
-        )
-
     def list_query_results(
         self,
         *,
@@ -598,47 +560,47 @@ class QueryManagement(BaseNamespace):
             timeout=timeout,
         )
 
-    def cancel_query(
+    def run_query(
         self,
         *,
-        query_result_id: str,
+        body: QueryResultDto,
         timeout: Optional[float] = None,
     ) -> httpx.Response:
-        """Cancel a running query
+        """Execute a query
 
-        Cancels a running query based on the provided result ID, and returns a
-        cancelled
-        result unless the query's already in a COMPLETED state.
+        Runs a query and immediately returns a query result entity, which has an
+        ID that
+        can be used to poll the status from the GET /queryresult method. A
+        status of
+        COMPLETED or ERROR indicates the query has completed.
         """
         return self._client.request(
-            "DELETE",
+            "POST",
             self._api,
-            "/api/v1/queryresult/{queryResultId}",
-            path_params={
-                "queryResultId": query_result_id,
-            },
+            "/api/v1/queryresult",
+            json_body=body,
             timeout=timeout,
         )
 
-    async def cancel_query_async(
+    async def run_query_async(
         self,
         *,
-        query_result_id: str,
+        body: QueryResultDto,
         timeout: Optional[float] = None,
     ) -> httpx.Response:
-        """Cancel a running query (async)
+        """Execute a query (async)
 
-        Cancels a running query based on the provided result ID, and returns a
-        cancelled
-        result unless the query's already in a COMPLETED state.
+        Runs a query and immediately returns a query result entity, which has an
+        ID that
+        can be used to poll the status from the GET /queryresult method. A
+        status of
+        COMPLETED or ERROR indicates the query has completed.
         """
         return await self._client.request_async(
-            "DELETE",
+            "POST",
             self._api,
-            "/api/v1/queryresult/{queryResultId}",
-            path_params={
-                "queryResultId": query_result_id,
-            },
+            "/api/v1/queryresult",
+            json_body=body,
             timeout=timeout,
         )
 
@@ -678,6 +640,50 @@ class QueryManagement(BaseNamespace):
         """
         return await self._client.request_async(
             "GET",
+            self._api,
+            "/api/v1/queryresult/{queryResultId}",
+            path_params={
+                "queryResultId": query_result_id,
+            },
+            timeout=timeout,
+        )
+
+    def cancel_query(
+        self,
+        *,
+        query_result_id: str,
+        timeout: Optional[float] = None,
+    ) -> httpx.Response:
+        """Cancel a running query
+
+        Cancels a running query based on the provided result ID, and returns a
+        cancelled
+        result unless the query's already in a COMPLETED state.
+        """
+        return self._client.request(
+            "DELETE",
+            self._api,
+            "/api/v1/queryresult/{queryResultId}",
+            path_params={
+                "queryResultId": query_result_id,
+            },
+            timeout=timeout,
+        )
+
+    async def cancel_query_async(
+        self,
+        *,
+        query_result_id: str,
+        timeout: Optional[float] = None,
+    ) -> httpx.Response:
+        """Cancel a running query (async)
+
+        Cancels a running query based on the provided result ID, and returns a
+        cancelled
+        result unless the query's already in a COMPLETED state.
+        """
+        return await self._client.request_async(
+            "DELETE",
             self._api,
             "/api/v1/queryresult/{queryResultId}",
             path_params={

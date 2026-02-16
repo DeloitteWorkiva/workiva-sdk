@@ -11,52 +11,17 @@ import httpx
 
 from workiva._constants import _API
 from workiva._operations._base import BaseNamespace
+from workiva.models.wdata import (
+    ImportDto,
+    ImportFromSpreadsheetDto,
+    TableDto,
+)
 
 
 class TableManagement(BaseNamespace):
     """TableManagement operations."""
 
     _api: _API = _API.WDATA
-
-    def create_table(
-        self,
-        *,
-        body: TableDto,
-        timeout: Optional[float] = None,
-    ) -> httpx.Response:
-        """Create a new table
-
-        Creates a table in the database with the specified schema. For type,
-        specify either a dimension or data table. In the interface, data tables
-        appear as fact tables.
-        """
-        return self._client.request(
-            "POST",
-            self._api,
-            "/api/v1/table",
-            json_body=body,
-            timeout=timeout,
-        )
-
-    async def create_table_async(
-        self,
-        *,
-        body: TableDto,
-        timeout: Optional[float] = None,
-    ) -> httpx.Response:
-        """Create a new table (async)
-
-        Creates a table in the database with the specified schema. For type,
-        specify either a dimension or data table. In the interface, data tables
-        appear as fact tables.
-        """
-        return await self._client.request_async(
-            "POST",
-            self._api,
-            "/api/v1/table",
-            json_body=body,
-            timeout=timeout,
-        )
 
     def get_tables(
         self,
@@ -106,6 +71,128 @@ class TableManagement(BaseNamespace):
                 "cursor": cursor,
                 "limit": limit,
                 "offset": offset,
+            },
+            timeout=timeout,
+        )
+
+    def create_table(
+        self,
+        *,
+        body: TableDto,
+        timeout: Optional[float] = None,
+    ) -> httpx.Response:
+        """Create a new table
+
+        Creates a table in the database with the specified schema. For type,
+        specify either a dimension or data table. In the interface, data tables
+        appear as fact tables.
+        """
+        return self._client.request(
+            "POST",
+            self._api,
+            "/api/v1/table",
+            json_body=body,
+            timeout=timeout,
+        )
+
+    async def create_table_async(
+        self,
+        *,
+        body: TableDto,
+        timeout: Optional[float] = None,
+    ) -> httpx.Response:
+        """Create a new table (async)
+
+        Creates a table in the database with the specified schema. For type,
+        specify either a dimension or data table. In the interface, data tables
+        appear as fact tables.
+        """
+        return await self._client.request_async(
+            "POST",
+            self._api,
+            "/api/v1/table",
+            json_body=body,
+            timeout=timeout,
+        )
+
+    def get_table(
+        self,
+        *,
+        table_id: str,
+        timeout: Optional[float] = None,
+    ) -> httpx.Response:
+        """Retrieve a single table
+
+        Returns a table with the provided ID, or a 404 if no such table is
+        found.
+        """
+        return self._client.request(
+            "GET",
+            self._api,
+            "/api/v1/table/{tableId}",
+            path_params={
+                "tableId": table_id,
+            },
+            timeout=timeout,
+        )
+
+    async def get_table_async(
+        self,
+        *,
+        table_id: str,
+        timeout: Optional[float] = None,
+    ) -> httpx.Response:
+        """Retrieve a single table (async)
+
+        Returns a table with the provided ID, or a 404 if no such table is
+        found.
+        """
+        return await self._client.request_async(
+            "GET",
+            self._api,
+            "/api/v1/table/{tableId}",
+            path_params={
+                "tableId": table_id,
+            },
+            timeout=timeout,
+        )
+
+    def delete_table(
+        self,
+        *,
+        table_id: str,
+        timeout: Optional[float] = None,
+    ) -> httpx.Response:
+        """Delete a single table
+
+        Soft-deletes the table with the provided ID.
+        """
+        return self._client.request(
+            "DELETE",
+            self._api,
+            "/api/v1/table/{tableId}",
+            path_params={
+                "tableId": table_id,
+            },
+            timeout=timeout,
+        )
+
+    async def delete_table_async(
+        self,
+        *,
+        table_id: str,
+        timeout: Optional[float] = None,
+    ) -> httpx.Response:
+        """Delete a single table (async)
+
+        Soft-deletes the table with the provided ID.
+        """
+        return await self._client.request_async(
+            "DELETE",
+            self._api,
+            "/api/v1/table/{tableId}",
+            path_params={
+                "tableId": table_id,
             },
             timeout=timeout,
         )
@@ -179,88 +266,6 @@ class TableManagement(BaseNamespace):
                 "tableId": table_id,
             },
             json_body=body,
-            timeout=timeout,
-        )
-
-    def delete_table(
-        self,
-        *,
-        table_id: str,
-        timeout: Optional[float] = None,
-    ) -> httpx.Response:
-        """Delete a single table
-
-        Soft-deletes the table with the provided ID.
-        """
-        return self._client.request(
-            "DELETE",
-            self._api,
-            "/api/v1/table/{tableId}",
-            path_params={
-                "tableId": table_id,
-            },
-            timeout=timeout,
-        )
-
-    async def delete_table_async(
-        self,
-        *,
-        table_id: str,
-        timeout: Optional[float] = None,
-    ) -> httpx.Response:
-        """Delete a single table (async)
-
-        Soft-deletes the table with the provided ID.
-        """
-        return await self._client.request_async(
-            "DELETE",
-            self._api,
-            "/api/v1/table/{tableId}",
-            path_params={
-                "tableId": table_id,
-            },
-            timeout=timeout,
-        )
-
-    def get_table(
-        self,
-        *,
-        table_id: str,
-        timeout: Optional[float] = None,
-    ) -> httpx.Response:
-        """Retrieve a single table
-
-        Returns a table with the provided ID, or a 404 if no such table is
-        found.
-        """
-        return self._client.request(
-            "GET",
-            self._api,
-            "/api/v1/table/{tableId}",
-            path_params={
-                "tableId": table_id,
-            },
-            timeout=timeout,
-        )
-
-    async def get_table_async(
-        self,
-        *,
-        table_id: str,
-        timeout: Optional[float] = None,
-    ) -> httpx.Response:
-        """Retrieve a single table (async)
-
-        Returns a table with the provided ID, or a 404 if no such table is
-        found.
-        """
-        return await self._client.request_async(
-            "GET",
-            self._api,
-            "/api/v1/table/{tableId}",
-            path_params={
-                "tableId": table_id,
-            },
             timeout=timeout,
         )
 

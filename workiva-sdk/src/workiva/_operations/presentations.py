@@ -11,6 +11,11 @@ import httpx
 
 from workiva._constants import _API
 from workiva._operations._base import BaseNamespace
+from workiva.models.platform import (
+    LinksPublicationOptions,
+    PresentationExport,
+    PresentationFiltersReapplication,
+)
 
 
 class Presentations(BaseNamespace):
@@ -70,7 +75,7 @@ class Presentations(BaseNamespace):
         self,
         *,
         presentation_id: str,
-        body: JSONPatchDocument,
+        body: list[Any],
         timeout: Optional[float] = None,
     ) -> httpx.Response:
         """Partially updates a single presentation
@@ -181,7 +186,7 @@ class Presentations(BaseNamespace):
         self,
         *,
         presentation_id: str,
-        body: JSONPatchDocument,
+        body: list[Any],
         timeout: Optional[float] = None,
     ) -> httpx.Response:
         """Partially updates a single presentation (async)
@@ -633,7 +638,7 @@ class Presentations(BaseNamespace):
         *,
         presentation_id: str,
         slide_layout_id: str,
-        body: JSONPatchDocument,
+        body: list[Any],
         timeout: Optional[float] = None,
     ) -> httpx.Response:
         """Partially update a single slide layout
@@ -670,7 +675,7 @@ class Presentations(BaseNamespace):
         *,
         presentation_id: str,
         slide_layout_id: str,
-        body: JSONPatchDocument,
+        body: list[Any],
         timeout: Optional[float] = None,
     ) -> httpx.Response:
         """Partially update a single slide layout (async)
@@ -815,7 +820,7 @@ class Presentations(BaseNamespace):
         *,
         presentation_id: str,
         slide_id: str,
-        body: JSONPatchDocument,
+        body: list[Any],
         timeout: Optional[float] = None,
     ) -> httpx.Response:
         """Partially update a single slide
@@ -943,7 +948,7 @@ class Presentations(BaseNamespace):
         *,
         presentation_id: str,
         slide_id: str,
-        body: JSONPatchDocument,
+        body: list[Any],
         timeout: Optional[float] = None,
     ) -> httpx.Response:
         """Partially update a single slide (async)

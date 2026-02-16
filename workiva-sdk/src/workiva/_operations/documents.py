@@ -11,6 +11,15 @@ import httpx
 
 from workiva._constants import _API
 from workiva._operations._base import BaseNamespace
+from workiva.models.platform import (
+    DocumentExport,
+    DocumentFiltersReapplication,
+    LinksPublicationOptions,
+    ResourcePermissionsModification,
+    Section,
+    SectionCopy,
+    SectionsEdits,
+)
 
 
 class Documents(BaseNamespace):
@@ -122,7 +131,7 @@ class Documents(BaseNamespace):
         self,
         *,
         document_id: str,
-        body: JSONPatchDocument,
+        body: list[Any],
         timeout: Optional[float] = None,
     ) -> httpx.Response:
         """Partially update a single document
@@ -224,7 +233,7 @@ class Documents(BaseNamespace):
         self,
         *,
         document_id: str,
-        body: JSONPatchDocument,
+        body: list[Any],
         timeout: Optional[float] = None,
     ) -> httpx.Response:
         """Partially update a single document (async)
@@ -668,54 +677,6 @@ class Documents(BaseNamespace):
             timeout=timeout,
         )
 
-    def create_section(
-        self,
-        *,
-        document_id: str,
-        body: Section,
-        timeout: Optional[float] = None,
-    ) -> httpx.Response:
-        """Create a new section in a document
-
-        Creates a new [section](ref:documents#section) in a
-        [document](ref:documents#document), given its properties. By default,
-        the new section appears at the top-most position.
-        """
-        return self._client.request(
-            "POST",
-            self._api,
-            "/documents/{documentId}/sections",
-            path_params={
-                "documentId": document_id,
-            },
-            json_body=body,
-            timeout=timeout,
-        )
-
-    async def create_section_async(
-        self,
-        *,
-        document_id: str,
-        body: Section,
-        timeout: Optional[float] = None,
-    ) -> httpx.Response:
-        """Create a new section in a document (async)
-
-        Creates a new [section](ref:documents#section) in a
-        [document](ref:documents#document), given its properties. By default,
-        the new section appears at the top-most position.
-        """
-        return await self._client.request_async(
-            "POST",
-            self._api,
-            "/documents/{documentId}/sections",
-            path_params={
-                "documentId": document_id,
-            },
-            json_body=body,
-            timeout=timeout,
-        )
-
     def get_sections(
         self,
         *,
@@ -772,47 +733,51 @@ class Documents(BaseNamespace):
             timeout=timeout,
         )
 
-    def delete_section_by_id(
+    def create_section(
         self,
         *,
         document_id: str,
-        section_id: str,
+        body: Section,
         timeout: Optional[float] = None,
     ) -> httpx.Response:
-        """Delete a single section
+        """Create a new section in a document
 
-        Deletes a [section](ref:documents#section) given its ID.
+        Creates a new [section](ref:documents#section) in a
+        [document](ref:documents#document), given its properties. By default,
+        the new section appears at the top-most position.
         """
         return self._client.request(
-            "DELETE",
+            "POST",
             self._api,
-            "/documents/{documentId}/sections/{sectionId}",
+            "/documents/{documentId}/sections",
             path_params={
                 "documentId": document_id,
-                "sectionId": section_id,
             },
+            json_body=body,
             timeout=timeout,
         )
 
-    async def delete_section_by_id_async(
+    async def create_section_async(
         self,
         *,
         document_id: str,
-        section_id: str,
+        body: Section,
         timeout: Optional[float] = None,
     ) -> httpx.Response:
-        """Delete a single section (async)
+        """Create a new section in a document (async)
 
-        Deletes a [section](ref:documents#section) given its ID.
+        Creates a new [section](ref:documents#section) in a
+        [document](ref:documents#document), given its properties. By default,
+        the new section appears at the top-most position.
         """
         return await self._client.request_async(
-            "DELETE",
+            "POST",
             self._api,
-            "/documents/{documentId}/sections/{sectionId}",
+            "/documents/{documentId}/sections",
             path_params={
                 "documentId": document_id,
-                "sectionId": section_id,
             },
+            json_body=body,
             timeout=timeout,
         )
 
@@ -872,12 +837,56 @@ class Documents(BaseNamespace):
             timeout=timeout,
         )
 
+    def delete_section_by_id(
+        self,
+        *,
+        document_id: str,
+        section_id: str,
+        timeout: Optional[float] = None,
+    ) -> httpx.Response:
+        """Delete a single section
+
+        Deletes a [section](ref:documents#section) given its ID.
+        """
+        return self._client.request(
+            "DELETE",
+            self._api,
+            "/documents/{documentId}/sections/{sectionId}",
+            path_params={
+                "documentId": document_id,
+                "sectionId": section_id,
+            },
+            timeout=timeout,
+        )
+
+    async def delete_section_by_id_async(
+        self,
+        *,
+        document_id: str,
+        section_id: str,
+        timeout: Optional[float] = None,
+    ) -> httpx.Response:
+        """Delete a single section (async)
+
+        Deletes a [section](ref:documents#section) given its ID.
+        """
+        return await self._client.request_async(
+            "DELETE",
+            self._api,
+            "/documents/{documentId}/sections/{sectionId}",
+            path_params={
+                "documentId": document_id,
+                "sectionId": section_id,
+            },
+            timeout=timeout,
+        )
+
     def partially_update_section_by_id(
         self,
         *,
         document_id: str,
         section_id: str,
-        body: JSONPatchDocument,
+        body: list[Any],
         timeout: Optional[float] = None,
     ) -> httpx.Response:
         """Partially update a single section
@@ -1067,7 +1076,7 @@ class Documents(BaseNamespace):
         *,
         document_id: str,
         section_id: str,
-        body: JSONPatchDocument,
+        body: list[Any],
         timeout: Optional[float] = None,
     ) -> httpx.Response:
         """Partially update a single section (async)

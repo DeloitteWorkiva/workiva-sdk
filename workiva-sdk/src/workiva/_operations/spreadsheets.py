@@ -11,6 +11,16 @@ import httpx
 
 from workiva._constants import _API
 from workiva._operations._base import BaseNamespace
+from workiva.models.platform import (
+    LinksPublicationOptions,
+    RangeValues,
+    ResourcePermissionsModification,
+    Sheet,
+    SheetCopy,
+    SheetUpdate,
+    SpreadsheetExport,
+    SpreadsheetFiltersReapplication,
+)
 
 
 class Spreadsheets(BaseNamespace):
@@ -124,7 +134,7 @@ class Spreadsheets(BaseNamespace):
         self,
         *,
         spreadsheet_id: str,
-        body: JSONPatchDocument,
+        body: list[Any],
         timeout: Optional[float] = None,
     ) -> httpx.Response:
         """Partially update a single spreadsheet
@@ -231,7 +241,7 @@ class Spreadsheets(BaseNamespace):
         self,
         *,
         spreadsheet_id: str,
-        body: JSONPatchDocument,
+        body: list[Any],
         timeout: Optional[float] = None,
     ) -> httpx.Response:
         """Partially update a single spreadsheet (async)
@@ -384,7 +394,7 @@ class Spreadsheets(BaseNamespace):
         self,
         *,
         spreadsheet_id: str,
-        body: Datasets,
+        body: list[Any],
         timeout: Optional[float] = None,
     ) -> httpx.Response:
         """Bulk upsert of datasets
@@ -418,7 +428,7 @@ class Spreadsheets(BaseNamespace):
         self,
         *,
         spreadsheet_id: str,
-        body: Datasets,
+        body: list[Any],
         timeout: Optional[float] = None,
     ) -> httpx.Response:
         """Bulk upsert of datasets (async)
@@ -794,56 +804,6 @@ class Spreadsheets(BaseNamespace):
             timeout=timeout,
         )
 
-    def create_sheet(
-        self,
-        *,
-        spreadsheet_id: str,
-        body: Sheet,
-        timeout: Optional[float] = None,
-    ) -> httpx.Response:
-        """Create a new sheet in a spreadsheet
-
-        Creates a new [sheet](ref:spreadsheets#sheet) in a
-        [spreadsheet](ref:spreadsheets#spreadsheet), given its properties. If
-        the sheet name provided isn't unique, a number is appended to make it
-        unique. By default, creates a top-level sheet in the top-most position.
-        """
-        return self._client.request(
-            "POST",
-            self._api,
-            "/spreadsheets/{spreadsheetId}/sheets",
-            path_params={
-                "spreadsheetId": spreadsheet_id,
-            },
-            json_body=body,
-            timeout=timeout,
-        )
-
-    async def create_sheet_async(
-        self,
-        *,
-        spreadsheet_id: str,
-        body: Sheet,
-        timeout: Optional[float] = None,
-    ) -> httpx.Response:
-        """Create a new sheet in a spreadsheet (async)
-
-        Creates a new [sheet](ref:spreadsheets#sheet) in a
-        [spreadsheet](ref:spreadsheets#spreadsheet), given its properties. If
-        the sheet name provided isn't unique, a number is appended to make it
-        unique. By default, creates a top-level sheet in the top-most position.
-        """
-        return await self._client.request_async(
-            "POST",
-            self._api,
-            "/spreadsheets/{spreadsheetId}/sheets",
-            path_params={
-                "spreadsheetId": spreadsheet_id,
-            },
-            json_body=body,
-            timeout=timeout,
-        )
-
     def get_sheets(
         self,
         *,
@@ -900,47 +860,53 @@ class Spreadsheets(BaseNamespace):
             timeout=timeout,
         )
 
-    def delete_sheet_by_id(
+    def create_sheet(
         self,
         *,
         spreadsheet_id: str,
-        sheet_id: str,
+        body: Sheet,
         timeout: Optional[float] = None,
     ) -> httpx.Response:
-        """Delete a single sheet
+        """Create a new sheet in a spreadsheet
 
-        Deletes a [sheet](ref:spreadsheets#sheet) given its ID.
+        Creates a new [sheet](ref:spreadsheets#sheet) in a
+        [spreadsheet](ref:spreadsheets#spreadsheet), given its properties. If
+        the sheet name provided isn't unique, a number is appended to make it
+        unique. By default, creates a top-level sheet in the top-most position.
         """
         return self._client.request(
-            "DELETE",
+            "POST",
             self._api,
-            "/spreadsheets/{spreadsheetId}/sheets/{sheetId}",
+            "/spreadsheets/{spreadsheetId}/sheets",
             path_params={
                 "spreadsheetId": spreadsheet_id,
-                "sheetId": sheet_id,
             },
+            json_body=body,
             timeout=timeout,
         )
 
-    async def delete_sheet_by_id_async(
+    async def create_sheet_async(
         self,
         *,
         spreadsheet_id: str,
-        sheet_id: str,
+        body: Sheet,
         timeout: Optional[float] = None,
     ) -> httpx.Response:
-        """Delete a single sheet (async)
+        """Create a new sheet in a spreadsheet (async)
 
-        Deletes a [sheet](ref:spreadsheets#sheet) given its ID.
+        Creates a new [sheet](ref:spreadsheets#sheet) in a
+        [spreadsheet](ref:spreadsheets#spreadsheet), given its properties. If
+        the sheet name provided isn't unique, a number is appended to make it
+        unique. By default, creates a top-level sheet in the top-most position.
         """
         return await self._client.request_async(
-            "DELETE",
+            "POST",
             self._api,
-            "/spreadsheets/{spreadsheetId}/sheets/{sheetId}",
+            "/spreadsheets/{spreadsheetId}/sheets",
             path_params={
                 "spreadsheetId": spreadsheet_id,
-                "sheetId": sheet_id,
             },
+            json_body=body,
             timeout=timeout,
         )
 
@@ -996,12 +962,56 @@ class Spreadsheets(BaseNamespace):
             timeout=timeout,
         )
 
+    def delete_sheet_by_id(
+        self,
+        *,
+        spreadsheet_id: str,
+        sheet_id: str,
+        timeout: Optional[float] = None,
+    ) -> httpx.Response:
+        """Delete a single sheet
+
+        Deletes a [sheet](ref:spreadsheets#sheet) given its ID.
+        """
+        return self._client.request(
+            "DELETE",
+            self._api,
+            "/spreadsheets/{spreadsheetId}/sheets/{sheetId}",
+            path_params={
+                "spreadsheetId": spreadsheet_id,
+                "sheetId": sheet_id,
+            },
+            timeout=timeout,
+        )
+
+    async def delete_sheet_by_id_async(
+        self,
+        *,
+        spreadsheet_id: str,
+        sheet_id: str,
+        timeout: Optional[float] = None,
+    ) -> httpx.Response:
+        """Delete a single sheet (async)
+
+        Deletes a [sheet](ref:spreadsheets#sheet) given its ID.
+        """
+        return await self._client.request_async(
+            "DELETE",
+            self._api,
+            "/spreadsheets/{spreadsheetId}/sheets/{sheetId}",
+            path_params={
+                "spreadsheetId": spreadsheet_id,
+                "sheetId": sheet_id,
+            },
+            timeout=timeout,
+        )
+
     def partially_update_sheet_by_id(
         self,
         *,
         spreadsheet_id: str,
         sheet_id: str,
-        body: JSONPatchDocument,
+        body: list[Any],
         timeout: Optional[float] = None,
     ) -> httpx.Response:
         """Partially update a single sheet
@@ -1152,7 +1162,7 @@ class Spreadsheets(BaseNamespace):
         *,
         spreadsheet_id: str,
         sheet_id: str,
-        body: JSONPatchDocument,
+        body: list[Any],
         timeout: Optional[float] = None,
     ) -> httpx.Response:
         """Partially update a single sheet (async)
@@ -1692,6 +1702,74 @@ class Spreadsheets(BaseNamespace):
             timeout=timeout,
         )
 
+    def get_values_by_range(
+        self,
+        *,
+        spreadsheet_id: str,
+        sheet_id: str,
+        range: str,
+        maxcellsperpage: Optional[int] = 50000,
+        next_: Optional[str] = None,
+        valuestyle: Optional[str] = "calculated",
+        timeout: Optional[float] = None,
+    ) -> httpx.Response:
+        """Retrieve a list of range values
+
+        Returns the paginated values for a specified range.
+        When you retrieve values from a range, Ones scale is used regardless of
+        the cell's scale formatting.
+        """
+        return self._client.request(
+            "GET",
+            self._api,
+            "/spreadsheets/{spreadsheetId}/sheets/{sheetId}/values/{range}",
+            path_params={
+                "spreadsheetId": spreadsheet_id,
+                "sheetId": sheet_id,
+                "range": range,
+            },
+            query_params={
+                "$maxcellsperpage": maxcellsperpage,
+                "$next": next_,
+                "$valuestyle": valuestyle,
+            },
+            timeout=timeout,
+        )
+
+    async def get_values_by_range_async(
+        self,
+        *,
+        spreadsheet_id: str,
+        sheet_id: str,
+        range: str,
+        maxcellsperpage: Optional[int] = 50000,
+        next_: Optional[str] = None,
+        valuestyle: Optional[str] = "calculated",
+        timeout: Optional[float] = None,
+    ) -> httpx.Response:
+        """Retrieve a list of range values (async)
+
+        Returns the paginated values for a specified range.
+        When you retrieve values from a range, Ones scale is used regardless of
+        the cell's scale formatting.
+        """
+        return await self._client.request_async(
+            "GET",
+            self._api,
+            "/spreadsheets/{spreadsheetId}/sheets/{sheetId}/values/{range}",
+            path_params={
+                "spreadsheetId": spreadsheet_id,
+                "sheetId": sheet_id,
+                "range": range,
+            },
+            query_params={
+                "$maxcellsperpage": maxcellsperpage,
+                "$next": next_,
+                "$valuestyle": valuestyle,
+            },
+            timeout=timeout,
+        )
+
     def update_values_by_range(
         self,
         *,
@@ -1759,73 +1837,5 @@ class Spreadsheets(BaseNamespace):
                 "range": range,
             },
             json_body=body,
-            timeout=timeout,
-        )
-
-    def get_values_by_range(
-        self,
-        *,
-        spreadsheet_id: str,
-        sheet_id: str,
-        range: str,
-        maxcellsperpage: Optional[int] = 50000,
-        next_: Optional[str] = None,
-        valuestyle: Optional[str] = "calculated",
-        timeout: Optional[float] = None,
-    ) -> httpx.Response:
-        """Retrieve a list of range values
-
-        Returns the paginated values for a specified range.
-        When you retrieve values from a range, Ones scale is used regardless of
-        the cell's scale formatting.
-        """
-        return self._client.request(
-            "GET",
-            self._api,
-            "/spreadsheets/{spreadsheetId}/sheets/{sheetId}/values/{range}",
-            path_params={
-                "spreadsheetId": spreadsheet_id,
-                "sheetId": sheet_id,
-                "range": range,
-            },
-            query_params={
-                "$maxcellsperpage": maxcellsperpage,
-                "$next": next_,
-                "$valuestyle": valuestyle,
-            },
-            timeout=timeout,
-        )
-
-    async def get_values_by_range_async(
-        self,
-        *,
-        spreadsheet_id: str,
-        sheet_id: str,
-        range: str,
-        maxcellsperpage: Optional[int] = 50000,
-        next_: Optional[str] = None,
-        valuestyle: Optional[str] = "calculated",
-        timeout: Optional[float] = None,
-    ) -> httpx.Response:
-        """Retrieve a list of range values (async)
-
-        Returns the paginated values for a specified range.
-        When you retrieve values from a range, Ones scale is used regardless of
-        the cell's scale formatting.
-        """
-        return await self._client.request_async(
-            "GET",
-            self._api,
-            "/spreadsheets/{spreadsheetId}/sheets/{sheetId}/values/{range}",
-            path_params={
-                "spreadsheetId": spreadsheet_id,
-                "sheetId": sheet_id,
-                "range": range,
-            },
-            query_params={
-                "$maxcellsperpage": maxcellsperpage,
-                "$next": next_,
-                "$valuestyle": valuestyle,
-            },
             timeout=timeout,
         )

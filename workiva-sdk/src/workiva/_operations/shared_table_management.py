@@ -11,50 +11,15 @@ import httpx
 
 from workiva._constants import _API
 from workiva._operations._base import BaseNamespace
+from workiva.models.wdata import (
+    SharedTableDto,
+)
 
 
 class SharedTableManagement(BaseNamespace):
     """SharedTableManagement operations."""
 
     _api: _API = _API.WDATA
-
-    def create_shared_table(
-        self,
-        *,
-        body: SharedTableDto,
-        timeout: Optional[float] = None,
-    ) -> httpx.Response:
-        """Create a new shared table
-
-        Creates a shared table instance between the workspace of the request and
-        the workspace provided in the body.
-        """
-        return self._client.request(
-            "POST",
-            self._api,
-            "/api/v1/sharedtable",
-            json_body=body,
-            timeout=timeout,
-        )
-
-    async def create_shared_table_async(
-        self,
-        *,
-        body: SharedTableDto,
-        timeout: Optional[float] = None,
-    ) -> httpx.Response:
-        """Create a new shared table (async)
-
-        Creates a shared table instance between the workspace of the request and
-        the workspace provided in the body.
-        """
-        return await self._client.request_async(
-            "POST",
-            self._api,
-            "/api/v1/sharedtable",
-            json_body=body,
-            timeout=timeout,
-        )
 
     def list_shared_tables(
         self,
@@ -114,51 +79,41 @@ class SharedTableManagement(BaseNamespace):
             timeout=timeout,
         )
 
-    def delete_shared_table(
+    def create_shared_table(
         self,
         *,
-        shared_table_id: str,
+        body: SharedTableDto,
         timeout: Optional[float] = None,
     ) -> httpx.Response:
-        """Delete a single shared table
+        """Create a new shared table
 
-        Deletes the linkages between the source and destination of a shared
-        table that matches
-        the provided ID; the actual table itself is left intact. If no such
-        shared table exists,
-        this is a no-op.
+        Creates a shared table instance between the workspace of the request and
+        the workspace provided in the body.
         """
         return self._client.request(
-            "DELETE",
+            "POST",
             self._api,
-            "/api/v1/sharedtable/{sharedTableId}",
-            path_params={
-                "sharedTableId": shared_table_id,
-            },
+            "/api/v1/sharedtable",
+            json_body=body,
             timeout=timeout,
         )
 
-    async def delete_shared_table_async(
+    async def create_shared_table_async(
         self,
         *,
-        shared_table_id: str,
+        body: SharedTableDto,
         timeout: Optional[float] = None,
     ) -> httpx.Response:
-        """Delete a single shared table (async)
+        """Create a new shared table (async)
 
-        Deletes the linkages between the source and destination of a shared
-        table that matches
-        the provided ID; the actual table itself is left intact. If no such
-        shared table exists,
-        this is a no-op.
+        Creates a shared table instance between the workspace of the request and
+        the workspace provided in the body.
         """
         return await self._client.request_async(
-            "DELETE",
+            "POST",
             self._api,
-            "/api/v1/sharedtable/{sharedTableId}",
-            path_params={
-                "sharedTableId": shared_table_id,
-            },
+            "/api/v1/sharedtable",
+            json_body=body,
             timeout=timeout,
         )
 
@@ -208,6 +163,54 @@ class SharedTableManagement(BaseNamespace):
             },
             query_params={
                 "sharedWithMe": shared_with_me,
+            },
+            timeout=timeout,
+        )
+
+    def delete_shared_table(
+        self,
+        *,
+        shared_table_id: str,
+        timeout: Optional[float] = None,
+    ) -> httpx.Response:
+        """Delete a single shared table
+
+        Deletes the linkages between the source and destination of a shared
+        table that matches
+        the provided ID; the actual table itself is left intact. If no such
+        shared table exists,
+        this is a no-op.
+        """
+        return self._client.request(
+            "DELETE",
+            self._api,
+            "/api/v1/sharedtable/{sharedTableId}",
+            path_params={
+                "sharedTableId": shared_table_id,
+            },
+            timeout=timeout,
+        )
+
+    async def delete_shared_table_async(
+        self,
+        *,
+        shared_table_id: str,
+        timeout: Optional[float] = None,
+    ) -> httpx.Response:
+        """Delete a single shared table (async)
+
+        Deletes the linkages between the source and destination of a shared
+        table that matches
+        the provided ID; the actual table itself is left intact. If no such
+        shared table exists,
+        this is a no-op.
+        """
+        return await self._client.request_async(
+            "DELETE",
+            self._api,
+            "/api/v1/sharedtable/{sharedTableId}",
+            path_params={
+                "sharedTableId": shared_table_id,
             },
             timeout=timeout,
         )

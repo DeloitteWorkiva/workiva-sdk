@@ -11,6 +11,9 @@ import httpx
 
 from workiva._constants import _API
 from workiva._operations._base import BaseNamespace
+from workiva.models.platform import (
+    GraphReportExport,
+)
 
 
 class Graph(BaseNamespace):
@@ -21,7 +24,7 @@ class Graph(BaseNamespace):
     def create_edits(
         self,
         *,
-        body: Edits,
+        body: list[Any],
         timeout: Optional[float] = None,
     ) -> httpx.Response:
         """Create new record edits
@@ -44,7 +47,7 @@ class Graph(BaseNamespace):
     async def create_edits_async(
         self,
         *,
-        body: Edits,
+        body: list[Any],
         timeout: Optional[float] = None,
     ) -> httpx.Response:
         """Create new record edits (async)
