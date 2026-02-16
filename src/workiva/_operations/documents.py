@@ -677,54 +677,6 @@ class Documents(BaseNamespace):
             timeout=timeout,
         )
 
-    def create_section(
-        self,
-        *,
-        document_id: str,
-        body: Section,
-        timeout: Optional[float] = None,
-    ) -> httpx.Response:
-        """Create a new section in a document
-
-        Creates a new [section](ref:documents#section) in a
-        [document](ref:documents#document), given its properties. By default,
-        the new section appears at the top-most position.
-        """
-        return self._client.request(
-            "POST",
-            self._api,
-            "/documents/{documentId}/sections",
-            path_params={
-                "documentId": document_id,
-            },
-            json_body=body,
-            timeout=timeout,
-        )
-
-    async def create_section_async(
-        self,
-        *,
-        document_id: str,
-        body: Section,
-        timeout: Optional[float] = None,
-    ) -> httpx.Response:
-        """Create a new section in a document (async)
-
-        Creates a new [section](ref:documents#section) in a
-        [document](ref:documents#document), given its properties. By default,
-        the new section appears at the top-most position.
-        """
-        return await self._client.request_async(
-            "POST",
-            self._api,
-            "/documents/{documentId}/sections",
-            path_params={
-                "documentId": document_id,
-            },
-            json_body=body,
-            timeout=timeout,
-        )
-
     def get_sections(
         self,
         *,
@@ -781,6 +733,54 @@ class Documents(BaseNamespace):
             timeout=timeout,
         )
 
+    def create_section(
+        self,
+        *,
+        document_id: str,
+        body: Section,
+        timeout: Optional[float] = None,
+    ) -> httpx.Response:
+        """Create a new section in a document
+
+        Creates a new [section](ref:documents#section) in a
+        [document](ref:documents#document), given its properties. By default,
+        the new section appears at the top-most position.
+        """
+        return self._client.request(
+            "POST",
+            self._api,
+            "/documents/{documentId}/sections",
+            path_params={
+                "documentId": document_id,
+            },
+            json_body=body,
+            timeout=timeout,
+        )
+
+    async def create_section_async(
+        self,
+        *,
+        document_id: str,
+        body: Section,
+        timeout: Optional[float] = None,
+    ) -> httpx.Response:
+        """Create a new section in a document (async)
+
+        Creates a new [section](ref:documents#section) in a
+        [document](ref:documents#document), given its properties. By default,
+        the new section appears at the top-most position.
+        """
+        return await self._client.request_async(
+            "POST",
+            self._api,
+            "/documents/{documentId}/sections",
+            path_params={
+                "documentId": document_id,
+            },
+            json_body=body,
+            timeout=timeout,
+        )
+
     def get_section_by_id(
         self,
         *,
@@ -833,50 +833,6 @@ class Documents(BaseNamespace):
             query_params={
                 "$expand": expand,
                 "$revision": revision,
-            },
-            timeout=timeout,
-        )
-
-    def delete_section_by_id(
-        self,
-        *,
-        document_id: str,
-        section_id: str,
-        timeout: Optional[float] = None,
-    ) -> httpx.Response:
-        """Delete a single section
-
-        Deletes a [section](ref:documents#section) given its ID.
-        """
-        return self._client.request(
-            "DELETE",
-            self._api,
-            "/documents/{documentId}/sections/{sectionId}",
-            path_params={
-                "documentId": document_id,
-                "sectionId": section_id,
-            },
-            timeout=timeout,
-        )
-
-    async def delete_section_by_id_async(
-        self,
-        *,
-        document_id: str,
-        section_id: str,
-        timeout: Optional[float] = None,
-    ) -> httpx.Response:
-        """Delete a single section (async)
-
-        Deletes a [section](ref:documents#section) given its ID.
-        """
-        return await self._client.request_async(
-            "DELETE",
-            self._api,
-            "/documents/{documentId}/sections/{sectionId}",
-            path_params={
-                "documentId": document_id,
-                "sectionId": section_id,
             },
             timeout=timeout,
         )
@@ -1258,6 +1214,50 @@ class Documents(BaseNamespace):
                 "sectionId": section_id,
             },
             json_body=body,
+            timeout=timeout,
+        )
+
+    def delete_section_by_id(
+        self,
+        *,
+        document_id: str,
+        section_id: str,
+        timeout: Optional[float] = None,
+    ) -> httpx.Response:
+        """Delete a single section
+
+        Deletes a [section](ref:documents#section) given its ID.
+        """
+        return self._client.request(
+            "DELETE",
+            self._api,
+            "/documents/{documentId}/sections/{sectionId}",
+            path_params={
+                "documentId": document_id,
+                "sectionId": section_id,
+            },
+            timeout=timeout,
+        )
+
+    async def delete_section_by_id_async(
+        self,
+        *,
+        document_id: str,
+        section_id: str,
+        timeout: Optional[float] = None,
+    ) -> httpx.Response:
+        """Delete a single section (async)
+
+        Deletes a [section](ref:documents#section) given its ID.
+        """
+        return await self._client.request_async(
+            "DELETE",
+            self._api,
+            "/documents/{documentId}/sections/{sectionId}",
+            path_params={
+                "documentId": document_id,
+                "sectionId": section_id,
+            },
             timeout=timeout,
         )
 

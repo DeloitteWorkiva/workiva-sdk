@@ -577,58 +577,6 @@ class TestForms(BaseNamespace):
             timeout=timeout,
         )
 
-    def create_matrix(
-        self,
-        *,
-        test_form_id: str,
-        test_phase_id: str,
-        body: Matrix,
-        timeout: Optional[float] = None,
-    ) -> httpx.Response:
-        """Create a new matrix
-
-        Create a new empty [matrix](ref:testforms#matrix). The `id` field for
-        the matrix and its columns should be left blank; this will be populated
-        by the endpoint.
-        """
-        return self._client.request(
-            "POST",
-            self._api,
-            "/testForms/{testFormId}/testPhases/{testPhaseId}/matrices",
-            path_params={
-                "testFormId": test_form_id,
-                "testPhaseId": test_phase_id,
-            },
-            json_body=body,
-            timeout=timeout,
-        )
-
-    async def create_matrix_async(
-        self,
-        *,
-        test_form_id: str,
-        test_phase_id: str,
-        body: Matrix,
-        timeout: Optional[float] = None,
-    ) -> httpx.Response:
-        """Create a new matrix (async)
-
-        Create a new empty [matrix](ref:testforms#matrix). The `id` field for
-        the matrix and its columns should be left blank; this will be populated
-        by the endpoint.
-        """
-        return await self._client.request_async(
-            "POST",
-            self._api,
-            "/testForms/{testFormId}/testPhases/{testPhaseId}/matrices",
-            path_params={
-                "testFormId": test_form_id,
-                "testPhaseId": test_phase_id,
-            },
-            json_body=body,
-            timeout=timeout,
-        )
-
     def get_matrices(
         self,
         *,
@@ -678,6 +626,58 @@ class TestForms(BaseNamespace):
             query_params={
                 "$expand": expand,
             },
+            timeout=timeout,
+        )
+
+    def create_matrix(
+        self,
+        *,
+        test_form_id: str,
+        test_phase_id: str,
+        body: Matrix,
+        timeout: Optional[float] = None,
+    ) -> httpx.Response:
+        """Create a new matrix
+
+        Create a new empty [matrix](ref:testforms#matrix). The `id` field for
+        the matrix and its columns should be left blank; this will be populated
+        by the endpoint.
+        """
+        return self._client.request(
+            "POST",
+            self._api,
+            "/testForms/{testFormId}/testPhases/{testPhaseId}/matrices",
+            path_params={
+                "testFormId": test_form_id,
+                "testPhaseId": test_phase_id,
+            },
+            json_body=body,
+            timeout=timeout,
+        )
+
+    async def create_matrix_async(
+        self,
+        *,
+        test_form_id: str,
+        test_phase_id: str,
+        body: Matrix,
+        timeout: Optional[float] = None,
+    ) -> httpx.Response:
+        """Create a new matrix (async)
+
+        Create a new empty [matrix](ref:testforms#matrix). The `id` field for
+        the matrix and its columns should be left blank; this will be populated
+        by the endpoint.
+        """
+        return await self._client.request_async(
+            "POST",
+            self._api,
+            "/testForms/{testFormId}/testPhases/{testPhaseId}/matrices",
+            path_params={
+                "testFormId": test_form_id,
+                "testPhaseId": test_phase_id,
+            },
+            json_body=body,
             timeout=timeout,
         )
 
@@ -1059,62 +1059,6 @@ class TestForms(BaseNamespace):
             timeout=timeout,
         )
 
-    def create_sample(
-        self,
-        *,
-        test_form_id: str,
-        test_phase_id: str,
-        matrix_id: str,
-        body: MatrixSample,
-        timeout: Optional[float] = None,
-    ) -> httpx.Response:
-        """Create a new sample
-
-        Create a new [sample](ref:testforms#matrixsample) in a
-        [matrix](ref:testforms#matrix). The new sample will be appended to the
-        end of the matrix.
-        """
-        return self._client.request(
-            "POST",
-            self._api,
-            "/testForms/{testFormId}/testPhases/{testPhaseId}/matrices/{matrixId}/samples",
-            path_params={
-                "testFormId": test_form_id,
-                "testPhaseId": test_phase_id,
-                "matrixId": matrix_id,
-            },
-            json_body=body,
-            timeout=timeout,
-        )
-
-    async def create_sample_async(
-        self,
-        *,
-        test_form_id: str,
-        test_phase_id: str,
-        matrix_id: str,
-        body: MatrixSample,
-        timeout: Optional[float] = None,
-    ) -> httpx.Response:
-        """Create a new sample (async)
-
-        Create a new [sample](ref:testforms#matrixsample) in a
-        [matrix](ref:testforms#matrix). The new sample will be appended to the
-        end of the matrix.
-        """
-        return await self._client.request_async(
-            "POST",
-            self._api,
-            "/testForms/{testFormId}/testPhases/{testPhaseId}/matrices/{matrixId}/samples",
-            path_params={
-                "testFormId": test_form_id,
-                "testPhaseId": test_phase_id,
-                "matrixId": matrix_id,
-            },
-            json_body=body,
-            timeout=timeout,
-        )
-
     def get_samples(
         self,
         *,
@@ -1168,6 +1112,62 @@ class TestForms(BaseNamespace):
             query_params={
                 "$expand": expand,
             },
+            timeout=timeout,
+        )
+
+    def create_sample(
+        self,
+        *,
+        test_form_id: str,
+        test_phase_id: str,
+        matrix_id: str,
+        body: MatrixSample,
+        timeout: Optional[float] = None,
+    ) -> httpx.Response:
+        """Create a new sample
+
+        Create a new [sample](ref:testforms#matrixsample) in a
+        [matrix](ref:testforms#matrix). The new sample will be appended to the
+        end of the matrix.
+        """
+        return self._client.request(
+            "POST",
+            self._api,
+            "/testForms/{testFormId}/testPhases/{testPhaseId}/matrices/{matrixId}/samples",
+            path_params={
+                "testFormId": test_form_id,
+                "testPhaseId": test_phase_id,
+                "matrixId": matrix_id,
+            },
+            json_body=body,
+            timeout=timeout,
+        )
+
+    async def create_sample_async(
+        self,
+        *,
+        test_form_id: str,
+        test_phase_id: str,
+        matrix_id: str,
+        body: MatrixSample,
+        timeout: Optional[float] = None,
+    ) -> httpx.Response:
+        """Create a new sample (async)
+
+        Create a new [sample](ref:testforms#matrixsample) in a
+        [matrix](ref:testforms#matrix). The new sample will be appended to the
+        end of the matrix.
+        """
+        return await self._client.request_async(
+            "POST",
+            self._api,
+            "/testForms/{testFormId}/testPhases/{testPhaseId}/matrices/{matrixId}/samples",
+            path_params={
+                "testFormId": test_form_id,
+                "testPhaseId": test_phase_id,
+                "matrixId": matrix_id,
+            },
+            json_body=body,
             timeout=timeout,
         )
 

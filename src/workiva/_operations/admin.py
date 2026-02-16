@@ -255,50 +255,6 @@ class Admin(BaseNamespace):
             timeout=timeout,
         )
 
-    def create_organization_user(
-        self,
-        *,
-        organization_id: str,
-        body: OrganizationUser,
-        timeout: Optional[float] = None,
-    ) -> httpx.Response:
-        """Create a new organization User
-
-        Creates a new OrganizationUser resource
-        """
-        return self._client.request(
-            "POST",
-            self._api,
-            "/organizations/{organizationId}/users",
-            path_params={
-                "organizationId": organization_id,
-            },
-            json_body=body,
-            timeout=timeout,
-        )
-
-    async def create_organization_user_async(
-        self,
-        *,
-        organization_id: str,
-        body: OrganizationUser,
-        timeout: Optional[float] = None,
-    ) -> httpx.Response:
-        """Create a new organization User (async)
-
-        Creates a new OrganizationUser resource
-        """
-        return await self._client.request_async(
-            "POST",
-            self._api,
-            "/organizations/{organizationId}/users",
-            path_params={
-                "organizationId": organization_id,
-            },
-            json_body=body,
-            timeout=timeout,
-        )
-
     def get_organization_users(
         self,
         *,
@@ -352,6 +308,50 @@ class Admin(BaseNamespace):
                 "$next": next_,
                 "$filter": filter_,
             },
+            timeout=timeout,
+        )
+
+    def create_organization_user(
+        self,
+        *,
+        organization_id: str,
+        body: OrganizationUser,
+        timeout: Optional[float] = None,
+    ) -> httpx.Response:
+        """Create a new organization User
+
+        Creates a new OrganizationUser resource
+        """
+        return self._client.request(
+            "POST",
+            self._api,
+            "/organizations/{organizationId}/users",
+            path_params={
+                "organizationId": organization_id,
+            },
+            json_body=body,
+            timeout=timeout,
+        )
+
+    async def create_organization_user_async(
+        self,
+        *,
+        organization_id: str,
+        body: OrganizationUser,
+        timeout: Optional[float] = None,
+    ) -> httpx.Response:
+        """Create a new organization User (async)
+
+        Creates a new OrganizationUser resource
+        """
+        return await self._client.request_async(
+            "POST",
+            self._api,
+            "/organizations/{organizationId}/users",
+            path_params={
+                "organizationId": organization_id,
+            },
+            json_body=body,
             timeout=timeout,
         )
 
@@ -443,50 +443,6 @@ class Admin(BaseNamespace):
             timeout=timeout,
         )
 
-    def delete_organization_user_by_id(
-        self,
-        *,
-        organization_id: str,
-        user_id: str,
-        timeout: Optional[float] = None,
-    ) -> httpx.Response:
-        """Delete an organization user
-
-        Delete a user from an organization
-        """
-        return self._client.request(
-            "DELETE",
-            self._api,
-            "/organizations/{organizationId}/users/{userId}",
-            path_params={
-                "organizationId": organization_id,
-                "userId": user_id,
-            },
-            timeout=timeout,
-        )
-
-    async def delete_organization_user_by_id_async(
-        self,
-        *,
-        organization_id: str,
-        user_id: str,
-        timeout: Optional[float] = None,
-    ) -> httpx.Response:
-        """Delete an organization user (async)
-
-        Delete a user from an organization
-        """
-        return await self._client.request_async(
-            "DELETE",
-            self._api,
-            "/organizations/{organizationId}/users/{userId}",
-            path_params={
-                "organizationId": organization_id,
-                "userId": user_id,
-            },
-            timeout=timeout,
-        )
-
     def partially_update_organization_user_by_id(
         self,
         *,
@@ -550,6 +506,50 @@ class Admin(BaseNamespace):
                 "userId": user_id,
             },
             json_body=body,
+            timeout=timeout,
+        )
+
+    def delete_organization_user_by_id(
+        self,
+        *,
+        organization_id: str,
+        user_id: str,
+        timeout: Optional[float] = None,
+    ) -> httpx.Response:
+        """Delete an organization user
+
+        Delete a user from an organization
+        """
+        return self._client.request(
+            "DELETE",
+            self._api,
+            "/organizations/{organizationId}/users/{userId}",
+            path_params={
+                "organizationId": organization_id,
+                "userId": user_id,
+            },
+            timeout=timeout,
+        )
+
+    async def delete_organization_user_by_id_async(
+        self,
+        *,
+        organization_id: str,
+        user_id: str,
+        timeout: Optional[float] = None,
+    ) -> httpx.Response:
+        """Delete an organization user (async)
+
+        Delete a user from an organization
+        """
+        return await self._client.request_async(
+            "DELETE",
+            self._api,
+            "/organizations/{organizationId}/users/{userId}",
+            path_params={
+                "organizationId": organization_id,
+                "userId": user_id,
+            },
             timeout=timeout,
         )
 
@@ -697,50 +697,6 @@ class Admin(BaseNamespace):
             timeout=timeout,
         )
 
-    def create_workspace(
-        self,
-        *,
-        organization_id: str,
-        body: Workspace,
-        timeout: Optional[float] = None,
-    ) -> httpx.Response:
-        """Create a new workspace
-
-        Creates a new workspace resource
-        """
-        return self._client.request(
-            "POST",
-            self._api,
-            "/organizations/{organizationId}/workspaces",
-            path_params={
-                "organizationId": organization_id,
-            },
-            json_body=body,
-            timeout=timeout,
-        )
-
-    async def create_workspace_async(
-        self,
-        *,
-        organization_id: str,
-        body: Workspace,
-        timeout: Optional[float] = None,
-    ) -> httpx.Response:
-        """Create a new workspace (async)
-
-        Creates a new workspace resource
-        """
-        return await self._client.request_async(
-            "POST",
-            self._api,
-            "/organizations/{organizationId}/workspaces",
-            path_params={
-                "organizationId": organization_id,
-            },
-            json_body=body,
-            timeout=timeout,
-        )
-
     def get_workspaces(
         self,
         *,
@@ -794,6 +750,50 @@ class Admin(BaseNamespace):
                 "$next": next_,
                 "$expand": expand,
             },
+            timeout=timeout,
+        )
+
+    def create_workspace(
+        self,
+        *,
+        organization_id: str,
+        body: Workspace,
+        timeout: Optional[float] = None,
+    ) -> httpx.Response:
+        """Create a new workspace
+
+        Creates a new workspace resource
+        """
+        return self._client.request(
+            "POST",
+            self._api,
+            "/organizations/{organizationId}/workspaces",
+            path_params={
+                "organizationId": organization_id,
+            },
+            json_body=body,
+            timeout=timeout,
+        )
+
+    async def create_workspace_async(
+        self,
+        *,
+        organization_id: str,
+        body: Workspace,
+        timeout: Optional[float] = None,
+    ) -> httpx.Response:
+        """Create a new workspace (async)
+
+        Creates a new workspace resource
+        """
+        return await self._client.request_async(
+            "POST",
+            self._api,
+            "/organizations/{organizationId}/workspaces",
+            path_params={
+                "organizationId": organization_id,
+            },
+            json_body=body,
             timeout=timeout,
         )
 
@@ -905,54 +905,6 @@ class Admin(BaseNamespace):
             timeout=timeout,
         )
 
-    def create_workspace_group(
-        self,
-        *,
-        organization_id: str,
-        workspace_id: str,
-        body: WorkspaceGroup,
-        timeout: Optional[float] = None,
-    ) -> httpx.Response:
-        """Create a new group in a workspace
-
-        Creates a new group resource
-        """
-        return self._client.request(
-            "POST",
-            self._api,
-            "/organizations/{organizationId}/workspaces/{workspaceId}/groups",
-            path_params={
-                "organizationId": organization_id,
-                "workspaceId": workspace_id,
-            },
-            json_body=body,
-            timeout=timeout,
-        )
-
-    async def create_workspace_group_async(
-        self,
-        *,
-        organization_id: str,
-        workspace_id: str,
-        body: WorkspaceGroup,
-        timeout: Optional[float] = None,
-    ) -> httpx.Response:
-        """Create a new group in a workspace (async)
-
-        Creates a new group resource
-        """
-        return await self._client.request_async(
-            "POST",
-            self._api,
-            "/organizations/{organizationId}/workspaces/{workspaceId}/groups",
-            path_params={
-                "organizationId": organization_id,
-                "workspaceId": workspace_id,
-            },
-            json_body=body,
-            timeout=timeout,
-        )
-
     def get_workspace_groups(
         self,
         *,
@@ -1013,6 +965,54 @@ class Admin(BaseNamespace):
             timeout=timeout,
         )
 
+    def create_workspace_group(
+        self,
+        *,
+        organization_id: str,
+        workspace_id: str,
+        body: WorkspaceGroup,
+        timeout: Optional[float] = None,
+    ) -> httpx.Response:
+        """Create a new group in a workspace
+
+        Creates a new group resource
+        """
+        return self._client.request(
+            "POST",
+            self._api,
+            "/organizations/{organizationId}/workspaces/{workspaceId}/groups",
+            path_params={
+                "organizationId": organization_id,
+                "workspaceId": workspace_id,
+            },
+            json_body=body,
+            timeout=timeout,
+        )
+
+    async def create_workspace_group_async(
+        self,
+        *,
+        organization_id: str,
+        workspace_id: str,
+        body: WorkspaceGroup,
+        timeout: Optional[float] = None,
+    ) -> httpx.Response:
+        """Create a new group in a workspace (async)
+
+        Creates a new group resource
+        """
+        return await self._client.request_async(
+            "POST",
+            self._api,
+            "/organizations/{organizationId}/workspaces/{workspaceId}/groups",
+            path_params={
+                "organizationId": organization_id,
+                "workspaceId": workspace_id,
+            },
+            json_body=body,
+            timeout=timeout,
+        )
+
     def get_workspace_group_by_id(
         self,
         *,
@@ -1065,54 +1065,6 @@ class Admin(BaseNamespace):
             },
             query_params={
                 "$expand": expand,
-            },
-            timeout=timeout,
-        )
-
-    def delete_workspace_group_by_id(
-        self,
-        *,
-        organization_id: str,
-        workspace_id: str,
-        group_id: str,
-        timeout: Optional[float] = None,
-    ) -> httpx.Response:
-        """Delete a single group
-
-        Deletes a group given its ID.
-        """
-        return self._client.request(
-            "DELETE",
-            self._api,
-            "/organizations/{organizationId}/workspaces/{workspaceId}/groups/{groupId}",
-            path_params={
-                "organizationId": organization_id,
-                "workspaceId": workspace_id,
-                "groupId": group_id,
-            },
-            timeout=timeout,
-        )
-
-    async def delete_workspace_group_by_id_async(
-        self,
-        *,
-        organization_id: str,
-        workspace_id: str,
-        group_id: str,
-        timeout: Optional[float] = None,
-    ) -> httpx.Response:
-        """Delete a single group (async)
-
-        Deletes a group given its ID.
-        """
-        return await self._client.request_async(
-            "DELETE",
-            self._api,
-            "/organizations/{organizationId}/workspaces/{workspaceId}/groups/{groupId}",
-            path_params={
-                "organizationId": organization_id,
-                "workspaceId": workspace_id,
-                "groupId": group_id,
             },
             timeout=timeout,
         )
@@ -1174,6 +1126,54 @@ class Admin(BaseNamespace):
                 "groupId": group_id,
             },
             json_body=body,
+            timeout=timeout,
+        )
+
+    def delete_workspace_group_by_id(
+        self,
+        *,
+        organization_id: str,
+        workspace_id: str,
+        group_id: str,
+        timeout: Optional[float] = None,
+    ) -> httpx.Response:
+        """Delete a single group
+
+        Deletes a group given its ID.
+        """
+        return self._client.request(
+            "DELETE",
+            self._api,
+            "/organizations/{organizationId}/workspaces/{workspaceId}/groups/{groupId}",
+            path_params={
+                "organizationId": organization_id,
+                "workspaceId": workspace_id,
+                "groupId": group_id,
+            },
+            timeout=timeout,
+        )
+
+    async def delete_workspace_group_by_id_async(
+        self,
+        *,
+        organization_id: str,
+        workspace_id: str,
+        group_id: str,
+        timeout: Optional[float] = None,
+    ) -> httpx.Response:
+        """Delete a single group (async)
+
+        Deletes a group given its ID.
+        """
+        return await self._client.request_async(
+            "DELETE",
+            self._api,
+            "/organizations/{organizationId}/workspaces/{workspaceId}/groups/{groupId}",
+            path_params={
+                "organizationId": organization_id,
+                "workspaceId": workspace_id,
+                "groupId": group_id,
+            },
             timeout=timeout,
         )
 
@@ -1291,54 +1291,6 @@ class Admin(BaseNamespace):
             timeout=timeout,
         )
 
-    def create_workspace_membership(
-        self,
-        *,
-        organization_id: str,
-        workspace_id: str,
-        body: WorkspaceMembership,
-        timeout: Optional[float] = None,
-    ) -> httpx.Response:
-        """Create a new workspace membership
-
-        Creates a new `WorkspaceMembership` resource
-        """
-        return self._client.request(
-            "POST",
-            self._api,
-            "/organizations/{organizationId}/workspaces/{workspaceId}/memberships",
-            path_params={
-                "organizationId": organization_id,
-                "workspaceId": workspace_id,
-            },
-            json_body=body,
-            timeout=timeout,
-        )
-
-    async def create_workspace_membership_async(
-        self,
-        *,
-        organization_id: str,
-        workspace_id: str,
-        body: WorkspaceMembership,
-        timeout: Optional[float] = None,
-    ) -> httpx.Response:
-        """Create a new workspace membership (async)
-
-        Creates a new `WorkspaceMembership` resource
-        """
-        return await self._client.request_async(
-            "POST",
-            self._api,
-            "/organizations/{organizationId}/workspaces/{workspaceId}/memberships",
-            path_params={
-                "organizationId": organization_id,
-                "workspaceId": workspace_id,
-            },
-            json_body=body,
-            timeout=timeout,
-        )
-
     def get_workspace_memberships(
         self,
         *,
@@ -1396,6 +1348,54 @@ class Admin(BaseNamespace):
                 "$maxpagesize": maxpagesize,
                 "$next": next_,
             },
+            timeout=timeout,
+        )
+
+    def create_workspace_membership(
+        self,
+        *,
+        organization_id: str,
+        workspace_id: str,
+        body: WorkspaceMembership,
+        timeout: Optional[float] = None,
+    ) -> httpx.Response:
+        """Create a new workspace membership
+
+        Creates a new `WorkspaceMembership` resource
+        """
+        return self._client.request(
+            "POST",
+            self._api,
+            "/organizations/{organizationId}/workspaces/{workspaceId}/memberships",
+            path_params={
+                "organizationId": organization_id,
+                "workspaceId": workspace_id,
+            },
+            json_body=body,
+            timeout=timeout,
+        )
+
+    async def create_workspace_membership_async(
+        self,
+        *,
+        organization_id: str,
+        workspace_id: str,
+        body: WorkspaceMembership,
+        timeout: Optional[float] = None,
+    ) -> httpx.Response:
+        """Create a new workspace membership (async)
+
+        Creates a new `WorkspaceMembership` resource
+        """
+        return await self._client.request_async(
+            "POST",
+            self._api,
+            "/organizations/{organizationId}/workspaces/{workspaceId}/memberships",
+            path_params={
+                "organizationId": organization_id,
+                "workspaceId": workspace_id,
+            },
+            json_body=body,
             timeout=timeout,
         )
 
