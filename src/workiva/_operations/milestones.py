@@ -115,46 +115,6 @@ class Milestones(BaseNamespace):
             timeout=timeout,
         )
 
-    def delete_milestone_by_id(
-        self,
-        *,
-        milestone_id: str,
-        timeout: Optional[float] = None,
-    ) -> httpx.Response:
-        """Deletes a milestone
-
-        Deletes the [`Milestone`](ref:milestones#milestone) with a given id.
-        """
-        return self._client.request(
-            "DELETE",
-            self._api,
-            "/milestones/{milestoneId}",
-            path_params={
-                "milestoneId": milestone_id,
-            },
-            timeout=timeout,
-        )
-
-    async def delete_milestone_by_id_async(
-        self,
-        *,
-        milestone_id: str,
-        timeout: Optional[float] = None,
-    ) -> httpx.Response:
-        """Deletes a milestone (async)
-
-        Deletes the [`Milestone`](ref:milestones#milestone) with a given id.
-        """
-        return await self._client.request_async(
-            "DELETE",
-            self._api,
-            "/milestones/{milestoneId}",
-            path_params={
-                "milestoneId": milestone_id,
-            },
-            timeout=timeout,
-        )
-
     def partially_update_milestone_by_id(
         self,
         *,
@@ -218,5 +178,45 @@ class Milestones(BaseNamespace):
                 "milestoneId": milestone_id,
             },
             json_body=body,
+            timeout=timeout,
+        )
+
+    def delete_milestone_by_id(
+        self,
+        *,
+        milestone_id: str,
+        timeout: Optional[float] = None,
+    ) -> httpx.Response:
+        """Deletes a milestone
+
+        Deletes the [`Milestone`](ref:milestones#milestone) with a given id.
+        """
+        return self._client.request(
+            "DELETE",
+            self._api,
+            "/milestones/{milestoneId}",
+            path_params={
+                "milestoneId": milestone_id,
+            },
+            timeout=timeout,
+        )
+
+    async def delete_milestone_by_id_async(
+        self,
+        *,
+        milestone_id: str,
+        timeout: Optional[float] = None,
+    ) -> httpx.Response:
+        """Deletes a milestone (async)
+
+        Deletes the [`Milestone`](ref:milestones#milestone) with a given id.
+        """
+        return await self._client.request_async(
+            "DELETE",
+            self._api,
+            "/milestones/{milestoneId}",
+            path_params={
+                "milestoneId": milestone_id,
+            },
             timeout=timeout,
         )

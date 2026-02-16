@@ -21,44 +21,6 @@ class ParameterManagement(BaseNamespace):
 
     _api: _API = _API.WDATA
 
-    def create_parameter(
-        self,
-        *,
-        body: GlobalParameterDto,
-        timeout: Optional[float] = None,
-    ) -> httpx.Response:
-        """Create parameter
-
-        Creates a parameter.  If there is a parameter with the same ID, a 409 is
-        returned.
-        """
-        return self._client.request(
-            "POST",
-            self._api,
-            "/api/v1/parameter",
-            json_body=body,
-            timeout=timeout,
-        )
-
-    async def create_parameter_async(
-        self,
-        *,
-        body: GlobalParameterDto,
-        timeout: Optional[float] = None,
-    ) -> httpx.Response:
-        """Create parameter (async)
-
-        Creates a parameter.  If there is a parameter with the same ID, a 409 is
-        returned.
-        """
-        return await self._client.request_async(
-            "POST",
-            self._api,
-            "/api/v1/parameter",
-            json_body=body,
-            timeout=timeout,
-        )
-
     def list_parameters(
         self,
         *,
@@ -111,46 +73,40 @@ class ParameterManagement(BaseNamespace):
             timeout=timeout,
         )
 
-    def update_parameter(
+    def create_parameter(
         self,
         *,
-        parameter_id: str,
         body: GlobalParameterDto,
         timeout: Optional[float] = None,
     ) -> httpx.Response:
-        """Update Parameter
+        """Create parameter
 
-        Updates the parameter matching the provided ID in the provided payload.
+        Creates a parameter.  If there is a parameter with the same ID, a 409 is
+        returned.
         """
         return self._client.request(
-            "PUT",
+            "POST",
             self._api,
-            "/api/v1/parameter/{parameterId}",
-            path_params={
-                "parameterId": parameter_id,
-            },
+            "/api/v1/parameter",
             json_body=body,
             timeout=timeout,
         )
 
-    async def update_parameter_async(
+    async def create_parameter_async(
         self,
         *,
-        parameter_id: str,
         body: GlobalParameterDto,
         timeout: Optional[float] = None,
     ) -> httpx.Response:
-        """Update Parameter (async)
+        """Create parameter (async)
 
-        Updates the parameter matching the provided ID in the provided payload.
+        Creates a parameter.  If there is a parameter with the same ID, a 409 is
+        returned.
         """
         return await self._client.request_async(
-            "PUT",
+            "POST",
             self._api,
-            "/api/v1/parameter/{parameterId}",
-            path_params={
-                "parameterId": parameter_id,
-            },
+            "/api/v1/parameter",
             json_body=body,
             timeout=timeout,
         )
@@ -236,5 +192,49 @@ class ParameterManagement(BaseNamespace):
             path_params={
                 "parameterId": parameter_id,
             },
+            timeout=timeout,
+        )
+
+    def update_parameter(
+        self,
+        *,
+        parameter_id: str,
+        body: GlobalParameterDto,
+        timeout: Optional[float] = None,
+    ) -> httpx.Response:
+        """Update Parameter
+
+        Updates the parameter matching the provided ID in the provided payload.
+        """
+        return self._client.request(
+            "PUT",
+            self._api,
+            "/api/v1/parameter/{parameterId}",
+            path_params={
+                "parameterId": parameter_id,
+            },
+            json_body=body,
+            timeout=timeout,
+        )
+
+    async def update_parameter_async(
+        self,
+        *,
+        parameter_id: str,
+        body: GlobalParameterDto,
+        timeout: Optional[float] = None,
+    ) -> httpx.Response:
+        """Update Parameter (async)
+
+        Updates the parameter matching the provided ID in the provided payload.
+        """
+        return await self._client.request_async(
+            "PUT",
+            self._api,
+            "/api/v1/parameter/{parameterId}",
+            path_params={
+                "parameterId": parameter_id,
+            },
+            json_body=body,
             timeout=timeout,
         )

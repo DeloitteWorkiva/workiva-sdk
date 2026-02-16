@@ -21,58 +21,6 @@ class PivotViewManagement(BaseNamespace):
 
     _api: _API = _API.WDATA
 
-    def create_pivot_view(
-        self,
-        *,
-        body: PivotViewDto,
-        timeout: Optional[float] = None,
-    ) -> httpx.Response:
-        """Create a new pivot view
-
-        Creates a view from the provided information. Currently, persists the
-        provided
-        `additionalMetadata` field, which can store an arbitrary JSON definition
-        of a pivot
-        table view. This pivot table must be associated with a query, and can
-        optionally be
-        associated with a query result. When a query is deleted, its associated
-        views are
-        also deleted.
-        """
-        return self._client.request(
-            "POST",
-            self._api,
-            "/api/v1/pivotview",
-            json_body=body,
-            timeout=timeout,
-        )
-
-    async def create_pivot_view_async(
-        self,
-        *,
-        body: PivotViewDto,
-        timeout: Optional[float] = None,
-    ) -> httpx.Response:
-        """Create a new pivot view (async)
-
-        Creates a view from the provided information. Currently, persists the
-        provided
-        `additionalMetadata` field, which can store an arbitrary JSON definition
-        of a pivot
-        table view. This pivot table must be associated with a query, and can
-        optionally be
-        associated with a query result. When a query is deleted, its associated
-        views are
-        also deleted.
-        """
-        return await self._client.request_async(
-            "POST",
-            self._api,
-            "/api/v1/pivotview",
-            json_body=body,
-            timeout=timeout,
-        )
-
     def list_pivot_views(
         self,
         *,
@@ -129,52 +77,54 @@ class PivotViewManagement(BaseNamespace):
             timeout=timeout,
         )
 
-    def update_pivot_view(
+    def create_pivot_view(
         self,
         *,
-        pivot_view_id: str,
         body: PivotViewDto,
         timeout: Optional[float] = None,
     ) -> httpx.Response:
-        """Update a single pivot view
+        """Create a new pivot view
 
-        Updates the view that matches the provided ID with the details provided
-        in the
-        body. The associated query can't be updated, so providing the query ID
-        has no effect.
+        Creates a view from the provided information. Currently, persists the
+        provided
+        `additionalMetadata` field, which can store an arbitrary JSON definition
+        of a pivot
+        table view. This pivot table must be associated with a query, and can
+        optionally be
+        associated with a query result. When a query is deleted, its associated
+        views are
+        also deleted.
         """
         return self._client.request(
-            "PUT",
+            "POST",
             self._api,
-            "/api/v1/pivotview/{pivotViewId}",
-            path_params={
-                "pivotViewId": pivot_view_id,
-            },
+            "/api/v1/pivotview",
             json_body=body,
             timeout=timeout,
         )
 
-    async def update_pivot_view_async(
+    async def create_pivot_view_async(
         self,
         *,
-        pivot_view_id: str,
         body: PivotViewDto,
         timeout: Optional[float] = None,
     ) -> httpx.Response:
-        """Update a single pivot view (async)
+        """Create a new pivot view (async)
 
-        Updates the view that matches the provided ID with the details provided
-        in the
-        body. The associated query can't be updated, so providing the query ID
-        has no effect.
+        Creates a view from the provided information. Currently, persists the
+        provided
+        `additionalMetadata` field, which can store an arbitrary JSON definition
+        of a pivot
+        table view. This pivot table must be associated with a query, and can
+        optionally be
+        associated with a query result. When a query is deleted, its associated
+        views are
+        also deleted.
         """
         return await self._client.request_async(
-            "PUT",
+            "POST",
             self._api,
-            "/api/v1/pivotview/{pivotViewId}",
-            path_params={
-                "pivotViewId": pivot_view_id,
-            },
+            "/api/v1/pivotview",
             json_body=body,
             timeout=timeout,
         )
@@ -264,5 +214,55 @@ class PivotViewManagement(BaseNamespace):
             path_params={
                 "pivotViewId": pivot_view_id,
             },
+            timeout=timeout,
+        )
+
+    def update_pivot_view(
+        self,
+        *,
+        pivot_view_id: str,
+        body: PivotViewDto,
+        timeout: Optional[float] = None,
+    ) -> httpx.Response:
+        """Update a single pivot view
+
+        Updates the view that matches the provided ID with the details provided
+        in the
+        body. The associated query can't be updated, so providing the query ID
+        has no effect.
+        """
+        return self._client.request(
+            "PUT",
+            self._api,
+            "/api/v1/pivotview/{pivotViewId}",
+            path_params={
+                "pivotViewId": pivot_view_id,
+            },
+            json_body=body,
+            timeout=timeout,
+        )
+
+    async def update_pivot_view_async(
+        self,
+        *,
+        pivot_view_id: str,
+        body: PivotViewDto,
+        timeout: Optional[float] = None,
+    ) -> httpx.Response:
+        """Update a single pivot view (async)
+
+        Updates the view that matches the provided ID with the details provided
+        in the
+        body. The associated query can't be updated, so providing the query ID
+        has no effect.
+        """
+        return await self._client.request_async(
+            "PUT",
+            self._api,
+            "/api/v1/pivotview/{pivotViewId}",
+            path_params={
+                "pivotViewId": pivot_view_id,
+            },
+            json_body=body,
             timeout=timeout,
         )
