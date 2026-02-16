@@ -61,23 +61,14 @@ def prepare_replacements(
         sys.exit(2)
     replacements["pyproject"] = (content, search, replacement)
 
-    # _version.py: __version__ and __user_agent__
+    # _version.py: __version__ (user_agent uses f-string, updates automatically)
     content = VERSION_FILES["version_py"].read_text()
     search = f'__version__: str = "{old}"'
     replacement = f'__version__: str = "{new}"'
     if search not in content:
         print(f"ERROR: '{search}' not found in _version.py", file=sys.stderr)
         sys.exit(2)
-    content = content.replace(search, replacement)
-    # Also update user_agent string
-    ua_search = f"workiva-python-sdk/{old}"
-    ua_replacement = f"workiva-python-sdk/{new}"
-    if ua_search not in content:
-        print(f"ERROR: '{ua_search}' not found in _version.py", file=sys.stderr)
-        sys.exit(2)
-    content = content.replace(ua_search, ua_replacement)
-    # Store full content for _version.py (already applied both replacements)
-    replacements["version_py"] = (content, "", "")
+    replacements["version_py"] = (content, search, replacement)
 
     # README.md: badge cache-buster ?v=X.Y.Z
     content = VERSION_FILES["readme"].read_text()
@@ -101,11 +92,7 @@ def main() -> int:
     # Write all files
     for key, (content, search, replacement) in replacements.items():
         path = VERSION_FILES[key]
-        if key == "version_py":
-            # Already has full content with both replacements applied
-            path.write_text(content)
-        else:
-            path.write_text(content.replace(search, replacement))
+        path.write_text(content.replace(search, replacement))
 
     print(new_version)
     return 0
