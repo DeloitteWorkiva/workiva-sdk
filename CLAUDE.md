@@ -85,12 +85,7 @@ oas/wdata.yaml    ─┘  │
 - Updates: `pyproject.toml`, `_version.py` (`__version__` + `__user_agent__`), `README.md` badge
 - Usage: `python scripts/bump_version.py` (prints new version to stdout)
 
-**`scripts/smoke_test.py`** — Manual pre-release smoke test against live APIs:
-- Verifies all 3 APIs (Platform, Wdata, Chains) respond with a valid token
-- Reads credentials from `.env` (`WORKIVA_CLIENT_ID`, `WORKIVA_CLIENT_SECRET`)
-- Usage: `cd workiva-sdk && uv run python ../scripts/smoke_test.py`
-
-**`scripts/e2e_test.py`** — Comprehensive end-to-end test suite:
+**`scripts/e2e_test.py`** — End-to-end test suite against live APIs:
 - 7 sync + 4 async tests across all 3 APIs
 - Tests token caching, X-Version header injection, asyncio.gather concurrency
 - Usage: `cd workiva-sdk && uv run python ../scripts/e2e_test.py`
