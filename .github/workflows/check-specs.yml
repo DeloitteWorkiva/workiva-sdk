@@ -46,6 +46,10 @@ jobs:
             echo "⚠ Specs have changed — regeneration needed"
           fi
 
+      - name: Snapshot current models
+        if: steps.check.outputs.changed == 'true'
+        run: cp -r workiva-sdk/src/workiva/models /tmp/old_models
+
       - name: Regenerate SDK
         if: steps.check.outputs.changed == 'true'
         env:
@@ -56,6 +60,23 @@ jobs:
         if: steps.check.outputs.changed == 'true'
         run: make test
 
+      - name: Detect breaking changes
+        if: steps.check.outputs.changed == 'true'
+        id: breaking
+        run: |
+          set +e
+          python scripts/detect_breaking_changes.py /tmp/old_models workiva-sdk/src/workiva/models oas/
+          exit_code=$?
+          set -e
+          if [ $exit_code -eq 0 ]; then
+            echo "found=false" >> "$GITHUB_OUTPUT"
+          elif [ $exit_code -eq 1 ]; then
+            echo "found=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "::error::Breaking change detection script failed"
+            exit 1
+          fi
+
       - name: Get spec versions
         if: steps.check.outputs.changed == 'true'
         id: versions
@@ -65,15 +86,86 @@ jobs:
           wdata_ver=$(grep -m1 'version:' oas/wdata.yaml | awk '{print $2}' | tr -d "'\"")
           echo "summary=Platform ${platform_ver}, Chains ${chains_ver}, Wdata ${wdata_ver}" >> "$GITHUB_OUTPUT"
 
-      - name: Create Pull Request
+      # --- Safe path: no breaking changes → bump, PR, auto-merge, release ---
+
+      - name: Bump version
+        if: steps.check.outputs.changed == 'true' && steps.breaking.outputs.found == 'false'
+        id: bump
+        run: |
+          new_version=$(python scripts/bump_version.py)
+          echo "version=${new_version}" >> "$GITHUB_OUTPUT"
+          echo "Bumped to v${new_version}"
+
+      - name: Read breaking changes report
         if: steps.check.outputs.changed == 'true'
+        id: report
+        run: |
+          {
+            echo 'content<<REPORT_EOF'
+            cat breaking_changes_report.md
+            echo 'REPORT_EOF'
+          } >> "$GITHUB_OUTPUT"
+
+      - name: Create PR (safe — auto-merge)
+        if: steps.check.outputs.changed == 'true' && steps.breaking.outputs.found == 'false'
+        id: safe-pr
+        uses: peter-evans/create-pull-request@v7
+        with:
+          token: ${{ secrets.AUTO_MERGE_TOKEN }}
+          branch: chore/update-oas-specs
+          delete-branch: true
+          title: "chore: update OpenAPI specs (${{ steps.versions.outputs.summary }})"
+          body: |
+            ## OAS Update — v${{ steps.bump.outputs.version }}
+
+            Automated detection of updated OpenAPI specs from developers.workiva.com.
+
+            **Spec versions:** ${{ steps.versions.outputs.summary }}
+
+            ### What changed
+            - Downloaded latest specs via `make download`
+            - Regenerated SDK via `make prepare merge generate`
+            - All tests passing via `make test`
+            - Version bumped to `${{ steps.bump.outputs.version }}`
+
+            ${{ steps.report.outputs.content }}
+          commit-message: "chore: update OpenAPI specs (${{ steps.versions.outputs.summary }})"
+          labels: |
+            automated
+            oas-update
+
+      - name: Auto-merge and release
+        if: steps.check.outputs.changed == 'true' && steps.breaking.outputs.found == 'false' && steps.safe-pr.outputs.pull-request-number
+        env:
+          GH_TOKEN: ${{ secrets.AUTO_MERGE_TOKEN }}
+        run: |
+          pr_number=${{ steps.safe-pr.outputs.pull-request-number }}
+          echo "Merging PR #${pr_number}..."
+          gh pr merge "${pr_number}" --admin --squash --delete-branch
+
+          echo "Creating release v${{ steps.bump.outputs.version }}..."
+          gh release create "v${{ steps.bump.outputs.version }}" \
+            --title "v${{ steps.bump.outputs.version }}" \
+            --notes "$(cat <<'EOF'
+          ## OAS Update
+
+          **Spec versions:** ${{ steps.versions.outputs.summary }}
+
+          ${{ steps.report.outputs.content }}
+          EOF
+          )"
+
+      # --- Breaking path: PR with label + report, no merge ---
+
+      - name: Create PR (breaking — manual review)
+        if: steps.check.outputs.changed == 'true' && steps.breaking.outputs.found == 'true'
         uses: peter-evans/create-pull-request@v7
         with:
           branch: chore/update-oas-specs
           delete-branch: true
-          title: "chore: update OpenAPI specs"
+          title: "chore: update OpenAPI specs [BREAKING]"
           body: |
-            ## OAS Update
+            ## OAS Update — ⚠️ Breaking Changes Detected
 
             Automated detection of updated OpenAPI specs from developers.workiva.com.
 
@@ -84,11 +176,15 @@ jobs:
             - Regenerated SDK via `make prepare merge generate`
             - All tests passing via `make test`
 
-            ### Review checklist
-            - [ ] Review generated diff for breaking changes
-            - [ ] Verify new/removed endpoints
-            - [ ] Check model changes
+            ${{ steps.report.outputs.content }}
+
+            ### Action required
+            1. Review the breaking changes above
+            2. Update custom hooks if needed (`_hooks/client.py`, `_hooks/polling.py`)
+            3. Bump version manually with `python scripts/bump_version.py`
+            4. Merge when ready
           commit-message: "chore: update OpenAPI specs (${{ steps.versions.outputs.summary }})"
           labels: |
             automated
             oas-update
+            breaking-change
