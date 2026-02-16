@@ -1,16 +1,18 @@
 # Workiva SDK Generation Pipeline
 # ================================
 # Usage:
-#   make download    - Download latest specs (requires SPEC_URLS configured)
-#   make check       - Check if specs changed since last generation
-#   make generate    - Full pipeline: prepare → merge → generate SDK
-#   make all         - Download + check + generate (only if changed)
-#   make force       - Force regeneration regardless of changes
+#   make download       - Download latest specs (requires SPEC_URLS configured)
+#   make check          - Check if specs changed since last generation
+#   make generate       - Generate models + operations from OAS specs
+#   make generate-models     - Generate Pydantic models only
+#   make generate-operations - Generate operation namespaces only
+#   make all            - Download + check + generate (only if changed)
+#   make force          - Force regeneration regardless of changes
 #
 # Configure download URLs in spec_sources.conf
 
 SHELL := /bin/bash
-.PHONY: all download check prepare merge generate force clean help test test-unit test-integration test-cov build publish
+.PHONY: all download check generate generate-models generate-operations force clean help test test-unit test-integration test-cov build publish
 
 # Directories
 SPECS_DIR := oas
@@ -21,7 +23,6 @@ CHECKSUMS_FILE := .spec_checksums
 # Source specs
 SPEC_NAMES := platform.yaml chains.yaml wdata.yaml
 SPECS := $(addprefix $(SPECS_DIR)/,$(SPEC_NAMES))
-PROCESSED := $(addprefix $(SPECS_DIR)/,platform_processed.yaml chains_processed.yaml wdata_processed.yaml)
 
 # Config file for download URLs
 SOURCES_CONF := spec_sources.conf
@@ -33,11 +34,11 @@ CURL_UA := Mozilla/5.0 (compatible; WorkivaSDKBot/1.0)
 
 help: ## Show this help
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | \
-		awk 'BEGIN {FS = ":.*?## "}; {printf "  \033[36m%-15s\033[0m %s\n", $$1, $$2}'
+		awk 'BEGIN {FS = ":.*?## "}; {printf "  \033[36m%-20s\033[0m %s\n", $$1, $$2}'
 
 all: download check-and-generate ## Download specs and regenerate if changed
 
-force: prepare merge generate ## Force full regeneration
+force: generate ## Force full regeneration
 
 generate-if-changed: check-and-generate ## Only regenerate if specs changed
 
@@ -95,49 +96,48 @@ check-and-generate:
 		echo "✓ No changes - skipping generation"; \
 	else \
 		echo "⚠ Changes detected - regenerating SDK..."; \
-		$(MAKE) prepare merge generate; \
+		$(MAKE) generate; \
 	fi
 
-# ---- Pipeline steps ----
+# ---- Generation ----
 
-prepare: ## Pre-process specs (rename schemas, fix conflicts)
-	@echo "🔧 Pre-processing specs..."
-	uv run --with pyyaml $(SCRIPTS_DIR)/prepare_specs.py $(SPECS_DIR)
-
-merge: ## Merge processed specs into single OpenAPI doc
-	@echo "🔗 Merging specs..."
-	speakeasy merge \
-		-s $(SPECS_DIR)/chains_processed.yaml \
-		-s $(SPECS_DIR)/wdata_processed.yaml \
-		-s $(SPECS_DIR)/platform_processed.yaml \
-		-o $(SPECS_DIR)/merged.yaml
-
-generate: ## Generate Python SDK from merged spec
-	@echo "🐍 Generating Python SDK..."
-	speakeasy generate sdk \
-		--lang python \
-		--schema $(SPECS_DIR)/merged.yaml \
-		--out $(SDK_DIR) \
-		-y
-	@echo "🔧 Applying post-generation patches..."
-	python3 $(SCRIPTS_DIR)/patch_sdk.py $(SDK_DIR)
+generate: ## Generate models + operations from OAS specs
+	@echo "🐍 Generating SDK (models + operations)..."
+	cd $(SDK_DIR) && uv run python ../$(SCRIPTS_DIR)/generate_sdk.py
 	@$(MAKE) save-checksums
 	@echo ""
 	@echo "✓ SDK generated in $(SDK_DIR)/"
 
+generate-models: ## Generate Pydantic models only
+	@echo "🐍 Generating models..."
+	cd $(SDK_DIR) && uv run python ../$(SCRIPTS_DIR)/generate_sdk.py --models-only
+
+generate-operations: ## Generate operation namespaces only
+	@echo "🐍 Generating operations..."
+	cd $(SDK_DIR) && uv run python ../$(SCRIPTS_DIR)/generate_sdk.py --operations-only
+
 # ---- Test & Build ----
 
 test: ## Run all tests
-	cd $(SDK_DIR) && uv run pytest tests/ -v
+	cd $(SDK_DIR) && uv run python -m pytest tests/ -v
 
 test-unit: ## Run unit tests only
-	cd $(SDK_DIR) && uv run pytest tests/unit/ -v
+	cd $(SDK_DIR) && uv run python -m pytest tests/unit/ -v
 
 test-integration: ## Run integration tests only
-	cd $(SDK_DIR) && uv run pytest tests/integration/ -v
+	cd $(SDK_DIR) && uv run python -m pytest tests/integration/ -v
 
-test-cov: ## Run tests with coverage for _hooks
-	cd $(SDK_DIR) && uv run pytest tests/ --cov=workiva._hooks --cov-report=term-missing
+test-cov: ## Run tests with coverage for core modules
+	cd $(SDK_DIR) && uv run python -m pytest tests/ \
+		--cov=workiva._auth \
+		--cov=workiva._retry \
+		--cov=workiva._pagination \
+		--cov=workiva._client \
+		--cov=workiva._errors \
+		--cov=workiva.client \
+		--cov=workiva.polling \
+		--cov=workiva.exceptions \
+		--cov-report=term-missing
 
 build: ## Build wheel for distribution
 	cd $(SDK_DIR) && uv build
@@ -147,8 +147,11 @@ publish: test build ## Publish to PyPI (set TWINE_PASSWORD or configure ~/.pypir
 
 # ---- Cleanup ----
 
-clean: ## Remove processed and merged specs
-	rm -f $(SPECS_DIR)/*_processed.yaml $(SPECS_DIR)/merged.yaml
+clean: ## Remove generated models and operations (keeps hand-written code)
+	rm -f $(SDK_DIR)/src/workiva/models/platform.py
+	rm -f $(SDK_DIR)/src/workiva/models/chains.py
+	rm -f $(SDK_DIR)/src/workiva/models/wdata.py
+	rm -f $(SDK_DIR)/src/workiva/_operations/[!_]*.py
 
-clean-all: clean ## Remove everything including generated SDK
-	rm -rf $(SDK_DIR) $(CHECKSUMS_FILE)
+clean-all: clean ## Remove everything including checksums
+	rm -f $(CHECKSUMS_FILE)

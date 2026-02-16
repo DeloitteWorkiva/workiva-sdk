@@ -24,11 +24,8 @@ jobs:
         with:
           python-version: "3.12"
 
-      - name: Install Speakeasy CLI
-        run: curl -fsSL https://go.speakeasy.com/cli-install.sh | sh
-
       - name: Install SDK dependencies
-        run: cd workiva-sdk && uv sync
+        run: cd workiva-sdk && uv sync --group codegen
 
       - name: Download latest specs
         run: make download
@@ -52,9 +49,7 @@ jobs:
 
       - name: Regenerate SDK
         if: steps.check.outputs.changed == 'true'
-        env:
-          SPEAKEASY_API_KEY: ${{ secrets.SPEAKEASY_API_KEY }}
-        run: make prepare merge generate
+        run: make generate
 
       - name: Run tests
         if: steps.check.outputs.changed == 'true'
@@ -124,7 +119,7 @@ jobs:
 
             ### What changed
             - Downloaded latest specs via `make download`
-            - Regenerated SDK via `make prepare merge generate`
+            - Regenerated SDK via `make generate`
             - All tests passing via `make test`
             - Version bumped to `${{ steps.bump.outputs.version }}`
 
@@ -173,14 +168,14 @@ jobs:
 
             ### What changed
             - Downloaded latest specs via `make download`
-            - Regenerated SDK via `make prepare merge generate`
+            - Regenerated SDK via `make generate`
             - All tests passing via `make test`
 
             ${{ steps.report.outputs.content }}
 
             ### Action required
             1. Review the breaking changes above
-            2. Update custom hooks if needed (`_hooks/client.py`, `_hooks/polling.py`)
+            2. Update custom code if needed (`client.py`, `polling.py`, `_client.py`, `_auth.py`, `_errors.py`)
             3. Bump version manually with `python scripts/bump_version.py`
             4. Merge when ready
           commit-message: "chore: update OpenAPI specs (${{ steps.versions.outputs.summary }})"

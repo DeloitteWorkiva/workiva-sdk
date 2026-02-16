@@ -6,7 +6,6 @@ Gracias por tu interés en contribuir. Esta guía explica cómo configurar el en
 
 - Python 3.10+
 - [uv](https://docs.astral.sh/uv/) para gestión de dependencias
-- [Speakeasy CLI](https://www.speakeasy.com/) para regeneración del SDK
 
 ## Setup del entorno
 
@@ -18,6 +17,9 @@ cd workiva-sdk
 # Instalar dependencias del SDK
 cd workiva-sdk && uv sync && cd ..
 
+# Instalar dependencias de codegen (si vas a regenerar)
+cd workiva-sdk && uv sync --group codegen && cd ..
+
 # Verificar que todo funciona
 make test
 ```
@@ -26,27 +28,33 @@ make test
 
 Antes de hacer cambios, entiende qué puedes y qué NO puedes modificar:
 
-### Seguro de editar (sobrevive regeneración)
+### Seguro de editar
 
 | Ubicación | Descripción |
 |-----------|-------------|
-| `workiva-sdk/src/workiva/_hooks/client.py` | Clase `Workiva` con `wait()` |
-| `workiva-sdk/src/workiva/_hooks/polling.py` | `OperationPoller` |
-| `workiva-sdk/src/workiva/_hooks/exceptions.py` | Excepciones custom |
+| `workiva-sdk/src/workiva/client.py` | Clase `Workiva` con `wait()` |
+| `workiva-sdk/src/workiva/polling.py` | `OperationPoller` |
+| `workiva-sdk/src/workiva/exceptions.py` | Excepciones custom |
+| `workiva-sdk/src/workiva/_auth.py` | OAuth2 client credentials |
+| `workiva-sdk/src/workiva/_client.py` | BaseClient (httpx wrapper) |
+| `workiva-sdk/src/workiva/_retry.py` | RetryTransport |
+| `workiva-sdk/src/workiva/_errors.py` | WorkivaAPIError hierarchy |
+| `workiva-sdk/src/workiva/_pagination.py` | Pagination generators |
+| `workiva-sdk/src/workiva/_config.py` | SDKConfig |
+| `workiva-sdk/src/workiva/_constants.py` | Regions, servers, API version |
 | `workiva-sdk/tests/` | Tests unitarios e integración |
-| `scripts/` | Pipeline de pre/post procesamiento |
-| `docs/` | Documentación |
+| `scripts/` | Pipeline de codegen |
 | `Makefile` | Build system |
-| `gen.yaml` | Configuración de Speakeasy |
 
-### NO editar (se regenera con `make force`)
+### NO editar (se regenera con `make generate`)
 
-Todo en `workiva-sdk/src/workiva/` excepto `_hooks/` se regenera automáticamente. Cualquier cambio manual se pierde.
+- `workiva-sdk/src/workiva/_operations/*.py` (excepto `_base.py`)
+- `workiva-sdk/src/workiva/models/platform/`, `models/chains/`, `models/wdata/`
 
 Si necesitas modificar código generado, el cambio debe ir en:
-- `scripts/prepare_specs.py` — para cambios en el OpenAPI spec antes de generar
-- `scripts/patch_sdk.py` — para patches post-generación
-- `gen.yaml` — para configuración del generador
+- `scripts/codegen/templates/*.j2` — para cambios en las templates Jinja2
+- `scripts/codegen/operations.py` — para cambios en parsing de OAS specs
+- `scripts/codegen/models.py` — para cambios en generación de modelos
 
 ## Flujo de contribución
 
@@ -58,17 +66,16 @@ git checkout -b feat/mi-cambio
 
 ### 2. Haz tus cambios
 
-- **Código custom** → edita en `_hooks/`
-- **Cambios en API** → modifica `prepare_specs.py`, luego `make force`
-- **Configuración** → edita `gen.yaml`, luego `make force`
+- **Código de infraestructura** → edita `_auth.py`, `_client.py`, `_retry.py`, etc.
+- **Código público** → edita `client.py`, `polling.py`, `exceptions.py`
+- **Cambios en API generada** → modifica templates o codegen, luego `make generate`
 - **Tests** → `workiva-sdk/tests/`
-- **Docs** → `docs/`
 
 ### 3. Ejecuta los tests
 
 ```bash
 make test          # Todos los tests deben pasar
-make test-cov      # Verifica cobertura de _hooks
+make test-cov      # Verifica cobertura
 ```
 
 ### 4. Commit
@@ -79,7 +86,7 @@ Usamos [Conventional Commits](https://www.conventionalcommits.org/):
 feat: add support for batch operations
 fix: handle 429 rate limit in polling
 docs: add retry configuration examples
-chore: update Speakeasy to v2.900
+chore: update codegen templates
 ```
 
 ### 5. Abre un Pull Request
@@ -99,7 +106,7 @@ make test-integration   # Solo integration
 make test-cov           # Con cobertura
 
 # Un test específico
-cd workiva-sdk && uv run pytest tests/unit/test_polling_helpers.py -v
+cd workiva-sdk && uv run python -m pytest tests/unit/test_polling_helpers.py -v
 ```
 
 ### Escribir tests
@@ -109,9 +116,8 @@ cd workiva-sdk && uv run pytest tests/unit/test_polling_helpers.py -v
 
 Consideraciones:
 
-- `conftest.py` limpia `ClientCredentialsHook._sessions` entre tests (autouse fixture)
+- `conftest.py` limpia `OAuth2ClientCredentials._cache` entre tests (autouse fixture)
 - Tests async necesitan AMBOS clientes: sync (para OAuth) y async (para API calls)
-- Los defaults de `OperationDetail()` son instancias `Unset()`, no `None`
 
 ## Regeneración del SDK
 
@@ -137,8 +143,7 @@ La documentación vive en `docs/` y se despliega automáticamente a [GitHub Page
 
 ```bash
 # Preview local
-pip install mkdocs-material
-mkdocs serve
+uv run mkdocs serve
 ```
 
 Abre `http://127.0.0.1:8000` para ver los cambios en tiempo real.

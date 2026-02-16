@@ -1,0 +1,54 @@
+    def {{ op.method_name }}(
+        self,
+        *,
+{% for p in op.params if p.location == 'path' %}
+        {{ p.python_name }}: {{ p.python_type }},
+{% endfor %}
+{% for p in op.params if p.location == 'query' and p.required %}
+        {{ p.python_name }}: {{ p.python_type }},
+{% endfor %}
+{% if op.has_body and op.request_body.required %}
+        body: {{ op.request_body.python_type }},
+{% endif %}
+{% for p in op.params if p.location == 'query' and not p.required %}
+        {{ p.python_name }}: {{ p.python_type }} = {{ p.default or 'None' }},
+{% endfor %}
+{% if op.has_body and not op.request_body.required %}
+        body: Optional[{{ op.request_body.python_type }}] = None,
+{% endif %}
+        timeout: Optional[float] = None,
+    ) -> httpx.Response:
+        """{{ op.summary }}
+{% if op.description %}
+
+        {{ op.description | wordwrap(72) | indent(8) }}
+{% endif %}
+{% if op.deprecated %}
+
+        .. deprecated::
+            This operation is deprecated.
+{% endif %}
+        """
+        return self._client.request(
+            "{{ op.http_method }}",
+            self._api,
+            "{{ op.path }}",
+{% if op.path_params %}
+            path_params={{ '{' }}{% for p in op.path_params %}"{{ p.name.strip('{}') }}": {{ p.python_name }}, {% endfor %}{{ '}' }},
+{% endif %}
+{% if op.query_params %}
+            query_params={{ '{' }}{% for p in op.query_params %}"{{ p.name }}": {{ p.python_name }}, {% endfor %}{{ '}' }},
+{% endif %}
+{% if op.has_body %}
+{% if op.request_body.content_type == 'application/json' %}
+            json_body=body,
+{% elif op.request_body.content_type == 'application/octet-stream' %}
+            content=body,
+{% elif op.request_body.content_type == 'multipart/form-data' %}
+            files=body,
+{% else %}
+            json_body=body,
+{% endif %}
+{% endif %}
+            timeout=timeout,
+        )
