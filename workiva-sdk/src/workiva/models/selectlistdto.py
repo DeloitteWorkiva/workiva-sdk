@@ -163,6 +163,15 @@ class SelectListDtoInput(BaseModel):
     More types may be added in the future. Defaults to 'static' if not provided.
     """
 
+    @field_serializer("type")
+    def serialize_type(self, value):
+        if isinstance(value, str):
+            try:
+                return models.SelectListDtoType(value)
+            except ValueError:
+                return value
+        return value
+
     @field_serializer("value_type")
     def serialize_value_type(self, value):
         if isinstance(value, str):
