@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-Workiva Multi-API Python SDK — 3 independent OpenAPI specs (Platform, Chains, Wdata) generated into a single unified Python SDK using a custom codegen pipeline (datamodel-code-generator + Jinja2). No external SDK generators (Speakeasy, openapi-generator, etc.). Output lives in `workiva-sdk/`.
+Workiva Multi-API Python SDK — 3 independent OpenAPI specs (Platform, Chains, Wdata) generated into a single unified Python SDK using a custom codegen pipeline (datamodel-code-generator + Jinja2). No external SDK generators (Speakeasy, openapi-generator, etc.). SDK source lives in `src/workiva/`.
 
 ## Commands
 
@@ -29,14 +29,14 @@ make test-integration    # Integration tests only
 make test-cov            # Coverage report for core modules
 
 # Run a single test
-cd workiva-sdk && uv run pytest tests/unit/test_polling_helpers.py::TestExtractOperationId::test_full_url -v
+uv run pytest tests/unit/test_polling_helpers.py::TestExtractOperationId::test_full_url -v
 
 # Build wheel
-make build               # → workiva-sdk/dist/workiva-X.Y.Z-py3-none-any.whl
+make build               # → dist/workiva-X.Y.Z-py3-none-any.whl
 
 # Dependency management
-cd workiva-sdk && uv sync                # Install runtime + dev deps
-cd workiva-sdk && uv sync --group codegen  # Install codegen deps (for generation)
+uv sync                # Install runtime + dev deps
+uv sync --group codegen  # Install codegen deps (for generation)
 ```
 
 ## Architecture
@@ -88,12 +88,12 @@ oas/wdata.yaml    ─┘  │
 **`scripts/e2e_test.py`** — End-to-end test suite against live APIs:
 - 7 sync + 4 async tests across all 3 APIs
 - Tests token caching, X-Version header injection, asyncio.gather concurrency
-- Usage: `cd workiva-sdk && uv run python ../scripts/e2e_test.py`
+- Usage: `uv run python scripts/e2e_test.py`
 
 ### SDK Source Structure
 
 ```
-workiva-sdk/src/workiva/
+src/workiva/
 ├── __init__.py         # Public exports (hand-written)
 ├── _version.py         # __version__ + __user_agent__
 ├── client.py           # Workiva class — namespace access + .wait() polling
@@ -181,7 +181,7 @@ async with Workiva(client_id="...", client_secret="...", region=Region.US) as cl
 
 ## Testing
 
-Tests live in `workiva-sdk/tests/` (outside `src/`, safe from regeneration). 164 tests total.
+Tests live in `tests/` (outside `src/`, safe from regeneration). 164 tests total.
 
 ```
 tests/
@@ -257,8 +257,8 @@ the `PYPI_API_TOKEN` secret in the `pypi` environment.
 
 | File | Field | Role |
 |------|-------|------|
-| `workiva-sdk/pyproject.toml` | `[project].version` | What `uv build` / `pip` reads |
-| `workiva-sdk/src/workiva/_version.py` | `__version__` + `__user_agent__` | Runtime version constant |
+| `pyproject.toml` | `[project].version` | What `uv build` / `pip` reads |
+| `src/workiva/_version.py` | `__version__` + `__user_agent__` | Runtime version constant |
 | `README.md` | Badge `?v=X.Y.Z` | Cache-buster for shields.io |
 
 All 3 are updated atomically by `scripts/bump_version.py`.

@@ -24,6 +24,50 @@ class QueryManagement(BaseNamespace):
 
     _api: _API = _API.WDATA
 
+    def create_query(
+        self,
+        *,
+        body: QueryDto,
+        timeout: Optional[float] = None,
+    ) -> httpx.Response:
+        """Create a new query
+
+        Creates a query object and validates full permissions to ensure the
+        requestor has
+        access to all data sources being queried. This endpoint _doesn't_
+        execute the query;
+        to execute, call the POST /queryresult method.
+        """
+        return self._client.request(
+            "POST",
+            self._api,
+            "/api/v1/query",
+            json_body=body,
+            timeout=timeout,
+        )
+
+    async def create_query_async(
+        self,
+        *,
+        body: QueryDto,
+        timeout: Optional[float] = None,
+    ) -> httpx.Response:
+        """Create a new query (async)
+
+        Creates a query object and validates full permissions to ensure the
+        requestor has
+        access to all data sources being queried. This endpoint _doesn't_
+        execute the query;
+        to execute, call the POST /queryresult method.
+        """
+        return await self._client.request_async(
+            "POST",
+            self._api,
+            "/api/v1/query",
+            json_body=body,
+            timeout=timeout,
+        )
+
     def list_queries(
         self,
         *,
@@ -77,50 +121,6 @@ class QueryManagement(BaseNamespace):
                 "offset": offset,
                 "ids": ids,
             },
-            timeout=timeout,
-        )
-
-    def create_query(
-        self,
-        *,
-        body: QueryDto,
-        timeout: Optional[float] = None,
-    ) -> httpx.Response:
-        """Create a new query
-
-        Creates a query object and validates full permissions to ensure the
-        requestor has
-        access to all data sources being queried. This endpoint _doesn't_
-        execute the query;
-        to execute, call the POST /queryresult method.
-        """
-        return self._client.request(
-            "POST",
-            self._api,
-            "/api/v1/query",
-            json_body=body,
-            timeout=timeout,
-        )
-
-    async def create_query_async(
-        self,
-        *,
-        body: QueryDto,
-        timeout: Optional[float] = None,
-    ) -> httpx.Response:
-        """Create a new query (async)
-
-        Creates a query object and validates full permissions to ensure the
-        requestor has
-        access to all data sources being queried. This endpoint _doesn't_
-        execute the query;
-        to execute, call the POST /queryresult method.
-        """
-        return await self._client.request_async(
-            "POST",
-            self._api,
-            "/api/v1/query",
-            json_body=body,
             timeout=timeout,
         )
 
@@ -196,6 +196,54 @@ class QueryManagement(BaseNamespace):
             "POST",
             self._api,
             "/api/v1/query/validation",
+            json_body=body,
+            timeout=timeout,
+        )
+
+    def update_query(
+        self,
+        *,
+        query_id: str,
+        body: QueryDto,
+        timeout: Optional[float] = None,
+    ) -> httpx.Response:
+        """Update a single query
+
+        Updates the query that matches the provided ID with the details provided
+        in the
+        body.
+        """
+        return self._client.request(
+            "PUT",
+            self._api,
+            "/api/v1/query/{queryId}",
+            path_params={
+                "queryId": query_id,
+            },
+            json_body=body,
+            timeout=timeout,
+        )
+
+    async def update_query_async(
+        self,
+        *,
+        query_id: str,
+        body: QueryDto,
+        timeout: Optional[float] = None,
+    ) -> httpx.Response:
+        """Update a single query (async)
+
+        Updates the query that matches the provided ID with the details provided
+        in the
+        body.
+        """
+        return await self._client.request_async(
+            "PUT",
+            self._api,
+            "/api/v1/query/{queryId}",
+            path_params={
+                "queryId": query_id,
+            },
             json_body=body,
             timeout=timeout,
         )
@@ -283,54 +331,6 @@ class QueryManagement(BaseNamespace):
             path_params={
                 "queryId": query_id,
             },
-            timeout=timeout,
-        )
-
-    def update_query(
-        self,
-        *,
-        query_id: str,
-        body: QueryDto,
-        timeout: Optional[float] = None,
-    ) -> httpx.Response:
-        """Update a single query
-
-        Updates the query that matches the provided ID with the details provided
-        in the
-        body.
-        """
-        return self._client.request(
-            "PUT",
-            self._api,
-            "/api/v1/query/{queryId}",
-            path_params={
-                "queryId": query_id,
-            },
-            json_body=body,
-            timeout=timeout,
-        )
-
-    async def update_query_async(
-        self,
-        *,
-        query_id: str,
-        body: QueryDto,
-        timeout: Optional[float] = None,
-    ) -> httpx.Response:
-        """Update a single query (async)
-
-        Updates the query that matches the provided ID with the details provided
-        in the
-        body.
-        """
-        return await self._client.request_async(
-            "PUT",
-            self._api,
-            "/api/v1/query/{queryId}",
-            path_params={
-                "queryId": query_id,
-            },
-            json_body=body,
             timeout=timeout,
         )
 
@@ -500,6 +500,50 @@ class QueryManagement(BaseNamespace):
             timeout=timeout,
         )
 
+    def run_query(
+        self,
+        *,
+        body: QueryResultDto,
+        timeout: Optional[float] = None,
+    ) -> httpx.Response:
+        """Execute a query
+
+        Runs a query and immediately returns a query result entity, which has an
+        ID that
+        can be used to poll the status from the GET /queryresult method. A
+        status of
+        COMPLETED or ERROR indicates the query has completed.
+        """
+        return self._client.request(
+            "POST",
+            self._api,
+            "/api/v1/queryresult",
+            json_body=body,
+            timeout=timeout,
+        )
+
+    async def run_query_async(
+        self,
+        *,
+        body: QueryResultDto,
+        timeout: Optional[float] = None,
+    ) -> httpx.Response:
+        """Execute a query (async)
+
+        Runs a query and immediately returns a query result entity, which has an
+        ID that
+        can be used to poll the status from the GET /queryresult method. A
+        status of
+        COMPLETED or ERROR indicates the query has completed.
+        """
+        return await self._client.request_async(
+            "POST",
+            self._api,
+            "/api/v1/queryresult",
+            json_body=body,
+            timeout=timeout,
+        )
+
     def list_query_results(
         self,
         *,
@@ -557,50 +601,6 @@ class QueryManagement(BaseNamespace):
                 "limit": limit,
                 "offset": offset,
             },
-            timeout=timeout,
-        )
-
-    def run_query(
-        self,
-        *,
-        body: QueryResultDto,
-        timeout: Optional[float] = None,
-    ) -> httpx.Response:
-        """Execute a query
-
-        Runs a query and immediately returns a query result entity, which has an
-        ID that
-        can be used to poll the status from the GET /queryresult method. A
-        status of
-        COMPLETED or ERROR indicates the query has completed.
-        """
-        return self._client.request(
-            "POST",
-            self._api,
-            "/api/v1/queryresult",
-            json_body=body,
-            timeout=timeout,
-        )
-
-    async def run_query_async(
-        self,
-        *,
-        body: QueryResultDto,
-        timeout: Optional[float] = None,
-    ) -> httpx.Response:
-        """Execute a query (async)
-
-        Runs a query and immediately returns a query result entity, which has an
-        ID that
-        can be used to poll the status from the GET /queryresult method. A
-        status of
-        COMPLETED or ERROR indicates the query has completed.
-        """
-        return await self._client.request_async(
-            "POST",
-            self._api,
-            "/api/v1/queryresult",
-            json_body=body,
             timeout=timeout,
         )
 

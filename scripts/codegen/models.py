@@ -21,7 +21,7 @@ def generate_models(
 
     Args:
         spec_path: Path to the OpenAPI YAML file.
-        output_dir: Base output directory (e.g. workiva-sdk/src/workiva/models/).
+        output_dir: Base output directory (e.g. src/workiva/models/).
         api_name: Sub-directory name (platform, chains, wdata).
     """
     target_file = output_dir / f"{api_name}.py"

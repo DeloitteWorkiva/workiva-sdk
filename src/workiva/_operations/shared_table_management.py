@@ -21,6 +21,44 @@ class SharedTableManagement(BaseNamespace):
 
     _api: _API = _API.WDATA
 
+    def create_shared_table(
+        self,
+        *,
+        body: SharedTableDto,
+        timeout: Optional[float] = None,
+    ) -> httpx.Response:
+        """Create a new shared table
+
+        Creates a shared table instance between the workspace of the request and
+        the workspace provided in the body.
+        """
+        return self._client.request(
+            "POST",
+            self._api,
+            "/api/v1/sharedtable",
+            json_body=body,
+            timeout=timeout,
+        )
+
+    async def create_shared_table_async(
+        self,
+        *,
+        body: SharedTableDto,
+        timeout: Optional[float] = None,
+    ) -> httpx.Response:
+        """Create a new shared table (async)
+
+        Creates a shared table instance between the workspace of the request and
+        the workspace provided in the body.
+        """
+        return await self._client.request_async(
+            "POST",
+            self._api,
+            "/api/v1/sharedtable",
+            json_body=body,
+            timeout=timeout,
+        )
+
     def list_shared_tables(
         self,
         *,
@@ -76,44 +114,6 @@ class SharedTableManagement(BaseNamespace):
                 "limit": limit,
                 "offset": offset,
             },
-            timeout=timeout,
-        )
-
-    def create_shared_table(
-        self,
-        *,
-        body: SharedTableDto,
-        timeout: Optional[float] = None,
-    ) -> httpx.Response:
-        """Create a new shared table
-
-        Creates a shared table instance between the workspace of the request and
-        the workspace provided in the body.
-        """
-        return self._client.request(
-            "POST",
-            self._api,
-            "/api/v1/sharedtable",
-            json_body=body,
-            timeout=timeout,
-        )
-
-    async def create_shared_table_async(
-        self,
-        *,
-        body: SharedTableDto,
-        timeout: Optional[float] = None,
-    ) -> httpx.Response:
-        """Create a new shared table (async)
-
-        Creates a shared table instance between the workspace of the request and
-        the workspace provided in the body.
-        """
-        return await self._client.request_async(
-            "POST",
-            self._api,
-            "/api/v1/sharedtable",
-            json_body=body,
             timeout=timeout,
         )
 

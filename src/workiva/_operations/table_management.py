@@ -23,6 +23,46 @@ class TableManagement(BaseNamespace):
 
     _api: _API = _API.WDATA
 
+    def create_table(
+        self,
+        *,
+        body: TableDto,
+        timeout: Optional[float] = None,
+    ) -> httpx.Response:
+        """Create a new table
+
+        Creates a table in the database with the specified schema. For type,
+        specify either a dimension or data table. In the interface, data tables
+        appear as fact tables.
+        """
+        return self._client.request(
+            "POST",
+            self._api,
+            "/api/v1/table",
+            json_body=body,
+            timeout=timeout,
+        )
+
+    async def create_table_async(
+        self,
+        *,
+        body: TableDto,
+        timeout: Optional[float] = None,
+    ) -> httpx.Response:
+        """Create a new table (async)
+
+        Creates a table in the database with the specified schema. For type,
+        specify either a dimension or data table. In the interface, data tables
+        appear as fact tables.
+        """
+        return await self._client.request_async(
+            "POST",
+            self._api,
+            "/api/v1/table",
+            json_body=body,
+            timeout=timeout,
+        )
+
     def get_tables(
         self,
         *,
@@ -75,42 +115,74 @@ class TableManagement(BaseNamespace):
             timeout=timeout,
         )
 
-    def create_table(
+    def update_table(
         self,
         *,
+        table_id: str,
         body: TableDto,
         timeout: Optional[float] = None,
     ) -> httpx.Response:
-        """Create a new table
+        """Update a single table
 
-        Creates a table in the database with the specified schema. For type,
-        specify either a dimension or data table. In the interface, data tables
-        appear as fact tables.
+        Updates an existing table with the provided information. Include all
+        user-defined
+        table columns with the request. For type, specify either a dimension or
+        data table.
+        In the interface, data tables appear as fact tables.
+        * If the table has no imported
+        data, user-defined columns not included with the request are deleted,
+        and columns are
+        sorted according to their order in the request.
+        * If the table has imported data,
+        any columns with names not already in the table are considered new. This
+        equality
+        check is case-insensitive. Any new columns appear after other user-
+        defined columns,
+        but before any meta columns, which start with `_`.
         """
         return self._client.request(
-            "POST",
+            "PUT",
             self._api,
-            "/api/v1/table",
+            "/api/v1/table/{tableId}",
+            path_params={
+                "tableId": table_id,
+            },
             json_body=body,
             timeout=timeout,
         )
 
-    async def create_table_async(
+    async def update_table_async(
         self,
         *,
+        table_id: str,
         body: TableDto,
         timeout: Optional[float] = None,
     ) -> httpx.Response:
-        """Create a new table (async)
+        """Update a single table (async)
 
-        Creates a table in the database with the specified schema. For type,
-        specify either a dimension or data table. In the interface, data tables
-        appear as fact tables.
+        Updates an existing table with the provided information. Include all
+        user-defined
+        table columns with the request. For type, specify either a dimension or
+        data table.
+        In the interface, data tables appear as fact tables.
+        * If the table has no imported
+        data, user-defined columns not included with the request are deleted,
+        and columns are
+        sorted according to their order in the request.
+        * If the table has imported data,
+        any columns with names not already in the table are considered new. This
+        equality
+        check is case-insensitive. Any new columns appear after other user-
+        defined columns,
+        but before any meta columns, which start with `_`.
         """
         return await self._client.request_async(
-            "POST",
+            "PUT",
             self._api,
-            "/api/v1/table",
+            "/api/v1/table/{tableId}",
+            path_params={
+                "tableId": table_id,
+            },
             json_body=body,
             timeout=timeout,
         )
@@ -194,78 +266,6 @@ class TableManagement(BaseNamespace):
             path_params={
                 "tableId": table_id,
             },
-            timeout=timeout,
-        )
-
-    def update_table(
-        self,
-        *,
-        table_id: str,
-        body: TableDto,
-        timeout: Optional[float] = None,
-    ) -> httpx.Response:
-        """Update a single table
-
-        Updates an existing table with the provided information. Include all
-        user-defined
-        table columns with the request. For type, specify either a dimension or
-        data table.
-        In the interface, data tables appear as fact tables.
-        * If the table has no imported
-        data, user-defined columns not included with the request are deleted,
-        and columns are
-        sorted according to their order in the request.
-        * If the table has imported data,
-        any columns with names not already in the table are considered new. This
-        equality
-        check is case-insensitive. Any new columns appear after other user-
-        defined columns,
-        but before any meta columns, which start with `_`.
-        """
-        return self._client.request(
-            "PUT",
-            self._api,
-            "/api/v1/table/{tableId}",
-            path_params={
-                "tableId": table_id,
-            },
-            json_body=body,
-            timeout=timeout,
-        )
-
-    async def update_table_async(
-        self,
-        *,
-        table_id: str,
-        body: TableDto,
-        timeout: Optional[float] = None,
-    ) -> httpx.Response:
-        """Update a single table (async)
-
-        Updates an existing table with the provided information. Include all
-        user-defined
-        table columns with the request. For type, specify either a dimension or
-        data table.
-        In the interface, data tables appear as fact tables.
-        * If the table has no imported
-        data, user-defined columns not included with the request are deleted,
-        and columns are
-        sorted according to their order in the request.
-        * If the table has imported data,
-        any columns with names not already in the table are considered new. This
-        equality
-        check is case-insensitive. Any new columns appear after other user-
-        defined columns,
-        but before any meta columns, which start with `_`.
-        """
-        return await self._client.request_async(
-            "PUT",
-            self._api,
-            "/api/v1/table/{tableId}",
-            path_params={
-                "tableId": table_id,
-            },
-            json_body=body,
             timeout=timeout,
         )
 

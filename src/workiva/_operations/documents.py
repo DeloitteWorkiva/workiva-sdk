@@ -677,6 +677,54 @@ class Documents(BaseNamespace):
             timeout=timeout,
         )
 
+    def create_section(
+        self,
+        *,
+        document_id: str,
+        body: Section,
+        timeout: Optional[float] = None,
+    ) -> httpx.Response:
+        """Create a new section in a document
+
+        Creates a new [section](ref:documents#section) in a
+        [document](ref:documents#document), given its properties. By default,
+        the new section appears at the top-most position.
+        """
+        return self._client.request(
+            "POST",
+            self._api,
+            "/documents/{documentId}/sections",
+            path_params={
+                "documentId": document_id,
+            },
+            json_body=body,
+            timeout=timeout,
+        )
+
+    async def create_section_async(
+        self,
+        *,
+        document_id: str,
+        body: Section,
+        timeout: Optional[float] = None,
+    ) -> httpx.Response:
+        """Create a new section in a document (async)
+
+        Creates a new [section](ref:documents#section) in a
+        [document](ref:documents#document), given its properties. By default,
+        the new section appears at the top-most position.
+        """
+        return await self._client.request_async(
+            "POST",
+            self._api,
+            "/documents/{documentId}/sections",
+            path_params={
+                "documentId": document_id,
+            },
+            json_body=body,
+            timeout=timeout,
+        )
+
     def get_sections(
         self,
         *,
@@ -730,54 +778,6 @@ class Documents(BaseNamespace):
                 "$maxpagesize": maxpagesize,
                 "$next": next_,
             },
-            timeout=timeout,
-        )
-
-    def create_section(
-        self,
-        *,
-        document_id: str,
-        body: Section,
-        timeout: Optional[float] = None,
-    ) -> httpx.Response:
-        """Create a new section in a document
-
-        Creates a new [section](ref:documents#section) in a
-        [document](ref:documents#document), given its properties. By default,
-        the new section appears at the top-most position.
-        """
-        return self._client.request(
-            "POST",
-            self._api,
-            "/documents/{documentId}/sections",
-            path_params={
-                "documentId": document_id,
-            },
-            json_body=body,
-            timeout=timeout,
-        )
-
-    async def create_section_async(
-        self,
-        *,
-        document_id: str,
-        body: Section,
-        timeout: Optional[float] = None,
-    ) -> httpx.Response:
-        """Create a new section in a document (async)
-
-        Creates a new [section](ref:documents#section) in a
-        [document](ref:documents#document), given its properties. By default,
-        the new section appears at the top-most position.
-        """
-        return await self._client.request_async(
-            "POST",
-            self._api,
-            "/documents/{documentId}/sections",
-            path_params={
-                "documentId": document_id,
-            },
-            json_body=body,
             timeout=timeout,
         )
 

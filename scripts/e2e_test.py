@@ -6,7 +6,7 @@ Goes beyond smoke_test.py by testing pagination, data parsing,
 token caching, and async methods.
 
 Usage:
-    cd workiva-sdk && uv run python ../scripts/e2e_test.py
+    uv run python scripts/e2e_test.py
 """
 
 from __future__ import annotations

@@ -21,6 +21,44 @@ class SelectListManagement(BaseNamespace):
 
     _api: _API = _API.WDATA
 
+    def create_select_list(
+        self,
+        *,
+        body: SelectListDto,
+        timeout: Optional[float] = None,
+    ) -> httpx.Response:
+        """Create a new select list
+
+        Creates a select list using the provided information and returns the
+        select list meta.
+        """
+        return self._client.request(
+            "POST",
+            self._api,
+            "/api/v1/selectlist",
+            json_body=body,
+            timeout=timeout,
+        )
+
+    async def create_select_list_async(
+        self,
+        *,
+        body: SelectListDto,
+        timeout: Optional[float] = None,
+    ) -> httpx.Response:
+        """Create a new select list (async)
+
+        Creates a select list using the provided information and returns the
+        select list meta.
+        """
+        return await self._client.request_async(
+            "POST",
+            self._api,
+            "/api/v1/selectlist",
+            json_body=body,
+            timeout=timeout,
+        )
+
     def list_select_lists(
         self,
         *,
@@ -69,40 +107,50 @@ class SelectListManagement(BaseNamespace):
             timeout=timeout,
         )
 
-    def create_select_list(
+    def update_select_list(
         self,
         *,
+        select_list_id: str,
         body: SelectListDto,
         timeout: Optional[float] = None,
     ) -> httpx.Response:
-        """Create a new select list
+        """Update a single select list
 
-        Creates a select list using the provided information and returns the
-        select list meta.
+        Updates the select list with the provided ID with the details provided
+        in the
+        body.
         """
         return self._client.request(
-            "POST",
+            "PUT",
             self._api,
-            "/api/v1/selectlist",
+            "/api/v1/selectlist/{selectListId}",
+            path_params={
+                "selectListId": select_list_id,
+            },
             json_body=body,
             timeout=timeout,
         )
 
-    async def create_select_list_async(
+    async def update_select_list_async(
         self,
         *,
+        select_list_id: str,
         body: SelectListDto,
         timeout: Optional[float] = None,
     ) -> httpx.Response:
-        """Create a new select list (async)
+        """Update a single select list (async)
 
-        Creates a select list using the provided information and returns the
-        select list meta.
+        Updates the select list with the provided ID with the details provided
+        in the
+        body.
         """
         return await self._client.request_async(
-            "POST",
+            "PUT",
             self._api,
-            "/api/v1/selectlist",
+            "/api/v1/selectlist/{selectListId}",
+            path_params={
+                "selectListId": select_list_id,
+            },
             json_body=body,
             timeout=timeout,
         )
@@ -192,53 +240,5 @@ class SelectListManagement(BaseNamespace):
             path_params={
                 "selectListId": select_list_id,
             },
-            timeout=timeout,
-        )
-
-    def update_select_list(
-        self,
-        *,
-        select_list_id: str,
-        body: SelectListDto,
-        timeout: Optional[float] = None,
-    ) -> httpx.Response:
-        """Update a single select list
-
-        Updates the select list with the provided ID with the details provided
-        in the
-        body.
-        """
-        return self._client.request(
-            "PUT",
-            self._api,
-            "/api/v1/selectlist/{selectListId}",
-            path_params={
-                "selectListId": select_list_id,
-            },
-            json_body=body,
-            timeout=timeout,
-        )
-
-    async def update_select_list_async(
-        self,
-        *,
-        select_list_id: str,
-        body: SelectListDto,
-        timeout: Optional[float] = None,
-    ) -> httpx.Response:
-        """Update a single select list (async)
-
-        Updates the select list with the provided ID with the details provided
-        in the
-        body.
-        """
-        return await self._client.request_async(
-            "PUT",
-            self._api,
-            "/api/v1/selectlist/{selectListId}",
-            path_params={
-                "selectListId": select_list_id,
-            },
-            json_body=body,
             timeout=timeout,
         )

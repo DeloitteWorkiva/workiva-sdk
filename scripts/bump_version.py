@@ -18,11 +18,9 @@ from pathlib import Path
 
 # All paths relative to repo root
 REPO_ROOT = Path(__file__).resolve().parent.parent
-SDK_DIR = REPO_ROOT / "workiva-sdk"
-
 VERSION_FILES = {
-    "pyproject": SDK_DIR / "pyproject.toml",
-    "version_py": SDK_DIR / "src" / "workiva" / "_version.py",
+    "pyproject": REPO_ROOT / "pyproject.toml",
+    "version_py": REPO_ROOT / "src" / "workiva" / "_version.py",
     "readme": REPO_ROOT / "README.md",
 }
 

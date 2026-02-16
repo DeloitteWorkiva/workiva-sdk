@@ -15,10 +15,10 @@ git clone https://github.com/DeloitteWorkiva/workiva-sdk.git
 cd workiva-sdk
 
 # Instalar dependencias del SDK
-cd workiva-sdk && uv sync && cd ..
+uv sync
 
 # Instalar dependencias de codegen (si vas a regenerar)
-cd workiva-sdk && uv sync --group codegen && cd ..
+uv sync --group codegen
 
 # Verificar que todo funciona
 make test
@@ -32,24 +32,24 @@ Antes de hacer cambios, entiende qué puedes y qué NO puedes modificar:
 
 | Ubicación | Descripción |
 |-----------|-------------|
-| `workiva-sdk/src/workiva/client.py` | Clase `Workiva` con `wait()` |
-| `workiva-sdk/src/workiva/polling.py` | `OperationPoller` |
-| `workiva-sdk/src/workiva/exceptions.py` | Excepciones custom |
-| `workiva-sdk/src/workiva/_auth.py` | OAuth2 client credentials |
-| `workiva-sdk/src/workiva/_client.py` | BaseClient (httpx wrapper) |
-| `workiva-sdk/src/workiva/_retry.py` | RetryTransport |
-| `workiva-sdk/src/workiva/_errors.py` | WorkivaAPIError hierarchy |
-| `workiva-sdk/src/workiva/_pagination.py` | Pagination generators |
-| `workiva-sdk/src/workiva/_config.py` | SDKConfig |
-| `workiva-sdk/src/workiva/_constants.py` | Regions, servers, API version |
-| `workiva-sdk/tests/` | Tests unitarios e integración |
+| `src/workiva/client.py` | Clase `Workiva` con `wait()` |
+| `src/workiva/polling.py` | `OperationPoller` |
+| `src/workiva/exceptions.py` | Excepciones custom |
+| `src/workiva/_auth.py` | OAuth2 client credentials |
+| `src/workiva/_client.py` | BaseClient (httpx wrapper) |
+| `src/workiva/_retry.py` | RetryTransport |
+| `src/workiva/_errors.py` | WorkivaAPIError hierarchy |
+| `src/workiva/_pagination.py` | Pagination generators |
+| `src/workiva/_config.py` | SDKConfig |
+| `src/workiva/_constants.py` | Regions, servers, API version |
+| `tests/` | Tests unitarios e integración |
 | `scripts/` | Pipeline de codegen |
 | `Makefile` | Build system |
 
 ### NO editar (se regenera con `make generate`)
 
-- `workiva-sdk/src/workiva/_operations/*.py` (excepto `_base.py`)
-- `workiva-sdk/src/workiva/models/platform/`, `models/chains/`, `models/wdata/`
+- `src/workiva/_operations/*.py` (excepto `_base.py`)
+- `src/workiva/models/platform.py`, `models/chains.py`, `models/wdata.py`
 
 Si necesitas modificar código generado, el cambio debe ir en:
 - `scripts/codegen/templates/*.j2` — para cambios en las templates Jinja2
@@ -69,7 +69,7 @@ git checkout -b feat/mi-cambio
 - **Código de infraestructura** → edita `_auth.py`, `_client.py`, `_retry.py`, etc.
 - **Código público** → edita `client.py`, `polling.py`, `exceptions.py`
 - **Cambios en API generada** → modifica templates o codegen, luego `make generate`
-- **Tests** → `workiva-sdk/tests/`
+- **Tests** → `tests/`
 
 ### 3. Ejecuta los tests
 
@@ -106,13 +106,13 @@ make test-integration   # Solo integration
 make test-cov           # Con cobertura
 
 # Un test específico
-cd workiva-sdk && uv run python -m pytest tests/unit/test_polling_helpers.py -v
+uv run python -m pytest tests/unit/test_polling_helpers.py -v
 ```
 
 ### Escribir tests
 
-- **Unit tests** → `workiva-sdk/tests/unit/` — mockean el SDK con `MagicMock`/`AsyncMock`
-- **Integration tests** → `workiva-sdk/tests/integration/` — usan `httpx.MockTransport`
+- **Unit tests** → `tests/unit/` — mockean el SDK con `MagicMock`/`AsyncMock`
+- **Integration tests** → `tests/integration/` — usan `httpx.MockTransport`
 
 Consideraciones:
 

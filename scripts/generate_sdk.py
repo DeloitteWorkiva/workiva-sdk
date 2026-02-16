@@ -33,7 +33,7 @@ except ImportError:
 # Paths
 ROOT = SCRIPTS_DIR.parent
 OAS_DIR = ROOT / "oas"
-SDK_SRC = ROOT / "workiva-sdk" / "src" / "workiva"
+SDK_SRC = ROOT / "src" / "workiva"
 MODELS_DIR = SDK_SRC / "models"
 OPERATIONS_DIR = SDK_SRC / "_operations"
 TEMPLATES_DIR = SCRIPTS_DIR / "codegen" / "templates"

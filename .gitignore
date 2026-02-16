@@ -6,9 +6,21 @@ __pycache__/
 *.pyc
 *.pyo
 .venv/
+venv/
 .env
+.env.local
 dist/
 *.egg-info/
+src/*.egg-info/
+.pytest_cache/
+.python-version
+
+# OS
+.DS_Store
+
+# Tools
+pyrightconfig.json
+.speakeasy/
 
 # IDE
 .vscode/

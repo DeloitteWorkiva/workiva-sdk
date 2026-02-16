@@ -25,7 +25,7 @@ jobs:
           python-version: "3.12"
 
       - name: Install SDK dependencies
-        run: cd workiva-sdk && uv sync --group codegen
+        run: uv sync --group codegen
 
       - name: Download latest specs
         run: make download
@@ -45,7 +45,7 @@ jobs:
 
       - name: Snapshot current models
         if: steps.check.outputs.changed == 'true'
-        run: cp -r workiva-sdk/src/workiva/models /tmp/old_models
+        run: cp -r src/workiva/models /tmp/old_models
 
       - name: Regenerate SDK
         if: steps.check.outputs.changed == 'true'
@@ -60,7 +60,7 @@ jobs:
         id: breaking
         run: |
           set +e
-          python scripts/detect_breaking_changes.py /tmp/old_models workiva-sdk/src/workiva/models oas/
+          python scripts/detect_breaking_changes.py /tmp/old_models src/workiva/models oas/
           exit_code=$?
           set -e
           if [ $exit_code -eq 0 ]; then

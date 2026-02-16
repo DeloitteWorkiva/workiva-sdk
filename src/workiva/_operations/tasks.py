@@ -22,6 +22,42 @@ class Tasks(BaseNamespace):
 
     _api: _API = _API.PLATFORM
 
+    def create_task(
+        self,
+        *,
+        body: Task,
+        timeout: Optional[float] = None,
+    ) -> httpx.Response:
+        """Create a new task
+
+        Creates a new [task](ref:tasks#task) given its properties.
+        """
+        return self._client.request(
+            "POST",
+            self._api,
+            "/tasks",
+            json_body=body,
+            timeout=timeout,
+        )
+
+    async def create_task_async(
+        self,
+        *,
+        body: Task,
+        timeout: Optional[float] = None,
+    ) -> httpx.Response:
+        """Create a new task (async)
+
+        Creates a new [task](ref:tasks#task) given its properties.
+        """
+        return await self._client.request_async(
+            "POST",
+            self._api,
+            "/tasks",
+            json_body=body,
+            timeout=timeout,
+        )
+
     def get_tasks(
         self,
         *,
@@ -81,42 +117,6 @@ class Tasks(BaseNamespace):
                 "$maxpagesize": maxpagesize,
                 "$next": next_,
             },
-            timeout=timeout,
-        )
-
-    def create_task(
-        self,
-        *,
-        body: Task,
-        timeout: Optional[float] = None,
-    ) -> httpx.Response:
-        """Create a new task
-
-        Creates a new [task](ref:tasks#task) given its properties.
-        """
-        return self._client.request(
-            "POST",
-            self._api,
-            "/tasks",
-            json_body=body,
-            timeout=timeout,
-        )
-
-    async def create_task_async(
-        self,
-        *,
-        body: Task,
-        timeout: Optional[float] = None,
-    ) -> httpx.Response:
-        """Create a new task (async)
-
-        Creates a new [task](ref:tasks#task) given its properties.
-        """
-        return await self._client.request_async(
-            "POST",
-            self._api,
-            "/tasks",
-            json_body=body,
             timeout=timeout,
         )
 

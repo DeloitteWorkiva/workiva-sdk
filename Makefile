@@ -17,7 +17,6 @@ SHELL := /bin/bash
 # Directories
 SPECS_DIR := oas
 SCRIPTS_DIR := scripts
-SDK_DIR := workiva-sdk
 CHECKSUMS_FILE := .spec_checksums
 
 # Source specs
@@ -103,32 +102,32 @@ check-and-generate:
 
 generate: ## Generate models + operations from OAS specs
 	@echo "🐍 Generating SDK (models + operations)..."
-	cd $(SDK_DIR) && uv run python ../$(SCRIPTS_DIR)/generate_sdk.py
+	uv run python $(SCRIPTS_DIR)/generate_sdk.py
 	@$(MAKE) save-checksums
 	@echo ""
-	@echo "✓ SDK generated in $(SDK_DIR)/"
+	@echo "✓ SDK generated"
 
 generate-models: ## Generate Pydantic models only
 	@echo "🐍 Generating models..."
-	cd $(SDK_DIR) && uv run python ../$(SCRIPTS_DIR)/generate_sdk.py --models-only
+	uv run python $(SCRIPTS_DIR)/generate_sdk.py --models-only
 
 generate-operations: ## Generate operation namespaces only
 	@echo "🐍 Generating operations..."
-	cd $(SDK_DIR) && uv run python ../$(SCRIPTS_DIR)/generate_sdk.py --operations-only
+	uv run python $(SCRIPTS_DIR)/generate_sdk.py --operations-only
 
 # ---- Test & Build ----
 
 test: ## Run all tests
-	cd $(SDK_DIR) && uv run python -m pytest tests/ -v
+	uv run python -m pytest tests/ -v
 
 test-unit: ## Run unit tests only
-	cd $(SDK_DIR) && uv run python -m pytest tests/unit/ -v
+	uv run python -m pytest tests/unit/ -v
 
 test-integration: ## Run integration tests only
-	cd $(SDK_DIR) && uv run python -m pytest tests/integration/ -v
+	uv run python -m pytest tests/integration/ -v
 
 test-cov: ## Run tests with coverage for core modules
-	cd $(SDK_DIR) && uv run python -m pytest tests/ \
+	uv run python -m pytest tests/ \
 		--cov=workiva._auth \
 		--cov=workiva._retry \
 		--cov=workiva._pagination \
@@ -140,18 +139,18 @@ test-cov: ## Run tests with coverage for core modules
 		--cov-report=term-missing
 
 build: ## Build wheel for distribution
-	cd $(SDK_DIR) && uv build
+	uv build
 
 publish: test build ## Publish to PyPI (set TWINE_PASSWORD or configure ~/.pypirc)
-	cd $(SDK_DIR) && uv run twine upload dist/*
+	uv run twine upload dist/*
 
 # ---- Cleanup ----
 
 clean: ## Remove generated models and operations (keeps hand-written code)
-	rm -f $(SDK_DIR)/src/workiva/models/platform.py
-	rm -f $(SDK_DIR)/src/workiva/models/chains.py
-	rm -f $(SDK_DIR)/src/workiva/models/wdata.py
-	rm -f $(SDK_DIR)/src/workiva/_operations/[!_]*.py
+	rm -f src/workiva/models/platform.py
+	rm -f src/workiva/models/chains.py
+	rm -f src/workiva/models/wdata.py
+	rm -f src/workiva/_operations/[!_]*.py
 
 clean-all: clean ## Remove everything including checksums
 	rm -f $(CHECKSUMS_FILE)

@@ -577,58 +577,6 @@ class TestForms(BaseNamespace):
             timeout=timeout,
         )
 
-    def get_matrices(
-        self,
-        *,
-        test_form_id: str,
-        test_phase_id: str,
-        expand: Optional[str] = None,
-        timeout: Optional[float] = None,
-    ) -> httpx.Response:
-        """Retrieve a list of matrices
-
-        Returns a list of [matrices](ref:testforms#matrix).
-        """
-        return self._client.request(
-            "GET",
-            self._api,
-            "/testForms/{testFormId}/testPhases/{testPhaseId}/matrices",
-            path_params={
-                "testFormId": test_form_id,
-                "testPhaseId": test_phase_id,
-            },
-            query_params={
-                "$expand": expand,
-            },
-            timeout=timeout,
-        )
-
-    async def get_matrices_async(
-        self,
-        *,
-        test_form_id: str,
-        test_phase_id: str,
-        expand: Optional[str] = None,
-        timeout: Optional[float] = None,
-    ) -> httpx.Response:
-        """Retrieve a list of matrices (async)
-
-        Returns a list of [matrices](ref:testforms#matrix).
-        """
-        return await self._client.request_async(
-            "GET",
-            self._api,
-            "/testForms/{testFormId}/testPhases/{testPhaseId}/matrices",
-            path_params={
-                "testFormId": test_form_id,
-                "testPhaseId": test_phase_id,
-            },
-            query_params={
-                "$expand": expand,
-            },
-            timeout=timeout,
-        )
-
     def create_matrix(
         self,
         *,
@@ -678,6 +626,58 @@ class TestForms(BaseNamespace):
                 "testPhaseId": test_phase_id,
             },
             json_body=body,
+            timeout=timeout,
+        )
+
+    def get_matrices(
+        self,
+        *,
+        test_form_id: str,
+        test_phase_id: str,
+        expand: Optional[str] = None,
+        timeout: Optional[float] = None,
+    ) -> httpx.Response:
+        """Retrieve a list of matrices
+
+        Returns a list of [matrices](ref:testforms#matrix).
+        """
+        return self._client.request(
+            "GET",
+            self._api,
+            "/testForms/{testFormId}/testPhases/{testPhaseId}/matrices",
+            path_params={
+                "testFormId": test_form_id,
+                "testPhaseId": test_phase_id,
+            },
+            query_params={
+                "$expand": expand,
+            },
+            timeout=timeout,
+        )
+
+    async def get_matrices_async(
+        self,
+        *,
+        test_form_id: str,
+        test_phase_id: str,
+        expand: Optional[str] = None,
+        timeout: Optional[float] = None,
+    ) -> httpx.Response:
+        """Retrieve a list of matrices (async)
+
+        Returns a list of [matrices](ref:testforms#matrix).
+        """
+        return await self._client.request_async(
+            "GET",
+            self._api,
+            "/testForms/{testFormId}/testPhases/{testPhaseId}/matrices",
+            path_params={
+                "testFormId": test_form_id,
+                "testPhaseId": test_phase_id,
+            },
+            query_params={
+                "$expand": expand,
+            },
             timeout=timeout,
         )
 
@@ -1059,62 +1059,6 @@ class TestForms(BaseNamespace):
             timeout=timeout,
         )
 
-    def get_samples(
-        self,
-        *,
-        test_form_id: str,
-        test_phase_id: str,
-        matrix_id: str,
-        expand: Optional[str] = None,
-        timeout: Optional[float] = None,
-    ) -> httpx.Response:
-        """Retrieve a list of samples
-
-        Returns a list of [samples](ref:testforms#matrixsample).
-        """
-        return self._client.request(
-            "GET",
-            self._api,
-            "/testForms/{testFormId}/testPhases/{testPhaseId}/matrices/{matrixId}/samples",
-            path_params={
-                "testFormId": test_form_id,
-                "testPhaseId": test_phase_id,
-                "matrixId": matrix_id,
-            },
-            query_params={
-                "$expand": expand,
-            },
-            timeout=timeout,
-        )
-
-    async def get_samples_async(
-        self,
-        *,
-        test_form_id: str,
-        test_phase_id: str,
-        matrix_id: str,
-        expand: Optional[str] = None,
-        timeout: Optional[float] = None,
-    ) -> httpx.Response:
-        """Retrieve a list of samples (async)
-
-        Returns a list of [samples](ref:testforms#matrixsample).
-        """
-        return await self._client.request_async(
-            "GET",
-            self._api,
-            "/testForms/{testFormId}/testPhases/{testPhaseId}/matrices/{matrixId}/samples",
-            path_params={
-                "testFormId": test_form_id,
-                "testPhaseId": test_phase_id,
-                "matrixId": matrix_id,
-            },
-            query_params={
-                "$expand": expand,
-            },
-            timeout=timeout,
-        )
-
     def create_sample(
         self,
         *,
@@ -1168,6 +1112,62 @@ class TestForms(BaseNamespace):
                 "matrixId": matrix_id,
             },
             json_body=body,
+            timeout=timeout,
+        )
+
+    def get_samples(
+        self,
+        *,
+        test_form_id: str,
+        test_phase_id: str,
+        matrix_id: str,
+        expand: Optional[str] = None,
+        timeout: Optional[float] = None,
+    ) -> httpx.Response:
+        """Retrieve a list of samples
+
+        Returns a list of [samples](ref:testforms#matrixsample).
+        """
+        return self._client.request(
+            "GET",
+            self._api,
+            "/testForms/{testFormId}/testPhases/{testPhaseId}/matrices/{matrixId}/samples",
+            path_params={
+                "testFormId": test_form_id,
+                "testPhaseId": test_phase_id,
+                "matrixId": matrix_id,
+            },
+            query_params={
+                "$expand": expand,
+            },
+            timeout=timeout,
+        )
+
+    async def get_samples_async(
+        self,
+        *,
+        test_form_id: str,
+        test_phase_id: str,
+        matrix_id: str,
+        expand: Optional[str] = None,
+        timeout: Optional[float] = None,
+    ) -> httpx.Response:
+        """Retrieve a list of samples (async)
+
+        Returns a list of [samples](ref:testforms#matrixsample).
+        """
+        return await self._client.request_async(
+            "GET",
+            self._api,
+            "/testForms/{testFormId}/testPhases/{testPhaseId}/matrices/{matrixId}/samples",
+            path_params={
+                "testFormId": test_form_id,
+                "testPhaseId": test_phase_id,
+                "matrixId": matrix_id,
+            },
+            query_params={
+                "$expand": expand,
+            },
             timeout=timeout,
         )
 
