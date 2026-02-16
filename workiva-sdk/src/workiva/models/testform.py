@@ -68,3 +68,9 @@ class TestForm(BaseModel):
                     m[k] = val
 
         return m
+
+
+try:
+    TestForm.model_rebuild()
+except NameError:
+    pass

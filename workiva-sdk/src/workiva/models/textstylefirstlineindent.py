@@ -47,3 +47,9 @@ class TextStyleFirstLineIndent(BaseModel):
                     m[k] = val
 
         return m
+
+
+try:
+    TextStyleFirstLineIndent.model_rebuild()
+except NameError:
+    pass

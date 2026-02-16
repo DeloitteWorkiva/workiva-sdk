@@ -392,3 +392,13 @@ class CellFormatInput(BaseModel):
                     m[k] = val
 
         return m
+
+
+try:
+    CellFormat.model_rebuild()
+except NameError:
+    pass
+try:
+    CellFormatInput.model_rebuild()
+except NameError:
+    pass

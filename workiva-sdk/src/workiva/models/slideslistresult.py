@@ -40,3 +40,9 @@ class SlidesListResult(BaseModel):
                     m[k] = val
 
         return m
+
+
+try:
+    SlidesListResult.model_rebuild()
+except NameError:
+    pass

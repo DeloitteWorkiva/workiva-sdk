@@ -217,3 +217,9 @@ class TextElement(BaseModel):
                     m[k] = val
 
         return m
+
+
+try:
+    TextElement.model_rebuild()
+except NameError:
+    pass

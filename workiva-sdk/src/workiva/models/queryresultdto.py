@@ -205,3 +205,9 @@ class QueryResultDto(BaseModel):
                     m[k] = val
 
         return m
+
+
+try:
+    QueryResultDto.model_rebuild()
+except NameError:
+    pass

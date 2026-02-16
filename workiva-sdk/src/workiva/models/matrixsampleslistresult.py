@@ -53,3 +53,9 @@ class MatrixSamplesListResult(BaseModel):
                     m[k] = val
 
         return m
+
+
+try:
+    MatrixSamplesListResult.model_rebuild()
+except NameError:
+    pass

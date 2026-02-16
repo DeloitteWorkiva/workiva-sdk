@@ -87,3 +87,9 @@ class Paragraph(BaseModel):
                     m[k] = val
 
         return m
+
+
+try:
+    Paragraph.model_rebuild()
+except NameError:
+    pass

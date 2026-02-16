@@ -88,3 +88,9 @@ class DescribeQueryColumnDto(BaseModel):
                     m[k] = val
 
         return m
+
+
+try:
+    DescribeQueryColumnDto.model_rebuild()
+except NameError:
+    pass

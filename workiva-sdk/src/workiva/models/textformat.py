@@ -100,3 +100,9 @@ class TextFormat(BaseModel):
                     m[k] = val
 
         return m
+
+
+try:
+    TextFormat.model_rebuild()
+except NameError:
+    pass

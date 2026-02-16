@@ -49,3 +49,9 @@ class TestFormExport(BaseModel):
                     m[k] = val
 
         return m
+
+
+try:
+    TestFormExport.model_rebuild()
+except NameError:
+    pass

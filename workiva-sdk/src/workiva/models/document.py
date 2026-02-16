@@ -325,3 +325,21 @@ class Document(BaseModel):
                     m[k] = val
 
         return m
+
+
+try:
+    DocumentCreated.model_rebuild()
+except NameError:
+    pass
+try:
+    LinksStatus.model_rebuild()
+except NameError:
+    pass
+try:
+    DocumentModified.model_rebuild()
+except NameError:
+    pass
+try:
+    Document.model_rebuild()
+except NameError:
+    pass

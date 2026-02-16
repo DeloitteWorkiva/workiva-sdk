@@ -42,3 +42,9 @@ class Variable(BaseModel):
                     m[k] = val
 
         return m
+
+
+try:
+    Variable.model_rebuild()
+except NameError:
+    pass

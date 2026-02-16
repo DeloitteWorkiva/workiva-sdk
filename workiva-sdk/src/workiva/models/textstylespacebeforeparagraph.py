@@ -43,3 +43,9 @@ class TextStyleSpaceBeforeParagraph(BaseModel):
                     m[k] = val
 
         return m
+
+
+try:
+    TextStyleSpaceBeforeParagraph.model_rebuild()
+except NameError:
+    pass

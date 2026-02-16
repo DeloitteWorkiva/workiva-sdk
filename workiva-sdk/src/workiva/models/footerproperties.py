@@ -145,3 +145,9 @@ class FooterProperties(BaseModel):
                     m[k] = val
 
         return m
+
+
+try:
+    FooterProperties.model_rebuild()
+except NameError:
+    pass

@@ -82,3 +82,9 @@ class FootnoteIndicator(BaseModel):
                     m[k] = val
 
         return m
+
+
+try:
+    FootnoteIndicator.model_rebuild()
+except NameError:
+    pass

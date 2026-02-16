@@ -889,3 +889,57 @@ class SectionInput(BaseModel):
                     m[k] = val
 
         return m
+
+
+try:
+    Body.model_rebuild()
+except NameError:
+    pass
+try:
+    Even.model_rebuild()
+except NameError:
+    pass
+try:
+    First.model_rebuild()
+except NameError:
+    pass
+try:
+    Last.model_rebuild()
+except NameError:
+    pass
+try:
+    Odd.model_rebuild()
+except NameError:
+    pass
+try:
+    SectionEven.model_rebuild()
+except NameError:
+    pass
+try:
+    SectionFirst.model_rebuild()
+except NameError:
+    pass
+try:
+    SectionLast.model_rebuild()
+except NameError:
+    pass
+try:
+    SectionOdd.model_rebuild()
+except NameError:
+    pass
+try:
+    SectionSchemasPageNumber.model_rebuild()
+except NameError:
+    pass
+try:
+    SectionProperties.model_rebuild()
+except NameError:
+    pass
+try:
+    Section.model_rebuild()
+except NameError:
+    pass
+try:
+    SectionInput.model_rebuild()
+except NameError:
+    pass

@@ -59,3 +59,9 @@ class RichTextLinksEditResult(BaseModel):
                     m[k] = val
 
         return m
+
+
+try:
+    RichTextLinksEditResult.model_rebuild()
+except NameError:
+    pass

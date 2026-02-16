@@ -142,3 +142,9 @@ class ListProgressionFormats(BaseModel):
                     m[k] = val
 
         return m
+
+
+try:
+    ListProgressionFormats.model_rebuild()
+except NameError:
+    pass

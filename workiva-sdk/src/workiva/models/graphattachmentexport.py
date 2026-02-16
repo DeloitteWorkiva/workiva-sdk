@@ -45,3 +45,9 @@ class GraphAttachmentExport(BaseModel):
                     m[k] = val
 
         return m
+
+
+try:
+    GraphAttachmentExport.model_rebuild()
+except NameError:
+    pass

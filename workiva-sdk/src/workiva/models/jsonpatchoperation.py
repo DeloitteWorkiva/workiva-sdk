@@ -62,3 +62,9 @@ class JSONPatchOperation(BaseModel):
                     m[k] = val
 
         return m
+
+
+try:
+    JSONPatchOperation.model_rebuild()
+except NameError:
+    pass

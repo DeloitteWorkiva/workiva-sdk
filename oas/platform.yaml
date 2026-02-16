@@ -11375,6 +11375,30 @@ paths:
 
         ### Examples
 
+        #### Lock an unlocked sheet
+
+        ```json
+        [
+          {
+            "op": "replace",
+            "path": "/lock",
+            "value": "lock"
+          }
+        ]
+        ```
+
+        #### Unlock a locked sheet
+
+        ```json
+        [
+          {
+            "op": "replace",
+            "path": "/lock",
+            "value": null
+          }
+        ]
+        ```
+
         #### Update the name of a sheet
 
         ```json
@@ -25097,7 +25121,7 @@ components:
           example: 1
           type: integer
         lock:
-          description: The type of lock applied to this sheet, if any. Note this property is not tied to revision and will always reflect the sheet's current lock state.
+          description: The type of lock applied to this sheet, if any. Note this property is not tied to revision and will always reflect the sheet's current lock state. When this field is not present on the sheet object, the sheet is not locked.
           type: string
           nullable: true
           allOf:
@@ -25587,6 +25611,10 @@ components:
             - RIGHT SPACED INSIDE
             - RIGHT SPACED
           type: string
+          nullable: true
+        useDashesForZeros:
+          description: Render zero as a dash instead of a digit. Valid for ACCOUNTING, CURRENCY, NUMBER, and PERCENT.
+          type: boolean
           nullable: true
         useParensForNegatives:
           description: Render parentheses around the number instead of a negative symbol. Valid for ACCOUNTING, CURRENCY, NUMBER, and PERCENT.

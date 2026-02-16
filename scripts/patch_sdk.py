@@ -168,8 +168,9 @@ def patch_pyproject(sdk_dir: Path) -> None:
     original = content
 
     # Fix authors format: Speakeasy merges email into name field
+    # Use lazy match ([^<"]+?) so trailing whitespace before < is not captured
     content = re.sub(
-        r'authors\s*=\s*\[\{\s*name\s*=\s*"([^<"]+)\s*<([^>]+)>"\s*},?\s*\]',
+        r'authors\s*=\s*\[\{\s*name\s*=\s*"([^<"]+?)\s*<([^>]+)>"\s*},?\s*\]',
         r'authors = [{ name = "\1", email = "\2" },]',
         content,
     )

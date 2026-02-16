@@ -57,3 +57,9 @@ class TestFormsListResult(BaseModel):
                     m[k] = val
 
         return m
+
+
+try:
+    TestFormsListResult.model_rebuild()
+except NameError:
+    pass

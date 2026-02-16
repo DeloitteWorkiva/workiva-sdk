@@ -71,3 +71,9 @@ class ResourcePermission(BaseModel):
                     m[k] = val
 
         return m
+
+
+try:
+    ResourcePermission.model_rebuild()
+except NameError:
+    pass

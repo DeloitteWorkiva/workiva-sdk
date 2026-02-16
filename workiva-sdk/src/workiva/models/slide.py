@@ -182,3 +182,9 @@ class Slide(BaseModel):
                     m[k] = val
 
         return m
+
+
+try:
+    Slide.model_rebuild()
+except NameError:
+    pass

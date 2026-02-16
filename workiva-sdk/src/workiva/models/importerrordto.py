@@ -83,3 +83,9 @@ class ImportErrorDto(BaseModel):
                     m[k] = val
 
         return m
+
+
+try:
+    ImportErrorDto.model_rebuild()
+except NameError:
+    pass

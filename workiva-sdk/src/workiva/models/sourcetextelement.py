@@ -282,3 +282,21 @@ class SourceTextElement(BaseModel):
                     m[k] = val
 
         return m
+
+
+try:
+    SoftReturn.model_rebuild()
+except NameError:
+    pass
+try:
+    SourceTextElementTextSpan.model_rebuild()
+except NameError:
+    pass
+try:
+    Unspecified.model_rebuild()
+except NameError:
+    pass
+try:
+    SourceTextElement.model_rebuild()
+except NameError:
+    pass

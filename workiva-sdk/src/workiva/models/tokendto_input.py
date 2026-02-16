@@ -37,3 +37,9 @@ class TokenDtoInput(BaseModel):
                     m[k] = val
 
         return m
+
+
+try:
+    TokenDtoInput.model_rebuild()
+except NameError:
+    pass

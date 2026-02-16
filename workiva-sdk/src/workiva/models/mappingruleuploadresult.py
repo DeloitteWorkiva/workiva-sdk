@@ -37,3 +37,9 @@ class MappingRuleUploadResult(BaseModel):
                     m[k] = val
 
         return m
+
+
+try:
+    MappingRuleUploadResult.model_rebuild()
+except NameError:
+    pass

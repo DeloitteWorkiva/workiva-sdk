@@ -157,3 +157,9 @@ class QueryDto(BaseModel):
                     m[k] = val
 
         return m
+
+
+try:
+    QueryDto.model_rebuild()
+except NameError:
+    pass

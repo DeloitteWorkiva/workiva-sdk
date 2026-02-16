@@ -5,8 +5,8 @@ import importlib.metadata
 __title__: str = "workiva"
 __version__: str = "0.5.5"
 __openapi_doc_version__: str = "1.2734.0"
-__gen_version__: str = "2.812.2"
-__user_agent__: str = "speakeasy-sdk/python 0.5.5 2.812.2 1.2734.0 workiva"
+__gen_version__: str = "2.824.1"
+__user_agent__: str = "speakeasy-sdk/python 0.5.5 2.824.1 1.2734.0 workiva"
 
 try:
     if __package__ is not None:

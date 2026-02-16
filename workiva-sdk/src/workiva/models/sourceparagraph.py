@@ -440,3 +440,21 @@ class SourceParagraph(BaseModel):
                     m[k] = val
 
         return m
+
+
+try:
+    Format.model_rebuild()
+except NameError:
+    pass
+try:
+    ListT.model_rebuild()
+except NameError:
+    pass
+try:
+    SourceParagraphProperties.model_rebuild()
+except NameError:
+    pass
+try:
+    SourceParagraph.model_rebuild()
+except NameError:
+    pass

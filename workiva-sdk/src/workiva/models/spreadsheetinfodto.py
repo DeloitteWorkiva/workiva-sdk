@@ -37,3 +37,9 @@ class SpreadsheetInfoDto(BaseModel):
                     m[k] = val
 
         return m
+
+
+try:
+    SpreadsheetInfoDto.model_rebuild()
+except NameError:
+    pass

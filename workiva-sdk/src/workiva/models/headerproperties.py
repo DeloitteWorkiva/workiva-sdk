@@ -145,3 +145,9 @@ class HeaderProperties(BaseModel):
                     m[k] = val
 
         return m
+
+
+try:
+    HeaderProperties.model_rebuild()
+except NameError:
+    pass

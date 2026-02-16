@@ -50,3 +50,9 @@ class SheetDataResult(BaseModel):
                     m[k] = val
 
         return m
+
+
+try:
+    SheetDataResult.model_rebuild()
+except NameError:
+    pass

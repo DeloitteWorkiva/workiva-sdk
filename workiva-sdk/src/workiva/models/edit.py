@@ -89,3 +89,9 @@ class Edit(BaseModel):
                     m[k] = val
 
         return m
+
+
+try:
+    Edit.model_rebuild()
+except NameError:
+    pass

@@ -240,3 +240,13 @@ class TableDtoInput(BaseModel):
                     m[k] = val
 
         return m
+
+
+try:
+    TableDto.model_rebuild()
+except NameError:
+    pass
+try:
+    TableDtoInput.model_rebuild()
+except NameError:
+    pass

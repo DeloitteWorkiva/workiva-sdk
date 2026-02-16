@@ -29,3 +29,9 @@ class DrawingRichTextSelection(BaseModel):
 
     drawing_element: Annotated[str, pydantic.Field(alias="drawingElement")]
     r"""Identifier of the drawing element"""
+
+
+try:
+    DrawingRichTextSelection.model_rebuild()
+except NameError:
+    pass

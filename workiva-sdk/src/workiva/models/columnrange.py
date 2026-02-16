@@ -41,3 +41,9 @@ class ColumnRange(BaseModel):
                     m[k] = val
 
         return m
+
+
+try:
+    ColumnRange.model_rebuild()
+except NameError:
+    pass

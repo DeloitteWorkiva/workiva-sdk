@@ -116,3 +116,9 @@ class SlideLayout(BaseModel):
                     m[k] = val
 
         return m
+
+
+try:
+    SlideLayout.model_rebuild()
+except NameError:
+    pass

@@ -288,3 +288,13 @@ class MetricInput(BaseModel):
                     m[k] = val
 
         return m
+
+
+try:
+    Metric.model_rebuild()
+except NameError:
+    pass
+try:
+    MetricInput.model_rebuild()
+except NameError:
+    pass

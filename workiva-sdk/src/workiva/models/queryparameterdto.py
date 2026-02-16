@@ -229,3 +229,13 @@ class QueryParameterDtoInput(BaseModel):
                     m[k] = val
 
         return m
+
+
+try:
+    QueryParameterDto.model_rebuild()
+except NameError:
+    pass
+try:
+    QueryParameterDtoInput.model_rebuild()
+except NameError:
+    pass

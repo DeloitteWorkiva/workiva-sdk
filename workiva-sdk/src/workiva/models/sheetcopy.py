@@ -65,3 +65,9 @@ class SheetCopy(BaseModel):
                     m[k] = val
 
         return m
+
+
+try:
+    SheetCopy.model_rebuild()
+except NameError:
+    pass

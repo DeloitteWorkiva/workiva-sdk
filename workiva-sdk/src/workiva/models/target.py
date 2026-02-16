@@ -51,3 +51,9 @@ class Target(BaseModel):
                     m[k] = val
 
         return m
+
+
+try:
+    Target.model_rebuild()
+except NameError:
+    pass

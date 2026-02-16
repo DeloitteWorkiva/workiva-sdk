@@ -214,3 +214,9 @@ class SheetUpdate(BaseModel):
                     m[k] = val
 
         return m
+
+
+try:
+    SheetUpdate.model_rebuild()
+except NameError:
+    pass

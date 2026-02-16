@@ -98,3 +98,13 @@ class TextLinkEdit(BaseModel):
                     m[k] = val
 
         return m
+
+
+try:
+    InsertDestinationLink.model_rebuild()
+except NameError:
+    pass
+try:
+    TextLinkEdit.model_rebuild()
+except NameError:
+    pass

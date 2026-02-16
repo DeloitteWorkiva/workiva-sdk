@@ -41,3 +41,9 @@ class HierarchyMetadata(BaseModel):
     simply indicates the row is a root node.
 
     """
+
+
+try:
+    HierarchyMetadata.model_rebuild()
+except NameError:
+    pass

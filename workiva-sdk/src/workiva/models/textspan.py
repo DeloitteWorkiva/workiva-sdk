@@ -83,3 +83,9 @@ class TextSpan(BaseModel):
                     m[k] = val
 
         return m
+
+
+try:
+    TextSpan.model_rebuild()
+except NameError:
+    pass

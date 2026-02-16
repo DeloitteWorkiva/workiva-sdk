@@ -43,3 +43,9 @@ class SharedTableDtoInput(BaseModel):
                     m[k] = val
 
         return m
+
+
+try:
+    SharedTableDtoInput.model_rebuild()
+except NameError:
+    pass

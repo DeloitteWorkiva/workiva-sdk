@@ -40,3 +40,9 @@ class MetricValuesListResult(BaseModel):
                     m[k] = val
 
         return m
+
+
+try:
+    MetricValuesListResult.model_rebuild()
+except NameError:
+    pass

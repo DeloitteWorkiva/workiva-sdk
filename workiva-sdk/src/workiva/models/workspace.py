@@ -418,3 +418,21 @@ class Workspace(BaseModel):
                     m[k] = val
 
         return m
+
+
+try:
+    WorkspaceCreated.model_rebuild()
+except NameError:
+    pass
+try:
+    WorkspaceModified.model_rebuild()
+except NameError:
+    pass
+try:
+    WorkspaceSchemasCreated.model_rebuild()
+except NameError:
+    pass
+try:
+    WorkspaceSchemasModified.model_rebuild()
+except NameError:
+    pass

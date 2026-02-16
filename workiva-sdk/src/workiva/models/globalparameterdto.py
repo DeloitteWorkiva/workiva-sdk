@@ -271,3 +271,13 @@ class GlobalParameterDtoInput(BaseModel):
                     m[k] = val
 
         return m
+
+
+try:
+    GlobalParameterDto.model_rebuild()
+except NameError:
+    pass
+try:
+    GlobalParameterDtoInput.model_rebuild()
+except NameError:
+    pass

@@ -331,3 +331,21 @@ class OrganizationUserInput(BaseModel):
                     m[k] = val
 
         return m
+
+
+try:
+    OrganizationUserCreated.model_rebuild()
+except NameError:
+    pass
+try:
+    OrganizationUserModified.model_rebuild()
+except NameError:
+    pass
+try:
+    OrganizationUser.model_rebuild()
+except NameError:
+    pass
+try:
+    OrganizationUserInput.model_rebuild()
+except NameError:
+    pass

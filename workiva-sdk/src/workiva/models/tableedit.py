@@ -407,3 +407,25 @@ class TableEdit(BaseModel):
                     m[k] = val
 
         return m
+
+
+try:
+    InsertColumns.model_rebuild()
+except NameError:
+    pass
+try:
+    InsertRows.model_rebuild()
+except NameError:
+    pass
+try:
+    MoveColumns.model_rebuild()
+except NameError:
+    pass
+try:
+    MoveRows.model_rebuild()
+except NameError:
+    pass
+try:
+    TableEdit.model_rebuild()
+except NameError:
+    pass

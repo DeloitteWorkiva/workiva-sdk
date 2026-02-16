@@ -51,3 +51,9 @@ class TypesListResult(BaseModel):
                     m[k] = val
 
         return m
+
+
+try:
+    TypesListResult.model_rebuild()
+except NameError:
+    pass

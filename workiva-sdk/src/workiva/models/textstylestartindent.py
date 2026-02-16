@@ -45,3 +45,9 @@ class TextStyleStartIndent(BaseModel):
                     m[k] = val
 
         return m
+
+
+try:
+    TextStyleStartIndent.model_rebuild()
+except NameError:
+    pass

@@ -38,3 +38,9 @@ class SpreadsheetFiltersReapplication(BaseModel):
                     m[k] = val
 
         return m
+
+
+try:
+    SpreadsheetFiltersReapplication.model_rebuild()
+except NameError:
+    pass

@@ -302,3 +302,13 @@ class PivotDefinitionDtoInput(BaseModel):
                     m[k] = val
 
         return m
+
+
+try:
+    PivotDefinitionDto.model_rebuild()
+except NameError:
+    pass
+try:
+    PivotDefinitionDtoInput.model_rebuild()
+except NameError:
+    pass

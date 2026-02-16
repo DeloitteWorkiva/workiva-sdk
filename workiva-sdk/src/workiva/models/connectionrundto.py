@@ -177,3 +177,9 @@ class ConnectionRunDto(BaseModel):
                     m[k] = val
 
         return m
+
+
+try:
+    ConnectionRunDto.model_rebuild()
+except NameError:
+    pass

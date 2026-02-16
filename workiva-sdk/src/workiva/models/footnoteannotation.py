@@ -72,3 +72,9 @@ class FootnoteAnnotation(BaseModel):
                     m[k] = val
 
         return m
+
+
+try:
+    FootnoteAnnotation.model_rebuild()
+except NameError:
+    pass

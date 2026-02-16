@@ -129,3 +129,9 @@ class RefreshBatchDto(BaseModel):
                     m[k] = val
 
         return m
+
+
+try:
+    RefreshBatchDto.model_rebuild()
+except NameError:
+    pass

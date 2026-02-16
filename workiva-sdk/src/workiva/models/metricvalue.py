@@ -497,3 +497,21 @@ class MetricValueInput(BaseModel):
                     m[k] = val
 
         return m
+
+
+try:
+    DataSource.model_rebuild()
+except NameError:
+    pass
+try:
+    MetricValue.model_rebuild()
+except NameError:
+    pass
+try:
+    MetricValueDataSource.model_rebuild()
+except NameError:
+    pass
+try:
+    MetricValueInput.model_rebuild()
+except NameError:
+    pass

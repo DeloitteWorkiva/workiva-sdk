@@ -75,3 +75,9 @@ class SheetData(BaseModel):
                     m[k] = val
 
         return m
+
+
+try:
+    SheetData.model_rebuild()
+except NameError:
+    pass

@@ -108,3 +108,9 @@ class MetricValueIdentifier(BaseModel):
                     m[k] = val
 
         return m
+
+
+try:
+    Data.model_rebuild()
+except NameError:
+    pass

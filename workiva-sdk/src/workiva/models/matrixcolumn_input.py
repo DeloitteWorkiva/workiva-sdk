@@ -55,3 +55,9 @@ class MatrixColumnInput(BaseModel):
                     m[k] = val
 
         return m
+
+
+try:
+    MatrixColumnInput.model_rebuild()
+except NameError:
+    pass

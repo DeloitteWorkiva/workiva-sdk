@@ -18,3 +18,9 @@ class ImageUploadResponse(BaseModel):
 
     upload_url: Annotated[str, pydantic.Field(alias="uploadUrl")]
     r"""The URL used to upload the image. Make a PUT request to this URL whose body is the contents of the image."""
+
+
+try:
+    ImageUploadResponse.model_rebuild()
+except NameError:
+    pass

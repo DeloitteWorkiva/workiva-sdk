@@ -1975,13 +1975,12 @@ components:
           minLength: 0
         type:
           description: |-
-            This is currently not used and its value will always be 'static'. In the future,
-            more types will be added.
+            Defines the type of the select list. Currently supported types include 'static'.
+            More types may be added in the future. Defaults to 'static' if not provided.
           type: string
+          default: static
           enum:
             - static
-            - ''
-          readOnly: true
         updated:
           description: When the entity was last updated
           type: string

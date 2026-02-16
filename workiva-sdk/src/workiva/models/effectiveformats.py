@@ -64,3 +64,9 @@ class EffectiveFormats(BaseModel):
                     m[k] = val
 
         return m
+
+
+try:
+    EffectiveFormats.model_rebuild()
+except NameError:
+    pass

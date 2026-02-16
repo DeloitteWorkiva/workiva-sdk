@@ -51,3 +51,9 @@ class DatasetsListResult(BaseModel):
                     m[k] = val
 
         return m
+
+
+try:
+    DatasetsListResult.model_rebuild()
+except NameError:
+    pass

@@ -111,3 +111,9 @@ class PivotViewDefinitionFilterDto(BaseModel):
                     m[k] = val
 
         return m
+
+
+try:
+    PivotViewDefinitionFilterDto.model_rebuild()
+except NameError:
+    pass

@@ -46,3 +46,9 @@ class ValidateTablesDto(BaseModel):
                     m[k] = val
 
         return m
+
+
+try:
+    ValidateTablesDto.model_rebuild()
+except NameError:
+    pass

@@ -63,3 +63,9 @@ class TableBreaking(BaseModel):
                     m[k] = val
 
         return m
+
+
+try:
+    TableBreaking.model_rebuild()
+except NameError:
+    pass

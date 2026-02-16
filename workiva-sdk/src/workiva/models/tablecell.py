@@ -575,3 +575,21 @@ class TableCell(BaseModel):
                     m[k] = val
 
         return m
+
+
+try:
+    ParentOf.model_rebuild()
+except NameError:
+    pass
+try:
+    Merges.model_rebuild()
+except NameError:
+    pass
+try:
+    TableCellProperties.model_rebuild()
+except NameError:
+    pass
+try:
+    TableCell.model_rebuild()
+except NameError:
+    pass

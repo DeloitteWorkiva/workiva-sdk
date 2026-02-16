@@ -51,3 +51,9 @@ class ActivityActionsListResult(BaseModel):
                     m[k] = val
 
         return m
+
+
+try:
+    ActivityActionsListResult.model_rebuild()
+except NameError:
+    pass

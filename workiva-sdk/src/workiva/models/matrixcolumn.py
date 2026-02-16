@@ -60,3 +60,9 @@ class MatrixColumn(BaseModel):
                     m[k] = val
 
         return m
+
+
+try:
+    MatrixColumn.model_rebuild()
+except NameError:
+    pass

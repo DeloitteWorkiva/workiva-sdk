@@ -145,3 +145,9 @@ class ParagraphProperties(BaseModel):
                     m[k] = val
 
         return m
+
+
+try:
+    ParagraphProperties.model_rebuild()
+except NameError:
+    pass

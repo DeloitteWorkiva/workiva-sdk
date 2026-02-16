@@ -87,3 +87,9 @@ class WorkspaceMembershipCreation(BaseModel):
                     m[k] = val
 
         return m
+
+
+try:
+    Options.model_rebuild()
+except NameError:
+    pass

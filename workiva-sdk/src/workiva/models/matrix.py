@@ -79,3 +79,9 @@ class Matrix(BaseModel):
                     m[k] = val
 
         return m
+
+
+try:
+    Matrix.model_rebuild()
+except NameError:
+    pass

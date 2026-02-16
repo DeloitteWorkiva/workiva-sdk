@@ -39,3 +39,9 @@ class ImportFromSpreadsheetDto(BaseModel):
                     m[k] = val
 
         return m
+
+
+try:
+    ImportFromSpreadsheetDto.model_rebuild()
+except NameError:
+    pass

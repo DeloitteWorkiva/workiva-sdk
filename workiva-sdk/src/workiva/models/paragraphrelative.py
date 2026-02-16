@@ -28,3 +28,9 @@ class ParagraphRelative(BaseModel):
 
     paragraph_index: Annotated[int, pydantic.Field(alias="paragraphIndex")]
     r"""The zero-based inclusive index of a paragraph."""
+
+
+try:
+    ParagraphRelative.model_rebuild()
+except NameError:
+    pass

@@ -64,3 +64,9 @@ class SectionCopy(BaseModel):
                     m[k] = val
 
         return m
+
+
+try:
+    SectionCopy.model_rebuild()
+except NameError:
+    pass

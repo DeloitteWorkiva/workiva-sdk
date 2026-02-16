@@ -33,3 +33,9 @@ class Image(BaseModel):
 
     mime_type: Annotated[str, pydantic.Field(alias="mimeType")]
     r"""The mime type of the image."""
+
+
+try:
+    Image.model_rebuild()
+except NameError:
+    pass

@@ -61,6 +61,7 @@ python:
   flattenRequests: false
   flatteningOrder: parameters-first
   forwardCompatibleEnumsByDefault: true
+  forwardCompatibleUnionsByDefault: tagged-only
   imports:
     option: openapi
     paths:

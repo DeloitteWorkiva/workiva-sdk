@@ -58,3 +58,9 @@ class TableLinksEditResult(BaseModel):
                     m[k] = val
 
         return m
+
+
+try:
+    TableLinksEditResult.model_rebuild()
+except NameError:
+    pass

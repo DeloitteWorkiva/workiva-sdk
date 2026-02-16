@@ -40,3 +40,9 @@ class MilestoneListResult(BaseModel):
                     m[k] = val
 
         return m
+
+
+try:
+    MilestoneListResult.model_rebuild()
+except NameError:
+    pass

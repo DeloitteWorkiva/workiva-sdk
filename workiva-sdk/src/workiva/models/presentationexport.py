@@ -185,3 +185,17 @@ class PresentationExport(BaseModel):
                     m[k] = val
 
         return m
+
+
+try:
+    PresentationExportPdfOptions.model_rebuild()
+except NameError:
+    pass
+try:
+    PptxOptions.model_rebuild()
+except NameError:
+    pass
+try:
+    PresentationExport.model_rebuild()
+except NameError:
+    pass

@@ -66,3 +66,9 @@ class TableStyle(BaseModel):
                     m[k] = val
 
         return m
+
+
+try:
+    TableStyle.model_rebuild()
+except NameError:
+    pass

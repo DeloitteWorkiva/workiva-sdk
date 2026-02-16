@@ -270,3 +270,17 @@ class FileImport(BaseModel):
                     m[k] = val
 
         return m
+
+
+try:
+    SupportingDocumentImportOptions.model_rebuild()
+except NameError:
+    pass
+try:
+    WorkivaFileImportOptions.model_rebuild()
+except NameError:
+    pass
+try:
+    FileImport.model_rebuild()
+except NameError:
+    pass

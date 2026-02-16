@@ -41,3 +41,9 @@ class RowRange(BaseModel):
                     m[k] = val
 
         return m
+
+
+try:
+    RowRange.model_rebuild()
+except NameError:
+    pass

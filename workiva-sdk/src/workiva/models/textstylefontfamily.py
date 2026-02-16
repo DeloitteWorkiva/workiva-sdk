@@ -41,3 +41,9 @@ class TextStyleFontFamily(BaseModel):
                     m[k] = val
 
         return m
+
+
+try:
+    TextStyleFontFamily.model_rebuild()
+except NameError:
+    pass

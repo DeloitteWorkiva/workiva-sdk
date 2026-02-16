@@ -59,3 +59,9 @@ class UniqueConstraintDto(BaseModel):
                     m[k] = val
 
         return m
+
+
+try:
+    UniqueConstraintDto.model_rebuild()
+except NameError:
+    pass

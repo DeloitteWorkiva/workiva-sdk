@@ -230,3 +230,9 @@ class ConnectionDto(BaseModel):
                     m[k] = val
 
         return m
+
+
+try:
+    ConnectionDto.model_rebuild()
+except NameError:
+    pass

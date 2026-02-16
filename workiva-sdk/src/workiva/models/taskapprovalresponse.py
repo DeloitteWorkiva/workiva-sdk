@@ -141,3 +141,9 @@ class TaskApprovalResponse(BaseModel):
                     m[k] = val
 
         return m
+
+
+try:
+    TaskApprovalResponseCreated.model_rebuild()
+except NameError:
+    pass

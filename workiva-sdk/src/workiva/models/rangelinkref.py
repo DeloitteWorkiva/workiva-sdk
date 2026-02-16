@@ -52,3 +52,9 @@ class RangeLinkRef(BaseModel):
                     m[k] = val
 
         return m
+
+
+try:
+    RangeLinkRef.model_rebuild()
+except NameError:
+    pass

@@ -167,3 +167,17 @@ class TableLinksEdit(BaseModel):
                     m[k] = val
 
         return m
+
+
+try:
+    InsertCellDestinationLink.model_rebuild()
+except NameError:
+    pass
+try:
+    RichCellLinkBatchEdit.model_rebuild()
+except NameError:
+    pass
+try:
+    TableLinksEdit.model_rebuild()
+except NameError:
+    pass

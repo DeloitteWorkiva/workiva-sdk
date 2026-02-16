@@ -111,3 +111,9 @@ class TableDrawingElement(BaseModel):
                     m[k] = val
 
         return m
+
+
+try:
+    TableDrawingElement.model_rebuild()
+except NameError:
+    pass

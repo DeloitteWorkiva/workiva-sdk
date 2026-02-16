@@ -66,7 +66,7 @@ class SheetDataset(BaseModel):
 
 
 class SheetLock(str, Enum, metaclass=utils.OpenEnumMeta):
-    r"""The type of lock applied to this sheet, if any. Note this property is not tied to revision and will always reflect the sheet's current lock state."""
+    r"""The type of lock applied to this sheet, if any. Note this property is not tied to revision and will always reflect the sheet's current lock state. When this field is not present on the sheet object, the sheet is not locked."""
 
     LOCK = "lock"
     INPUT_MODE = "inputMode"
@@ -121,7 +121,7 @@ class SheetTypedDict(TypedDict):
     index: NotRequired[int]
     r"""The integer index of the sheet relative to its parent sheet or to the spreadsheet, if no parent sheet. To position a sheet at the end of its siblings, use the special value -1."""
     lock: NotRequired[Nullable[SheetLock]]
-    r"""The type of lock applied to this sheet, if any. Note this property is not tied to revision and will always reflect the sheet's current lock state."""
+    r"""The type of lock applied to this sheet, if any. Note this property is not tied to revision and will always reflect the sheet's current lock state. When this field is not present on the sheet object, the sheet is not locked."""
     name: NotRequired[str]
     r"""The name of the sheet"""
     parent: NotRequired[Nullable[SheetParentTypedDict]]
@@ -157,7 +157,7 @@ class Sheet(BaseModel):
     r"""The integer index of the sheet relative to its parent sheet or to the spreadsheet, if no parent sheet. To position a sheet at the end of its siblings, use the special value -1."""
 
     lock: OptionalNullable[SheetLock] = UNSET
-    r"""The type of lock applied to this sheet, if any. Note this property is not tied to revision and will always reflect the sheet's current lock state."""
+    r"""The type of lock applied to this sheet, if any. Note this property is not tied to revision and will always reflect the sheet's current lock state. When this field is not present on the sheet object, the sheet is not locked."""
 
     name: Optional[str] = None
     r"""The name of the sheet"""
@@ -233,7 +233,7 @@ class SheetInputTypedDict(TypedDict):
     index: NotRequired[int]
     r"""The integer index of the sheet relative to its parent sheet or to the spreadsheet, if no parent sheet. To position a sheet at the end of its siblings, use the special value -1."""
     lock: NotRequired[Nullable[SheetLock]]
-    r"""The type of lock applied to this sheet, if any. Note this property is not tied to revision and will always reflect the sheet's current lock state."""
+    r"""The type of lock applied to this sheet, if any. Note this property is not tied to revision and will always reflect the sheet's current lock state. When this field is not present on the sheet object, the sheet is not locked."""
     name: NotRequired[str]
     r"""The name of the sheet"""
     parent: NotRequired[Nullable[SheetParentTypedDict]]
@@ -259,7 +259,7 @@ class SheetInput(BaseModel):
     r"""The integer index of the sheet relative to its parent sheet or to the spreadsheet, if no parent sheet. To position a sheet at the end of its siblings, use the special value -1."""
 
     lock: OptionalNullable[SheetLock] = UNSET
-    r"""The type of lock applied to this sheet, if any. Note this property is not tied to revision and will always reflect the sheet's current lock state."""
+    r"""The type of lock applied to this sheet, if any. Note this property is not tied to revision and will always reflect the sheet's current lock state. When this field is not present on the sheet object, the sheet is not locked."""
 
     name: Optional[str] = None
     r"""The name of the sheet"""
@@ -307,3 +307,13 @@ class SheetInput(BaseModel):
                     m[k] = val
 
         return m
+
+
+try:
+    Sheet.model_rebuild()
+except NameError:
+    pass
+try:
+    SheetInput.model_rebuild()
+except NameError:
+    pass

@@ -268,3 +268,17 @@ class Presentation(BaseModel):
                     m[k] = val
 
         return m
+
+
+try:
+    PresentationCreated.model_rebuild()
+except NameError:
+    pass
+try:
+    PresentationModified.model_rebuild()
+except NameError:
+    pass
+try:
+    Presentation.model_rebuild()
+except NameError:
+    pass

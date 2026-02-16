@@ -14,3 +14,9 @@ class QueryTextDtoTypedDict(TypedDict):
 class QueryTextDto(BaseModel):
     query_text: Annotated[str, pydantic.Field(alias="queryText")]
     r"""queryText to be parsed, if present and valid."""
+
+
+try:
+    QueryTextDto.model_rebuild()
+except NameError:
+    pass

@@ -3784,6 +3784,30 @@ class Spreadsheets(BaseSDK):
 
         ### Examples
 
+        #### Lock an unlocked sheet
+
+        ```json
+        [
+        {
+        \"op\": \"replace\",
+        \"path\": \"/lock\",
+        \"value\": \"lock\"
+        }
+        ]
+        ```
+
+        #### Unlock a locked sheet
+
+        ```json
+        [
+        {
+        \"op\": \"replace\",
+        \"path\": \"/lock\",
+        \"value\": null
+        }
+        ]
+        ```
+
         #### Update the name of a sheet
 
         ```json
@@ -4000,6 +4024,30 @@ class Spreadsheets(BaseSDK):
         | `/lock`                           | `replace`                          |
 
         ### Examples
+
+        #### Lock an unlocked sheet
+
+        ```json
+        [
+        {
+        \"op\": \"replace\",
+        \"path\": \"/lock\",
+        \"value\": \"lock\"
+        }
+        ]
+        ```
+
+        #### Unlock a locked sheet
+
+        ```json
+        [
+        {
+        \"op\": \"replace\",
+        \"path\": \"/lock\",
+        \"value\": null
+        }
+        ]
+        ```
 
         #### Update the name of a sheet
 

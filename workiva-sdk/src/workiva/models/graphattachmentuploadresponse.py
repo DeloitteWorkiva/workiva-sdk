@@ -40,3 +40,9 @@ class GraphAttachmentUploadResponse(BaseModel):
                     m[k] = val
 
         return m
+
+
+try:
+    GraphAttachmentUploadResponse.model_rebuild()
+except NameError:
+    pass

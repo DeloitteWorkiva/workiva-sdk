@@ -64,3 +64,9 @@ class RangeLinkEditResultCollection(BaseModel):
                     m[k] = val
 
         return m
+
+
+try:
+    RangeLinkEditResultCollection.model_rebuild()
+except NameError:
+    pass

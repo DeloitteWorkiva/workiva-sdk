@@ -51,3 +51,9 @@ class FilesListResult(BaseModel):
                     m[k] = val
 
         return m
+
+
+try:
+    FilesListResult.model_rebuild()
+except NameError:
+    pass

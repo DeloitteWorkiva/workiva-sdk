@@ -28,3 +28,9 @@ class SetNonPrintingEdit(BaseModel):
     r"""A selection of one or more sections
 
     """
+
+
+try:
+    SetNonPrintingEdit.model_rebuild()
+except NameError:
+    pass

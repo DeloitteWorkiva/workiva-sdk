@@ -40,3 +40,9 @@ class DimensionsListResult(BaseModel):
                     m[k] = val
 
         return m
+
+
+try:
+    DimensionsListResult.model_rebuild()
+except NameError:
+    pass

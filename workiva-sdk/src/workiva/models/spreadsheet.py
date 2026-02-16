@@ -313,3 +313,21 @@ class Spreadsheet(BaseModel):
                     m[k] = val
 
         return m
+
+
+try:
+    SpreadsheetCreated.model_rebuild()
+except NameError:
+    pass
+try:
+    SpreadsheetLinksStatus.model_rebuild()
+except NameError:
+    pass
+try:
+    SpreadsheetModified.model_rebuild()
+except NameError:
+    pass
+try:
+    Spreadsheet.model_rebuild()
+except NameError:
+    pass

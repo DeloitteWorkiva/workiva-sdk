@@ -90,7 +90,6 @@ with SDK(
         "approval_steps": [
             {
                 "completion_mode": models.CompletionMode.ONE,
-                "due_date": parse_datetime("2023-06-11T13:00:00+00:00"),
                 "participants": [
                     {
                         "id": "V1ZVd2VyFzU3NiQ1NDA4NjIzNzk2MjD",

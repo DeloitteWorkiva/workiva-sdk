@@ -101,3 +101,9 @@ class PivotViewDefinitionValueDto(BaseModel):
                     m[k] = val
 
         return m
+
+
+try:
+    PivotViewDefinitionValueDto.model_rebuild()
+except NameError:
+    pass

@@ -36,3 +36,9 @@ class FileImportResponse(BaseModel):
                     m[k] = val
 
         return m
+
+
+try:
+    FileImportResponse.model_rebuild()
+except NameError:
+    pass

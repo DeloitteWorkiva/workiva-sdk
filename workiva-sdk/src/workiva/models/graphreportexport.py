@@ -25,3 +25,9 @@ class GraphReportExport(BaseModel):
 
     format_: Annotated[GraphReportExportFormat, pydantic.Field(alias="format")]
     r"""The format to export the graph report to - curently, only .CSV"""
+
+
+try:
+    GraphReportExport.model_rebuild()
+except NameError:
+    pass

@@ -81,3 +81,9 @@ class ContentRef(BaseModel):
                     m[k] = val
 
         return m
+
+
+try:
+    ContentRef.model_rebuild()
+except NameError:
+    pass

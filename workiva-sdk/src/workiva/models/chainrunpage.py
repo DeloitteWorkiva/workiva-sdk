@@ -40,3 +40,9 @@ class ChainRunPage(BaseModel):
                     m[k] = val
 
         return m
+
+
+try:
+    ChainRunPage.model_rebuild()
+except NameError:
+    pass

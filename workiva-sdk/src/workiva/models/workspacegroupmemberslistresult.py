@@ -51,3 +51,9 @@ class WorkspaceGroupMembersListResult(BaseModel):
                     m[k] = val
 
         return m
+
+
+try:
+    WorkspaceGroupMembersListResult.model_rebuild()
+except NameError:
+    pass

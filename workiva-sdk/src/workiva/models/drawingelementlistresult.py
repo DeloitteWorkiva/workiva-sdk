@@ -53,3 +53,9 @@ class DrawingElementListResult(BaseModel):
                     m[k] = val
 
         return m
+
+
+try:
+    DrawingElementListResult.model_rebuild()
+except NameError:
+    pass

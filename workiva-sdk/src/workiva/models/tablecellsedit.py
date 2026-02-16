@@ -976,3 +976,37 @@ class TableCellsEdit(BaseModel):
                     m[k] = val
 
         return m
+
+
+try:
+    ClearCellsBorders.model_rebuild()
+except NameError:
+    pass
+try:
+    ClearCellsFormat.model_rebuild()
+except NameError:
+    pass
+try:
+    ClearCellsProperties.model_rebuild()
+except NameError:
+    pass
+try:
+    FormatCells.model_rebuild()
+except NameError:
+    pass
+try:
+    RichCellBatchEdit.model_rebuild()
+except NameError:
+    pass
+try:
+    SetCellsProperties.model_rebuild()
+except NameError:
+    pass
+try:
+    SetInputCells.model_rebuild()
+except NameError:
+    pass
+try:
+    TableCellsEdit.model_rebuild()
+except NameError:
+    pass

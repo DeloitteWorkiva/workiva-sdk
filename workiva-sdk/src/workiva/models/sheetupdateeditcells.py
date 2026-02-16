@@ -98,3 +98,9 @@ class SheetUpdateEditCells(BaseModel):
                     m[k] = val
 
         return m
+
+
+try:
+    SheetUpdateEditCellsOptions.model_rebuild()
+except NameError:
+    pass

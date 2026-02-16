@@ -18,3 +18,9 @@ class StyleGuideImportResponse(BaseModel):
 
     upload_url: Annotated[str, pydantic.Field(alias="uploadUrl")]
     r"""The signed URL used to upload the style guide. Make a POST request to this URL whose body is the contents of the style guide to upload."""
+
+
+try:
+    StyleGuideImportResponse.model_rebuild()
+except NameError:
+    pass

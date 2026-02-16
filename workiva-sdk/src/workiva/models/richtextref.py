@@ -39,3 +39,9 @@ class RichTextRef(BaseModel):
                     m[k] = val
 
         return m
+
+
+try:
+    RichTextRef.model_rebuild()
+except NameError:
+    pass
