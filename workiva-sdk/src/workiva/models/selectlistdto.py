@@ -11,7 +11,7 @@ from workiva import models, utils
 from workiva.types import BaseModel, UNSET_SENTINEL
 
 
-class SelectListDtoType(str, Enum):
+class SelectListDtoType(str, Enum, metaclass=utils.OpenEnumMeta):
     r"""Defines the type of the select list. Currently supported types include 'static'.
     More types may be added in the future. Defaults to 'static' if not provided.
     """
@@ -92,6 +92,15 @@ class SelectListDto(BaseModel):
 
     version: Optional[int] = None
     r"""The version of the current representation of the entity"""
+
+    @field_serializer("type")
+    def serialize_type(self, value):
+        if isinstance(value, str):
+            try:
+                return models.SelectListDtoType(value)
+            except ValueError:
+                return value
+        return value
 
     @field_serializer("value_type")
     def serialize_value_type(self, value):

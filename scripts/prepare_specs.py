@@ -395,6 +395,26 @@ def process_platform(base_dir):
     print(f"     Pagination extensions: {pag_count} operations")
 
 
+def mark_open_enums(spec):
+    """Add x-speakeasy-unknown-values: allow to enums that may gain new values.
+
+    Without this, Speakeasy generates strict Enum classes that raise ValueError
+    on unknown values.  The Wdata spec explicitly states "more types may be
+    added in the future" for SelectListDto.type, so it MUST remain open.
+    """
+    open_enum_paths = [
+        ("SelectListDto", "type"),
+    ]
+    schemas = spec.get("components", {}).get("schemas", {})
+    marked = []
+    for schema_name, prop_name in open_enum_paths:
+        prop = schemas.get(schema_name, {}).get("properties", {}).get(prop_name)
+        if prop and "enum" in prop:
+            prop["x-speakeasy-unknown-values"] = "allow"
+            marked.append(f"{schema_name}.{prop_name}")
+    return marked
+
+
 def process_wdata(base_dir):
     input_path = base_dir / "wdata.yaml"
     output_path = base_dir / "wdata_processed.yaml"
@@ -402,19 +422,23 @@ def process_wdata(base_dir):
     with open(input_path, "r") as f:
         spec = yaml.safe_load(f)
 
-    # 1. Prefix operationIds to avoid collisions
+    # 1. Mark enums that must stay forward-compatible
+    marked_enums = mark_open_enums(spec)
+
+    # 2. Prefix operationIds to avoid collisions
     renamed_ops = prefix_operation_ids(spec, "wdata")
 
-    # 2. Add group and servers
+    # 3. Add group and servers
     add_group_and_servers(spec, "wdata", WDATA_SERVERS)
 
-    # 3. Add pagination extensions (after prefixing, so we strip prefix)
+    # 4. Add pagination extensions (after prefixing, so we strip prefix)
     pag_count = add_pagination_extensions(spec, resolve_wdata_pagination, prefix="wdata")
 
     with open(output_path, "w") as f:
         yaml.dump(spec, f, default_flow_style=False, allow_unicode=True, sort_keys=False, width=200)
 
     print(f"[OK] wdata: {input_path} -> {output_path}")
+    print(f"     Open enums: {marked_enums}")
     print(f"     Prefixed operationIds: {len(renamed_ops)} operations")
     print(f"     Pagination extensions: {pag_count} operations")
 
