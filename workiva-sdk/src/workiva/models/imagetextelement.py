@@ -88,3 +88,9 @@ class ImageTextElement(BaseModel):
                     m[k] = val
 
         return m
+
+
+try:
+    ImageTextElement.model_rebuild()
+except NameError:
+    pass

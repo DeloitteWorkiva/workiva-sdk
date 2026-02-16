@@ -522,3 +522,25 @@ class Activity(BaseModel):
                     m[k] = val
 
         return m
+
+
+try:
+    ActivityCreated.model_rebuild()
+except NameError:
+    pass
+try:
+    ActivityModified.model_rebuild()
+except NameError:
+    pass
+try:
+    ActivitySchemasCreated.model_rebuild()
+except NameError:
+    pass
+try:
+    ActivitySchemasModified.model_rebuild()
+except NameError:
+    pass
+try:
+    Activity.model_rebuild()
+except NameError:
+    pass

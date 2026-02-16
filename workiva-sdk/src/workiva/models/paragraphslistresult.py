@@ -62,3 +62,9 @@ class ParagraphsListResult(BaseModel):
                     m[k] = val
 
         return m
+
+
+try:
+    ParagraphsListResult.model_rebuild()
+except NameError:
+    pass

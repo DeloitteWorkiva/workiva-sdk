@@ -64,3 +64,9 @@ class Formats(BaseModel):
                     m[k] = val
 
         return m
+
+
+try:
+    Formats.model_rebuild()
+except NameError:
+    pass

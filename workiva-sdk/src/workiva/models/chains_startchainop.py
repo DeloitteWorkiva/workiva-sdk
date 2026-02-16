@@ -74,3 +74,9 @@ class ChainsStartChainRequest(BaseModel):
         FieldMetadata(request=RequestMetadata(media_type="application/json")),
     ]
     r"""The runtime variables that have been pre-defined for a Chain."""
+
+
+try:
+    ChainsStartChainRequestBody.model_rebuild()
+except NameError:
+    pass

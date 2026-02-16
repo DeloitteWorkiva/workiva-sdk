@@ -53,3 +53,9 @@ class GraphAttachmentsListResult(BaseModel):
                     m[k] = val
 
         return m
+
+
+try:
+    GraphAttachmentsListResult.model_rebuild()
+except NameError:
+    pass

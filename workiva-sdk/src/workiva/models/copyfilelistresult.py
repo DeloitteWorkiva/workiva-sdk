@@ -51,3 +51,9 @@ class CopyFileListResult(BaseModel):
                     m[k] = val
 
         return m
+
+
+try:
+    CopyFileListResult.model_rebuild()
+except NameError:
+    pass

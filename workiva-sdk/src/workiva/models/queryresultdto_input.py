@@ -48,3 +48,9 @@ class QueryResultDtoInput(BaseModel):
                     m[k] = val
 
         return m
+
+
+try:
+    QueryResultDtoInput.model_rebuild()
+except NameError:
+    pass

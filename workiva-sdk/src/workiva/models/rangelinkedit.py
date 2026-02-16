@@ -216,3 +216,25 @@ class RangeLinkEdit(BaseModel):
                     m[k] = val
 
         return m
+
+
+try:
+    ChangeSourceRange.model_rebuild()
+except NameError:
+    pass
+try:
+    CreateDestination.model_rebuild()
+except NameError:
+    pass
+try:
+    RemoveDestination.model_rebuild()
+except NameError:
+    pass
+try:
+    RemoveSource.model_rebuild()
+except NameError:
+    pass
+try:
+    RangeLinkEdit.model_rebuild()
+except NameError:
+    pass

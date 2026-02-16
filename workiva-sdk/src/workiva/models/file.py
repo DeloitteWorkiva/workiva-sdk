@@ -324,3 +324,13 @@ class FileInput(BaseModel):
                     m[k] = val
 
         return m
+
+
+try:
+    FileCreated.model_rebuild()
+except NameError:
+    pass
+try:
+    FileModified.model_rebuild()
+except NameError:
+    pass

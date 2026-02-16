@@ -64,3 +64,9 @@ class RowPropertiesListResult(BaseModel):
                     m[k] = val
 
         return m
+
+
+try:
+    RowPropertiesListResult.model_rebuild()
+except NameError:
+    pass

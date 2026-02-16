@@ -220,3 +220,17 @@ class WorkspaceGroup(BaseModel):
                     m[k] = val
 
         return m
+
+
+try:
+    WorkspaceGroupCreated.model_rebuild()
+except NameError:
+    pass
+try:
+    WorkspaceGroupModified.model_rebuild()
+except NameError:
+    pass
+try:
+    WorkspaceGroup.model_rebuild()
+except NameError:
+    pass

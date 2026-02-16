@@ -56,3 +56,9 @@ class Performer(BaseModel):
                     m[k] = val
 
         return m
+
+
+try:
+    Performer.model_rebuild()
+except NameError:
+    pass

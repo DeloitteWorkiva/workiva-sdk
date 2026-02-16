@@ -73,3 +73,9 @@ class ListProgressionStyle(BaseModel):
                     m[k] = val
 
         return m
+
+
+try:
+    ListProgressionStyle.model_rebuild()
+except NameError:
+    pass

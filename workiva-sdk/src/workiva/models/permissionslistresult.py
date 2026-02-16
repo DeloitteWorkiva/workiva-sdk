@@ -51,3 +51,9 @@ class PermissionsListResult(BaseModel):
                     m[k] = val
 
         return m
+
+
+try:
+    PermissionsListResult.model_rebuild()
+except NameError:
+    pass

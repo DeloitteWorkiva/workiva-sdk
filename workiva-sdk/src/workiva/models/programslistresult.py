@@ -40,3 +40,9 @@ class ProgramsListResult(BaseModel):
                     m[k] = val
 
         return m
+
+
+try:
+    ProgramsListResult.model_rebuild()
+except NameError:
+    pass

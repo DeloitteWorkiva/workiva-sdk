@@ -51,3 +51,9 @@ class OrganizationUsersListResult(BaseModel):
                     m[k] = val
 
         return m
+
+
+try:
+    OrganizationUsersListResult.model_rebuild()
+except NameError:
+    pass

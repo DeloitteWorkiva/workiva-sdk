@@ -3,7 +3,7 @@
 name = "workiva"
 version = "0.5.5"
 description = "Workiva Python SDK - Unified client for Platform, Chains, and Wdata APIs"
-authors = [{ name = "Jorge Revenga", email = "jrevengamartindevida@deloitte.es" },]
+authors = [{ name = "Jorge Revenga ", email = "jrevengamartindevida@deloitte.es" },]
 readme = "README.md"
 license = {text = "Proprietary"}
 requires-python = ">=3.10"

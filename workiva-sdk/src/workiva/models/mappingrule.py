@@ -84,3 +84,9 @@ class MappingRule(BaseModel):
                     m[k] = val
 
         return m
+
+
+try:
+    MappingRule.model_rebuild()
+except NameError:
+    pass

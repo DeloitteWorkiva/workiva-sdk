@@ -186,3 +186,9 @@ class RichTextFormat(BaseModel):
                     m[k] = val
 
         return m
+
+
+try:
+    RichTextFormat.model_rebuild()
+except NameError:
+    pass

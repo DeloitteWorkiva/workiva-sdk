@@ -72,3 +72,9 @@ class UnspecifiedTextElement(BaseModel):
                     m[k] = val
 
         return m
+
+
+try:
+    UnspecifiedTextElement.model_rebuild()
+except NameError:
+    pass

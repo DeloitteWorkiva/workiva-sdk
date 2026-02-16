@@ -23,3 +23,9 @@ class Caret(BaseModel):
 
     paragraph_index: Annotated[int, pydantic.Field(alias="paragraphIndex")]
     r"""The zero-based index of a paragraph."""
+
+
+try:
+    Caret.model_rebuild()
+except NameError:
+    pass

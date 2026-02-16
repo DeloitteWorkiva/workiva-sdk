@@ -61,3 +61,9 @@ class TableAnchorCreationResultCollection(BaseModel):
                     m[k] = val
 
         return m
+
+
+try:
+    TableAnchorCreationResultCollection.model_rebuild()
+except NameError:
+    pass

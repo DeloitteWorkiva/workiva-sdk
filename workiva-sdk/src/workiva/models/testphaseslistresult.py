@@ -57,3 +57,9 @@ class TestPhasesListResult(BaseModel):
                     m[k] = val
 
         return m
+
+
+try:
+    TestPhasesListResult.model_rebuild()
+except NameError:
+    pass

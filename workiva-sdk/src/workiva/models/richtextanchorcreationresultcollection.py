@@ -61,3 +61,9 @@ class RichTextAnchorCreationResultCollection(BaseModel):
                     m[k] = val
 
         return m
+
+
+try:
+    RichTextAnchorCreationResultCollection.model_rebuild()
+except NameError:
+    pass

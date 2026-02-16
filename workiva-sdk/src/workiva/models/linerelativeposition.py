@@ -83,3 +83,9 @@ class LineRelativePosition(BaseModel):
                     m[k] = val
 
         return m
+
+
+try:
+    LineRelativePosition.model_rebuild()
+except NameError:
+    pass

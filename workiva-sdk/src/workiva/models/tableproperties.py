@@ -73,3 +73,9 @@ class TableProperties(BaseModel):
                 m[k] = val
 
         return m
+
+
+try:
+    TableProperties.model_rebuild()
+except NameError:
+    pass

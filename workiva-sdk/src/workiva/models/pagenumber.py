@@ -72,3 +72,9 @@ class PageNumber(BaseModel):
                     m[k] = val
 
         return m
+
+
+try:
+    PageNumber.model_rebuild()
+except NameError:
+    pass

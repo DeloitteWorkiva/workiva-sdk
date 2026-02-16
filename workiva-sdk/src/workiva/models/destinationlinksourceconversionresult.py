@@ -69,3 +69,9 @@ class DestinationLinkSourceConversionResult(BaseModel):
                     m[k] = val
 
         return m
+
+
+try:
+    DestinationLinkSourceConversionResult.model_rebuild()
+except NameError:
+    pass

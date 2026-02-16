@@ -561,3 +561,29 @@ class CellValue(BaseModel):
                     m[k] = val
 
         return m
+
+
+try:
+    CellValueDestinationLink.model_rebuild()
+except NameError:
+    pass
+try:
+    CellValueFormat.model_rebuild()
+except NameError:
+    pass
+try:
+    Formula.model_rebuild()
+except NameError:
+    pass
+try:
+    CellValueSchemasFormat.model_rebuild()
+except NameError:
+    pass
+try:
+    PlainText.model_rebuild()
+except NameError:
+    pass
+try:
+    CellValue.model_rebuild()
+except NameError:
+    pass

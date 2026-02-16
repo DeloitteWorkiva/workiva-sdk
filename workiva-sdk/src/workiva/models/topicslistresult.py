@@ -40,3 +40,9 @@ class TopicsListResult(BaseModel):
                     m[k] = val
 
         return m
+
+
+try:
+    TopicsListResult.model_rebuild()
+except NameError:
+    pass

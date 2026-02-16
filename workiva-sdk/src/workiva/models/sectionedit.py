@@ -81,3 +81,9 @@ class SectionEdit(BaseModel):
                     m[k] = val
 
         return m
+
+
+try:
+    SectionEdit.model_rebuild()
+except NameError:
+    pass

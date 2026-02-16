@@ -117,3 +117,9 @@ class UnspecifiedDrawingElement(BaseModel):
                     m[k] = val
 
         return m
+
+
+try:
+    UnspecifiedDrawingElement.model_rebuild()
+except NameError:
+    pass

@@ -38,3 +38,9 @@ class PresentationFiltersReapplication(BaseModel):
                     m[k] = val
 
         return m
+
+
+try:
+    PresentationFiltersReapplication.model_rebuild()
+except NameError:
+    pass

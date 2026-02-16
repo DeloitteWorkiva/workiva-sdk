@@ -26,3 +26,9 @@ class SheetUpdateInsertRows(BaseModel):
 
     insertions: List[Insertion]
     r"""List of row insertions"""
+
+
+try:
+    SheetUpdateInsertRows.model_rebuild()
+except NameError:
+    pass

@@ -76,3 +76,9 @@ class SheetUpdateClearFormats(BaseModel):
                     m[k] = val
 
         return m
+
+
+try:
+    SheetUpdateClearFormats.model_rebuild()
+except NameError:
+    pass

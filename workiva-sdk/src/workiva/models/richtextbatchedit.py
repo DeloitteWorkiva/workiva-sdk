@@ -60,3 +60,9 @@ class RichTextBatchEdit(BaseModel):
                     m[k] = val
 
         return m
+
+
+try:
+    RichTextBatchEdit.model_rebuild()
+except NameError:
+    pass

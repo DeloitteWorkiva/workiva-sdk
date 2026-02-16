@@ -65,3 +65,9 @@ class CellRange(BaseModel):
                     m[k] = val
 
         return m
+
+
+try:
+    CellRange.model_rebuild()
+except NameError:
+    pass

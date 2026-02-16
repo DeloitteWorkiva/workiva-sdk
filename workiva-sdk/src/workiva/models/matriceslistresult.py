@@ -53,3 +53,9 @@ class MatricesListResult(BaseModel):
                     m[k] = val
 
         return m
+
+
+try:
+    MatricesListResult.model_rebuild()
+except NameError:
+    pass

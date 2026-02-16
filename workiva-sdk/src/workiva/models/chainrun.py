@@ -147,3 +147,9 @@ class ChainRun(BaseModel):
                     m[k] = val
 
         return m
+
+
+try:
+    ChainRun.model_rebuild()
+except NameError:
+    pass

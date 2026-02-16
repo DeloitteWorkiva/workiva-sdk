@@ -18,3 +18,9 @@ class ImageUpload(BaseModel):
 
     file_name: Annotated[str, pydantic.Field(alias="fileName")]
     r"""The name for the new image."""
+
+
+try:
+    ImageUpload.model_rebuild()
+except NameError:
+    pass

@@ -58,3 +58,9 @@ class SheetUpdateMergeRanges(BaseModel):
                     m[k] = val
 
         return m
+
+
+try:
+    SheetUpdateMergeRanges.model_rebuild()
+except NameError:
+    pass

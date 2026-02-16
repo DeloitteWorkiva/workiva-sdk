@@ -92,3 +92,9 @@ class ListStyle(BaseModel):
                     m[k] = val
 
         return m
+
+
+try:
+    ListStyle.model_rebuild()
+except NameError:
+    pass

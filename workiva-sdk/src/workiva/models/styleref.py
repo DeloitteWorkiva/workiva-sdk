@@ -46,3 +46,9 @@ class StyleRef(BaseModel):
                     m[k] = val
 
         return m
+
+
+try:
+    StyleRef.model_rebuild()
+except NameError:
+    pass

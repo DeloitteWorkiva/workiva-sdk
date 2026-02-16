@@ -82,3 +82,9 @@ class SectionPageNumber(BaseModel):
                     m[k] = val
 
         return m
+
+
+try:
+    SectionPageNumber.model_rebuild()
+except NameError:
+    pass

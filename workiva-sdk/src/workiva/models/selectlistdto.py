@@ -11,13 +11,12 @@ from workiva import models, utils
 from workiva.types import BaseModel, UNSET_SENTINEL
 
 
-class SelectListDtoType(str, Enum, metaclass=utils.OpenEnumMeta):
-    r"""This is currently not used and its value will always be 'static'. In the future,
-    more types will be added.
+class SelectListDtoType(str, Enum):
+    r"""Defines the type of the select list. Currently supported types include 'static'.
+    More types may be added in the future. Defaults to 'static' if not provided.
     """
 
     STATIC = "static"
-    UNKNOWN = ""
 
 
 class ValueType(str, Enum, metaclass=utils.OpenEnumMeta):
@@ -50,8 +49,8 @@ class SelectListDtoTypedDict(TypedDict):
     id: NotRequired[str]
     r"""The entity's unique identifier"""
     type: NotRequired[SelectListDtoType]
-    r"""This is currently not used and its value will always be 'static'. In the future,
-    more types will be added.
+    r"""Defines the type of the select list. Currently supported types include 'static'.
+    More types may be added in the future. Defaults to 'static' if not provided.
     """
     updated: NotRequired[datetime]
     r"""When the entity was last updated"""
@@ -80,9 +79,9 @@ class SelectListDto(BaseModel):
     id: Optional[str] = None
     r"""The entity's unique identifier"""
 
-    type: Optional[SelectListDtoType] = None
-    r"""This is currently not used and its value will always be 'static'. In the future,
-    more types will be added.
+    type: Optional[SelectListDtoType] = SelectListDtoType.STATIC
+    r"""Defines the type of the select list. Currently supported types include 'static'.
+    More types may be added in the future. Defaults to 'static' if not provided.
     """
 
     updated: Optional[datetime] = None
@@ -93,15 +92,6 @@ class SelectListDto(BaseModel):
 
     version: Optional[int] = None
     r"""The version of the current representation of the entity"""
-
-    @field_serializer("type")
-    def serialize_type(self, value):
-        if isinstance(value, str):
-            try:
-                return models.SelectListDtoType(value)
-            except ValueError:
-                return value
-        return value
 
     @field_serializer("value_type")
     def serialize_value_type(self, value):
@@ -140,6 +130,10 @@ class SelectListDtoInputTypedDict(TypedDict):
     r"""List of possible values for the list. These values will be validated against the valueType provided."""
     description: NotRequired[str]
     r"""Description of this select list. Max length: 1024"""
+    type: NotRequired[SelectListDtoType]
+    r"""Defines the type of the select list. Currently supported types include 'static'.
+    More types may be added in the future. Defaults to 'static' if not provided.
+    """
 
 
 class SelectListDtoInput(BaseModel):
@@ -155,6 +149,11 @@ class SelectListDtoInput(BaseModel):
     description: Optional[str] = None
     r"""Description of this select list. Max length: 1024"""
 
+    type: Optional[SelectListDtoType] = SelectListDtoType.STATIC
+    r"""Defines the type of the select list. Currently supported types include 'static'.
+    More types may be added in the future. Defaults to 'static' if not provided.
+    """
+
     @field_serializer("value_type")
     def serialize_value_type(self, value):
         if isinstance(value, str):
@@ -166,7 +165,7 @@ class SelectListDtoInput(BaseModel):
 
     @model_serializer(mode="wrap")
     def serialize_model(self, handler):
-        optional_fields = set(["description"])
+        optional_fields = set(["description", "type"])
         serialized = handler(self)
         m = {}
 
@@ -179,3 +178,13 @@ class SelectListDtoInput(BaseModel):
                     m[k] = val
 
         return m
+
+
+try:
+    SelectListDto.model_rebuild()
+except NameError:
+    pass
+try:
+    SelectListDtoInput.model_rebuild()
+except NameError:
+    pass

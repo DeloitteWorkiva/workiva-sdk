@@ -60,3 +60,9 @@ class ResourcePermissionsModification(BaseModel):
                     m[k] = val
 
         return m
+
+
+try:
+    ResourcePermissionsModification.model_rebuild()
+except NameError:
+    pass

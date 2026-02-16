@@ -51,3 +51,9 @@ class SectionsListResult(BaseModel):
                     m[k] = val
 
         return m
+
+
+try:
+    SectionsListResult.model_rebuild()
+except NameError:
+    pass

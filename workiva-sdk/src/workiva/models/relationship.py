@@ -74,3 +74,9 @@ class Relationship(BaseModel):
                     m[k] = val
 
         return m
+
+
+try:
+    Relationship.model_rebuild()
+except NameError:
+    pass

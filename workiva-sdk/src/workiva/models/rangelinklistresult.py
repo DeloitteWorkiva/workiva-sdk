@@ -53,3 +53,9 @@ class RangeLinkListResult(BaseModel):
                     m[k] = val
 
         return m
+
+
+try:
+    RangeLinkListResult.model_rebuild()
+except NameError:
+    pass

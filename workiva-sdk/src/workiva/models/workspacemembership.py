@@ -208,3 +208,13 @@ class WorkspaceMembership(BaseModel):
                     m[k] = val
 
         return m
+
+
+try:
+    WorkspaceMembershipCreated.model_rebuild()
+except NameError:
+    pass
+try:
+    WorkspaceMembershipModified.model_rebuild()
+except NameError:
+    pass

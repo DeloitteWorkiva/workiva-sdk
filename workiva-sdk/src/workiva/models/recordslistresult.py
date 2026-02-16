@@ -51,3 +51,9 @@ class RecordsListResult(BaseModel):
                     m[k] = val
 
         return m
+
+
+try:
+    RecordsListResult.model_rebuild()
+except NameError:
+    pass

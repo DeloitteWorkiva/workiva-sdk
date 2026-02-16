@@ -33,3 +33,9 @@ class ErrorWithLineNumber(BaseModel):
                     m[k] = val
 
         return m
+
+
+try:
+    ErrorWithLineNumber.model_rebuild()
+except NameError:
+    pass

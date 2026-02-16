@@ -51,3 +51,9 @@ class ImportFileListResult(BaseModel):
                     m[k] = val
 
         return m
+
+
+try:
+    ImportFileListResult.model_rebuild()
+except NameError:
+    pass

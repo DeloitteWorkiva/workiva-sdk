@@ -99,3 +99,9 @@ class ChainRunNodeResult(BaseModel):
                     m[k] = val
 
         return m
+
+
+try:
+    ChainRunNodeResult.model_rebuild()
+except NameError:
+    pass

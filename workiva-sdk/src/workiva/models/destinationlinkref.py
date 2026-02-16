@@ -23,3 +23,9 @@ class DestinationLinkRef(BaseModel):
 
     revision: str
     r"""The version of the destination link."""
+
+
+try:
+    DestinationLinkRef.model_rebuild()
+except NameError:
+    pass

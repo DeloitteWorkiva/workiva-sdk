@@ -36,7 +36,11 @@ if TYPE_CHECKING:
 
 
 class SDK(BaseSDK):
-    r"""Workiva API: 2026-01-01 Version of the Workiva API
+    r"""Workiva API: This API is used to manage the execution of OneCloud chains and fetch metadata about your OneCloud workspaces.
+    The Wdata Preparation API allow users
+    to import data sets from their source system, tag, organize, manipulate, share,
+    export, and query against the data
+    2026-01-01 Version of the Workiva API
     https://developers.workiva.com - Developer documentation for Workiva Inc.
     """
 

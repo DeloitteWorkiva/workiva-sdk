@@ -156,3 +156,9 @@ class FileCopyOptions(BaseModel):
                     m[k] = val
 
         return m
+
+
+try:
+    FileCopyOptions.model_rebuild()
+except NameError:
+    pass

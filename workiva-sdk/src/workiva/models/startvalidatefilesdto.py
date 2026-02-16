@@ -14,3 +14,9 @@ class StartValidateFilesDtoTypedDict(TypedDict):
 class StartValidateFilesDto(BaseModel):
     table_id: Annotated[str, pydantic.Field(alias="tableId")]
     r"""The unique identifier for the table."""
+
+
+try:
+    StartValidateFilesDto.model_rebuild()
+except NameError:
+    pass

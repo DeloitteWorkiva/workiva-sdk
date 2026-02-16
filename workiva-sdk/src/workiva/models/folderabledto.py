@@ -103,3 +103,9 @@ class FolderableDto(BaseModel):
                     m[k] = val
 
         return m
+
+
+try:
+    FolderableDto.model_rebuild()
+except NameError:
+    pass

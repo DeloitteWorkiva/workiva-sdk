@@ -40,3 +40,9 @@ class TasksListResult(BaseModel):
                     m[k] = val
 
         return m
+
+
+try:
+    TasksListResult.model_rebuild()
+except NameError:
+    pass

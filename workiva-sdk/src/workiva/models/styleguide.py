@@ -81,3 +81,9 @@ class StyleGuide(BaseModel):
                     m[k] = val
 
         return m
+
+
+try:
+    StyleGuide.model_rebuild()
+except NameError:
+    pass

@@ -80,3 +80,9 @@ class SharedTableDto(BaseModel):
                     m[k] = val
 
         return m
+
+
+try:
+    SharedTableDto.model_rebuild()
+except NameError:
+    pass

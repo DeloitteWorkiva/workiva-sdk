@@ -62,3 +62,9 @@ class AnchorsListResult(BaseModel):
                     m[k] = val
 
         return m
+
+
+try:
+    AnchorsListResult.model_rebuild()
+except NameError:
+    pass

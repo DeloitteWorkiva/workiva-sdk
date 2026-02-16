@@ -162,3 +162,9 @@ class Shape(BaseModel):
                     m[k] = val
 
         return m
+
+
+try:
+    Shape.model_rebuild()
+except NameError:
+    pass

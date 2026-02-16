@@ -79,3 +79,9 @@ class Action(BaseModel):
                     m[k] = val
 
         return m
+
+
+try:
+    Action.model_rebuild()
+except NameError:
+    pass

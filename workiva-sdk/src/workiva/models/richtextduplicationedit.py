@@ -79,3 +79,13 @@ class RichTextDuplicationEdit(BaseModel):
                     m[k] = val
 
         return m
+
+
+try:
+    DuplicateTable.model_rebuild()
+except NameError:
+    pass
+try:
+    RichTextDuplicationEdit.model_rebuild()
+except NameError:
+    pass

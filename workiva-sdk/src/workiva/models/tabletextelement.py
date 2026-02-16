@@ -91,3 +91,9 @@ class TableTextElement(BaseModel):
                     m[k] = val
 
         return m
+
+
+try:
+    TableTextElement.model_rebuild()
+except NameError:
+    pass

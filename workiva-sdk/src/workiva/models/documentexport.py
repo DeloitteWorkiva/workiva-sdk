@@ -291,3 +291,21 @@ class DocumentExport(BaseModel):
                     m[k] = val
 
         return m
+
+
+try:
+    DocxOptions.model_rebuild()
+except NameError:
+    pass
+try:
+    PdfOptions.model_rebuild()
+except NameError:
+    pass
+try:
+    XhtmlOptions.model_rebuild()
+except NameError:
+    pass
+try:
+    DocumentExport.model_rebuild()
+except NameError:
+    pass

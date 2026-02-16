@@ -141,3 +141,13 @@ class TaskApprovalStepInput(BaseModel):
                     m[k] = val
 
         return m
+
+
+try:
+    TaskApprovalStep.model_rebuild()
+except NameError:
+    pass
+try:
+    TaskApprovalStepInput.model_rebuild()
+except NameError:
+    pass

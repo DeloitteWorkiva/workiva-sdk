@@ -60,3 +60,9 @@ class MatrixSampleInput(BaseModel):
                     m[k] = val
 
         return m
+
+
+try:
+    MatrixSampleInput.model_rebuild()
+except NameError:
+    pass

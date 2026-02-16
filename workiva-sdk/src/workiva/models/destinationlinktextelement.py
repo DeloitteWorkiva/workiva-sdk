@@ -86,3 +86,9 @@ class DestinationLinkTextElement(BaseModel):
                     m[k] = val
 
         return m
+
+
+try:
+    DestinationLinkTextElement.model_rebuild()
+except NameError:
+    pass

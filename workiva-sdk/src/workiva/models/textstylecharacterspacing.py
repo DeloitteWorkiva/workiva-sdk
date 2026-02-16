@@ -43,3 +43,9 @@ class TextStyleCharacterSpacing(BaseModel):
                     m[k] = val
 
         return m
+
+
+try:
+    TextStyleCharacterSpacing.model_rebuild()
+except NameError:
+    pass

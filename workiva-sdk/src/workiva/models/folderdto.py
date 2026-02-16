@@ -74,3 +74,9 @@ class FolderDto(BaseModel):
                     m[k] = val
 
         return m
+
+
+try:
+    FolderDto.model_rebuild()
+except NameError:
+    pass

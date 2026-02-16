@@ -103,3 +103,9 @@ class SheetUpdateEditRange(BaseModel):
                     m[k] = val
 
         return m
+
+
+try:
+    SheetUpdateEditRangeOptions.model_rebuild()
+except NameError:
+    pass

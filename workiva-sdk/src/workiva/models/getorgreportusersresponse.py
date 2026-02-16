@@ -380,3 +380,13 @@ class GetOrgReportUsersResponse(BaseModel):
                     m[k] = val
 
         return m
+
+
+try:
+    WorkspaceMemberships.model_rebuild()
+except NameError:
+    pass
+try:
+    Attributes.model_rebuild()
+except NameError:
+    pass

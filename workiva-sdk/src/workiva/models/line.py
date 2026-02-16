@@ -93,3 +93,9 @@ class Line(BaseModel):
                 m[k] = val
 
         return m
+
+
+try:
+    Line.model_rebuild()
+except NameError:
+    pass

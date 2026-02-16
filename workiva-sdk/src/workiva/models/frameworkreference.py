@@ -48,3 +48,9 @@ class FrameworkReference(BaseModel):
                     m[k] = val
 
         return m
+
+
+try:
+    FrameworkReference.model_rebuild()
+except NameError:
+    pass

@@ -240,3 +240,9 @@ class AnchorAttachmentPoint(BaseModel):
                     m[k] = val
 
         return m
+
+
+try:
+    AnchorAttachmentPoint.model_rebuild()
+except NameError:
+    pass

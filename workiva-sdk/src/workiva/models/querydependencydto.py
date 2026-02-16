@@ -58,3 +58,9 @@ class QueryDependencyDto(BaseModel):
             except ValueError:
                 return value
         return value
+
+
+try:
+    QueryDependencyDto.model_rebuild()
+except NameError:
+    pass

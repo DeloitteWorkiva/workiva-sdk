@@ -211,3 +211,13 @@ class Organization(BaseModel):
                     m[k] = val
 
         return m
+
+
+try:
+    Created.model_rebuild()
+except NameError:
+    pass
+try:
+    Modified.model_rebuild()
+except NameError:
+    pass

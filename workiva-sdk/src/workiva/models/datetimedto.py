@@ -19,3 +19,9 @@ class DatetimeDto(BaseModel):
 
     date_format: Annotated[str, pydantic.Field(alias="dateFormat")]
     r"""The dateformat of the candidate to test."""
+
+
+try:
+    DatetimeDto.model_rebuild()
+except NameError:
+    pass

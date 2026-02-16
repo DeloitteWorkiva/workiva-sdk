@@ -253,3 +253,17 @@ class Operation(BaseModel):
                     m[k] = val
 
         return m
+
+
+try:
+    OperationCreated.model_rebuild()
+except NameError:
+    pass
+try:
+    Updated.model_rebuild()
+except NameError:
+    pass
+try:
+    Operation.model_rebuild()
+except NameError:
+    pass

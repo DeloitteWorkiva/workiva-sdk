@@ -573,6 +573,8 @@ class ValueFormatTypedDict(TypedDict):
     r"""Custom suffix value to render in the cell. Valid for ACCOUNTING, CURRENCY, NUMBER, PERCENT, and DATE."""
     symbol_align: NotRequired[Nullable[SymbolAlign]]
     r"""Where to render the symbol relative to the value. All values valid for ACCOUNTING and CURRENCY. Left values valid for NUMBER. Right values valid for PERCENT."""
+    use_dashes_for_zeros: NotRequired[Nullable[bool]]
+    r"""Render zero as a dash instead of a digit. Valid for ACCOUNTING, CURRENCY, NUMBER, and PERCENT."""
     use_parens_for_negatives: NotRequired[Nullable[bool]]
     r"""Render parentheses around the number instead of a negative symbol. Valid for ACCOUNTING, CURRENCY, NUMBER, and PERCENT."""
     value_format_type: NotRequired[Nullable[ValueFormatType]]
@@ -683,6 +685,11 @@ class ValueFormat(BaseModel):
     ] = UNSET
     r"""Where to render the symbol relative to the value. All values valid for ACCOUNTING and CURRENCY. Left values valid for NUMBER. Right values valid for PERCENT."""
 
+    use_dashes_for_zeros: Annotated[
+        OptionalNullable[bool], pydantic.Field(alias="useDashesForZeros")
+    ] = UNSET
+    r"""Render zero as a dash instead of a digit. Valid for ACCOUNTING, CURRENCY, NUMBER, and PERCENT."""
+
     use_parens_for_negatives: Annotated[
         OptionalNullable[bool], pydantic.Field(alias="useParensForNegatives")
     ] = UNSET
@@ -771,6 +778,7 @@ class ValueFormat(BaseModel):
                 "shownIn",
                 "suffix",
                 "symbolAlign",
+                "useDashesForZeros",
                 "useParensForNegatives",
                 "valueFormatType",
             ]
@@ -797,6 +805,7 @@ class ValueFormat(BaseModel):
                 "shownIn",
                 "suffix",
                 "symbolAlign",
+                "useDashesForZeros",
                 "useParensForNegatives",
                 "valueFormatType",
             ]
@@ -821,3 +830,17 @@ class ValueFormat(BaseModel):
                     m[k] = val
 
         return m
+
+
+try:
+    NumbersAsWordsOptions.model_rebuild()
+except NameError:
+    pass
+try:
+    PeriodFormat.model_rebuild()
+except NameError:
+    pass
+try:
+    ValueFormat.model_rebuild()
+except NameError:
+    pass

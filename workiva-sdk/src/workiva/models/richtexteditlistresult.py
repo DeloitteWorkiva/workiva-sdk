@@ -56,3 +56,9 @@ class RichTextEditListResult(BaseModel):
                     m[k] = val
 
         return m
+
+
+try:
+    RichTextEditListResult.model_rebuild()
+except NameError:
+    pass

@@ -51,3 +51,9 @@ class ListProgressionIndentation(BaseModel):
                     m[k] = val
 
         return m
+
+
+try:
+    ListProgressionIndentation.model_rebuild()
+except NameError:
+    pass

@@ -917,6 +917,30 @@ see [Operations endpoint](ref:getoperationbyid).
 
 ### Examples
 
+#### Lock an unlocked sheet
+
+```json
+[
+  {
+    "op": "replace",
+    "path": "/lock",
+    "value": "lock"
+  }
+]
+```
+
+#### Unlock a locked sheet
+
+```json
+[
+  {
+    "op": "replace",
+    "path": "/lock",
+    "value": null
+  }
+]
+```
+
 #### Update the name of a sheet
 
 ```json

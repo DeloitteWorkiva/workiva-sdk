@@ -111,3 +111,9 @@ class ChartDrawingElement(BaseModel):
                     m[k] = val
 
         return m
+
+
+try:
+    ChartDrawingElement.model_rebuild()
+except NameError:
+    pass

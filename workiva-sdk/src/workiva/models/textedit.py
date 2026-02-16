@@ -1705,3 +1705,69 @@ class TextEdit(BaseModel):
                     m[k] = val
 
         return m
+
+
+try:
+    ClearListFormat.model_rebuild()
+except NameError:
+    pass
+try:
+    ClearParagraphProperties.model_rebuild()
+except NameError:
+    pass
+try:
+    ClearTextFormat.model_rebuild()
+except NameError:
+    pass
+try:
+    FormatText.model_rebuild()
+except NameError:
+    pass
+try:
+    InsertFootnote.model_rebuild()
+except NameError:
+    pass
+try:
+    InsertImage.model_rebuild()
+except NameError:
+    pass
+try:
+    InsertPageNumber.model_rebuild()
+except NameError:
+    pass
+try:
+    InsertParagraph.model_rebuild()
+except NameError:
+    pass
+try:
+    InsertSoftReturn.model_rebuild()
+except NameError:
+    pass
+try:
+    InsertTable.model_rebuild()
+except NameError:
+    pass
+try:
+    InsertText.model_rebuild()
+except NameError:
+    pass
+try:
+    SetListFormat.model_rebuild()
+except NameError:
+    pass
+try:
+    SetParagraphProperties.model_rebuild()
+except NameError:
+    pass
+try:
+    TextEditTableBreaking.model_rebuild()
+except NameError:
+    pass
+try:
+    SetTableProperties.model_rebuild()
+except NameError:
+    pass
+try:
+    TextEdit.model_rebuild()
+except NameError:
+    pass

@@ -51,3 +51,9 @@ class SheetsListResult(BaseModel):
                     m[k] = val
 
         return m
+
+
+try:
+    SheetsListResult.model_rebuild()
+except NameError:
+    pass

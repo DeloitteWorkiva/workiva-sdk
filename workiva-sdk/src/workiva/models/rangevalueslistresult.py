@@ -51,3 +51,9 @@ class RangeValuesListResult(BaseModel):
                     m[k] = val
 
         return m
+
+
+try:
+    RangeValuesListResult.model_rebuild()
+except NameError:
+    pass

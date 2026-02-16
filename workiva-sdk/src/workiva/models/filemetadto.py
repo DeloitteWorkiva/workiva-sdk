@@ -167,3 +167,9 @@ class FileMetaDto(BaseModel):
                     m[k] = val
 
         return m
+
+
+try:
+    FileMetaDto.model_rebuild()
+except NameError:
+    pass

@@ -51,3 +51,9 @@ class WorkspaceRolesListResult(BaseModel):
                     m[k] = val
 
         return m
+
+
+try:
+    WorkspaceRolesListResult.model_rebuild()
+except NameError:
+    pass

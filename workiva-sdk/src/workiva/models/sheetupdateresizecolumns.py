@@ -20,3 +20,9 @@ class SheetUpdateResizeColumns(BaseModel):
     resize_intervals: Annotated[
         List[ResizeColumnIntervals], pydantic.Field(alias="resizeIntervals")
     ]
+
+
+try:
+    SheetUpdateResizeColumns.model_rebuild()
+except NameError:
+    pass

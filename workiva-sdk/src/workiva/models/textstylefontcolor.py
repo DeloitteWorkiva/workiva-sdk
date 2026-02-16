@@ -76,3 +76,9 @@ class TextStyleFontColor(BaseModel):
                     m[k] = val
 
         return m
+
+
+try:
+    TextStyleFontColor.model_rebuild()
+except NameError:
+    pass

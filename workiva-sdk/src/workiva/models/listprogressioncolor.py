@@ -42,3 +42,9 @@ class ListProgressionColor(BaseModel):
                     m[k] = val
 
         return m
+
+
+try:
+    ListProgressionColor.model_rebuild()
+except NameError:
+    pass

@@ -42,3 +42,9 @@ class ValidateFilesDto(BaseModel):
                     m[k] = val
 
         return m
+
+
+try:
+    ValidateFilesDto.model_rebuild()
+except NameError:
+    pass

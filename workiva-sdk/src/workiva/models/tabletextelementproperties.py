@@ -65,3 +65,9 @@ class TableTextElementProperties(BaseModel):
                     m[k] = val
 
         return m
+
+
+try:
+    TableTextElementProperties.model_rebuild()
+except NameError:
+    pass

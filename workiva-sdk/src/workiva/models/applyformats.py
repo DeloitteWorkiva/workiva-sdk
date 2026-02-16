@@ -83,3 +83,9 @@ class ApplyFormats(BaseModel):
                     m[k] = val
 
         return m
+
+
+try:
+    ApplyFormats.model_rebuild()
+except NameError:
+    pass

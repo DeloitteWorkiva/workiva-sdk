@@ -1020,3 +1020,57 @@ class FileExportByID(BaseModel):
                     m[k] = val
 
         return m
+
+
+try:
+    FileExportByIDDocxOptions.model_rebuild()
+except NameError:
+    pass
+try:
+    FileExportByIDPdfOptions.model_rebuild()
+except NameError:
+    pass
+try:
+    FileExportByIDXhtmlOptions.model_rebuild()
+except NameError:
+    pass
+try:
+    FileExportByIDDocumentExport.model_rebuild()
+except NameError:
+    pass
+try:
+    FolderExport.model_rebuild()
+except NameError:
+    pass
+try:
+    FileExportByIDSchemasPdfOptions.model_rebuild()
+except NameError:
+    pass
+try:
+    FileExportByIDPptxOptions.model_rebuild()
+except NameError:
+    pass
+try:
+    FileExportByIDPresentationExport.model_rebuild()
+except NameError:
+    pass
+try:
+    FileExportByIDCsvOptions.model_rebuild()
+except NameError:
+    pass
+try:
+    FileExportByIDSchemasSpreadsheetExportPdfOptions.model_rebuild()
+except NameError:
+    pass
+try:
+    FileExportByIDXlsxOptions.model_rebuild()
+except NameError:
+    pass
+try:
+    FileExportByIDSpreadsheetExport.model_rebuild()
+except NameError:
+    pass
+try:
+    FileExportByID.model_rebuild()
+except NameError:
+    pass

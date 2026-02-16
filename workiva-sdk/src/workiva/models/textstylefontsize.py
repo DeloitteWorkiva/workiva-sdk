@@ -41,3 +41,9 @@ class TextStyleFontSize(BaseModel):
                     m[k] = val
 
         return m
+
+
+try:
+    TextStyleFontSize.model_rebuild()
+except NameError:
+    pass

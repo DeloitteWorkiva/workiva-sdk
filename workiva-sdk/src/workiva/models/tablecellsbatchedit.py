@@ -69,3 +69,9 @@ class TableCellsBatchEdit(BaseModel):
                     m[k] = val
 
         return m
+
+
+try:
+    TableCellsBatchEdit.model_rebuild()
+except NameError:
+    pass

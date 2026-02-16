@@ -53,3 +53,9 @@ class ImageUploadResultCollection(BaseModel):
                     m[k] = val
 
         return m
+
+
+try:
+    ImageUploadResultCollection.model_rebuild()
+except NameError:
+    pass

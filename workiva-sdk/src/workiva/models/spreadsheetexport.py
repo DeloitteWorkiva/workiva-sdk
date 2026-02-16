@@ -320,3 +320,21 @@ class SpreadsheetExport(BaseModel):
                     m[k] = val
 
         return m
+
+
+try:
+    CsvOptions.model_rebuild()
+except NameError:
+    pass
+try:
+    SpreadsheetExportPdfOptions.model_rebuild()
+except NameError:
+    pass
+try:
+    XlsxOptions.model_rebuild()
+except NameError:
+    pass
+try:
+    SpreadsheetExport.model_rebuild()
+except NameError:
+    pass

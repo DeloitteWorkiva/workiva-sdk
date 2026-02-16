@@ -63,3 +63,9 @@ class Anchor(BaseModel):
                     m[k] = val
 
         return m
+
+
+try:
+    Anchor.model_rebuild()
+except NameError:
+    pass

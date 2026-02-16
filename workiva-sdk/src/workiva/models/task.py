@@ -416,3 +416,21 @@ class TaskInput(BaseModel):
                     m[k] = val
 
         return m
+
+
+try:
+    TaskCreated.model_rebuild()
+except NameError:
+    pass
+try:
+    TaskModified.model_rebuild()
+except NameError:
+    pass
+try:
+    Task.model_rebuild()
+except NameError:
+    pass
+try:
+    TaskInput.model_rebuild()
+except NameError:
+    pass

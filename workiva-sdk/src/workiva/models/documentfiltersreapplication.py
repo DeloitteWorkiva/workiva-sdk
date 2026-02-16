@@ -45,3 +45,9 @@ class DocumentFiltersReapplication(BaseModel):
                     m[k] = val
 
         return m
+
+
+try:
+    DocumentFiltersReapplication.model_rebuild()
+except NameError:
+    pass

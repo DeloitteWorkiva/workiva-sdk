@@ -65,3 +65,9 @@ class TextStyleLineSpacing(BaseModel):
                     m[k] = val
 
         return m
+
+
+try:
+    TextStyleLineSpacing.model_rebuild()
+except NameError:
+    pass
