@@ -127,7 +127,7 @@ make build                # → dist/workiva-X.Y.Z-py3-none-any.whl
 1. **Codigo de infraestructura** → edita `_auth.py`, `_client.py`, `_retry.py`, etc.
 2. **Codigo publico** → edita `client.py`, `polling.py`, `exceptions.py`
 3. **Cambios en API generada** → modifica templates o codegen, luego `make generate`
-4. **Tests** → `workiva-sdk/tests/` (fuera de `src/`, seguro)
+4. **Tests** → `tests/` (fuera de `src/`, seguro)
 
 ### Agregar un nuevo endpoint
 
