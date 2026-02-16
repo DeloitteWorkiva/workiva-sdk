@@ -17,6 +17,9 @@ dist/
 .idea/
 *.swp
 
+# CI artifacts
+breaking_changes_report.md
+
 # Speakeasy
 .speakeasy/
 
