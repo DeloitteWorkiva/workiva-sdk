@@ -59,7 +59,7 @@ Async, paginación, reintentos, multi-región — todo documentado en las [guía
 ## Desarrollo
 
 ```bash
-make test           # 58 tests (unit + integration)
+make test           # unit + integration tests
 make force          # Regenerar SDK desde specs
 make build          # Construir wheel
 ```

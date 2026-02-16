@@ -67,7 +67,7 @@ git checkout -b feat/mi-cambio
 ### 3. Ejecuta los tests
 
 ```bash
-make test          # Los 58 tests deben pasar
+make test          # Todos los tests deben pasar
 make test-cov      # Verifica cobertura de _hooks
 ```
 

@@ -21,7 +21,7 @@ make merge          # Speakeasy merge into merged.yaml
 make generate       # Speakeasy generate + patch_sdk.py + save checksums
 
 # Testing
-make test           # All 58 tests (unit + integration)
+make test           # All tests (unit + integration)
 make test-unit      # Unit tests only
 make test-integration  # Integration tests only
 make test-cov       # Coverage report for workiva._hooks
@@ -30,7 +30,7 @@ make test-cov       # Coverage report for workiva._hooks
 cd workiva-sdk && uv run pytest tests/unit/test_polling_helpers.py::TestExtractOperationId::test_full_url -v
 
 # Build wheel
-make build          # → workiva-sdk/dist/workiva-0.4.0-py3-none-any.whl
+make build          # → workiva-sdk/dist/workiva-X.Y.Z-py3-none-any.whl
 
 # Dependency management
 cd workiva-sdk && uv sync   # Install/sync all deps including dev
@@ -59,6 +59,24 @@ oas/wdata.yaml    ─┘                                    └─ patch_sdk.py 
 - Cleans README.md (removes Speakeasy scaffolding, adds real install instructions)
 - Injects `X-Version: 2026-01-01` header into `clientcredentials.py` token request
 - Adds proprietary license, classifiers, and project URLs to `pyproject.toml`
+
+**`scripts/detect_breaking_changes.py`** — AST-based comparison of old vs new model files:
+- Parses all `.py` in models dir, extracts Enum classes (members + OpenEnumMeta) and BaseModel classes (fields + types + defaults)
+- **Breaking** (exit 1): enum value removed, OpenEnumMeta lost, model/field removed, new required field, schema collision
+- **Compatible** (exit 0): new model/enum/field/value added, type annotation changed
+- Outputs markdown report for PR body; also writes `breaking_changes_report.md`
+- Usage: `python scripts/detect_breaking_changes.py <old_models_dir> <new_models_dir> [oas_dir]`
+
+**`scripts/bump_version.py`** — Atomic patch version bump across all 4 version files:
+- Reads current version from `pyproject.toml`, increments patch (e.g. `0.5.7` → `0.5.8`)
+- Validates all files contain the old version before writing any (fail-fast)
+- Updates: `pyproject.toml`, `gen.yaml`, `_version.py` (`__version__` + `__user_agent__`), `README.md` badge
+- Usage: `python scripts/bump_version.py` (prints new version to stdout)
+
+**`scripts/smoke_test.py`** — Manual pre-release smoke test against live APIs:
+- Verifies all 3 APIs (Platform, Wdata, Chains) respond with a valid token
+- Reads credentials from `.env` (`WORKIVA_CLIENT_ID`, `WORKIVA_CLIENT_SECRET`)
+- Usage: `cd workiva-sdk && uv run python ../scripts/smoke_test.py`
 
 ### Generated vs Custom Code
 
@@ -121,24 +139,34 @@ Tests live in `workiva-sdk/tests/` (outside `src/`, safe from regeneration).
 
 When changes affect the SDK source code (hooks, patches, or regeneration), a new version must be published to PyPI.
 
-### Full publish flow
+### Automated publish (OAS spec updates)
+
+`check-specs.yml` runs every Monday and handles the full lifecycle:
+
+```
+download → changed? → snapshot models → regenerate → test
+    → detect_breaking_changes.py
+        ├─ exit 0 → bump_version.py → create PR → auto-merge → create release → publish.yml → PyPI
+        └─ exit 1 → create PR with "breaking-change" label + report → STOP (manual review)
+```
+
+Auto-merge uses `AUTO_MERGE_TOKEN` (PAT with admin access) for `gh pr merge --admin`.
+
+### Manual publish flow
+
+For changes outside OAS updates (hooks, patches, scripts):
 
 ```bash
-# 1. Bump version in ALL files (must match)
-#    - workiva-sdk/gen.yaml        → python.version
-#    - workiva-sdk/pyproject.toml  → [project].version
-#    - workiva-sdk/src/workiva/_version.py → __version__ + __user_agent__
+# 1. Bump version atomically across all 4 files
+python scripts/bump_version.py  # prints new version
 
-# 2. Update PyPI badge cache-buster in README.md
-#    [![PyPI](https://img.shields.io/pypi/v/workiva?v=X.Y.Z)]
+# 2. Run tests
+make test
 
-# 3. Run tests
-make test  # or: cd workiva-sdk && uv run python -m pytest tests/ -v
-
-# 4. Commit and push
+# 3. Commit and push
 git add ... && git commit && git push
 
-# 5. Create GitHub release (triggers CI publish)
+# 4. Create GitHub release (triggers CI publish)
 gh release create vX.Y.Z --title "vX.Y.Z" --notes "Release notes here"
 ```
 
