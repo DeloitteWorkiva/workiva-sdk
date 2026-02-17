@@ -86,11 +86,9 @@ for ws in result.data:
 ```python
 user = client.admin.create_organization_user(
     organization_id="org-123",
-    body={
-        "email": "dev@example.com",
-        "first_name": "Dev",
-        "last_name": "User",
-    },
+    email="dev@example.com",
+    given_name="Dev",
+    family_name="User",
 )
 print(f"Usuario creado: {user.id}")
 ```

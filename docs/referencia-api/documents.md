@@ -48,7 +48,7 @@ for doc in result.data:
 ```python
 response = client.documents.document_export(
     document_id="doc-123",
-    body={"format": "pdf"},
+    format_="pdf",
 )
 
 # Operacion 202
@@ -61,7 +61,7 @@ print(f"Exportado: {operation.resource_url}")
 ```python
 section = client.documents.create_section(
     document_id="doc-123",
-    body={"name": "Nueva Seccion"},
+    name="Nueva Seccion",
 )
 print(f"Seccion creada: {section.id}")
 ```
@@ -72,7 +72,7 @@ print(f"Seccion creada: {section.id}")
 response = client.documents.copy_section(
     document_id="doc-123",
     section_id="sec-456",
-    body={"destination_document_id": "doc-789"},
+    document="doc-789",
 )
 
 operation = client.wait(response).result(timeout=300)

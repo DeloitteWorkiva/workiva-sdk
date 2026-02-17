@@ -153,8 +153,8 @@ class Activities(BaseNamespace):
                 timeout=timeout,
             )
 
-        _body = paginate_all(_fetch, extract_next_link, "data")
-        return ActivityActionsListResult.model_validate(_body)
+        _body_result = paginate_all(_fetch, extract_next_link, "data")
+        return ActivityActionsListResult.model_validate(_body_result)
 
     async def get_activity_actions_async(
         self,
@@ -200,8 +200,8 @@ class Activities(BaseNamespace):
                 timeout=timeout,
             )
 
-        _body = await paginate_all_async(_fetch, extract_next_link, "data")
-        return ActivityActionsListResult.model_validate(_body)
+        _body_result = await paginate_all_async(_fetch, extract_next_link, "data")
+        return ActivityActionsListResult.model_validate(_body_result)
 
     def get_activity_action_by_id(
         self,
@@ -333,8 +333,8 @@ class Activities(BaseNamespace):
                 timeout=timeout,
             )
 
-        _body = paginate_all(_fetch, extract_next_link, "data")
-        return ActivitiesListResult.model_validate(_body)
+        _body_result = paginate_all(_fetch, extract_next_link, "data")
+        return ActivitiesListResult.model_validate(_body_result)
 
     async def get_organization_activities_async(
         self,
@@ -388,8 +388,8 @@ class Activities(BaseNamespace):
                 timeout=timeout,
             )
 
-        _body = await paginate_all_async(_fetch, extract_next_link, "data")
-        return ActivitiesListResult.model_validate(_body)
+        _body_result = await paginate_all_async(_fetch, extract_next_link, "data")
+        return ActivitiesListResult.model_validate(_body_result)
 
     def get_organization_workspace_activities(
         self,
@@ -447,8 +447,8 @@ class Activities(BaseNamespace):
                 timeout=timeout,
             )
 
-        _body = paginate_all(_fetch, extract_next_link, "data")
-        return ActivitiesListResult.model_validate(_body)
+        _body_result = paginate_all(_fetch, extract_next_link, "data")
+        return ActivitiesListResult.model_validate(_body_result)
 
     async def get_organization_workspace_activities_async(
         self,
@@ -506,5 +506,5 @@ class Activities(BaseNamespace):
                 timeout=timeout,
             )
 
-        _body = await paginate_all_async(_fetch, extract_next_link, "data")
-        return ActivitiesListResult.model_validate(_body)
+        _body_result = await paginate_all_async(_fetch, extract_next_link, "data")
+        return ActivitiesListResult.model_validate(_body_result)

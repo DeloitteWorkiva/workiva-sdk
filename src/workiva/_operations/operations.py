@@ -162,8 +162,8 @@ class Operations(BaseNamespace):
                 timeout=timeout,
             )
 
-        _body = paginate_all(_fetch, extract_next_link, "data")
-        return CopyFileListResult.model_validate(_body)
+        _body_result = paginate_all(_fetch, extract_next_link, "data")
+        return CopyFileListResult.model_validate(_body_result)
 
     async def get_copy_file_results_async(
         self,
@@ -207,8 +207,8 @@ class Operations(BaseNamespace):
                 timeout=timeout,
             )
 
-        _body = await paginate_all_async(_fetch, extract_next_link, "data")
-        return CopyFileListResult.model_validate(_body)
+        _body_result = await paginate_all_async(_fetch, extract_next_link, "data")
+        return CopyFileListResult.model_validate(_body_result)
 
     def get_destination_link_source_conversion_results(
         self,
@@ -250,8 +250,8 @@ class Operations(BaseNamespace):
                 timeout=timeout,
             )
 
-        _body = paginate_all(_fetch, extract_next_link, "data")
-        return DestinationLinkSourceConversionResultListResult.model_validate(_body)
+        _body_result = paginate_all(_fetch, extract_next_link, "data")
+        return DestinationLinkSourceConversionResultListResult.model_validate(_body_result)
 
     async def get_destination_link_source_conversion_results_async(
         self,
@@ -293,8 +293,8 @@ class Operations(BaseNamespace):
                 timeout=timeout,
             )
 
-        _body = await paginate_all_async(_fetch, extract_next_link, "data")
-        return DestinationLinkSourceConversionResultListResult.model_validate(_body)
+        _body_result = await paginate_all_async(_fetch, extract_next_link, "data")
+        return DestinationLinkSourceConversionResultListResult.model_validate(_body_result)
 
     def get_image_upload_creation_results(
         self,
@@ -335,8 +335,8 @@ class Operations(BaseNamespace):
                 timeout=timeout,
             )
 
-        _body = paginate_all(_fetch, extract_next_link, "data")
-        return ImageUploadResultCollection.model_validate(_body)
+        _body_result = paginate_all(_fetch, extract_next_link, "data")
+        return ImageUploadResultCollection.model_validate(_body_result)
 
     async def get_image_upload_creation_results_async(
         self,
@@ -377,8 +377,8 @@ class Operations(BaseNamespace):
                 timeout=timeout,
             )
 
-        _body = await paginate_all_async(_fetch, extract_next_link, "data")
-        return ImageUploadResultCollection.model_validate(_body)
+        _body_result = await paginate_all_async(_fetch, extract_next_link, "data")
+        return ImageUploadResultCollection.model_validate(_body_result)
 
     def get_import_file_results(
         self,
@@ -422,8 +422,8 @@ class Operations(BaseNamespace):
                 timeout=timeout,
             )
 
-        _body = paginate_all(_fetch, extract_next_link, "data")
-        return ImportFileListResult.model_validate(_body)
+        _body_result = paginate_all(_fetch, extract_next_link, "data")
+        return ImportFileListResult.model_validate(_body_result)
 
     async def get_import_file_results_async(
         self,
@@ -467,8 +467,8 @@ class Operations(BaseNamespace):
                 timeout=timeout,
             )
 
-        _body = await paginate_all_async(_fetch, extract_next_link, "data")
-        return ImportFileListResult.model_validate(_body)
+        _body_result = await paginate_all_async(_fetch, extract_next_link, "data")
+        return ImportFileListResult.model_validate(_body_result)
 
     def get_batch_upsertion_metric_values_results(
         self,
@@ -513,8 +513,8 @@ class Operations(BaseNamespace):
                 timeout=timeout,
             )
 
-        _body = paginate_all(_fetch, extract_next_link, "data")
-        return MetricValuesListResult.model_validate(_body)
+        _body_result = paginate_all(_fetch, extract_next_link, "data")
+        return MetricValuesListResult.model_validate(_body_result)
 
     async def get_batch_upsertion_metric_values_results_async(
         self,
@@ -559,8 +559,8 @@ class Operations(BaseNamespace):
                 timeout=timeout,
             )
 
-        _body = await paginate_all_async(_fetch, extract_next_link, "data")
-        return MetricValuesListResult.model_validate(_body)
+        _body_result = await paginate_all_async(_fetch, extract_next_link, "data")
+        return MetricValuesListResult.model_validate(_body_result)
 
     def get_milestone_creation_results(
         self,
@@ -601,8 +601,8 @@ class Operations(BaseNamespace):
                 timeout=timeout,
             )
 
-        _body = paginate_all(_fetch, extract_next_link, "data")
-        return MilestoneCreationListResult.model_validate(_body)
+        _body_result = paginate_all(_fetch, extract_next_link, "data")
+        return MilestoneCreationListResult.model_validate(_body_result)
 
     async def get_milestone_creation_results_async(
         self,
@@ -643,8 +643,8 @@ class Operations(BaseNamespace):
                 timeout=timeout,
             )
 
-        _body = await paginate_all_async(_fetch, extract_next_link, "data")
-        return MilestoneCreationListResult.model_validate(_body)
+        _body_result = await paginate_all_async(_fetch, extract_next_link, "data")
+        return MilestoneCreationListResult.model_validate(_body_result)
 
     def get_patch_document_results(
         self,
@@ -1201,8 +1201,8 @@ class Operations(BaseNamespace):
                 timeout=timeout,
             )
 
-        _body = paginate_all(_fetch, extract_next_link, "data")
-        return RangeLinkEditResultCollection.model_validate(_body)
+        _body_result = paginate_all(_fetch, extract_next_link, "data")
+        return RangeLinkEditResultCollection.model_validate(_body_result)
 
     async def get_range_link_edit_results_async(
         self,
@@ -1243,8 +1243,8 @@ class Operations(BaseNamespace):
                 timeout=timeout,
             )
 
-        _body = await paginate_all_async(_fetch, extract_next_link, "data")
-        return RangeLinkEditResultCollection.model_validate(_body)
+        _body_result = await paginate_all_async(_fetch, extract_next_link, "data")
+        return RangeLinkEditResultCollection.model_validate(_body_result)
 
     def get_rich_text_batch_edit_results(
         self,
@@ -1286,8 +1286,8 @@ class Operations(BaseNamespace):
                 timeout=timeout,
             )
 
-        _body = paginate_all(_fetch, extract_next_link, "data")
-        return RichTextEditListResult.model_validate(_body)
+        _body_result = paginate_all(_fetch, extract_next_link, "data")
+        return RichTextEditListResult.model_validate(_body_result)
 
     async def get_rich_text_batch_edit_results_async(
         self,
@@ -1329,8 +1329,8 @@ class Operations(BaseNamespace):
                 timeout=timeout,
             )
 
-        _body = await paginate_all_async(_fetch, extract_next_link, "data")
-        return RichTextEditListResult.model_validate(_body)
+        _body_result = await paginate_all_async(_fetch, extract_next_link, "data")
+        return RichTextEditListResult.model_validate(_body_result)
 
     def get_rich_text_anchor_creation_results(
         self,
@@ -1372,8 +1372,8 @@ class Operations(BaseNamespace):
                 timeout=timeout,
             )
 
-        _body = paginate_all(_fetch, extract_next_link, "data")
-        return RichTextAnchorCreationResultCollection.model_validate(_body)
+        _body_result = paginate_all(_fetch, extract_next_link, "data")
+        return RichTextAnchorCreationResultCollection.model_validate(_body_result)
 
     async def get_rich_text_anchor_creation_results_async(
         self,
@@ -1415,8 +1415,8 @@ class Operations(BaseNamespace):
                 timeout=timeout,
             )
 
-        _body = await paginate_all_async(_fetch, extract_next_link, "data")
-        return RichTextAnchorCreationResultCollection.model_validate(_body)
+        _body_result = await paginate_all_async(_fetch, extract_next_link, "data")
+        return RichTextAnchorCreationResultCollection.model_validate(_body_result)
 
     def get_rich_text_duplication_edit_results(
         self,
@@ -1458,8 +1458,8 @@ class Operations(BaseNamespace):
                 timeout=timeout,
             )
 
-        _body = paginate_all(_fetch, extract_next_link, "data")
-        return RichTextDuplicationEditListResult.model_validate(_body)
+        _body_result = paginate_all(_fetch, extract_next_link, "data")
+        return RichTextDuplicationEditListResult.model_validate(_body_result)
 
     async def get_rich_text_duplication_edit_results_async(
         self,
@@ -1501,8 +1501,8 @@ class Operations(BaseNamespace):
                 timeout=timeout,
             )
 
-        _body = await paginate_all_async(_fetch, extract_next_link, "data")
-        return RichTextDuplicationEditListResult.model_validate(_body)
+        _body_result = await paginate_all_async(_fetch, extract_next_link, "data")
+        return RichTextDuplicationEditListResult.model_validate(_body_result)
 
     def get_rich_text_links_batch_edit_results(
         self,
@@ -1543,8 +1543,8 @@ class Operations(BaseNamespace):
                 timeout=timeout,
             )
 
-        _body = paginate_all(_fetch, extract_next_link, "data")
-        return RichTextLinksEditListResult.model_validate(_body)
+        _body_result = paginate_all(_fetch, extract_next_link, "data")
+        return RichTextLinksEditListResult.model_validate(_body_result)
 
     async def get_rich_text_links_batch_edit_results_async(
         self,
@@ -1585,8 +1585,8 @@ class Operations(BaseNamespace):
                 timeout=timeout,
             )
 
-        _body = await paginate_all_async(_fetch, extract_next_link, "data")
-        return RichTextLinksEditListResult.model_validate(_body)
+        _body_result = await paginate_all_async(_fetch, extract_next_link, "data")
+        return RichTextLinksEditListResult.model_validate(_body_result)
 
     def get_table_anchor_creation_results(
         self,
@@ -1628,8 +1628,8 @@ class Operations(BaseNamespace):
                 timeout=timeout,
             )
 
-        _body = paginate_all(_fetch, extract_next_link, "data")
-        return TableAnchorCreationResultCollection.model_validate(_body)
+        _body_result = paginate_all(_fetch, extract_next_link, "data")
+        return TableAnchorCreationResultCollection.model_validate(_body_result)
 
     async def get_table_anchor_creation_results_async(
         self,
@@ -1671,8 +1671,8 @@ class Operations(BaseNamespace):
                 timeout=timeout,
             )
 
-        _body = await paginate_all_async(_fetch, extract_next_link, "data")
-        return TableAnchorCreationResultCollection.model_validate(_body)
+        _body_result = await paginate_all_async(_fetch, extract_next_link, "data")
+        return TableAnchorCreationResultCollection.model_validate(_body_result)
 
     def get_table_cell_edit_results(
         self,
@@ -1844,8 +1844,8 @@ class Operations(BaseNamespace):
                 timeout=timeout,
             )
 
-        _body = paginate_all(_fetch, extract_next_link, "data")
-        return TableLinksEditListResult.model_validate(_body)
+        _body_result = paginate_all(_fetch, extract_next_link, "data")
+        return TableLinksEditListResult.model_validate(_body_result)
 
     async def get_table_links_edit_results_async(
         self,
@@ -1887,8 +1887,8 @@ class Operations(BaseNamespace):
                 timeout=timeout,
             )
 
-        _body = await paginate_all_async(_fetch, extract_next_link, "data")
-        return TableLinksEditListResult.model_validate(_body)
+        _body_result = await paginate_all_async(_fetch, extract_next_link, "data")
+        return TableLinksEditListResult.model_validate(_body_result)
 
     def get_table_reapply_filter_results(
         self,

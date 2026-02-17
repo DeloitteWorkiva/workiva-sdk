@@ -40,8 +40,8 @@ for record in result.data:
 
 ```python
 response = client.graph.graph_report_export(
-    workspace_id="ws-123",
-    body=export_config,
+    report_id="report-123",
+    format_="csv",
 )
 
 operation = client.wait(response).result(timeout=300)

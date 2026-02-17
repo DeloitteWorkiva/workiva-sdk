@@ -501,8 +501,8 @@ class Chains(BaseNamespace):
                 timeout=timeout,
             )
 
-        _body = paginate_all(_fetch, extract_chains_cursor, "data.chainExecutors")
-        return ChainRunPageResponse.model_validate(_body)
+        _body_result = paginate_all(_fetch, extract_chains_cursor, "data.chainExecutors")
+        return ChainRunPageResponse.model_validate(_body_result)
 
     async def chain_filter_search_async(
         self,
@@ -559,8 +559,10 @@ class Chains(BaseNamespace):
                 timeout=timeout,
             )
 
-        _body = await paginate_all_async(_fetch, extract_chains_cursor, "data.chainExecutors")
-        return ChainRunPageResponse.model_validate(_body)
+        _body_result = await paginate_all_async(
+            _fetch, extract_chains_cursor, "data.chainExecutors"
+        )
+        return ChainRunPageResponse.model_validate(_body_result)
 
     def get_chain_run(
         self,
@@ -799,8 +801,8 @@ class Chains(BaseNamespace):
                 timeout=timeout,
             )
 
-        _body = paginate_all(_fetch, extract_chains_cursor, "data.chainExecutors")
-        return ChainRunPageResponse.model_validate(_body)
+        _body_result = paginate_all(_fetch, extract_chains_cursor, "data.chainExecutors")
+        return ChainRunPageResponse.model_validate(_body_result)
 
     async def chain_inputs_search_async(
         self,
@@ -849,8 +851,10 @@ class Chains(BaseNamespace):
                 timeout=timeout,
             )
 
-        _body = await paginate_all_async(_fetch, extract_chains_cursor, "data.chainExecutors")
-        return ChainRunPageResponse.model_validate(_body)
+        _body_result = await paginate_all_async(
+            _fetch, extract_chains_cursor, "data.chainExecutors"
+        )
+        return ChainRunPageResponse.model_validate(_body_result)
 
     def chain_run_history(
         self,
@@ -899,8 +903,8 @@ class Chains(BaseNamespace):
                 timeout=timeout,
             )
 
-        _body = paginate_all(_fetch, extract_chains_cursor, "data.chainExecutors")
-        return ChainRunPageResponse.model_validate(_body)
+        _body_result = paginate_all(_fetch, extract_chains_cursor, "data.chainExecutors")
+        return ChainRunPageResponse.model_validate(_body_result)
 
     async def chain_run_history_async(
         self,
@@ -949,8 +953,10 @@ class Chains(BaseNamespace):
                 timeout=timeout,
             )
 
-        _body = await paginate_all_async(_fetch, extract_chains_cursor, "data.chainExecutors")
-        return ChainRunPageResponse.model_validate(_body)
+        _body_result = await paginate_all_async(
+            _fetch, extract_chains_cursor, "data.chainExecutors"
+        )
+        return ChainRunPageResponse.model_validate(_body_result)
 
     def start_chain(
         self,
@@ -1601,8 +1607,8 @@ class Chains(BaseNamespace):
                 timeout=timeout,
             )
 
-        _body = paginate_all(_fetch, extract_chains_cursor, "data")
-        return ActivityResponse.model_validate(_body)
+        _body_result = paginate_all(_fetch, extract_chains_cursor, "data")
+        return ActivityResponse.model_validate(_body_result)
 
     async def get_authorizations_activity_async(
         self,
@@ -1637,8 +1643,8 @@ class Chains(BaseNamespace):
                 timeout=timeout,
             )
 
-        _body = await paginate_all_async(_fetch, extract_chains_cursor, "data")
-        return ActivityResponse.model_validate(_body)
+        _body_result = await paginate_all_async(_fetch, extract_chains_cursor, "data")
+        return ActivityResponse.model_validate(_body_result)
 
     def get_login_activity(
         self,
@@ -1673,8 +1679,8 @@ class Chains(BaseNamespace):
                 timeout=timeout,
             )
 
-        _body = paginate_all(_fetch, extract_chains_cursor, "data")
-        return LoginActivityResponse.model_validate(_body)
+        _body_result = paginate_all(_fetch, extract_chains_cursor, "data")
+        return LoginActivityResponse.model_validate(_body_result)
 
     async def get_login_activity_async(
         self,
@@ -1709,8 +1715,8 @@ class Chains(BaseNamespace):
                 timeout=timeout,
             )
 
-        _body = await paginate_all_async(_fetch, extract_chains_cursor, "data")
-        return LoginActivityResponse.model_validate(_body)
+        _body_result = await paginate_all_async(_fetch, extract_chains_cursor, "data")
+        return LoginActivityResponse.model_validate(_body_result)
 
     def get_permissions(
         self,
@@ -1745,8 +1751,8 @@ class Chains(BaseNamespace):
                 timeout=timeout,
             )
 
-        _body = paginate_all(_fetch, extract_chains_cursor, "data")
-        return PermissionsResponse.model_validate(_body)
+        _body_result = paginate_all(_fetch, extract_chains_cursor, "data")
+        return PermissionsResponse.model_validate(_body_result)
 
     async def get_permissions_async(
         self,
@@ -1781,8 +1787,8 @@ class Chains(BaseNamespace):
                 timeout=timeout,
             )
 
-        _body = await paginate_all_async(_fetch, extract_chains_cursor, "data")
-        return PermissionsResponse.model_validate(_body)
+        _body_result = await paginate_all_async(_fetch, extract_chains_cursor, "data")
+        return PermissionsResponse.model_validate(_body_result)
 
     def get_user_groups(
         self,
@@ -1817,8 +1823,8 @@ class Chains(BaseNamespace):
                 timeout=timeout,
             )
 
-        _body = paginate_all(_fetch, extract_chains_cursor, "data")
-        return UserGroupsResponse.model_validate(_body)
+        _body_result = paginate_all(_fetch, extract_chains_cursor, "data")
+        return UserGroupsResponse.model_validate(_body_result)
 
     async def get_user_groups_async(
         self,
@@ -1853,8 +1859,8 @@ class Chains(BaseNamespace):
                 timeout=timeout,
             )
 
-        _body = await paginate_all_async(_fetch, extract_chains_cursor, "data")
-        return UserGroupsResponse.model_validate(_body)
+        _body_result = await paginate_all_async(_fetch, extract_chains_cursor, "data")
+        return UserGroupsResponse.model_validate(_body_result)
 
     def get_user_group(
         self,
@@ -1959,8 +1965,8 @@ class Chains(BaseNamespace):
                 timeout=timeout,
             )
 
-        _body = paginate_all(_fetch, extract_chains_cursor, "data")
-        return PermissionsResponse.model_validate(_body)
+        _body_result = paginate_all(_fetch, extract_chains_cursor, "data")
+        return PermissionsResponse.model_validate(_body_result)
 
     async def get_user_group_permissions_async(
         self,
@@ -2001,8 +2007,8 @@ class Chains(BaseNamespace):
                 timeout=timeout,
             )
 
-        _body = await paginate_all_async(_fetch, extract_chains_cursor, "data")
-        return PermissionsResponse.model_validate(_body)
+        _body_result = await paginate_all_async(_fetch, extract_chains_cursor, "data")
+        return PermissionsResponse.model_validate(_body_result)
 
     def get_users(
         self,
@@ -2037,8 +2043,8 @@ class Chains(BaseNamespace):
                 timeout=timeout,
             )
 
-        _body = paginate_all(_fetch, extract_chains_cursor, "data")
-        return UsersResponse.model_validate(_body)
+        _body_result = paginate_all(_fetch, extract_chains_cursor, "data")
+        return UsersResponse.model_validate(_body_result)
 
     async def get_users_async(
         self,
@@ -2073,8 +2079,8 @@ class Chains(BaseNamespace):
                 timeout=timeout,
             )
 
-        _body = await paginate_all_async(_fetch, extract_chains_cursor, "data")
-        return UsersResponse.model_validate(_body)
+        _body_result = await paginate_all_async(_fetch, extract_chains_cursor, "data")
+        return UsersResponse.model_validate(_body_result)
 
     def get_user(
         self,
@@ -2179,8 +2185,8 @@ class Chains(BaseNamespace):
                 timeout=timeout,
             )
 
-        _body = paginate_all(_fetch, extract_chains_cursor, "data")
-        return UserGroupsResponse.model_validate(_body)
+        _body_result = paginate_all(_fetch, extract_chains_cursor, "data")
+        return UserGroupsResponse.model_validate(_body_result)
 
     async def get_user_user_groups_async(
         self,
@@ -2221,5 +2227,5 @@ class Chains(BaseNamespace):
                 timeout=timeout,
             )
 
-        _body = await paginate_all_async(_fetch, extract_chains_cursor, "data")
-        return UserGroupsResponse.model_validate(_body)
+        _body_result = await paginate_all_async(_fetch, extract_chains_cursor, "data")
+        return UserGroupsResponse.model_validate(_body_result)

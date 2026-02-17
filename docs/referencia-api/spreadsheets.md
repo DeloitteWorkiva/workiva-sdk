@@ -88,7 +88,7 @@ client.spreadsheets.update_values_by_range(
     spreadsheet_id="ss-123",
     sheet_id="sheet-456",
     range_="A1:B2",
-    body=values_data,
+    values=values_data,
 )
 ```
 
@@ -97,7 +97,7 @@ client.spreadsheets.update_values_by_range(
 ```python
 response = client.spreadsheets.spreadsheet_export(
     spreadsheet_id="ss-123",
-    body={"format": "xlsx"},
+    format_="xlsx",
 )
 
 operation = client.wait(response).result(timeout=120)

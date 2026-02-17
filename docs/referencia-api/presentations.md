@@ -56,7 +56,7 @@ for slide in result.data:
 ```python
 response = client.presentations.presentation_export(
     presentation_id="pres-123",
-    body={"format": "pdf"},
+    format_="pdf",
 )
 
 operation = client.wait(response).result(timeout=120)

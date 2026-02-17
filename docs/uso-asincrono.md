@@ -79,7 +79,7 @@ async with Workiva(client_id="...", client_secret="...") as client:
 async with Workiva(client_id="...", client_secret="...") as client:
     response = await client.files.copy_file_async(
         file_id="abc",
-        body=body,
+        destination_container="folder-456",
     )
 
     # Polling automatico async
@@ -117,7 +117,8 @@ async def export_file(client, file_id: str):
     """Exportar un archivo y esperar el resultado."""
     response = await client.files.export_file_by_id_async(
         file_id=file_id,
-        body={"format": "pdf"},
+        kind="Document",
+        document_export={"format": "pdf"},
     )
     return await client.wait(response).result_async(timeout=120)
 

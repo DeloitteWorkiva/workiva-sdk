@@ -163,7 +163,13 @@ class BaseNamespace:
             has_literal = False
             for op in operations:
                 if op.request_body and op.request_body.python_type:
-                    _collect_model_types(op.request_body.python_type, model_types)
+                    if op.body_fields:
+                        # Flat body: import field types (nested models only)
+                        for bf in op.body_fields:
+                            _collect_model_types(bf.python_type, model_types)
+                    else:
+                        # Non-flat body: import the body model itself
+                        _collect_model_types(op.request_body.python_type, model_types)
                 if op.success_response and op.success_response.python_type and op.success_response.python_type != "None":
                     _collect_model_types(op.success_response.python_type, model_types)
                 if op.pagination:
@@ -171,6 +177,8 @@ class BaseNamespace:
                 if op.success_response and op.success_response.is_list:
                     has_list_response = True
                 if any("Literal[" in p.python_type for p in op.params):
+                    has_literal = True
+                if any("Literal[" in bf.python_type for bf in op.body_fields):
                     has_literal = True
 
             # Render template

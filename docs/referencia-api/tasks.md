@@ -30,10 +30,8 @@ for task in result.data:
 
 ```python
 task = client.tasks.create_task(
-    body={
-        "name": "Revisar reporte Q4",
-        "description": "Verificar datos financieros",
-    },
+    title="Revisar reporte Q4",
+    description="Verificar datos financieros",
 )
 print(f"Tarea creada: {task.id}")
 ```
@@ -43,7 +41,7 @@ print(f"Tarea creada: {task.id}")
 ```python
 client.tasks.partially_update_task_by_id(
     task_id="task-123",
-    body={"status": "completed"},
+    body=[{"op": "replace", "path": "/status", "value": "completed"}],
 )
 ```
 
@@ -58,6 +56,6 @@ client.tasks.delete_task_by_id(task_id="task-123")
 ```python
 client.tasks.submit_task_action(
     task_id="task-123",
-    body={"action": "approve"},
+    action="APPROVE",
 )
 ```

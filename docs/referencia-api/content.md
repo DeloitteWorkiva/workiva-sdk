@@ -85,9 +85,7 @@ for cell in result.data:
 
 ```python
 response = client.content.image_upload(
-    document_id="doc-123",
-    section_id="sec-456",
-    body=image_data,
+    file_name="chart.png",
 )
 # Operacion 202
 operation = client.wait(response).result(timeout=60)

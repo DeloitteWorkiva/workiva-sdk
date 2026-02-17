@@ -81,8 +81,8 @@ class Reports(BaseNamespace):
                 timeout=timeout,
             )
 
-        _body = paginate_all(_fetch, extract_jsonapi_next, "data")
-        return GetOrgReportUsersResponse.model_validate(_body)
+        _body_result = paginate_all(_fetch, extract_jsonapi_next, "data")
+        return GetOrgReportUsersResponse.model_validate(_body_result)
 
     async def get_org_report_users_async(
         self,
@@ -137,5 +137,5 @@ class Reports(BaseNamespace):
                 timeout=timeout,
             )
 
-        _body = await paginate_all_async(_fetch, extract_jsonapi_next, "data")
-        return GetOrgReportUsersResponse.model_validate(_body)
+        _body_result = await paginate_all_async(_fetch, extract_jsonapi_next, "data")
+        return GetOrgReportUsersResponse.model_validate(_body_result)

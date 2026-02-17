@@ -54,7 +54,7 @@ Cada codigo HTTP comun tiene su propia excepcion:
 from workiva import BadRequestError
 
 try:
-    client.files.copy_file(file_id="abc", body={})
+    client.files.copy_file(file_id="abc")
 except BadRequestError as e:
     print(f"Request invalido: {e}")
     print(f"Detalles: {e.body}")
@@ -101,7 +101,7 @@ except NotFoundError as e:
 from workiva import ConflictError
 
 try:
-    client.files.copy_file(file_id="abc", body=body)
+    client.files.copy_file(file_id="abc", destination_container="folder-456")
 except ConflictError as e:
     print(f"Conflicto: {e}")
 ```
@@ -237,14 +237,13 @@ from workiva import (
     OperationTimeout,
     TokenAcquisitionError,
 )
-from workiva.models.platform import FileCopy
 
 with Workiva(client_id="...", client_secret="...") as client:
     try:
         # Copiar archivo (operacion de larga duracion)
         response = client.files.copy_file(
             file_id="abc",
-            body=FileCopy(workspace_id="ws-123"),
+            destination_container="ws-123",
         )
 
         # Esperar resultado

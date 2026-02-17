@@ -18,21 +18,39 @@ from workiva._pagination import (
 )
 from workiva.models.platform import (
     DatasetsListResult,
-    LinksPublicationOptions,
     MilestoneListResult,
-    RangeValues,
     RangeValuesListResult,
+    ResourcePermission,
     ResourcePermissionsListResult,
-    ResourcePermissionsModification,
     Sheet,
-    SheetCopy,
     SheetDataResult,
     SheetsListResult,
-    SheetUpdate,
+    SheetUpdateApplyBorders,
+    SheetUpdateApplyFormats,
+    SheetUpdateClearBorders,
+    SheetUpdateClearFormats,
+    SheetUpdateDeleteColumns,
+    SheetUpdateDeleteRows,
+    SheetUpdateEditCells,
+    SheetUpdateEditRange,
+    SheetUpdateHideColumns,
+    SheetUpdateHideRows,
+    SheetUpdateInsertColumns,
+    SheetUpdateInsertRows,
+    SheetUpdateMergeRanges,
+    SheetUpdateResizeColumns,
+    SheetUpdateResizeColumnsToFit,
+    SheetUpdateResizeRows,
+    SheetUpdateResizeRowsToFit,
+    SheetUpdateUnhideColumns,
+    SheetUpdateUnhideRows,
+    SheetUpdateUnmergeRanges,
     Spreadsheet,
-    SpreadsheetExport,
-    SpreadsheetFiltersReapplication,
     SpreadsheetsListResult,
+    SpreadsheetToCsvOptions,
+    SpreadsheetToPdfOptions,
+    SpreadsheetToXlsxOptions,
+    TableRef,
 )
 
 __all__ = ["Spreadsheets"]
@@ -83,8 +101,8 @@ class Spreadsheets(BaseNamespace):
                 timeout=timeout,
             )
 
-        _body = paginate_all(_fetch, extract_next_link, "data")
-        return SpreadsheetsListResult.model_validate(_body)
+        _body_result = paginate_all(_fetch, extract_next_link, "data")
+        return SpreadsheetsListResult.model_validate(_body_result)
 
     async def get_spreadsheets_async(
         self,
@@ -126,8 +144,8 @@ class Spreadsheets(BaseNamespace):
                 timeout=timeout,
             )
 
-        _body = await paginate_all_async(_fetch, extract_next_link, "data")
-        return SpreadsheetsListResult.model_validate(_body)
+        _body_result = await paginate_all_async(_fetch, extract_next_link, "data")
+        return SpreadsheetsListResult.model_validate(_body_result)
 
     def partially_update_spreadsheet_by_id(
         self,
@@ -603,38 +621,59 @@ class Spreadsheets(BaseNamespace):
         self,
         *,
         spreadsheet_id: str,
-        body: SpreadsheetExport,
+        format_: Literal["pdf", "xlsx", "csv"],
+        csv_options: Optional[SpreadsheetToCsvOptions] = None,
+        pdf_options: Optional[SpreadsheetToPdfOptions] = None,
+        sheets: Optional[list[str]] = None,
+        xlsx_options: Optional[SpreadsheetToXlsxOptions] = None,
         timeout: Optional[float] = None,
     ) -> httpx.Response:
         """Initiate a spreadsheet export
 
-        Asynchronously exports a [spreadsheet](ref:spreadsheets#spreadsheet) as
-        .XLSX, .PDF, or .CSV.
+                Asynchronously exports a [spreadsheet](ref:spreadsheets#spreadsheet) as
+                .XLSX, .PDF, or .CSV.
 
-        Responses include a `Location` header, which indicates where to poll for
-        export results. For more details on long-running job polling, see
-        [Operations endpoint](ref:getoperationbyid). When the export completes,
-        its status will be `completed`, and the response body includes a
-        `resourceURL`. To download the exported file, perform a GET on the
-        `resourceURL` with the same authentication credentials and flow as the
-        export request. For more details, see [Authentication
-        documentation](ref:authentication).
+                Responses include a `Location` header, which indicates where to poll for
+                export results. For more details on long-running job polling, see
+                [Operations endpoint](ref:getoperationbyid). When the export completes,
+                its status will be `completed`, and the response body includes a
+                `resourceURL`. To download the exported file, perform a GET on the
+                `resourceURL` with the same authentication credentials and flow as the
+                export request. For more details, see [Authentication
+                documentation](ref:authentication).
 
-        Note: To export to .PDF, the spreadsheet can have no more than 250,000
-        cells.
+                Note: To export to .PDF, the spreadsheet can have no more than 250,000
+                cells.
 
-        Args:
-            spreadsheet_id: The unique identifier of the spreadsheet
-            body: Request body.
-            timeout: Override the default request timeout (seconds).
+                Args:
+                    spreadsheet_id: The unique identifier of the spreadsheet
+                    format_: The file format to export the spreadsheet as.
+                    csv_options:
+                    pdf_options:
+                    sheets: The IDs of the sheets within the spreadsheet to export. Omit to export the entire spreadsheet.
 
-        Raises:
-            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
+        Note: When exporting to .CSV, you can export only the entire spreadsheet or a single sheet. When exporting the entire spreadsheet, the resulting file is a .ZIP of .CSV files, with one .CSV file per sheet.
+                    xlsx_options:
+                    timeout: Override the default request timeout (seconds).
 
-        Note:
-            This is a long-running operation (HTTP 202). Use
-            ``client.wait(response).result()`` to poll until completion.
+                Raises:
+                    WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
+
+                Note:
+                    This is a long-running operation (HTTP 202). Use
+                    ``client.wait(response).result()`` to poll until completion.
         """
+        _body: dict[str, Any] = {}
+        if format_ is not None:
+            _body["format"] = format_
+        if csv_options is not None:
+            _body["csvOptions"] = csv_options
+        if pdf_options is not None:
+            _body["pdfOptions"] = pdf_options
+        if sheets is not None:
+            _body["sheets"] = sheets
+        if xlsx_options is not None:
+            _body["xlsxOptions"] = xlsx_options
         return self._client.request(
             "POST",
             self._api,
@@ -642,7 +681,7 @@ class Spreadsheets(BaseNamespace):
             path_params={
                 "spreadsheetId": spreadsheet_id,
             },
-            json_body=body,
+            json_body=_body or None,
             timeout=timeout,
         )
 
@@ -650,38 +689,59 @@ class Spreadsheets(BaseNamespace):
         self,
         *,
         spreadsheet_id: str,
-        body: SpreadsheetExport,
+        format_: Literal["pdf", "xlsx", "csv"],
+        csv_options: Optional[SpreadsheetToCsvOptions] = None,
+        pdf_options: Optional[SpreadsheetToPdfOptions] = None,
+        sheets: Optional[list[str]] = None,
+        xlsx_options: Optional[SpreadsheetToXlsxOptions] = None,
         timeout: Optional[float] = None,
     ) -> httpx.Response:
         """Initiate a spreadsheet export (async)
 
-        Asynchronously exports a [spreadsheet](ref:spreadsheets#spreadsheet) as
-        .XLSX, .PDF, or .CSV.
+                Asynchronously exports a [spreadsheet](ref:spreadsheets#spreadsheet) as
+                .XLSX, .PDF, or .CSV.
 
-        Responses include a `Location` header, which indicates where to poll for
-        export results. For more details on long-running job polling, see
-        [Operations endpoint](ref:getoperationbyid). When the export completes,
-        its status will be `completed`, and the response body includes a
-        `resourceURL`. To download the exported file, perform a GET on the
-        `resourceURL` with the same authentication credentials and flow as the
-        export request. For more details, see [Authentication
-        documentation](ref:authentication).
+                Responses include a `Location` header, which indicates where to poll for
+                export results. For more details on long-running job polling, see
+                [Operations endpoint](ref:getoperationbyid). When the export completes,
+                its status will be `completed`, and the response body includes a
+                `resourceURL`. To download the exported file, perform a GET on the
+                `resourceURL` with the same authentication credentials and flow as the
+                export request. For more details, see [Authentication
+                documentation](ref:authentication).
 
-        Note: To export to .PDF, the spreadsheet can have no more than 250,000
-        cells.
+                Note: To export to .PDF, the spreadsheet can have no more than 250,000
+                cells.
 
-        Args:
-            spreadsheet_id: The unique identifier of the spreadsheet
-            body: Request body.
-            timeout: Override the default request timeout (seconds).
+                Args:
+                    spreadsheet_id: The unique identifier of the spreadsheet
+                    format_: The file format to export the spreadsheet as.
+                    csv_options:
+                    pdf_options:
+                    sheets: The IDs of the sheets within the spreadsheet to export. Omit to export the entire spreadsheet.
 
-        Raises:
-            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
+        Note: When exporting to .CSV, you can export only the entire spreadsheet or a single sheet. When exporting the entire spreadsheet, the resulting file is a .ZIP of .CSV files, with one .CSV file per sheet.
+                    xlsx_options:
+                    timeout: Override the default request timeout (seconds).
 
-        Note:
-            This is a long-running operation (HTTP 202). Use
-            ``await client.wait(response).result_async()`` to poll until completion.
+                Raises:
+                    WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
+
+                Note:
+                    This is a long-running operation (HTTP 202). Use
+                    ``await client.wait(response).result_async()`` to poll until completion.
         """
+        _body: dict[str, Any] = {}
+        if format_ is not None:
+            _body["format"] = format_
+        if csv_options is not None:
+            _body["csvOptions"] = csv_options
+        if pdf_options is not None:
+            _body["pdfOptions"] = pdf_options
+        if sheets is not None:
+            _body["sheets"] = sheets
+        if xlsx_options is not None:
+            _body["xlsxOptions"] = xlsx_options
         return await self._client.request_async(
             "POST",
             self._api,
@@ -689,7 +749,7 @@ class Spreadsheets(BaseNamespace):
             path_params={
                 "spreadsheetId": spreadsheet_id,
             },
-            json_body=body,
+            json_body=_body or None,
             timeout=timeout,
         )
 
@@ -697,7 +757,7 @@ class Spreadsheets(BaseNamespace):
         self,
         *,
         spreadsheet_id: str,
-        body: SpreadsheetFiltersReapplication,
+        ignore_non_editable_filters: Optional[bool] = None,
         timeout: Optional[float] = None,
     ) -> httpx.Response:
         """Reapply filters to the spreadsheet
@@ -716,7 +776,7 @@ class Spreadsheets(BaseNamespace):
 
         Args:
             spreadsheet_id: The unique identifier of the spreadsheet
-            body: Request body.
+            ignore_non_editable_filters: Skip filters that cannot be reapplied (due to not having edit permissions, locked sheets, or sheets in input mode) instead of returning an error.
             timeout: Override the default request timeout (seconds).
 
         Raises:
@@ -726,6 +786,9 @@ class Spreadsheets(BaseNamespace):
             This is a long-running operation (HTTP 202). Use
             ``client.wait(response).result()`` to poll until completion.
         """
+        _body: dict[str, Any] = {}
+        if ignore_non_editable_filters is not None:
+            _body["ignoreNonEditableFilters"] = ignore_non_editable_filters
         return self._client.request(
             "POST",
             self._api,
@@ -733,7 +796,7 @@ class Spreadsheets(BaseNamespace):
             path_params={
                 "spreadsheetId": spreadsheet_id,
             },
-            json_body=body,
+            json_body=_body or None,
             timeout=timeout,
         )
 
@@ -741,7 +804,7 @@ class Spreadsheets(BaseNamespace):
         self,
         *,
         spreadsheet_id: str,
-        body: SpreadsheetFiltersReapplication,
+        ignore_non_editable_filters: Optional[bool] = None,
         timeout: Optional[float] = None,
     ) -> httpx.Response:
         """Reapply filters to the spreadsheet (async)
@@ -760,7 +823,7 @@ class Spreadsheets(BaseNamespace):
 
         Args:
             spreadsheet_id: The unique identifier of the spreadsheet
-            body: Request body.
+            ignore_non_editable_filters: Skip filters that cannot be reapplied (due to not having edit permissions, locked sheets, or sheets in input mode) instead of returning an error.
             timeout: Override the default request timeout (seconds).
 
         Raises:
@@ -770,6 +833,9 @@ class Spreadsheets(BaseNamespace):
             This is a long-running operation (HTTP 202). Use
             ``await client.wait(response).result_async()`` to poll until completion.
         """
+        _body: dict[str, Any] = {}
+        if ignore_non_editable_filters is not None:
+            _body["ignoreNonEditableFilters"] = ignore_non_editable_filters
         return await self._client.request_async(
             "POST",
             self._api,
@@ -777,7 +843,7 @@ class Spreadsheets(BaseNamespace):
             path_params={
                 "spreadsheetId": spreadsheet_id,
             },
-            json_body=body,
+            json_body=_body or None,
             timeout=timeout,
         )
 
@@ -785,7 +851,7 @@ class Spreadsheets(BaseNamespace):
         self,
         *,
         spreadsheet_id: str,
-        body: LinksPublicationOptions,
+        publish_type: Literal["ownLinks", "allLinks"],
         timeout: Optional[float] = None,
     ) -> httpx.Response:
         """Initiate publication of links in a spreadsheet
@@ -799,7 +865,8 @@ class Spreadsheets(BaseNamespace):
 
         Args:
             spreadsheet_id: The unique identifier of the spreadsheet
-            body: Request body.
+            publish_type: Whether or not all links should be published. When "ownLinks" only links one has last edited are published. When "allLinks" all links in document or presentation are published.
+
             timeout: Override the default request timeout (seconds).
 
         Raises:
@@ -809,6 +876,9 @@ class Spreadsheets(BaseNamespace):
             This is a long-running operation (HTTP 202). Use
             ``client.wait(response).result()`` to poll until completion.
         """
+        _body: dict[str, Any] = {}
+        if publish_type is not None:
+            _body["publishType"] = publish_type
         return self._client.request(
             "POST",
             self._api,
@@ -816,7 +886,7 @@ class Spreadsheets(BaseNamespace):
             path_params={
                 "spreadsheetId": spreadsheet_id,
             },
-            json_body=body,
+            json_body=_body or None,
             timeout=timeout,
         )
 
@@ -824,7 +894,7 @@ class Spreadsheets(BaseNamespace):
         self,
         *,
         spreadsheet_id: str,
-        body: LinksPublicationOptions,
+        publish_type: Literal["ownLinks", "allLinks"],
         timeout: Optional[float] = None,
     ) -> httpx.Response:
         """Initiate publication of links in a spreadsheet (async)
@@ -838,7 +908,8 @@ class Spreadsheets(BaseNamespace):
 
         Args:
             spreadsheet_id: The unique identifier of the spreadsheet
-            body: Request body.
+            publish_type: Whether or not all links should be published. When "ownLinks" only links one has last edited are published. When "allLinks" all links in document or presentation are published.
+
             timeout: Override the default request timeout (seconds).
 
         Raises:
@@ -848,6 +919,9 @@ class Spreadsheets(BaseNamespace):
             This is a long-running operation (HTTP 202). Use
             ``await client.wait(response).result_async()`` to poll until completion.
         """
+        _body: dict[str, Any] = {}
+        if publish_type is not None:
+            _body["publishType"] = publish_type
         return await self._client.request_async(
             "POST",
             self._api,
@@ -855,7 +929,7 @@ class Spreadsheets(BaseNamespace):
             path_params={
                 "spreadsheetId": spreadsheet_id,
             },
-            json_body=body,
+            json_body=_body or None,
             timeout=timeout,
         )
 
@@ -894,8 +968,8 @@ class Spreadsheets(BaseNamespace):
                 timeout=timeout,
             )
 
-        _body = paginate_all(_fetch, extract_next_link, "data")
-        return MilestoneListResult.model_validate(_body)
+        _body_result = paginate_all(_fetch, extract_next_link, "data")
+        return MilestoneListResult.model_validate(_body_result)
 
     async def get_spreadsheet_milestones_async(
         self,
@@ -932,8 +1006,8 @@ class Spreadsheets(BaseNamespace):
                 timeout=timeout,
             )
 
-        _body = await paginate_all_async(_fetch, extract_next_link, "data")
-        return MilestoneListResult.model_validate(_body)
+        _body_result = await paginate_all_async(_fetch, extract_next_link, "data")
+        return MilestoneListResult.model_validate(_body_result)
 
     def get_spreadsheet_permissions(
         self,
@@ -976,8 +1050,8 @@ class Spreadsheets(BaseNamespace):
                 timeout=timeout,
             )
 
-        _body = paginate_all(_fetch, extract_next_link, "data")
-        return ResourcePermissionsListResult.model_validate(_body)
+        _body_result = paginate_all(_fetch, extract_next_link, "data")
+        return ResourcePermissionsListResult.model_validate(_body_result)
 
     async def get_spreadsheet_permissions_async(
         self,
@@ -1020,14 +1094,15 @@ class Spreadsheets(BaseNamespace):
                 timeout=timeout,
             )
 
-        _body = await paginate_all_async(_fetch, extract_next_link, "data")
-        return ResourcePermissionsListResult.model_validate(_body)
+        _body_result = await paginate_all_async(_fetch, extract_next_link, "data")
+        return ResourcePermissionsListResult.model_validate(_body_result)
 
     def spreadsheet_permissions_modification(
         self,
         *,
         spreadsheet_id: str,
-        body: ResourcePermissionsModification,
+        to_assign: Optional[list[ResourcePermission]] = None,
+        to_revoke: Optional[list[ResourcePermission]] = None,
         timeout: Optional[float] = None,
     ) -> httpx.Response:
         """Modify permissions on a spreadsheet
@@ -1041,12 +1116,18 @@ class Spreadsheets(BaseNamespace):
 
         Args:
             spreadsheet_id: The unique identifier of the spreadsheet
-            body: Request body.
+            to_assign: The list of permissions to be assigned to the resource
+            to_revoke: The list of permissions to be revoked from the resource
             timeout: Override the default request timeout (seconds).
 
         Raises:
             WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
         """
+        _body: dict[str, Any] = {}
+        if to_assign is not None:
+            _body["toAssign"] = to_assign
+        if to_revoke is not None:
+            _body["toRevoke"] = to_revoke
         return self._client.request(
             "POST",
             self._api,
@@ -1054,7 +1135,7 @@ class Spreadsheets(BaseNamespace):
             path_params={
                 "spreadsheetId": spreadsheet_id,
             },
-            json_body=body,
+            json_body=_body or None,
             timeout=timeout,
         )
 
@@ -1062,7 +1143,8 @@ class Spreadsheets(BaseNamespace):
         self,
         *,
         spreadsheet_id: str,
-        body: ResourcePermissionsModification,
+        to_assign: Optional[list[ResourcePermission]] = None,
+        to_revoke: Optional[list[ResourcePermission]] = None,
         timeout: Optional[float] = None,
     ) -> httpx.Response:
         """Modify permissions on a spreadsheet (async)
@@ -1076,12 +1158,18 @@ class Spreadsheets(BaseNamespace):
 
         Args:
             spreadsheet_id: The unique identifier of the spreadsheet
-            body: Request body.
+            to_assign: The list of permissions to be assigned to the resource
+            to_revoke: The list of permissions to be revoked from the resource
             timeout: Override the default request timeout (seconds).
 
         Raises:
             WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
         """
+        _body: dict[str, Any] = {}
+        if to_assign is not None:
+            _body["toAssign"] = to_assign
+        if to_revoke is not None:
+            _body["toRevoke"] = to_revoke
         return await self._client.request_async(
             "POST",
             self._api,
@@ -1089,9 +1177,139 @@ class Spreadsheets(BaseNamespace):
             path_params={
                 "spreadsheetId": spreadsheet_id,
             },
-            json_body=body,
+            json_body=_body or None,
             timeout=timeout,
         )
+
+    def create_sheet(
+        self,
+        *,
+        spreadsheet_id: str,
+        custom_fields: Optional[dict[str, Any]] = None,
+        id_: Optional[str] = None,
+        index: Optional[int] = None,
+        lock: Optional[str] = None,
+        name: Optional[str] = None,
+        parent: Optional[Sheet] = None,
+        table: Optional[TableRef] = None,
+        timeout: Optional[float] = None,
+    ) -> Sheet:
+        """Create a new sheet in a spreadsheet
+
+        Creates a new [sheet](ref:spreadsheets#sheet) in a
+        [spreadsheet](ref:spreadsheets#spreadsheet), given its properties. If
+        the sheet name provided isn't unique, a number is appended to make it
+        unique. By default, creates a top-level sheet in the top-most position.
+
+        Args:
+            spreadsheet_id: The unique identifier of the spreadsheet
+            custom_fields: A map of ids to values representing Custom Fields on the sheet.
+
+            id_: The unique identifier of the sheet
+            index: The integer index of the sheet relative to its parent sheet or to the spreadsheet, if no parent sheet. To position a sheet at the end of its siblings, use the special value -1.
+            lock: The type of lock applied to this sheet, if any. Note this property is not tied to revision and will always reflect the sheet's current lock state. When this field is not present on the sheet object, the sheet is not locked.
+            name: The name of the sheet
+            parent:
+            table:
+            timeout: Override the default request timeout (seconds).
+
+        Returns:
+            Sheet
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
+        """
+        _body: dict[str, Any] = {}
+        if custom_fields is not None:
+            _body["customFields"] = custom_fields
+        if id_ is not None:
+            _body["id"] = id_
+        if index is not None:
+            _body["index"] = index
+        if lock is not None:
+            _body["lock"] = lock
+        if name is not None:
+            _body["name"] = name
+        if parent is not None:
+            _body["parent"] = parent
+        if table is not None:
+            _body["table"] = table
+        response = self._client.request(
+            "POST",
+            self._api,
+            "/spreadsheets/{spreadsheetId}/sheets",
+            path_params={
+                "spreadsheetId": spreadsheet_id,
+            },
+            json_body=_body or None,
+            timeout=timeout,
+        )
+        return Sheet.model_validate(response.json())
+
+    async def create_sheet_async(
+        self,
+        *,
+        spreadsheet_id: str,
+        custom_fields: Optional[dict[str, Any]] = None,
+        id_: Optional[str] = None,
+        index: Optional[int] = None,
+        lock: Optional[str] = None,
+        name: Optional[str] = None,
+        parent: Optional[Sheet] = None,
+        table: Optional[TableRef] = None,
+        timeout: Optional[float] = None,
+    ) -> Sheet:
+        """Create a new sheet in a spreadsheet (async)
+
+        Creates a new [sheet](ref:spreadsheets#sheet) in a
+        [spreadsheet](ref:spreadsheets#spreadsheet), given its properties. If
+        the sheet name provided isn't unique, a number is appended to make it
+        unique. By default, creates a top-level sheet in the top-most position.
+
+        Args:
+            spreadsheet_id: The unique identifier of the spreadsheet
+            custom_fields: A map of ids to values representing Custom Fields on the sheet.
+
+            id_: The unique identifier of the sheet
+            index: The integer index of the sheet relative to its parent sheet or to the spreadsheet, if no parent sheet. To position a sheet at the end of its siblings, use the special value -1.
+            lock: The type of lock applied to this sheet, if any. Note this property is not tied to revision and will always reflect the sheet's current lock state. When this field is not present on the sheet object, the sheet is not locked.
+            name: The name of the sheet
+            parent:
+            table:
+            timeout: Override the default request timeout (seconds).
+
+        Returns:
+            Sheet
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
+        """
+        _body: dict[str, Any] = {}
+        if custom_fields is not None:
+            _body["customFields"] = custom_fields
+        if id_ is not None:
+            _body["id"] = id_
+        if index is not None:
+            _body["index"] = index
+        if lock is not None:
+            _body["lock"] = lock
+        if name is not None:
+            _body["name"] = name
+        if parent is not None:
+            _body["parent"] = parent
+        if table is not None:
+            _body["table"] = table
+        response = await self._client.request_async(
+            "POST",
+            self._api,
+            "/spreadsheets/{spreadsheetId}/sheets",
+            path_params={
+                "spreadsheetId": spreadsheet_id,
+            },
+            json_body=_body or None,
+            timeout=timeout,
+        )
+        return Sheet.model_validate(response.json())
 
     def get_sheets(
         self,
@@ -1134,8 +1352,8 @@ class Spreadsheets(BaseNamespace):
                 timeout=timeout,
             )
 
-        _body = paginate_all(_fetch, extract_next_link, "data")
-        return SheetsListResult.model_validate(_body)
+        _body_result = paginate_all(_fetch, extract_next_link, "data")
+        return SheetsListResult.model_validate(_body_result)
 
     async def get_sheets_async(
         self,
@@ -1178,82 +1396,8 @@ class Spreadsheets(BaseNamespace):
                 timeout=timeout,
             )
 
-        _body = await paginate_all_async(_fetch, extract_next_link, "data")
-        return SheetsListResult.model_validate(_body)
-
-    def create_sheet(
-        self,
-        *,
-        spreadsheet_id: str,
-        body: Sheet,
-        timeout: Optional[float] = None,
-    ) -> Sheet:
-        """Create a new sheet in a spreadsheet
-
-        Creates a new [sheet](ref:spreadsheets#sheet) in a
-        [spreadsheet](ref:spreadsheets#spreadsheet), given its properties. If
-        the sheet name provided isn't unique, a number is appended to make it
-        unique. By default, creates a top-level sheet in the top-most position.
-
-        Args:
-            spreadsheet_id: The unique identifier of the spreadsheet
-            body: Request body.
-            timeout: Override the default request timeout (seconds).
-
-        Returns:
-            Sheet
-
-        Raises:
-            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
-        """
-        response = self._client.request(
-            "POST",
-            self._api,
-            "/spreadsheets/{spreadsheetId}/sheets",
-            path_params={
-                "spreadsheetId": spreadsheet_id,
-            },
-            json_body=body,
-            timeout=timeout,
-        )
-        return Sheet.model_validate(response.json())
-
-    async def create_sheet_async(
-        self,
-        *,
-        spreadsheet_id: str,
-        body: Sheet,
-        timeout: Optional[float] = None,
-    ) -> Sheet:
-        """Create a new sheet in a spreadsheet (async)
-
-        Creates a new [sheet](ref:spreadsheets#sheet) in a
-        [spreadsheet](ref:spreadsheets#spreadsheet), given its properties. If
-        the sheet name provided isn't unique, a number is appended to make it
-        unique. By default, creates a top-level sheet in the top-most position.
-
-        Args:
-            spreadsheet_id: The unique identifier of the spreadsheet
-            body: Request body.
-            timeout: Override the default request timeout (seconds).
-
-        Returns:
-            Sheet
-
-        Raises:
-            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
-        """
-        response = await self._client.request_async(
-            "POST",
-            self._api,
-            "/spreadsheets/{spreadsheetId}/sheets",
-            path_params={
-                "spreadsheetId": spreadsheet_id,
-            },
-            json_body=body,
-            timeout=timeout,
-        )
-        return Sheet.model_validate(response.json())
+        _body_result = await paginate_all_async(_fetch, extract_next_link, "data")
+        return SheetsListResult.model_validate(_body_result)
 
     def partially_update_sheet_by_id(
         self,
@@ -1583,6 +1727,66 @@ class Spreadsheets(BaseNamespace):
             timeout=timeout,
         )
 
+    def delete_sheet_by_id(
+        self,
+        *,
+        spreadsheet_id: str,
+        sheet_id: str,
+        timeout: Optional[float] = None,
+    ) -> httpx.Response:
+        """Delete a single sheet
+
+        Deletes a [sheet](ref:spreadsheets#sheet) given its ID.
+
+        Args:
+            spreadsheet_id: The unique identifier of the spreadsheet
+            sheet_id: The unique identifier of the sheet
+            timeout: Override the default request timeout (seconds).
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
+        """
+        return self._client.request(
+            "DELETE",
+            self._api,
+            "/spreadsheets/{spreadsheetId}/sheets/{sheetId}",
+            path_params={
+                "spreadsheetId": spreadsheet_id,
+                "sheetId": sheet_id,
+            },
+            timeout=timeout,
+        )
+
+    async def delete_sheet_by_id_async(
+        self,
+        *,
+        spreadsheet_id: str,
+        sheet_id: str,
+        timeout: Optional[float] = None,
+    ) -> httpx.Response:
+        """Delete a single sheet (async)
+
+        Deletes a [sheet](ref:spreadsheets#sheet) given its ID.
+
+        Args:
+            spreadsheet_id: The unique identifier of the spreadsheet
+            sheet_id: The unique identifier of the sheet
+            timeout: Override the default request timeout (seconds).
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
+        """
+        return await self._client.request_async(
+            "DELETE",
+            self._api,
+            "/spreadsheets/{spreadsheetId}/sheets/{sheetId}",
+            path_params={
+                "spreadsheetId": spreadsheet_id,
+                "sheetId": sheet_id,
+            },
+            timeout=timeout,
+        )
+
     def get_sheet_by_id(
         self,
         *,
@@ -1661,72 +1865,15 @@ class Spreadsheets(BaseNamespace):
         )
         return Sheet.model_validate(response.json())
 
-    def delete_sheet_by_id(
-        self,
-        *,
-        spreadsheet_id: str,
-        sheet_id: str,
-        timeout: Optional[float] = None,
-    ) -> httpx.Response:
-        """Delete a single sheet
-
-        Deletes a [sheet](ref:spreadsheets#sheet) given its ID.
-
-        Args:
-            spreadsheet_id: The unique identifier of the spreadsheet
-            sheet_id: The unique identifier of the sheet
-            timeout: Override the default request timeout (seconds).
-
-        Raises:
-            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
-        """
-        return self._client.request(
-            "DELETE",
-            self._api,
-            "/spreadsheets/{spreadsheetId}/sheets/{sheetId}",
-            path_params={
-                "spreadsheetId": spreadsheet_id,
-                "sheetId": sheet_id,
-            },
-            timeout=timeout,
-        )
-
-    async def delete_sheet_by_id_async(
-        self,
-        *,
-        spreadsheet_id: str,
-        sheet_id: str,
-        timeout: Optional[float] = None,
-    ) -> httpx.Response:
-        """Delete a single sheet (async)
-
-        Deletes a [sheet](ref:spreadsheets#sheet) given its ID.
-
-        Args:
-            spreadsheet_id: The unique identifier of the spreadsheet
-            sheet_id: The unique identifier of the sheet
-            timeout: Override the default request timeout (seconds).
-
-        Raises:
-            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
-        """
-        return await self._client.request_async(
-            "DELETE",
-            self._api,
-            "/spreadsheets/{spreadsheetId}/sheets/{sheetId}",
-            path_params={
-                "spreadsheetId": spreadsheet_id,
-                "sheetId": sheet_id,
-            },
-            timeout=timeout,
-        )
-
     def copy_sheet(
         self,
         *,
         spreadsheet_id: str,
         sheet_id: str,
-        body: SheetCopy,
+        spreadsheet: str,
+        sheet_index: Optional[int] = None,
+        sheet_name: Optional[str] = None,
+        sheet_parent: Optional[str] = None,
         timeout: Optional[float] = None,
     ) -> httpx.Response:
         """Copy sheet
@@ -1749,7 +1896,10 @@ class Spreadsheets(BaseNamespace):
         Args:
             spreadsheet_id: The unique identifier of the spreadsheet
             sheet_id: The unique identifier of the sheet
-            body: Request body.
+            spreadsheet: The unique identifier of the spreadsheet to copy a sheet into
+            sheet_index: The integer index of where within the siblings to place the new sheet; 0 by default. To place the sheet at the end of its siblings, use the special value -1.
+            sheet_name: The name of the new sheet, if different than the source sheet.
+            sheet_parent: The ID of the parent sheet to copy the sheet into. To place the sheet at the top level of the spreadsheet, use the default null.
             timeout: Override the default request timeout (seconds).
 
         Raises:
@@ -1759,6 +1909,15 @@ class Spreadsheets(BaseNamespace):
             This is a long-running operation (HTTP 202). Use
             ``client.wait(response).result()`` to poll until completion.
         """
+        _body: dict[str, Any] = {}
+        if spreadsheet is not None:
+            _body["spreadsheet"] = spreadsheet
+        if sheet_index is not None:
+            _body["sheetIndex"] = sheet_index
+        if sheet_name is not None:
+            _body["sheetName"] = sheet_name
+        if sheet_parent is not None:
+            _body["sheetParent"] = sheet_parent
         return self._client.request(
             "POST",
             self._api,
@@ -1767,7 +1926,7 @@ class Spreadsheets(BaseNamespace):
                 "spreadsheetId": spreadsheet_id,
                 "sheetId": sheet_id,
             },
-            json_body=body,
+            json_body=_body or None,
             timeout=timeout,
         )
 
@@ -1776,7 +1935,10 @@ class Spreadsheets(BaseNamespace):
         *,
         spreadsheet_id: str,
         sheet_id: str,
-        body: SheetCopy,
+        spreadsheet: str,
+        sheet_index: Optional[int] = None,
+        sheet_name: Optional[str] = None,
+        sheet_parent: Optional[str] = None,
         timeout: Optional[float] = None,
     ) -> httpx.Response:
         """Copy sheet (async)
@@ -1799,7 +1961,10 @@ class Spreadsheets(BaseNamespace):
         Args:
             spreadsheet_id: The unique identifier of the spreadsheet
             sheet_id: The unique identifier of the sheet
-            body: Request body.
+            spreadsheet: The unique identifier of the spreadsheet to copy a sheet into
+            sheet_index: The integer index of where within the siblings to place the new sheet; 0 by default. To place the sheet at the end of its siblings, use the special value -1.
+            sheet_name: The name of the new sheet, if different than the source sheet.
+            sheet_parent: The ID of the parent sheet to copy the sheet into. To place the sheet at the top level of the spreadsheet, use the default null.
             timeout: Override the default request timeout (seconds).
 
         Raises:
@@ -1809,6 +1974,15 @@ class Spreadsheets(BaseNamespace):
             This is a long-running operation (HTTP 202). Use
             ``await client.wait(response).result_async()`` to poll until completion.
         """
+        _body: dict[str, Any] = {}
+        if spreadsheet is not None:
+            _body["spreadsheet"] = spreadsheet
+        if sheet_index is not None:
+            _body["sheetIndex"] = sheet_index
+        if sheet_name is not None:
+            _body["sheetName"] = sheet_name
+        if sheet_parent is not None:
+            _body["sheetParent"] = sheet_parent
         return await self._client.request_async(
             "POST",
             self._api,
@@ -1817,7 +1991,7 @@ class Spreadsheets(BaseNamespace):
                 "spreadsheetId": spreadsheet_id,
                 "sheetId": sheet_id,
             },
-            json_body=body,
+            json_body=_body or None,
             timeout=timeout,
         )
 
@@ -1952,8 +2126,8 @@ class Spreadsheets(BaseNamespace):
                 timeout=timeout,
             )
 
-        _body = paginate_all(_fetch, extract_next_link, "data")
-        return ResourcePermissionsListResult.model_validate(_body)
+        _body_result = paginate_all(_fetch, extract_next_link, "data")
+        return ResourcePermissionsListResult.model_validate(_body_result)
 
     async def get_sheet_permissions_async(
         self,
@@ -2000,15 +2174,16 @@ class Spreadsheets(BaseNamespace):
                 timeout=timeout,
             )
 
-        _body = await paginate_all_async(_fetch, extract_next_link, "data")
-        return ResourcePermissionsListResult.model_validate(_body)
+        _body_result = await paginate_all_async(_fetch, extract_next_link, "data")
+        return ResourcePermissionsListResult.model_validate(_body_result)
 
     def sheet_permissions_modification(
         self,
         *,
         spreadsheet_id: str,
         sheet_id: str,
-        body: ResourcePermissionsModification,
+        to_assign: Optional[list[ResourcePermission]] = None,
+        to_revoke: Optional[list[ResourcePermission]] = None,
         timeout: Optional[float] = None,
     ) -> httpx.Response:
         """Modify permissions on a given sheet of a spreadsheet
@@ -2023,12 +2198,18 @@ class Spreadsheets(BaseNamespace):
         Args:
             spreadsheet_id: The unique identifier of the spreadsheet
             sheet_id: The unique identifier of the sheet
-            body: Request body.
+            to_assign: The list of permissions to be assigned to the resource
+            to_revoke: The list of permissions to be revoked from the resource
             timeout: Override the default request timeout (seconds).
 
         Raises:
             WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
         """
+        _body: dict[str, Any] = {}
+        if to_assign is not None:
+            _body["toAssign"] = to_assign
+        if to_revoke is not None:
+            _body["toRevoke"] = to_revoke
         return self._client.request(
             "POST",
             self._api,
@@ -2037,7 +2218,7 @@ class Spreadsheets(BaseNamespace):
                 "spreadsheetId": spreadsheet_id,
                 "sheetId": sheet_id,
             },
-            json_body=body,
+            json_body=_body or None,
             timeout=timeout,
         )
 
@@ -2046,7 +2227,8 @@ class Spreadsheets(BaseNamespace):
         *,
         spreadsheet_id: str,
         sheet_id: str,
-        body: ResourcePermissionsModification,
+        to_assign: Optional[list[ResourcePermission]] = None,
+        to_revoke: Optional[list[ResourcePermission]] = None,
         timeout: Optional[float] = None,
     ) -> httpx.Response:
         """Modify permissions on a given sheet of a spreadsheet (async)
@@ -2061,12 +2243,18 @@ class Spreadsheets(BaseNamespace):
         Args:
             spreadsheet_id: The unique identifier of the spreadsheet
             sheet_id: The unique identifier of the sheet
-            body: Request body.
+            to_assign: The list of permissions to be assigned to the resource
+            to_revoke: The list of permissions to be revoked from the resource
             timeout: Override the default request timeout (seconds).
 
         Raises:
             WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
         """
+        _body: dict[str, Any] = {}
+        if to_assign is not None:
+            _body["toAssign"] = to_assign
+        if to_revoke is not None:
+            _body["toRevoke"] = to_revoke
         return await self._client.request_async(
             "POST",
             self._api,
@@ -2075,7 +2263,7 @@ class Spreadsheets(BaseNamespace):
                 "spreadsheetId": spreadsheet_id,
                 "sheetId": sheet_id,
             },
-            json_body=body,
+            json_body=_body or None,
             timeout=timeout,
         )
 
@@ -2136,8 +2324,8 @@ class Spreadsheets(BaseNamespace):
                 timeout=timeout,
             )
 
-        _body = paginate_all(_fetch, extract_next_link, "data")
-        return SheetDataResult.model_validate(_body)
+        _body_result = paginate_all(_fetch, extract_next_link, "data")
+        return SheetDataResult.model_validate(_body_result)
 
     async def get_sheet_data_async(
         self,
@@ -2196,15 +2384,34 @@ class Spreadsheets(BaseNamespace):
                 timeout=timeout,
             )
 
-        _body = await paginate_all_async(_fetch, extract_next_link, "data")
-        return SheetDataResult.model_validate(_body)
+        _body_result = await paginate_all_async(_fetch, extract_next_link, "data")
+        return SheetDataResult.model_validate(_body_result)
 
     def update_sheet(
         self,
         *,
         spreadsheet_id: str,
         sheet_id: str,
-        body: SheetUpdate,
+        apply_borders: Optional[SheetUpdateApplyBorders] = None,
+        apply_formats: Optional[SheetUpdateApplyFormats] = None,
+        clear_borders: Optional[SheetUpdateClearBorders] = None,
+        clear_formats: Optional[SheetUpdateClearFormats] = None,
+        delete_columns: Optional[SheetUpdateDeleteColumns] = None,
+        delete_rows: Optional[SheetUpdateDeleteRows] = None,
+        edit_cells: Optional[SheetUpdateEditCells] = None,
+        edit_range: Optional[SheetUpdateEditRange] = None,
+        hide_columns: Optional[SheetUpdateHideColumns] = None,
+        hide_rows: Optional[SheetUpdateHideRows] = None,
+        insert_columns: Optional[SheetUpdateInsertColumns] = None,
+        insert_rows: Optional[SheetUpdateInsertRows] = None,
+        merge_ranges: Optional[SheetUpdateMergeRanges] = None,
+        resize_columns: Optional[SheetUpdateResizeColumns] = None,
+        resize_columns_to_fit: Optional[SheetUpdateResizeColumnsToFit] = None,
+        resize_rows: Optional[SheetUpdateResizeRows] = None,
+        resize_rows_to_fit: Optional[SheetUpdateResizeRowsToFit] = None,
+        unhide_columns: Optional[SheetUpdateUnhideColumns] = None,
+        unhide_rows: Optional[SheetUpdateUnhideRows] = None,
+        unmerge_ranges: Optional[SheetUpdateUnmergeRanges] = None,
         timeout: Optional[float] = None,
     ) -> httpx.Response:
         """Update sheet content
@@ -2220,7 +2427,26 @@ class Spreadsheets(BaseNamespace):
         Args:
             spreadsheet_id: The unique identifier of the spreadsheet
             sheet_id: The unique identifier of the sheet
-            body: Request body.
+            apply_borders:
+            apply_formats:
+            clear_borders:
+            clear_formats:
+            delete_columns:
+            delete_rows:
+            edit_cells:
+            edit_range:
+            hide_columns:
+            hide_rows:
+            insert_columns:
+            insert_rows:
+            merge_ranges:
+            resize_columns:
+            resize_columns_to_fit:
+            resize_rows:
+            resize_rows_to_fit:
+            unhide_columns:
+            unhide_rows:
+            unmerge_ranges:
             timeout: Override the default request timeout (seconds).
 
         Raises:
@@ -2230,6 +2456,47 @@ class Spreadsheets(BaseNamespace):
             This is a long-running operation (HTTP 202). Use
             ``client.wait(response).result()`` to poll until completion.
         """
+        _body: dict[str, Any] = {}
+        if apply_borders is not None:
+            _body["applyBorders"] = apply_borders
+        if apply_formats is not None:
+            _body["applyFormats"] = apply_formats
+        if clear_borders is not None:
+            _body["clearBorders"] = clear_borders
+        if clear_formats is not None:
+            _body["clearFormats"] = clear_formats
+        if delete_columns is not None:
+            _body["deleteColumns"] = delete_columns
+        if delete_rows is not None:
+            _body["deleteRows"] = delete_rows
+        if edit_cells is not None:
+            _body["editCells"] = edit_cells
+        if edit_range is not None:
+            _body["editRange"] = edit_range
+        if hide_columns is not None:
+            _body["hideColumns"] = hide_columns
+        if hide_rows is not None:
+            _body["hideRows"] = hide_rows
+        if insert_columns is not None:
+            _body["insertColumns"] = insert_columns
+        if insert_rows is not None:
+            _body["insertRows"] = insert_rows
+        if merge_ranges is not None:
+            _body["mergeRanges"] = merge_ranges
+        if resize_columns is not None:
+            _body["resizeColumns"] = resize_columns
+        if resize_columns_to_fit is not None:
+            _body["resizeColumnsToFit"] = resize_columns_to_fit
+        if resize_rows is not None:
+            _body["resizeRows"] = resize_rows
+        if resize_rows_to_fit is not None:
+            _body["resizeRowsToFit"] = resize_rows_to_fit
+        if unhide_columns is not None:
+            _body["unhideColumns"] = unhide_columns
+        if unhide_rows is not None:
+            _body["unhideRows"] = unhide_rows
+        if unmerge_ranges is not None:
+            _body["unmergeRanges"] = unmerge_ranges
         return self._client.request(
             "POST",
             self._api,
@@ -2238,7 +2505,7 @@ class Spreadsheets(BaseNamespace):
                 "spreadsheetId": spreadsheet_id,
                 "sheetId": sheet_id,
             },
-            json_body=body,
+            json_body=_body or None,
             timeout=timeout,
         )
 
@@ -2247,7 +2514,26 @@ class Spreadsheets(BaseNamespace):
         *,
         spreadsheet_id: str,
         sheet_id: str,
-        body: SheetUpdate,
+        apply_borders: Optional[SheetUpdateApplyBorders] = None,
+        apply_formats: Optional[SheetUpdateApplyFormats] = None,
+        clear_borders: Optional[SheetUpdateClearBorders] = None,
+        clear_formats: Optional[SheetUpdateClearFormats] = None,
+        delete_columns: Optional[SheetUpdateDeleteColumns] = None,
+        delete_rows: Optional[SheetUpdateDeleteRows] = None,
+        edit_cells: Optional[SheetUpdateEditCells] = None,
+        edit_range: Optional[SheetUpdateEditRange] = None,
+        hide_columns: Optional[SheetUpdateHideColumns] = None,
+        hide_rows: Optional[SheetUpdateHideRows] = None,
+        insert_columns: Optional[SheetUpdateInsertColumns] = None,
+        insert_rows: Optional[SheetUpdateInsertRows] = None,
+        merge_ranges: Optional[SheetUpdateMergeRanges] = None,
+        resize_columns: Optional[SheetUpdateResizeColumns] = None,
+        resize_columns_to_fit: Optional[SheetUpdateResizeColumnsToFit] = None,
+        resize_rows: Optional[SheetUpdateResizeRows] = None,
+        resize_rows_to_fit: Optional[SheetUpdateResizeRowsToFit] = None,
+        unhide_columns: Optional[SheetUpdateUnhideColumns] = None,
+        unhide_rows: Optional[SheetUpdateUnhideRows] = None,
+        unmerge_ranges: Optional[SheetUpdateUnmergeRanges] = None,
         timeout: Optional[float] = None,
     ) -> httpx.Response:
         """Update sheet content (async)
@@ -2263,7 +2549,26 @@ class Spreadsheets(BaseNamespace):
         Args:
             spreadsheet_id: The unique identifier of the spreadsheet
             sheet_id: The unique identifier of the sheet
-            body: Request body.
+            apply_borders:
+            apply_formats:
+            clear_borders:
+            clear_formats:
+            delete_columns:
+            delete_rows:
+            edit_cells:
+            edit_range:
+            hide_columns:
+            hide_rows:
+            insert_columns:
+            insert_rows:
+            merge_ranges:
+            resize_columns:
+            resize_columns_to_fit:
+            resize_rows:
+            resize_rows_to_fit:
+            unhide_columns:
+            unhide_rows:
+            unmerge_ranges:
             timeout: Override the default request timeout (seconds).
 
         Raises:
@@ -2273,6 +2578,47 @@ class Spreadsheets(BaseNamespace):
             This is a long-running operation (HTTP 202). Use
             ``await client.wait(response).result_async()`` to poll until completion.
         """
+        _body: dict[str, Any] = {}
+        if apply_borders is not None:
+            _body["applyBorders"] = apply_borders
+        if apply_formats is not None:
+            _body["applyFormats"] = apply_formats
+        if clear_borders is not None:
+            _body["clearBorders"] = clear_borders
+        if clear_formats is not None:
+            _body["clearFormats"] = clear_formats
+        if delete_columns is not None:
+            _body["deleteColumns"] = delete_columns
+        if delete_rows is not None:
+            _body["deleteRows"] = delete_rows
+        if edit_cells is not None:
+            _body["editCells"] = edit_cells
+        if edit_range is not None:
+            _body["editRange"] = edit_range
+        if hide_columns is not None:
+            _body["hideColumns"] = hide_columns
+        if hide_rows is not None:
+            _body["hideRows"] = hide_rows
+        if insert_columns is not None:
+            _body["insertColumns"] = insert_columns
+        if insert_rows is not None:
+            _body["insertRows"] = insert_rows
+        if merge_ranges is not None:
+            _body["mergeRanges"] = merge_ranges
+        if resize_columns is not None:
+            _body["resizeColumns"] = resize_columns
+        if resize_columns_to_fit is not None:
+            _body["resizeColumnsToFit"] = resize_columns_to_fit
+        if resize_rows is not None:
+            _body["resizeRows"] = resize_rows
+        if resize_rows_to_fit is not None:
+            _body["resizeRowsToFit"] = resize_rows_to_fit
+        if unhide_columns is not None:
+            _body["unhideColumns"] = unhide_columns
+        if unhide_rows is not None:
+            _body["unhideRows"] = unhide_rows
+        if unmerge_ranges is not None:
+            _body["unmergeRanges"] = unmerge_ranges
         return await self._client.request_async(
             "POST",
             self._api,
@@ -2281,7 +2627,119 @@ class Spreadsheets(BaseNamespace):
                 "spreadsheetId": spreadsheet_id,
                 "sheetId": sheet_id,
             },
-            json_body=body,
+            json_body=_body or None,
+            timeout=timeout,
+        )
+
+    def update_values_by_range(
+        self,
+        *,
+        spreadsheet_id: str,
+        sheet_id: str,
+        range: str,
+        range_: Optional[str] = None,
+        values: Optional[list[list[dict[str, Any]]]] = None,
+        timeout: Optional[float] = None,
+    ) -> httpx.Response:
+        """Update values in a range
+
+        Overwrites all values in a range with new values. The provided range
+        must not exceed the specified range. If the provided range of values is
+        *smaller* than the specified range, it clears all cells in the range
+        **and** those not covered by the range values. Rows of values in the
+        provided range must be of equal length. An empty range of values is
+        valid and may be used to clear a range.
+        To indicate that a cell's value shouldn't be replaced, use the special
+        cell value `null`.
+        When you add a value to a cell, it uses Ones scale regardless of the
+        cell's scale formatting.
+
+        Args:
+            spreadsheet_id: The unique identifier of the spreadsheet
+            sheet_id: The unique identifier of the sheet
+            range: The range of values, in A1-style notation
+            range_: The range of values, in A1-style notation.
+            values: A row-major ordered multidimensional array of cell values.
+            timeout: Override the default request timeout (seconds).
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
+
+        Note:
+            This is a long-running operation (HTTP 202). Use
+            ``client.wait(response).result()`` to poll until completion.
+        """
+        _body: dict[str, Any] = {}
+        if range_ is not None:
+            _body["range"] = range_
+        if values is not None:
+            _body["values"] = values
+        return self._client.request(
+            "PUT",
+            self._api,
+            "/spreadsheets/{spreadsheetId}/sheets/{sheetId}/values/{range}",
+            path_params={
+                "spreadsheetId": spreadsheet_id,
+                "sheetId": sheet_id,
+                "range": range,
+            },
+            json_body=_body or None,
+            timeout=timeout,
+        )
+
+    async def update_values_by_range_async(
+        self,
+        *,
+        spreadsheet_id: str,
+        sheet_id: str,
+        range: str,
+        range_: Optional[str] = None,
+        values: Optional[list[list[dict[str, Any]]]] = None,
+        timeout: Optional[float] = None,
+    ) -> httpx.Response:
+        """Update values in a range (async)
+
+        Overwrites all values in a range with new values. The provided range
+        must not exceed the specified range. If the provided range of values is
+        *smaller* than the specified range, it clears all cells in the range
+        **and** those not covered by the range values. Rows of values in the
+        provided range must be of equal length. An empty range of values is
+        valid and may be used to clear a range.
+        To indicate that a cell's value shouldn't be replaced, use the special
+        cell value `null`.
+        When you add a value to a cell, it uses Ones scale regardless of the
+        cell's scale formatting.
+
+        Args:
+            spreadsheet_id: The unique identifier of the spreadsheet
+            sheet_id: The unique identifier of the sheet
+            range: The range of values, in A1-style notation
+            range_: The range of values, in A1-style notation.
+            values: A row-major ordered multidimensional array of cell values.
+            timeout: Override the default request timeout (seconds).
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
+
+        Note:
+            This is a long-running operation (HTTP 202). Use
+            ``await client.wait(response).result_async()`` to poll until completion.
+        """
+        _body: dict[str, Any] = {}
+        if range_ is not None:
+            _body["range"] = range_
+        if values is not None:
+            _body["values"] = values
+        return await self._client.request_async(
+            "PUT",
+            self._api,
+            "/spreadsheets/{spreadsheetId}/sheets/{sheetId}/values/{range}",
+            path_params={
+                "spreadsheetId": spreadsheet_id,
+                "sheetId": sheet_id,
+                "range": range,
+            },
+            json_body=_body or None,
             timeout=timeout,
         )
 
@@ -2334,8 +2792,8 @@ class Spreadsheets(BaseNamespace):
                 timeout=timeout,
             )
 
-        _body = paginate_all(_fetch, extract_next_link, "data")
-        return RangeValuesListResult.model_validate(_body)
+        _body_result = paginate_all(_fetch, extract_next_link, "data")
+        return RangeValuesListResult.model_validate(_body_result)
 
     async def get_values_by_range_async(
         self,
@@ -2386,103 +2844,5 @@ class Spreadsheets(BaseNamespace):
                 timeout=timeout,
             )
 
-        _body = await paginate_all_async(_fetch, extract_next_link, "data")
-        return RangeValuesListResult.model_validate(_body)
-
-    def update_values_by_range(
-        self,
-        *,
-        spreadsheet_id: str,
-        sheet_id: str,
-        range: str,
-        body: RangeValues,
-        timeout: Optional[float] = None,
-    ) -> httpx.Response:
-        """Update values in a range
-
-        Overwrites all values in a range with new values. The provided range
-        must not exceed the specified range. If the provided range of values is
-        *smaller* than the specified range, it clears all cells in the range
-        **and** those not covered by the range values. Rows of values in the
-        provided range must be of equal length. An empty range of values is
-        valid and may be used to clear a range.
-        To indicate that a cell's value shouldn't be replaced, use the special
-        cell value `null`.
-        When you add a value to a cell, it uses Ones scale regardless of the
-        cell's scale formatting.
-
-        Args:
-            spreadsheet_id: The unique identifier of the spreadsheet
-            sheet_id: The unique identifier of the sheet
-            range: The range of values, in A1-style notation
-            body: Request body.
-            timeout: Override the default request timeout (seconds).
-
-        Raises:
-            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
-
-        Note:
-            This is a long-running operation (HTTP 202). Use
-            ``client.wait(response).result()`` to poll until completion.
-        """
-        return self._client.request(
-            "PUT",
-            self._api,
-            "/spreadsheets/{spreadsheetId}/sheets/{sheetId}/values/{range}",
-            path_params={
-                "spreadsheetId": spreadsheet_id,
-                "sheetId": sheet_id,
-                "range": range,
-            },
-            json_body=body,
-            timeout=timeout,
-        )
-
-    async def update_values_by_range_async(
-        self,
-        *,
-        spreadsheet_id: str,
-        sheet_id: str,
-        range: str,
-        body: RangeValues,
-        timeout: Optional[float] = None,
-    ) -> httpx.Response:
-        """Update values in a range (async)
-
-        Overwrites all values in a range with new values. The provided range
-        must not exceed the specified range. If the provided range of values is
-        *smaller* than the specified range, it clears all cells in the range
-        **and** those not covered by the range values. Rows of values in the
-        provided range must be of equal length. An empty range of values is
-        valid and may be used to clear a range.
-        To indicate that a cell's value shouldn't be replaced, use the special
-        cell value `null`.
-        When you add a value to a cell, it uses Ones scale regardless of the
-        cell's scale formatting.
-
-        Args:
-            spreadsheet_id: The unique identifier of the spreadsheet
-            sheet_id: The unique identifier of the sheet
-            range: The range of values, in A1-style notation
-            body: Request body.
-            timeout: Override the default request timeout (seconds).
-
-        Raises:
-            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
-
-        Note:
-            This is a long-running operation (HTTP 202). Use
-            ``await client.wait(response).result_async()`` to poll until completion.
-        """
-        return await self._client.request_async(
-            "PUT",
-            self._api,
-            "/spreadsheets/{spreadsheetId}/sheets/{sheetId}/values/{range}",
-            path_params={
-                "spreadsheetId": spreadsheet_id,
-                "sheetId": sheet_id,
-                "range": range,
-            },
-            json_body=body,
-            timeout=timeout,
-        )
+        _body_result = await paginate_all_async(_fetch, extract_next_link, "data")
+        return RangeValuesListResult.model_validate(_body_result)

@@ -127,7 +127,8 @@ for table in result.body:
 ```python
 # Crear query
 query = client.wdata.create_query(
-    body={"name": "Mi Query", "query_string": "SELECT * FROM mi_tabla"},
+    name="Mi Query",
+    query_text="SELECT * FROM mi_tabla",
 )
 
 # Ejecutar
@@ -151,7 +152,7 @@ client.wdata.import_data(
 ```python
 # Crear carpeta
 folder = client.wdata.create_folder(
-    body={"name": "Datos Q4"},
+    name="Datos Q4",
 )
 
 # Listar carpetas (auto-paginacion)
@@ -165,6 +166,6 @@ result = client.wdata.list_children(folder_id="folder-123")
 
 ```python
 result = client.wdata.search(
-    body={"query": "revenue"},
+    name="revenue",
 )
 ```

@@ -35,7 +35,7 @@ class TestTypedJsonResponse:
         client = _mock_client(body)
         ns = Files(client)
 
-        result = ns.create_file(body=body)
+        result = ns.create_file(name="test.xlsx", kind="Spreadsheet")
 
         assert isinstance(result, File)
         assert result.name == "test.xlsx"
@@ -70,7 +70,7 @@ class TestRawResponse:
         client.request.return_value = response
         ns = Files(client)
 
-        result = ns.copy_file(file_id="abc", body={"destFolderId": "f1"})
+        result = ns.copy_file(file_id="abc", destination_container="f1")
 
         assert isinstance(result, httpx.Response)
         assert result.status_code == 202

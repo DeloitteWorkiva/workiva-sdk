@@ -76,6 +76,21 @@ class RequestBodySpec:
 
 
 @dataclass
+class BodyFieldSpec:
+    """A single field extracted from a JSON request body schema.
+
+    Used to flatten object body schemas into individual method parameters
+    (Stripe/OpenAI style) instead of requiring a single ``body=Model(...)`` param.
+    """
+
+    name: str  # OAS property name (camelCase) — used as JSON dict key
+    python_name: str  # snake_case Python param name
+    python_type: str  # Python type annotation (e.g. "str", "FileCopyOptions")
+    required: bool  # Whether field is in schema's ``required`` array
+    description: str  # From OAS property description
+
+
+@dataclass
 class ResponseSpec:
     """Success response metadata."""
 
@@ -104,6 +119,12 @@ class OperationSpec:
     pagination: Optional[PaginationConfig] = None
     scopes: list[str] = field(default_factory=list)
     deprecated: bool = False
+    body_fields: list[BodyFieldSpec] = field(default_factory=list)
+
+    @property
+    def has_flat_body(self) -> bool:
+        """True when the JSON body is flattened into keyword params."""
+        return len(self.body_fields) > 0
 
     @property
     def path_params(self) -> list[ParamSpec]:
@@ -253,6 +274,98 @@ def _extract_request_body(
     return None
 
 
+def _extract_body_fields(
+    body_spec: Optional[RequestBodySpec],
+    spec: dict[str, Any],
+    existing_param_names: set[str],
+) -> list[BodyFieldSpec]:
+    """Extract individual fields from a JSON body schema for flat param signatures.
+
+    Returns an empty list (keeping the ``body=`` pattern) when:
+    - No body, non-JSON content type, no schema_ref
+    - Schema is not ``type: object`` (e.g. array bodies like JSONPatchDocument)
+    - Schema has no ``properties``
+    """
+    if not body_spec:
+        return []
+    if body_spec.content_type != "application/json":
+        return []
+    if not body_spec.schema_ref:
+        return []
+
+    resolved = _resolve_ref(body_spec.schema_ref, spec)
+    # Must have properties to flatten. Allow missing "type" (some OAS schemas
+    # omit type: object but still define properties). Skip arrays/strings/etc.
+    if "properties" not in resolved:
+        return []
+    schema_type = resolved.get("type")
+    if schema_type is not None and schema_type != "object":
+        return []
+
+    required_set = set(resolved.get("required", []))
+    properties = resolved["properties"]
+
+    # Names that would collide with existing params or Python builtins
+    reserved = existing_param_names | {"timeout", "self"}
+
+    fields: list[BodyFieldSpec] = []
+    for prop_name, prop_schema in properties.items():
+        # Skip readOnly properties (response-only fields).
+        # readOnly can be on the property itself or as a sibling of allOf.
+        if prop_schema.get("readOnly", False):
+            continue
+
+        # Resolve type
+        python_type = _resolve_body_field_type(prop_schema, spec)
+
+        python_name = _snake_case(prop_name)
+
+        # Handle name collisions with path/query/header params
+        if python_name in reserved:
+            python_name += "_"
+
+        description = prop_schema.get("description", "")
+
+        fields.append(BodyFieldSpec(
+            name=prop_name,
+            python_name=python_name,
+            python_type=python_type,
+            required=prop_name in required_set and not prop_schema.get("readOnly", False),
+            description=description,
+        ))
+
+    # Sort: required first, then optional, alphabetical within each group
+    fields.sort(key=lambda f: (not f.required, f.python_name))
+    return fields
+
+
+def _resolve_body_field_type(prop_schema: dict[str, Any], spec: dict[str, Any]) -> str:
+    """Resolve a property schema to a Python type for a body field parameter."""
+    # Direct $ref → model name
+    if "$ref" in prop_schema:
+        return _get_python_type(prop_schema, spec)
+
+    # allOf: [{$ref: X}] → model name (common OAS pattern for nullable/readOnly wrappers)
+    all_of = prop_schema.get("allOf")
+    if all_of and len(all_of) >= 1 and "$ref" in all_of[0]:
+        return _get_python_type(all_of[0], spec)
+
+    # Array of items
+    if prop_schema.get("type") == "array":
+        items = prop_schema.get("items", {})
+        item_type = _resolve_body_field_type(items, spec)
+        return f"list[{item_type}]"
+
+    # Enum → Literal[...]
+    enum_values = prop_schema.get("enum")
+    if enum_values and prop_schema.get("type") == "string":
+        quoted = ", ".join(f'"{v}"' for v in enum_values)
+        return f"Literal[{quoted}]"
+
+    # Primitives
+    return TYPE_MAP.get(prop_schema.get("type", "object"), "Any")
+
+
 def _extract_success_response(
     responses: dict[str, Any], spec: dict[str, Any]
 ) -> Optional[ResponseSpec]:
@@ -370,6 +483,10 @@ def parse_spec(
                 operation.get("requestBody", {}), spec
             )
 
+            # Extract flat body fields (Stripe/OpenAI style)
+            existing_param_names = {p.python_name for p in params}
+            body_fields = _extract_body_fields(request_body, spec, existing_param_names)
+
             # Extract responses
             responses = operation.get("responses", {})
             success_response = _extract_success_response(responses, spec)
@@ -406,6 +523,7 @@ def parse_spec(
                 pagination=pagination,
                 scopes=scopes,
                 deprecated=operation.get("deprecated", False),
+                body_fields=body_fields,
             )
 
             groups.setdefault(tag, []).append(op_spec)

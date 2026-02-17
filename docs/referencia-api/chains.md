@@ -81,8 +81,9 @@ result = client.chains.get_chains()
 
 ```python
 result = client.chains.start_chain(
+    environment_id="env-456",
     chain_id="chain-123",
-    body={"environment_id": "env-456"},
+    body={"key": "value"},
 )
 ```
 

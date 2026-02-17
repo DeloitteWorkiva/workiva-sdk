@@ -13,7 +13,6 @@ from workiva._constants import _API
 from workiva._operations._base import BaseNamespace
 from workiva.models.platform import (
     Milestone,
-    MilestoneCreation,
 )
 
 __all__ = ["Milestones"]
@@ -27,7 +26,12 @@ class Milestones(BaseNamespace):
     def milestone_creation(
         self,
         *,
-        body: MilestoneCreation,
+        title: str,
+        type_: str,
+        document: Optional[str] = None,
+        presentation: Optional[str] = None,
+        remarks: Optional[str] = None,
+        spreadsheet: Optional[str] = None,
         timeout: Optional[float] = None,
     ) -> httpx.Response:
         """Initiates a request to create a new milestone
@@ -43,6 +47,15 @@ class Milestones(BaseNamespace):
         as the initial request. For more details, see [Authentication
         documentation](ref:authentication).
 
+        Args:
+            title: The title of the milestone
+            type_:
+            document: The unique identifier of the document being referred to
+            presentation: The unique identifier of the presentation being referred to
+            remarks: The remarks associated with the milestone
+            spreadsheet: The unique identifier of the spreadsheet being referred to
+            timeout: Override the default request timeout (seconds).
+
         Raises:
             WorkivaAPIError: On API errors (400, 401, 403, 500).
 
@@ -50,18 +63,36 @@ class Milestones(BaseNamespace):
             This is a long-running operation (HTTP 202). Use
             ``client.wait(response).result()`` to poll until completion.
         """
+        _body: dict[str, Any] = {}
+        if title is not None:
+            _body["title"] = title
+        if type_ is not None:
+            _body["type"] = type_
+        if document is not None:
+            _body["document"] = document
+        if presentation is not None:
+            _body["presentation"] = presentation
+        if remarks is not None:
+            _body["remarks"] = remarks
+        if spreadsheet is not None:
+            _body["spreadsheet"] = spreadsheet
         return self._client.request(
             "POST",
             self._api,
             "/milestones/creation",
-            json_body=body,
+            json_body=_body or None,
             timeout=timeout,
         )
 
     async def milestone_creation_async(
         self,
         *,
-        body: MilestoneCreation,
+        title: str,
+        type_: str,
+        document: Optional[str] = None,
+        presentation: Optional[str] = None,
+        remarks: Optional[str] = None,
+        spreadsheet: Optional[str] = None,
         timeout: Optional[float] = None,
     ) -> httpx.Response:
         """Initiates a request to create a new milestone (async)
@@ -77,6 +108,15 @@ class Milestones(BaseNamespace):
         as the initial request. For more details, see [Authentication
         documentation](ref:authentication).
 
+        Args:
+            title: The title of the milestone
+            type_:
+            document: The unique identifier of the document being referred to
+            presentation: The unique identifier of the presentation being referred to
+            remarks: The remarks associated with the milestone
+            spreadsheet: The unique identifier of the spreadsheet being referred to
+            timeout: Override the default request timeout (seconds).
+
         Raises:
             WorkivaAPIError: On API errors (400, 401, 403, 500).
 
@@ -84,11 +124,24 @@ class Milestones(BaseNamespace):
             This is a long-running operation (HTTP 202). Use
             ``await client.wait(response).result_async()`` to poll until completion.
         """
+        _body: dict[str, Any] = {}
+        if title is not None:
+            _body["title"] = title
+        if type_ is not None:
+            _body["type"] = type_
+        if document is not None:
+            _body["document"] = document
+        if presentation is not None:
+            _body["presentation"] = presentation
+        if remarks is not None:
+            _body["remarks"] = remarks
+        if spreadsheet is not None:
+            _body["spreadsheet"] = spreadsheet
         return await self._client.request_async(
             "POST",
             self._api,
             "/milestones/creation",
-            json_body=body,
+            json_body=_body or None,
             timeout=timeout,
         )
 
@@ -182,6 +235,60 @@ class Milestones(BaseNamespace):
         )
         return Milestone.model_validate(response.json())
 
+    def delete_milestone_by_id(
+        self,
+        *,
+        milestone_id: str,
+        timeout: Optional[float] = None,
+    ) -> httpx.Response:
+        """Deletes a milestone
+
+        Deletes the [`Milestone`](ref:milestones#milestone) with a given id.
+
+        Args:
+            milestone_id: The unique identifier of a milestone.
+            timeout: Override the default request timeout (seconds).
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 500).
+        """
+        return self._client.request(
+            "DELETE",
+            self._api,
+            "/milestones/{milestoneId}",
+            path_params={
+                "milestoneId": milestone_id,
+            },
+            timeout=timeout,
+        )
+
+    async def delete_milestone_by_id_async(
+        self,
+        *,
+        milestone_id: str,
+        timeout: Optional[float] = None,
+    ) -> httpx.Response:
+        """Deletes a milestone (async)
+
+        Deletes the [`Milestone`](ref:milestones#milestone) with a given id.
+
+        Args:
+            milestone_id: The unique identifier of a milestone.
+            timeout: Override the default request timeout (seconds).
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 500).
+        """
+        return await self._client.request_async(
+            "DELETE",
+            self._api,
+            "/milestones/{milestoneId}",
+            path_params={
+                "milestoneId": milestone_id,
+            },
+            timeout=timeout,
+        )
+
     def get_milestone_by_id(
         self,
         *,
@@ -243,57 +350,3 @@ class Milestones(BaseNamespace):
             timeout=timeout,
         )
         return Milestone.model_validate(response.json())
-
-    def delete_milestone_by_id(
-        self,
-        *,
-        milestone_id: str,
-        timeout: Optional[float] = None,
-    ) -> httpx.Response:
-        """Deletes a milestone
-
-        Deletes the [`Milestone`](ref:milestones#milestone) with a given id.
-
-        Args:
-            milestone_id: The unique identifier of a milestone.
-            timeout: Override the default request timeout (seconds).
-
-        Raises:
-            WorkivaAPIError: On API errors (400, 401, 403, 404, 500).
-        """
-        return self._client.request(
-            "DELETE",
-            self._api,
-            "/milestones/{milestoneId}",
-            path_params={
-                "milestoneId": milestone_id,
-            },
-            timeout=timeout,
-        )
-
-    async def delete_milestone_by_id_async(
-        self,
-        *,
-        milestone_id: str,
-        timeout: Optional[float] = None,
-    ) -> httpx.Response:
-        """Deletes a milestone (async)
-
-        Deletes the [`Milestone`](ref:milestones#milestone) with a given id.
-
-        Args:
-            milestone_id: The unique identifier of a milestone.
-            timeout: Override the default request timeout (seconds).
-
-        Raises:
-            WorkivaAPIError: On API errors (400, 401, 403, 404, 500).
-        """
-        return await self._client.request_async(
-            "DELETE",
-            self._api,
-            "/milestones/{milestoneId}",
-            path_params={
-                "milestoneId": milestone_id,
-            },
-            timeout=timeout,
-        )

@@ -28,6 +28,22 @@ from workiva._version import __user_agent__, __version__
 _PATH_PARAM_RE = re.compile(r"\{(\w+)\}")
 
 
+def _deep_serialize(value: Any) -> Any:
+    """Recursively serialize Pydantic models within dicts/lists.
+
+    When flat body params contain nested Pydantic model instances
+    (e.g. ``options=FileCopyOptions(...)``), httpx can't serialize them.
+    This converts them to plain dicts suitable for JSON encoding.
+    """
+    if isinstance(value, PydanticBaseModel):
+        return value.model_dump(by_alias=True, exclude_none=True)
+    if isinstance(value, list):
+        return [_deep_serialize(v) for v in value]
+    if isinstance(value, dict):
+        return {k: _deep_serialize(v) for k, v in value.items()}
+    return value
+
+
 def _version_header_hook(request: httpx.Request) -> None:
     """Event hook that injects ``X-Version`` on every request (sync client)."""
     request.headers.setdefault("X-Version", API_VERSION)
@@ -162,7 +178,7 @@ class BaseClient:
             if isinstance(json_body, PydanticBaseModel):
                 kwargs["json"] = json_body.model_dump(by_alias=True, exclude_none=True)
             else:
-                kwargs["json"] = json_body
+                kwargs["json"] = _deep_serialize(json_body)
         elif content is not None:
             kwargs["content"] = content
         elif files is not None:

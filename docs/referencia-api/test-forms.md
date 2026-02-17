@@ -80,7 +80,7 @@ client.test_forms.create_sample(
     test_form_id="tf-123",
     test_phase_id="tp-456",
     matrix_id="mx-789",
-    body=sample_data,
+    data_values=sample_cells,
 )
 ```
 
@@ -90,6 +90,6 @@ client.test_forms.create_sample(
 client.test_forms.test_phase_attachment_upload(
     test_form_id="tf-123",
     test_phase_id="tp-456",
-    body=attachment_data,
+    file_name="report.pdf",
 )
 ```

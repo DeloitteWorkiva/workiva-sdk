@@ -72,7 +72,8 @@ for program in result.data:
 ```python
 metric = client.sustainability.create_metric(
     program_id="prog-123",
-    body={"name": "Emisiones CO2", "unit": "toneladas"},
+    name="Emisiones CO2",
+    unit="toneladas",
 )
 print(f"Metrica creada: {metric.id}")
 ```
@@ -82,7 +83,8 @@ print(f"Metrica creada: {metric.id}")
 ```python
 response = client.sustainability.batch_upsertion_metric_values(
     program_id="prog-123",
-    body=values_data,
+    metric_id="metric-456",
+    data=values_data,
 )
 
 # Operacion 202

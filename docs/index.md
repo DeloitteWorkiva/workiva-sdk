@@ -28,9 +28,7 @@ with Workiva(client_id="tu_client_id", client_secret="tu_client_secret") as clie
         print(f"{file.name} ({file.kind})")
 
     # Copiar un archivo (operacion de larga duracion)
-    from workiva.models.platform import FileCopy
-
-    response = client.files.copy_file(file_id="abc123", body=FileCopy(...))
+    response = client.files.copy_file(file_id="abc123", destination_container="folder-456")
     operation = client.wait(response).result(timeout=300)
     print(f"Operacion completada: {operation.resource_url}")
 ```

@@ -45,11 +45,9 @@ print(f"Creado: {file.created}")
 ### Copiar archivo (operacion 202)
 
 ```python
-from workiva.models.platform import FileCopy
-
 response = client.files.copy_file(
     file_id="file-123",
-    body=FileCopy(workspace_id="ws-456"),
+    destination_container="ws-456",
 )
 
 # Esperar resultado
@@ -66,8 +64,8 @@ results = client.operations.get_copy_file_results(
 
 ```python
 response = client.files.import_file(
-    file_id="file-123",
-    body=import_data,
+    file_name="report.xlsx",
+    kind="Spreadsheet",
 )
 
 operation = client.wait(response).result(timeout=120)
@@ -78,7 +76,8 @@ operation = client.wait(response).result(timeout=120)
 ```python
 response = client.files.export_file_by_id(
     file_id="file-123",
-    body={"format": "pdf"},
+    kind="Document",
+    document_export={"format": "pdf"},
 )
 
 operation = client.wait(response).result(timeout=120)

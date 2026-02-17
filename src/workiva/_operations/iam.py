@@ -41,6 +41,10 @@ class Iam(BaseNamespace):
         `scope` returned may not match the `scope` requested. Subsequent
         requests to Workiva APIs are authorized using the bearer token.
 
+        Args:
+            body: Request body.
+            timeout: Override the default request timeout (seconds).
+
         Returns:
             BearerToken
 
@@ -73,6 +77,10 @@ class Iam(BaseNamespace):
         client of the scope of the actual access token issued. The actual
         `scope` returned may not match the `scope` requested. Subsequent
         requests to Workiva APIs are authorized using the bearer token.
+
+        Args:
+            body: Request body.
+            timeout: Override the default request timeout (seconds).
 
         Returns:
             BearerToken

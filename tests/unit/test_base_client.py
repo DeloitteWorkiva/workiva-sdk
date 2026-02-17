@@ -132,7 +132,7 @@ class TestPrepareRequest:
             "/files",
             json_body=body,
         )
-        assert kwargs["json"] is body
+        assert kwargs["json"] == body
 
     def test_passes_content(self):
         client = _make_client()

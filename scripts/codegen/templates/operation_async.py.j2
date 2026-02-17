@@ -14,7 +14,10 @@
 {% for p in op.header_params if p.required %}
         {{ p.python_name }}: {{ p.python_type }},
 {% endfor %}
-{% if op.has_body and op.request_body.required %}
+{% for bf in op.body_fields if bf.required %}
+        {{ bf.python_name }}: {{ bf.python_type }},
+{% endfor %}
+{% if op.has_body and not op.has_flat_body and op.request_body.required %}
         body: {{ op.request_body.python_type }},
 {% endif %}
 {% for p in op.params if p.location == 'query' and not p.required and p.name != cursor_spec_name %}
@@ -23,7 +26,10 @@
 {% for p in op.header_params if not p.required %}
         {{ p.python_name }}: {{ p.python_type }} = {{ p.default or 'None' }},
 {% endfor %}
-{% if op.has_body and not op.request_body.required %}
+{% for bf in op.body_fields if not bf.required %}
+        {{ bf.python_name }}: Optional[{{ bf.python_type }}] = None,
+{% endfor %}
+{% if op.has_body and not op.has_flat_body and not op.request_body.required %}
         body: Optional[{{ op.request_body.python_type }}] = None,
 {% endif %}
         timeout: Optional[float] = None,
@@ -42,7 +48,7 @@
         .. deprecated::
             This operation is deprecated.
 {% endif %}
-{% if op.params %}
+{% if op.params or op.body_fields or (op.has_body and not op.has_flat_body) %}
 
         Args:
 {% for p in op.params if p.location == 'path' %}
@@ -54,7 +60,10 @@
 {% for p in op.header_params %}
             {{ p.python_name }}: {{ p.description or '' }}
 {% endfor %}
-{% if op.has_body %}
+{% for bf in op.body_fields %}
+            {{ bf.python_name }}: {{ bf.description or '' }}
+{% endfor %}
+{% if op.has_body and not op.has_flat_body %}
             body: Request body.
 {% endif %}
             timeout: Override the default request timeout (seconds).
@@ -87,6 +96,13 @@
                 }
 {% endif %}
         """
+{% if op.has_flat_body %}
+        _body: dict[str, Any] = {}
+{% for bf in op.body_fields %}
+        if {{ bf.python_name }} is not None:
+            _body["{{ bf.name }}"] = {{ bf.python_name }}
+{% endfor %}
+{% endif %}
 {% if op.pagination and has_json_response %}
         async def _fetch(_cursor: str | None) -> httpx.Response:
             return await self._client.request_async(
@@ -98,7 +114,9 @@
 {% endif %}
                 query_params={{ '{' }}{% for p in op.query_params if p.name != cursor_spec_name %}"{{ p.name }}": {{ p.python_name }}, {% endfor %}"{{ cursor_spec_name }}": _cursor, {{ '}' }},
 {% if op.has_body %}
-{% if op.request_body.content_type == 'application/json' %}
+{% if op.has_flat_body %}
+                json_body=_body or None,
+{% elif op.request_body.content_type == 'application/json' %}
                 json_body=body,
 {% elif op.request_body.content_type == 'application/octet-stream' %}
                 content=body,
@@ -116,8 +134,8 @@
                 timeout=timeout,
             )
 
-        _body = await paginate_all_async(_fetch, {{ op.pagination.extractor_func }}, "{{ op.pagination.items_path }}")
-        return {{ op.success_response.python_type }}.model_validate(_body)
+        _body_result = await paginate_all_async(_fetch, {{ op.pagination.extractor_func }}, "{{ op.pagination.items_path }}")
+        return {{ op.success_response.python_type }}.model_validate(_body_result)
 {% elif has_json_response %}
         response = await self._client.request_async(
             "{{ op.http_method }}",
@@ -130,7 +148,9 @@
             query_params={{ '{' }}{% for p in op.query_params %}"{{ p.name }}": {{ p.python_name }}, {% endfor %}{{ '}' }},
 {% endif %}
 {% if op.has_body %}
-{% if op.request_body.content_type == 'application/json' %}
+{% if op.has_flat_body %}
+            json_body=_body or None,
+{% elif op.request_body.content_type == 'application/json' %}
             json_body=body,
 {% elif op.request_body.content_type == 'application/octet-stream' %}
             content=body,
@@ -153,6 +173,24 @@
 {% else %}
         return {{ op.success_response.python_type }}.model_validate(response.json())
 {% endif %}
+{% else %}
+{% if op.has_flat_body %}
+        return await self._client.request_async(
+            "{{ op.http_method }}",
+            self._api,
+            "{{ op.path }}",
+{% if op.path_params %}
+            path_params={{ '{' }}{% for p in op.path_params %}"{{ p.name.strip('{}') }}": {{ p.python_name }}, {% endfor %}{{ '}' }},
+{% endif %}
+{% if op.query_params %}
+            query_params={{ '{' }}{% for p in op.query_params %}"{{ p.name }}": {{ p.python_name }}, {% endfor %}{{ '}' }},
+{% endif %}
+            json_body=_body or None,
+{% if op.header_params %}
+            headers={{ '{' }}{% for p in op.header_params %}"{{ p.name }}": {{ p.python_name }}, {% endfor %}{{ '}' }},
+{% endif %}
+            timeout=timeout,
+        )
 {% else %}
         return await self._client.request_async(
             "{{ op.http_method }}",
@@ -182,4 +220,5 @@
 {% endif %}
             timeout=timeout,
         )
+{% endif %}
 {% endif %}

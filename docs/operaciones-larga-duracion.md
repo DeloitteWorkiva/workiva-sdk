@@ -17,13 +17,12 @@ El SDK simplifica este patron con `client.wait()` y `OperationPoller`.
 
 ```python
 from workiva import Workiva
-from workiva.models.platform import FileCopy
 
 with Workiva(client_id="...", client_secret="...") as client:
     # Iniciar la operacion (devuelve httpx.Response con 202)
     response = client.files.copy_file(
         file_id="abc123",
-        body=FileCopy(workspace_id="ws-456"),
+        destination_container="ws-456",
     )
 
     # Crear el poller y esperar el resultado
@@ -194,13 +193,12 @@ operation.updated         # Updated -- Ultima actualizacion
 
 ```python
 from workiva import Workiva, OperationFailed, OperationTimeout
-from workiva.models.platform import FileCopy
 
 with Workiva(client_id="...", client_secret="...") as client:
     # 1. Iniciar copia
     response = client.files.copy_file(
         file_id="original-file-id",
-        body=FileCopy(workspace_id="target-workspace-id"),
+        destination_container="target-workspace-id",
     )
 
     # 2. Esperar resultado

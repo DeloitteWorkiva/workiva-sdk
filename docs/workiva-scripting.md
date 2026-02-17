@@ -54,7 +54,7 @@ from workiva import Workiva, OperationTimeout
 with Workiva(client_id="...", client_secret="...") as client:
     response = client.files.export_file_by_id(
         file_id="file-123",
-        body={"format": "xlsx"},
+        kind="Spreadsheet",
     )
 
     try:
@@ -68,12 +68,11 @@ with Workiva(client_id="...", client_secret="...") as client:
 
 ```python
 from workiva import Workiva, OperationFailed
-from workiva.models.platform import FileCopy
 
 with Workiva(client_id="...", client_secret="...") as client:
     response = client.files.copy_file(
         file_id="source-file-id",
-        body=FileCopy(workspace_id="target-workspace-id"),
+        destination_container="target-workspace-id",
     )
 
     try:

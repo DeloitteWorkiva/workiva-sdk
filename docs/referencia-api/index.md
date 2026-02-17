@@ -102,6 +102,6 @@ Las operaciones que devuelven HTTP 202 (larga duracion) o 204 (sin contenido) re
 
 ```python
 # Devuelve httpx.Response (HTTP 202)
-response = client.files.copy_file(file_id="abc", body=body)
+response = client.files.copy_file(file_id="abc", destination_container="folder-456")
 # Usa client.wait(response).result() para obtener el resultado
 ```

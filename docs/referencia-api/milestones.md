@@ -16,10 +16,9 @@
 ### Crear milestone (operacion 202)
 
 ```python
-from workiva.models.platform import MilestoneCreation
-
 response = client.milestones.milestone_creation(
-    body=MilestoneCreation(title="Q4 Review"),
+    title="Q4 Review",
+    type_="review",
 )
 
 operation = client.wait(response).result(timeout=60)

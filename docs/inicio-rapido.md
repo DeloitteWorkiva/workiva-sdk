@@ -99,11 +99,10 @@ Algunas operaciones (copiar archivos, exportar, etc.) devuelven HTTP 202. Usa `c
 
 ```python
 from workiva import Workiva
-from workiva.models.platform import FileCopy
 
 with Workiva(client_id="tu_client_id", client_secret="tu_client_secret") as client:
     # copy_file devuelve httpx.Response (HTTP 202)
-    response = client.files.copy_file(file_id="abc123", body=FileCopy(...))
+    response = client.files.copy_file(file_id="abc123", destination_container="folder-456")
 
     # wait() extrae el operation ID del header Location
     # result() hace polling hasta que la operacion termine o pase el timeout
