@@ -31,8 +31,8 @@ class TestWorkivaInit:
         d = dir(client)
         assert "files" in d
         assert "operations" in d
-        assert "chain" in d
-        assert "table_management" in d
+        assert "chains" in d
+        assert "wdata" in d
         client.close()
 
 

@@ -1,12 +1,12 @@
 # IAM
 
-`client.iam` — Tokens de acceso OAuth2.
+`client.iam` -- Tokens de acceso OAuth2.
 
-> Normalmente NO necesitas usar este namespace directamente. El SDK obtiene y renueva tokens automáticamente a través del hook `ClientCredentialsHook`. Este endpoint existe para casos avanzados donde necesitas gestionar tokens manualmente.
+> Normalmente NO necesitas usar este namespace directamente. El SDK obtiene y renueva tokens automaticamente a traves de `OAuth2ClientCredentials`. Este endpoint existe para casos avanzados donde necesitas gestionar tokens manualmente.
 
 ## Operaciones
 
-| Método | Descripción | Paginado |
+| Metodo | Descripcion | Paginado |
 |--------|-------------|----------|
 | `token_request` | Solicitar token de acceso | No |
 
@@ -15,15 +15,17 @@
 ### Obtener token manualmente
 
 ```python
-response = client.iam.token_request(
-    grant_type="client_credentials",
-    client_id="tu_client_id",
-    client_secret="tu_client_secret",
+token = client.iam.token_request(
+    body={
+        "grant_type": "client_credentials",
+        "client_id": "tu_client_id",
+        "client_secret": "tu_client_secret",
+    },
 )
 
-print(f"Token: {response.result.access_token}")
-print(f"Tipo: {response.result.token_type}")
-print(f"Expira en: {response.result.expires_in}s")
+print(f"Token: {token.access_token}")
+print(f"Tipo: {token.token_type}")
+print(f"Expira en: {token.expires_in}s")
 ```
 
-> En la práctica, usa `Workiva(client_id=..., client_secret=...)` y deja que el SDK maneje los tokens automáticamente. Ver [Autenticación](../autenticacion.md).
+> En la practica, usa `Workiva(client_id=..., client_secret=...)` y deja que el SDK maneje los tokens automaticamente. Ver [Autenticacion](../autenticacion.md).

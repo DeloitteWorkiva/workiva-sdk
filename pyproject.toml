@@ -1,7 +1,7 @@
 
 [project]
 name = "workiva"
-version = "0.6.1"
+version = "0.6.2"
 description = "Workiva Python SDK - Unified client for Platform, Chains, and Wdata APIs"
 authors = [{ name = "Jorge Revenga", email = "jrevengamartindevida@deloitte.es" },]
 readme = "README.md"
@@ -57,6 +57,7 @@ requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
 
 [tool.pytest.ini_options]
+testpaths = ["tests"]
 asyncio_default_fixture_loop_scope = "function"
 pythonpath = ["src"]
 

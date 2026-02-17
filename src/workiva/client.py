@@ -3,25 +3,25 @@
 Usage::
 
     with Workiva(client_id="...", client_secret="...") as client:
-        # Platform APIs
-        client.files.get_files()
+        # Platform APIs — typed responses
+        result = client.files.get_files()  # -> FilesListResult
         client.operations.get_operation_by_id(operation_id="...")
 
         # Chains API
-        client.chains.list_chains()
+        client.chains.get_chains()
 
         # Wdata API
         client.wdata.get_tables()
 
-        # Long-running operations
-        response = client.files.copy_file(file_id="abc", file_copy=params)
+        # Long-running operations (202)
+        response = client.files.copy_file(file_id="abc", body=params)
         operation = client.wait(response).result(timeout=300)
 """
 
 from __future__ import annotations
 
 import importlib
-from typing import Any, Optional
+from typing import TYPE_CHECKING, Any, Optional
 
 import httpx
 
@@ -30,6 +30,26 @@ from workiva._config import SDKConfig
 from workiva._constants import Region
 from workiva.polling import OperationPoller, _extract_operation_id, _get_retry_after
 
+if TYPE_CHECKING:
+    from workiva._operations.activities import Activities
+    from workiva._operations.admin import Admin
+    from workiva._operations.chains import Chains
+    from workiva._operations.content import Content
+    from workiva._operations.documents import Documents
+    from workiva._operations.files import Files
+    from workiva._operations.graph import Graph
+    from workiva._operations.iam import Iam
+    from workiva._operations.milestones import Milestones
+    from workiva._operations.operations import Operations
+    from workiva._operations.permissions import Permissions
+    from workiva._operations.presentations import Presentations
+    from workiva._operations.reports import Reports
+    from workiva._operations.spreadsheets import Spreadsheets
+    from workiva._operations.sustainability import Sustainability
+    from workiva._operations.tasks import Tasks
+    from workiva._operations.test_forms import TestForms
+    from workiva._operations.wdata import Wdata
+
 
 class Workiva:
     """Workiva SDK with simplified authentication and namespace access.
@@ -37,6 +57,27 @@ class Workiva:
     All three APIs (Platform, Chains, Wdata) are accessible via
     attribute namespaces that lazy-load their operation modules.
     """
+
+    # -- Type annotations for IDE autocompletion (Pylance, Pyright, mypy) ------
+    # These are never set at class level; __getattr__ handles lazy-loading.
+    activities: Activities
+    admin: Admin
+    chains: Chains
+    content: Content
+    documents: Documents
+    files: Files
+    graph: Graph
+    iam: Iam
+    milestones: Milestones
+    operations: Operations
+    permissions: Permissions
+    presentations: Presentations
+    reports: Reports
+    spreadsheets: Spreadsheets
+    sustainability: Sustainability
+    tasks: Tasks
+    test_forms: TestForms
+    wdata: Wdata
 
     # Maps attribute name → (module_path, class_name)
     # Auto-populated from generated namespace files.
@@ -58,28 +99,10 @@ class Workiva:
         "sustainability": ("workiva._operations.sustainability", "Sustainability"),
         "tasks": ("workiva._operations.tasks", "Tasks"),
         "test_forms": ("workiva._operations.test_forms", "TestForms"),
-        # Chains namespaces (split by OAS tag)
-        "chain": ("workiva._operations.chain", "Chain"),
-        "dataprep": ("workiva._operations.dataprep", "Dataprep"),
-        "execution": ("workiva._operations.execution", "Execution"),
-        "workspace": ("workiva._operations.workspace", "Workspace"),
-        "environment": ("workiva._operations.environment", "Environment"),
-        "security": ("workiva._operations.security", "Security"),
-        # Wdata namespaces (split by OAS tag)
-        "administrative_tasks": ("workiva._operations.administrative_tasks", "AdministrativeTasks"),
-        "connection_management": ("workiva._operations.connection_management", "ConnectionManagement"),
-        "folder_management": ("workiva._operations.folder_management", "FolderManagement"),
-        "file_management": ("workiva._operations.file_management", "FileManagement"),
-        "parameter_management": ("workiva._operations.parameter_management", "ParameterManagement"),
-        "pivot_view_management": ("workiva._operations.pivot_view_management", "PivotViewManagement"),
-        "query_management": ("workiva._operations.query_management", "QueryManagement"),
-        "select_list_management": ("workiva._operations.select_list_management", "SelectListManagement"),
-        "shared_table_management": ("workiva._operations.shared_table_management", "SharedTableManagement"),
-        "table_management": ("workiva._operations.table_management", "TableManagement"),
-        "tag_management": ("workiva._operations.tag_management", "TagManagement"),
-        "token_management": ("workiva._operations.token_management", "TokenManagement"),
-        "utilities": ("workiva._operations.utilities", "Utilities"),
-        "api_health": ("workiva._operations.api_health", "ApiHealth"),
+        # Chains — all OAS tags merged into single namespace
+        "chains": ("workiva._operations.chains", "Chains"),
+        # Wdata — all OAS tags merged into single namespace
+        "wdata": ("workiva._operations.wdata", "Wdata"),
     }
 
     def __init__(

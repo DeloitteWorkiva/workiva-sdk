@@ -1,27 +1,24 @@
 # Reports
 
-`client.reports` — Generación de reportes administrativos.
+`client.reports` -- Generacion de reportes administrativos.
 
 ## Operaciones
 
-| Método | Descripción | Paginado |
+| Metodo | Descripcion | Paginado |
 |--------|-------------|----------|
-| `get_org_report_users` | Listar usuarios en reporte de organización | Sí |
+| `get_org_report_users` | Listar usuarios en reporte de organizacion | Si |
 
-> Este endpoint usa paginación estilo JSON:API (Patrón B), diferente al resto de Platform.
+> Este endpoint usa paginacion estilo JSON:API (Patron B), pero la auto-paginacion funciona igual que el resto.
 
 ## Ejemplo
 
 ```python
-response = client.reports.get_org_report_users(
+# Auto-paginacion transparente
+result = client.reports.get_org_report_users(
     organization_id="org-123",
     report_type="users",
 )
 
-for user in response.result.data:
+for user in result.data:
     print(f"Usuario: {user}")
-
-# Paginar (funciona igual que el resto)
-while response.next is not None:
-    response = response.next()
 ```

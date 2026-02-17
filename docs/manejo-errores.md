@@ -1,241 +1,299 @@
 # Manejo de errores
 
-El SDK define una jerarquía de excepciones que cubre errores de API, errores de validación y errores de polling.
+El SDK define una jerarquia de excepciones que cubre errores de API, errores de autenticacion y errores de polling.
 
-## Jerarquía de excepciones
+## Jerarquia de excepciones
 
 ```
 Exception
-├── SDKBaseError                    # Base para errores HTTP
-│   ├── ErrorResponse               # Platform API errors (4xx/5xx con body JSON)
-│   ├── SingleError                 # Error simple con code + body + details
-│   ├── MultiError                  # Múltiples mensajes en body
-│   ├── ChainSingleError            # Error de Chains API (error + error_description)
-│   ├── Failure                     # Error JSON:API
-│   ├── IamError                    # Error de IAM/OAuth
-│   ├── SDKError                    # Fallback genérico
-│   ├── ResponseValidationError     # Pydantic no pudo parsear la respuesta
-│   └── NoResponseError             # Sin respuesta del servidor
-├── OperationFailed                 # Operación polling: status == "failed"
-├── OperationCancelled              # Operación polling: status == "cancelled"
-└── OperationTimeout                # Operación polling: timeout excedido
+├── WorkivaAPIError                 # Base para errores HTTP de la API
+│   ├── BadRequestError             # 400
+│   ├── AuthenticationError         # 401
+│   ├── ForbiddenError              # 403
+│   ├── NotFoundError               # 404
+│   ├── ConflictError               # 409
+│   ├── RateLimitError              # 429
+│   └── ServerError                 # 5xx
+├── TokenAcquisitionError           # Error al obtener token OAuth2
+├── OperationFailed                 # Polling: status == "failed"
+├── OperationCancelled              # Polling: status == "cancelled"
+└── OperationTimeout                # Polling: timeout excedido
 ```
 
-## `SDKBaseError` — La base
+## `WorkivaAPIError` -- La base
 
-Todos los errores HTTP heredan de `SDKBaseError`:
+Todos los errores HTTP de la API heredan de `WorkivaAPIError`:
 
 ```python
-from workiva.errors import SDKBaseError
+from workiva import WorkivaAPIError
 
 try:
-    response = client.files.get_file_by_id(file_id="no-existe")
-except SDKBaseError as e:
-    print(f"Status: {e.status_code}")
-    print(f"Mensaje: {e.message}")
-    print(f"Body: {e.body}")
-    print(f"Headers: {e.headers}")
-    print(f"Response: {e.raw_response}")
+    result = client.files.get_file_by_id(file_id="no-existe")
+except WorkivaAPIError as e:
+    print(f"Status: {e.status_code}")   # int (404, 400, etc.)
+    print(f"Mensaje: {e}")              # Mensaje legible
+    print(f"Body: {e.body}")            # dict JSON o texto
+    print(f"Response: {e.response}")    # httpx.Response completo
 ```
 
-### Propiedades
+### Atributos de `WorkivaAPIError`
 
-| Propiedad | Tipo | Descripción |
-|-----------|------|-------------|
-| `message` | `str` | Mensaje del error |
-| `status_code` | `int` | Código HTTP |
-| `body` | `str` | Body de la respuesta |
-| `headers` | `httpx.Headers` | Headers de la respuesta |
-| `raw_response` | `httpx.Response` | Respuesta HTTP completa |
+| Atributo | Tipo | Descripcion |
+|----------|------|-------------|
+| `status_code` | `int` | Codigo HTTP (400, 401, 404, etc.) |
+| `body` | `Any` | Body JSON parseado, o texto si no es JSON |
+| `response` | `httpx.Response` | Respuesta HTTP completa (headers, etc.) |
 
-## `ErrorResponse` — Error de Platform API
+## Excepciones por codigo HTTP
 
-La mayoría de errores de Platform API (archivos, documentos, etc.):
+Cada codigo HTTP comun tiene su propia excepcion:
+
+### `BadRequestError` (400)
 
 ```python
-from workiva.errors import ErrorResponse
+from workiva import BadRequestError
 
 try:
-    client.files.get_file_by_id(file_id="invalid")
-except ErrorResponse as e:
-    print(f"Code: {e.data.code}")
-    print(f"Message: {e.data.message}")
-    print(f"Target: {e.data.target}")
-    print(f"Docs: {e.data.documentation_url}")
-
-    if e.data.details:
-        for detail in e.data.details:
-            print(f"  Detail: {detail.code} - {detail.message}")
+    client.files.copy_file(file_id="abc", body={})
+except BadRequestError as e:
+    print(f"Request invalido: {e}")
+    print(f"Detalles: {e.body}")
 ```
 
-### `ErrorResponseData`
-
-| Campo | Tipo | Descripción |
-|-------|------|-------------|
-| `code` | `str \| None` | Código de error del servidor |
-| `message` | `str \| None` | Mensaje legible |
-| `target` | `str \| None` | Objetivo del error |
-| `documentation_url` | `str \| None` | URL de documentación |
-| `details` | `list[ErrorDetails] \| None` | Detalles adicionales |
-| `version` | `str \| None` | Versión de la API |
-
-## `SingleError` — Error simple
-
-Usado por algunos endpoints de Platform:
+### `AuthenticationError` (401)
 
 ```python
-from workiva.errors import SingleError
-
-try:
-    client.admin.create_workspace(workspace=data)
-except SingleError as e:
-    print(f"Code: {e.data.code}")      # int
-    print(f"Body: {e.data.body}")      # str
-    if e.data.details:
-        for d in e.data.details:
-            print(f"  {d.code}: {d.message} → {d.target}")
-```
-
-## `MultiError` — Error múltiple
-
-Similar a `SingleError` pero `body` es una lista de strings:
-
-```python
-from workiva.errors import MultiError
-
-try:
-    client.admin.assign_organization_user_roles(
-        organization_id="org-1",
-        user_id="user-1",
-        request_body=["invalid-role"],
-    )
-except MultiError as e:
-    for msg in e.data.body:
-        print(f"Error: {msg}")
-```
-
-## `ChainSingleError` — Error de Chains
-
-Los endpoints de Chains devuelven un formato distinto:
-
-```python
-from workiva.errors import ChainSingleError
-
-try:
-    client.chains.get_chain(chain_id="invalid")
-except ChainSingleError as e:
-    print(f"Error: {e.data.error}")
-    print(f"Descripción: {e.data.error_description}")
-```
-
-## `SDKError` — Fallback genérico
-
-Cuando la respuesta no coincide con ningún error tipado:
-
-```python
-from workiva.errors import SDKError
+from workiva import AuthenticationError
 
 try:
     client.files.get_files()
-except SDKError as e:
-    print(f"Status: {e.status_code}")
-    print(f"Body: {e.body}")
+except AuthenticationError as e:
+    print(f"Token invalido o expirado: {e}")
 ```
 
-## `ResponseValidationError` — Error de validación
+> Normalmente no veras esta excepcion porque el SDK reintenta automaticamente ante 401 con un token nuevo. Solo ocurre si el reintento tambien falla.
 
-Cuando Pydantic no puede parsear la respuesta del servidor:
+### `ForbiddenError` (403)
 
 ```python
-from workiva.errors import ResponseValidationError
+from workiva import ForbiddenError
 
 try:
-    response = client.files.get_files()
-except ResponseValidationError as e:
-    print(f"Error de validación: {e.message}")
-    print(f"Causa: {e.cause}")  # ValidationError de Pydantic
+    client.admin.get_workspaces()
+except ForbiddenError as e:
+    print(f"Sin permisos: {e}")
+```
+
+### `NotFoundError` (404)
+
+```python
+from workiva import NotFoundError
+
+try:
+    client.files.get_file_by_id(file_id="no-existe")
+except NotFoundError as e:
+    print(f"No encontrado: {e}")
+```
+
+### `ConflictError` (409)
+
+```python
+from workiva import ConflictError
+
+try:
+    client.files.copy_file(file_id="abc", body=body)
+except ConflictError as e:
+    print(f"Conflicto: {e}")
+```
+
+### `RateLimitError` (429)
+
+```python
+from workiva import RateLimitError
+
+try:
+    client.files.get_files()
+except RateLimitError as e:
+    print(f"Rate limit: {e}")
+    # El SDK reintenta automaticamente con backoff,
+    # solo llegas aqui si se agotan los reintentos
+```
+
+### `ServerError` (5xx)
+
+```python
+from workiva import ServerError
+
+try:
+    client.files.get_files()
+except ServerError as e:
+    print(f"Error del servidor ({e.status_code}): {e}")
+```
+
+## `TokenAcquisitionError`
+
+Error al obtener el token OAuth2 (credenciales invalidas, servidor no disponible):
+
+```python
+from workiva import Workiva, TokenAcquisitionError
+
+try:
+    with Workiva(client_id="invalido", client_secret="invalido") as client:
+        client.files.get_files()
+except TokenAcquisitionError as e:
+    print(f"No se pudo obtener el token: {e}")
 ```
 
 ## Excepciones de polling
 
-Estas NO heredan de `SDKBaseError` — son `Exception` directas:
+Estas NO heredan de `WorkivaAPIError` -- son `Exception` directas, relacionadas con operaciones de larga duracion:
+
+### `OperationFailed`
+
+Lanzada cuando una operacion llega a `status == "failed"`:
 
 ```python
-from workiva import OperationFailed, OperationCancelled, OperationTimeout
+from workiva import OperationFailed
 
 try:
-    operation = client.wait(response).result(timeout=120)
+    operation = client.wait(response).result(timeout=300)
 except OperationFailed as e:
-    # e.operation: Operation
-    # e.details: list[OperationDetail]
-    print(f"Falló: {e}")
-except OperationCancelled as e:
-    # e.operation: Operation
-    print(f"Cancelada: {e.operation.id}")
-except OperationTimeout as e:
-    # e.operation_id: str
-    # e.timeout: float
-    # e.last_status: str | None
-    print(f"Timeout: {e}")
+    print(f"Operacion fallida: {e}")
+    print(f"Operation ID: {e.operation.id}")          # str
+    print(f"Status: {e.operation.status}")             # "failed"
+    for detail in e.details:                           # list[OperationDetail]
+        print(f"  [{detail.code}] {detail.message}")
 ```
+
+### `OperationCancelled`
+
+Lanzada cuando una operacion llega a `status == "cancelled"`:
+
+```python
+from workiva import OperationCancelled
+
+try:
+    operation = client.wait(response).result()
+except OperationCancelled as e:
+    print(f"Cancelada: {e.operation.id}")
+```
+
+### `OperationTimeout`
+
+Lanzada cuando el polling excede el timeout solicitado:
+
+```python
+from workiva import OperationTimeout
+
+try:
+    operation = client.wait(response).result(timeout=60)
+except OperationTimeout as e:
+    print(f"Timeout: operacion {e.operation_id}")
+    print(f"Duracion maxima: {e.timeout}s")
+    print(f"Ultimo estado conocido: {e.last_status}")
+```
+
+## Formato de mensajes de error
+
+El SDK parsea automaticamente el body de error de la API y construye mensajes legibles:
+
+```
+# Formato Workiva: {"error": {"code": "...", "message": "..."}}
+[404] NotFound: The requested resource was not found
+
+# Formato alternativo: {"message": "..."}
+[400] Invalid file ID format
+
+# Sin body JSON
+[500] API request failed
+```
+
+## Errores de red
+
+Los errores de red de `httpx` se propagan directamente (no son `WorkivaAPIError`):
+
+```python
+import httpx
+
+try:
+    result = client.files.get_files()
+except httpx.ConnectError:
+    print("No se pudo conectar al servidor")
+except httpx.TimeoutException:
+    print("Timeout de conexion")
+```
+
+> El SDK reintenta automaticamente `ConnectError` y `TimeoutException` segun la configuracion de `RetryConfig`. Solo llegas al `except` si se agotan todos los reintentos.
 
 ## Ejemplo completo: try/except multinivel
 
 ```python
-from workiva import Workiva, OperationFailed, OperationTimeout
-from workiva.errors import ErrorResponse, SingleError, SDKBaseError
-from workiva.models import FileCopy
+from workiva import (
+    Workiva,
+    WorkivaAPIError,
+    NotFoundError,
+    BadRequestError,
+    OperationFailed,
+    OperationTimeout,
+    TokenAcquisitionError,
+)
+from workiva.models.platform import FileCopy
 
 with Workiva(client_id="...", client_secret="...") as client:
     try:
-        # Copiar archivo
+        # Copiar archivo (operacion de larga duracion)
         response = client.files.copy_file(
             file_id="abc",
-            file_copy=FileCopy(workspace_id="ws-123"),
+            body=FileCopy(workspace_id="ws-123"),
         )
 
         # Esperar resultado
         operation = client.wait(response).result(timeout=300)
         print(f"Completado: {operation.resource_url}")
 
-    except ErrorResponse as e:
-        # Error de API con detalles ricos
-        print(f"API Error [{e.data.code}]: {e.data.message}")
+    except NotFoundError as e:
+        # Archivo no encontrado
+        print(f"Archivo no existe: {e}")
 
-    except SingleError as e:
-        # Error simple
-        print(f"Error {e.data.code}: {e.data.body}")
+    except BadRequestError as e:
+        # Parametros invalidos
+        print(f"Request invalido: {e}")
 
     except OperationFailed as e:
-        # La operación se completó con error
-        print(f"Operación fallida: {e.operation.id}")
+        # La operacion se completo con error
+        print(f"Operacion fallida: {e}")
         for detail in e.details:
             print(f"  {detail.message}")
 
     except OperationTimeout as e:
         # Timeout de polling
-        print(f"Timeout después de {e.timeout}s")
+        print(f"Timeout despues de {e.timeout}s")
 
-    except SDKBaseError as e:
-        # Cualquier otro error HTTP
-        print(f"Error HTTP {e.status_code}: {e.message}")
-
-    except Exception as e:
-        # Errores de red, etc.
-        print(f"Error inesperado: {e}")
+    except WorkivaAPIError as e:
+        # Cualquier otro error HTTP de la API
+        print(f"Error API [{e.status_code}]: {e}")
 ```
 
-## Errores de red
+## Imports
 
-Los errores de red de `httpx` se propagan directamente:
+Todas las excepciones se exportan desde el paquete raiz:
 
 ```python
-import httpx
-
-try:
-    response = client.files.get_files()
-except httpx.ConnectError:
-    print("No se pudo conectar al servidor")
-except httpx.TimeoutException:
-    print("Timeout de conexión")
+from workiva import (
+    # Errores de API
+    WorkivaAPIError,
+    BadRequestError,
+    AuthenticationError,
+    ForbiddenError,
+    NotFoundError,
+    ConflictError,
+    RateLimitError,
+    ServerError,
+    # Errores de autenticacion
+    TokenAcquisitionError,
+    # Errores de polling
+    OperationFailed,
+    OperationCancelled,
+    OperationTimeout,
+)
 ```

@@ -1,12 +1,12 @@
 # Test Forms
 
-`client.test_forms` — Gestión de formularios de prueba, fases, matrices y muestras.
+`client.test_forms` -- Gestion de formularios de prueba, fases, matrices y muestras.
 
 ## Operaciones
 
 ### Formularios de prueba
 
-| Método | Descripción | Paginado |
+| Metodo | Descripcion | Paginado |
 |--------|-------------|----------|
 | `get_test_forms` | Listar formularios | No |
 | `get_test_form_by_id` | Obtener formulario por ID | No |
@@ -14,7 +14,7 @@
 
 ### Fases de prueba
 
-| Método | Descripción | Paginado |
+| Metodo | Descripcion | Paginado |
 |--------|-------------|----------|
 | `get_test_phases` | Listar fases | No |
 | `get_test_phase_by_id` | Obtener fase por ID | No |
@@ -26,7 +26,7 @@
 
 ### Matrices
 
-| Método | Descripción | Paginado |
+| Metodo | Descripcion | Paginado |
 |--------|-------------|----------|
 | `get_matrices` | Listar matrices | No |
 | `get_matrix_by_id` | Obtener matriz por ID | No |
@@ -39,7 +39,7 @@
 
 ### Muestras
 
-| Método | Descripción | Paginado |
+| Metodo | Descripcion | Paginado |
 |--------|-------------|----------|
 | `get_samples` | Listar muestras | No |
 | `get_sample_by_id` | Obtener muestra por ID | No |
@@ -58,42 +58,38 @@
 ### Listar formularios de prueba
 
 ```python
-response = client.test_forms.get_test_forms(
-    workspace_id="ws-123",
-)
+result = client.test_forms.get_test_forms(workspace_id="ws-123")
 
-for form in response.result.data:
+for form in result.data:
     print(f"Formulario: {form.name} (ID: {form.id})")
 ```
 
 ### Obtener fases de un formulario
 
 ```python
-response = client.test_forms.get_test_phases(
-    test_form_id="tf-123",
-)
+result = client.test_forms.get_test_phases(test_form_id="tf-123")
 
-for phase in response.result.data:
+for phase in result.data:
     print(f"Fase: {phase.name}")
 ```
 
 ### Crear una muestra
 
 ```python
-response = client.test_forms.create_sample(
+client.test_forms.create_sample(
     test_form_id="tf-123",
     test_phase_id="tp-456",
     matrix_id="mx-789",
-    sample=sample_data,
+    body=sample_data,
 )
 ```
 
 ### Subir adjunto a una fase
 
 ```python
-response = client.test_forms.test_phase_attachment_upload(
+client.test_forms.test_phase_attachment_upload(
     test_form_id="tf-123",
     test_phase_id="tp-456",
-    graph_attachment_upload=attachment_data,
+    body=attachment_data,
 )
 ```

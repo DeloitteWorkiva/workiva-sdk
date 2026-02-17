@@ -12,8 +12,15 @@ import httpx
 from workiva._constants import _API
 from workiva._operations._base import BaseNamespace
 from workiva.models.platform import (
+    EditsResult,
     GraphReportExport,
+    Record,
+    RecordsListResult,
+    Type,
+    TypesListResult,
 )
+
+__all__ = ["Graph"]
 
 
 class Graph(BaseNamespace):
@@ -26,7 +33,7 @@ class Graph(BaseNamespace):
         *,
         body: list[Any],
         timeout: Optional[float] = None,
-    ) -> httpx.Response:
+    ) -> EditsResult:
         """Create new record edits
 
         Creates new record [edits](ref:graph#edit) given their properties. Each
@@ -35,21 +42,28 @@ class Graph(BaseNamespace):
         If there are invalid edits, the error details will include a list of
         errors encountered. Each message will include the zero-based position of
         the failed edit in the provided list of edits.
+
+        Returns:
+            EditsResult
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
         """
-        return self._client.request(
+        response = self._client.request(
             "POST",
             self._api,
             "/graph/edits",
             json_body=body,
             timeout=timeout,
         )
+        return EditsResult.model_validate(response.json())
 
     async def create_edits_async(
         self,
         *,
         body: list[Any],
         timeout: Optional[float] = None,
-    ) -> httpx.Response:
+    ) -> EditsResult:
         """Create new record edits (async)
 
         Creates new record [edits](ref:graph#edit) given their properties. Each
@@ -58,14 +72,21 @@ class Graph(BaseNamespace):
         If there are invalid edits, the error details will include a list of
         errors encountered. Each message will include the zero-based position of
         the failed edit in the provided list of edits.
+
+        Returns:
+            EditsResult
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
         """
-        return await self._client.request_async(
+        response = await self._client.request_async(
             "POST",
             self._api,
             "/graph/edits",
             json_body=body,
             timeout=timeout,
         )
+        return EditsResult.model_validate(response.json())
 
     def get_records(
         self,
@@ -73,14 +94,25 @@ class Graph(BaseNamespace):
         expand: Optional[str] = None,
         filter_: Optional[str] = None,
         timeout: Optional[float] = None,
-    ) -> httpx.Response:
+    ) -> RecordsListResult:
         """Retrieve a list of records
 
         Returns a list of [records](ref:graph#record) matching the provided
         filters. At least one filter is required. If no filter is provided an
         error will be returned.
+
+        Args:
+            expand: Returns related resources inline with the main resource
+            filter_: The properties to filter the results by.
+            timeout: Override the default request timeout (seconds).
+
+        Returns:
+            RecordsListResult
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
         """
-        return self._client.request(
+        response = self._client.request(
             "GET",
             self._api,
             "/graph/records",
@@ -90,6 +122,7 @@ class Graph(BaseNamespace):
             },
             timeout=timeout,
         )
+        return RecordsListResult.model_validate(response.json())
 
     async def get_records_async(
         self,
@@ -97,14 +130,25 @@ class Graph(BaseNamespace):
         expand: Optional[str] = None,
         filter_: Optional[str] = None,
         timeout: Optional[float] = None,
-    ) -> httpx.Response:
+    ) -> RecordsListResult:
         """Retrieve a list of records (async)
 
         Returns a list of [records](ref:graph#record) matching the provided
         filters. At least one filter is required. If no filter is provided an
         error will be returned.
+
+        Args:
+            expand: Returns related resources inline with the main resource
+            filter_: The properties to filter the results by.
+            timeout: Override the default request timeout (seconds).
+
+        Returns:
+            RecordsListResult
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
         """
-        return await self._client.request_async(
+        response = await self._client.request_async(
             "GET",
             self._api,
             "/graph/records",
@@ -114,6 +158,7 @@ class Graph(BaseNamespace):
             },
             timeout=timeout,
         )
+        return RecordsListResult.model_validate(response.json())
 
     def get_record_by_id(
         self,
@@ -121,14 +166,25 @@ class Graph(BaseNamespace):
         record_id: str,
         expand: Optional[str] = None,
         timeout: Optional[float] = None,
-    ) -> httpx.Response:
+    ) -> Record:
         """Retrieve a single record
 
         Retrieves a [record](ref:graph#record) given its ID. The unique
         identifier is typically a UUID, but it may be a different unique string
         in some cases.
+
+        Args:
+            record_id: The unique identifier of the record
+            expand: Returns related resources inline with the main resource
+            timeout: Override the default request timeout (seconds).
+
+        Returns:
+            Record
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
         """
-        return self._client.request(
+        response = self._client.request(
             "GET",
             self._api,
             "/graph/records/{recordId}",
@@ -140,6 +196,7 @@ class Graph(BaseNamespace):
             },
             timeout=timeout,
         )
+        return Record.model_validate(response.json())
 
     async def get_record_by_id_async(
         self,
@@ -147,14 +204,25 @@ class Graph(BaseNamespace):
         record_id: str,
         expand: Optional[str] = None,
         timeout: Optional[float] = None,
-    ) -> httpx.Response:
+    ) -> Record:
         """Retrieve a single record (async)
 
         Retrieves a [record](ref:graph#record) given its ID. The unique
         identifier is typically a UUID, but it may be a different unique string
         in some cases.
+
+        Args:
+            record_id: The unique identifier of the record
+            expand: Returns related resources inline with the main resource
+            timeout: Override the default request timeout (seconds).
+
+        Returns:
+            Record
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
         """
-        return await self._client.request_async(
+        response = await self._client.request_async(
             "GET",
             self._api,
             "/graph/records/{recordId}",
@@ -166,6 +234,7 @@ class Graph(BaseNamespace):
             },
             timeout=timeout,
         )
+        return Record.model_validate(response.json())
 
     def graph_report_export(
         self,
@@ -193,6 +262,18 @@ class Graph(BaseNamespace):
         `resourceURL` with the same authentication credentials and flow as the
         export request. For more details, see [Authentication
         documentation](ref:authentication).
+
+        Args:
+            report_id: The unique identifier of the report
+            body: Request body.
+            timeout: Override the default request timeout (seconds).
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
+
+        Note:
+            This is a long-running operation (HTTP 202). Use
+            ``client.wait(response).result()`` to poll until completion.
         """
         return self._client.request(
             "POST",
@@ -231,6 +312,18 @@ class Graph(BaseNamespace):
         `resourceURL` with the same authentication credentials and flow as the
         export request. For more details, see [Authentication
         documentation](ref:authentication).
+
+        Args:
+            report_id: The unique identifier of the report
+            body: Request body.
+            timeout: Override the default request timeout (seconds).
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
+
+        Note:
+            This is a long-running operation (HTTP 202). Use
+            ``await client.wait(response).result_async()`` to poll until completion.
         """
         return await self._client.request_async(
             "POST",
@@ -248,14 +341,24 @@ class Graph(BaseNamespace):
         *,
         expand: Optional[str] = None,
         timeout: Optional[float] = None,
-    ) -> httpx.Response:
+    ) -> TypesListResult:
         """Retrieve a list of types
 
         The Types endpoint is used to discover what [types](ref:graph#type) of
         records exist and their attributes. This endpoint lets you know what to
         expect from the Records endpoints.
+
+        Args:
+            expand: Returns related resources inline with the main resource
+            timeout: Override the default request timeout (seconds).
+
+        Returns:
+            TypesListResult
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
         """
-        return self._client.request(
+        response = self._client.request(
             "GET",
             self._api,
             "/graph/types",
@@ -264,20 +367,31 @@ class Graph(BaseNamespace):
             },
             timeout=timeout,
         )
+        return TypesListResult.model_validate(response.json())
 
     async def get_types_async(
         self,
         *,
         expand: Optional[str] = None,
         timeout: Optional[float] = None,
-    ) -> httpx.Response:
+    ) -> TypesListResult:
         """Retrieve a list of types (async)
 
         The Types endpoint is used to discover what [types](ref:graph#type) of
         records exist and their attributes. This endpoint lets you know what to
         expect from the Records endpoints.
+
+        Args:
+            expand: Returns related resources inline with the main resource
+            timeout: Override the default request timeout (seconds).
+
+        Returns:
+            TypesListResult
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
         """
-        return await self._client.request_async(
+        response = await self._client.request_async(
             "GET",
             self._api,
             "/graph/types",
@@ -286,6 +400,7 @@ class Graph(BaseNamespace):
             },
             timeout=timeout,
         )
+        return TypesListResult.model_validate(response.json())
 
     def get_type_by_id(
         self,
@@ -293,12 +408,23 @@ class Graph(BaseNamespace):
         type_id: str,
         expand: Optional[str] = None,
         timeout: Optional[float] = None,
-    ) -> httpx.Response:
+    ) -> Type:
         """Retrieve a single type
 
         Returns a record [type](ref:graph#type) given its ID (name)
+
+        Args:
+            type_id: The unique identifier of the type
+            expand: Returns related resources inline with the main resource
+            timeout: Override the default request timeout (seconds).
+
+        Returns:
+            Type
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
         """
-        return self._client.request(
+        response = self._client.request(
             "GET",
             self._api,
             "/graph/types/{typeId}",
@@ -310,6 +436,7 @@ class Graph(BaseNamespace):
             },
             timeout=timeout,
         )
+        return Type.model_validate(response.json())
 
     async def get_type_by_id_async(
         self,
@@ -317,12 +444,23 @@ class Graph(BaseNamespace):
         type_id: str,
         expand: Optional[str] = None,
         timeout: Optional[float] = None,
-    ) -> httpx.Response:
+    ) -> Type:
         """Retrieve a single type (async)
 
         Returns a record [type](ref:graph#type) given its ID (name)
+
+        Args:
+            type_id: The unique identifier of the type
+            expand: Returns related resources inline with the main resource
+            timeout: Override the default request timeout (seconds).
+
+        Returns:
+            Type
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
         """
-        return await self._client.request_async(
+        response = await self._client.request_async(
             "GET",
             self._api,
             "/graph/types/{typeId}",
@@ -334,3 +472,4 @@ class Graph(BaseNamespace):
             },
             timeout=timeout,
         )
+        return Type.model_validate(response.json())

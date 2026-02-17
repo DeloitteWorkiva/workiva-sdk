@@ -11,15 +11,25 @@ import httpx
 
 from workiva._constants import _API
 from workiva._operations._base import BaseNamespace
+from workiva._pagination import (
+    extract_next_link,
+    paginate_all,
+    paginate_all_async,
+)
 from workiva.models.platform import (
     File,
     FileCopy,
     FileExportById,
     FileImport,
+    FileImportResponse,
     FileRestoreOptions,
+    FilesListResult,
     FileTrashOptions,
+    ResourcePermissionsListResult,
     ResourcePermissionsModification,
 )
+
+__all__ = ["Files"]
 
 
 class Files(BaseNamespace):
@@ -33,25 +43,41 @@ class Files(BaseNamespace):
         filter_: Optional[str] = None,
         order_by: Optional[str] = None,
         maxpagesize: Optional[int] = 1000,
-        next_: Optional[str] = None,
         timeout: Optional[float] = None,
-    ) -> httpx.Response:
+    ) -> FilesListResult:
         """Retrieve a list of files
 
         Returns a paginated list of [files](ref:files#file).
+
+        Args:
+            filter_: The properties to filter the results by.
+            order_by: One or more comma-separated expressions to indicate the order in which to sort the results.
+            maxpagesize: The maximum number of results to retrieve
+            timeout: Override the default request timeout (seconds).
+
+        Returns:
+            FilesListResult
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
         """
-        return self._client.request(
-            "GET",
-            self._api,
-            "/files",
-            query_params={
-                "$filter": filter_,
-                "$orderBy": order_by,
-                "$maxpagesize": maxpagesize,
-                "$next": next_,
-            },
-            timeout=timeout,
-        )
+
+        def _fetch(_cursor: str | None) -> httpx.Response:
+            return self._client.request(
+                "GET",
+                self._api,
+                "/files",
+                query_params={
+                    "$filter": filter_,
+                    "$orderBy": order_by,
+                    "$maxpagesize": maxpagesize,
+                    "$next": _cursor,
+                },
+                timeout=timeout,
+            )
+
+        _body = paginate_all(_fetch, extract_next_link, "data")
+        return FilesListResult.model_validate(_body)
 
     async def get_files_async(
         self,
@@ -59,32 +85,48 @@ class Files(BaseNamespace):
         filter_: Optional[str] = None,
         order_by: Optional[str] = None,
         maxpagesize: Optional[int] = 1000,
-        next_: Optional[str] = None,
         timeout: Optional[float] = None,
-    ) -> httpx.Response:
+    ) -> FilesListResult:
         """Retrieve a list of files (async)
 
         Returns a paginated list of [files](ref:files#file).
+
+        Args:
+            filter_: The properties to filter the results by.
+            order_by: One or more comma-separated expressions to indicate the order in which to sort the results.
+            maxpagesize: The maximum number of results to retrieve
+            timeout: Override the default request timeout (seconds).
+
+        Returns:
+            FilesListResult
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
         """
-        return await self._client.request_async(
-            "GET",
-            self._api,
-            "/files",
-            query_params={
-                "$filter": filter_,
-                "$orderBy": order_by,
-                "$maxpagesize": maxpagesize,
-                "$next": next_,
-            },
-            timeout=timeout,
-        )
+
+        async def _fetch(_cursor: str | None) -> httpx.Response:
+            return await self._client.request_async(
+                "GET",
+                self._api,
+                "/files",
+                query_params={
+                    "$filter": filter_,
+                    "$orderBy": order_by,
+                    "$maxpagesize": maxpagesize,
+                    "$next": _cursor,
+                },
+                timeout=timeout,
+            )
+
+        _body = await paginate_all_async(_fetch, extract_next_link, "data")
+        return FilesListResult.model_validate(_body)
 
     def create_file(
         self,
         *,
         body: File,
         timeout: Optional[float] = None,
-    ) -> httpx.Response:
+    ) -> File:
         """Create a new file
 
         Creates a new [file](ref:files#file). Requires name and kind. kind
@@ -115,21 +157,28 @@ class Files(BaseNamespace):
         "V0ZFYXRhSW50aXR5IkZvbGRlcjoxSkFGOTZGRjiENDk1Qzk4RjQ4OTgzN0M6ODdDNjZENi"
         }
         ```
+
+        Returns:
+            File
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
         """
-        return self._client.request(
+        response = self._client.request(
             "POST",
             self._api,
             "/files",
             json_body=body,
             timeout=timeout,
         )
+        return File.model_validate(response.json())
 
     async def create_file_async(
         self,
         *,
         body: File,
         timeout: Optional[float] = None,
-    ) -> httpx.Response:
+    ) -> File:
         """Create a new file (async)
 
         Creates a new [file](ref:files#file). Requires name and kind. kind
@@ -160,21 +209,28 @@ class Files(BaseNamespace):
         "V0ZFYXRhSW50aXR5IkZvbGRlcjoxSkFGOTZGRjiENDk1Qzk4RjQ4OTgzN0M6ODdDNjZENi"
         }
         ```
+
+        Returns:
+            File
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
         """
-        return await self._client.request_async(
+        response = await self._client.request_async(
             "POST",
             self._api,
             "/files",
             json_body=body,
             timeout=timeout,
         )
+        return File.model_validate(response.json())
 
     def import_file(
         self,
         *,
         body: FileImport,
         timeout: Optional[float] = None,
-    ) -> httpx.Response:
+    ) -> FileImportResponse:
         """Initiate a file import
 
         Import a file for conversion to a Workiva equivalent. This is a long
@@ -184,21 +240,28 @@ class Files(BaseNamespace):
         `uploadUrl` with the same authentication credentials and flow as the
         import request. For more details, see [Authentication
         documentation](ref:authentication).
+
+        Returns:
+            FileImportResponse
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
         """
-        return self._client.request(
+        response = self._client.request(
             "POST",
             self._api,
             "/files/import",
             json_body=body,
             timeout=timeout,
         )
+        return FileImportResponse.model_validate(response.json())
 
     async def import_file_async(
         self,
         *,
         body: FileImport,
         timeout: Optional[float] = None,
-    ) -> httpx.Response:
+    ) -> FileImportResponse:
         """Initiate a file import (async)
 
         Import a file for conversion to a Workiva equivalent. This is a long
@@ -208,98 +271,93 @@ class Files(BaseNamespace):
         `uploadUrl` with the same authentication credentials and flow as the
         import request. For more details, see [Authentication
         documentation](ref:authentication).
+
+        Returns:
+            FileImportResponse
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
         """
-        return await self._client.request_async(
+        response = await self._client.request_async(
             "POST",
             self._api,
             "/files/import",
             json_body=body,
             timeout=timeout,
         )
+        return FileImportResponse.model_validate(response.json())
 
     def get_trashed_files(
         self,
         *,
         maxpagesize: Optional[int] = 1000,
-        next_: Optional[str] = None,
         timeout: Optional[float] = None,
-    ) -> httpx.Response:
+    ) -> FilesListResult:
         """Retrieve a list of trashed files
 
         Returns a paginated list of files that have been trashed.
+
+        Args:
+            maxpagesize: The maximum number of results to retrieve
+            timeout: Override the default request timeout (seconds).
+
+        Returns:
+            FilesListResult
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
         """
-        return self._client.request(
-            "GET",
-            self._api,
-            "/files/trash",
-            query_params={
-                "$maxpagesize": maxpagesize,
-                "$next": next_,
-            },
-            timeout=timeout,
-        )
+
+        def _fetch(_cursor: str | None) -> httpx.Response:
+            return self._client.request(
+                "GET",
+                self._api,
+                "/files/trash",
+                query_params={
+                    "$maxpagesize": maxpagesize,
+                    "$next": _cursor,
+                },
+                timeout=timeout,
+            )
+
+        _body = paginate_all(_fetch, extract_next_link, "data")
+        return FilesListResult.model_validate(_body)
 
     async def get_trashed_files_async(
         self,
         *,
         maxpagesize: Optional[int] = 1000,
-        next_: Optional[str] = None,
         timeout: Optional[float] = None,
-    ) -> httpx.Response:
+    ) -> FilesListResult:
         """Retrieve a list of trashed files (async)
 
         Returns a paginated list of files that have been trashed.
+
+        Args:
+            maxpagesize: The maximum number of results to retrieve
+            timeout: Override the default request timeout (seconds).
+
+        Returns:
+            FilesListResult
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
         """
-        return await self._client.request_async(
-            "GET",
-            self._api,
-            "/files/trash",
-            query_params={
-                "$maxpagesize": maxpagesize,
-                "$next": next_,
-            },
-            timeout=timeout,
-        )
 
-    def get_file_by_id(
-        self,
-        *,
-        file_id: str,
-        timeout: Optional[float] = None,
-    ) -> httpx.Response:
-        """Retrieve a single file
+        async def _fetch(_cursor: str | None) -> httpx.Response:
+            return await self._client.request_async(
+                "GET",
+                self._api,
+                "/files/trash",
+                query_params={
+                    "$maxpagesize": maxpagesize,
+                    "$next": _cursor,
+                },
+                timeout=timeout,
+            )
 
-        Retrieves a [file](ref:files#file) given its ID
-        """
-        return self._client.request(
-            "GET",
-            self._api,
-            "/files/{fileId}",
-            path_params={
-                "fileId": file_id,
-            },
-            timeout=timeout,
-        )
-
-    async def get_file_by_id_async(
-        self,
-        *,
-        file_id: str,
-        timeout: Optional[float] = None,
-    ) -> httpx.Response:
-        """Retrieve a single file (async)
-
-        Retrieves a [file](ref:files#file) given its ID
-        """
-        return await self._client.request_async(
-            "GET",
-            self._api,
-            "/files/{fileId}",
-            path_params={
-                "fileId": file_id,
-            },
-            timeout=timeout,
-        )
+        _body = await paginate_all_async(_fetch, extract_next_link, "data")
+        return FilesListResult.model_validate(_body)
 
     def partially_update_file_by_id(
         self,
@@ -307,7 +365,7 @@ class Files(BaseNamespace):
         file_id: str,
         body: list[Any],
         timeout: Optional[float] = None,
-    ) -> httpx.Response:
+    ) -> File:
         """Partially update a single file
 
         Partially updates the properties of a [file](ref:files#file). Only one
@@ -319,8 +377,19 @@ class Files(BaseNamespace):
         |---|---|
         |`/container`|`replace`|
         |`/name`|`replace`|
+
+        Args:
+            file_id: The unique identifier of the file
+            body: Request body.
+            timeout: Override the default request timeout (seconds).
+
+        Returns:
+            File
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
         """
-        return self._client.request(
+        response = self._client.request(
             "PATCH",
             self._api,
             "/files/{fileId}",
@@ -330,6 +399,7 @@ class Files(BaseNamespace):
             json_body=body,
             timeout=timeout,
         )
+        return File.model_validate(response.json())
 
     async def partially_update_file_by_id_async(
         self,
@@ -337,7 +407,7 @@ class Files(BaseNamespace):
         file_id: str,
         body: list[Any],
         timeout: Optional[float] = None,
-    ) -> httpx.Response:
+    ) -> File:
         """Partially update a single file (async)
 
         Partially updates the properties of a [file](ref:files#file). Only one
@@ -349,8 +419,19 @@ class Files(BaseNamespace):
         |---|---|
         |`/container`|`replace`|
         |`/name`|`replace`|
+
+        Args:
+            file_id: The unique identifier of the file
+            body: Request body.
+            timeout: Override the default request timeout (seconds).
+
+        Returns:
+            File
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
         """
-        return await self._client.request_async(
+        response = await self._client.request_async(
             "PATCH",
             self._api,
             "/files/{fileId}",
@@ -360,6 +441,69 @@ class Files(BaseNamespace):
             json_body=body,
             timeout=timeout,
         )
+        return File.model_validate(response.json())
+
+    def get_file_by_id(
+        self,
+        *,
+        file_id: str,
+        timeout: Optional[float] = None,
+    ) -> File:
+        """Retrieve a single file
+
+        Retrieves a [file](ref:files#file) given its ID
+
+        Args:
+            file_id: The unique identifier of the file
+            timeout: Override the default request timeout (seconds).
+
+        Returns:
+            File
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
+        """
+        response = self._client.request(
+            "GET",
+            self._api,
+            "/files/{fileId}",
+            path_params={
+                "fileId": file_id,
+            },
+            timeout=timeout,
+        )
+        return File.model_validate(response.json())
+
+    async def get_file_by_id_async(
+        self,
+        *,
+        file_id: str,
+        timeout: Optional[float] = None,
+    ) -> File:
+        """Retrieve a single file (async)
+
+        Retrieves a [file](ref:files#file) given its ID
+
+        Args:
+            file_id: The unique identifier of the file
+            timeout: Override the default request timeout (seconds).
+
+        Returns:
+            File
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
+        """
+        response = await self._client.request_async(
+            "GET",
+            self._api,
+            "/files/{fileId}",
+            path_params={
+                "fileId": file_id,
+            },
+            timeout=timeout,
+        )
+        return File.model_validate(response.json())
 
     def copy_file(
         self,
@@ -378,6 +522,18 @@ class Files(BaseNamespace):
         populated with a link to the   [Retrieve copy file results for a single
         operation endpoint](ref:getcopyfileresults)  to see the results of the
         File Copy Request.
+
+        Args:
+            file_id: The unique identifier of the file
+            body: Request body.
+            timeout: Override the default request timeout (seconds).
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
+
+        Note:
+            This is a long-running operation (HTTP 202). Use
+            ``client.wait(response).result()`` to poll until completion.
         """
         return self._client.request(
             "POST",
@@ -407,6 +563,18 @@ class Files(BaseNamespace):
         populated with a link to the   [Retrieve copy file results for a single
         operation endpoint](ref:getcopyfileresults)  to see the results of the
         File Copy Request.
+
+        Args:
+            file_id: The unique identifier of the file
+            body: Request body.
+            timeout: Override the default request timeout (seconds).
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
+
+        Note:
+            This is a long-running operation (HTTP 202). Use
+            ``await client.wait(response).result_async()`` to poll until completion.
         """
         return await self._client.request_async(
             "POST",
@@ -446,6 +614,18 @@ class Files(BaseNamespace):
         spreadsheetexport), and
         [Presentations](https://developers.workiva.com/2026-01-01/platform-
         presentationexport).
+
+        Args:
+            file_id: The unique identifier of the file
+            body: Request body.
+            timeout: Override the default request timeout (seconds).
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
+
+        Note:
+            This is a long-running operation (HTTP 202). Use
+            ``client.wait(response).result()`` to poll until completion.
         """
         return self._client.request(
             "POST",
@@ -485,6 +665,18 @@ class Files(BaseNamespace):
         spreadsheetexport), and
         [Presentations](https://developers.workiva.com/2026-01-01/platform-
         presentationexport).
+
+        Args:
+            file_id: The unique identifier of the file
+            body: Request body.
+            timeout: Override the default request timeout (seconds).
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
+
+        Note:
+            This is a long-running operation (HTTP 202). Use
+            ``await client.wait(response).result_async()`` to poll until completion.
         """
         return await self._client.request_async(
             "POST",
@@ -508,6 +700,18 @@ class Files(BaseNamespace):
 
         Restores a file given its ID. If the file being restored is a Folder,
         its contents will be recursively restored.
+
+        Args:
+            file_id: The unique identifier of the file
+            body: Request body.
+            timeout: Override the default request timeout (seconds).
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
+
+        Note:
+            This is a long-running operation (HTTP 202). Use
+            ``client.wait(response).result()`` to poll until completion.
         """
         return self._client.request(
             "POST",
@@ -531,6 +735,18 @@ class Files(BaseNamespace):
 
         Restores a file given its ID. If the file being restored is a Folder,
         its contents will be recursively restored.
+
+        Args:
+            file_id: The unique identifier of the file
+            body: Request body.
+            timeout: Override the default request timeout (seconds).
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
+
+        Note:
+            This is a long-running operation (HTTP 202). Use
+            ``await client.wait(response).result_async()`` to poll until completion.
         """
         return await self._client.request_async(
             "POST",
@@ -554,6 +770,18 @@ class Files(BaseNamespace):
 
         Trashes a file given its ID. If the file being trashed is a Folder, its
         contents will be recursively trashed.
+
+        Args:
+            file_id: The unique identifier of the file
+            body: Request body.
+            timeout: Override the default request timeout (seconds).
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
+
+        Note:
+            This is a long-running operation (HTTP 202). Use
+            ``client.wait(response).result()`` to poll until completion.
         """
         return self._client.request(
             "POST",
@@ -577,6 +805,18 @@ class Files(BaseNamespace):
 
         Trashes a file given its ID. If the file being trashed is a Folder, its
         contents will be recursively trashed.
+
+        Args:
+            file_id: The unique identifier of the file
+            body: Request body.
+            timeout: Override the default request timeout (seconds).
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
+
+        Note:
+            This is a long-running operation (HTTP 202). Use
+            ``await client.wait(response).result_async()`` to poll until completion.
         """
         return await self._client.request_async(
             "POST",
@@ -595,27 +835,43 @@ class Files(BaseNamespace):
         file_id: str,
         filter_: Optional[str] = None,
         maxpagesize: Optional[int] = 1000,
-        next_: Optional[str] = None,
         timeout: Optional[float] = None,
-    ) -> httpx.Response:
+    ) -> ResourcePermissionsListResult:
         """Retrieve permissions for a file
 
         Retrieves a paginated list of permissions for a given file
+
+        Args:
+            file_id: The unique identifier of the file
+            filter_: The properties to filter the results by.
+            maxpagesize: The maximum number of results to retrieve
+            timeout: Override the default request timeout (seconds).
+
+        Returns:
+            ResourcePermissionsListResult
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
         """
-        return self._client.request(
-            "GET",
-            self._api,
-            "/files/{fileId}/permissions",
-            path_params={
-                "fileId": file_id,
-            },
-            query_params={
-                "$filter": filter_,
-                "$maxpagesize": maxpagesize,
-                "$next": next_,
-            },
-            timeout=timeout,
-        )
+
+        def _fetch(_cursor: str | None) -> httpx.Response:
+            return self._client.request(
+                "GET",
+                self._api,
+                "/files/{fileId}/permissions",
+                path_params={
+                    "fileId": file_id,
+                },
+                query_params={
+                    "$filter": filter_,
+                    "$maxpagesize": maxpagesize,
+                    "$next": _cursor,
+                },
+                timeout=timeout,
+            )
+
+        _body = paginate_all(_fetch, extract_next_link, "data")
+        return ResourcePermissionsListResult.model_validate(_body)
 
     async def get_file_permissions_async(
         self,
@@ -623,27 +879,43 @@ class Files(BaseNamespace):
         file_id: str,
         filter_: Optional[str] = None,
         maxpagesize: Optional[int] = 1000,
-        next_: Optional[str] = None,
         timeout: Optional[float] = None,
-    ) -> httpx.Response:
+    ) -> ResourcePermissionsListResult:
         """Retrieve permissions for a file (async)
 
         Retrieves a paginated list of permissions for a given file
+
+        Args:
+            file_id: The unique identifier of the file
+            filter_: The properties to filter the results by.
+            maxpagesize: The maximum number of results to retrieve
+            timeout: Override the default request timeout (seconds).
+
+        Returns:
+            ResourcePermissionsListResult
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
         """
-        return await self._client.request_async(
-            "GET",
-            self._api,
-            "/files/{fileId}/permissions",
-            path_params={
-                "fileId": file_id,
-            },
-            query_params={
-                "$filter": filter_,
-                "$maxpagesize": maxpagesize,
-                "$next": next_,
-            },
-            timeout=timeout,
-        )
+
+        async def _fetch(_cursor: str | None) -> httpx.Response:
+            return await self._client.request_async(
+                "GET",
+                self._api,
+                "/files/{fileId}/permissions",
+                path_params={
+                    "fileId": file_id,
+                },
+                query_params={
+                    "$filter": filter_,
+                    "$maxpagesize": maxpagesize,
+                    "$next": _cursor,
+                },
+                timeout=timeout,
+            )
+
+        _body = await paginate_all_async(_fetch, extract_next_link, "data")
+        return ResourcePermissionsListResult.model_validate(_body)
 
     def file_permissions_modification(
         self,
@@ -660,6 +932,14 @@ class Files(BaseNamespace):
         explicitly revoked. Then, the new permission needs to be assigned. This
         can be done in a single request by sending `toAssign` and `toRevoke` in
         the request body._
+
+        Args:
+            file_id: The unique identifier of the file
+            body: Request body.
+            timeout: Override the default request timeout (seconds).
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
         """
         return self._client.request(
             "POST",
@@ -687,6 +967,14 @@ class Files(BaseNamespace):
         explicitly revoked. Then, the new permission needs to be assigned. This
         can be done in a single request by sending `toAssign` and `toRevoke` in
         the request body._
+
+        Args:
+            file_id: The unique identifier of the file
+            body: Request body.
+            timeout: Override the default request timeout (seconds).
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
         """
         return await self._client.request_async(
             "POST",

@@ -11,6 +11,40 @@ import httpx
 
 from workiva._constants import _API
 from workiva._operations._base import BaseNamespace
+from workiva._pagination import (
+    extract_next_link,
+    paginate_all,
+    paginate_all_async,
+)
+from workiva.models.platform import (
+    CopyFileListResult,
+    DestinationLinkSourceConversionResultListResult,
+    ImageUploadResultCollection,
+    ImportFileListResult,
+    MetricValuesListResult,
+    MilestoneCreationListResult,
+    Operation,
+    PatchDocumentListResult,
+    PatchPresentationListResult,
+    PatchSectionListResult,
+    PatchSheetListResult,
+    PatchSlideLayoutListResult,
+    PatchSlideListResult,
+    PatchSpreadsheetListResult,
+    PatchTablePropertiesListResult,
+    RangeLinkEditResultCollection,
+    RichTextAnchorCreationResultCollection,
+    RichTextDuplicationEditListResult,
+    RichTextEditListResult,
+    RichTextLinksEditListResult,
+    TableAnchorCreationResultCollection,
+    TableCellEditListResult,
+    TableEditListResult,
+    TableLinksEditListResult,
+    TableReapplyFilterListResult,
+)
+
+__all__ = ["Operations"]
 
 
 class Operations(BaseNamespace):
@@ -23,15 +57,25 @@ class Operations(BaseNamespace):
         *,
         operation_id: str,
         timeout: Optional[float] = None,
-    ) -> httpx.Response:
+    ) -> Operation:
         """Retrieve a single operation
 
         Retrieves an [operation](ref:operations#operation) given its ID. <br
         /><br /> Note: This endpoint is rate-limited. You may experience rates
         as low as 1 request per second. When polling for updates, examine the
         `Retry-After` header and retry after that many seconds.
+
+        Args:
+            operation_id: The unique identifier of the operation
+            timeout: Override the default request timeout (seconds).
+
+        Returns:
+            Operation
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
         """
-        return self._client.request(
+        response = self._client.request(
             "GET",
             self._api,
             "/operations/{operationId}",
@@ -40,21 +84,32 @@ class Operations(BaseNamespace):
             },
             timeout=timeout,
         )
+        return Operation.model_validate(response.json())
 
     async def get_operation_by_id_async(
         self,
         *,
         operation_id: str,
         timeout: Optional[float] = None,
-    ) -> httpx.Response:
+    ) -> Operation:
         """Retrieve a single operation (async)
 
         Retrieves an [operation](ref:operations#operation) given its ID. <br
         /><br /> Note: This endpoint is rate-limited. You may experience rates
         as low as 1 request per second. When polling for updates, examine the
         `Retry-After` header and retry after that many seconds.
+
+        Args:
+            operation_id: The unique identifier of the operation
+            timeout: Override the default request timeout (seconds).
+
+        Returns:
+            Operation
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
         """
-        return await self._client.request_async(
+        response = await self._client.request_async(
             "GET",
             self._api,
             "/operations/{operationId}",
@@ -63,15 +118,15 @@ class Operations(BaseNamespace):
             },
             timeout=timeout,
         )
+        return Operation.model_validate(response.json())
 
     def get_copy_file_results(
         self,
         *,
         operation_id: str,
         maxpagesize: Optional[int] = 1000,
-        next_: Optional[str] = None,
         timeout: Optional[float] = None,
-    ) -> httpx.Response:
+    ) -> CopyFileListResult:
         """Retrieve copy file results for a single operation
 
         Returns a [`CopyFileListResult`](ref:operations#copyfilelistresult)
@@ -79,29 +134,44 @@ class Operations(BaseNamespace):
         endpoint is rate-limited. You may experience rates as low as 1 request
         per second. When polling for updates, examine the `Retry-After` header
         and retry after that many seconds.
+
+        Args:
+            operation_id: The unique identifier of the operation
+            maxpagesize: The maximum number of results to retrieve
+            timeout: Override the default request timeout (seconds).
+
+        Returns:
+            CopyFileListResult
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
         """
-        return self._client.request(
-            "GET",
-            self._api,
-            "/operations/{operationId}/copyFileResults",
-            path_params={
-                "operationId": operation_id,
-            },
-            query_params={
-                "$maxpagesize": maxpagesize,
-                "$next": next_,
-            },
-            timeout=timeout,
-        )
+
+        def _fetch(_cursor: str | None) -> httpx.Response:
+            return self._client.request(
+                "GET",
+                self._api,
+                "/operations/{operationId}/copyFileResults",
+                path_params={
+                    "operationId": operation_id,
+                },
+                query_params={
+                    "$maxpagesize": maxpagesize,
+                    "$next": _cursor,
+                },
+                timeout=timeout,
+            )
+
+        _body = paginate_all(_fetch, extract_next_link, "data")
+        return CopyFileListResult.model_validate(_body)
 
     async def get_copy_file_results_async(
         self,
         *,
         operation_id: str,
         maxpagesize: Optional[int] = 1000,
-        next_: Optional[str] = None,
         timeout: Optional[float] = None,
-    ) -> httpx.Response:
+    ) -> CopyFileListResult:
         """Retrieve copy file results for a single operation (async)
 
         Returns a [`CopyFileListResult`](ref:operations#copyfilelistresult)
@@ -109,139 +179,214 @@ class Operations(BaseNamespace):
         endpoint is rate-limited. You may experience rates as low as 1 request
         per second. When polling for updates, examine the `Retry-After` header
         and retry after that many seconds.
+
+        Args:
+            operation_id: The unique identifier of the operation
+            maxpagesize: The maximum number of results to retrieve
+            timeout: Override the default request timeout (seconds).
+
+        Returns:
+            CopyFileListResult
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
         """
-        return await self._client.request_async(
-            "GET",
-            self._api,
-            "/operations/{operationId}/copyFileResults",
-            path_params={
-                "operationId": operation_id,
-            },
-            query_params={
-                "$maxpagesize": maxpagesize,
-                "$next": next_,
-            },
-            timeout=timeout,
-        )
+
+        async def _fetch(_cursor: str | None) -> httpx.Response:
+            return await self._client.request_async(
+                "GET",
+                self._api,
+                "/operations/{operationId}/copyFileResults",
+                path_params={
+                    "operationId": operation_id,
+                },
+                query_params={
+                    "$maxpagesize": maxpagesize,
+                    "$next": _cursor,
+                },
+                timeout=timeout,
+            )
+
+        _body = await paginate_all_async(_fetch, extract_next_link, "data")
+        return CopyFileListResult.model_validate(_body)
 
     def get_destination_link_source_conversion_results(
         self,
         *,
         operation_id: str,
         maxpagesize: Optional[int] = 1000,
-        next_: Optional[str] = None,
         timeout: Optional[float] = None,
-    ) -> httpx.Response:
+    ) -> DestinationLinkSourceConversionResultListResult:
         """Retrieves the results from a destination link source conversion.
 
         Returns the results for a destination link source conversion.
         This will include the new source anchor's ID and the destination link ID
         for the old source (if any).
+
+        Args:
+            operation_id: The unique identifier of the operation
+            maxpagesize: The maximum number of results to retrieve
+            timeout: Override the default request timeout (seconds).
+
+        Returns:
+            DestinationLinkSourceConversionResultListResult
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
         """
-        return self._client.request(
-            "GET",
-            self._api,
-            "/operations/{operationId}/destinationLinkSourceConversionResults",
-            path_params={
-                "operationId": operation_id,
-            },
-            query_params={
-                "$maxpagesize": maxpagesize,
-                "$next": next_,
-            },
-            timeout=timeout,
-        )
+
+        def _fetch(_cursor: str | None) -> httpx.Response:
+            return self._client.request(
+                "GET",
+                self._api,
+                "/operations/{operationId}/destinationLinkSourceConversionResults",
+                path_params={
+                    "operationId": operation_id,
+                },
+                query_params={
+                    "$maxpagesize": maxpagesize,
+                    "$next": _cursor,
+                },
+                timeout=timeout,
+            )
+
+        _body = paginate_all(_fetch, extract_next_link, "data")
+        return DestinationLinkSourceConversionResultListResult.model_validate(_body)
 
     async def get_destination_link_source_conversion_results_async(
         self,
         *,
         operation_id: str,
         maxpagesize: Optional[int] = 1000,
-        next_: Optional[str] = None,
         timeout: Optional[float] = None,
-    ) -> httpx.Response:
+    ) -> DestinationLinkSourceConversionResultListResult:
         """Retrieves the results from a destination link source conversion. (async)
 
         Returns the results for a destination link source conversion.
         This will include the new source anchor's ID and the destination link ID
         for the old source (if any).
+
+        Args:
+            operation_id: The unique identifier of the operation
+            maxpagesize: The maximum number of results to retrieve
+            timeout: Override the default request timeout (seconds).
+
+        Returns:
+            DestinationLinkSourceConversionResultListResult
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
         """
-        return await self._client.request_async(
-            "GET",
-            self._api,
-            "/operations/{operationId}/destinationLinkSourceConversionResults",
-            path_params={
-                "operationId": operation_id,
-            },
-            query_params={
-                "$maxpagesize": maxpagesize,
-                "$next": next_,
-            },
-            timeout=timeout,
-        )
+
+        async def _fetch(_cursor: str | None) -> httpx.Response:
+            return await self._client.request_async(
+                "GET",
+                self._api,
+                "/operations/{operationId}/destinationLinkSourceConversionResults",
+                path_params={
+                    "operationId": operation_id,
+                },
+                query_params={
+                    "$maxpagesize": maxpagesize,
+                    "$next": _cursor,
+                },
+                timeout=timeout,
+            )
+
+        _body = await paginate_all_async(_fetch, extract_next_link, "data")
+        return DestinationLinkSourceConversionResultListResult.model_validate(_body)
 
     def get_image_upload_creation_results(
         self,
         *,
         operation_id: str,
         maxpagesize: Optional[int] = 1000,
-        next_: Optional[str] = None,
         timeout: Optional[float] = None,
-    ) -> httpx.Response:
+    ) -> ImageUploadResultCollection:
         """Retrieve results for a image upload
 
         Returns a [`ImageUploadResultCollection`](ref:operations#imageuploadresu
         ltcollection) describing the results of a image upload.
+
+        Args:
+            operation_id: The unique identifier of the operation
+            maxpagesize: The maximum number of results to retrieve
+            timeout: Override the default request timeout (seconds).
+
+        Returns:
+            ImageUploadResultCollection
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
         """
-        return self._client.request(
-            "GET",
-            self._api,
-            "/operations/{operationId}/imageUploadResults",
-            path_params={
-                "operationId": operation_id,
-            },
-            query_params={
-                "$maxpagesize": maxpagesize,
-                "$next": next_,
-            },
-            timeout=timeout,
-        )
+
+        def _fetch(_cursor: str | None) -> httpx.Response:
+            return self._client.request(
+                "GET",
+                self._api,
+                "/operations/{operationId}/imageUploadResults",
+                path_params={
+                    "operationId": operation_id,
+                },
+                query_params={
+                    "$maxpagesize": maxpagesize,
+                    "$next": _cursor,
+                },
+                timeout=timeout,
+            )
+
+        _body = paginate_all(_fetch, extract_next_link, "data")
+        return ImageUploadResultCollection.model_validate(_body)
 
     async def get_image_upload_creation_results_async(
         self,
         *,
         operation_id: str,
         maxpagesize: Optional[int] = 1000,
-        next_: Optional[str] = None,
         timeout: Optional[float] = None,
-    ) -> httpx.Response:
+    ) -> ImageUploadResultCollection:
         """Retrieve results for a image upload (async)
 
         Returns a [`ImageUploadResultCollection`](ref:operations#imageuploadresu
         ltcollection) describing the results of a image upload.
+
+        Args:
+            operation_id: The unique identifier of the operation
+            maxpagesize: The maximum number of results to retrieve
+            timeout: Override the default request timeout (seconds).
+
+        Returns:
+            ImageUploadResultCollection
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
         """
-        return await self._client.request_async(
-            "GET",
-            self._api,
-            "/operations/{operationId}/imageUploadResults",
-            path_params={
-                "operationId": operation_id,
-            },
-            query_params={
-                "$maxpagesize": maxpagesize,
-                "$next": next_,
-            },
-            timeout=timeout,
-        )
+
+        async def _fetch(_cursor: str | None) -> httpx.Response:
+            return await self._client.request_async(
+                "GET",
+                self._api,
+                "/operations/{operationId}/imageUploadResults",
+                path_params={
+                    "operationId": operation_id,
+                },
+                query_params={
+                    "$maxpagesize": maxpagesize,
+                    "$next": _cursor,
+                },
+                timeout=timeout,
+            )
+
+        _body = await paginate_all_async(_fetch, extract_next_link, "data")
+        return ImageUploadResultCollection.model_validate(_body)
 
     def get_import_file_results(
         self,
         *,
         operation_id: str,
         maxpagesize: Optional[int] = 1000,
-        next_: Optional[str] = None,
         timeout: Optional[float] = None,
-    ) -> httpx.Response:
+    ) -> ImportFileListResult:
         """Retrieve import file results for a single operation
 
         Returns a [`ImportFileListResult`](ref:operations#importfilelistresult)
@@ -249,29 +394,44 @@ class Operations(BaseNamespace):
         This endpoint is rate-limited. You may experience rates as low as 1
         request per second. When polling for updates, examine the `Retry-After`
         header and retry after that many seconds.
+
+        Args:
+            operation_id: The unique identifier of the operation
+            maxpagesize: The maximum number of results to retrieve
+            timeout: Override the default request timeout (seconds).
+
+        Returns:
+            ImportFileListResult
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
         """
-        return self._client.request(
-            "GET",
-            self._api,
-            "/operations/{operationId}/importFileResults",
-            path_params={
-                "operationId": operation_id,
-            },
-            query_params={
-                "$maxpagesize": maxpagesize,
-                "$next": next_,
-            },
-            timeout=timeout,
-        )
+
+        def _fetch(_cursor: str | None) -> httpx.Response:
+            return self._client.request(
+                "GET",
+                self._api,
+                "/operations/{operationId}/importFileResults",
+                path_params={
+                    "operationId": operation_id,
+                },
+                query_params={
+                    "$maxpagesize": maxpagesize,
+                    "$next": _cursor,
+                },
+                timeout=timeout,
+            )
+
+        _body = paginate_all(_fetch, extract_next_link, "data")
+        return ImportFileListResult.model_validate(_body)
 
     async def get_import_file_results_async(
         self,
         *,
         operation_id: str,
         maxpagesize: Optional[int] = 1000,
-        next_: Optional[str] = None,
         timeout: Optional[float] = None,
-    ) -> httpx.Response:
+    ) -> ImportFileListResult:
         """Retrieve import file results for a single operation (async)
 
         Returns a [`ImportFileListResult`](ref:operations#importfilelistresult)
@@ -279,29 +439,44 @@ class Operations(BaseNamespace):
         This endpoint is rate-limited. You may experience rates as low as 1
         request per second. When polling for updates, examine the `Retry-After`
         header and retry after that many seconds.
+
+        Args:
+            operation_id: The unique identifier of the operation
+            maxpagesize: The maximum number of results to retrieve
+            timeout: Override the default request timeout (seconds).
+
+        Returns:
+            ImportFileListResult
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
         """
-        return await self._client.request_async(
-            "GET",
-            self._api,
-            "/operations/{operationId}/importFileResults",
-            path_params={
-                "operationId": operation_id,
-            },
-            query_params={
-                "$maxpagesize": maxpagesize,
-                "$next": next_,
-            },
-            timeout=timeout,
-        )
+
+        async def _fetch(_cursor: str | None) -> httpx.Response:
+            return await self._client.request_async(
+                "GET",
+                self._api,
+                "/operations/{operationId}/importFileResults",
+                path_params={
+                    "operationId": operation_id,
+                },
+                query_params={
+                    "$maxpagesize": maxpagesize,
+                    "$next": _cursor,
+                },
+                timeout=timeout,
+            )
+
+        _body = await paginate_all_async(_fetch, extract_next_link, "data")
+        return ImportFileListResult.model_validate(_body)
 
     def get_batch_upsertion_metric_values_results(
         self,
         *,
         operation_id: str,
         maxpagesize: Optional[int] = 1000,
-        next_: Optional[str] = None,
         timeout: Optional[float] = None,
-    ) -> httpx.Response:
+    ) -> MetricValuesListResult:
         """Retrieve the results of a metric values batch upsertion operation
 
         Returns a
@@ -310,29 +485,44 @@ class Operations(BaseNamespace):
         /><br /> Note: This endpoint is rate-limited. You may experience rates
         as low as 1 request per second. When polling for updates, examine the
         `Retry-After` header and retry after that many seconds.
+
+        Args:
+            operation_id: The unique identifier of the operation
+            maxpagesize: The maximum number of results to retrieve
+            timeout: Override the default request timeout (seconds).
+
+        Returns:
+            MetricValuesListResult
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
         """
-        return self._client.request(
-            "GET",
-            self._api,
-            "/operations/{operationId}/metricValuesBatchUpsertionResults",
-            path_params={
-                "operationId": operation_id,
-            },
-            query_params={
-                "$maxpagesize": maxpagesize,
-                "$next": next_,
-            },
-            timeout=timeout,
-        )
+
+        def _fetch(_cursor: str | None) -> httpx.Response:
+            return self._client.request(
+                "GET",
+                self._api,
+                "/operations/{operationId}/metricValuesBatchUpsertionResults",
+                path_params={
+                    "operationId": operation_id,
+                },
+                query_params={
+                    "$maxpagesize": maxpagesize,
+                    "$next": _cursor,
+                },
+                timeout=timeout,
+            )
+
+        _body = paginate_all(_fetch, extract_next_link, "data")
+        return MetricValuesListResult.model_validate(_body)
 
     async def get_batch_upsertion_metric_values_results_async(
         self,
         *,
         operation_id: str,
         maxpagesize: Optional[int] = 1000,
-        next_: Optional[str] = None,
         timeout: Optional[float] = None,
-    ) -> httpx.Response:
+    ) -> MetricValuesListResult:
         """Retrieve the results of a metric values batch upsertion operation (async)
 
         Returns a
@@ -341,88 +531,144 @@ class Operations(BaseNamespace):
         /><br /> Note: This endpoint is rate-limited. You may experience rates
         as low as 1 request per second. When polling for updates, examine the
         `Retry-After` header and retry after that many seconds.
+
+        Args:
+            operation_id: The unique identifier of the operation
+            maxpagesize: The maximum number of results to retrieve
+            timeout: Override the default request timeout (seconds).
+
+        Returns:
+            MetricValuesListResult
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
         """
-        return await self._client.request_async(
-            "GET",
-            self._api,
-            "/operations/{operationId}/metricValuesBatchUpsertionResults",
-            path_params={
-                "operationId": operation_id,
-            },
-            query_params={
-                "$maxpagesize": maxpagesize,
-                "$next": next_,
-            },
-            timeout=timeout,
-        )
+
+        async def _fetch(_cursor: str | None) -> httpx.Response:
+            return await self._client.request_async(
+                "GET",
+                self._api,
+                "/operations/{operationId}/metricValuesBatchUpsertionResults",
+                path_params={
+                    "operationId": operation_id,
+                },
+                query_params={
+                    "$maxpagesize": maxpagesize,
+                    "$next": _cursor,
+                },
+                timeout=timeout,
+            )
+
+        _body = await paginate_all_async(_fetch, extract_next_link, "data")
+        return MetricValuesListResult.model_validate(_body)
 
     def get_milestone_creation_results(
         self,
         *,
         operation_id: str,
         maxpagesize: Optional[int] = 1000,
-        next_: Optional[str] = None,
         timeout: Optional[float] = None,
-    ) -> httpx.Response:
+    ) -> MilestoneCreationListResult:
         """Retrieve results for a milestone creation
 
         Returns a [`MilestoneCreationListResult`](ref:operations#milestonecreati
         onlistresult) describing the results of a milestone creation.
+
+        Args:
+            operation_id: The unique identifier of the operation
+            maxpagesize: The maximum number of results to retrieve
+            timeout: Override the default request timeout (seconds).
+
+        Returns:
+            MilestoneCreationListResult
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 500).
         """
-        return self._client.request(
-            "GET",
-            self._api,
-            "/operations/{operationId}/milestoneCreationResults",
-            path_params={
-                "operationId": operation_id,
-            },
-            query_params={
-                "$maxpagesize": maxpagesize,
-                "$next": next_,
-            },
-            timeout=timeout,
-        )
+
+        def _fetch(_cursor: str | None) -> httpx.Response:
+            return self._client.request(
+                "GET",
+                self._api,
+                "/operations/{operationId}/milestoneCreationResults",
+                path_params={
+                    "operationId": operation_id,
+                },
+                query_params={
+                    "$maxpagesize": maxpagesize,
+                    "$next": _cursor,
+                },
+                timeout=timeout,
+            )
+
+        _body = paginate_all(_fetch, extract_next_link, "data")
+        return MilestoneCreationListResult.model_validate(_body)
 
     async def get_milestone_creation_results_async(
         self,
         *,
         operation_id: str,
         maxpagesize: Optional[int] = 1000,
-        next_: Optional[str] = None,
         timeout: Optional[float] = None,
-    ) -> httpx.Response:
+    ) -> MilestoneCreationListResult:
         """Retrieve results for a milestone creation (async)
 
         Returns a [`MilestoneCreationListResult`](ref:operations#milestonecreati
         onlistresult) describing the results of a milestone creation.
+
+        Args:
+            operation_id: The unique identifier of the operation
+            maxpagesize: The maximum number of results to retrieve
+            timeout: Override the default request timeout (seconds).
+
+        Returns:
+            MilestoneCreationListResult
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 500).
         """
-        return await self._client.request_async(
-            "GET",
-            self._api,
-            "/operations/{operationId}/milestoneCreationResults",
-            path_params={
-                "operationId": operation_id,
-            },
-            query_params={
-                "$maxpagesize": maxpagesize,
-                "$next": next_,
-            },
-            timeout=timeout,
-        )
+
+        async def _fetch(_cursor: str | None) -> httpx.Response:
+            return await self._client.request_async(
+                "GET",
+                self._api,
+                "/operations/{operationId}/milestoneCreationResults",
+                path_params={
+                    "operationId": operation_id,
+                },
+                query_params={
+                    "$maxpagesize": maxpagesize,
+                    "$next": _cursor,
+                },
+                timeout=timeout,
+            )
+
+        _body = await paginate_all_async(_fetch, extract_next_link, "data")
+        return MilestoneCreationListResult.model_validate(_body)
 
     def get_patch_document_results(
         self,
         *,
         operation_id: str,
         timeout: Optional[float] = None,
-    ) -> httpx.Response:
+    ) -> PatchDocumentListResult:
         """Retrieve results for a patch document
 
         Returns a
         [`PatchDocumentListResult`](ref:operations#patchdocumentlistresult)
         describing the results of a patch document.
+
+        Args:
+            operation_id: The unique identifier of the operation
+            timeout: Override the default request timeout (seconds).
+
+        Returns:
+            PatchDocumentListResult
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
         """
-        return self._client.request(
+        response = self._client.request(
             "GET",
             self._api,
             "/operations/{operationId}/patchDocumentResults",
@@ -431,20 +677,31 @@ class Operations(BaseNamespace):
             },
             timeout=timeout,
         )
+        return PatchDocumentListResult.model_validate(response.json())
 
     async def get_patch_document_results_async(
         self,
         *,
         operation_id: str,
         timeout: Optional[float] = None,
-    ) -> httpx.Response:
+    ) -> PatchDocumentListResult:
         """Retrieve results for a patch document (async)
 
         Returns a
         [`PatchDocumentListResult`](ref:operations#patchdocumentlistresult)
         describing the results of a patch document.
+
+        Args:
+            operation_id: The unique identifier of the operation
+            timeout: Override the default request timeout (seconds).
+
+        Returns:
+            PatchDocumentListResult
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
         """
-        return await self._client.request_async(
+        response = await self._client.request_async(
             "GET",
             self._api,
             "/operations/{operationId}/patchDocumentResults",
@@ -453,19 +710,30 @@ class Operations(BaseNamespace):
             },
             timeout=timeout,
         )
+        return PatchDocumentListResult.model_validate(response.json())
 
     def get_patch_presentation_results(
         self,
         *,
         operation_id: str,
         timeout: Optional[float] = None,
-    ) -> httpx.Response:
+    ) -> PatchPresentationListResult:
         """Retrieve results for a patch presentation
 
         Returns a [`PatchPresentationListResult`](ref:operations#patchpresentati
         onlistresult) describing the results of a patch presentation.
+
+        Args:
+            operation_id: The unique identifier of the operation
+            timeout: Override the default request timeout (seconds).
+
+        Returns:
+            PatchPresentationListResult
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
         """
-        return self._client.request(
+        response = self._client.request(
             "GET",
             self._api,
             "/operations/{operationId}/patchPresentationResults",
@@ -474,19 +742,30 @@ class Operations(BaseNamespace):
             },
             timeout=timeout,
         )
+        return PatchPresentationListResult.model_validate(response.json())
 
     async def get_patch_presentation_results_async(
         self,
         *,
         operation_id: str,
         timeout: Optional[float] = None,
-    ) -> httpx.Response:
+    ) -> PatchPresentationListResult:
         """Retrieve results for a patch presentation (async)
 
         Returns a [`PatchPresentationListResult`](ref:operations#patchpresentati
         onlistresult) describing the results of a patch presentation.
+
+        Args:
+            operation_id: The unique identifier of the operation
+            timeout: Override the default request timeout (seconds).
+
+        Returns:
+            PatchPresentationListResult
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
         """
-        return await self._client.request_async(
+        response = await self._client.request_async(
             "GET",
             self._api,
             "/operations/{operationId}/patchPresentationResults",
@@ -495,20 +774,31 @@ class Operations(BaseNamespace):
             },
             timeout=timeout,
         )
+        return PatchPresentationListResult.model_validate(response.json())
 
     def get_patch_section_results(
         self,
         *,
         operation_id: str,
         timeout: Optional[float] = None,
-    ) -> httpx.Response:
+    ) -> PatchSectionListResult:
         """Retrieve results for a patch Section
 
         Returns a
         [`PatchSectionListResult`](ref:operations#patchsectionlistresult)
         describing the results of a patch section.
+
+        Args:
+            operation_id: The unique identifier of the operation
+            timeout: Override the default request timeout (seconds).
+
+        Returns:
+            PatchSectionListResult
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
         """
-        return self._client.request(
+        response = self._client.request(
             "GET",
             self._api,
             "/operations/{operationId}/patchSectionResults",
@@ -517,20 +807,31 @@ class Operations(BaseNamespace):
             },
             timeout=timeout,
         )
+        return PatchSectionListResult.model_validate(response.json())
 
     async def get_patch_section_results_async(
         self,
         *,
         operation_id: str,
         timeout: Optional[float] = None,
-    ) -> httpx.Response:
+    ) -> PatchSectionListResult:
         """Retrieve results for a patch Section (async)
 
         Returns a
         [`PatchSectionListResult`](ref:operations#patchsectionlistresult)
         describing the results of a patch section.
+
+        Args:
+            operation_id: The unique identifier of the operation
+            timeout: Override the default request timeout (seconds).
+
+        Returns:
+            PatchSectionListResult
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
         """
-        return await self._client.request_async(
+        response = await self._client.request_async(
             "GET",
             self._api,
             "/operations/{operationId}/patchSectionResults",
@@ -539,19 +840,30 @@ class Operations(BaseNamespace):
             },
             timeout=timeout,
         )
+        return PatchSectionListResult.model_validate(response.json())
 
     def get_patch_sheet_results(
         self,
         *,
         operation_id: str,
         timeout: Optional[float] = None,
-    ) -> httpx.Response:
+    ) -> PatchSheetListResult:
         """Retrieve results for a patch sheet
 
         Returns a [`PatchSheetListResult`](ref:operations#patchsheetlistresult)
         describing the results of a patch sheet.
+
+        Args:
+            operation_id: The unique identifier of the operation
+            timeout: Override the default request timeout (seconds).
+
+        Returns:
+            PatchSheetListResult
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
         """
-        return self._client.request(
+        response = self._client.request(
             "GET",
             self._api,
             "/operations/{operationId}/patchSheetResults",
@@ -560,19 +872,30 @@ class Operations(BaseNamespace):
             },
             timeout=timeout,
         )
+        return PatchSheetListResult.model_validate(response.json())
 
     async def get_patch_sheet_results_async(
         self,
         *,
         operation_id: str,
         timeout: Optional[float] = None,
-    ) -> httpx.Response:
+    ) -> PatchSheetListResult:
         """Retrieve results for a patch sheet (async)
 
         Returns a [`PatchSheetListResult`](ref:operations#patchsheetlistresult)
         describing the results of a patch sheet.
+
+        Args:
+            operation_id: The unique identifier of the operation
+            timeout: Override the default request timeout (seconds).
+
+        Returns:
+            PatchSheetListResult
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
         """
-        return await self._client.request_async(
+        response = await self._client.request_async(
             "GET",
             self._api,
             "/operations/{operationId}/patchSheetResults",
@@ -581,19 +904,30 @@ class Operations(BaseNamespace):
             },
             timeout=timeout,
         )
+        return PatchSheetListResult.model_validate(response.json())
 
     def get_patch_slide_layout_results(
         self,
         *,
         operation_id: str,
         timeout: Optional[float] = None,
-    ) -> httpx.Response:
+    ) -> PatchSlideLayoutListResult:
         """Retrieve results for a patch slide layout
 
         Returns a [`PatchSlideLayoutListResult`](ref:operations#patchslidelayout
         listresult) describing the results of a patch slide layout.
+
+        Args:
+            operation_id: The unique identifier of the operation
+            timeout: Override the default request timeout (seconds).
+
+        Returns:
+            PatchSlideLayoutListResult
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
         """
-        return self._client.request(
+        response = self._client.request(
             "GET",
             self._api,
             "/operations/{operationId}/patchSlideLayoutResults",
@@ -602,19 +936,30 @@ class Operations(BaseNamespace):
             },
             timeout=timeout,
         )
+        return PatchSlideLayoutListResult.model_validate(response.json())
 
     async def get_patch_slide_layout_results_async(
         self,
         *,
         operation_id: str,
         timeout: Optional[float] = None,
-    ) -> httpx.Response:
+    ) -> PatchSlideLayoutListResult:
         """Retrieve results for a patch slide layout (async)
 
         Returns a [`PatchSlideLayoutListResult`](ref:operations#patchslidelayout
         listresult) describing the results of a patch slide layout.
+
+        Args:
+            operation_id: The unique identifier of the operation
+            timeout: Override the default request timeout (seconds).
+
+        Returns:
+            PatchSlideLayoutListResult
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
         """
-        return await self._client.request_async(
+        response = await self._client.request_async(
             "GET",
             self._api,
             "/operations/{operationId}/patchSlideLayoutResults",
@@ -623,19 +968,30 @@ class Operations(BaseNamespace):
             },
             timeout=timeout,
         )
+        return PatchSlideLayoutListResult.model_validate(response.json())
 
     def get_patch_slide_results(
         self,
         *,
         operation_id: str,
         timeout: Optional[float] = None,
-    ) -> httpx.Response:
+    ) -> PatchSlideListResult:
         """Retrieve results for a patch slide
 
         Returns a [`PatchSlideListResult`](ref:operations#patchslidelistresult)
         describing the results of a patch slide.
+
+        Args:
+            operation_id: The unique identifier of the operation
+            timeout: Override the default request timeout (seconds).
+
+        Returns:
+            PatchSlideListResult
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
         """
-        return self._client.request(
+        response = self._client.request(
             "GET",
             self._api,
             "/operations/{operationId}/patchSlideResults",
@@ -644,19 +1000,30 @@ class Operations(BaseNamespace):
             },
             timeout=timeout,
         )
+        return PatchSlideListResult.model_validate(response.json())
 
     async def get_patch_slide_results_async(
         self,
         *,
         operation_id: str,
         timeout: Optional[float] = None,
-    ) -> httpx.Response:
+    ) -> PatchSlideListResult:
         """Retrieve results for a patch slide (async)
 
         Returns a [`PatchSlideListResult`](ref:operations#patchslidelistresult)
         describing the results of a patch slide.
+
+        Args:
+            operation_id: The unique identifier of the operation
+            timeout: Override the default request timeout (seconds).
+
+        Returns:
+            PatchSlideListResult
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
         """
-        return await self._client.request_async(
+        response = await self._client.request_async(
             "GET",
             self._api,
             "/operations/{operationId}/patchSlideResults",
@@ -665,19 +1032,30 @@ class Operations(BaseNamespace):
             },
             timeout=timeout,
         )
+        return PatchSlideListResult.model_validate(response.json())
 
     def get_patch_spreadsheet_results(
         self,
         *,
         operation_id: str,
         timeout: Optional[float] = None,
-    ) -> httpx.Response:
+    ) -> PatchSpreadsheetListResult:
         """Retrieve results for a patch spreadsheet
 
         Returns a [`PatchSpreadsheetListResult`](ref:operations#patchspreadsheet
         listresult) describing the results of a patch spreadsheet.
+
+        Args:
+            operation_id: The unique identifier of the operation
+            timeout: Override the default request timeout (seconds).
+
+        Returns:
+            PatchSpreadsheetListResult
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
         """
-        return self._client.request(
+        response = self._client.request(
             "GET",
             self._api,
             "/operations/{operationId}/patchSpreadsheetResults",
@@ -686,19 +1064,30 @@ class Operations(BaseNamespace):
             },
             timeout=timeout,
         )
+        return PatchSpreadsheetListResult.model_validate(response.json())
 
     async def get_patch_spreadsheet_results_async(
         self,
         *,
         operation_id: str,
         timeout: Optional[float] = None,
-    ) -> httpx.Response:
+    ) -> PatchSpreadsheetListResult:
         """Retrieve results for a patch spreadsheet (async)
 
         Returns a [`PatchSpreadsheetListResult`](ref:operations#patchspreadsheet
         listresult) describing the results of a patch spreadsheet.
+
+        Args:
+            operation_id: The unique identifier of the operation
+            timeout: Override the default request timeout (seconds).
+
+        Returns:
+            PatchSpreadsheetListResult
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
         """
-        return await self._client.request_async(
+        response = await self._client.request_async(
             "GET",
             self._api,
             "/operations/{operationId}/patchSpreadsheetResults",
@@ -707,19 +1096,30 @@ class Operations(BaseNamespace):
             },
             timeout=timeout,
         )
+        return PatchSpreadsheetListResult.model_validate(response.json())
 
     def get_patch_table_properties_results(
         self,
         *,
         operation_id: str,
         timeout: Optional[float] = None,
-    ) -> httpx.Response:
+    ) -> PatchTablePropertiesListResult:
         """Retrieve results for a patch table properties
 
         Returns a [`PatchTablePropertiesListResult`](ref:operations#patchtablepr
         opertieslistresult) describing the results of a patch table properties.
+
+        Args:
+            operation_id: The unique identifier of the operation
+            timeout: Override the default request timeout (seconds).
+
+        Returns:
+            PatchTablePropertiesListResult
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
         """
-        return self._client.request(
+        response = self._client.request(
             "GET",
             self._api,
             "/operations/{operationId}/patchTablePropertiesResults",
@@ -728,19 +1128,30 @@ class Operations(BaseNamespace):
             },
             timeout=timeout,
         )
+        return PatchTablePropertiesListResult.model_validate(response.json())
 
     async def get_patch_table_properties_results_async(
         self,
         *,
         operation_id: str,
         timeout: Optional[float] = None,
-    ) -> httpx.Response:
+    ) -> PatchTablePropertiesListResult:
         """Retrieve results for a patch table properties (async)
 
         Returns a [`PatchTablePropertiesListResult`](ref:operations#patchtablepr
         opertieslistresult) describing the results of a patch table properties.
+
+        Args:
+            operation_id: The unique identifier of the operation
+            timeout: Override the default request timeout (seconds).
+
+        Returns:
+            PatchTablePropertiesListResult
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
         """
-        return await self._client.request_async(
+        response = await self._client.request_async(
             "GET",
             self._api,
             "/operations/{operationId}/patchTablePropertiesResults",
@@ -749,352 +1160,543 @@ class Operations(BaseNamespace):
             },
             timeout=timeout,
         )
+        return PatchTablePropertiesListResult.model_validate(response.json())
 
     def get_range_link_edit_results(
         self,
         *,
         operation_id: str,
         maxpagesize: Optional[int] = 1000,
-        next_: Optional[str] = None,
         timeout: Optional[float] = None,
-    ) -> httpx.Response:
+    ) -> RangeLinkEditResultCollection:
         """Retrieve results for a range link edit
 
         Returns a [`RangeLinkEditResultCollection`](ref:operations#rangelinkedit
         resultcollection) describing the results of a range link edit.
+
+        Args:
+            operation_id: The unique identifier of the operation
+            maxpagesize: The maximum number of results to retrieve
+            timeout: Override the default request timeout (seconds).
+
+        Returns:
+            RangeLinkEditResultCollection
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
         """
-        return self._client.request(
-            "GET",
-            self._api,
-            "/operations/{operationId}/rangeLinkEditResults",
-            path_params={
-                "operationId": operation_id,
-            },
-            query_params={
-                "$maxpagesize": maxpagesize,
-                "$next": next_,
-            },
-            timeout=timeout,
-        )
+
+        def _fetch(_cursor: str | None) -> httpx.Response:
+            return self._client.request(
+                "GET",
+                self._api,
+                "/operations/{operationId}/rangeLinkEditResults",
+                path_params={
+                    "operationId": operation_id,
+                },
+                query_params={
+                    "$maxpagesize": maxpagesize,
+                    "$next": _cursor,
+                },
+                timeout=timeout,
+            )
+
+        _body = paginate_all(_fetch, extract_next_link, "data")
+        return RangeLinkEditResultCollection.model_validate(_body)
 
     async def get_range_link_edit_results_async(
         self,
         *,
         operation_id: str,
         maxpagesize: Optional[int] = 1000,
-        next_: Optional[str] = None,
         timeout: Optional[float] = None,
-    ) -> httpx.Response:
+    ) -> RangeLinkEditResultCollection:
         """Retrieve results for a range link edit (async)
 
         Returns a [`RangeLinkEditResultCollection`](ref:operations#rangelinkedit
         resultcollection) describing the results of a range link edit.
+
+        Args:
+            operation_id: The unique identifier of the operation
+            maxpagesize: The maximum number of results to retrieve
+            timeout: Override the default request timeout (seconds).
+
+        Returns:
+            RangeLinkEditResultCollection
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
         """
-        return await self._client.request_async(
-            "GET",
-            self._api,
-            "/operations/{operationId}/rangeLinkEditResults",
-            path_params={
-                "operationId": operation_id,
-            },
-            query_params={
-                "$maxpagesize": maxpagesize,
-                "$next": next_,
-            },
-            timeout=timeout,
-        )
+
+        async def _fetch(_cursor: str | None) -> httpx.Response:
+            return await self._client.request_async(
+                "GET",
+                self._api,
+                "/operations/{operationId}/rangeLinkEditResults",
+                path_params={
+                    "operationId": operation_id,
+                },
+                query_params={
+                    "$maxpagesize": maxpagesize,
+                    "$next": _cursor,
+                },
+                timeout=timeout,
+            )
+
+        _body = await paginate_all_async(_fetch, extract_next_link, "data")
+        return RangeLinkEditResultCollection.model_validate(_body)
 
     def get_rich_text_batch_edit_results(
         self,
         *,
         operation_id: str,
         maxpagesize: Optional[int] = 1000,
-        next_: Optional[str] = None,
         timeout: Optional[float] = None,
-    ) -> httpx.Response:
+    ) -> RichTextEditListResult:
         """Retrieve results for a rich text batch edit
 
         Returns a
         [`RichTextEditListResult`](ref:operations#richtexteditlistresult)
         describing the results of a rich text batch edit.
+
+        Args:
+            operation_id: The unique identifier of the operation
+            maxpagesize: The maximum number of results to retrieve
+            timeout: Override the default request timeout (seconds).
+
+        Returns:
+            RichTextEditListResult
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
         """
-        return self._client.request(
-            "GET",
-            self._api,
-            "/operations/{operationId}/richTextBatchEditResults",
-            path_params={
-                "operationId": operation_id,
-            },
-            query_params={
-                "$maxpagesize": maxpagesize,
-                "$next": next_,
-            },
-            timeout=timeout,
-        )
+
+        def _fetch(_cursor: str | None) -> httpx.Response:
+            return self._client.request(
+                "GET",
+                self._api,
+                "/operations/{operationId}/richTextBatchEditResults",
+                path_params={
+                    "operationId": operation_id,
+                },
+                query_params={
+                    "$maxpagesize": maxpagesize,
+                    "$next": _cursor,
+                },
+                timeout=timeout,
+            )
+
+        _body = paginate_all(_fetch, extract_next_link, "data")
+        return RichTextEditListResult.model_validate(_body)
 
     async def get_rich_text_batch_edit_results_async(
         self,
         *,
         operation_id: str,
         maxpagesize: Optional[int] = 1000,
-        next_: Optional[str] = None,
         timeout: Optional[float] = None,
-    ) -> httpx.Response:
+    ) -> RichTextEditListResult:
         """Retrieve results for a rich text batch edit (async)
 
         Returns a
         [`RichTextEditListResult`](ref:operations#richtexteditlistresult)
         describing the results of a rich text batch edit.
+
+        Args:
+            operation_id: The unique identifier of the operation
+            maxpagesize: The maximum number of results to retrieve
+            timeout: Override the default request timeout (seconds).
+
+        Returns:
+            RichTextEditListResult
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
         """
-        return await self._client.request_async(
-            "GET",
-            self._api,
-            "/operations/{operationId}/richTextBatchEditResults",
-            path_params={
-                "operationId": operation_id,
-            },
-            query_params={
-                "$maxpagesize": maxpagesize,
-                "$next": next_,
-            },
-            timeout=timeout,
-        )
+
+        async def _fetch(_cursor: str | None) -> httpx.Response:
+            return await self._client.request_async(
+                "GET",
+                self._api,
+                "/operations/{operationId}/richTextBatchEditResults",
+                path_params={
+                    "operationId": operation_id,
+                },
+                query_params={
+                    "$maxpagesize": maxpagesize,
+                    "$next": _cursor,
+                },
+                timeout=timeout,
+            )
+
+        _body = await paginate_all_async(_fetch, extract_next_link, "data")
+        return RichTextEditListResult.model_validate(_body)
 
     def get_rich_text_anchor_creation_results(
         self,
         *,
         operation_id: str,
         maxpagesize: Optional[int] = 1000,
-        next_: Optional[str] = None,
         timeout: Optional[float] = None,
-    ) -> httpx.Response:
+    ) -> RichTextAnchorCreationResultCollection:
         """Retrieve results for a rich text anchor creation
 
         Returns a [`RichTextAnchorCreationResultCollection`](ref:operations#rich
         textanchorcreationresultcollection) describing the results of a rich
         text anchor creation.
+
+        Args:
+            operation_id: The unique identifier of the operation
+            maxpagesize: The maximum number of results to retrieve
+            timeout: Override the default request timeout (seconds).
+
+        Returns:
+            RichTextAnchorCreationResultCollection
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
         """
-        return self._client.request(
-            "GET",
-            self._api,
-            "/operations/{operationId}/richTextAnchorCreationResults",
-            path_params={
-                "operationId": operation_id,
-            },
-            query_params={
-                "$maxpagesize": maxpagesize,
-                "$next": next_,
-            },
-            timeout=timeout,
-        )
+
+        def _fetch(_cursor: str | None) -> httpx.Response:
+            return self._client.request(
+                "GET",
+                self._api,
+                "/operations/{operationId}/richTextAnchorCreationResults",
+                path_params={
+                    "operationId": operation_id,
+                },
+                query_params={
+                    "$maxpagesize": maxpagesize,
+                    "$next": _cursor,
+                },
+                timeout=timeout,
+            )
+
+        _body = paginate_all(_fetch, extract_next_link, "data")
+        return RichTextAnchorCreationResultCollection.model_validate(_body)
 
     async def get_rich_text_anchor_creation_results_async(
         self,
         *,
         operation_id: str,
         maxpagesize: Optional[int] = 1000,
-        next_: Optional[str] = None,
         timeout: Optional[float] = None,
-    ) -> httpx.Response:
+    ) -> RichTextAnchorCreationResultCollection:
         """Retrieve results for a rich text anchor creation (async)
 
         Returns a [`RichTextAnchorCreationResultCollection`](ref:operations#rich
         textanchorcreationresultcollection) describing the results of a rich
         text anchor creation.
+
+        Args:
+            operation_id: The unique identifier of the operation
+            maxpagesize: The maximum number of results to retrieve
+            timeout: Override the default request timeout (seconds).
+
+        Returns:
+            RichTextAnchorCreationResultCollection
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
         """
-        return await self._client.request_async(
-            "GET",
-            self._api,
-            "/operations/{operationId}/richTextAnchorCreationResults",
-            path_params={
-                "operationId": operation_id,
-            },
-            query_params={
-                "$maxpagesize": maxpagesize,
-                "$next": next_,
-            },
-            timeout=timeout,
-        )
+
+        async def _fetch(_cursor: str | None) -> httpx.Response:
+            return await self._client.request_async(
+                "GET",
+                self._api,
+                "/operations/{operationId}/richTextAnchorCreationResults",
+                path_params={
+                    "operationId": operation_id,
+                },
+                query_params={
+                    "$maxpagesize": maxpagesize,
+                    "$next": _cursor,
+                },
+                timeout=timeout,
+            )
+
+        _body = await paginate_all_async(_fetch, extract_next_link, "data")
+        return RichTextAnchorCreationResultCollection.model_validate(_body)
 
     def get_rich_text_duplication_edit_results(
         self,
         *,
         operation_id: str,
         maxpagesize: Optional[int] = 1000,
-        next_: Optional[str] = None,
         timeout: Optional[float] = None,
-    ) -> httpx.Response:
+    ) -> RichTextDuplicationEditListResult:
         """Retrieve results for a rich text duplication edit
 
         Returns a [`RichTextDuplicationEditListResult`](ref:operations#richtextd
         uplicationeditlistresult) describing the results of a rich text
         duplication edit.
+
+        Args:
+            operation_id: The unique identifier of the operation
+            maxpagesize: The maximum number of results to retrieve
+            timeout: Override the default request timeout (seconds).
+
+        Returns:
+            RichTextDuplicationEditListResult
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
         """
-        return self._client.request(
-            "GET",
-            self._api,
-            "/operations/{operationId}/richTextDuplicationEditResults",
-            path_params={
-                "operationId": operation_id,
-            },
-            query_params={
-                "$maxpagesize": maxpagesize,
-                "$next": next_,
-            },
-            timeout=timeout,
-        )
+
+        def _fetch(_cursor: str | None) -> httpx.Response:
+            return self._client.request(
+                "GET",
+                self._api,
+                "/operations/{operationId}/richTextDuplicationEditResults",
+                path_params={
+                    "operationId": operation_id,
+                },
+                query_params={
+                    "$maxpagesize": maxpagesize,
+                    "$next": _cursor,
+                },
+                timeout=timeout,
+            )
+
+        _body = paginate_all(_fetch, extract_next_link, "data")
+        return RichTextDuplicationEditListResult.model_validate(_body)
 
     async def get_rich_text_duplication_edit_results_async(
         self,
         *,
         operation_id: str,
         maxpagesize: Optional[int] = 1000,
-        next_: Optional[str] = None,
         timeout: Optional[float] = None,
-    ) -> httpx.Response:
+    ) -> RichTextDuplicationEditListResult:
         """Retrieve results for a rich text duplication edit (async)
 
         Returns a [`RichTextDuplicationEditListResult`](ref:operations#richtextd
         uplicationeditlistresult) describing the results of a rich text
         duplication edit.
+
+        Args:
+            operation_id: The unique identifier of the operation
+            maxpagesize: The maximum number of results to retrieve
+            timeout: Override the default request timeout (seconds).
+
+        Returns:
+            RichTextDuplicationEditListResult
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
         """
-        return await self._client.request_async(
-            "GET",
-            self._api,
-            "/operations/{operationId}/richTextDuplicationEditResults",
-            path_params={
-                "operationId": operation_id,
-            },
-            query_params={
-                "$maxpagesize": maxpagesize,
-                "$next": next_,
-            },
-            timeout=timeout,
-        )
+
+        async def _fetch(_cursor: str | None) -> httpx.Response:
+            return await self._client.request_async(
+                "GET",
+                self._api,
+                "/operations/{operationId}/richTextDuplicationEditResults",
+                path_params={
+                    "operationId": operation_id,
+                },
+                query_params={
+                    "$maxpagesize": maxpagesize,
+                    "$next": _cursor,
+                },
+                timeout=timeout,
+            )
+
+        _body = await paginate_all_async(_fetch, extract_next_link, "data")
+        return RichTextDuplicationEditListResult.model_validate(_body)
 
     def get_rich_text_links_batch_edit_results(
         self,
         *,
         operation_id: str,
         maxpagesize: Optional[int] = 1000,
-        next_: Optional[str] = None,
         timeout: Optional[float] = None,
-    ) -> httpx.Response:
+    ) -> RichTextLinksEditListResult:
         """Retrieve results for a rich text links batch edit
 
         Returns a [`RichTextLinksEditListResult`](ref:operations#richtextlinksed
         itlistresult) describing the results of a rich text batch edit.
+
+        Args:
+            operation_id: The unique identifier of the operation
+            maxpagesize: The maximum number of results to retrieve
+            timeout: Override the default request timeout (seconds).
+
+        Returns:
+            RichTextLinksEditListResult
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
         """
-        return self._client.request(
-            "GET",
-            self._api,
-            "/operations/{operationId}/richTextLinksBatchEditResults",
-            path_params={
-                "operationId": operation_id,
-            },
-            query_params={
-                "$maxpagesize": maxpagesize,
-                "$next": next_,
-            },
-            timeout=timeout,
-        )
+
+        def _fetch(_cursor: str | None) -> httpx.Response:
+            return self._client.request(
+                "GET",
+                self._api,
+                "/operations/{operationId}/richTextLinksBatchEditResults",
+                path_params={
+                    "operationId": operation_id,
+                },
+                query_params={
+                    "$maxpagesize": maxpagesize,
+                    "$next": _cursor,
+                },
+                timeout=timeout,
+            )
+
+        _body = paginate_all(_fetch, extract_next_link, "data")
+        return RichTextLinksEditListResult.model_validate(_body)
 
     async def get_rich_text_links_batch_edit_results_async(
         self,
         *,
         operation_id: str,
         maxpagesize: Optional[int] = 1000,
-        next_: Optional[str] = None,
         timeout: Optional[float] = None,
-    ) -> httpx.Response:
+    ) -> RichTextLinksEditListResult:
         """Retrieve results for a rich text links batch edit (async)
 
         Returns a [`RichTextLinksEditListResult`](ref:operations#richtextlinksed
         itlistresult) describing the results of a rich text batch edit.
+
+        Args:
+            operation_id: The unique identifier of the operation
+            maxpagesize: The maximum number of results to retrieve
+            timeout: Override the default request timeout (seconds).
+
+        Returns:
+            RichTextLinksEditListResult
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
         """
-        return await self._client.request_async(
-            "GET",
-            self._api,
-            "/operations/{operationId}/richTextLinksBatchEditResults",
-            path_params={
-                "operationId": operation_id,
-            },
-            query_params={
-                "$maxpagesize": maxpagesize,
-                "$next": next_,
-            },
-            timeout=timeout,
-        )
+
+        async def _fetch(_cursor: str | None) -> httpx.Response:
+            return await self._client.request_async(
+                "GET",
+                self._api,
+                "/operations/{operationId}/richTextLinksBatchEditResults",
+                path_params={
+                    "operationId": operation_id,
+                },
+                query_params={
+                    "$maxpagesize": maxpagesize,
+                    "$next": _cursor,
+                },
+                timeout=timeout,
+            )
+
+        _body = await paginate_all_async(_fetch, extract_next_link, "data")
+        return RichTextLinksEditListResult.model_validate(_body)
 
     def get_table_anchor_creation_results(
         self,
         *,
         operation_id: str,
         maxpagesize: Optional[int] = 1000,
-        next_: Optional[str] = None,
         timeout: Optional[float] = None,
-    ) -> httpx.Response:
+    ) -> TableAnchorCreationResultCollection:
         """Retrieve results for a table anchor creation
 
         Returns a [`TableAnchorCreationResultCollection`](ref:operations#tablean
         chorcreationresultcollection) describing the results of a table anchor
         creation.
+
+        Args:
+            operation_id: The unique identifier of the operation
+            maxpagesize: The maximum number of results to retrieve
+            timeout: Override the default request timeout (seconds).
+
+        Returns:
+            TableAnchorCreationResultCollection
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
         """
-        return self._client.request(
-            "GET",
-            self._api,
-            "/operations/{operationId}/tableAnchorCreationResults",
-            path_params={
-                "operationId": operation_id,
-            },
-            query_params={
-                "$maxpagesize": maxpagesize,
-                "$next": next_,
-            },
-            timeout=timeout,
-        )
+
+        def _fetch(_cursor: str | None) -> httpx.Response:
+            return self._client.request(
+                "GET",
+                self._api,
+                "/operations/{operationId}/tableAnchorCreationResults",
+                path_params={
+                    "operationId": operation_id,
+                },
+                query_params={
+                    "$maxpagesize": maxpagesize,
+                    "$next": _cursor,
+                },
+                timeout=timeout,
+            )
+
+        _body = paginate_all(_fetch, extract_next_link, "data")
+        return TableAnchorCreationResultCollection.model_validate(_body)
 
     async def get_table_anchor_creation_results_async(
         self,
         *,
         operation_id: str,
         maxpagesize: Optional[int] = 1000,
-        next_: Optional[str] = None,
         timeout: Optional[float] = None,
-    ) -> httpx.Response:
+    ) -> TableAnchorCreationResultCollection:
         """Retrieve results for a table anchor creation (async)
 
         Returns a [`TableAnchorCreationResultCollection`](ref:operations#tablean
         chorcreationresultcollection) describing the results of a table anchor
         creation.
+
+        Args:
+            operation_id: The unique identifier of the operation
+            maxpagesize: The maximum number of results to retrieve
+            timeout: Override the default request timeout (seconds).
+
+        Returns:
+            TableAnchorCreationResultCollection
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
         """
-        return await self._client.request_async(
-            "GET",
-            self._api,
-            "/operations/{operationId}/tableAnchorCreationResults",
-            path_params={
-                "operationId": operation_id,
-            },
-            query_params={
-                "$maxpagesize": maxpagesize,
-                "$next": next_,
-            },
-            timeout=timeout,
-        )
+
+        async def _fetch(_cursor: str | None) -> httpx.Response:
+            return await self._client.request_async(
+                "GET",
+                self._api,
+                "/operations/{operationId}/tableAnchorCreationResults",
+                path_params={
+                    "operationId": operation_id,
+                },
+                query_params={
+                    "$maxpagesize": maxpagesize,
+                    "$next": _cursor,
+                },
+                timeout=timeout,
+            )
+
+        _body = await paginate_all_async(_fetch, extract_next_link, "data")
+        return TableAnchorCreationResultCollection.model_validate(_body)
 
     def get_table_cell_edit_results(
         self,
         *,
         operation_id: str,
         timeout: Optional[float] = None,
-    ) -> httpx.Response:
+    ) -> TableCellEditListResult:
         """Retrieve results for a table cell edit
 
         Returns a
         [`TableCellEditListResult`](ref:operations#tablecelleditlistresult)
         describing the results of a table cell edit.
+
+        Args:
+            operation_id: The unique identifier of the operation
+            timeout: Override the default request timeout (seconds).
+
+        Returns:
+            TableCellEditListResult
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
         """
-        return self._client.request(
+        response = self._client.request(
             "GET",
             self._api,
             "/operations/{operationId}/tableCellEditResults",
@@ -1103,20 +1705,31 @@ class Operations(BaseNamespace):
             },
             timeout=timeout,
         )
+        return TableCellEditListResult.model_validate(response.json())
 
     async def get_table_cell_edit_results_async(
         self,
         *,
         operation_id: str,
         timeout: Optional[float] = None,
-    ) -> httpx.Response:
+    ) -> TableCellEditListResult:
         """Retrieve results for a table cell edit (async)
 
         Returns a
         [`TableCellEditListResult`](ref:operations#tablecelleditlistresult)
         describing the results of a table cell edit.
+
+        Args:
+            operation_id: The unique identifier of the operation
+            timeout: Override the default request timeout (seconds).
+
+        Returns:
+            TableCellEditListResult
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
         """
-        return await self._client.request_async(
+        response = await self._client.request_async(
             "GET",
             self._api,
             "/operations/{operationId}/tableCellEditResults",
@@ -1125,19 +1738,30 @@ class Operations(BaseNamespace):
             },
             timeout=timeout,
         )
+        return TableCellEditListResult.model_validate(response.json())
 
     def get_table_edit_results(
         self,
         *,
         operation_id: str,
         timeout: Optional[float] = None,
-    ) -> httpx.Response:
+    ) -> TableEditListResult:
         """Retrieve results for a table edit
 
         Returns a [`TableEditListResult`](ref:operations#tableeditlistresult)
         describing the results of a table edit.
+
+        Args:
+            operation_id: The unique identifier of the operation
+            timeout: Override the default request timeout (seconds).
+
+        Returns:
+            TableEditListResult
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
         """
-        return self._client.request(
+        response = self._client.request(
             "GET",
             self._api,
             "/operations/{operationId}/tableEditResults",
@@ -1146,19 +1770,30 @@ class Operations(BaseNamespace):
             },
             timeout=timeout,
         )
+        return TableEditListResult.model_validate(response.json())
 
     async def get_table_edit_results_async(
         self,
         *,
         operation_id: str,
         timeout: Optional[float] = None,
-    ) -> httpx.Response:
+    ) -> TableEditListResult:
         """Retrieve results for a table edit (async)
 
         Returns a [`TableEditListResult`](ref:operations#tableeditlistresult)
         describing the results of a table edit.
+
+        Args:
+            operation_id: The unique identifier of the operation
+            timeout: Override the default request timeout (seconds).
+
+        Returns:
+            TableEditListResult
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
         """
-        return await self._client.request_async(
+        response = await self._client.request_async(
             "GET",
             self._api,
             "/operations/{operationId}/tableEditResults",
@@ -1167,75 +1802,116 @@ class Operations(BaseNamespace):
             },
             timeout=timeout,
         )
+        return TableEditListResult.model_validate(response.json())
 
     def get_table_links_edit_results(
         self,
         *,
         operation_id: str,
         maxpagesize: Optional[int] = 1000,
-        next_: Optional[str] = None,
         timeout: Optional[float] = None,
-    ) -> httpx.Response:
+    ) -> TableLinksEditListResult:
         """Retrieve results for a table links edit
 
         Returns a
         [`TableLinksEditListResult`](ref:operations#tablelinkseditlistresult)
         describing the results of a table links edit.
+
+        Args:
+            operation_id: The unique identifier of the operation
+            maxpagesize: The maximum number of results to retrieve
+            timeout: Override the default request timeout (seconds).
+
+        Returns:
+            TableLinksEditListResult
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
         """
-        return self._client.request(
-            "GET",
-            self._api,
-            "/operations/{operationId}/tableLinksEditResults",
-            path_params={
-                "operationId": operation_id,
-            },
-            query_params={
-                "$maxpagesize": maxpagesize,
-                "$next": next_,
-            },
-            timeout=timeout,
-        )
+
+        def _fetch(_cursor: str | None) -> httpx.Response:
+            return self._client.request(
+                "GET",
+                self._api,
+                "/operations/{operationId}/tableLinksEditResults",
+                path_params={
+                    "operationId": operation_id,
+                },
+                query_params={
+                    "$maxpagesize": maxpagesize,
+                    "$next": _cursor,
+                },
+                timeout=timeout,
+            )
+
+        _body = paginate_all(_fetch, extract_next_link, "data")
+        return TableLinksEditListResult.model_validate(_body)
 
     async def get_table_links_edit_results_async(
         self,
         *,
         operation_id: str,
         maxpagesize: Optional[int] = 1000,
-        next_: Optional[str] = None,
         timeout: Optional[float] = None,
-    ) -> httpx.Response:
+    ) -> TableLinksEditListResult:
         """Retrieve results for a table links edit (async)
 
         Returns a
         [`TableLinksEditListResult`](ref:operations#tablelinkseditlistresult)
         describing the results of a table links edit.
+
+        Args:
+            operation_id: The unique identifier of the operation
+            maxpagesize: The maximum number of results to retrieve
+            timeout: Override the default request timeout (seconds).
+
+        Returns:
+            TableLinksEditListResult
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
         """
-        return await self._client.request_async(
-            "GET",
-            self._api,
-            "/operations/{operationId}/tableLinksEditResults",
-            path_params={
-                "operationId": operation_id,
-            },
-            query_params={
-                "$maxpagesize": maxpagesize,
-                "$next": next_,
-            },
-            timeout=timeout,
-        )
+
+        async def _fetch(_cursor: str | None) -> httpx.Response:
+            return await self._client.request_async(
+                "GET",
+                self._api,
+                "/operations/{operationId}/tableLinksEditResults",
+                path_params={
+                    "operationId": operation_id,
+                },
+                query_params={
+                    "$maxpagesize": maxpagesize,
+                    "$next": _cursor,
+                },
+                timeout=timeout,
+            )
+
+        _body = await paginate_all_async(_fetch, extract_next_link, "data")
+        return TableLinksEditListResult.model_validate(_body)
 
     def get_table_reapply_filter_results(
         self,
         *,
         operation_id: str,
         timeout: Optional[float] = None,
-    ) -> httpx.Response:
+    ) -> TableReapplyFilterListResult:
         """Retrieve results for a table reapply filter
 
         Returns a [`TableReapplyFilterListResult`](ref:operations#tablereapplyfi
         lterlistresult) describing the results of a table reapply filter.
+
+        Args:
+            operation_id: The unique identifier of the operation
+            timeout: Override the default request timeout (seconds).
+
+        Returns:
+            TableReapplyFilterListResult
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
         """
-        return self._client.request(
+        response = self._client.request(
             "GET",
             self._api,
             "/operations/{operationId}/tableReapplyFilterResults",
@@ -1244,19 +1920,30 @@ class Operations(BaseNamespace):
             },
             timeout=timeout,
         )
+        return TableReapplyFilterListResult.model_validate(response.json())
 
     async def get_table_reapply_filter_results_async(
         self,
         *,
         operation_id: str,
         timeout: Optional[float] = None,
-    ) -> httpx.Response:
+    ) -> TableReapplyFilterListResult:
         """Retrieve results for a table reapply filter (async)
 
         Returns a [`TableReapplyFilterListResult`](ref:operations#tablereapplyfi
         lterlistresult) describing the results of a table reapply filter.
+
+        Args:
+            operation_id: The unique identifier of the operation
+            timeout: Override the default request timeout (seconds).
+
+        Returns:
+            TableReapplyFilterListResult
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
         """
-        return await self._client.request_async(
+        response = await self._client.request_async(
             "GET",
             self._api,
             "/operations/{operationId}/tableReapplyFilterResults",
@@ -1265,3 +1952,4 @@ class Operations(BaseNamespace):
             },
             timeout=timeout,
         )
+        return TableReapplyFilterListResult.model_validate(response.json())

@@ -1,64 +1,62 @@
 # Presentations
 
-`client.presentations` — Gestión de presentaciones, slides y layouts.
+`client.presentations` -- Gestion de presentaciones, slides y layouts.
 
 ## Operaciones
 
 ### Presentaciones
 
-| Método | Descripción | Paginado | 202 |
+| Metodo | Descripcion | Paginado | 202 |
 |--------|-------------|----------|-----|
-| `get_presentation_by_id` | Obtener presentación por ID | No | No |
-| `partially_update_presentation_by_id` | Actualizar presentación | No | Sí |
-| `presentation_export` | Exportar presentación | No | Sí |
-| `presentation_filters_reapplication` | Reaplicar filtros | No | Sí |
-| `presentation_links_publication` | Publicar links | No | Sí |
-| `get_presentation_milestones` | Milestones de presentación | Sí | No |
+| `get_presentation_by_id` | Obtener presentacion por ID | No | No |
+| `partially_update_presentation_by_id` | Actualizar presentacion | No | Si |
+| `presentation_export` | Exportar presentacion | No | Si |
+| `presentation_filters_reapplication` | Reaplicar filtros | No | Si |
+| `presentation_links_publication` | Publicar links | No | Si |
+| `get_presentation_milestones` | Milestones de presentacion | Si | No |
 
 ### Slides
 
-| Método | Descripción | Paginado | 202 |
+| Metodo | Descripcion | Paginado | 202 |
 |--------|-------------|----------|-----|
-| `get_slides` | Listar slides | Sí | No |
+| `get_slides` | Listar slides | Si | No |
 | `get_slide_by_id` | Obtener slide por ID | No | No |
-| `partially_update_slide_by_id` | Actualizar slide | No | Sí |
+| `partially_update_slide_by_id` | Actualizar slide | No | Si |
 
 ### Slide Layouts
 
-| Método | Descripción | Paginado | 202 |
+| Metodo | Descripcion | Paginado | 202 |
 |--------|-------------|----------|-----|
-| `get_slide_layouts` | Listar layouts | Sí | No |
+| `get_slide_layouts` | Listar layouts | Si | No |
 | `get_slide_layout_by_id` | Obtener layout por ID | No | No |
-| `partially_update_slide_layout_by_id` | Actualizar layout | No | Sí |
+| `partially_update_slide_layout_by_id` | Actualizar layout | No | Si |
 
 ## Ejemplos
 
-### Obtener presentación
+### Obtener presentacion
 
 ```python
-response = client.presentations.get_presentation_by_id(
+pres = client.presentations.get_presentation_by_id(
     presentation_id="pres-123",
 )
-print(f"Presentación: {response.result.name}")
+print(f"Presentacion: {pres.name}")
 ```
 
-### Listar slides
+### Listar slides (auto-paginacion)
 
 ```python
-response = client.presentations.get_slides(
-    presentation_id="pres-123",
-)
+result = client.presentations.get_slides(presentation_id="pres-123")
 
-for slide in response.result.data:
+for slide in result.data:
     print(f"Slide: {slide.id}")
 ```
 
-### Exportar presentación (operación 202)
+### Exportar presentacion (operacion 202)
 
 ```python
 response = client.presentations.presentation_export(
     presentation_id="pres-123",
-    presentation_export={"format": "pdf"},
+    body={"format": "pdf"},
 )
 
 operation = client.wait(response).result(timeout=120)

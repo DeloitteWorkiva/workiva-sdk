@@ -11,15 +11,35 @@ import httpx
 
 from workiva._constants import _API
 from workiva._operations._base import BaseNamespace
+from workiva._pagination import (
+    extract_next_link,
+    paginate_all,
+    paginate_all_async,
+)
 from workiva.models.platform import (
     BulkWorkspaceGroupMembersModification,
+    Organization,
+    OrganizationRolesListResult,
+    OrganizationsListResult,
+    OrganizationSolutionsListResult,
     OrganizationUser,
     OrganizationUserAssignment,
+    OrganizationUsersListResult,
+    Solution,
     Workspace,
     WorkspaceGroup,
+    WorkspaceGroupMembersListResult,
+    WorkspaceGroupsListResult,
     WorkspaceMembership,
     WorkspaceMembershipCreation,
+    WorkspaceMembershipRolesListResult,
+    WorkspaceMembershipsListResult,
+    WorkspaceRolesListResult,
+    WorkspacesListResult,
+    WorkspaceSolutionsListResult,
 )
+
+__all__ = ["Admin"]
 
 
 class Admin(BaseNamespace):
@@ -30,98 +50,100 @@ class Admin(BaseNamespace):
     def get_organizations(
         self,
         *,
+        wk_service_provider: str,
         maxpagesize: Optional[int] = 1000,
-        next_: Optional[str] = None,
         filter_: Optional[str] = None,
         order_by: Optional[str] = None,
         timeout: Optional[float] = None,
-    ) -> httpx.Response:
+    ) -> OrganizationsListResult:
         """Retrieve a list of organizations
 
         Returns a paginated list of [organizations](ref:admin#organization).
         This functionality is only available to Managed Service Provider
         Applications. Contact your CSM for assistance.
+
+        Args:
+            maxpagesize: The maximum number of results to retrieve
+            filter_: The properties to filter the results by.
+            order_by: One or more comma-separated expressions to indicate the order in which to sort the results.
+            wk_service_provider: The unique identifier of the service provider
+            timeout: Override the default request timeout (seconds).
+
+        Returns:
+            OrganizationsListResult
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
         """
-        return self._client.request(
-            "GET",
-            self._api,
-            "/organizations",
-            query_params={
-                "$maxpagesize": maxpagesize,
-                "$next": next_,
-                "$filter": filter_,
-                "$orderBy": order_by,
-            },
-            timeout=timeout,
-        )
+
+        def _fetch(_cursor: str | None) -> httpx.Response:
+            return self._client.request(
+                "GET",
+                self._api,
+                "/organizations",
+                query_params={
+                    "$maxpagesize": maxpagesize,
+                    "$filter": filter_,
+                    "$orderBy": order_by,
+                    "$next": _cursor,
+                },
+                headers={
+                    "Wk-Service-Provider": wk_service_provider,
+                },
+                timeout=timeout,
+            )
+
+        _body = paginate_all(_fetch, extract_next_link, "data")
+        return OrganizationsListResult.model_validate(_body)
 
     async def get_organizations_async(
         self,
         *,
+        wk_service_provider: str,
         maxpagesize: Optional[int] = 1000,
-        next_: Optional[str] = None,
         filter_: Optional[str] = None,
         order_by: Optional[str] = None,
         timeout: Optional[float] = None,
-    ) -> httpx.Response:
+    ) -> OrganizationsListResult:
         """Retrieve a list of organizations (async)
 
         Returns a paginated list of [organizations](ref:admin#organization).
         This functionality is only available to Managed Service Provider
         Applications. Contact your CSM for assistance.
+
+        Args:
+            maxpagesize: The maximum number of results to retrieve
+            filter_: The properties to filter the results by.
+            order_by: One or more comma-separated expressions to indicate the order in which to sort the results.
+            wk_service_provider: The unique identifier of the service provider
+            timeout: Override the default request timeout (seconds).
+
+        Returns:
+            OrganizationsListResult
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
         """
-        return await self._client.request_async(
-            "GET",
-            self._api,
-            "/organizations",
-            query_params={
-                "$maxpagesize": maxpagesize,
-                "$next": next_,
-                "$filter": filter_,
-                "$orderBy": order_by,
-            },
-            timeout=timeout,
-        )
 
-    def get_organization_by_id(
-        self,
-        *,
-        organization_id: str,
-        timeout: Optional[float] = None,
-    ) -> httpx.Response:
-        """Retrieve a single organization
+        async def _fetch(_cursor: str | None) -> httpx.Response:
+            return await self._client.request_async(
+                "GET",
+                self._api,
+                "/organizations",
+                query_params={
+                    "$maxpagesize": maxpagesize,
+                    "$filter": filter_,
+                    "$orderBy": order_by,
+                    "$next": _cursor,
+                },
+                headers={
+                    "Wk-Service-Provider": wk_service_provider,
+                },
+                timeout=timeout,
+            )
 
-        Retrieves an organization given its ID
-        """
-        return self._client.request(
-            "GET",
-            self._api,
-            "/organizations/{organizationId}",
-            path_params={
-                "organizationId": organization_id,
-            },
-            timeout=timeout,
-        )
-
-    async def get_organization_by_id_async(
-        self,
-        *,
-        organization_id: str,
-        timeout: Optional[float] = None,
-    ) -> httpx.Response:
-        """Retrieve a single organization (async)
-
-        Retrieves an organization given its ID
-        """
-        return await self._client.request_async(
-            "GET",
-            self._api,
-            "/organizations/{organizationId}",
-            path_params={
-                "organizationId": organization_id,
-            },
-            timeout=timeout,
-        )
+        _body = await paginate_all_async(_fetch, extract_next_link, "data")
+        return OrganizationsListResult.model_validate(_body)
 
     def partially_update_organization_by_id(
         self,
@@ -129,7 +151,7 @@ class Admin(BaseNamespace):
         organization_id: str,
         body: list[Any],
         timeout: Optional[float] = None,
-    ) -> httpx.Response:
+    ) -> Organization:
         """Update a single organization
 
         Updates the properties of an organization.
@@ -137,8 +159,19 @@ class Admin(BaseNamespace):
         |Path|PATCH Operations Supported|
         |---|---|
         |`/name`|`replace`|
+
+        Args:
+            organization_id: The unique identifier of the organization
+            body: Request body.
+            timeout: Override the default request timeout (seconds).
+
+        Returns:
+            Organization
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
         """
-        return self._client.request(
+        response = self._client.request(
             "PATCH",
             self._api,
             "/organizations/{organizationId}",
@@ -148,6 +181,7 @@ class Admin(BaseNamespace):
             json_body=body,
             timeout=timeout,
         )
+        return Organization.model_validate(response.json())
 
     async def partially_update_organization_by_id_async(
         self,
@@ -155,7 +189,7 @@ class Admin(BaseNamespace):
         organization_id: str,
         body: list[Any],
         timeout: Optional[float] = None,
-    ) -> httpx.Response:
+    ) -> Organization:
         """Update a single organization (async)
 
         Updates the properties of an organization.
@@ -163,8 +197,19 @@ class Admin(BaseNamespace):
         |Path|PATCH Operations Supported|
         |---|---|
         |`/name`|`replace`|
+
+        Args:
+            organization_id: The unique identifier of the organization
+            body: Request body.
+            timeout: Override the default request timeout (seconds).
+
+        Returns:
+            Organization
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
         """
-        return await self._client.request_async(
+        response = await self._client.request_async(
             "PATCH",
             self._api,
             "/organizations/{organizationId}",
@@ -174,18 +219,91 @@ class Admin(BaseNamespace):
             json_body=body,
             timeout=timeout,
         )
+        return Organization.model_validate(response.json())
+
+    def get_organization_by_id(
+        self,
+        *,
+        organization_id: str,
+        timeout: Optional[float] = None,
+    ) -> Organization:
+        """Retrieve a single organization
+
+        Retrieves an organization given its ID
+
+        Args:
+            organization_id: The unique identifier of the organization
+            timeout: Override the default request timeout (seconds).
+
+        Returns:
+            Organization
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
+        """
+        response = self._client.request(
+            "GET",
+            self._api,
+            "/organizations/{organizationId}",
+            path_params={
+                "organizationId": organization_id,
+            },
+            timeout=timeout,
+        )
+        return Organization.model_validate(response.json())
+
+    async def get_organization_by_id_async(
+        self,
+        *,
+        organization_id: str,
+        timeout: Optional[float] = None,
+    ) -> Organization:
+        """Retrieve a single organization (async)
+
+        Retrieves an organization given its ID
+
+        Args:
+            organization_id: The unique identifier of the organization
+            timeout: Override the default request timeout (seconds).
+
+        Returns:
+            Organization
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
+        """
+        response = await self._client.request_async(
+            "GET",
+            self._api,
+            "/organizations/{organizationId}",
+            path_params={
+                "organizationId": organization_id,
+            },
+            timeout=timeout,
+        )
+        return Organization.model_validate(response.json())
 
     def get_organization_roles(
         self,
         *,
         organization_id: str,
         timeout: Optional[float] = None,
-    ) -> httpx.Response:
+    ) -> OrganizationRolesListResult:
         """Retrieve available roles within an organization
 
         Retrieves available roles within an organization given its ID
+
+        Args:
+            organization_id: The unique identifier of the organization
+            timeout: Override the default request timeout (seconds).
+
+        Returns:
+            OrganizationRolesListResult
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
         """
-        return self._client.request(
+        response = self._client.request(
             "GET",
             self._api,
             "/organizations/{organizationId}/roles",
@@ -194,18 +312,29 @@ class Admin(BaseNamespace):
             },
             timeout=timeout,
         )
+        return OrganizationRolesListResult.model_validate(response.json())
 
     async def get_organization_roles_async(
         self,
         *,
         organization_id: str,
         timeout: Optional[float] = None,
-    ) -> httpx.Response:
+    ) -> OrganizationRolesListResult:
         """Retrieve available roles within an organization (async)
 
         Retrieves available roles within an organization given its ID
+
+        Args:
+            organization_id: The unique identifier of the organization
+            timeout: Override the default request timeout (seconds).
+
+        Returns:
+            OrganizationRolesListResult
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
         """
-        return await self._client.request_async(
+        response = await self._client.request_async(
             "GET",
             self._api,
             "/organizations/{organizationId}/roles",
@@ -214,18 +343,29 @@ class Admin(BaseNamespace):
             },
             timeout=timeout,
         )
+        return OrganizationRolesListResult.model_validate(response.json())
 
     def get_organization_solutions(
         self,
         *,
         organization_id: str,
         timeout: Optional[float] = None,
-    ) -> httpx.Response:
+    ) -> OrganizationSolutionsListResult:
         """Retrieve available solutions within an organization
 
         Retrieves available solutions within an organization given its ID
+
+        Args:
+            organization_id: The unique identifier of the organization
+            timeout: Override the default request timeout (seconds).
+
+        Returns:
+            OrganizationSolutionsListResult
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
         """
-        return self._client.request(
+        response = self._client.request(
             "GET",
             self._api,
             "/organizations/{organizationId}/solutions",
@@ -234,18 +374,29 @@ class Admin(BaseNamespace):
             },
             timeout=timeout,
         )
+        return OrganizationSolutionsListResult.model_validate(response.json())
 
     async def get_organization_solutions_async(
         self,
         *,
         organization_id: str,
         timeout: Optional[float] = None,
-    ) -> httpx.Response:
+    ) -> OrganizationSolutionsListResult:
         """Retrieve available solutions within an organization (async)
 
         Retrieves available solutions within an organization given its ID
+
+        Args:
+            organization_id: The unique identifier of the organization
+            timeout: Override the default request timeout (seconds).
+
+        Returns:
+            OrganizationSolutionsListResult
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
         """
-        return await self._client.request_async(
+        response = await self._client.request_async(
             "GET",
             self._api,
             "/organizations/{organizationId}/solutions",
@@ -254,62 +405,95 @@ class Admin(BaseNamespace):
             },
             timeout=timeout,
         )
+        return OrganizationSolutionsListResult.model_validate(response.json())
 
     def get_organization_users(
         self,
         *,
         organization_id: str,
         maxpagesize: Optional[int] = 1000,
-        next_: Optional[str] = None,
         filter_: Optional[str] = None,
         timeout: Optional[float] = None,
-    ) -> httpx.Response:
+    ) -> OrganizationUsersListResult:
         """Retrieve list of an organizations users
 
         Retrieve users in an organization.
+
+        Args:
+            organization_id: The unique identifier of the organization
+            maxpagesize: The maximum number of results to retrieve
+            filter_: The properties to filter the results by.
+            timeout: Override the default request timeout (seconds).
+
+        Returns:
+            OrganizationUsersListResult
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
         """
-        return self._client.request(
-            "GET",
-            self._api,
-            "/organizations/{organizationId}/users",
-            path_params={
-                "organizationId": organization_id,
-            },
-            query_params={
-                "$maxpagesize": maxpagesize,
-                "$next": next_,
-                "$filter": filter_,
-            },
-            timeout=timeout,
-        )
+
+        def _fetch(_cursor: str | None) -> httpx.Response:
+            return self._client.request(
+                "GET",
+                self._api,
+                "/organizations/{organizationId}/users",
+                path_params={
+                    "organizationId": organization_id,
+                },
+                query_params={
+                    "$maxpagesize": maxpagesize,
+                    "$filter": filter_,
+                    "$next": _cursor,
+                },
+                timeout=timeout,
+            )
+
+        _body = paginate_all(_fetch, extract_next_link, "data")
+        return OrganizationUsersListResult.model_validate(_body)
 
     async def get_organization_users_async(
         self,
         *,
         organization_id: str,
         maxpagesize: Optional[int] = 1000,
-        next_: Optional[str] = None,
         filter_: Optional[str] = None,
         timeout: Optional[float] = None,
-    ) -> httpx.Response:
+    ) -> OrganizationUsersListResult:
         """Retrieve list of an organizations users (async)
 
         Retrieve users in an organization.
+
+        Args:
+            organization_id: The unique identifier of the organization
+            maxpagesize: The maximum number of results to retrieve
+            filter_: The properties to filter the results by.
+            timeout: Override the default request timeout (seconds).
+
+        Returns:
+            OrganizationUsersListResult
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
         """
-        return await self._client.request_async(
-            "GET",
-            self._api,
-            "/organizations/{organizationId}/users",
-            path_params={
-                "organizationId": organization_id,
-            },
-            query_params={
-                "$maxpagesize": maxpagesize,
-                "$next": next_,
-                "$filter": filter_,
-            },
-            timeout=timeout,
-        )
+
+        async def _fetch(_cursor: str | None) -> httpx.Response:
+            return await self._client.request_async(
+                "GET",
+                self._api,
+                "/organizations/{organizationId}/users",
+                path_params={
+                    "organizationId": organization_id,
+                },
+                query_params={
+                    "$maxpagesize": maxpagesize,
+                    "$filter": filter_,
+                    "$next": _cursor,
+                },
+                timeout=timeout,
+            )
+
+        _body = await paginate_all_async(_fetch, extract_next_link, "data")
+        return OrganizationUsersListResult.model_validate(_body)
 
     def create_organization_user(
         self,
@@ -317,12 +501,23 @@ class Admin(BaseNamespace):
         organization_id: str,
         body: OrganizationUser,
         timeout: Optional[float] = None,
-    ) -> httpx.Response:
+    ) -> OrganizationUser:
         """Create a new organization User
 
         Creates a new OrganizationUser resource
+
+        Args:
+            organization_id: The unique identifier of the organization
+            body: Request body.
+            timeout: Override the default request timeout (seconds).
+
+        Returns:
+            OrganizationUser
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
         """
-        return self._client.request(
+        response = self._client.request(
             "POST",
             self._api,
             "/organizations/{organizationId}/users",
@@ -332,6 +527,7 @@ class Admin(BaseNamespace):
             json_body=body,
             timeout=timeout,
         )
+        return OrganizationUser.model_validate(response.json())
 
     async def create_organization_user_async(
         self,
@@ -339,12 +535,23 @@ class Admin(BaseNamespace):
         organization_id: str,
         body: OrganizationUser,
         timeout: Optional[float] = None,
-    ) -> httpx.Response:
+    ) -> OrganizationUser:
         """Create a new organization User (async)
 
         Creates a new OrganizationUser resource
+
+        Args:
+            organization_id: The unique identifier of the organization
+            body: Request body.
+            timeout: Override the default request timeout (seconds).
+
+        Returns:
+            OrganizationUser
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
         """
-        return await self._client.request_async(
+        response = await self._client.request_async(
             "POST",
             self._api,
             "/organizations/{organizationId}/users",
@@ -354,6 +561,7 @@ class Admin(BaseNamespace):
             json_body=body,
             timeout=timeout,
         )
+        return OrganizationUser.model_validate(response.json())
 
     def assign_user_to_organization(
         self,
@@ -361,12 +569,23 @@ class Admin(BaseNamespace):
         organization_id: str,
         body: OrganizationUserAssignment,
         timeout: Optional[float] = None,
-    ) -> httpx.Response:
+    ) -> OrganizationUser:
         """Assign existing user to organization
 
         Assign an existing organization user to an organization
+
+        Args:
+            organization_id: The unique identifier of the organization
+            body: Request body.
+            timeout: Override the default request timeout (seconds).
+
+        Returns:
+            OrganizationUser
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
         """
-        return self._client.request(
+        response = self._client.request(
             "POST",
             self._api,
             "/organizations/{organizationId}/users/assignment",
@@ -376,6 +595,7 @@ class Admin(BaseNamespace):
             json_body=body,
             timeout=timeout,
         )
+        return OrganizationUser.model_validate(response.json())
 
     async def assign_user_to_organization_async(
         self,
@@ -383,12 +603,23 @@ class Admin(BaseNamespace):
         organization_id: str,
         body: OrganizationUserAssignment,
         timeout: Optional[float] = None,
-    ) -> httpx.Response:
+    ) -> OrganizationUser:
         """Assign existing user to organization (async)
 
         Assign an existing organization user to an organization
+
+        Args:
+            organization_id: The unique identifier of the organization
+            body: Request body.
+            timeout: Override the default request timeout (seconds).
+
+        Returns:
+            OrganizationUser
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
         """
-        return await self._client.request_async(
+        response = await self._client.request_async(
             "POST",
             self._api,
             "/organizations/{organizationId}/users/assignment",
@@ -398,50 +629,7 @@ class Admin(BaseNamespace):
             json_body=body,
             timeout=timeout,
         )
-
-    def get_organization_user_by_id(
-        self,
-        *,
-        organization_id: str,
-        user_id: str,
-        timeout: Optional[float] = None,
-    ) -> httpx.Response:
-        """Retrieve a single user in an organization
-
-        Retrieves an organization user given its ID
-        """
-        return self._client.request(
-            "GET",
-            self._api,
-            "/organizations/{organizationId}/users/{userId}",
-            path_params={
-                "organizationId": organization_id,
-                "userId": user_id,
-            },
-            timeout=timeout,
-        )
-
-    async def get_organization_user_by_id_async(
-        self,
-        *,
-        organization_id: str,
-        user_id: str,
-        timeout: Optional[float] = None,
-    ) -> httpx.Response:
-        """Retrieve a single user in an organization (async)
-
-        Retrieves an organization user given its ID
-        """
-        return await self._client.request_async(
-            "GET",
-            self._api,
-            "/organizations/{organizationId}/users/{userId}",
-            path_params={
-                "organizationId": organization_id,
-                "userId": user_id,
-            },
-            timeout=timeout,
-        )
+        return OrganizationUser.model_validate(response.json())
 
     def partially_update_organization_user_by_id(
         self,
@@ -450,7 +638,7 @@ class Admin(BaseNamespace):
         user_id: str,
         body: list[Any],
         timeout: Optional[float] = None,
-    ) -> httpx.Response:
+    ) -> OrganizationUser:
         """Partially update a single user in an organization
 
         Partially update the properties of a [User](ref:admin#user) within an
@@ -463,8 +651,20 @@ class Admin(BaseNamespace):
         |`/displayName`|`replace`|
         |`/username`|`replace`|
         |`/email`|`replace`|
+
+        Args:
+            organization_id: The unique identifier of the organization
+            user_id: The unique identifier of the user
+            body: Request body.
+            timeout: Override the default request timeout (seconds).
+
+        Returns:
+            OrganizationUser
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
         """
-        return self._client.request(
+        response = self._client.request(
             "PATCH",
             self._api,
             "/organizations/{organizationId}/users/{userId}",
@@ -475,6 +675,7 @@ class Admin(BaseNamespace):
             json_body=body,
             timeout=timeout,
         )
+        return OrganizationUser.model_validate(response.json())
 
     async def partially_update_organization_user_by_id_async(
         self,
@@ -483,7 +684,7 @@ class Admin(BaseNamespace):
         user_id: str,
         body: list[Any],
         timeout: Optional[float] = None,
-    ) -> httpx.Response:
+    ) -> OrganizationUser:
         """Partially update a single user in an organization (async)
 
         Partially update the properties of a [User](ref:admin#user) within an
@@ -496,8 +697,20 @@ class Admin(BaseNamespace):
         |`/displayName`|`replace`|
         |`/username`|`replace`|
         |`/email`|`replace`|
+
+        Args:
+            organization_id: The unique identifier of the organization
+            user_id: The unique identifier of the user
+            body: Request body.
+            timeout: Override the default request timeout (seconds).
+
+        Returns:
+            OrganizationUser
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
         """
-        return await self._client.request_async(
+        response = await self._client.request_async(
             "PATCH",
             self._api,
             "/organizations/{organizationId}/users/{userId}",
@@ -508,6 +721,75 @@ class Admin(BaseNamespace):
             json_body=body,
             timeout=timeout,
         )
+        return OrganizationUser.model_validate(response.json())
+
+    def get_organization_user_by_id(
+        self,
+        *,
+        organization_id: str,
+        user_id: str,
+        timeout: Optional[float] = None,
+    ) -> OrganizationUser:
+        """Retrieve a single user in an organization
+
+        Retrieves an organization user given its ID
+
+        Args:
+            organization_id: The unique identifier of the organization
+            user_id: The unique identifier of the user
+            timeout: Override the default request timeout (seconds).
+
+        Returns:
+            OrganizationUser
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
+        """
+        response = self._client.request(
+            "GET",
+            self._api,
+            "/organizations/{organizationId}/users/{userId}",
+            path_params={
+                "organizationId": organization_id,
+                "userId": user_id,
+            },
+            timeout=timeout,
+        )
+        return OrganizationUser.model_validate(response.json())
+
+    async def get_organization_user_by_id_async(
+        self,
+        *,
+        organization_id: str,
+        user_id: str,
+        timeout: Optional[float] = None,
+    ) -> OrganizationUser:
+        """Retrieve a single user in an organization (async)
+
+        Retrieves an organization user given its ID
+
+        Args:
+            organization_id: The unique identifier of the organization
+            user_id: The unique identifier of the user
+            timeout: Override the default request timeout (seconds).
+
+        Returns:
+            OrganizationUser
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
+        """
+        response = await self._client.request_async(
+            "GET",
+            self._api,
+            "/organizations/{organizationId}/users/{userId}",
+            path_params={
+                "organizationId": organization_id,
+                "userId": user_id,
+            },
+            timeout=timeout,
+        )
+        return OrganizationUser.model_validate(response.json())
 
     def delete_organization_user_by_id(
         self,
@@ -519,6 +801,14 @@ class Admin(BaseNamespace):
         """Delete an organization user
 
         Delete a user from an organization
+
+        Args:
+            organization_id: The unique identifier of the organization
+            user_id: The unique identifier of the user
+            timeout: Override the default request timeout (seconds).
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
         """
         return self._client.request(
             "DELETE",
@@ -541,6 +831,14 @@ class Admin(BaseNamespace):
         """Delete an organization user (async)
 
         Delete a user from an organization
+
+        Args:
+            organization_id: The unique identifier of the organization
+            user_id: The unique identifier of the user
+            timeout: Override the default request timeout (seconds).
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
         """
         return await self._client.request_async(
             "DELETE",
@@ -559,12 +857,23 @@ class Admin(BaseNamespace):
         organization_id: str,
         user_id: str,
         timeout: Optional[float] = None,
-    ) -> httpx.Response:
+    ) -> OrganizationRolesListResult:
         """List Roles assigned to an Organization User
 
         Retrieve a User's roles within an Organization
+
+        Args:
+            organization_id: The unique identifier of the organization
+            user_id: The unique identifier of the user
+            timeout: Override the default request timeout (seconds).
+
+        Returns:
+            OrganizationRolesListResult
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
         """
-        return self._client.request(
+        response = self._client.request(
             "GET",
             self._api,
             "/organizations/{organizationId}/users/{userId}/roles",
@@ -574,6 +883,7 @@ class Admin(BaseNamespace):
             },
             timeout=timeout,
         )
+        return OrganizationRolesListResult.model_validate(response.json())
 
     async def get_organization_user_role_list_async(
         self,
@@ -581,12 +891,23 @@ class Admin(BaseNamespace):
         organization_id: str,
         user_id: str,
         timeout: Optional[float] = None,
-    ) -> httpx.Response:
+    ) -> OrganizationRolesListResult:
         """List Roles assigned to an Organization User (async)
 
         Retrieve a User's roles within an Organization
+
+        Args:
+            organization_id: The unique identifier of the organization
+            user_id: The unique identifier of the user
+            timeout: Override the default request timeout (seconds).
+
+        Returns:
+            OrganizationRolesListResult
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
         """
-        return await self._client.request_async(
+        response = await self._client.request_async(
             "GET",
             self._api,
             "/organizations/{organizationId}/users/{userId}/roles",
@@ -596,6 +917,7 @@ class Admin(BaseNamespace):
             },
             timeout=timeout,
         )
+        return OrganizationRolesListResult.model_validate(response.json())
 
     def assign_organization_user_roles(
         self,
@@ -609,6 +931,19 @@ class Admin(BaseNamespace):
 
         Assign a User's roles within an Organization. If one assignment fails,
         all assignments fail.
+
+        Args:
+            organization_id: The unique identifier of the organization
+            user_id: The unique identifier of the user
+            body: Request body.
+            timeout: Override the default request timeout (seconds).
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
+
+        Note:
+            This is a long-running operation (HTTP 202). Use
+            ``client.wait(response).result()`` to poll until completion.
         """
         return self._client.request(
             "POST",
@@ -634,6 +969,19 @@ class Admin(BaseNamespace):
 
         Assign a User's roles within an Organization. If one assignment fails,
         all assignments fail.
+
+        Args:
+            organization_id: The unique identifier of the organization
+            user_id: The unique identifier of the user
+            body: Request body.
+            timeout: Override the default request timeout (seconds).
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
+
+        Note:
+            This is a long-running operation (HTTP 202). Use
+            ``await client.wait(response).result_async()`` to poll until completion.
         """
         return await self._client.request_async(
             "POST",
@@ -659,6 +1007,19 @@ class Admin(BaseNamespace):
 
         Revoke a User's roles within an Organization. If one revocation fails,
         all revocations fail.
+
+        Args:
+            organization_id: The unique identifier of the organization
+            user_id: The unique identifier of the user
+            body: Request body.
+            timeout: Override the default request timeout (seconds).
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
+
+        Note:
+            This is a long-running operation (HTTP 202). Use
+            ``client.wait(response).result()`` to poll until completion.
         """
         return self._client.request(
             "POST",
@@ -684,6 +1045,19 @@ class Admin(BaseNamespace):
 
         Revoke a User's roles within an Organization. If one revocation fails,
         all revocations fail.
+
+        Args:
+            organization_id: The unique identifier of the organization
+            user_id: The unique identifier of the user
+            body: Request body.
+            timeout: Override the default request timeout (seconds).
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
+
+        Note:
+            This is a long-running operation (HTTP 202). Use
+            ``await client.wait(response).result_async()`` to poll until completion.
         """
         return await self._client.request_async(
             "POST",
@@ -702,56 +1076,88 @@ class Admin(BaseNamespace):
         *,
         organization_id: str,
         maxpagesize: Optional[int] = 1000,
-        next_: Optional[str] = None,
         expand: Optional[str] = None,
         timeout: Optional[float] = None,
-    ) -> httpx.Response:
+    ) -> WorkspacesListResult:
         """Retrieve list of workspaces
 
         Retrieve a list of workspaces in an organization.
+
+        Args:
+            organization_id: The unique identifier of the organization
+            maxpagesize: The maximum number of results to retrieve
+            expand: Returns related resources inline with the main resource
+            timeout: Override the default request timeout (seconds).
+
+        Returns:
+            WorkspacesListResult
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
         """
-        return self._client.request(
-            "GET",
-            self._api,
-            "/organizations/{organizationId}/workspaces",
-            path_params={
-                "organizationId": organization_id,
-            },
-            query_params={
-                "$maxpagesize": maxpagesize,
-                "$next": next_,
-                "$expand": expand,
-            },
-            timeout=timeout,
-        )
+
+        def _fetch(_cursor: str | None) -> httpx.Response:
+            return self._client.request(
+                "GET",
+                self._api,
+                "/organizations/{organizationId}/workspaces",
+                path_params={
+                    "organizationId": organization_id,
+                },
+                query_params={
+                    "$maxpagesize": maxpagesize,
+                    "$expand": expand,
+                    "$next": _cursor,
+                },
+                timeout=timeout,
+            )
+
+        _body = paginate_all(_fetch, extract_next_link, "data")
+        return WorkspacesListResult.model_validate(_body)
 
     async def get_workspaces_async(
         self,
         *,
         organization_id: str,
         maxpagesize: Optional[int] = 1000,
-        next_: Optional[str] = None,
         expand: Optional[str] = None,
         timeout: Optional[float] = None,
-    ) -> httpx.Response:
+    ) -> WorkspacesListResult:
         """Retrieve list of workspaces (async)
 
         Retrieve a list of workspaces in an organization.
+
+        Args:
+            organization_id: The unique identifier of the organization
+            maxpagesize: The maximum number of results to retrieve
+            expand: Returns related resources inline with the main resource
+            timeout: Override the default request timeout (seconds).
+
+        Returns:
+            WorkspacesListResult
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
         """
-        return await self._client.request_async(
-            "GET",
-            self._api,
-            "/organizations/{organizationId}/workspaces",
-            path_params={
-                "organizationId": organization_id,
-            },
-            query_params={
-                "$maxpagesize": maxpagesize,
-                "$next": next_,
-                "$expand": expand,
-            },
-            timeout=timeout,
-        )
+
+        async def _fetch(_cursor: str | None) -> httpx.Response:
+            return await self._client.request_async(
+                "GET",
+                self._api,
+                "/organizations/{organizationId}/workspaces",
+                path_params={
+                    "organizationId": organization_id,
+                },
+                query_params={
+                    "$maxpagesize": maxpagesize,
+                    "$expand": expand,
+                    "$next": _cursor,
+                },
+                timeout=timeout,
+            )
+
+        _body = await paginate_all_async(_fetch, extract_next_link, "data")
+        return WorkspacesListResult.model_validate(_body)
 
     def create_workspace(
         self,
@@ -759,12 +1165,23 @@ class Admin(BaseNamespace):
         organization_id: str,
         body: Workspace,
         timeout: Optional[float] = None,
-    ) -> httpx.Response:
+    ) -> Workspace:
         """Create a new workspace
 
         Creates a new workspace resource
+
+        Args:
+            organization_id: The unique identifier of the organization
+            body: Request body.
+            timeout: Override the default request timeout (seconds).
+
+        Returns:
+            Workspace
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
         """
-        return self._client.request(
+        response = self._client.request(
             "POST",
             self._api,
             "/organizations/{organizationId}/workspaces",
@@ -774,6 +1191,7 @@ class Admin(BaseNamespace):
             json_body=body,
             timeout=timeout,
         )
+        return Workspace.model_validate(response.json())
 
     async def create_workspace_async(
         self,
@@ -781,12 +1199,23 @@ class Admin(BaseNamespace):
         organization_id: str,
         body: Workspace,
         timeout: Optional[float] = None,
-    ) -> httpx.Response:
+    ) -> Workspace:
         """Create a new workspace (async)
 
         Creates a new workspace resource
+
+        Args:
+            organization_id: The unique identifier of the organization
+            body: Request body.
+            timeout: Override the default request timeout (seconds).
+
+        Returns:
+            Workspace
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
         """
-        return await self._client.request_async(
+        response = await self._client.request_async(
             "POST",
             self._api,
             "/organizations/{organizationId}/workspaces",
@@ -796,58 +1225,7 @@ class Admin(BaseNamespace):
             json_body=body,
             timeout=timeout,
         )
-
-    def get_workspace_by_id(
-        self,
-        *,
-        organization_id: str,
-        workspace_id: str,
-        expand: Optional[str] = None,
-        timeout: Optional[float] = None,
-    ) -> httpx.Response:
-        """Retrieve a single workspace
-
-        Retrieves a workspace given its ID
-        """
-        return self._client.request(
-            "GET",
-            self._api,
-            "/organizations/{organizationId}/workspaces/{workspaceId}",
-            path_params={
-                "organizationId": organization_id,
-                "workspaceId": workspace_id,
-            },
-            query_params={
-                "$expand": expand,
-            },
-            timeout=timeout,
-        )
-
-    async def get_workspace_by_id_async(
-        self,
-        *,
-        organization_id: str,
-        workspace_id: str,
-        expand: Optional[str] = None,
-        timeout: Optional[float] = None,
-    ) -> httpx.Response:
-        """Retrieve a single workspace (async)
-
-        Retrieves a workspace given its ID
-        """
-        return await self._client.request_async(
-            "GET",
-            self._api,
-            "/organizations/{organizationId}/workspaces/{workspaceId}",
-            path_params={
-                "organizationId": organization_id,
-                "workspaceId": workspace_id,
-            },
-            query_params={
-                "$expand": expand,
-            },
-            timeout=timeout,
-        )
+        return Workspace.model_validate(response.json())
 
     def partially_update_workspace_by_id(
         self,
@@ -856,7 +1234,7 @@ class Admin(BaseNamespace):
         workspace_id: str,
         body: list[Any],
         timeout: Optional[float] = None,
-    ) -> httpx.Response:
+    ) -> Workspace:
         """Update a single workspace
 
         Updates the properties of a workspace.
@@ -864,8 +1242,20 @@ class Admin(BaseNamespace):
         |Path|PATCH Operations Supported|
         |---|---|
         |`/name`|`replace`|
+
+        Args:
+            organization_id: The unique identifier of the organization
+            workspace_id: The unique identifier of the workspace
+            body: Request body.
+            timeout: Override the default request timeout (seconds).
+
+        Returns:
+            Workspace
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
         """
-        return self._client.request(
+        response = self._client.request(
             "PATCH",
             self._api,
             "/organizations/{organizationId}/workspaces/{workspaceId}",
@@ -876,6 +1266,7 @@ class Admin(BaseNamespace):
             json_body=body,
             timeout=timeout,
         )
+        return Workspace.model_validate(response.json())
 
     async def partially_update_workspace_by_id_async(
         self,
@@ -884,7 +1275,7 @@ class Admin(BaseNamespace):
         workspace_id: str,
         body: list[Any],
         timeout: Optional[float] = None,
-    ) -> httpx.Response:
+    ) -> Workspace:
         """Update a single workspace (async)
 
         Updates the properties of a workspace.
@@ -892,8 +1283,20 @@ class Admin(BaseNamespace):
         |Path|PATCH Operations Supported|
         |---|---|
         |`/name`|`replace`|
+
+        Args:
+            organization_id: The unique identifier of the organization
+            workspace_id: The unique identifier of the workspace
+            body: Request body.
+            timeout: Override the default request timeout (seconds).
+
+        Returns:
+            Workspace
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
         """
-        return await self._client.request_async(
+        response = await self._client.request_async(
             "PATCH",
             self._api,
             "/organizations/{organizationId}/workspaces/{workspaceId}",
@@ -904,6 +1307,85 @@ class Admin(BaseNamespace):
             json_body=body,
             timeout=timeout,
         )
+        return Workspace.model_validate(response.json())
+
+    def get_workspace_by_id(
+        self,
+        *,
+        organization_id: str,
+        workspace_id: str,
+        expand: Optional[str] = None,
+        timeout: Optional[float] = None,
+    ) -> Workspace:
+        """Retrieve a single workspace
+
+        Retrieves a workspace given its ID
+
+        Args:
+            organization_id: The unique identifier of the organization
+            workspace_id: The unique identifier of the workspace
+            expand: Returns related resources inline with the main resource
+            timeout: Override the default request timeout (seconds).
+
+        Returns:
+            Workspace
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
+        """
+        response = self._client.request(
+            "GET",
+            self._api,
+            "/organizations/{organizationId}/workspaces/{workspaceId}",
+            path_params={
+                "organizationId": organization_id,
+                "workspaceId": workspace_id,
+            },
+            query_params={
+                "$expand": expand,
+            },
+            timeout=timeout,
+        )
+        return Workspace.model_validate(response.json())
+
+    async def get_workspace_by_id_async(
+        self,
+        *,
+        organization_id: str,
+        workspace_id: str,
+        expand: Optional[str] = None,
+        timeout: Optional[float] = None,
+    ) -> Workspace:
+        """Retrieve a single workspace (async)
+
+        Retrieves a workspace given its ID
+
+        Args:
+            organization_id: The unique identifier of the organization
+            workspace_id: The unique identifier of the workspace
+            expand: Returns related resources inline with the main resource
+            timeout: Override the default request timeout (seconds).
+
+        Returns:
+            Workspace
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
+        """
+        response = await self._client.request_async(
+            "GET",
+            self._api,
+            "/organizations/{organizationId}/workspaces/{workspaceId}",
+            path_params={
+                "organizationId": organization_id,
+                "workspaceId": workspace_id,
+            },
+            query_params={
+                "$expand": expand,
+            },
+            timeout=timeout,
+        )
+        return Workspace.model_validate(response.json())
 
     def get_workspace_groups(
         self,
@@ -911,29 +1393,46 @@ class Admin(BaseNamespace):
         organization_id: str,
         workspace_id: str,
         maxpagesize: Optional[int] = 1000,
-        next_: Optional[str] = None,
         filter_: Optional[str] = None,
         timeout: Optional[float] = None,
-    ) -> httpx.Response:
+    ) -> WorkspaceGroupsListResult:
         """Retrieve list of groups
 
         Retrieve a list of groups in a workspace
+
+        Args:
+            organization_id: The unique identifier of the organization
+            workspace_id: The unique identifier of the workspace
+            maxpagesize: The maximum number of results to retrieve
+            filter_: The properties to filter the results by.
+            timeout: Override the default request timeout (seconds).
+
+        Returns:
+            WorkspaceGroupsListResult
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
         """
-        return self._client.request(
-            "GET",
-            self._api,
-            "/organizations/{organizationId}/workspaces/{workspaceId}/groups",
-            path_params={
-                "organizationId": organization_id,
-                "workspaceId": workspace_id,
-            },
-            query_params={
-                "$maxpagesize": maxpagesize,
-                "$next": next_,
-                "$filter": filter_,
-            },
-            timeout=timeout,
-        )
+
+        def _fetch(_cursor: str | None) -> httpx.Response:
+            return self._client.request(
+                "GET",
+                self._api,
+                "/organizations/{organizationId}/workspaces/{workspaceId}/groups",
+                path_params={
+                    "organizationId": organization_id,
+                    "workspaceId": workspace_id,
+                },
+                query_params={
+                    "$maxpagesize": maxpagesize,
+                    "$filter": filter_,
+                    "$next": _cursor,
+                },
+                timeout=timeout,
+            )
+
+        _body = paginate_all(_fetch, extract_next_link, "data")
+        return WorkspaceGroupsListResult.model_validate(_body)
 
     async def get_workspace_groups_async(
         self,
@@ -941,29 +1440,46 @@ class Admin(BaseNamespace):
         organization_id: str,
         workspace_id: str,
         maxpagesize: Optional[int] = 1000,
-        next_: Optional[str] = None,
         filter_: Optional[str] = None,
         timeout: Optional[float] = None,
-    ) -> httpx.Response:
+    ) -> WorkspaceGroupsListResult:
         """Retrieve list of groups (async)
 
         Retrieve a list of groups in a workspace
+
+        Args:
+            organization_id: The unique identifier of the organization
+            workspace_id: The unique identifier of the workspace
+            maxpagesize: The maximum number of results to retrieve
+            filter_: The properties to filter the results by.
+            timeout: Override the default request timeout (seconds).
+
+        Returns:
+            WorkspaceGroupsListResult
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
         """
-        return await self._client.request_async(
-            "GET",
-            self._api,
-            "/organizations/{organizationId}/workspaces/{workspaceId}/groups",
-            path_params={
-                "organizationId": organization_id,
-                "workspaceId": workspace_id,
-            },
-            query_params={
-                "$maxpagesize": maxpagesize,
-                "$next": next_,
-                "$filter": filter_,
-            },
-            timeout=timeout,
-        )
+
+        async def _fetch(_cursor: str | None) -> httpx.Response:
+            return await self._client.request_async(
+                "GET",
+                self._api,
+                "/organizations/{organizationId}/workspaces/{workspaceId}/groups",
+                path_params={
+                    "organizationId": organization_id,
+                    "workspaceId": workspace_id,
+                },
+                query_params={
+                    "$maxpagesize": maxpagesize,
+                    "$filter": filter_,
+                    "$next": _cursor,
+                },
+                timeout=timeout,
+            )
+
+        _body = await paginate_all_async(_fetch, extract_next_link, "data")
+        return WorkspaceGroupsListResult.model_validate(_body)
 
     def create_workspace_group(
         self,
@@ -972,12 +1488,24 @@ class Admin(BaseNamespace):
         workspace_id: str,
         body: WorkspaceGroup,
         timeout: Optional[float] = None,
-    ) -> httpx.Response:
+    ) -> WorkspaceGroup:
         """Create a new group in a workspace
 
         Creates a new group resource
+
+        Args:
+            organization_id: The unique identifier of the organization
+            workspace_id: The unique identifier of the workspace
+            body: Request body.
+            timeout: Override the default request timeout (seconds).
+
+        Returns:
+            WorkspaceGroup
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
         """
-        return self._client.request(
+        response = self._client.request(
             "POST",
             self._api,
             "/organizations/{organizationId}/workspaces/{workspaceId}/groups",
@@ -988,6 +1516,7 @@ class Admin(BaseNamespace):
             json_body=body,
             timeout=timeout,
         )
+        return WorkspaceGroup.model_validate(response.json())
 
     async def create_workspace_group_async(
         self,
@@ -996,12 +1525,24 @@ class Admin(BaseNamespace):
         workspace_id: str,
         body: WorkspaceGroup,
         timeout: Optional[float] = None,
-    ) -> httpx.Response:
+    ) -> WorkspaceGroup:
         """Create a new group in a workspace (async)
 
         Creates a new group resource
+
+        Args:
+            organization_id: The unique identifier of the organization
+            workspace_id: The unique identifier of the workspace
+            body: Request body.
+            timeout: Override the default request timeout (seconds).
+
+        Returns:
+            WorkspaceGroup
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
         """
-        return await self._client.request_async(
+        response = await self._client.request_async(
             "POST",
             self._api,
             "/organizations/{organizationId}/workspaces/{workspaceId}/groups",
@@ -1012,62 +1553,7 @@ class Admin(BaseNamespace):
             json_body=body,
             timeout=timeout,
         )
-
-    def get_workspace_group_by_id(
-        self,
-        *,
-        organization_id: str,
-        workspace_id: str,
-        group_id: str,
-        expand: Optional[str] = None,
-        timeout: Optional[float] = None,
-    ) -> httpx.Response:
-        """Retrieve a single group
-
-        Retrieves a group given its ID
-        """
-        return self._client.request(
-            "GET",
-            self._api,
-            "/organizations/{organizationId}/workspaces/{workspaceId}/groups/{groupId}",
-            path_params={
-                "organizationId": organization_id,
-                "workspaceId": workspace_id,
-                "groupId": group_id,
-            },
-            query_params={
-                "$expand": expand,
-            },
-            timeout=timeout,
-        )
-
-    async def get_workspace_group_by_id_async(
-        self,
-        *,
-        organization_id: str,
-        workspace_id: str,
-        group_id: str,
-        expand: Optional[str] = None,
-        timeout: Optional[float] = None,
-    ) -> httpx.Response:
-        """Retrieve a single group (async)
-
-        Retrieves a group given its ID
-        """
-        return await self._client.request_async(
-            "GET",
-            self._api,
-            "/organizations/{organizationId}/workspaces/{workspaceId}/groups/{groupId}",
-            path_params={
-                "organizationId": organization_id,
-                "workspaceId": workspace_id,
-                "groupId": group_id,
-            },
-            query_params={
-                "$expand": expand,
-            },
-            timeout=timeout,
-        )
+        return WorkspaceGroup.model_validate(response.json())
 
     def partially_update_workspace_group_by_id(
         self,
@@ -1077,7 +1563,7 @@ class Admin(BaseNamespace):
         group_id: str,
         body: list[Any],
         timeout: Optional[float] = None,
-    ) -> httpx.Response:
+    ) -> WorkspaceGroup:
         """Update a single group
 
         Updates the properties of a group.
@@ -1085,8 +1571,21 @@ class Admin(BaseNamespace):
         |Path|PATCH Operations Supported|
         |---|---|
         |`/name`|`replace`|
+
+        Args:
+            organization_id: The unique identifier of the organization
+            workspace_id: The unique identifier of the workspace
+            group_id: The unique identifier of the group
+            body: Request body.
+            timeout: Override the default request timeout (seconds).
+
+        Returns:
+            WorkspaceGroup
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
         """
-        return self._client.request(
+        response = self._client.request(
             "PATCH",
             self._api,
             "/organizations/{organizationId}/workspaces/{workspaceId}/groups/{groupId}",
@@ -1098,6 +1597,7 @@ class Admin(BaseNamespace):
             json_body=body,
             timeout=timeout,
         )
+        return WorkspaceGroup.model_validate(response.json())
 
     async def partially_update_workspace_group_by_id_async(
         self,
@@ -1107,7 +1607,7 @@ class Admin(BaseNamespace):
         group_id: str,
         body: list[Any],
         timeout: Optional[float] = None,
-    ) -> httpx.Response:
+    ) -> WorkspaceGroup:
         """Update a single group (async)
 
         Updates the properties of a group.
@@ -1115,8 +1615,21 @@ class Admin(BaseNamespace):
         |Path|PATCH Operations Supported|
         |---|---|
         |`/name`|`replace`|
+
+        Args:
+            organization_id: The unique identifier of the organization
+            workspace_id: The unique identifier of the workspace
+            group_id: The unique identifier of the group
+            body: Request body.
+            timeout: Override the default request timeout (seconds).
+
+        Returns:
+            WorkspaceGroup
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
         """
-        return await self._client.request_async(
+        response = await self._client.request_async(
             "PATCH",
             self._api,
             "/organizations/{organizationId}/workspaces/{workspaceId}/groups/{groupId}",
@@ -1128,6 +1641,91 @@ class Admin(BaseNamespace):
             json_body=body,
             timeout=timeout,
         )
+        return WorkspaceGroup.model_validate(response.json())
+
+    def get_workspace_group_by_id(
+        self,
+        *,
+        organization_id: str,
+        workspace_id: str,
+        group_id: str,
+        expand: Optional[str] = None,
+        timeout: Optional[float] = None,
+    ) -> WorkspaceGroup:
+        """Retrieve a single group
+
+        Retrieves a group given its ID
+
+        Args:
+            organization_id: The unique identifier of the organization
+            workspace_id: The unique identifier of the workspace
+            group_id: The unique identifier of the group
+            expand: Returns related resources inline with the main resource
+            timeout: Override the default request timeout (seconds).
+
+        Returns:
+            WorkspaceGroup
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
+        """
+        response = self._client.request(
+            "GET",
+            self._api,
+            "/organizations/{organizationId}/workspaces/{workspaceId}/groups/{groupId}",
+            path_params={
+                "organizationId": organization_id,
+                "workspaceId": workspace_id,
+                "groupId": group_id,
+            },
+            query_params={
+                "$expand": expand,
+            },
+            timeout=timeout,
+        )
+        return WorkspaceGroup.model_validate(response.json())
+
+    async def get_workspace_group_by_id_async(
+        self,
+        *,
+        organization_id: str,
+        workspace_id: str,
+        group_id: str,
+        expand: Optional[str] = None,
+        timeout: Optional[float] = None,
+    ) -> WorkspaceGroup:
+        """Retrieve a single group (async)
+
+        Retrieves a group given its ID
+
+        Args:
+            organization_id: The unique identifier of the organization
+            workspace_id: The unique identifier of the workspace
+            group_id: The unique identifier of the group
+            expand: Returns related resources inline with the main resource
+            timeout: Override the default request timeout (seconds).
+
+        Returns:
+            WorkspaceGroup
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
+        """
+        response = await self._client.request_async(
+            "GET",
+            self._api,
+            "/organizations/{organizationId}/workspaces/{workspaceId}/groups/{groupId}",
+            path_params={
+                "organizationId": organization_id,
+                "workspaceId": workspace_id,
+                "groupId": group_id,
+            },
+            query_params={
+                "$expand": expand,
+            },
+            timeout=timeout,
+        )
+        return WorkspaceGroup.model_validate(response.json())
 
     def delete_workspace_group_by_id(
         self,
@@ -1140,6 +1738,15 @@ class Admin(BaseNamespace):
         """Delete a single group
 
         Deletes a group given its ID.
+
+        Args:
+            organization_id: The unique identifier of the organization
+            workspace_id: The unique identifier of the workspace
+            group_id: The unique identifier of the group
+            timeout: Override the default request timeout (seconds).
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
         """
         return self._client.request(
             "DELETE",
@@ -1164,6 +1771,15 @@ class Admin(BaseNamespace):
         """Delete a single group (async)
 
         Deletes a group given its ID.
+
+        Args:
+            organization_id: The unique identifier of the organization
+            workspace_id: The unique identifier of the workspace
+            group_id: The unique identifier of the group
+            timeout: Override the default request timeout (seconds).
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
         """
         return await self._client.request_async(
             "DELETE",
@@ -1184,28 +1800,45 @@ class Admin(BaseNamespace):
         workspace_id: str,
         group_id: str,
         maxpagesize: Optional[int] = 1000,
-        next_: Optional[str] = None,
         timeout: Optional[float] = None,
-    ) -> httpx.Response:
+    ) -> WorkspaceGroupMembersListResult:
         """Retrieve list of group members
 
         Retrieve a list of members in a workspace group
+
+        Args:
+            organization_id: The unique identifier of the organization
+            workspace_id: The unique identifier of the workspace
+            group_id: The unique identifier of the group
+            maxpagesize: The maximum number of results to retrieve
+            timeout: Override the default request timeout (seconds).
+
+        Returns:
+            WorkspaceGroupMembersListResult
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
         """
-        return self._client.request(
-            "GET",
-            self._api,
-            "/organizations/{organizationId}/workspaces/{workspaceId}/groups/{groupId}/members",
-            path_params={
-                "organizationId": organization_id,
-                "workspaceId": workspace_id,
-                "groupId": group_id,
-            },
-            query_params={
-                "$maxpagesize": maxpagesize,
-                "$next": next_,
-            },
-            timeout=timeout,
-        )
+
+        def _fetch(_cursor: str | None) -> httpx.Response:
+            return self._client.request(
+                "GET",
+                self._api,
+                "/organizations/{organizationId}/workspaces/{workspaceId}/groups/{groupId}/members",
+                path_params={
+                    "organizationId": organization_id,
+                    "workspaceId": workspace_id,
+                    "groupId": group_id,
+                },
+                query_params={
+                    "$maxpagesize": maxpagesize,
+                    "$next": _cursor,
+                },
+                timeout=timeout,
+            )
+
+        _body = paginate_all(_fetch, extract_next_link, "data")
+        return WorkspaceGroupMembersListResult.model_validate(_body)
 
     async def get_workspace_group_members_async(
         self,
@@ -1214,28 +1847,45 @@ class Admin(BaseNamespace):
         workspace_id: str,
         group_id: str,
         maxpagesize: Optional[int] = 1000,
-        next_: Optional[str] = None,
         timeout: Optional[float] = None,
-    ) -> httpx.Response:
+    ) -> WorkspaceGroupMembersListResult:
         """Retrieve list of group members (async)
 
         Retrieve a list of members in a workspace group
+
+        Args:
+            organization_id: The unique identifier of the organization
+            workspace_id: The unique identifier of the workspace
+            group_id: The unique identifier of the group
+            maxpagesize: The maximum number of results to retrieve
+            timeout: Override the default request timeout (seconds).
+
+        Returns:
+            WorkspaceGroupMembersListResult
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
         """
-        return await self._client.request_async(
-            "GET",
-            self._api,
-            "/organizations/{organizationId}/workspaces/{workspaceId}/groups/{groupId}/members",
-            path_params={
-                "organizationId": organization_id,
-                "workspaceId": workspace_id,
-                "groupId": group_id,
-            },
-            query_params={
-                "$maxpagesize": maxpagesize,
-                "$next": next_,
-            },
-            timeout=timeout,
-        )
+
+        async def _fetch(_cursor: str | None) -> httpx.Response:
+            return await self._client.request_async(
+                "GET",
+                self._api,
+                "/organizations/{organizationId}/workspaces/{workspaceId}/groups/{groupId}/members",
+                path_params={
+                    "organizationId": organization_id,
+                    "workspaceId": workspace_id,
+                    "groupId": group_id,
+                },
+                query_params={
+                    "$maxpagesize": maxpagesize,
+                    "$next": _cursor,
+                },
+                timeout=timeout,
+            )
+
+        _body = await paginate_all_async(_fetch, extract_next_link, "data")
+        return WorkspaceGroupMembersListResult.model_validate(_body)
 
     def modify_workspace_group_members(
         self,
@@ -1250,6 +1900,16 @@ class Admin(BaseNamespace):
 
         Add and/or remove members from a group. When failures are encountered
         for particular members, error responses are returned for each.
+
+        Args:
+            organization_id: The unique identifier of the organization
+            workspace_id: The unique identifier of the workspace
+            group_id: The unique identifier of the group
+            body: Request body.
+            timeout: Override the default request timeout (seconds).
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
         """
         return self._client.request(
             "POST",
@@ -1277,6 +1937,16 @@ class Admin(BaseNamespace):
 
         Add and/or remove members from a group. When failures are encountered
         for particular members, error responses are returned for each.
+
+        Args:
+            organization_id: The unique identifier of the organization
+            workspace_id: The unique identifier of the workspace
+            group_id: The unique identifier of the group
+            body: Request body.
+            timeout: Override the default request timeout (seconds).
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
         """
         return await self._client.request_async(
             "POST",
@@ -1298,28 +1968,45 @@ class Admin(BaseNamespace):
         workspace_id: str,
         filter_: Optional[str] = None,
         maxpagesize: Optional[int] = 1000,
-        next_: Optional[str] = None,
         timeout: Optional[float] = None,
-    ) -> httpx.Response:
+    ) -> WorkspaceMembershipsListResult:
         """Retrieve list of workspace memberships
 
         Retrieve all memberships of a workspace
+
+        Args:
+            organization_id: The unique identifier of the organization
+            workspace_id: The unique identifier of the workspace
+            filter_: The properties to filter the results by.
+            maxpagesize: The maximum number of results to retrieve
+            timeout: Override the default request timeout (seconds).
+
+        Returns:
+            WorkspaceMembershipsListResult
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
         """
-        return self._client.request(
-            "GET",
-            self._api,
-            "/organizations/{organizationId}/workspaces/{workspaceId}/memberships",
-            path_params={
-                "organizationId": organization_id,
-                "workspaceId": workspace_id,
-            },
-            query_params={
-                "$filter": filter_,
-                "$maxpagesize": maxpagesize,
-                "$next": next_,
-            },
-            timeout=timeout,
-        )
+
+        def _fetch(_cursor: str | None) -> httpx.Response:
+            return self._client.request(
+                "GET",
+                self._api,
+                "/organizations/{organizationId}/workspaces/{workspaceId}/memberships",
+                path_params={
+                    "organizationId": organization_id,
+                    "workspaceId": workspace_id,
+                },
+                query_params={
+                    "$filter": filter_,
+                    "$maxpagesize": maxpagesize,
+                    "$next": _cursor,
+                },
+                timeout=timeout,
+            )
+
+        _body = paginate_all(_fetch, extract_next_link, "data")
+        return WorkspaceMembershipsListResult.model_validate(_body)
 
     async def get_workspace_memberships_async(
         self,
@@ -1328,28 +2015,45 @@ class Admin(BaseNamespace):
         workspace_id: str,
         filter_: Optional[str] = None,
         maxpagesize: Optional[int] = 1000,
-        next_: Optional[str] = None,
         timeout: Optional[float] = None,
-    ) -> httpx.Response:
+    ) -> WorkspaceMembershipsListResult:
         """Retrieve list of workspace memberships (async)
 
         Retrieve all memberships of a workspace
+
+        Args:
+            organization_id: The unique identifier of the organization
+            workspace_id: The unique identifier of the workspace
+            filter_: The properties to filter the results by.
+            maxpagesize: The maximum number of results to retrieve
+            timeout: Override the default request timeout (seconds).
+
+        Returns:
+            WorkspaceMembershipsListResult
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
         """
-        return await self._client.request_async(
-            "GET",
-            self._api,
-            "/organizations/{organizationId}/workspaces/{workspaceId}/memberships",
-            path_params={
-                "organizationId": organization_id,
-                "workspaceId": workspace_id,
-            },
-            query_params={
-                "$filter": filter_,
-                "$maxpagesize": maxpagesize,
-                "$next": next_,
-            },
-            timeout=timeout,
-        )
+
+        async def _fetch(_cursor: str | None) -> httpx.Response:
+            return await self._client.request_async(
+                "GET",
+                self._api,
+                "/organizations/{organizationId}/workspaces/{workspaceId}/memberships",
+                path_params={
+                    "organizationId": organization_id,
+                    "workspaceId": workspace_id,
+                },
+                query_params={
+                    "$filter": filter_,
+                    "$maxpagesize": maxpagesize,
+                    "$next": _cursor,
+                },
+                timeout=timeout,
+            )
+
+        _body = await paginate_all_async(_fetch, extract_next_link, "data")
+        return WorkspaceMembershipsListResult.model_validate(_body)
 
     def create_workspace_membership(
         self,
@@ -1358,12 +2062,24 @@ class Admin(BaseNamespace):
         workspace_id: str,
         body: WorkspaceMembership,
         timeout: Optional[float] = None,
-    ) -> httpx.Response:
+    ) -> WorkspaceMembership:
         """Create a new workspace membership
 
         Creates a new `WorkspaceMembership` resource
+
+        Args:
+            organization_id: The unique identifier of the organization
+            workspace_id: The unique identifier of the workspace
+            body: Request body.
+            timeout: Override the default request timeout (seconds).
+
+        Returns:
+            WorkspaceMembership
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
         """
-        return self._client.request(
+        response = self._client.request(
             "POST",
             self._api,
             "/organizations/{organizationId}/workspaces/{workspaceId}/memberships",
@@ -1374,6 +2090,7 @@ class Admin(BaseNamespace):
             json_body=body,
             timeout=timeout,
         )
+        return WorkspaceMembership.model_validate(response.json())
 
     async def create_workspace_membership_async(
         self,
@@ -1382,12 +2099,24 @@ class Admin(BaseNamespace):
         workspace_id: str,
         body: WorkspaceMembership,
         timeout: Optional[float] = None,
-    ) -> httpx.Response:
+    ) -> WorkspaceMembership:
         """Create a new workspace membership (async)
 
         Creates a new `WorkspaceMembership` resource
+
+        Args:
+            organization_id: The unique identifier of the organization
+            workspace_id: The unique identifier of the workspace
+            body: Request body.
+            timeout: Override the default request timeout (seconds).
+
+        Returns:
+            WorkspaceMembership
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
         """
-        return await self._client.request_async(
+        response = await self._client.request_async(
             "POST",
             self._api,
             "/organizations/{organizationId}/workspaces/{workspaceId}/memberships",
@@ -1398,6 +2127,7 @@ class Admin(BaseNamespace):
             json_body=body,
             timeout=timeout,
         )
+        return WorkspaceMembership.model_validate(response.json())
 
     def workspace_membership_creation_with_options(
         self,
@@ -1406,13 +2136,25 @@ class Admin(BaseNamespace):
         workspace_id: str,
         body: WorkspaceMembershipCreation,
         timeout: Optional[float] = None,
-    ) -> httpx.Response:
+    ) -> WorkspaceMembership:
         """Create a new workspace membership with options
 
         Creates a new `WorkspaceMembership` and allows control over notification
         options.
+
+        Args:
+            organization_id: The unique identifier of the organization
+            workspace_id: The unique identifier of the workspace
+            body: Request body.
+            timeout: Override the default request timeout (seconds).
+
+        Returns:
+            WorkspaceMembership
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
         """
-        return self._client.request(
+        response = self._client.request(
             "POST",
             self._api,
             "/organizations/{organizationId}/workspaces/{workspaceId}/memberships/membershipCreation",
@@ -1423,6 +2165,7 @@ class Admin(BaseNamespace):
             json_body=body,
             timeout=timeout,
         )
+        return WorkspaceMembership.model_validate(response.json())
 
     async def workspace_membership_creation_with_options_async(
         self,
@@ -1431,13 +2174,25 @@ class Admin(BaseNamespace):
         workspace_id: str,
         body: WorkspaceMembershipCreation,
         timeout: Optional[float] = None,
-    ) -> httpx.Response:
+    ) -> WorkspaceMembership:
         """Create a new workspace membership with options (async)
 
         Creates a new `WorkspaceMembership` and allows control over notification
         options.
+
+        Args:
+            organization_id: The unique identifier of the organization
+            workspace_id: The unique identifier of the workspace
+            body: Request body.
+            timeout: Override the default request timeout (seconds).
+
+        Returns:
+            WorkspaceMembership
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
         """
-        return await self._client.request_async(
+        response = await self._client.request_async(
             "POST",
             self._api,
             "/organizations/{organizationId}/workspaces/{workspaceId}/memberships/membershipCreation",
@@ -1448,6 +2203,7 @@ class Admin(BaseNamespace):
             json_body=body,
             timeout=timeout,
         )
+        return WorkspaceMembership.model_validate(response.json())
 
     def get_workspace_membership_by_id(
         self,
@@ -1456,12 +2212,24 @@ class Admin(BaseNamespace):
         workspace_id: str,
         workspace_membership_id: str,
         timeout: Optional[float] = None,
-    ) -> httpx.Response:
+    ) -> WorkspaceMembership:
         """Retrieve a single workspace membership
 
         Retrieves a workspace membership given its ID
+
+        Args:
+            organization_id: The unique identifier of the organization
+            workspace_id: The unique identifier of the workspace
+            workspace_membership_id: The unique identifier of the workspace membership
+            timeout: Override the default request timeout (seconds).
+
+        Returns:
+            WorkspaceMembership
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
         """
-        return self._client.request(
+        response = self._client.request(
             "GET",
             self._api,
             "/organizations/{organizationId}/workspaces/{workspaceId}/memberships/{workspaceMembershipId}",
@@ -1472,6 +2240,7 @@ class Admin(BaseNamespace):
             },
             timeout=timeout,
         )
+        return WorkspaceMembership.model_validate(response.json())
 
     async def get_workspace_membership_by_id_async(
         self,
@@ -1480,12 +2249,24 @@ class Admin(BaseNamespace):
         workspace_id: str,
         workspace_membership_id: str,
         timeout: Optional[float] = None,
-    ) -> httpx.Response:
+    ) -> WorkspaceMembership:
         """Retrieve a single workspace membership (async)
 
         Retrieves a workspace membership given its ID
+
+        Args:
+            organization_id: The unique identifier of the organization
+            workspace_id: The unique identifier of the workspace
+            workspace_membership_id: The unique identifier of the workspace membership
+            timeout: Override the default request timeout (seconds).
+
+        Returns:
+            WorkspaceMembership
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
         """
-        return await self._client.request_async(
+        response = await self._client.request_async(
             "GET",
             self._api,
             "/organizations/{organizationId}/workspaces/{workspaceId}/memberships/{workspaceMembershipId}",
@@ -1496,6 +2277,7 @@ class Admin(BaseNamespace):
             },
             timeout=timeout,
         )
+        return WorkspaceMembership.model_validate(response.json())
 
     def delete_workspace_membership_by_id(
         self,
@@ -1508,6 +2290,15 @@ class Admin(BaseNamespace):
         """Delete a workspace membership
 
         Revoke a user's membership to a `Workspace`.
+
+        Args:
+            organization_id: The unique identifier of the organization
+            workspace_id: The unique identifier of the workspace
+            workspace_membership_id: The unique identifier of the workspace membership
+            timeout: Override the default request timeout (seconds).
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
         """
         return self._client.request(
             "DELETE",
@@ -1532,6 +2323,15 @@ class Admin(BaseNamespace):
         """Delete a workspace membership (async)
 
         Revoke a user's membership to a `Workspace`.
+
+        Args:
+            organization_id: The unique identifier of the organization
+            workspace_id: The unique identifier of the workspace
+            workspace_membership_id: The unique identifier of the workspace membership
+            timeout: Override the default request timeout (seconds).
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
         """
         return await self._client.request_async(
             "DELETE",
@@ -1552,12 +2352,24 @@ class Admin(BaseNamespace):
         workspace_id: str,
         workspace_membership_id: str,
         timeout: Optional[float] = None,
-    ) -> httpx.Response:
+    ) -> WorkspaceMembershipRolesListResult:
         """Retrieve available roles for a workspace membership
 
         Retrieves available roles for a workspace membership
+
+        Args:
+            organization_id: The unique identifier of the organization
+            workspace_id: The unique identifier of the workspace
+            workspace_membership_id: The unique identifier of the workspace membership
+            timeout: Override the default request timeout (seconds).
+
+        Returns:
+            WorkspaceMembershipRolesListResult
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
         """
-        return self._client.request(
+        response = self._client.request(
             "GET",
             self._api,
             "/organizations/{organizationId}/workspaces/{workspaceId}/memberships/{workspaceMembershipId}/roles",
@@ -1568,6 +2380,7 @@ class Admin(BaseNamespace):
             },
             timeout=timeout,
         )
+        return WorkspaceMembershipRolesListResult.model_validate(response.json())
 
     async def get_organization_workspace_membership_roles_async(
         self,
@@ -1576,12 +2389,24 @@ class Admin(BaseNamespace):
         workspace_id: str,
         workspace_membership_id: str,
         timeout: Optional[float] = None,
-    ) -> httpx.Response:
+    ) -> WorkspaceMembershipRolesListResult:
         """Retrieve available roles for a workspace membership (async)
 
         Retrieves available roles for a workspace membership
+
+        Args:
+            organization_id: The unique identifier of the organization
+            workspace_id: The unique identifier of the workspace
+            workspace_membership_id: The unique identifier of the workspace membership
+            timeout: Override the default request timeout (seconds).
+
+        Returns:
+            WorkspaceMembershipRolesListResult
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
         """
-        return await self._client.request_async(
+        response = await self._client.request_async(
             "GET",
             self._api,
             "/organizations/{organizationId}/workspaces/{workspaceId}/memberships/{workspaceMembershipId}/roles",
@@ -1592,6 +2417,7 @@ class Admin(BaseNamespace):
             },
             timeout=timeout,
         )
+        return WorkspaceMembershipRolesListResult.model_validate(response.json())
 
     def assign_workspace_membership_roles(
         self,
@@ -1606,6 +2432,20 @@ class Admin(BaseNamespace):
 
         Assign a member's roles within a Workspace. If one assignment fails, all
         assignments fail.
+
+        Args:
+            organization_id: The unique identifier of the organization
+            workspace_id: The unique identifier of the workspace
+            workspace_membership_id: The unique identifier of the workspace membership
+            body: Request body.
+            timeout: Override the default request timeout (seconds).
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
+
+        Note:
+            This is a long-running operation (HTTP 202). Use
+            ``client.wait(response).result()`` to poll until completion.
         """
         return self._client.request(
             "POST",
@@ -1633,6 +2473,20 @@ class Admin(BaseNamespace):
 
         Assign a member's roles within a Workspace. If one assignment fails, all
         assignments fail.
+
+        Args:
+            organization_id: The unique identifier of the organization
+            workspace_id: The unique identifier of the workspace
+            workspace_membership_id: The unique identifier of the workspace membership
+            body: Request body.
+            timeout: Override the default request timeout (seconds).
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
+
+        Note:
+            This is a long-running operation (HTTP 202). Use
+            ``await client.wait(response).result_async()`` to poll until completion.
         """
         return await self._client.request_async(
             "POST",
@@ -1660,6 +2514,20 @@ class Admin(BaseNamespace):
 
         Revoke a member's roles within a Workspace. If one revocation fails, all
         revocations fail.
+
+        Args:
+            organization_id: The unique identifier of the organization
+            workspace_id: The unique identifier of the workspace
+            workspace_membership_id: The unique identifier of the workspace membership
+            body: Request body.
+            timeout: Override the default request timeout (seconds).
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
+
+        Note:
+            This is a long-running operation (HTTP 202). Use
+            ``client.wait(response).result()`` to poll until completion.
         """
         return self._client.request(
             "POST",
@@ -1687,6 +2555,20 @@ class Admin(BaseNamespace):
 
         Revoke a member's roles within a Workspace. If one revocation fails, all
         revocations fail.
+
+        Args:
+            organization_id: The unique identifier of the organization
+            workspace_id: The unique identifier of the workspace
+            workspace_membership_id: The unique identifier of the workspace membership
+            body: Request body.
+            timeout: Override the default request timeout (seconds).
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
+
+        Note:
+            This is a long-running operation (HTTP 202). Use
+            ``await client.wait(response).result_async()`` to poll until completion.
         """
         return await self._client.request_async(
             "POST",
@@ -1707,13 +2589,24 @@ class Admin(BaseNamespace):
         organization_id: str,
         workspace_id: str,
         timeout: Optional[float] = None,
-    ) -> httpx.Response:
+    ) -> WorkspaceRolesListResult:
         """Retrieve available roles within a workspace
 
         Retrieves available roles within a workspace given an organization and
         workspace ID
+
+        Args:
+            organization_id: The unique identifier of the organization
+            workspace_id: The unique identifier of the workspace
+            timeout: Override the default request timeout (seconds).
+
+        Returns:
+            WorkspaceRolesListResult
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
         """
-        return self._client.request(
+        response = self._client.request(
             "GET",
             self._api,
             "/organizations/{organizationId}/workspaces/{workspaceId}/roles",
@@ -1723,6 +2616,7 @@ class Admin(BaseNamespace):
             },
             timeout=timeout,
         )
+        return WorkspaceRolesListResult.model_validate(response.json())
 
     async def get_organization_workspace_roles_async(
         self,
@@ -1730,13 +2624,24 @@ class Admin(BaseNamespace):
         organization_id: str,
         workspace_id: str,
         timeout: Optional[float] = None,
-    ) -> httpx.Response:
+    ) -> WorkspaceRolesListResult:
         """Retrieve available roles within a workspace (async)
 
         Retrieves available roles within a workspace given an organization and
         workspace ID
+
+        Args:
+            organization_id: The unique identifier of the organization
+            workspace_id: The unique identifier of the workspace
+            timeout: Override the default request timeout (seconds).
+
+        Returns:
+            WorkspaceRolesListResult
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
         """
-        return await self._client.request_async(
+        response = await self._client.request_async(
             "GET",
             self._api,
             "/organizations/{organizationId}/workspaces/{workspaceId}/roles",
@@ -1746,6 +2651,7 @@ class Admin(BaseNamespace):
             },
             timeout=timeout,
         )
+        return WorkspaceRolesListResult.model_validate(response.json())
 
     def get_workspace_solutions(
         self,
@@ -1753,12 +2659,23 @@ class Admin(BaseNamespace):
         organization_id: str,
         workspace_id: str,
         timeout: Optional[float] = None,
-    ) -> httpx.Response:
+    ) -> WorkspaceSolutionsListResult:
         """Retrieve available solutions within a workspace
 
         Retrieves available solutions within a workspace given its ID
+
+        Args:
+            organization_id: The unique identifier of the organization
+            workspace_id: The unique identifier of the workspace
+            timeout: Override the default request timeout (seconds).
+
+        Returns:
+            WorkspaceSolutionsListResult
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
         """
-        return self._client.request(
+        response = self._client.request(
             "GET",
             self._api,
             "/organizations/{organizationId}/workspaces/{workspaceId}/solutions",
@@ -1768,6 +2685,7 @@ class Admin(BaseNamespace):
             },
             timeout=timeout,
         )
+        return WorkspaceSolutionsListResult.model_validate(response.json())
 
     async def get_workspace_solutions_async(
         self,
@@ -1775,12 +2693,23 @@ class Admin(BaseNamespace):
         organization_id: str,
         workspace_id: str,
         timeout: Optional[float] = None,
-    ) -> httpx.Response:
+    ) -> WorkspaceSolutionsListResult:
         """Retrieve available solutions within a workspace (async)
 
         Retrieves available solutions within a workspace given its ID
+
+        Args:
+            organization_id: The unique identifier of the organization
+            workspace_id: The unique identifier of the workspace
+            timeout: Override the default request timeout (seconds).
+
+        Returns:
+            WorkspaceSolutionsListResult
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
         """
-        return await self._client.request_async(
+        response = await self._client.request_async(
             "GET",
             self._api,
             "/organizations/{organizationId}/workspaces/{workspaceId}/solutions",
@@ -1790,6 +2719,7 @@ class Admin(BaseNamespace):
             },
             timeout=timeout,
         )
+        return WorkspaceSolutionsListResult.model_validate(response.json())
 
     def get_workspace_solutions_by_id(
         self,
@@ -1798,12 +2728,24 @@ class Admin(BaseNamespace):
         workspace_id: str,
         solution_id: str,
         timeout: Optional[float] = None,
-    ) -> httpx.Response:
+    ) -> Solution:
         """Retrieve a solution by id
 
         Retrieve a solutions within a workspace given its ID
+
+        Args:
+            organization_id: The unique identifier of the organization
+            workspace_id: The unique identifier of the workspace
+            solution_id: The unique identifier of the solution
+            timeout: Override the default request timeout (seconds).
+
+        Returns:
+            Solution
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
         """
-        return self._client.request(
+        response = self._client.request(
             "GET",
             self._api,
             "/organizations/{organizationId}/workspaces/{workspaceId}/solutions/{solutionId}",
@@ -1814,6 +2756,7 @@ class Admin(BaseNamespace):
             },
             timeout=timeout,
         )
+        return Solution.model_validate(response.json())
 
     async def get_workspace_solutions_by_id_async(
         self,
@@ -1822,12 +2765,24 @@ class Admin(BaseNamespace):
         workspace_id: str,
         solution_id: str,
         timeout: Optional[float] = None,
-    ) -> httpx.Response:
+    ) -> Solution:
         """Retrieve a solution by id (async)
 
         Retrieve a solutions within a workspace given its ID
+
+        Args:
+            organization_id: The unique identifier of the organization
+            workspace_id: The unique identifier of the workspace
+            solution_id: The unique identifier of the solution
+            timeout: Override the default request timeout (seconds).
+
+        Returns:
+            Solution
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
         """
-        return await self._client.request_async(
+        response = await self._client.request_async(
             "GET",
             self._api,
             "/organizations/{organizationId}/workspaces/{workspaceId}/solutions/{solutionId}",
@@ -1838,3 +2793,4 @@ class Admin(BaseNamespace):
             },
             timeout=timeout,
         )
+        return Solution.model_validate(response.json())

@@ -15,6 +15,7 @@ from typing import Any, Optional
 from urllib.parse import quote
 
 import httpx
+from pydantic import BaseModel as PydanticBaseModel
 
 from workiva._auth import OAuth2ClientCredentials
 from workiva._config import SDKConfig
@@ -154,15 +155,22 @@ class BaseClient:
         if query_params:
             query_params = {k: v for k, v in query_params.items() if v is not None}
 
+        if headers:
+            headers = {k: v for k, v in headers.items() if v is not None}
         kwargs: dict[str, Any] = {"headers": headers or {}}
         if json_body is not None:
-            kwargs["json"] = json_body
+            if isinstance(json_body, PydanticBaseModel):
+                kwargs["json"] = json_body.model_dump(by_alias=True, exclude_none=True)
+            else:
+                kwargs["json"] = json_body
         elif content is not None:
             kwargs["content"] = content
         elif files is not None:
             kwargs["files"] = files
             if data is not None:
                 kwargs["data"] = data
+        elif data is not None:
+            kwargs["data"] = data
         if query_params:
             kwargs["params"] = query_params
         if timeout is not None:

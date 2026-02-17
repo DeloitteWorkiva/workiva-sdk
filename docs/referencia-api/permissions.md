@@ -1,24 +1,30 @@
 # Permissions
 
-`client.permissions` — Consulta de permisos en Workiva.
+`client.permissions` -- Consulta de permisos en Workiva.
 
 ## Operaciones
 
-| Método | Descripción | Paginado |
+| Metodo | Descripcion | Paginado |
 |--------|-------------|----------|
 | `get_permissions` | Listar permisos | No |
 | `get_permission_by_id` | Obtener permiso por ID | No |
 
-## Ejemplo
+## Ejemplos
+
+### Listar permisos
 
 ```python
-response = client.permissions.get_permissions()
-print(response.result)
+result = client.permissions.get_permissions()
+
+for perm in result.data:
+    print(f"Permiso: {perm.id} - {perm.name}")
 ```
 
+### Obtener permiso por ID
+
 ```python
-response = client.permissions.get_permission_by_id(
+perm = client.permissions.get_permission_by_id(
     permission_id="perm-123",
 )
-print(f"Permiso: {response.result}")
+print(f"Permiso: {perm.name}")
 ```

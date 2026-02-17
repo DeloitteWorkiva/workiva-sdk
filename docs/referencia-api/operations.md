@@ -1,85 +1,79 @@
 # Operations
 
-`client.operations` — Consultar el estado de operaciones asíncronas y obtener resultados.
+`client.operations` -- Consultar el estado de operaciones asincronas y obtener resultados.
 
-Este namespace es el complemento de las operaciones 202. Cuando una operación (copy, import, export, etc.) se completa, puedes consultar sus resultados detallados aquí.
+Este namespace es el complemento de las operaciones 202. Cuando una operacion (copy, import, export, etc.) se completa, puedes consultar sus resultados detallados aqui.
 
-> Para polling automático, usa `client.wait(response).result()`. Este namespace se usa para consultas manuales o para obtener resultados detallados después de que el polling termine.
+> Para polling automatico, usa `client.wait(response).result()`. Este namespace se usa para consultas manuales o para obtener resultados detallados despues de que el polling termine.
 
 ## Operaciones
 
 ### Estado general
 
-| Método | Descripción | Paginado |
+| Metodo | Descripcion | Paginado |
 |--------|-------------|----------|
-| `get_operation_by_id` | Obtener estado de una operación | No |
+| `get_operation_by_id` | Obtener estado de una operacion | No |
 
 ### Resultados de archivos
 
-| Método | Descripción | Paginado |
+| Metodo | Descripcion | Paginado |
 |--------|-------------|----------|
-| `get_copy_file_results` | Resultados de copia de archivo | Sí |
-| `get_import_file_results` | Resultados de importación | Sí |
-| `get_image_upload_creation_results` | Resultados de subida de imagen | Sí |
+| `get_copy_file_results` | Resultados de copia de archivo | Si |
+| `get_import_file_results` | Resultados de importacion | Si |
+| `get_image_upload_creation_results` | Resultados de subida de imagen | Si |
 
 ### Resultados de contenido
 
-| Método | Descripción | Paginado |
+| Metodo | Descripcion | Paginado |
 |--------|-------------|----------|
-| `get_rich_text_anchor_creation_results` | Resultados de creación de anchor | Sí |
-| `get_rich_text_batch_edit_results` | Resultados de edición batch de rich text | Sí |
-| `get_rich_text_duplication_edit_results` | Resultados de duplicación | Sí |
-| `get_rich_text_links_batch_edit_results` | Resultados de links batch | Sí |
-| `get_table_anchor_creation_results` | Resultados de creación de table anchor | Sí |
-| `get_table_cell_edit_results` | Resultados de edición de celdas | No |
-| `get_table_edit_results` | Resultados de edición de tabla | No |
-| `get_table_links_edit_results` | Resultados de links de tabla | Sí |
-| `get_table_reapply_filter_results` | Resultados de reaplicación de filtros | No |
-| `get_range_link_edit_results` | Resultados de edición de range links | Sí |
-| `get_destination_link_source_conversion_results` | Resultados de conversión | Sí |
+| `get_rich_text_anchor_creation_results` | Resultados de creacion de anchor | Si |
+| `get_rich_text_batch_edit_results` | Resultados de edicion batch de rich text | Si |
+| `get_rich_text_duplication_edit_results` | Resultados de duplicacion | Si |
+| `get_rich_text_links_batch_edit_results` | Resultados de links batch | Si |
+| `get_table_anchor_creation_results` | Resultados de creacion de table anchor | Si |
+| `get_table_cell_edit_results` | Resultados de edicion de celdas | No |
+| `get_table_edit_results` | Resultados de edicion de tabla | No |
+| `get_table_links_edit_results` | Resultados de links de tabla | Si |
+| `get_table_reapply_filter_results` | Resultados de reaplicacion de filtros | No |
+| `get_range_link_edit_results` | Resultados de edicion de range links | Si |
+| `get_destination_link_source_conversion_results` | Resultados de conversion | Si |
 
 ### Resultados de documentos/presentaciones
 
-| Método | Descripción | Paginado |
+| Metodo | Descripcion | Paginado |
 |--------|-------------|----------|
-| `get_patch_document_results` | Resultados de actualización de documento | No |
-| `get_patch_section_results` | Resultados de actualización de sección | No |
-| `get_patch_presentation_results` | Resultados de actualización de presentación | No |
-| `get_patch_slide_results` | Resultados de actualización de slide | No |
-| `get_patch_slide_layout_results` | Resultados de actualización de slide layout | No |
-| `get_patch_sheet_results` | Resultados de actualización de sheet | No |
-| `get_patch_spreadsheet_results` | Resultados de actualización de spreadsheet | No |
-| `get_patch_table_properties_results` | Resultados de actualización de tabla | No |
+| `get_patch_document_results` | Resultados de actualizacion de documento | No |
+| `get_patch_section_results` | Resultados de actualizacion de seccion | No |
+| `get_patch_presentation_results` | Resultados de actualizacion de presentacion | No |
+| `get_patch_slide_results` | Resultados de actualizacion de slide | No |
+| `get_patch_slide_layout_results` | Resultados de actualizacion de slide layout | No |
+| `get_patch_sheet_results` | Resultados de actualizacion de sheet | No |
+| `get_patch_spreadsheet_results` | Resultados de actualizacion de spreadsheet | No |
+| `get_patch_table_properties_results` | Resultados de actualizacion de tabla | No |
 
-### Resultados de milestones y métricas
+### Resultados de milestones y metricas
 
-| Método | Descripción | Paginado |
+| Metodo | Descripcion | Paginado |
 |--------|-------------|----------|
-| `get_milestone_creation_results` | Resultados de creación de milestone | Sí |
-| `get_batch_upsertion_metric_values_results` | Resultados de upsert de métricas | Sí |
+| `get_milestone_creation_results` | Resultados de creacion de milestone | Si |
+| `get_batch_upsertion_metric_values_results` | Resultados de upsert de metricas | Si |
 
 ## Ejemplo
 
-### Consultar estado de operación
+### Consultar estado de operacion
 
 ```python
-response = client.operations.get_operation_by_id(
-    operation_id="op-123",
-)
-
-operation = response.result
+operation = client.operations.get_operation_by_id(operation_id="op-123")
 print(f"Estado: {operation.status}")
 print(f"Recurso: {operation.resource_url}")
 ```
 
-### Obtener resultados de copia
+### Obtener resultados de copia (auto-paginacion)
 
 ```python
-# Después de completar un copy_file
-results = client.operations.get_copy_file_results(
-    operation_id="op-123",
-)
+# Despues de completar un copy_file
+results = client.operations.get_copy_file_results(operation_id="op-123")
 
-for result in results.result.data:
-    print(f"Archivo copiado: {result}")
+for item in results.data:
+    print(f"Archivo copiado: {item}")
 ```

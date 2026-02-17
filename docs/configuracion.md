@@ -1,153 +1,182 @@
-# Configuración
+# Configuracion
 
-El SDK ofrece múltiples opciones de configuración: selección de servidor, timeouts, reintentos, logging y clientes HTTP custom.
+El SDK ofrece opciones de configuracion para seleccion de region, timeouts, reintentos y clientes HTTP custom.
 
-## Selección de servidor
+## Seleccion de region
 
-Workiva tiene 3 regiones disponibles:
-
-| Índice | Región | URL |
-|--------|--------|-----|
-| 0 (default) | EU | `https://api.eu.wdesk.com` |
-| 1 | US | `https://api.app.wdesk.com` |
-| 2 | APAC | `https://api.apac.wdesk.com` |
+Workiva tiene 3 regiones disponibles. Se seleccionan con el enum `Region`:
 
 ```python
-from workiva import Workiva
+from workiva import Workiva, Region
 
 # EU (por defecto)
 client = Workiva(client_id="...", client_secret="...")
 
 # US
-client = Workiva(client_id="...", client_secret="...", server_idx=1)
+client = Workiva(client_id="...", client_secret="...", region=Region.US)
 
 # APAC
-client = Workiva(client_id="...", client_secret="...", server_idx=2)
+client = Workiva(client_id="...", client_secret="...", region=Region.APAC)
 ```
 
-### URL personalizada
+| Region | Enum | Platform URL | Chains URL | Wdata URL |
+|--------|------|-------------|------------|-----------|
+| EU (default) | `Region.EU` | `api.eu.wdesk.com` | `h.eu.wdesk.com/s/wdata/oc/api` | `h.eu.wdesk.com/s/wdata/prep` |
+| US | `Region.US` | `api.app.wdesk.com` | `h.app.wdesk.com/s/wdata/oc/api` | `h.app.wdesk.com/s/wdata/prep` |
+| APAC | `Region.APAC` | `api.apac.wdesk.com` | `h.apac.wdesk.com/s/wdata/oc/api` | `h.apac.wdesk.com/s/wdata/prep` |
 
-Puedes pasar un `server_url` directamente:
+> **No existe** un parametro `server_url` ni `server_idx`. La region es la unica forma de seleccionar el servidor.
+
+### Multi-base-URL automatico
+
+Cada API (Platform, Chains, Wdata) tiene su propio servidor base. El SDK rutea automaticamente cada operacion al servidor correcto segun el namespace que uses. No necesitas configurar nada:
 
 ```python
-client = Workiva(
-    client_id="...",
-    client_secret="...",
-    server_url="https://api.custom.wdesk.com",
-)
+with Workiva(client_id="...", client_secret="...", region=Region.US) as client:
+    # Se envia a api.app.wdesk.com
+    files = client.files.get_files()
+
+    # Se envia a h.app.wdesk.com/s/wdata/oc/api
+    chains = client.chains.get_chains(...)
+
+    # Se envia a h.app.wdesk.com/s/wdata/prep
+    tables = client.wdata.get_tables(...)
 ```
-
-### Multi-base-URL
-
-Las APIs de Chains y Wdata tienen sus propias URLs base, inyectadas automáticamente a nivel de path. No necesitas configurar nada especial — el SDK rutea cada operación al servidor correcto.
 
 ## Timeout
 
 ### Global
 
-Timeout en milisegundos para todas las operaciones:
+Timeout en **segundos** para todas las operaciones HTTP:
 
 ```python
 client = Workiva(
     client_id="...",
     client_secret="...",
-    timeout_ms=30000,  # 30 segundos
+    timeout=30,  # 30 segundos
 )
 ```
 
+Si no se especifica, no hay timeout (las conexiones esperan indefinidamente).
+
+> **Nota:** el timeout se especifica en **segundos** (float), no en milisegundos.
+
 ### Per-operation
 
-Cada método acepta un parámetro `timeout_ms` que sobreescribe el timeout global:
+Cada metodo acepta un parametro `timeout` que sobreescribe el timeout global para esa solicitud especifica:
 
 ```python
-# Timeout de 60 segundos solo para esta operación
-response = client.files.get_files(timeout_ms=60000)
+# Timeout de 60 segundos solo para esta operacion
+result = client.files.get_files(timeout=60)
+
+# Timeout de 5 minutos para una operacion pesada
+result = client.spreadsheets.get_spreadsheet(
+    spreadsheet_id="abc",
+    timeout=300,
+)
 ```
+
+> **No existen** parametros `retries=`, `server_url=` ni `http_headers=` per-operation. El unico parametro extra que aceptan todos los metodos es `timeout`.
 
 ## Reintentos
 
-Configura una estrategia de reintentos con backoff exponencial:
+El SDK incluye un sistema de reintentos con backoff exponencial implementado como transport de httpx. Se configura a traves de `SDKConfig` y `RetryConfig`:
 
 ```python
-from workiva import Workiva
-from workiva.utils.retries import RetryConfig, BackoffStrategy
+from workiva import Workiva, Region
+from workiva._config import SDKConfig, RetryConfig
 
 client = Workiva(
     client_id="...",
     client_secret="...",
-    retry_config=RetryConfig(
-        strategy="backoff",
-        backoff=BackoffStrategy(
-            initial_interval=500,    # 500ms
-            max_interval=60000,      # 60 segundos
-            exponent=1.5,            # Factor exponencial
-            max_elapsed_time=300000, # 5 minutos máximo
+    config=SDKConfig(
+        region=Region.EU,
+        timeout_s=30,
+        retry=RetryConfig(
+            initial_interval_ms=500,       # 500ms intervalo inicial
+            max_interval_ms=30_000,        # 30 segundos maximo entre reintentos
+            exponent=1.5,                  # Factor exponencial
+            max_elapsed_ms=120_000,        # 2 minutos maximo total
+            retry_connection_errors=True,  # Reintentar errores de conexion
+            status_codes=(429, 500, 502, 503, 504),  # Codigos a reintentar
         ),
-        retry_connection_errors=True,
     ),
 )
 ```
 
-### Per-operation
+### Parametros de RetryConfig
+
+| Parametro | Default | Descripcion |
+|-----------|---------|-------------|
+| `initial_interval_ms` | `500` | Intervalo inicial entre reintentos (ms) |
+| `max_interval_ms` | `30_000` | Intervalo maximo entre reintentos (ms) |
+| `exponent` | `1.5` | Factor de crecimiento exponencial |
+| `max_elapsed_ms` | `120_000` | Tiempo maximo total para reintentos (ms) |
+| `retry_connection_errors` | `True` | Reintentar ante `ConnectError` y `TimeoutException` |
+| `status_codes` | `(429, 500, 502, 503, 504)` | Codigos HTTP que activan reintento |
+
+### Calculo del intervalo
+
+El intervalo entre reintentos se calcula asi:
+
+```
+intervalo = (initial_interval_ms / 1000) * (exponent ^ intento) + jitter_aleatorio(0, 1)
+intervalo = min(intervalo, max_interval_ms / 1000)
+```
+
+Si la respuesta incluye un header `Retry-After`, el SDK respeta ese intervalo (con tope en `max_interval_ms`).
+
+### Valores por defecto
+
+Si no configuras nada, el SDK usa estos valores por defecto:
 
 ```python
-from workiva.utils.retries import RetryConfig, BackoffStrategy
-
-custom_retry = RetryConfig(
-    strategy="backoff",
-    backoff=BackoffStrategy(
-        initial_interval=1000,
-        max_interval=30000,
-        exponent=2.0,
-        max_elapsed_time=120000,
-    ),
+RetryConfig(
+    initial_interval_ms=500,
+    max_interval_ms=30_000,
+    exponent=1.5,
+    max_elapsed_ms=120_000,
     retry_connection_errors=True,
+    status_codes=(429, 500, 502, 503, 504),
 )
-
-response = client.files.get_files(retries=custom_retry)
 ```
 
-### Códigos HTTP reintentados
+> **No existen** las clases `BackoffStrategy` ni el modulo `workiva.utils.retries`. La configuracion de reintentos vive en `workiva._config.RetryConfig`.
 
-El SDK reintenta automáticamente los siguientes status codes (según la operación):
-- `408` — Request Timeout
-- `429` — Too Many Requests
-- `5XX` — Server Errors
+### Desactivar reintentos
 
-Si la respuesta incluye un header `Retry-After`, el SDK respeta ese intervalo.
-
-## Debug logging
-
-Para habilitar logging de debug:
+Para desactivar completamente los reintentos:
 
 ```python
-import logging
-
-# Logger estándar de Python
-logger = logging.getLogger("workiva")
-logger.setLevel(logging.DEBUG)
-logger.addHandler(logging.StreamHandler())
+from workiva._config import SDKConfig, RetryConfig
 
 client = Workiva(
     client_id="...",
     client_secret="...",
-    debug_logger=logger,
+    config=SDKConfig(
+        retry=RetryConfig(
+            max_elapsed_ms=0,
+            retry_connection_errors=False,
+            status_codes=(),
+        ),
+    ),
 )
 ```
 
 ## Clientes HTTP custom
 
-El SDK usa `httpx` internamente. Puedes pasar tu propio cliente:
+El SDK usa `httpx` internamente. Puedes pasar tu propio cliente para escenarios avanzados (proxies, certificados, configuracion de red):
+
+### Cliente sync custom
 
 ```python
 import httpx
 from workiva import Workiva
 
-# Cliente sync custom
 custom_client = httpx.Client(
     follow_redirects=True,
     verify=False,  # Solo para desarrollo
-    proxies="http://proxy:8080",
+    proxy="http://proxy:8080",
 )
 
 client = Workiva(
@@ -175,40 +204,91 @@ client = Workiva(
 )
 ```
 
-> Si proporcionas un cliente custom, el SDK NO lo cerrará automáticamente. Eres responsable de cerrarlo cuando termines.
+> **Importante:** Si proporcionas un cliente custom, el SDK **NO** lo cerrara automaticamente. Eres responsable de gestionarlo. Los clientes creados internamente por el SDK si se cierran automaticamente al salir del context manager.
+
+### Clientes lazy
+
+Si no proporcionas un cliente custom, el SDK crea los clientes HTTP de forma **lazy** (al primer uso):
+
+- Si solo usas metodos sync, nunca se crea un `AsyncClient`
+- Si solo usas metodos async, nunca se crea un `Client` sync
+- Esto evita crear recursos innecesarios
 
 ## Context managers
 
-El SDK soporta context managers para cerrar conexiones automáticamente:
+Usa context managers para cerrar conexiones automaticamente:
 
 ```python
 # Sync
 with Workiva(client_id="...", client_secret="...") as client:
-    response = client.files.get_files()
-# Conexión cerrada automáticamente
+    result = client.files.get_files()
+# Conexiones cerradas automaticamente
 
 # Async
 async with Workiva(client_id="...", client_secret="...") as client:
-    response = await client.files.get_files_async()
-# Conexión cerrada automáticamente
+    result = await client.files.get_files_async()
+# Conexiones cerradas automaticamente
 ```
 
-## Headers personalizados
-
-Cada método acepta `http_headers` para agregar o sobreescribir headers:
+Si prefieres no usar context managers, cierra manualmente:
 
 ```python
-response = client.files.get_files(
-    http_headers={"X-Request-Id": "abc123"},
+client = Workiva(client_id="...", client_secret="...")
+try:
+    result = client.files.get_files()
+finally:
+    client.close()      # Sync
+    # await client.aclose()  # Async
+```
+
+## SDKConfig completo
+
+`SDKConfig` agrupa toda la configuracion del SDK en un solo dataclass:
+
+```python
+from workiva._config import SDKConfig, RetryConfig
+from workiva._constants import Region
+
+config = SDKConfig(
+    region=Region.US,        # Region del servidor
+    timeout_s=30.0,          # Timeout global en segundos
+    retry=RetryConfig(...),  # Configuracion de reintentos
 )
 ```
 
-## Server URL per-operation
+| Campo | Tipo | Default | Descripcion |
+|-------|------|---------|-------------|
+| `region` | `Region` | `Region.EU` | Region del servidor |
+| `timeout_s` | `Optional[float]` | `None` | Timeout global (segundos). `None` = sin limite |
+| `retry` | `RetryConfig` | `RetryConfig()` | Configuracion de reintentos |
+| `logger` | `logging.Logger` | `logging.getLogger("workiva")` | Logger para el SDK |
 
-Cada método acepta `server_url` para sobreescribir el servidor de esa operación específica:
+### Relacion entre `timeout` y `config`
+
+Si pasas tanto `timeout=` como `config=` al constructor de `Workiva`, el `config` tiene prioridad:
 
 ```python
-response = client.files.get_files(
-    server_url="https://api.eu.wdesk.com",
+# El timeout del config prevalece (timeout=30 se ignora)
+client = Workiva(
+    client_id="...",
+    client_secret="...",
+    timeout=30,
+    config=SDKConfig(timeout_s=60),  # Este gana
 )
 ```
+
+Si pasas `timeout=` sin `config=`, el SDK crea un `SDKConfig` internamente con ese timeout:
+
+```python
+# Internamente: SDKConfig(region=Region.EU, timeout_s=30)
+client = Workiva(
+    client_id="...",
+    client_secret="...",
+    timeout=30,
+)
+```
+
+## Siguiente paso
+
+- [Operaciones de larga duracion](operaciones-larga-duracion.md) -- Patron 202, polling, `wait()`
+- [Manejo de errores](manejo-errores.md) -- Jerarquia de excepciones, try/except

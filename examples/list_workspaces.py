@@ -1,6 +1,6 @@
 """Example: List workspaces and recent activities using the Workiva SDK."""
 
-from workiva._hooks.client import Workiva
+from workiva import Workiva
 
 
 def main():
@@ -13,7 +13,8 @@ def main():
         print(f"Activities: {activities}")
 
         workspaces = client.admin.get_workspaces()
-        print(f"Workspaces: {workspaces}")
+        for ws in workspaces.data:
+            print(f"Workspace: {ws.name} (ID: {ws.id})")
 
         # --- Wdata API (h.app.wdesk.com/s/wdata/prep) ---
         tables = client.wdata.get_tables()

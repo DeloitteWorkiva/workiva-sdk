@@ -11,20 +11,43 @@ import httpx
 
 from workiva._constants import _API
 from workiva._operations._base import BaseNamespace
+from workiva._pagination import (
+    extract_next_link,
+    paginate_all,
+    paginate_all_async,
+)
 from workiva.models.platform import (
+    Anchor,
+    AnchorExtensionsListResult,
+    AnchorsListResult,
+    ColumnPropertiesListResult,
+    DestinationLink,
+    DrawingElementListResult,
+    Image,
     ImageUpload,
+    ImageUploadResponse,
+    ParagraphsListResult,
+    RangeLink,
     RangeLinkEdit,
+    RangeLinkListResult,
     RichTextAnchorCreation,
     RichTextBatchEdit,
     RichTextDuplicationEdit,
     RichTextLinksBatchEdit,
+    RowPropertiesListResult,
+    StyleGuide,
     StyleGuideExport,
+    StyleGuideImportResponse,
     TableAnchorCreation,
     TableCellsBatchEdit,
+    TableCellsResult,
     TableEdit,
     TableFiltersReapplication,
     TableLinksBatchEdit,
+    TableProperties,
 )
+
+__all__ = ["Content"]
 
 
 class Content(BaseNamespace):
@@ -38,12 +61,23 @@ class Content(BaseNamespace):
         anchor_id: str,
         revision: Optional[str] = None,
         timeout: Optional[float] = None,
-    ) -> httpx.Response:
+    ) -> Anchor:
         """Retrieve an anchor by ID
 
         Returns an [`Anchor`](ref:content#anchor) given its id.
+
+        Args:
+            anchor_id: The unique identifier of the anchor
+            revision: Returns resources at a specific revision
+            timeout: Override the default request timeout (seconds).
+
+        Returns:
+            Anchor
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
         """
-        return self._client.request(
+        response = self._client.request(
             "GET",
             self._api,
             "/content/anchors/{anchorId}",
@@ -55,6 +89,7 @@ class Content(BaseNamespace):
             },
             timeout=timeout,
         )
+        return Anchor.model_validate(response.json())
 
     async def get_anchor_by_id_async(
         self,
@@ -62,12 +97,23 @@ class Content(BaseNamespace):
         anchor_id: str,
         revision: Optional[str] = None,
         timeout: Optional[float] = None,
-    ) -> httpx.Response:
+    ) -> Anchor:
         """Retrieve an anchor by ID (async)
 
         Returns an [`Anchor`](ref:content#anchor) given its id.
+
+        Args:
+            anchor_id: The unique identifier of the anchor
+            revision: Returns resources at a specific revision
+            timeout: Override the default request timeout (seconds).
+
+        Returns:
+            Anchor
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
         """
-        return await self._client.request_async(
+        response = await self._client.request_async(
             "GET",
             self._api,
             "/content/anchors/{anchorId}",
@@ -79,6 +125,7 @@ class Content(BaseNamespace):
             },
             timeout=timeout,
         )
+        return Anchor.model_validate(response.json())
 
     def get_destination_link_by_id(
         self,
@@ -86,12 +133,23 @@ class Content(BaseNamespace):
         destination_link_id: str,
         revision: Optional[str] = None,
         timeout: Optional[float] = None,
-    ) -> httpx.Response:
+    ) -> DestinationLink:
         """Retrieve a destination link by id
 
         Returns a [`DestinationLink`](ref:content#destinationlink) given its id
+
+        Args:
+            destination_link_id: The unique identifier of the destination link
+            revision: Returns resources at a specific revision
+            timeout: Override the default request timeout (seconds).
+
+        Returns:
+            DestinationLink
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
         """
-        return self._client.request(
+        response = self._client.request(
             "GET",
             self._api,
             "/content/destinationLinks/{destinationLinkId}",
@@ -103,6 +161,7 @@ class Content(BaseNamespace):
             },
             timeout=timeout,
         )
+        return DestinationLink.model_validate(response.json())
 
     async def get_destination_link_by_id_async(
         self,
@@ -110,12 +169,23 @@ class Content(BaseNamespace):
         destination_link_id: str,
         revision: Optional[str] = None,
         timeout: Optional[float] = None,
-    ) -> httpx.Response:
+    ) -> DestinationLink:
         """Retrieve a destination link by id (async)
 
         Returns a [`DestinationLink`](ref:content#destinationlink) given its id
+
+        Args:
+            destination_link_id: The unique identifier of the destination link
+            revision: Returns resources at a specific revision
+            timeout: Override the default request timeout (seconds).
+
+        Returns:
+            DestinationLink
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
         """
-        return await self._client.request_async(
+        response = await self._client.request_async(
             "GET",
             self._api,
             "/content/destinationLinks/{destinationLinkId}",
@@ -127,6 +197,7 @@ class Content(BaseNamespace):
             },
             timeout=timeout,
         )
+        return DestinationLink.model_validate(response.json())
 
     def destination_link_source_conversion(
         self,
@@ -149,6 +220,17 @@ class Content(BaseNamespace):
         endpoint](ref:getdestinationlinksourceconversionresults).
         For more details, see [Authentication
         documentation](ref:authentication).
+
+        Args:
+            destination_link_id: The unique identifier of the destination link
+            timeout: Override the default request timeout (seconds).
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
+
+        Note:
+            This is a long-running operation (HTTP 202). Use
+            ``client.wait(response).result()`` to poll until completion.
         """
         return self._client.request(
             "POST",
@@ -181,6 +263,17 @@ class Content(BaseNamespace):
         endpoint](ref:getdestinationlinksourceconversionresults).
         For more details, see [Authentication
         documentation](ref:authentication).
+
+        Args:
+            destination_link_id: The unique identifier of the destination link
+            timeout: Override the default request timeout (seconds).
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
+
+        Note:
+            This is a long-running operation (HTTP 202). Use
+            ``await client.wait(response).result_async()`` to poll until completion.
         """
         return await self._client.request_async(
             "POST",
@@ -198,29 +291,45 @@ class Content(BaseNamespace):
         drawing_id: str,
         revision: Optional[str] = None,
         maxpagesize: Optional[int] = 1000,
-        next_: Optional[str] = None,
         timeout: Optional[float] = None,
-    ) -> httpx.Response:
+    ) -> DrawingElementListResult:
         """Retrieve drawing elements by id
 
         Returns a
         [`DrawingElementListResult`](ref:content#drawingelementlistresult) given
         its id
+
+        Args:
+            drawing_id: The unique identifier of a drawing
+            revision: Returns resources at a specific revision
+            maxpagesize: The maximum number of results to retrieve
+            timeout: Override the default request timeout (seconds).
+
+        Returns:
+            DrawingElementListResult
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
         """
-        return self._client.request(
-            "GET",
-            self._api,
-            "/content/drawings/{drawingId}/elements",
-            path_params={
-                "drawingId": drawing_id,
-            },
-            query_params={
-                "$revision": revision,
-                "$maxpagesize": maxpagesize,
-                "$next": next_,
-            },
-            timeout=timeout,
-        )
+
+        def _fetch(_cursor: str | None) -> httpx.Response:
+            return self._client.request(
+                "GET",
+                self._api,
+                "/content/drawings/{drawingId}/elements",
+                path_params={
+                    "drawingId": drawing_id,
+                },
+                query_params={
+                    "$revision": revision,
+                    "$maxpagesize": maxpagesize,
+                    "$next": _cursor,
+                },
+                timeout=timeout,
+            )
+
+        _body = paginate_all(_fetch, extract_next_link, "data")
+        return DrawingElementListResult.model_validate(_body)
 
     async def get_drawing_elements_by_id_async(
         self,
@@ -228,87 +337,135 @@ class Content(BaseNamespace):
         drawing_id: str,
         revision: Optional[str] = None,
         maxpagesize: Optional[int] = 1000,
-        next_: Optional[str] = None,
         timeout: Optional[float] = None,
-    ) -> httpx.Response:
+    ) -> DrawingElementListResult:
         """Retrieve drawing elements by id (async)
 
         Returns a
         [`DrawingElementListResult`](ref:content#drawingelementlistresult) given
         its id
+
+        Args:
+            drawing_id: The unique identifier of a drawing
+            revision: Returns resources at a specific revision
+            maxpagesize: The maximum number of results to retrieve
+            timeout: Override the default request timeout (seconds).
+
+        Returns:
+            DrawingElementListResult
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
         """
-        return await self._client.request_async(
-            "GET",
-            self._api,
-            "/content/drawings/{drawingId}/elements",
-            path_params={
-                "drawingId": drawing_id,
-            },
-            query_params={
-                "$revision": revision,
-                "$maxpagesize": maxpagesize,
-                "$next": next_,
-            },
-            timeout=timeout,
-        )
+
+        async def _fetch(_cursor: str | None) -> httpx.Response:
+            return await self._client.request_async(
+                "GET",
+                self._api,
+                "/content/drawings/{drawingId}/elements",
+                path_params={
+                    "drawingId": drawing_id,
+                },
+                query_params={
+                    "$revision": revision,
+                    "$maxpagesize": maxpagesize,
+                    "$next": _cursor,
+                },
+                timeout=timeout,
+            )
+
+        _body = await paginate_all_async(_fetch, extract_next_link, "data")
+        return DrawingElementListResult.model_validate(_body)
 
     def get_drawing_anchors(
         self,
         *,
         drawing_id: str,
         maxpagesize: Optional[int] = 1000,
-        next_: Optional[str] = None,
         revision: Optional[str] = None,
         timeout: Optional[float] = None,
-    ) -> httpx.Response:
+    ) -> AnchorsListResult:
         """Retrieve a list of drawing anchors
 
         Returns an [`AnchorsListResult`](ref:content#anchorslistresult) for a
         given drawingId.
+
+        Args:
+            drawing_id: The unique identifier of a drawing
+            maxpagesize: The maximum number of results to retrieve
+            revision: Returns resources at a specific revision
+            timeout: Override the default request timeout (seconds).
+
+        Returns:
+            AnchorsListResult
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
         """
-        return self._client.request(
-            "GET",
-            self._api,
-            "/content/drawings/{drawingId}/anchors",
-            path_params={
-                "drawingId": drawing_id,
-            },
-            query_params={
-                "$maxpagesize": maxpagesize,
-                "$next": next_,
-                "$revision": revision,
-            },
-            timeout=timeout,
-        )
+
+        def _fetch(_cursor: str | None) -> httpx.Response:
+            return self._client.request(
+                "GET",
+                self._api,
+                "/content/drawings/{drawingId}/anchors",
+                path_params={
+                    "drawingId": drawing_id,
+                },
+                query_params={
+                    "$maxpagesize": maxpagesize,
+                    "$revision": revision,
+                    "$next": _cursor,
+                },
+                timeout=timeout,
+            )
+
+        _body = paginate_all(_fetch, extract_next_link, "data")
+        return AnchorsListResult.model_validate(_body)
 
     async def get_drawing_anchors_async(
         self,
         *,
         drawing_id: str,
         maxpagesize: Optional[int] = 1000,
-        next_: Optional[str] = None,
         revision: Optional[str] = None,
         timeout: Optional[float] = None,
-    ) -> httpx.Response:
+    ) -> AnchorsListResult:
         """Retrieve a list of drawing anchors (async)
 
         Returns an [`AnchorsListResult`](ref:content#anchorslistresult) for a
         given drawingId.
+
+        Args:
+            drawing_id: The unique identifier of a drawing
+            maxpagesize: The maximum number of results to retrieve
+            revision: Returns resources at a specific revision
+            timeout: Override the default request timeout (seconds).
+
+        Returns:
+            AnchorsListResult
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
         """
-        return await self._client.request_async(
-            "GET",
-            self._api,
-            "/content/drawings/{drawingId}/anchors",
-            path_params={
-                "drawingId": drawing_id,
-            },
-            query_params={
-                "$maxpagesize": maxpagesize,
-                "$next": next_,
-                "$revision": revision,
-            },
-            timeout=timeout,
-        )
+
+        async def _fetch(_cursor: str | None) -> httpx.Response:
+            return await self._client.request_async(
+                "GET",
+                self._api,
+                "/content/drawings/{drawingId}/anchors",
+                path_params={
+                    "drawingId": drawing_id,
+                },
+                query_params={
+                    "$maxpagesize": maxpagesize,
+                    "$revision": revision,
+                    "$next": _cursor,
+                },
+                timeout=timeout,
+            )
+
+        _body = await paginate_all_async(_fetch, extract_next_link, "data")
+        return AnchorsListResult.model_validate(_body)
 
     def get_drawing_anchor_by_id(
         self,
@@ -317,12 +474,24 @@ class Content(BaseNamespace):
         anchor_id: str,
         revision: Optional[str] = None,
         timeout: Optional[float] = None,
-    ) -> httpx.Response:
+    ) -> Anchor:
         """Retrieve a drawing anchor by ID
 
         Returns an [`Anchor`](ref:content#anchor) given its id.
+
+        Args:
+            drawing_id: The unique identifier of a drawing
+            anchor_id: The unique identifier of the anchor
+            revision: Returns resources at a specific revision
+            timeout: Override the default request timeout (seconds).
+
+        Returns:
+            Anchor
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
         """
-        return self._client.request(
+        response = self._client.request(
             "GET",
             self._api,
             "/content/drawings/{drawingId}/anchors/{anchorId}",
@@ -335,6 +504,7 @@ class Content(BaseNamespace):
             },
             timeout=timeout,
         )
+        return Anchor.model_validate(response.json())
 
     async def get_drawing_anchor_by_id_async(
         self,
@@ -343,12 +513,24 @@ class Content(BaseNamespace):
         anchor_id: str,
         revision: Optional[str] = None,
         timeout: Optional[float] = None,
-    ) -> httpx.Response:
+    ) -> Anchor:
         """Retrieve a drawing anchor by ID (async)
 
         Returns an [`Anchor`](ref:content#anchor) given its id.
+
+        Args:
+            drawing_id: The unique identifier of a drawing
+            anchor_id: The unique identifier of the anchor
+            revision: Returns resources at a specific revision
+            timeout: Override the default request timeout (seconds).
+
+        Returns:
+            Anchor
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
         """
-        return await self._client.request_async(
+        response = await self._client.request_async(
             "GET",
             self._api,
             "/content/drawings/{drawingId}/anchors/{anchorId}",
@@ -361,6 +543,7 @@ class Content(BaseNamespace):
             },
             timeout=timeout,
         )
+        return Anchor.model_validate(response.json())
 
     def get_drawing_anchor_extensions(
         self,
@@ -368,30 +551,47 @@ class Content(BaseNamespace):
         drawing_id: str,
         anchor_id: str,
         maxpagesize: Optional[int] = 1000,
-        next_: Optional[str] = None,
         revision: Optional[str] = None,
         timeout: Optional[float] = None,
-    ) -> httpx.Response:
+    ) -> AnchorExtensionsListResult:
         """Retrieve a list of drawing anchor extensions
 
         Returns a paginated list of
         [`AnchorExtensions`](ref:content#anchorextension) for a given anchorId.
+
+        Args:
+            drawing_id: The unique identifier of a drawing
+            anchor_id: The unique identifier of the anchor
+            maxpagesize: The maximum number of results to retrieve
+            revision: Returns resources at a specific revision
+            timeout: Override the default request timeout (seconds).
+
+        Returns:
+            AnchorExtensionsListResult
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
         """
-        return self._client.request(
-            "GET",
-            self._api,
-            "/content/drawings/{drawingId}/anchors/{anchorId}/extensions",
-            path_params={
-                "drawingId": drawing_id,
-                "anchorId": anchor_id,
-            },
-            query_params={
-                "$maxpagesize": maxpagesize,
-                "$next": next_,
-                "$revision": revision,
-            },
-            timeout=timeout,
-        )
+
+        def _fetch(_cursor: str | None) -> httpx.Response:
+            return self._client.request(
+                "GET",
+                self._api,
+                "/content/drawings/{drawingId}/anchors/{anchorId}/extensions",
+                path_params={
+                    "drawingId": drawing_id,
+                    "anchorId": anchor_id,
+                },
+                query_params={
+                    "$maxpagesize": maxpagesize,
+                    "$revision": revision,
+                    "$next": _cursor,
+                },
+                timeout=timeout,
+            )
+
+        _body = paginate_all(_fetch, extract_next_link, "data")
+        return AnchorExtensionsListResult.model_validate(_body)
 
     async def get_drawing_anchor_extensions_async(
         self,
@@ -399,37 +599,54 @@ class Content(BaseNamespace):
         drawing_id: str,
         anchor_id: str,
         maxpagesize: Optional[int] = 1000,
-        next_: Optional[str] = None,
         revision: Optional[str] = None,
         timeout: Optional[float] = None,
-    ) -> httpx.Response:
+    ) -> AnchorExtensionsListResult:
         """Retrieve a list of drawing anchor extensions (async)
 
         Returns a paginated list of
         [`AnchorExtensions`](ref:content#anchorextension) for a given anchorId.
+
+        Args:
+            drawing_id: The unique identifier of a drawing
+            anchor_id: The unique identifier of the anchor
+            maxpagesize: The maximum number of results to retrieve
+            revision: Returns resources at a specific revision
+            timeout: Override the default request timeout (seconds).
+
+        Returns:
+            AnchorExtensionsListResult
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
         """
-        return await self._client.request_async(
-            "GET",
-            self._api,
-            "/content/drawings/{drawingId}/anchors/{anchorId}/extensions",
-            path_params={
-                "drawingId": drawing_id,
-                "anchorId": anchor_id,
-            },
-            query_params={
-                "$maxpagesize": maxpagesize,
-                "$next": next_,
-                "$revision": revision,
-            },
-            timeout=timeout,
-        )
+
+        async def _fetch(_cursor: str | None) -> httpx.Response:
+            return await self._client.request_async(
+                "GET",
+                self._api,
+                "/content/drawings/{drawingId}/anchors/{anchorId}/extensions",
+                path_params={
+                    "drawingId": drawing_id,
+                    "anchorId": anchor_id,
+                },
+                query_params={
+                    "$maxpagesize": maxpagesize,
+                    "$revision": revision,
+                    "$next": _cursor,
+                },
+                timeout=timeout,
+            )
+
+        _body = await paginate_all_async(_fetch, extract_next_link, "data")
+        return AnchorExtensionsListResult.model_validate(_body)
 
     def image_upload(
         self,
         *,
         body: Optional[ImageUpload] = None,
         timeout: Optional[float] = None,
-    ) -> httpx.Response:
+    ) -> ImageUploadResponse:
         """Initiate upload of an image
 
         Retrieves a URL that can be used to upload an image, and an operationId
@@ -457,21 +674,28 @@ class Content(BaseNamespace):
         [Operations endpoint](ref:getoperationbyid). When the upload completes,
         its status will be
         `completed`, and the response body includes a `resourceURL`.
+
+        Returns:
+            ImageUploadResponse
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
         """
-        return self._client.request(
+        response = self._client.request(
             "POST",
             self._api,
             "/content/images/upload",
             json_body=body,
             timeout=timeout,
         )
+        return ImageUploadResponse.model_validate(response.json())
 
     async def image_upload_async(
         self,
         *,
         body: Optional[ImageUpload] = None,
         timeout: Optional[float] = None,
-    ) -> httpx.Response:
+    ) -> ImageUploadResponse:
         """Initiate upload of an image (async)
 
         Retrieves a URL that can be used to upload an image, and an operationId
@@ -499,26 +723,43 @@ class Content(BaseNamespace):
         [Operations endpoint](ref:getoperationbyid). When the upload completes,
         its status will be
         `completed`, and the response body includes a `resourceURL`.
+
+        Returns:
+            ImageUploadResponse
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
         """
-        return await self._client.request_async(
+        response = await self._client.request_async(
             "POST",
             self._api,
             "/content/images/upload",
             json_body=body,
             timeout=timeout,
         )
+        return ImageUploadResponse.model_validate(response.json())
 
     def get_image_by_id(
         self,
         *,
         image_id: str,
         timeout: Optional[float] = None,
-    ) -> httpx.Response:
+    ) -> Image:
         """Retrieve an image by id
 
         Returns a [`Image`](ref:content#image) given its id
+
+        Args:
+            image_id: The unique identifier of the image
+            timeout: Override the default request timeout (seconds).
+
+        Returns:
+            Image
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
         """
-        return self._client.request(
+        response = self._client.request(
             "GET",
             self._api,
             "/content/images/{imageId}",
@@ -527,18 +768,29 @@ class Content(BaseNamespace):
             },
             timeout=timeout,
         )
+        return Image.model_validate(response.json())
 
     async def get_image_by_id_async(
         self,
         *,
         image_id: str,
         timeout: Optional[float] = None,
-    ) -> httpx.Response:
+    ) -> Image:
         """Retrieve an image by id (async)
 
         Returns a [`Image`](ref:content#image) given its id
+
+        Args:
+            image_id: The unique identifier of the image
+            timeout: Override the default request timeout (seconds).
+
+        Returns:
+            Image
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
         """
-        return await self._client.request_async(
+        response = await self._client.request_async(
             "GET",
             self._api,
             "/content/images/{imageId}",
@@ -547,64 +799,97 @@ class Content(BaseNamespace):
             },
             timeout=timeout,
         )
+        return Image.model_validate(response.json())
 
     def get_rich_text_anchors(
         self,
         *,
         rich_text_id: str,
         maxpagesize: Optional[int] = 1000,
-        next_: Optional[str] = None,
         revision: Optional[str] = None,
         timeout: Optional[float] = None,
-    ) -> httpx.Response:
+    ) -> AnchorsListResult:
         """Retrieve a list of rich text anchors
 
         Returns an [`AnchorsListResult`](ref:content#anchorslistresult) for a
         given richTextId.
+
+        Args:
+            rich_text_id: The unique identifier of the rich text content
+            maxpagesize: The maximum number of results to retrieve
+            revision: Returns resources at a specific revision
+            timeout: Override the default request timeout (seconds).
+
+        Returns:
+            AnchorsListResult
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
         """
-        return self._client.request(
-            "GET",
-            self._api,
-            "/content/richText/{richTextId}/anchors",
-            path_params={
-                "richTextId": rich_text_id,
-            },
-            query_params={
-                "$maxpagesize": maxpagesize,
-                "$next": next_,
-                "$revision": revision,
-            },
-            timeout=timeout,
-        )
+
+        def _fetch(_cursor: str | None) -> httpx.Response:
+            return self._client.request(
+                "GET",
+                self._api,
+                "/content/richText/{richTextId}/anchors",
+                path_params={
+                    "richTextId": rich_text_id,
+                },
+                query_params={
+                    "$maxpagesize": maxpagesize,
+                    "$revision": revision,
+                    "$next": _cursor,
+                },
+                timeout=timeout,
+            )
+
+        _body = paginate_all(_fetch, extract_next_link, "data")
+        return AnchorsListResult.model_validate(_body)
 
     async def get_rich_text_anchors_async(
         self,
         *,
         rich_text_id: str,
         maxpagesize: Optional[int] = 1000,
-        next_: Optional[str] = None,
         revision: Optional[str] = None,
         timeout: Optional[float] = None,
-    ) -> httpx.Response:
+    ) -> AnchorsListResult:
         """Retrieve a list of rich text anchors (async)
 
         Returns an [`AnchorsListResult`](ref:content#anchorslistresult) for a
         given richTextId.
+
+        Args:
+            rich_text_id: The unique identifier of the rich text content
+            maxpagesize: The maximum number of results to retrieve
+            revision: Returns resources at a specific revision
+            timeout: Override the default request timeout (seconds).
+
+        Returns:
+            AnchorsListResult
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
         """
-        return await self._client.request_async(
-            "GET",
-            self._api,
-            "/content/richText/{richTextId}/anchors",
-            path_params={
-                "richTextId": rich_text_id,
-            },
-            query_params={
-                "$maxpagesize": maxpagesize,
-                "$next": next_,
-                "$revision": revision,
-            },
-            timeout=timeout,
-        )
+
+        async def _fetch(_cursor: str | None) -> httpx.Response:
+            return await self._client.request_async(
+                "GET",
+                self._api,
+                "/content/richText/{richTextId}/anchors",
+                path_params={
+                    "richTextId": rich_text_id,
+                },
+                query_params={
+                    "$maxpagesize": maxpagesize,
+                    "$revision": revision,
+                    "$next": _cursor,
+                },
+                timeout=timeout,
+            )
+
+        _body = await paginate_all_async(_fetch, extract_next_link, "data")
+        return AnchorsListResult.model_validate(_body)
 
     def rich_text_anchor_creation(
         self,
@@ -630,6 +915,18 @@ class Content(BaseNamespace):
         as the
         initial request. For more details, see
         [Authentication documentation](ref:authentication).
+
+        Args:
+            rich_text_id: The unique identifier of the rich text content
+            body: Request body.
+            timeout: Override the default request timeout (seconds).
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
+
+        Note:
+            This is a long-running operation (HTTP 202). Use
+            ``client.wait(response).result()`` to poll until completion.
         """
         return self._client.request(
             "POST",
@@ -666,6 +963,18 @@ class Content(BaseNamespace):
         as the
         initial request. For more details, see
         [Authentication documentation](ref:authentication).
+
+        Args:
+            rich_text_id: The unique identifier of the rich text content
+            body: Request body.
+            timeout: Override the default request timeout (seconds).
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
+
+        Note:
+            This is a long-running operation (HTTP 202). Use
+            ``await client.wait(response).result_async()`` to poll until completion.
         """
         return await self._client.request_async(
             "POST",
@@ -685,12 +994,24 @@ class Content(BaseNamespace):
         anchor_id: str,
         revision: Optional[str] = None,
         timeout: Optional[float] = None,
-    ) -> httpx.Response:
+    ) -> Anchor:
         """Retrieve a rich text anchor by id
 
         Returns an [`Anchor`](ref:content#anchor) given its id.
+
+        Args:
+            rich_text_id: The unique identifier of the rich text content
+            anchor_id: The unique identifier of the anchor
+            revision: Returns resources at a specific revision
+            timeout: Override the default request timeout (seconds).
+
+        Returns:
+            Anchor
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
         """
-        return self._client.request(
+        response = self._client.request(
             "GET",
             self._api,
             "/content/richText/{richTextId}/anchors/{anchorId}",
@@ -703,6 +1024,7 @@ class Content(BaseNamespace):
             },
             timeout=timeout,
         )
+        return Anchor.model_validate(response.json())
 
     async def get_rich_text_anchor_by_id_async(
         self,
@@ -711,12 +1033,24 @@ class Content(BaseNamespace):
         anchor_id: str,
         revision: Optional[str] = None,
         timeout: Optional[float] = None,
-    ) -> httpx.Response:
+    ) -> Anchor:
         """Retrieve a rich text anchor by id (async)
 
         Returns an [`Anchor`](ref:content#anchor) given its id.
+
+        Args:
+            rich_text_id: The unique identifier of the rich text content
+            anchor_id: The unique identifier of the anchor
+            revision: Returns resources at a specific revision
+            timeout: Override the default request timeout (seconds).
+
+        Returns:
+            Anchor
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
         """
-        return await self._client.request_async(
+        response = await self._client.request_async(
             "GET",
             self._api,
             "/content/richText/{richTextId}/anchors/{anchorId}",
@@ -729,6 +1063,7 @@ class Content(BaseNamespace):
             },
             timeout=timeout,
         )
+        return Anchor.model_validate(response.json())
 
     def get_rich_text_anchor_extensions(
         self,
@@ -736,30 +1071,47 @@ class Content(BaseNamespace):
         rich_text_id: str,
         anchor_id: str,
         maxpagesize: Optional[int] = 1000,
-        next_: Optional[str] = None,
         revision: Optional[str] = None,
         timeout: Optional[float] = None,
-    ) -> httpx.Response:
+    ) -> AnchorExtensionsListResult:
         """Retrieve a list of rich text anchor extensions
 
         Returns a paginated list of
         [`AnchorExtensions`](ref:content#anchorextension) for a given anchorId.
+
+        Args:
+            rich_text_id: The unique identifier of the rich text content
+            anchor_id: The unique identifier of the anchor
+            maxpagesize: The maximum number of results to retrieve
+            revision: Returns resources at a specific revision
+            timeout: Override the default request timeout (seconds).
+
+        Returns:
+            AnchorExtensionsListResult
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
         """
-        return self._client.request(
-            "GET",
-            self._api,
-            "/content/richText/{richTextId}/anchors/{anchorId}/extensions",
-            path_params={
-                "richTextId": rich_text_id,
-                "anchorId": anchor_id,
-            },
-            query_params={
-                "$maxpagesize": maxpagesize,
-                "$next": next_,
-                "$revision": revision,
-            },
-            timeout=timeout,
-        )
+
+        def _fetch(_cursor: str | None) -> httpx.Response:
+            return self._client.request(
+                "GET",
+                self._api,
+                "/content/richText/{richTextId}/anchors/{anchorId}/extensions",
+                path_params={
+                    "richTextId": rich_text_id,
+                    "anchorId": anchor_id,
+                },
+                query_params={
+                    "$maxpagesize": maxpagesize,
+                    "$revision": revision,
+                    "$next": _cursor,
+                },
+                timeout=timeout,
+            )
+
+        _body = paginate_all(_fetch, extract_next_link, "data")
+        return AnchorExtensionsListResult.model_validate(_body)
 
     async def get_rich_text_anchor_extensions_async(
         self,
@@ -767,30 +1119,47 @@ class Content(BaseNamespace):
         rich_text_id: str,
         anchor_id: str,
         maxpagesize: Optional[int] = 1000,
-        next_: Optional[str] = None,
         revision: Optional[str] = None,
         timeout: Optional[float] = None,
-    ) -> httpx.Response:
+    ) -> AnchorExtensionsListResult:
         """Retrieve a list of rich text anchor extensions (async)
 
         Returns a paginated list of
         [`AnchorExtensions`](ref:content#anchorextension) for a given anchorId.
+
+        Args:
+            rich_text_id: The unique identifier of the rich text content
+            anchor_id: The unique identifier of the anchor
+            maxpagesize: The maximum number of results to retrieve
+            revision: Returns resources at a specific revision
+            timeout: Override the default request timeout (seconds).
+
+        Returns:
+            AnchorExtensionsListResult
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
         """
-        return await self._client.request_async(
-            "GET",
-            self._api,
-            "/content/richText/{richTextId}/anchors/{anchorId}/extensions",
-            path_params={
-                "richTextId": rich_text_id,
-                "anchorId": anchor_id,
-            },
-            query_params={
-                "$maxpagesize": maxpagesize,
-                "$next": next_,
-                "$revision": revision,
-            },
-            timeout=timeout,
-        )
+
+        async def _fetch(_cursor: str | None) -> httpx.Response:
+            return await self._client.request_async(
+                "GET",
+                self._api,
+                "/content/richText/{richTextId}/anchors/{anchorId}/extensions",
+                path_params={
+                    "richTextId": rich_text_id,
+                    "anchorId": anchor_id,
+                },
+                query_params={
+                    "$maxpagesize": maxpagesize,
+                    "$revision": revision,
+                    "$next": _cursor,
+                },
+                timeout=timeout,
+            )
+
+        _body = await paginate_all_async(_fetch, extract_next_link, "data")
+        return AnchorExtensionsListResult.model_validate(_body)
 
     def rich_text_duplication_edit(
         self,
@@ -813,6 +1182,18 @@ class Content(BaseNamespace):
         Duplication Edit Results
         endpoint](ref:getrichtextduplicationeditresults) to retrieve the IDs of
         the new resources.
+
+        Args:
+            rich_text_id: The unique identifier of the rich text content
+            body: Request body.
+            timeout: Override the default request timeout (seconds).
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
+
+        Note:
+            This is a long-running operation (HTTP 202). Use
+            ``client.wait(response).result()`` to poll until completion.
         """
         return self._client.request(
             "POST",
@@ -846,6 +1227,18 @@ class Content(BaseNamespace):
         Duplication Edit Results
         endpoint](ref:getrichtextduplicationeditresults) to retrieve the IDs of
         the new resources.
+
+        Args:
+            rich_text_id: The unique identifier of the rich text content
+            body: Request body.
+            timeout: Override the default request timeout (seconds).
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
+
+        Note:
+            This is a long-running operation (HTTP 202). Use
+            ``await client.wait(response).result_async()`` to poll until completion.
         """
         return await self._client.request_async(
             "POST",
@@ -879,6 +1272,18 @@ class Content(BaseNamespace):
         `resourceUrl` field will be populated with a link to the [Rich Text
         Batch Edit Results endpoint](ref:getrichtextbatcheditresults) to
         retrieve the IDs of the new resources.
+
+        Args:
+            rich_text_id: The unique identifier of the rich text content
+            body: Request body.
+            timeout: Override the default request timeout (seconds).
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
+
+        Note:
+            This is a long-running operation (HTTP 202). Use
+            ``client.wait(response).result()`` to poll until completion.
         """
         return self._client.request(
             "POST",
@@ -912,6 +1317,18 @@ class Content(BaseNamespace):
         `resourceUrl` field will be populated with a link to the [Rich Text
         Batch Edit Results endpoint](ref:getrichtextbatcheditresults) to
         retrieve the IDs of the new resources.
+
+        Args:
+            rich_text_id: The unique identifier of the rich text content
+            body: Request body.
+            timeout: Override the default request timeout (seconds).
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
+
+        Note:
+            This is a long-running operation (HTTP 202). Use
+            ``await client.wait(response).result_async()`` to poll until completion.
         """
         return await self._client.request_async(
             "POST",
@@ -945,6 +1362,18 @@ class Content(BaseNamespace):
         the `resourceUrl` field will be populated with a link to the [Rich Text
         Links Batch Edit Results endpoint](ref:getrichtextlinksbatcheditresults)
         to retrieve the IDs of the new resources.
+
+        Args:
+            rich_text_id: The unique identifier of the rich text content
+            body: Request body.
+            timeout: Override the default request timeout (seconds).
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
+
+        Note:
+            This is a long-running operation (HTTP 202). Use
+            ``client.wait(response).result()`` to poll until completion.
         """
         return self._client.request(
             "POST",
@@ -978,6 +1407,18 @@ class Content(BaseNamespace):
         the `resourceUrl` field will be populated with a link to the [Rich Text
         Links Batch Edit Results endpoint](ref:getrichtextlinksbatcheditresults)
         to retrieve the IDs of the new resources.
+
+        Args:
+            rich_text_id: The unique identifier of the rich text content
+            body: Request body.
+            timeout: Override the default request timeout (seconds).
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
+
+        Note:
+            This is a long-running operation (HTTP 202). Use
+            ``await client.wait(response).result_async()`` to poll until completion.
         """
         return await self._client.request_async(
             "POST",
@@ -995,58 +1436,90 @@ class Content(BaseNamespace):
         *,
         rich_text_id: str,
         maxpagesize: Optional[int] = 1000,
-        next_: Optional[str] = None,
         revision: Optional[str] = None,
         timeout: Optional[float] = None,
-    ) -> httpx.Response:
+    ) -> ParagraphsListResult:
         """Retrieve rich text paragraphs
 
         Returns a [`ParagraphsListResult`](ref:content#paragraphslistresult) for
         a rich text object, given its id.
+
+        Args:
+            rich_text_id: The unique identifier of the rich text content
+            maxpagesize: The maximum number of results to retrieve
+            revision: Returns resources at a specific revision
+            timeout: Override the default request timeout (seconds).
+
+        Returns:
+            ParagraphsListResult
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
         """
-        return self._client.request(
-            "GET",
-            self._api,
-            "/content/richText/{richTextId}/paragraphs",
-            path_params={
-                "richTextId": rich_text_id,
-            },
-            query_params={
-                "$maxpagesize": maxpagesize,
-                "$next": next_,
-                "$revision": revision,
-            },
-            timeout=timeout,
-        )
+
+        def _fetch(_cursor: str | None) -> httpx.Response:
+            return self._client.request(
+                "GET",
+                self._api,
+                "/content/richText/{richTextId}/paragraphs",
+                path_params={
+                    "richTextId": rich_text_id,
+                },
+                query_params={
+                    "$maxpagesize": maxpagesize,
+                    "$revision": revision,
+                    "$next": _cursor,
+                },
+                timeout=timeout,
+            )
+
+        _body = paginate_all(_fetch, extract_next_link, "data")
+        return ParagraphsListResult.model_validate(_body)
 
     async def get_rich_text_paragraphs_async(
         self,
         *,
         rich_text_id: str,
         maxpagesize: Optional[int] = 1000,
-        next_: Optional[str] = None,
         revision: Optional[str] = None,
         timeout: Optional[float] = None,
-    ) -> httpx.Response:
+    ) -> ParagraphsListResult:
         """Retrieve rich text paragraphs (async)
 
         Returns a [`ParagraphsListResult`](ref:content#paragraphslistresult) for
         a rich text object, given its id.
+
+        Args:
+            rich_text_id: The unique identifier of the rich text content
+            maxpagesize: The maximum number of results to retrieve
+            revision: Returns resources at a specific revision
+            timeout: Override the default request timeout (seconds).
+
+        Returns:
+            ParagraphsListResult
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
         """
-        return await self._client.request_async(
-            "GET",
-            self._api,
-            "/content/richText/{richTextId}/paragraphs",
-            path_params={
-                "richTextId": rich_text_id,
-            },
-            query_params={
-                "$maxpagesize": maxpagesize,
-                "$next": next_,
-                "$revision": revision,
-            },
-            timeout=timeout,
-        )
+
+        async def _fetch(_cursor: str | None) -> httpx.Response:
+            return await self._client.request_async(
+                "GET",
+                self._api,
+                "/content/richText/{richTextId}/paragraphs",
+                path_params={
+                    "richTextId": rich_text_id,
+                },
+                query_params={
+                    "$maxpagesize": maxpagesize,
+                    "$revision": revision,
+                    "$next": _cursor,
+                },
+                timeout=timeout,
+            )
+
+        _body = await paginate_all_async(_fetch, extract_next_link, "data")
+        return ParagraphsListResult.model_validate(_body)
 
     def get_style_guide_by_id(
         self,
@@ -1054,14 +1527,25 @@ class Content(BaseNamespace):
         style_guide_id: str,
         revision: Optional[str] = None,
         timeout: Optional[float] = None,
-    ) -> httpx.Response:
+    ) -> StyleGuide:
         """Retrieve a style guide by id
 
         Returns the [`StyleGuide`](ref:content#styleguide) populated with the
         text styles, list styles, etc. The revision will ensure a static
         content.
+
+        Args:
+            style_guide_id: The unique identifier of the style guide
+            revision: Returns resources at a specific revision
+            timeout: Override the default request timeout (seconds).
+
+        Returns:
+            StyleGuide
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
         """
-        return self._client.request(
+        response = self._client.request(
             "GET",
             self._api,
             "/content/styleGuides/{styleGuideId}",
@@ -1073,6 +1557,7 @@ class Content(BaseNamespace):
             },
             timeout=timeout,
         )
+        return StyleGuide.model_validate(response.json())
 
     async def get_style_guide_by_id_async(
         self,
@@ -1080,14 +1565,25 @@ class Content(BaseNamespace):
         style_guide_id: str,
         revision: Optional[str] = None,
         timeout: Optional[float] = None,
-    ) -> httpx.Response:
+    ) -> StyleGuide:
         """Retrieve a style guide by id (async)
 
         Returns the [`StyleGuide`](ref:content#styleguide) populated with the
         text styles, list styles, etc. The revision will ensure a static
         content.
+
+        Args:
+            style_guide_id: The unique identifier of the style guide
+            revision: Returns resources at a specific revision
+            timeout: Override the default request timeout (seconds).
+
+        Returns:
+            StyleGuide
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
         """
-        return await self._client.request_async(
+        response = await self._client.request_async(
             "GET",
             self._api,
             "/content/styleGuides/{styleGuideId}",
@@ -1099,6 +1595,7 @@ class Content(BaseNamespace):
             },
             timeout=timeout,
         )
+        return StyleGuide.model_validate(response.json())
 
     def style_guide_export(
         self,
@@ -1124,6 +1621,18 @@ class Content(BaseNamespace):
         as the
         initial request. For more details, see
         [Authentication documentation](ref:authentication).
+
+        Args:
+            style_guide_id: The unique identifier of the style guide
+            body: Request body.
+            timeout: Override the default request timeout (seconds).
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
+
+        Note:
+            This is a long-running operation (HTTP 202). Use
+            ``client.wait(response).result()`` to poll until completion.
         """
         return self._client.request(
             "POST",
@@ -1160,6 +1669,18 @@ class Content(BaseNamespace):
         as the
         initial request. For more details, see
         [Authentication documentation](ref:authentication).
+
+        Args:
+            style_guide_id: The unique identifier of the style guide
+            body: Request body.
+            timeout: Override the default request timeout (seconds).
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
+
+        Note:
+            This is a long-running operation (HTTP 202). Use
+            ``await client.wait(response).result_async()`` to poll until completion.
         """
         return await self._client.request_async(
             "POST",
@@ -1177,7 +1698,7 @@ class Content(BaseNamespace):
         *,
         style_guide_id: str,
         timeout: Optional[float] = None,
-    ) -> httpx.Response:
+    ) -> StyleGuideImportResponse:
         """Initiate import of a style guide
 
         Imports a style guide to the given identifier. This operation will
@@ -1197,8 +1718,18 @@ class Content(BaseNamespace):
         style guide, perform a GET
         on the `resourceURL` with the same authentication credentials and flow
         as the initial request.
+
+        Args:
+            style_guide_id: The unique identifier of the style guide
+            timeout: Override the default request timeout (seconds).
+
+        Returns:
+            StyleGuideImportResponse
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
         """
-        return self._client.request(
+        response = self._client.request(
             "POST",
             self._api,
             "/content/styleGuides/{styleGuideId}/import",
@@ -1207,13 +1738,14 @@ class Content(BaseNamespace):
             },
             timeout=timeout,
         )
+        return StyleGuideImportResponse.model_validate(response.json())
 
     async def style_guide_import_async(
         self,
         *,
         style_guide_id: str,
         timeout: Optional[float] = None,
-    ) -> httpx.Response:
+    ) -> StyleGuideImportResponse:
         """Initiate import of a style guide (async)
 
         Imports a style guide to the given identifier. This operation will
@@ -1233,8 +1765,18 @@ class Content(BaseNamespace):
         style guide, perform a GET
         on the `resourceURL` with the same authentication credentials and flow
         as the initial request.
+
+        Args:
+            style_guide_id: The unique identifier of the style guide
+            timeout: Override the default request timeout (seconds).
+
+        Returns:
+            StyleGuideImportResponse
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
         """
-        return await self._client.request_async(
+        response = await self._client.request_async(
             "POST",
             self._api,
             "/content/styleGuides/{styleGuideId}/import",
@@ -1243,64 +1785,97 @@ class Content(BaseNamespace):
             },
             timeout=timeout,
         )
+        return StyleGuideImportResponse.model_validate(response.json())
 
     def get_table_anchors(
         self,
         *,
         table_id: str,
         maxpagesize: Optional[int] = 1000,
-        next_: Optional[str] = None,
         revision: Optional[str] = None,
         timeout: Optional[float] = None,
-    ) -> httpx.Response:
+    ) -> AnchorsListResult:
         """Retrieve a list of table anchors
 
         Returns an [`AnchorsListResult`](ref:content#anchorslistresult) given
         tableId.
+
+        Args:
+            table_id: The unique identifier for the table
+            maxpagesize: The maximum number of results to retrieve
+            revision: Returns resources at a specific revision
+            timeout: Override the default request timeout (seconds).
+
+        Returns:
+            AnchorsListResult
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
         """
-        return self._client.request(
-            "GET",
-            self._api,
-            "/content/tables/{tableId}/anchors",
-            path_params={
-                "tableId": table_id,
-            },
-            query_params={
-                "$maxpagesize": maxpagesize,
-                "$next": next_,
-                "$revision": revision,
-            },
-            timeout=timeout,
-        )
+
+        def _fetch(_cursor: str | None) -> httpx.Response:
+            return self._client.request(
+                "GET",
+                self._api,
+                "/content/tables/{tableId}/anchors",
+                path_params={
+                    "tableId": table_id,
+                },
+                query_params={
+                    "$maxpagesize": maxpagesize,
+                    "$revision": revision,
+                    "$next": _cursor,
+                },
+                timeout=timeout,
+            )
+
+        _body = paginate_all(_fetch, extract_next_link, "data")
+        return AnchorsListResult.model_validate(_body)
 
     async def get_table_anchors_async(
         self,
         *,
         table_id: str,
         maxpagesize: Optional[int] = 1000,
-        next_: Optional[str] = None,
         revision: Optional[str] = None,
         timeout: Optional[float] = None,
-    ) -> httpx.Response:
+    ) -> AnchorsListResult:
         """Retrieve a list of table anchors (async)
 
         Returns an [`AnchorsListResult`](ref:content#anchorslistresult) given
         tableId.
+
+        Args:
+            table_id: The unique identifier for the table
+            maxpagesize: The maximum number of results to retrieve
+            revision: Returns resources at a specific revision
+            timeout: Override the default request timeout (seconds).
+
+        Returns:
+            AnchorsListResult
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
         """
-        return await self._client.request_async(
-            "GET",
-            self._api,
-            "/content/tables/{tableId}/anchors",
-            path_params={
-                "tableId": table_id,
-            },
-            query_params={
-                "$maxpagesize": maxpagesize,
-                "$next": next_,
-                "$revision": revision,
-            },
-            timeout=timeout,
-        )
+
+        async def _fetch(_cursor: str | None) -> httpx.Response:
+            return await self._client.request_async(
+                "GET",
+                self._api,
+                "/content/tables/{tableId}/anchors",
+                path_params={
+                    "tableId": table_id,
+                },
+                query_params={
+                    "$maxpagesize": maxpagesize,
+                    "$revision": revision,
+                    "$next": _cursor,
+                },
+                timeout=timeout,
+            )
+
+        _body = await paginate_all_async(_fetch, extract_next_link, "data")
+        return AnchorsListResult.model_validate(_body)
 
     def table_anchor_creation(
         self,
@@ -1326,6 +1901,18 @@ class Content(BaseNamespace):
         as the
         initial request. For more details, see
         [Authentication documentation](ref:authentication).
+
+        Args:
+            table_id: The unique identifier for the table
+            body: Request body.
+            timeout: Override the default request timeout (seconds).
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
+
+        Note:
+            This is a long-running operation (HTTP 202). Use
+            ``client.wait(response).result()`` to poll until completion.
         """
         return self._client.request(
             "POST",
@@ -1362,6 +1949,18 @@ class Content(BaseNamespace):
         as the
         initial request. For more details, see
         [Authentication documentation](ref:authentication).
+
+        Args:
+            table_id: The unique identifier for the table
+            body: Request body.
+            timeout: Override the default request timeout (seconds).
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
+
+        Note:
+            This is a long-running operation (HTTP 202). Use
+            ``await client.wait(response).result_async()`` to poll until completion.
         """
         return await self._client.request_async(
             "POST",
@@ -1381,12 +1980,24 @@ class Content(BaseNamespace):
         anchor_id: str,
         revision: Optional[str] = None,
         timeout: Optional[float] = None,
-    ) -> httpx.Response:
+    ) -> Anchor:
         """Retrieve a table anchor by ID
 
         Returns an [`Anchor`](ref:content#anchor) given its id.
+
+        Args:
+            table_id: The unique identifier for the table
+            anchor_id: The unique identifier of the anchor
+            revision: Returns resources at a specific revision
+            timeout: Override the default request timeout (seconds).
+
+        Returns:
+            Anchor
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
         """
-        return self._client.request(
+        response = self._client.request(
             "GET",
             self._api,
             "/content/tables/{tableId}/anchors/{anchorId}",
@@ -1399,6 +2010,7 @@ class Content(BaseNamespace):
             },
             timeout=timeout,
         )
+        return Anchor.model_validate(response.json())
 
     async def get_table_anchor_by_id_async(
         self,
@@ -1407,12 +2019,24 @@ class Content(BaseNamespace):
         anchor_id: str,
         revision: Optional[str] = None,
         timeout: Optional[float] = None,
-    ) -> httpx.Response:
+    ) -> Anchor:
         """Retrieve a table anchor by ID (async)
 
         Returns an [`Anchor`](ref:content#anchor) given its id.
+
+        Args:
+            table_id: The unique identifier for the table
+            anchor_id: The unique identifier of the anchor
+            revision: Returns resources at a specific revision
+            timeout: Override the default request timeout (seconds).
+
+        Returns:
+            Anchor
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
         """
-        return await self._client.request_async(
+        response = await self._client.request_async(
             "GET",
             self._api,
             "/content/tables/{tableId}/anchors/{anchorId}",
@@ -1425,6 +2049,7 @@ class Content(BaseNamespace):
             },
             timeout=timeout,
         )
+        return Anchor.model_validate(response.json())
 
     def get_table_anchor_extensions(
         self,
@@ -1432,30 +2057,47 @@ class Content(BaseNamespace):
         table_id: str,
         anchor_id: str,
         maxpagesize: Optional[int] = 1000,
-        next_: Optional[str] = None,
         revision: Optional[str] = None,
         timeout: Optional[float] = None,
-    ) -> httpx.Response:
+    ) -> AnchorExtensionsListResult:
         """Retrieve a list of table anchor extensions
 
         Returns a paginated list of
         [`AnchorExtensions`](ref:content#anchorextension) for a given anchorId.
+
+        Args:
+            table_id: The unique identifier for the table
+            anchor_id: The unique identifier of the anchor
+            maxpagesize: The maximum number of results to retrieve
+            revision: Returns resources at a specific revision
+            timeout: Override the default request timeout (seconds).
+
+        Returns:
+            AnchorExtensionsListResult
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
         """
-        return self._client.request(
-            "GET",
-            self._api,
-            "/content/tables/{tableId}/anchors/{anchorId}/extensions",
-            path_params={
-                "tableId": table_id,
-                "anchorId": anchor_id,
-            },
-            query_params={
-                "$maxpagesize": maxpagesize,
-                "$next": next_,
-                "$revision": revision,
-            },
-            timeout=timeout,
-        )
+
+        def _fetch(_cursor: str | None) -> httpx.Response:
+            return self._client.request(
+                "GET",
+                self._api,
+                "/content/tables/{tableId}/anchors/{anchorId}/extensions",
+                path_params={
+                    "tableId": table_id,
+                    "anchorId": anchor_id,
+                },
+                query_params={
+                    "$maxpagesize": maxpagesize,
+                    "$revision": revision,
+                    "$next": _cursor,
+                },
+                timeout=timeout,
+            )
+
+        _body = paginate_all(_fetch, extract_next_link, "data")
+        return AnchorExtensionsListResult.model_validate(_body)
 
     async def get_table_anchor_extensions_async(
         self,
@@ -1463,30 +2105,47 @@ class Content(BaseNamespace):
         table_id: str,
         anchor_id: str,
         maxpagesize: Optional[int] = 1000,
-        next_: Optional[str] = None,
         revision: Optional[str] = None,
         timeout: Optional[float] = None,
-    ) -> httpx.Response:
+    ) -> AnchorExtensionsListResult:
         """Retrieve a list of table anchor extensions (async)
 
         Returns a paginated list of
         [`AnchorExtensions`](ref:content#anchorextension) for a given anchorId.
+
+        Args:
+            table_id: The unique identifier for the table
+            anchor_id: The unique identifier of the anchor
+            maxpagesize: The maximum number of results to retrieve
+            revision: Returns resources at a specific revision
+            timeout: Override the default request timeout (seconds).
+
+        Returns:
+            AnchorExtensionsListResult
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
         """
-        return await self._client.request_async(
-            "GET",
-            self._api,
-            "/content/tables/{tableId}/anchors/{anchorId}/extensions",
-            path_params={
-                "tableId": table_id,
-                "anchorId": anchor_id,
-            },
-            query_params={
-                "$maxpagesize": maxpagesize,
-                "$next": next_,
-                "$revision": revision,
-            },
-            timeout=timeout,
-        )
+
+        async def _fetch(_cursor: str | None) -> httpx.Response:
+            return await self._client.request_async(
+                "GET",
+                self._api,
+                "/content/tables/{tableId}/anchors/{anchorId}/extensions",
+                path_params={
+                    "tableId": table_id,
+                    "anchorId": anchor_id,
+                },
+                query_params={
+                    "$maxpagesize": maxpagesize,
+                    "$revision": revision,
+                    "$next": _cursor,
+                },
+                timeout=timeout,
+            )
+
+        _body = await paginate_all_async(_fetch, extract_next_link, "data")
+        return AnchorExtensionsListResult.model_validate(_body)
 
     def get_table_cells(
         self,
@@ -1494,36 +2153,56 @@ class Content(BaseNamespace):
         table_id: str,
         revision: Optional[str] = None,
         maxcellsperpage: Optional[int] = 50000,
-        next_: Optional[str] = None,
         start_row: Optional[int] = None,
         stop_row: Optional[int] = None,
         start_column: Optional[int] = None,
         stop_column: Optional[int] = None,
         timeout: Optional[float] = None,
-    ) -> httpx.Response:
+    ) -> TableCellsResult:
         """Retrieve table cell content
 
         Returns a [`TableCellsResult`](ref:content#tablecellsresult) for a given
         tableId.
+
+        Args:
+            table_id: The unique identifier for the table
+            revision: Returns resources at a specific revision
+            maxcellsperpage: The maximum number of cells to retrieve. The default is 50000. The maximum allowed value is 50000.
+            start_row: The inclusive start row of the range of cells to retrieve. If this parameter is omitted, then the range will be unbounded in this direction.
+            stop_row: The inclusive stop row of the range of cells to retrieve. If this parameter is omitted, then the range will be unbounded in this direction.
+            start_column: The inclusive start column of the range of cells to retrieve. If this parameter is omitted, then the range will be unbounded in this direction.
+            stop_column: The inclusive stop column of the range of cells to retrieve. If this parameter is omitted, then the range will be unbounded in this direction.
+            timeout: Override the default request timeout (seconds).
+
+        Returns:
+            TableCellsResult
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
         """
-        return self._client.request(
-            "GET",
-            self._api,
-            "/content/tables/{tableId}/cells",
-            path_params={
-                "tableId": table_id,
-            },
-            query_params={
-                "$revision": revision,
-                "$maxcellsperpage": maxcellsperpage,
-                "$next": next_,
-                "startRow": start_row,
-                "stopRow": stop_row,
-                "startColumn": start_column,
-                "stopColumn": stop_column,
-            },
-            timeout=timeout,
-        )
+
+        def _fetch(_cursor: str | None) -> httpx.Response:
+            return self._client.request(
+                "GET",
+                self._api,
+                "/content/tables/{tableId}/cells",
+                path_params={
+                    "tableId": table_id,
+                },
+                query_params={
+                    "$revision": revision,
+                    "$maxcellsperpage": maxcellsperpage,
+                    "startRow": start_row,
+                    "stopRow": stop_row,
+                    "startColumn": start_column,
+                    "stopColumn": stop_column,
+                    "$next": _cursor,
+                },
+                timeout=timeout,
+            )
+
+        _body = paginate_all(_fetch, extract_next_link, "data")
+        return TableCellsResult.model_validate(_body)
 
     async def get_table_cells_async(
         self,
@@ -1531,36 +2210,56 @@ class Content(BaseNamespace):
         table_id: str,
         revision: Optional[str] = None,
         maxcellsperpage: Optional[int] = 50000,
-        next_: Optional[str] = None,
         start_row: Optional[int] = None,
         stop_row: Optional[int] = None,
         start_column: Optional[int] = None,
         stop_column: Optional[int] = None,
         timeout: Optional[float] = None,
-    ) -> httpx.Response:
+    ) -> TableCellsResult:
         """Retrieve table cell content (async)
 
         Returns a [`TableCellsResult`](ref:content#tablecellsresult) for a given
         tableId.
+
+        Args:
+            table_id: The unique identifier for the table
+            revision: Returns resources at a specific revision
+            maxcellsperpage: The maximum number of cells to retrieve. The default is 50000. The maximum allowed value is 50000.
+            start_row: The inclusive start row of the range of cells to retrieve. If this parameter is omitted, then the range will be unbounded in this direction.
+            stop_row: The inclusive stop row of the range of cells to retrieve. If this parameter is omitted, then the range will be unbounded in this direction.
+            start_column: The inclusive start column of the range of cells to retrieve. If this parameter is omitted, then the range will be unbounded in this direction.
+            stop_column: The inclusive stop column of the range of cells to retrieve. If this parameter is omitted, then the range will be unbounded in this direction.
+            timeout: Override the default request timeout (seconds).
+
+        Returns:
+            TableCellsResult
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
         """
-        return await self._client.request_async(
-            "GET",
-            self._api,
-            "/content/tables/{tableId}/cells",
-            path_params={
-                "tableId": table_id,
-            },
-            query_params={
-                "$revision": revision,
-                "$maxcellsperpage": maxcellsperpage,
-                "$next": next_,
-                "startRow": start_row,
-                "stopRow": stop_row,
-                "startColumn": start_column,
-                "stopColumn": stop_column,
-            },
-            timeout=timeout,
-        )
+
+        async def _fetch(_cursor: str | None) -> httpx.Response:
+            return await self._client.request_async(
+                "GET",
+                self._api,
+                "/content/tables/{tableId}/cells",
+                path_params={
+                    "tableId": table_id,
+                },
+                query_params={
+                    "$revision": revision,
+                    "$maxcellsperpage": maxcellsperpage,
+                    "startRow": start_row,
+                    "stopRow": stop_row,
+                    "startColumn": start_column,
+                    "stopColumn": stop_column,
+                    "$next": _cursor,
+                },
+                timeout=timeout,
+            )
+
+        _body = await paginate_all_async(_fetch, extract_next_link, "data")
+        return TableCellsResult.model_validate(_body)
 
     def table_cells_batch_edit(
         self,
@@ -1582,6 +2281,18 @@ class Content(BaseNamespace):
         endpoint ](ref:getoperationbyid). When the creation completes, its
         status will be `completed`, and the response\nbody includes a
         `resourceURL`.\n"
+
+        Args:
+            table_id: The unique identifier for the table
+            body: Request body.
+            timeout: Override the default request timeout (seconds).
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
+
+        Note:
+            This is a long-running operation (HTTP 202). Use
+            ``client.wait(response).result()`` to poll until completion.
         """
         return self._client.request(
             "POST",
@@ -1614,6 +2325,18 @@ class Content(BaseNamespace):
         endpoint ](ref:getoperationbyid). When the creation completes, its
         status will be `completed`, and the response\nbody includes a
         `resourceURL`.\n"
+
+        Args:
+            table_id: The unique identifier for the table
+            body: Request body.
+            timeout: Override the default request timeout (seconds).
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
+
+        Note:
+            This is a long-running operation (HTTP 202). Use
+            ``await client.wait(response).result_async()`` to poll until completion.
         """
         return await self._client.request_async(
             "POST",
@@ -1632,33 +2355,51 @@ class Content(BaseNamespace):
         table_id: str,
         revision: Optional[str] = None,
         maxpagesize: Optional[int] = 1000,
-        next_: Optional[str] = None,
         start_column: Optional[int] = None,
         stop_column: Optional[int] = None,
         timeout: Optional[float] = None,
-    ) -> httpx.Response:
+    ) -> ColumnPropertiesListResult:
         """Retrieve table column properties
 
         Returns a
         [`ColumnPropertiesListResult`](ref:content#columnpropertieslistresult)
         for a table
+
+        Args:
+            table_id: The unique identifier for the table
+            revision: Returns resources at a specific revision
+            maxpagesize: The maximum number of results to retrieve
+            start_column: The inclusive start column of the range of cells to retrieve. If this parameter is omitted, then the range will be unbounded in this direction.
+            stop_column: The inclusive stop column of the range of cells to retrieve. If this parameter is omitted, then the range will be unbounded in this direction.
+            timeout: Override the default request timeout (seconds).
+
+        Returns:
+            ColumnPropertiesListResult
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
         """
-        return self._client.request(
-            "GET",
-            self._api,
-            "/content/tables/{tableId}/properties/columns",
-            path_params={
-                "tableId": table_id,
-            },
-            query_params={
-                "$revision": revision,
-                "$maxpagesize": maxpagesize,
-                "$next": next_,
-                "startColumn": start_column,
-                "stopColumn": stop_column,
-            },
-            timeout=timeout,
-        )
+
+        def _fetch(_cursor: str | None) -> httpx.Response:
+            return self._client.request(
+                "GET",
+                self._api,
+                "/content/tables/{tableId}/properties/columns",
+                path_params={
+                    "tableId": table_id,
+                },
+                query_params={
+                    "$revision": revision,
+                    "$maxpagesize": maxpagesize,
+                    "startColumn": start_column,
+                    "stopColumn": stop_column,
+                    "$next": _cursor,
+                },
+                timeout=timeout,
+            )
+
+        _body = paginate_all(_fetch, extract_next_link, "data")
+        return ColumnPropertiesListResult.model_validate(_body)
 
     async def get_column_properties_async(
         self,
@@ -1666,33 +2407,51 @@ class Content(BaseNamespace):
         table_id: str,
         revision: Optional[str] = None,
         maxpagesize: Optional[int] = 1000,
-        next_: Optional[str] = None,
         start_column: Optional[int] = None,
         stop_column: Optional[int] = None,
         timeout: Optional[float] = None,
-    ) -> httpx.Response:
+    ) -> ColumnPropertiesListResult:
         """Retrieve table column properties (async)
 
         Returns a
         [`ColumnPropertiesListResult`](ref:content#columnpropertieslistresult)
         for a table
+
+        Args:
+            table_id: The unique identifier for the table
+            revision: Returns resources at a specific revision
+            maxpagesize: The maximum number of results to retrieve
+            start_column: The inclusive start column of the range of cells to retrieve. If this parameter is omitted, then the range will be unbounded in this direction.
+            stop_column: The inclusive stop column of the range of cells to retrieve. If this parameter is omitted, then the range will be unbounded in this direction.
+            timeout: Override the default request timeout (seconds).
+
+        Returns:
+            ColumnPropertiesListResult
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
         """
-        return await self._client.request_async(
-            "GET",
-            self._api,
-            "/content/tables/{tableId}/properties/columns",
-            path_params={
-                "tableId": table_id,
-            },
-            query_params={
-                "$revision": revision,
-                "$maxpagesize": maxpagesize,
-                "$next": next_,
-                "startColumn": start_column,
-                "stopColumn": stop_column,
-            },
-            timeout=timeout,
-        )
+
+        async def _fetch(_cursor: str | None) -> httpx.Response:
+            return await self._client.request_async(
+                "GET",
+                self._api,
+                "/content/tables/{tableId}/properties/columns",
+                path_params={
+                    "tableId": table_id,
+                },
+                query_params={
+                    "$revision": revision,
+                    "$maxpagesize": maxpagesize,
+                    "startColumn": start_column,
+                    "stopColumn": stop_column,
+                    "$next": _cursor,
+                },
+                timeout=timeout,
+            )
+
+        _body = await paginate_all_async(_fetch, extract_next_link, "data")
+        return ColumnPropertiesListResult.model_validate(_body)
 
     def table_edit(
         self,
@@ -1711,6 +2470,18 @@ class Content(BaseNamespace):
         [ Operations endpoint ](ref:getoperationbyid). When the creation
         completes, its status will be `completed`, and the response
         body includes a `resourceURL`.
+
+        Args:
+            table_id: The unique identifier for the table
+            body: Request body.
+            timeout: Override the default request timeout (seconds).
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
+
+        Note:
+            This is a long-running operation (HTTP 202). Use
+            ``client.wait(response).result()`` to poll until completion.
         """
         return self._client.request(
             "POST",
@@ -1740,6 +2511,18 @@ class Content(BaseNamespace):
         [ Operations endpoint ](ref:getoperationbyid). When the creation
         completes, its status will be `completed`, and the response
         body includes a `resourceURL`.
+
+        Args:
+            table_id: The unique identifier for the table
+            body: Request body.
+            timeout: Override the default request timeout (seconds).
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
+
+        Note:
+            This is a long-running operation (HTTP 202). Use
+            ``await client.wait(response).result_async()`` to poll until completion.
         """
         return await self._client.request_async(
             "POST",
@@ -1772,6 +2555,18 @@ class Content(BaseNamespace):
         which indicates where to poll for results. For more details on
         long-running job polling, see [Operations
         endpoint](ref:getoperationbyid).
+
+        Args:
+            table_id: The unique identifier for the table
+            body: Request body.
+            timeout: Override the default request timeout (seconds).
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
+
+        Note:
+            This is a long-running operation (HTTP 202). Use
+            ``client.wait(response).result()`` to poll until completion.
         """
         return self._client.request(
             "POST",
@@ -1804,6 +2599,18 @@ class Content(BaseNamespace):
         which indicates where to poll for results. For more details on
         long-running job polling, see [Operations
         endpoint](ref:getoperationbyid).
+
+        Args:
+            table_id: The unique identifier for the table
+            body: Request body.
+            timeout: Override the default request timeout (seconds).
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
+
+        Note:
+            This is a long-running operation (HTTP 202). Use
+            ``await client.wait(response).result_async()`` to poll until completion.
         """
         return await self._client.request_async(
             "POST",
@@ -1835,6 +2642,18 @@ class Content(BaseNamespace):
         `resourceUrl` field will be populated with a link to the [Table Links
         Edit Results endpoint](ref:gettablelinkseditresults) to retrieve the IDs
         of the new resources.
+
+        Args:
+            table_id: The unique identifier for the table
+            body: Request body.
+            timeout: Override the default request timeout (seconds).
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
+
+        Note:
+            This is a long-running operation (HTTP 202). Use
+            ``client.wait(response).result()`` to poll until completion.
         """
         return self._client.request(
             "POST",
@@ -1866,6 +2685,18 @@ class Content(BaseNamespace):
         `resourceUrl` field will be populated with a link to the [Table Links
         Edit Results endpoint](ref:gettablelinkseditresults) to retrieve the IDs
         of the new resources.
+
+        Args:
+            table_id: The unique identifier for the table
+            body: Request body.
+            timeout: Override the default request timeout (seconds).
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
+
+        Note:
+            This is a long-running operation (HTTP 202). Use
+            ``await client.wait(response).result_async()`` to poll until completion.
         """
         return await self._client.request_async(
             "POST",
@@ -1883,58 +2714,90 @@ class Content(BaseNamespace):
         *,
         table_id: str,
         maxpagesize: Optional[int] = 1000,
-        next_: Optional[str] = None,
         revision: Optional[str] = None,
         timeout: Optional[float] = None,
-    ) -> httpx.Response:
+    ) -> RangeLinkListResult:
         """Retrieve a list of range links
 
         Returns a [`RangeLinkListResult`](ref:content#rangelinklistresult) for a
         given tableId.
+
+        Args:
+            table_id: The unique identifier for the table
+            maxpagesize: The maximum number of results to retrieve
+            revision: Returns resources at a specific revision
+            timeout: Override the default request timeout (seconds).
+
+        Returns:
+            RangeLinkListResult
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 429, 500, 503).
         """
-        return self._client.request(
-            "GET",
-            self._api,
-            "/content/tables/{tableId}/rangeLinks",
-            path_params={
-                "tableId": table_id,
-            },
-            query_params={
-                "$maxpagesize": maxpagesize,
-                "$next": next_,
-                "$revision": revision,
-            },
-            timeout=timeout,
-        )
+
+        def _fetch(_cursor: str | None) -> httpx.Response:
+            return self._client.request(
+                "GET",
+                self._api,
+                "/content/tables/{tableId}/rangeLinks",
+                path_params={
+                    "tableId": table_id,
+                },
+                query_params={
+                    "$maxpagesize": maxpagesize,
+                    "$revision": revision,
+                    "$next": _cursor,
+                },
+                timeout=timeout,
+            )
+
+        _body = paginate_all(_fetch, extract_next_link, "data")
+        return RangeLinkListResult.model_validate(_body)
 
     async def get_range_links_async(
         self,
         *,
         table_id: str,
         maxpagesize: Optional[int] = 1000,
-        next_: Optional[str] = None,
         revision: Optional[str] = None,
         timeout: Optional[float] = None,
-    ) -> httpx.Response:
+    ) -> RangeLinkListResult:
         """Retrieve a list of range links (async)
 
         Returns a [`RangeLinkListResult`](ref:content#rangelinklistresult) for a
         given tableId.
+
+        Args:
+            table_id: The unique identifier for the table
+            maxpagesize: The maximum number of results to retrieve
+            revision: Returns resources at a specific revision
+            timeout: Override the default request timeout (seconds).
+
+        Returns:
+            RangeLinkListResult
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 429, 500, 503).
         """
-        return await self._client.request_async(
-            "GET",
-            self._api,
-            "/content/tables/{tableId}/rangeLinks",
-            path_params={
-                "tableId": table_id,
-            },
-            query_params={
-                "$maxpagesize": maxpagesize,
-                "$next": next_,
-                "$revision": revision,
-            },
-            timeout=timeout,
-        )
+
+        async def _fetch(_cursor: str | None) -> httpx.Response:
+            return await self._client.request_async(
+                "GET",
+                self._api,
+                "/content/tables/{tableId}/rangeLinks",
+                path_params={
+                    "tableId": table_id,
+                },
+                query_params={
+                    "$maxpagesize": maxpagesize,
+                    "$revision": revision,
+                    "$next": _cursor,
+                },
+                timeout=timeout,
+            )
+
+        _body = await paginate_all_async(_fetch, extract_next_link, "data")
+        return RangeLinkListResult.model_validate(_body)
 
     def get_range_link_by_id(
         self,
@@ -1943,12 +2806,24 @@ class Content(BaseNamespace):
         range_link_id: str,
         revision: Optional[str] = None,
         timeout: Optional[float] = None,
-    ) -> httpx.Response:
+    ) -> RangeLink:
         """Retrieve a range link by id
 
         Returns a [`RangeLink`](ref:content#rangelink) given its id
+
+        Args:
+            table_id: The unique identifier for the table
+            range_link_id: The unique identifier of a range link.
+            revision: Returns resources at a specific revision
+            timeout: Override the default request timeout (seconds).
+
+        Returns:
+            RangeLink
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 429, 500, 503).
         """
-        return self._client.request(
+        response = self._client.request(
             "GET",
             self._api,
             "/content/tables/{tableId}/rangeLinks/{rangeLinkId}",
@@ -1961,6 +2836,7 @@ class Content(BaseNamespace):
             },
             timeout=timeout,
         )
+        return RangeLink.model_validate(response.json())
 
     async def get_range_link_by_id_async(
         self,
@@ -1969,12 +2845,24 @@ class Content(BaseNamespace):
         range_link_id: str,
         revision: Optional[str] = None,
         timeout: Optional[float] = None,
-    ) -> httpx.Response:
+    ) -> RangeLink:
         """Retrieve a range link by id (async)
 
         Returns a [`RangeLink`](ref:content#rangelink) given its id
+
+        Args:
+            table_id: The unique identifier for the table
+            range_link_id: The unique identifier of a range link.
+            revision: Returns resources at a specific revision
+            timeout: Override the default request timeout (seconds).
+
+        Returns:
+            RangeLink
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 429, 500, 503).
         """
-        return await self._client.request_async(
+        response = await self._client.request_async(
             "GET",
             self._api,
             "/content/tables/{tableId}/rangeLinks/{rangeLinkId}",
@@ -1987,6 +2875,7 @@ class Content(BaseNamespace):
             },
             timeout=timeout,
         )
+        return RangeLink.model_validate(response.json())
 
     def get_range_link_destinations(
         self,
@@ -1994,30 +2883,47 @@ class Content(BaseNamespace):
         table_id: str,
         range_link_id: str,
         maxpagesize: Optional[int] = 1000,
-        next_: Optional[str] = None,
         revision: Optional[str] = None,
         timeout: Optional[float] = None,
-    ) -> httpx.Response:
+    ) -> RangeLinkListResult:
         """Retrieve range link destinations for a source
 
         Returns a [`RangeLinkListResult`](ref:content#rangelinklistresult) of
         destinations for a given source range link.
+
+        Args:
+            table_id: The unique identifier for the table
+            range_link_id: The unique identifier of a range link.
+            maxpagesize: The maximum number of results to retrieve
+            revision: Returns resources at a specific revision
+            timeout: Override the default request timeout (seconds).
+
+        Returns:
+            RangeLinkListResult
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 429, 500, 503).
         """
-        return self._client.request(
-            "GET",
-            self._api,
-            "/content/tables/{tableId}/rangeLinks/{rangeLinkId}/destinations",
-            path_params={
-                "tableId": table_id,
-                "rangeLinkId": range_link_id,
-            },
-            query_params={
-                "$maxpagesize": maxpagesize,
-                "$next": next_,
-                "$revision": revision,
-            },
-            timeout=timeout,
-        )
+
+        def _fetch(_cursor: str | None) -> httpx.Response:
+            return self._client.request(
+                "GET",
+                self._api,
+                "/content/tables/{tableId}/rangeLinks/{rangeLinkId}/destinations",
+                path_params={
+                    "tableId": table_id,
+                    "rangeLinkId": range_link_id,
+                },
+                query_params={
+                    "$maxpagesize": maxpagesize,
+                    "$revision": revision,
+                    "$next": _cursor,
+                },
+                timeout=timeout,
+            )
+
+        _body = paginate_all(_fetch, extract_next_link, "data")
+        return RangeLinkListResult.model_validate(_body)
 
     async def get_range_link_destinations_async(
         self,
@@ -2025,30 +2931,47 @@ class Content(BaseNamespace):
         table_id: str,
         range_link_id: str,
         maxpagesize: Optional[int] = 1000,
-        next_: Optional[str] = None,
         revision: Optional[str] = None,
         timeout: Optional[float] = None,
-    ) -> httpx.Response:
+    ) -> RangeLinkListResult:
         """Retrieve range link destinations for a source (async)
 
         Returns a [`RangeLinkListResult`](ref:content#rangelinklistresult) of
         destinations for a given source range link.
+
+        Args:
+            table_id: The unique identifier for the table
+            range_link_id: The unique identifier of a range link.
+            maxpagesize: The maximum number of results to retrieve
+            revision: Returns resources at a specific revision
+            timeout: Override the default request timeout (seconds).
+
+        Returns:
+            RangeLinkListResult
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 429, 500, 503).
         """
-        return await self._client.request_async(
-            "GET",
-            self._api,
-            "/content/tables/{tableId}/rangeLinks/{rangeLinkId}/destinations",
-            path_params={
-                "tableId": table_id,
-                "rangeLinkId": range_link_id,
-            },
-            query_params={
-                "$maxpagesize": maxpagesize,
-                "$next": next_,
-                "$revision": revision,
-            },
-            timeout=timeout,
-        )
+
+        async def _fetch(_cursor: str | None) -> httpx.Response:
+            return await self._client.request_async(
+                "GET",
+                self._api,
+                "/content/tables/{tableId}/rangeLinks/{rangeLinkId}/destinations",
+                path_params={
+                    "tableId": table_id,
+                    "rangeLinkId": range_link_id,
+                },
+                query_params={
+                    "$maxpagesize": maxpagesize,
+                    "$revision": revision,
+                    "$next": _cursor,
+                },
+                timeout=timeout,
+            )
+
+        _body = await paginate_all_async(_fetch, extract_next_link, "data")
+        return RangeLinkListResult.model_validate(_body)
 
     def table_range_links_edit(
         self,
@@ -2064,6 +2987,18 @@ class Content(BaseNamespace):
         This is a long running operation. Responses include a `Location` header,
         which indicates where to poll for results. For more details on long-
         running job polling, see [Operations endpoint](ref:getoperationbyid).
+
+        Args:
+            table_id: The unique identifier for the table
+            body: Request body.
+            timeout: Override the default request timeout (seconds).
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
+
+        Note:
+            This is a long-running operation (HTTP 202). Use
+            ``client.wait(response).result()`` to poll until completion.
         """
         return self._client.request(
             "POST",
@@ -2090,6 +3025,18 @@ class Content(BaseNamespace):
         This is a long running operation. Responses include a `Location` header,
         which indicates where to poll for results. For more details on long-
         running job polling, see [Operations endpoint](ref:getoperationbyid).
+
+        Args:
+            table_id: The unique identifier for the table
+            body: Request body.
+            timeout: Override the default request timeout (seconds).
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
+
+        Note:
+            This is a long-running operation (HTTP 202). Use
+            ``await client.wait(response).result_async()`` to poll until completion.
         """
         return await self._client.request_async(
             "POST",
@@ -2099,54 +3046,6 @@ class Content(BaseNamespace):
                 "tableId": table_id,
             },
             json_body=body,
-            timeout=timeout,
-        )
-
-    def get_table_properties(
-        self,
-        *,
-        table_id: str,
-        revision: Optional[str] = None,
-        timeout: Optional[float] = None,
-    ) -> httpx.Response:
-        """Retrieve a table's properties by id
-
-        Returns a [`TableProperties`](ref:content#tableproperties) for a table
-        """
-        return self._client.request(
-            "GET",
-            self._api,
-            "/content/tables/{tableId}/properties",
-            path_params={
-                "tableId": table_id,
-            },
-            query_params={
-                "$revision": revision,
-            },
-            timeout=timeout,
-        )
-
-    async def get_table_properties_async(
-        self,
-        *,
-        table_id: str,
-        revision: Optional[str] = None,
-        timeout: Optional[float] = None,
-    ) -> httpx.Response:
-        """Retrieve a table's properties by id (async)
-
-        Returns a [`TableProperties`](ref:content#tableproperties) for a table
-        """
-        return await self._client.request_async(
-            "GET",
-            self._api,
-            "/content/tables/{tableId}/properties",
-            path_params={
-                "tableId": table_id,
-            },
-            query_params={
-                "$revision": revision,
-            },
             timeout=timeout,
         )
 
@@ -2172,6 +3071,18 @@ class Content(BaseNamespace):
         | `/name`            | `replace`                  |
         | `/resizeRowsToFit` | `replace`                  |
         | `/lock`            | `replace`                  |
+
+        Args:
+            table_id: The unique identifier for the table
+            body: Request body.
+            timeout: Override the default request timeout (seconds).
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
+
+        Note:
+            This is a long-running operation (HTTP 202). Use
+            ``client.wait(response).result()`` to poll until completion.
         """
         return self._client.request(
             "PATCH",
@@ -2206,6 +3117,18 @@ class Content(BaseNamespace):
         | `/name`            | `replace`                  |
         | `/resizeRowsToFit` | `replace`                  |
         | `/lock`            | `replace`                  |
+
+        Args:
+            table_id: The unique identifier for the table
+            body: Request body.
+            timeout: Override the default request timeout (seconds).
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
+
+        Note:
+            This is a long-running operation (HTTP 202). Use
+            ``await client.wait(response).result_async()`` to poll until completion.
         """
         return await self._client.request_async(
             "PATCH",
@@ -2218,39 +3141,129 @@ class Content(BaseNamespace):
             timeout=timeout,
         )
 
+    def get_table_properties(
+        self,
+        *,
+        table_id: str,
+        revision: Optional[str] = None,
+        timeout: Optional[float] = None,
+    ) -> TableProperties:
+        """Retrieve a table's properties by id
+
+        Returns a [`TableProperties`](ref:content#tableproperties) for a table
+
+        Args:
+            table_id: The unique identifier for the table
+            revision: Returns resources at a specific revision
+            timeout: Override the default request timeout (seconds).
+
+        Returns:
+            TableProperties
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
+        """
+        response = self._client.request(
+            "GET",
+            self._api,
+            "/content/tables/{tableId}/properties",
+            path_params={
+                "tableId": table_id,
+            },
+            query_params={
+                "$revision": revision,
+            },
+            timeout=timeout,
+        )
+        return TableProperties.model_validate(response.json())
+
+    async def get_table_properties_async(
+        self,
+        *,
+        table_id: str,
+        revision: Optional[str] = None,
+        timeout: Optional[float] = None,
+    ) -> TableProperties:
+        """Retrieve a table's properties by id (async)
+
+        Returns a [`TableProperties`](ref:content#tableproperties) for a table
+
+        Args:
+            table_id: The unique identifier for the table
+            revision: Returns resources at a specific revision
+            timeout: Override the default request timeout (seconds).
+
+        Returns:
+            TableProperties
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
+        """
+        response = await self._client.request_async(
+            "GET",
+            self._api,
+            "/content/tables/{tableId}/properties",
+            path_params={
+                "tableId": table_id,
+            },
+            query_params={
+                "$revision": revision,
+            },
+            timeout=timeout,
+        )
+        return TableProperties.model_validate(response.json())
+
     def get_row_properties(
         self,
         *,
         table_id: str,
         revision: Optional[str] = None,
         maxpagesize: Optional[int] = 1000,
-        next_: Optional[str] = None,
         start_row: Optional[int] = None,
         stop_row: Optional[int] = None,
         timeout: Optional[float] = None,
-    ) -> httpx.Response:
+    ) -> RowPropertiesListResult:
         """Retrieve table row properties
 
         Returns a
         [`RowPropertiesListResult`](ref:content#rowpropertieslistresult) for a
         table
+
+        Args:
+            table_id: The unique identifier for the table
+            revision: Returns resources at a specific revision
+            maxpagesize: The maximum number of results to retrieve
+            start_row: The inclusive start row of the range of cells to retrieve. If this parameter is omitted, then the range will be unbounded in this direction.
+            stop_row: The inclusive stop row of the range of cells to retrieve. If this parameter is omitted, then the range will be unbounded in this direction.
+            timeout: Override the default request timeout (seconds).
+
+        Returns:
+            RowPropertiesListResult
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
         """
-        return self._client.request(
-            "GET",
-            self._api,
-            "/content/tables/{tableId}/properties/rows",
-            path_params={
-                "tableId": table_id,
-            },
-            query_params={
-                "$revision": revision,
-                "$maxpagesize": maxpagesize,
-                "$next": next_,
-                "startRow": start_row,
-                "stopRow": stop_row,
-            },
-            timeout=timeout,
-        )
+
+        def _fetch(_cursor: str | None) -> httpx.Response:
+            return self._client.request(
+                "GET",
+                self._api,
+                "/content/tables/{tableId}/properties/rows",
+                path_params={
+                    "tableId": table_id,
+                },
+                query_params={
+                    "$revision": revision,
+                    "$maxpagesize": maxpagesize,
+                    "startRow": start_row,
+                    "stopRow": stop_row,
+                    "$next": _cursor,
+                },
+                timeout=timeout,
+            )
+
+        _body = paginate_all(_fetch, extract_next_link, "data")
+        return RowPropertiesListResult.model_validate(_body)
 
     async def get_row_properties_async(
         self,
@@ -2258,30 +3271,48 @@ class Content(BaseNamespace):
         table_id: str,
         revision: Optional[str] = None,
         maxpagesize: Optional[int] = 1000,
-        next_: Optional[str] = None,
         start_row: Optional[int] = None,
         stop_row: Optional[int] = None,
         timeout: Optional[float] = None,
-    ) -> httpx.Response:
+    ) -> RowPropertiesListResult:
         """Retrieve table row properties (async)
 
         Returns a
         [`RowPropertiesListResult`](ref:content#rowpropertieslistresult) for a
         table
+
+        Args:
+            table_id: The unique identifier for the table
+            revision: Returns resources at a specific revision
+            maxpagesize: The maximum number of results to retrieve
+            start_row: The inclusive start row of the range of cells to retrieve. If this parameter is omitted, then the range will be unbounded in this direction.
+            stop_row: The inclusive stop row of the range of cells to retrieve. If this parameter is omitted, then the range will be unbounded in this direction.
+            timeout: Override the default request timeout (seconds).
+
+        Returns:
+            RowPropertiesListResult
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
         """
-        return await self._client.request_async(
-            "GET",
-            self._api,
-            "/content/tables/{tableId}/properties/rows",
-            path_params={
-                "tableId": table_id,
-            },
-            query_params={
-                "$revision": revision,
-                "$maxpagesize": maxpagesize,
-                "$next": next_,
-                "startRow": start_row,
-                "stopRow": stop_row,
-            },
-            timeout=timeout,
-        )
+
+        async def _fetch(_cursor: str | None) -> httpx.Response:
+            return await self._client.request_async(
+                "GET",
+                self._api,
+                "/content/tables/{tableId}/properties/rows",
+                path_params={
+                    "tableId": table_id,
+                },
+                query_params={
+                    "$revision": revision,
+                    "$maxpagesize": maxpagesize,
+                    "startRow": start_row,
+                    "stopRow": stop_row,
+                    "$next": _cursor,
+                },
+                timeout=timeout,
+            )
+
+        _body = await paginate_all_async(_fetch, extract_next_link, "data")
+        return RowPropertiesListResult.model_validate(_body)

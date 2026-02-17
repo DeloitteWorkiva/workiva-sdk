@@ -1,45 +1,41 @@
 # Tasks
 
-`client.tasks` — Gestión de tareas en la plataforma Workiva.
+`client.tasks` -- Gestion de tareas en la plataforma Workiva.
 
 Las tareas permiten organizar proyectos, asignar responsabilidades y controlar plazos.
 
 ## Operaciones
 
-| Método | Descripción | Paginado |
+| Metodo | Descripcion | Paginado |
 |--------|-------------|----------|
-| `get_tasks` | Listar tareas | Sí |
+| `get_tasks` | Listar tareas | Si |
 | `get_task_by_id` | Obtener tarea por ID | No |
 | `create_task` | Crear tarea | No |
 | `partially_update_task_by_id` | Actualizar tarea parcialmente | No |
 | `delete_task_by_id` | Eliminar tarea | No |
-| `submit_task_action` | Enviar acción sobre tarea | No |
+| `submit_task_action` | Enviar accion sobre tarea | No |
 
 ## Ejemplos
 
-### Listar tareas
+### Listar tareas (auto-paginacion)
 
 ```python
-response = client.tasks.get_tasks()
+result = client.tasks.get_tasks()
 
-for task in response.result.data:
+for task in result.data:
     print(f"{task.name} - {task.status}")
-
-# Paginar
-while response.next is not None:
-    response = response.next()
 ```
 
 ### Crear tarea
 
 ```python
-response = client.tasks.create_task(
-    task={
+task = client.tasks.create_task(
+    body={
         "name": "Revisar reporte Q4",
         "description": "Verificar datos financieros",
     },
 )
-print(f"Tarea creada: {response.result.id}")
+print(f"Tarea creada: {task.id}")
 ```
 
 ### Actualizar tarea
@@ -47,7 +43,7 @@ print(f"Tarea creada: {response.result.id}")
 ```python
 client.tasks.partially_update_task_by_id(
     task_id="task-123",
-    task={"status": "completed"},
+    body={"status": "completed"},
 )
 ```
 
@@ -57,11 +53,11 @@ client.tasks.partially_update_task_by_id(
 client.tasks.delete_task_by_id(task_id="task-123")
 ```
 
-### Enviar acción
+### Enviar accion
 
 ```python
 client.tasks.submit_task_action(
     task_id="task-123",
-    task_action={"action": "approve"},
+    body={"action": "approve"},
 )
 ```

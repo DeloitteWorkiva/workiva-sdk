@@ -11,16 +11,29 @@ import httpx
 
 from workiva._constants import _API
 from workiva._operations._base import BaseNamespace
+from workiva._pagination import (
+    extract_next_link,
+    paginate_all,
+    paginate_all_async,
+)
 from workiva.models.platform import (
     Dimension,
+    DimensionsListResult,
     Metric,
+    MetricsListResult,
     MetricValue,
     MetricValueIdentifier,
+    MetricValuesListResult,
     MetricValueUpsertion,
     Program,
+    ProgramsListResult,
+    ResourcePermissionsListResult,
     ResourcePermissionsModification,
     Topic,
+    TopicsListResult,
 )
+
+__all__ = ["Sustainability"]
 
 
 class Sustainability(BaseNamespace):
@@ -32,129 +45,135 @@ class Sustainability(BaseNamespace):
         self,
         *,
         maxpagesize: Optional[int] = 1000,
-        next_: Optional[str] = None,
         order_by: Optional[str] = None,
         filter_: Optional[str] = None,
         timeout: Optional[float] = None,
-    ) -> httpx.Response:
+    ) -> ProgramsListResult:
         """Retrieve a list of programs
 
         Returns a paginated list of [programs](ref:sustainability#program).
+
+        Args:
+            maxpagesize: The maximum number of results to retrieve
+            order_by: One or more comma-separated expressions to indicate the order in which to sort the results.
+            filter_: The properties to filter the results by.
+            timeout: Override the default request timeout (seconds).
+
+        Returns:
+            ProgramsListResult
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
         """
-        return self._client.request(
-            "GET",
-            self._api,
-            "/programs",
-            query_params={
-                "$maxpagesize": maxpagesize,
-                "$next": next_,
-                "$orderBy": order_by,
-                "$filter": filter_,
-            },
-            timeout=timeout,
-        )
+
+        def _fetch(_cursor: str | None) -> httpx.Response:
+            return self._client.request(
+                "GET",
+                self._api,
+                "/programs",
+                query_params={
+                    "$maxpagesize": maxpagesize,
+                    "$orderBy": order_by,
+                    "$filter": filter_,
+                    "$next": _cursor,
+                },
+                timeout=timeout,
+            )
+
+        _body = paginate_all(_fetch, extract_next_link, "data")
+        return ProgramsListResult.model_validate(_body)
 
     async def get_programs_async(
         self,
         *,
         maxpagesize: Optional[int] = 1000,
-        next_: Optional[str] = None,
         order_by: Optional[str] = None,
         filter_: Optional[str] = None,
         timeout: Optional[float] = None,
-    ) -> httpx.Response:
+    ) -> ProgramsListResult:
         """Retrieve a list of programs (async)
 
         Returns a paginated list of [programs](ref:sustainability#program).
+
+        Args:
+            maxpagesize: The maximum number of results to retrieve
+            order_by: One or more comma-separated expressions to indicate the order in which to sort the results.
+            filter_: The properties to filter the results by.
+            timeout: Override the default request timeout (seconds).
+
+        Returns:
+            ProgramsListResult
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
         """
-        return await self._client.request_async(
-            "GET",
-            self._api,
-            "/programs",
-            query_params={
-                "$maxpagesize": maxpagesize,
-                "$next": next_,
-                "$orderBy": order_by,
-                "$filter": filter_,
-            },
-            timeout=timeout,
-        )
+
+        async def _fetch(_cursor: str | None) -> httpx.Response:
+            return await self._client.request_async(
+                "GET",
+                self._api,
+                "/programs",
+                query_params={
+                    "$maxpagesize": maxpagesize,
+                    "$orderBy": order_by,
+                    "$filter": filter_,
+                    "$next": _cursor,
+                },
+                timeout=timeout,
+            )
+
+        _body = await paginate_all_async(_fetch, extract_next_link, "data")
+        return ProgramsListResult.model_validate(_body)
 
     def create_program(
         self,
         *,
         body: Program,
         timeout: Optional[float] = None,
-    ) -> httpx.Response:
+    ) -> Program:
         """Create a new program
 
         Creates a new [program](ref:sustainability#program).
+
+        Returns:
+            Program
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
         """
-        return self._client.request(
+        response = self._client.request(
             "POST",
             self._api,
             "/programs",
             json_body=body,
             timeout=timeout,
         )
+        return Program.model_validate(response.json())
 
     async def create_program_async(
         self,
         *,
         body: Program,
         timeout: Optional[float] = None,
-    ) -> httpx.Response:
+    ) -> Program:
         """Create a new program (async)
 
         Creates a new [program](ref:sustainability#program).
+
+        Returns:
+            Program
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
         """
-        return await self._client.request_async(
+        response = await self._client.request_async(
             "POST",
             self._api,
             "/programs",
             json_body=body,
             timeout=timeout,
         )
-
-    def get_program_by_id(
-        self,
-        *,
-        program_id: str,
-        timeout: Optional[float] = None,
-    ) -> httpx.Response:
-        """Retrieve a single program
-
-        Retrieves a [program](ref:sustainability#program) given its ID
-        """
-        return self._client.request(
-            "GET",
-            self._api,
-            "/programs/{programId}",
-            path_params={
-                "programId": program_id,
-            },
-            timeout=timeout,
-        )
-
-    async def get_program_by_id_async(
-        self,
-        *,
-        program_id: str,
-        timeout: Optional[float] = None,
-    ) -> httpx.Response:
-        """Retrieve a single program (async)
-
-        Retrieves a [program](ref:sustainability#program) given its ID
-        """
-        return await self._client.request_async(
-            "GET",
-            self._api,
-            "/programs/{programId}",
-            path_params={
-                "programId": program_id,
-            },
-            timeout=timeout,
-        )
+        return Program.model_validate(response.json())
 
     def partially_update_program_by_id(
         self,
@@ -162,7 +181,7 @@ class Sustainability(BaseNamespace):
         program_id: str,
         body: list[Any],
         timeout: Optional[float] = None,
-    ) -> httpx.Response:
+    ) -> Program:
         """Partially update a single program
 
         Partially updates the properties of a
@@ -172,8 +191,19 @@ class Sustainability(BaseNamespace):
         |Path|PATCH Operations Supported|
         |---|---|
         |`/name`|`replace`, `test`|
+
+        Args:
+            program_id: The unique identifier of the program
+            body: Request body.
+            timeout: Override the default request timeout (seconds).
+
+        Returns:
+            Program
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
         """
-        return self._client.request(
+        response = self._client.request(
             "PATCH",
             self._api,
             "/programs/{programId}",
@@ -183,6 +213,7 @@ class Sustainability(BaseNamespace):
             json_body=body,
             timeout=timeout,
         )
+        return Program.model_validate(response.json())
 
     async def partially_update_program_by_id_async(
         self,
@@ -190,7 +221,7 @@ class Sustainability(BaseNamespace):
         program_id: str,
         body: list[Any],
         timeout: Optional[float] = None,
-    ) -> httpx.Response:
+    ) -> Program:
         """Partially update a single program (async)
 
         Partially updates the properties of a
@@ -200,8 +231,19 @@ class Sustainability(BaseNamespace):
         |Path|PATCH Operations Supported|
         |---|---|
         |`/name`|`replace`, `test`|
+
+        Args:
+            program_id: The unique identifier of the program
+            body: Request body.
+            timeout: Override the default request timeout (seconds).
+
+        Returns:
+            Program
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
         """
-        return await self._client.request_async(
+        response = await self._client.request_async(
             "PATCH",
             self._api,
             "/programs/{programId}",
@@ -211,66 +253,163 @@ class Sustainability(BaseNamespace):
             json_body=body,
             timeout=timeout,
         )
+        return Program.model_validate(response.json())
+
+    def get_program_by_id(
+        self,
+        *,
+        program_id: str,
+        timeout: Optional[float] = None,
+    ) -> Program:
+        """Retrieve a single program
+
+        Retrieves a [program](ref:sustainability#program) given its ID
+
+        Args:
+            program_id: The unique identifier of the program
+            timeout: Override the default request timeout (seconds).
+
+        Returns:
+            Program
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
+        """
+        response = self._client.request(
+            "GET",
+            self._api,
+            "/programs/{programId}",
+            path_params={
+                "programId": program_id,
+            },
+            timeout=timeout,
+        )
+        return Program.model_validate(response.json())
+
+    async def get_program_by_id_async(
+        self,
+        *,
+        program_id: str,
+        timeout: Optional[float] = None,
+    ) -> Program:
+        """Retrieve a single program (async)
+
+        Retrieves a [program](ref:sustainability#program) given its ID
+
+        Args:
+            program_id: The unique identifier of the program
+            timeout: Override the default request timeout (seconds).
+
+        Returns:
+            Program
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
+        """
+        response = await self._client.request_async(
+            "GET",
+            self._api,
+            "/programs/{programId}",
+            path_params={
+                "programId": program_id,
+            },
+            timeout=timeout,
+        )
+        return Program.model_validate(response.json())
 
     def get_dimensions(
         self,
         *,
         program_id: str,
         maxpagesize: Optional[int] = 1000,
-        next_: Optional[str] = None,
         filter_: Optional[str] = None,
         order_by: Optional[str] = None,
         timeout: Optional[float] = None,
-    ) -> httpx.Response:
+    ) -> DimensionsListResult:
         """Retrieve a list of dimensions
 
         Returns a paginated list of [dimensions](ref:sustainability#dimension).
+
+        Args:
+            program_id: The unique identifier of the program
+            maxpagesize: The maximum number of results to retrieve
+            filter_: The properties to filter the results by.
+            order_by: One or more comma-separated expressions to indicate the order in which to sort the results.
+            timeout: Override the default request timeout (seconds).
+
+        Returns:
+            DimensionsListResult
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
         """
-        return self._client.request(
-            "GET",
-            self._api,
-            "/programs/{programId}/dimensions",
-            path_params={
-                "programId": program_id,
-            },
-            query_params={
-                "$maxpagesize": maxpagesize,
-                "$next": next_,
-                "$filter": filter_,
-                "$orderBy": order_by,
-            },
-            timeout=timeout,
-        )
+
+        def _fetch(_cursor: str | None) -> httpx.Response:
+            return self._client.request(
+                "GET",
+                self._api,
+                "/programs/{programId}/dimensions",
+                path_params={
+                    "programId": program_id,
+                },
+                query_params={
+                    "$maxpagesize": maxpagesize,
+                    "$filter": filter_,
+                    "$orderBy": order_by,
+                    "$next": _cursor,
+                },
+                timeout=timeout,
+            )
+
+        _body = paginate_all(_fetch, extract_next_link, "data")
+        return DimensionsListResult.model_validate(_body)
 
     async def get_dimensions_async(
         self,
         *,
         program_id: str,
         maxpagesize: Optional[int] = 1000,
-        next_: Optional[str] = None,
         filter_: Optional[str] = None,
         order_by: Optional[str] = None,
         timeout: Optional[float] = None,
-    ) -> httpx.Response:
+    ) -> DimensionsListResult:
         """Retrieve a list of dimensions (async)
 
         Returns a paginated list of [dimensions](ref:sustainability#dimension).
+
+        Args:
+            program_id: The unique identifier of the program
+            maxpagesize: The maximum number of results to retrieve
+            filter_: The properties to filter the results by.
+            order_by: One or more comma-separated expressions to indicate the order in which to sort the results.
+            timeout: Override the default request timeout (seconds).
+
+        Returns:
+            DimensionsListResult
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
         """
-        return await self._client.request_async(
-            "GET",
-            self._api,
-            "/programs/{programId}/dimensions",
-            path_params={
-                "programId": program_id,
-            },
-            query_params={
-                "$maxpagesize": maxpagesize,
-                "$next": next_,
-                "$filter": filter_,
-                "$orderBy": order_by,
-            },
-            timeout=timeout,
-        )
+
+        async def _fetch(_cursor: str | None) -> httpx.Response:
+            return await self._client.request_async(
+                "GET",
+                self._api,
+                "/programs/{programId}/dimensions",
+                path_params={
+                    "programId": program_id,
+                },
+                query_params={
+                    "$maxpagesize": maxpagesize,
+                    "$filter": filter_,
+                    "$orderBy": order_by,
+                    "$next": _cursor,
+                },
+                timeout=timeout,
+            )
+
+        _body = await paginate_all_async(_fetch, extract_next_link, "data")
+        return DimensionsListResult.model_validate(_body)
 
     def create_dimension(
         self,
@@ -278,12 +417,23 @@ class Sustainability(BaseNamespace):
         program_id: str,
         body: Dimension,
         timeout: Optional[float] = None,
-    ) -> httpx.Response:
+    ) -> Dimension:
         """Create a new dimension
 
         Creates a new [dimension](ref:sustainability#dimension).
+
+        Args:
+            program_id: The unique identifier of the program
+            body: Request body.
+            timeout: Override the default request timeout (seconds).
+
+        Returns:
+            Dimension
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
         """
-        return self._client.request(
+        response = self._client.request(
             "POST",
             self._api,
             "/programs/{programId}/dimensions",
@@ -293,6 +443,7 @@ class Sustainability(BaseNamespace):
             json_body=body,
             timeout=timeout,
         )
+        return Dimension.model_validate(response.json())
 
     async def create_dimension_async(
         self,
@@ -300,12 +451,23 @@ class Sustainability(BaseNamespace):
         program_id: str,
         body: Dimension,
         timeout: Optional[float] = None,
-    ) -> httpx.Response:
+    ) -> Dimension:
         """Create a new dimension (async)
 
         Creates a new [dimension](ref:sustainability#dimension).
+
+        Args:
+            program_id: The unique identifier of the program
+            body: Request body.
+            timeout: Override the default request timeout (seconds).
+
+        Returns:
+            Dimension
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
         """
-        return await self._client.request_async(
+        response = await self._client.request_async(
             "POST",
             self._api,
             "/programs/{programId}/dimensions",
@@ -315,50 +477,7 @@ class Sustainability(BaseNamespace):
             json_body=body,
             timeout=timeout,
         )
-
-    def get_dimension_by_id(
-        self,
-        *,
-        program_id: str,
-        dimension_id: str,
-        timeout: Optional[float] = None,
-    ) -> httpx.Response:
-        """Retrieve a single dimension
-
-        Retrieves a [dimension](ref:sustainability#dimension) given its ID
-        """
-        return self._client.request(
-            "GET",
-            self._api,
-            "/programs/{programId}/dimensions/{dimensionId}",
-            path_params={
-                "programId": program_id,
-                "dimensionId": dimension_id,
-            },
-            timeout=timeout,
-        )
-
-    async def get_dimension_by_id_async(
-        self,
-        *,
-        program_id: str,
-        dimension_id: str,
-        timeout: Optional[float] = None,
-    ) -> httpx.Response:
-        """Retrieve a single dimension (async)
-
-        Retrieves a [dimension](ref:sustainability#dimension) given its ID
-        """
-        return await self._client.request_async(
-            "GET",
-            self._api,
-            "/programs/{programId}/dimensions/{dimensionId}",
-            path_params={
-                "programId": program_id,
-                "dimensionId": dimension_id,
-            },
-            timeout=timeout,
-        )
+        return Dimension.model_validate(response.json())
 
     def partially_update_dimension_by_id(
         self,
@@ -367,7 +486,7 @@ class Sustainability(BaseNamespace):
         dimension_id: str,
         body: list[Any],
         timeout: Optional[float] = None,
-    ) -> httpx.Response:
+    ) -> Dimension:
         """Partially update a single dimension
 
         Partially updates the properties of a
@@ -379,8 +498,20 @@ class Sustainability(BaseNamespace):
         |`/active`|`replace`, `test`|
         |`/name`|`replace`, `test`|
         |`/values`|`replace`, `test`|
+
+        Args:
+            program_id: The unique identifier of the program
+            dimension_id: The unique identifier of the dimension
+            body: Request body.
+            timeout: Override the default request timeout (seconds).
+
+        Returns:
+            Dimension
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
         """
-        return self._client.request(
+        response = self._client.request(
             "PATCH",
             self._api,
             "/programs/{programId}/dimensions/{dimensionId}",
@@ -391,6 +522,7 @@ class Sustainability(BaseNamespace):
             json_body=body,
             timeout=timeout,
         )
+        return Dimension.model_validate(response.json())
 
     async def partially_update_dimension_by_id_async(
         self,
@@ -399,7 +531,7 @@ class Sustainability(BaseNamespace):
         dimension_id: str,
         body: list[Any],
         timeout: Optional[float] = None,
-    ) -> httpx.Response:
+    ) -> Dimension:
         """Partially update a single dimension (async)
 
         Partially updates the properties of a
@@ -411,8 +543,20 @@ class Sustainability(BaseNamespace):
         |`/active`|`replace`, `test`|
         |`/name`|`replace`, `test`|
         |`/values`|`replace`, `test`|
+
+        Args:
+            program_id: The unique identifier of the program
+            dimension_id: The unique identifier of the dimension
+            body: Request body.
+            timeout: Override the default request timeout (seconds).
+
+        Returns:
+            Dimension
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
         """
-        return await self._client.request_async(
+        response = await self._client.request_async(
             "PATCH",
             self._api,
             "/programs/{programId}/dimensions/{dimensionId}",
@@ -423,66 +567,169 @@ class Sustainability(BaseNamespace):
             json_body=body,
             timeout=timeout,
         )
+        return Dimension.model_validate(response.json())
+
+    def get_dimension_by_id(
+        self,
+        *,
+        program_id: str,
+        dimension_id: str,
+        timeout: Optional[float] = None,
+    ) -> Dimension:
+        """Retrieve a single dimension
+
+        Retrieves a [dimension](ref:sustainability#dimension) given its ID
+
+        Args:
+            program_id: The unique identifier of the program
+            dimension_id: The unique identifier of the dimension
+            timeout: Override the default request timeout (seconds).
+
+        Returns:
+            Dimension
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
+        """
+        response = self._client.request(
+            "GET",
+            self._api,
+            "/programs/{programId}/dimensions/{dimensionId}",
+            path_params={
+                "programId": program_id,
+                "dimensionId": dimension_id,
+            },
+            timeout=timeout,
+        )
+        return Dimension.model_validate(response.json())
+
+    async def get_dimension_by_id_async(
+        self,
+        *,
+        program_id: str,
+        dimension_id: str,
+        timeout: Optional[float] = None,
+    ) -> Dimension:
+        """Retrieve a single dimension (async)
+
+        Retrieves a [dimension](ref:sustainability#dimension) given its ID
+
+        Args:
+            program_id: The unique identifier of the program
+            dimension_id: The unique identifier of the dimension
+            timeout: Override the default request timeout (seconds).
+
+        Returns:
+            Dimension
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
+        """
+        response = await self._client.request_async(
+            "GET",
+            self._api,
+            "/programs/{programId}/dimensions/{dimensionId}",
+            path_params={
+                "programId": program_id,
+                "dimensionId": dimension_id,
+            },
+            timeout=timeout,
+        )
+        return Dimension.model_validate(response.json())
 
     def get_metrics(
         self,
         *,
         program_id: str,
         maxpagesize: Optional[int] = 1000,
-        next_: Optional[str] = None,
         order_by: Optional[str] = None,
         filter_: Optional[str] = None,
         timeout: Optional[float] = None,
-    ) -> httpx.Response:
+    ) -> MetricsListResult:
         """Retrieve a list of metrics
 
         Returns a paginated list of [Metrics](ref:sustainability#metric).
+
+        Args:
+            program_id: The unique identifier of the program
+            maxpagesize: The maximum number of results to retrieve
+            order_by: One or more comma-separated expressions to indicate the order in which to sort the results.
+            filter_: The properties to filter the results by.
+            timeout: Override the default request timeout (seconds).
+
+        Returns:
+            MetricsListResult
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
         """
-        return self._client.request(
-            "GET",
-            self._api,
-            "/programs/{programId}/metrics",
-            path_params={
-                "programId": program_id,
-            },
-            query_params={
-                "$maxpagesize": maxpagesize,
-                "$next": next_,
-                "$orderBy": order_by,
-                "$filter": filter_,
-            },
-            timeout=timeout,
-        )
+
+        def _fetch(_cursor: str | None) -> httpx.Response:
+            return self._client.request(
+                "GET",
+                self._api,
+                "/programs/{programId}/metrics",
+                path_params={
+                    "programId": program_id,
+                },
+                query_params={
+                    "$maxpagesize": maxpagesize,
+                    "$orderBy": order_by,
+                    "$filter": filter_,
+                    "$next": _cursor,
+                },
+                timeout=timeout,
+            )
+
+        _body = paginate_all(_fetch, extract_next_link, "data")
+        return MetricsListResult.model_validate(_body)
 
     async def get_metrics_async(
         self,
         *,
         program_id: str,
         maxpagesize: Optional[int] = 1000,
-        next_: Optional[str] = None,
         order_by: Optional[str] = None,
         filter_: Optional[str] = None,
         timeout: Optional[float] = None,
-    ) -> httpx.Response:
+    ) -> MetricsListResult:
         """Retrieve a list of metrics (async)
 
         Returns a paginated list of [Metrics](ref:sustainability#metric).
+
+        Args:
+            program_id: The unique identifier of the program
+            maxpagesize: The maximum number of results to retrieve
+            order_by: One or more comma-separated expressions to indicate the order in which to sort the results.
+            filter_: The properties to filter the results by.
+            timeout: Override the default request timeout (seconds).
+
+        Returns:
+            MetricsListResult
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
         """
-        return await self._client.request_async(
-            "GET",
-            self._api,
-            "/programs/{programId}/metrics",
-            path_params={
-                "programId": program_id,
-            },
-            query_params={
-                "$maxpagesize": maxpagesize,
-                "$next": next_,
-                "$orderBy": order_by,
-                "$filter": filter_,
-            },
-            timeout=timeout,
-        )
+
+        async def _fetch(_cursor: str | None) -> httpx.Response:
+            return await self._client.request_async(
+                "GET",
+                self._api,
+                "/programs/{programId}/metrics",
+                path_params={
+                    "programId": program_id,
+                },
+                query_params={
+                    "$maxpagesize": maxpagesize,
+                    "$orderBy": order_by,
+                    "$filter": filter_,
+                    "$next": _cursor,
+                },
+                timeout=timeout,
+            )
+
+        _body = await paginate_all_async(_fetch, extract_next_link, "data")
+        return MetricsListResult.model_validate(_body)
 
     def create_metric(
         self,
@@ -490,12 +737,23 @@ class Sustainability(BaseNamespace):
         program_id: str,
         body: Metric,
         timeout: Optional[float] = None,
-    ) -> httpx.Response:
+    ) -> Metric:
         """Create a new metric
 
         Creates a new [metric](ref:sustainability#metric).
+
+        Args:
+            program_id: The unique identifier of the program
+            body: Request body.
+            timeout: Override the default request timeout (seconds).
+
+        Returns:
+            Metric
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
         """
-        return self._client.request(
+        response = self._client.request(
             "POST",
             self._api,
             "/programs/{programId}/metrics",
@@ -505,6 +763,7 @@ class Sustainability(BaseNamespace):
             json_body=body,
             timeout=timeout,
         )
+        return Metric.model_validate(response.json())
 
     async def create_metric_async(
         self,
@@ -512,12 +771,23 @@ class Sustainability(BaseNamespace):
         program_id: str,
         body: Metric,
         timeout: Optional[float] = None,
-    ) -> httpx.Response:
+    ) -> Metric:
         """Create a new metric (async)
 
         Creates a new [metric](ref:sustainability#metric).
+
+        Args:
+            program_id: The unique identifier of the program
+            body: Request body.
+            timeout: Override the default request timeout (seconds).
+
+        Returns:
+            Metric
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
         """
-        return await self._client.request_async(
+        response = await self._client.request_async(
             "POST",
             self._api,
             "/programs/{programId}/metrics",
@@ -527,50 +797,7 @@ class Sustainability(BaseNamespace):
             json_body=body,
             timeout=timeout,
         )
-
-    def get_metric_by_id(
-        self,
-        *,
-        program_id: str,
-        metric_id: str,
-        timeout: Optional[float] = None,
-    ) -> httpx.Response:
-        """Retrieve a single metric
-
-        Retrieves a [`Metric`](ref:sustainability#metric) given its ID
-        """
-        return self._client.request(
-            "GET",
-            self._api,
-            "/programs/{programId}/metrics/{metricId}",
-            path_params={
-                "programId": program_id,
-                "metricId": metric_id,
-            },
-            timeout=timeout,
-        )
-
-    async def get_metric_by_id_async(
-        self,
-        *,
-        program_id: str,
-        metric_id: str,
-        timeout: Optional[float] = None,
-    ) -> httpx.Response:
-        """Retrieve a single metric (async)
-
-        Retrieves a [`Metric`](ref:sustainability#metric) given its ID
-        """
-        return await self._client.request_async(
-            "GET",
-            self._api,
-            "/programs/{programId}/metrics/{metricId}",
-            path_params={
-                "programId": program_id,
-                "metricId": metric_id,
-            },
-            timeout=timeout,
-        )
+        return Metric.model_validate(response.json())
 
     def partially_update_metric_by_id(
         self,
@@ -579,7 +806,7 @@ class Sustainability(BaseNamespace):
         metric_id: str,
         body: list[Any],
         timeout: Optional[float] = None,
-    ) -> httpx.Response:
+    ) -> Metric:
         """Partially update a single metric
 
         Partially updates the properties of a
@@ -596,8 +823,20 @@ class Sustainability(BaseNamespace):
         |`/requireSupportingAttachments`|`replace`, `test`|
         |`/topic`|`replace`, `test`|
         |`/unit`|`replace`, `test`|
+
+        Args:
+            program_id: The unique identifier of the program
+            metric_id: The unique identifier of the metric
+            body: Request body.
+            timeout: Override the default request timeout (seconds).
+
+        Returns:
+            Metric
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
         """
-        return self._client.request(
+        response = self._client.request(
             "PATCH",
             self._api,
             "/programs/{programId}/metrics/{metricId}",
@@ -608,6 +847,7 @@ class Sustainability(BaseNamespace):
             json_body=body,
             timeout=timeout,
         )
+        return Metric.model_validate(response.json())
 
     async def partially_update_metric_by_id_async(
         self,
@@ -616,7 +856,7 @@ class Sustainability(BaseNamespace):
         metric_id: str,
         body: list[Any],
         timeout: Optional[float] = None,
-    ) -> httpx.Response:
+    ) -> Metric:
         """Partially update a single metric (async)
 
         Partially updates the properties of a
@@ -633,8 +873,20 @@ class Sustainability(BaseNamespace):
         |`/requireSupportingAttachments`|`replace`, `test`|
         |`/topic`|`replace`, `test`|
         |`/unit`|`replace`, `test`|
+
+        Args:
+            program_id: The unique identifier of the program
+            metric_id: The unique identifier of the metric
+            body: Request body.
+            timeout: Override the default request timeout (seconds).
+
+        Returns:
+            Metric
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
         """
-        return await self._client.request_async(
+        response = await self._client.request_async(
             "PATCH",
             self._api,
             "/programs/{programId}/metrics/{metricId}",
@@ -645,6 +897,75 @@ class Sustainability(BaseNamespace):
             json_body=body,
             timeout=timeout,
         )
+        return Metric.model_validate(response.json())
+
+    def get_metric_by_id(
+        self,
+        *,
+        program_id: str,
+        metric_id: str,
+        timeout: Optional[float] = None,
+    ) -> Metric:
+        """Retrieve a single metric
+
+        Retrieves a [`Metric`](ref:sustainability#metric) given its ID
+
+        Args:
+            program_id: The unique identifier of the program
+            metric_id: The unique identifier of the metric
+            timeout: Override the default request timeout (seconds).
+
+        Returns:
+            Metric
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
+        """
+        response = self._client.request(
+            "GET",
+            self._api,
+            "/programs/{programId}/metrics/{metricId}",
+            path_params={
+                "programId": program_id,
+                "metricId": metric_id,
+            },
+            timeout=timeout,
+        )
+        return Metric.model_validate(response.json())
+
+    async def get_metric_by_id_async(
+        self,
+        *,
+        program_id: str,
+        metric_id: str,
+        timeout: Optional[float] = None,
+    ) -> Metric:
+        """Retrieve a single metric (async)
+
+        Retrieves a [`Metric`](ref:sustainability#metric) given its ID
+
+        Args:
+            program_id: The unique identifier of the program
+            metric_id: The unique identifier of the metric
+            timeout: Override the default request timeout (seconds).
+
+        Returns:
+            Metric
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
+        """
+        response = await self._client.request_async(
+            "GET",
+            self._api,
+            "/programs/{programId}/metrics/{metricId}",
+            path_params={
+                "programId": program_id,
+                "metricId": metric_id,
+            },
+            timeout=timeout,
+        )
+        return Metric.model_validate(response.json())
 
     def delete_metric_by_id(
         self,
@@ -656,6 +977,14 @@ class Sustainability(BaseNamespace):
         """Delete a single metric
 
         Deletes a [metric](ref:sustainability#metric) given its ID
+
+        Args:
+            program_id: The unique identifier of the program
+            metric_id: The unique identifier of the metric
+            timeout: Override the default request timeout (seconds).
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
         """
         return self._client.request(
             "DELETE",
@@ -678,6 +1007,14 @@ class Sustainability(BaseNamespace):
         """Delete a single metric (async)
 
         Deletes a [metric](ref:sustainability#metric) given its ID
+
+        Args:
+            program_id: The unique identifier of the program
+            metric_id: The unique identifier of the metric
+            timeout: Override the default request timeout (seconds).
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
         """
         return await self._client.request_async(
             "DELETE",
@@ -696,32 +1033,50 @@ class Sustainability(BaseNamespace):
         program_id: str,
         metric_id: str,
         maxpagesize: Optional[int] = 1000,
-        next_: Optional[str] = None,
         filter_: Optional[str] = None,
         order_by: Optional[str] = None,
         timeout: Optional[float] = None,
-    ) -> httpx.Response:
+    ) -> MetricValuesListResult:
         """Retrieve a list of metric values
 
         Returns a paginated list of [metric
         Values](ref:sustainability#metricvalue)
+
+        Args:
+            program_id: The unique identifier of the program
+            metric_id: The unique identifier of the metric
+            maxpagesize: The maximum number of results to retrieve
+            filter_: The properties to filter the results by.
+            order_by: One or more comma-separated expressions to indicate the order in which to sort the results.
+            timeout: Override the default request timeout (seconds).
+
+        Returns:
+            MetricValuesListResult
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
         """
-        return self._client.request(
-            "GET",
-            self._api,
-            "/programs/{programId}/metrics/{metricId}/values",
-            path_params={
-                "programId": program_id,
-                "metricId": metric_id,
-            },
-            query_params={
-                "$maxpagesize": maxpagesize,
-                "$next": next_,
-                "$filter": filter_,
-                "$orderBy": order_by,
-            },
-            timeout=timeout,
-        )
+
+        def _fetch(_cursor: str | None) -> httpx.Response:
+            return self._client.request(
+                "GET",
+                self._api,
+                "/programs/{programId}/metrics/{metricId}/values",
+                path_params={
+                    "programId": program_id,
+                    "metricId": metric_id,
+                },
+                query_params={
+                    "$maxpagesize": maxpagesize,
+                    "$filter": filter_,
+                    "$orderBy": order_by,
+                    "$next": _cursor,
+                },
+                timeout=timeout,
+            )
+
+        _body = paginate_all(_fetch, extract_next_link, "data")
+        return MetricValuesListResult.model_validate(_body)
 
     async def get_values_async(
         self,
@@ -729,32 +1084,50 @@ class Sustainability(BaseNamespace):
         program_id: str,
         metric_id: str,
         maxpagesize: Optional[int] = 1000,
-        next_: Optional[str] = None,
         filter_: Optional[str] = None,
         order_by: Optional[str] = None,
         timeout: Optional[float] = None,
-    ) -> httpx.Response:
+    ) -> MetricValuesListResult:
         """Retrieve a list of metric values (async)
 
         Returns a paginated list of [metric
         Values](ref:sustainability#metricvalue)
+
+        Args:
+            program_id: The unique identifier of the program
+            metric_id: The unique identifier of the metric
+            maxpagesize: The maximum number of results to retrieve
+            filter_: The properties to filter the results by.
+            order_by: One or more comma-separated expressions to indicate the order in which to sort the results.
+            timeout: Override the default request timeout (seconds).
+
+        Returns:
+            MetricValuesListResult
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
         """
-        return await self._client.request_async(
-            "GET",
-            self._api,
-            "/programs/{programId}/metrics/{metricId}/values",
-            path_params={
-                "programId": program_id,
-                "metricId": metric_id,
-            },
-            query_params={
-                "$maxpagesize": maxpagesize,
-                "$next": next_,
-                "$filter": filter_,
-                "$orderBy": order_by,
-            },
-            timeout=timeout,
-        )
+
+        async def _fetch(_cursor: str | None) -> httpx.Response:
+            return await self._client.request_async(
+                "GET",
+                self._api,
+                "/programs/{programId}/metrics/{metricId}/values",
+                path_params={
+                    "programId": program_id,
+                    "metricId": metric_id,
+                },
+                query_params={
+                    "$maxpagesize": maxpagesize,
+                    "$filter": filter_,
+                    "$orderBy": order_by,
+                    "$next": _cursor,
+                },
+                timeout=timeout,
+            )
+
+        _body = await paginate_all_async(_fetch, extract_next_link, "data")
+        return MetricValuesListResult.model_validate(_body)
 
     def create_value(
         self,
@@ -763,12 +1136,24 @@ class Sustainability(BaseNamespace):
         metric_id: str,
         body: MetricValue,
         timeout: Optional[float] = None,
-    ) -> httpx.Response:
+    ) -> MetricValue:
         """Create a new metric value
 
         Creates a new [metric value](ref:sustainability#metricvalue)
+
+        Args:
+            program_id: The unique identifier of the program
+            metric_id: The unique identifier of the metric
+            body: Request body.
+            timeout: Override the default request timeout (seconds).
+
+        Returns:
+            MetricValue
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
         """
-        return self._client.request(
+        response = self._client.request(
             "POST",
             self._api,
             "/programs/{programId}/metrics/{metricId}/values",
@@ -779,6 +1164,7 @@ class Sustainability(BaseNamespace):
             json_body=body,
             timeout=timeout,
         )
+        return MetricValue.model_validate(response.json())
 
     async def create_value_async(
         self,
@@ -787,12 +1173,24 @@ class Sustainability(BaseNamespace):
         metric_id: str,
         body: MetricValue,
         timeout: Optional[float] = None,
-    ) -> httpx.Response:
+    ) -> MetricValue:
         """Create a new metric value (async)
 
         Creates a new [metric value](ref:sustainability#metricvalue)
+
+        Args:
+            program_id: The unique identifier of the program
+            metric_id: The unique identifier of the metric
+            body: Request body.
+            timeout: Override the default request timeout (seconds).
+
+        Returns:
+            MetricValue
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
         """
-        return await self._client.request_async(
+        response = await self._client.request_async(
             "POST",
             self._api,
             "/programs/{programId}/metrics/{metricId}/values",
@@ -803,56 +1201,7 @@ class Sustainability(BaseNamespace):
             json_body=body,
             timeout=timeout,
         )
-
-    def get_metric_value_by_id(
-        self,
-        *,
-        program_id: str,
-        metric_id: str,
-        metric_value_id: str,
-        timeout: Optional[float] = None,
-    ) -> httpx.Response:
-        """Retrieve a single metric value
-
-        Retrieves a [metric value](ref:sustainability#metricvalue) value given
-        its ID
-        """
-        return self._client.request(
-            "GET",
-            self._api,
-            "/programs/{programId}/metrics/{metricId}/values/{metricValueId}",
-            path_params={
-                "programId": program_id,
-                "metricId": metric_id,
-                "metricValueId": metric_value_id,
-            },
-            timeout=timeout,
-        )
-
-    async def get_metric_value_by_id_async(
-        self,
-        *,
-        program_id: str,
-        metric_id: str,
-        metric_value_id: str,
-        timeout: Optional[float] = None,
-    ) -> httpx.Response:
-        """Retrieve a single metric value (async)
-
-        Retrieves a [metric value](ref:sustainability#metricvalue) value given
-        its ID
-        """
-        return await self._client.request_async(
-            "GET",
-            self._api,
-            "/programs/{programId}/metrics/{metricId}/values/{metricValueId}",
-            path_params={
-                "programId": program_id,
-                "metricId": metric_id,
-                "metricValueId": metric_value_id,
-            },
-            timeout=timeout,
-        )
+        return MetricValue.model_validate(response.json())
 
     def partially_update_metric_value_by_id(
         self,
@@ -862,7 +1211,7 @@ class Sustainability(BaseNamespace):
         metric_value_id: str,
         body: list[Any],
         timeout: Optional[float] = None,
-    ) -> httpx.Response:
+    ) -> MetricValue:
         """Partially update a single metric value
 
         Partially updates the properties of a [metric
@@ -873,8 +1222,21 @@ class Sustainability(BaseNamespace):
         |---|---|
         |`/notes`|`replace`, `test`|
         |`/value`|`replace`, `test`|
+
+        Args:
+            program_id: The unique identifier of the program
+            metric_id: The unique identifier of the metric
+            metric_value_id: The unique identifier of the value
+            body: Request body.
+            timeout: Override the default request timeout (seconds).
+
+        Returns:
+            MetricValue
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
         """
-        return self._client.request(
+        response = self._client.request(
             "PATCH",
             self._api,
             "/programs/{programId}/metrics/{metricId}/values/{metricValueId}",
@@ -886,6 +1248,7 @@ class Sustainability(BaseNamespace):
             json_body=body,
             timeout=timeout,
         )
+        return MetricValue.model_validate(response.json())
 
     async def partially_update_metric_value_by_id_async(
         self,
@@ -895,7 +1258,7 @@ class Sustainability(BaseNamespace):
         metric_value_id: str,
         body: list[Any],
         timeout: Optional[float] = None,
-    ) -> httpx.Response:
+    ) -> MetricValue:
         """Partially update a single metric value (async)
 
         Partially updates the properties of a [metric
@@ -906,8 +1269,21 @@ class Sustainability(BaseNamespace):
         |---|---|
         |`/notes`|`replace`, `test`|
         |`/value`|`replace`, `test`|
+
+        Args:
+            program_id: The unique identifier of the program
+            metric_id: The unique identifier of the metric
+            metric_value_id: The unique identifier of the value
+            body: Request body.
+            timeout: Override the default request timeout (seconds).
+
+        Returns:
+            MetricValue
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
         """
-        return await self._client.request_async(
+        response = await self._client.request_async(
             "PATCH",
             self._api,
             "/programs/{programId}/metrics/{metricId}/values/{metricValueId}",
@@ -919,6 +1295,83 @@ class Sustainability(BaseNamespace):
             json_body=body,
             timeout=timeout,
         )
+        return MetricValue.model_validate(response.json())
+
+    def get_metric_value_by_id(
+        self,
+        *,
+        program_id: str,
+        metric_id: str,
+        metric_value_id: str,
+        timeout: Optional[float] = None,
+    ) -> MetricValue:
+        """Retrieve a single metric value
+
+        Retrieves a [metric value](ref:sustainability#metricvalue) value given
+        its ID
+
+        Args:
+            program_id: The unique identifier of the program
+            metric_id: The unique identifier of the metric
+            metric_value_id: The unique identifier of the value
+            timeout: Override the default request timeout (seconds).
+
+        Returns:
+            MetricValue
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
+        """
+        response = self._client.request(
+            "GET",
+            self._api,
+            "/programs/{programId}/metrics/{metricId}/values/{metricValueId}",
+            path_params={
+                "programId": program_id,
+                "metricId": metric_id,
+                "metricValueId": metric_value_id,
+            },
+            timeout=timeout,
+        )
+        return MetricValue.model_validate(response.json())
+
+    async def get_metric_value_by_id_async(
+        self,
+        *,
+        program_id: str,
+        metric_id: str,
+        metric_value_id: str,
+        timeout: Optional[float] = None,
+    ) -> MetricValue:
+        """Retrieve a single metric value (async)
+
+        Retrieves a [metric value](ref:sustainability#metricvalue) value given
+        its ID
+
+        Args:
+            program_id: The unique identifier of the program
+            metric_id: The unique identifier of the metric
+            metric_value_id: The unique identifier of the value
+            timeout: Override the default request timeout (seconds).
+
+        Returns:
+            MetricValue
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
+        """
+        response = await self._client.request_async(
+            "GET",
+            self._api,
+            "/programs/{programId}/metrics/{metricId}/values/{metricValueId}",
+            path_params={
+                "programId": program_id,
+                "metricId": metric_id,
+                "metricValueId": metric_value_id,
+            },
+            timeout=timeout,
+        )
+        return MetricValue.model_validate(response.json())
 
     def delete_metric_value_by_id(
         self,
@@ -932,6 +1385,15 @@ class Sustainability(BaseNamespace):
 
         Deletes a [metric value](ref:sustainability#metricvalue) value given its
         ID
+
+        Args:
+            program_id: The unique identifier of the program
+            metric_id: The unique identifier of the metric
+            metric_value_id: The unique identifier of the value
+            timeout: Override the default request timeout (seconds).
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
         """
         return self._client.request(
             "DELETE",
@@ -957,6 +1419,15 @@ class Sustainability(BaseNamespace):
 
         Deletes a [metric value](ref:sustainability#metricvalue) value given its
         ID
+
+        Args:
+            program_id: The unique identifier of the program
+            metric_id: The unique identifier of the metric
+            metric_value_id: The unique identifier of the value
+            timeout: Override the default request timeout (seconds).
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
         """
         return await self._client.request_async(
             "DELETE",
@@ -985,6 +1456,15 @@ class Sustainability(BaseNamespace):
         For each value, provide either the id or both the reportingPeriod and
         coordinates (if any).
         If both are provided, the given id will be used.
+
+        Args:
+            program_id: The unique identifier of the program
+            metric_id: The unique identifier of the metric
+            body: Request body.
+            timeout: Override the default request timeout (seconds).
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
         """
         return self._client.request(
             "POST",
@@ -1013,6 +1493,15 @@ class Sustainability(BaseNamespace):
         For each value, provide either the id or both the reportingPeriod and
         coordinates (if any).
         If both are provided, the given id will be used.
+
+        Args:
+            program_id: The unique identifier of the program
+            metric_id: The unique identifier of the metric
+            body: Request body.
+            timeout: Override the default request timeout (seconds).
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
         """
         return await self._client.request_async(
             "POST",
@@ -1051,6 +1540,19 @@ class Sustainability(BaseNamespace):
 
         If any of the values fail to be processed, no changes will be stored in
         the system.
+
+        Args:
+            program_id: The unique identifier of the program
+            metric_id: The unique identifier of the metric
+            body: Request body.
+            timeout: Override the default request timeout (seconds).
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
+
+        Note:
+            This is a long-running operation (HTTP 202). Use
+            ``client.wait(response).result()`` to poll until completion.
         """
         return self._client.request(
             "POST",
@@ -1089,6 +1591,19 @@ class Sustainability(BaseNamespace):
 
         If any of the values fail to be processed, no changes will be stored in
         the system.
+
+        Args:
+            program_id: The unique identifier of the program
+            metric_id: The unique identifier of the metric
+            body: Request body.
+            timeout: Override the default request timeout (seconds).
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
+
+        Note:
+            This is a long-running operation (HTTP 202). Use
+            ``await client.wait(response).result_async()`` to poll until completion.
         """
         return await self._client.request_async(
             "POST",
@@ -1108,28 +1623,44 @@ class Sustainability(BaseNamespace):
         program_id: str,
         filter_: Optional[str] = None,
         maxpagesize: Optional[int] = 1000,
-        next_: Optional[str] = None,
         timeout: Optional[float] = None,
-    ) -> httpx.Response:
+    ) -> ResourcePermissionsListResult:
         """Retrieve permissions for a program
 
         Retrieves a paginated list of permissions for a given Sustainability
         Program
+
+        Args:
+            program_id: The unique identifier of the program
+            filter_: The properties to filter the results by.
+            maxpagesize: The maximum number of results to retrieve
+            timeout: Override the default request timeout (seconds).
+
+        Returns:
+            ResourcePermissionsListResult
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
         """
-        return self._client.request(
-            "GET",
-            self._api,
-            "/programs/{programId}/permissions",
-            path_params={
-                "programId": program_id,
-            },
-            query_params={
-                "$filter": filter_,
-                "$maxpagesize": maxpagesize,
-                "$next": next_,
-            },
-            timeout=timeout,
-        )
+
+        def _fetch(_cursor: str | None) -> httpx.Response:
+            return self._client.request(
+                "GET",
+                self._api,
+                "/programs/{programId}/permissions",
+                path_params={
+                    "programId": program_id,
+                },
+                query_params={
+                    "$filter": filter_,
+                    "$maxpagesize": maxpagesize,
+                    "$next": _cursor,
+                },
+                timeout=timeout,
+            )
+
+        _body = paginate_all(_fetch, extract_next_link, "data")
+        return ResourcePermissionsListResult.model_validate(_body)
 
     async def get_program_permissions_async(
         self,
@@ -1137,28 +1668,44 @@ class Sustainability(BaseNamespace):
         program_id: str,
         filter_: Optional[str] = None,
         maxpagesize: Optional[int] = 1000,
-        next_: Optional[str] = None,
         timeout: Optional[float] = None,
-    ) -> httpx.Response:
+    ) -> ResourcePermissionsListResult:
         """Retrieve permissions for a program (async)
 
         Retrieves a paginated list of permissions for a given Sustainability
         Program
+
+        Args:
+            program_id: The unique identifier of the program
+            filter_: The properties to filter the results by.
+            maxpagesize: The maximum number of results to retrieve
+            timeout: Override the default request timeout (seconds).
+
+        Returns:
+            ResourcePermissionsListResult
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
         """
-        return await self._client.request_async(
-            "GET",
-            self._api,
-            "/programs/{programId}/permissions",
-            path_params={
-                "programId": program_id,
-            },
-            query_params={
-                "$filter": filter_,
-                "$maxpagesize": maxpagesize,
-                "$next": next_,
-            },
-            timeout=timeout,
-        )
+
+        async def _fetch(_cursor: str | None) -> httpx.Response:
+            return await self._client.request_async(
+                "GET",
+                self._api,
+                "/programs/{programId}/permissions",
+                path_params={
+                    "programId": program_id,
+                },
+                query_params={
+                    "$filter": filter_,
+                    "$maxpagesize": maxpagesize,
+                    "$next": _cursor,
+                },
+                timeout=timeout,
+            )
+
+        _body = await paginate_all_async(_fetch, extract_next_link, "data")
+        return ResourcePermissionsListResult.model_validate(_body)
 
     def program_permissions_modification(
         self,
@@ -1175,6 +1722,14 @@ class Sustainability(BaseNamespace):
         must first be  explicitly revoked. Then, the new permission needs to be
         assigned. This  can be done in a single request by sending `toAssign`
         and `toRevoke` in  the request body._
+
+        Args:
+            program_id: The unique identifier of the program
+            body: Request body.
+            timeout: Override the default request timeout (seconds).
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
         """
         return self._client.request(
             "POST",
@@ -1202,6 +1757,14 @@ class Sustainability(BaseNamespace):
         must first be  explicitly revoked. Then, the new permission needs to be
         assigned. This  can be done in a single request by sending `toAssign`
         and `toRevoke` in  the request body._
+
+        Args:
+            program_id: The unique identifier of the program
+            body: Request body.
+            timeout: Override the default request timeout (seconds).
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
         """
         return await self._client.request_async(
             "POST",
@@ -1219,60 +1782,94 @@ class Sustainability(BaseNamespace):
         *,
         program_id: str,
         maxpagesize: Optional[int] = 1000,
-        next_: Optional[str] = None,
         filter_: Optional[str] = None,
         order_by: Optional[str] = None,
         timeout: Optional[float] = None,
-    ) -> httpx.Response:
+    ) -> TopicsListResult:
         """Retrieve a list of topics
 
         Returns a paginated list of [topics](ref:sustainability#topic).
+
+        Args:
+            program_id: The unique identifier of the program
+            maxpagesize: The maximum number of results to retrieve
+            filter_: The properties to filter the results by.
+            order_by: One or more comma-separated expressions to indicate the order in which to sort the results.
+            timeout: Override the default request timeout (seconds).
+
+        Returns:
+            TopicsListResult
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
         """
-        return self._client.request(
-            "GET",
-            self._api,
-            "/programs/{programId}/topics",
-            path_params={
-                "programId": program_id,
-            },
-            query_params={
-                "$maxpagesize": maxpagesize,
-                "$next": next_,
-                "$filter": filter_,
-                "$orderBy": order_by,
-            },
-            timeout=timeout,
-        )
+
+        def _fetch(_cursor: str | None) -> httpx.Response:
+            return self._client.request(
+                "GET",
+                self._api,
+                "/programs/{programId}/topics",
+                path_params={
+                    "programId": program_id,
+                },
+                query_params={
+                    "$maxpagesize": maxpagesize,
+                    "$filter": filter_,
+                    "$orderBy": order_by,
+                    "$next": _cursor,
+                },
+                timeout=timeout,
+            )
+
+        _body = paginate_all(_fetch, extract_next_link, "data")
+        return TopicsListResult.model_validate(_body)
 
     async def get_topics_async(
         self,
         *,
         program_id: str,
         maxpagesize: Optional[int] = 1000,
-        next_: Optional[str] = None,
         filter_: Optional[str] = None,
         order_by: Optional[str] = None,
         timeout: Optional[float] = None,
-    ) -> httpx.Response:
+    ) -> TopicsListResult:
         """Retrieve a list of topics (async)
 
         Returns a paginated list of [topics](ref:sustainability#topic).
+
+        Args:
+            program_id: The unique identifier of the program
+            maxpagesize: The maximum number of results to retrieve
+            filter_: The properties to filter the results by.
+            order_by: One or more comma-separated expressions to indicate the order in which to sort the results.
+            timeout: Override the default request timeout (seconds).
+
+        Returns:
+            TopicsListResult
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
         """
-        return await self._client.request_async(
-            "GET",
-            self._api,
-            "/programs/{programId}/topics",
-            path_params={
-                "programId": program_id,
-            },
-            query_params={
-                "$maxpagesize": maxpagesize,
-                "$next": next_,
-                "$filter": filter_,
-                "$orderBy": order_by,
-            },
-            timeout=timeout,
-        )
+
+        async def _fetch(_cursor: str | None) -> httpx.Response:
+            return await self._client.request_async(
+                "GET",
+                self._api,
+                "/programs/{programId}/topics",
+                path_params={
+                    "programId": program_id,
+                },
+                query_params={
+                    "$maxpagesize": maxpagesize,
+                    "$filter": filter_,
+                    "$orderBy": order_by,
+                    "$next": _cursor,
+                },
+                timeout=timeout,
+            )
+
+        _body = await paginate_all_async(_fetch, extract_next_link, "data")
+        return TopicsListResult.model_validate(_body)
 
     def create_topic(
         self,
@@ -1280,12 +1877,23 @@ class Sustainability(BaseNamespace):
         program_id: str,
         body: Topic,
         timeout: Optional[float] = None,
-    ) -> httpx.Response:
+    ) -> Topic:
         """Create a new topic
 
         Creates a new [topic](ref:sustainability#topic).
+
+        Args:
+            program_id: The unique identifier of the program
+            body: Request body.
+            timeout: Override the default request timeout (seconds).
+
+        Returns:
+            Topic
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
         """
-        return self._client.request(
+        response = self._client.request(
             "POST",
             self._api,
             "/programs/{programId}/topics",
@@ -1295,6 +1903,7 @@ class Sustainability(BaseNamespace):
             json_body=body,
             timeout=timeout,
         )
+        return Topic.model_validate(response.json())
 
     async def create_topic_async(
         self,
@@ -1302,12 +1911,23 @@ class Sustainability(BaseNamespace):
         program_id: str,
         body: Topic,
         timeout: Optional[float] = None,
-    ) -> httpx.Response:
+    ) -> Topic:
         """Create a new topic (async)
 
         Creates a new [topic](ref:sustainability#topic).
+
+        Args:
+            program_id: The unique identifier of the program
+            body: Request body.
+            timeout: Override the default request timeout (seconds).
+
+        Returns:
+            Topic
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
         """
-        return await self._client.request_async(
+        response = await self._client.request_async(
             "POST",
             self._api,
             "/programs/{programId}/topics",
@@ -1317,50 +1937,7 @@ class Sustainability(BaseNamespace):
             json_body=body,
             timeout=timeout,
         )
-
-    def get_topic_by_id(
-        self,
-        *,
-        program_id: str,
-        topic_id: str,
-        timeout: Optional[float] = None,
-    ) -> httpx.Response:
-        """Retrieve a single topic
-
-        Retrieves a [topic](ref:sustainability#topic) given its ID
-        """
-        return self._client.request(
-            "GET",
-            self._api,
-            "/programs/{programId}/topics/{topicId}",
-            path_params={
-                "programId": program_id,
-                "topicId": topic_id,
-            },
-            timeout=timeout,
-        )
-
-    async def get_topic_by_id_async(
-        self,
-        *,
-        program_id: str,
-        topic_id: str,
-        timeout: Optional[float] = None,
-    ) -> httpx.Response:
-        """Retrieve a single topic (async)
-
-        Retrieves a [topic](ref:sustainability#topic) given its ID
-        """
-        return await self._client.request_async(
-            "GET",
-            self._api,
-            "/programs/{programId}/topics/{topicId}",
-            path_params={
-                "programId": program_id,
-                "topicId": topic_id,
-            },
-            timeout=timeout,
-        )
+        return Topic.model_validate(response.json())
 
     def partially_update_topic_by_id(
         self,
@@ -1369,7 +1946,7 @@ class Sustainability(BaseNamespace):
         topic_id: str,
         body: list[Any],
         timeout: Optional[float] = None,
-    ) -> httpx.Response:
+    ) -> Topic:
         """Partially update a single topic
 
         Partially updates the properties of a [topic](ref:sustainability#topic).
@@ -1380,8 +1957,20 @@ class Sustainability(BaseNamespace):
         |`/index`|`replace`, `test`|
         |`/name`|`replace`, `test`|
         |`/parent`|`replace`, `test`|
+
+        Args:
+            program_id: The unique identifier of the program
+            topic_id: The unique identifier of the topic
+            body: Request body.
+            timeout: Override the default request timeout (seconds).
+
+        Returns:
+            Topic
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
         """
-        return self._client.request(
+        response = self._client.request(
             "PATCH",
             self._api,
             "/programs/{programId}/topics/{topicId}",
@@ -1392,6 +1981,7 @@ class Sustainability(BaseNamespace):
             json_body=body,
             timeout=timeout,
         )
+        return Topic.model_validate(response.json())
 
     async def partially_update_topic_by_id_async(
         self,
@@ -1400,7 +1990,7 @@ class Sustainability(BaseNamespace):
         topic_id: str,
         body: list[Any],
         timeout: Optional[float] = None,
-    ) -> httpx.Response:
+    ) -> Topic:
         """Partially update a single topic (async)
 
         Partially updates the properties of a [topic](ref:sustainability#topic).
@@ -1411,8 +2001,20 @@ class Sustainability(BaseNamespace):
         |`/index`|`replace`, `test`|
         |`/name`|`replace`, `test`|
         |`/parent`|`replace`, `test`|
+
+        Args:
+            program_id: The unique identifier of the program
+            topic_id: The unique identifier of the topic
+            body: Request body.
+            timeout: Override the default request timeout (seconds).
+
+        Returns:
+            Topic
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
         """
-        return await self._client.request_async(
+        response = await self._client.request_async(
             "PATCH",
             self._api,
             "/programs/{programId}/topics/{topicId}",
@@ -1423,6 +2025,75 @@ class Sustainability(BaseNamespace):
             json_body=body,
             timeout=timeout,
         )
+        return Topic.model_validate(response.json())
+
+    def get_topic_by_id(
+        self,
+        *,
+        program_id: str,
+        topic_id: str,
+        timeout: Optional[float] = None,
+    ) -> Topic:
+        """Retrieve a single topic
+
+        Retrieves a [topic](ref:sustainability#topic) given its ID
+
+        Args:
+            program_id: The unique identifier of the program
+            topic_id: The unique identifier of the topic
+            timeout: Override the default request timeout (seconds).
+
+        Returns:
+            Topic
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
+        """
+        response = self._client.request(
+            "GET",
+            self._api,
+            "/programs/{programId}/topics/{topicId}",
+            path_params={
+                "programId": program_id,
+                "topicId": topic_id,
+            },
+            timeout=timeout,
+        )
+        return Topic.model_validate(response.json())
+
+    async def get_topic_by_id_async(
+        self,
+        *,
+        program_id: str,
+        topic_id: str,
+        timeout: Optional[float] = None,
+    ) -> Topic:
+        """Retrieve a single topic (async)
+
+        Retrieves a [topic](ref:sustainability#topic) given its ID
+
+        Args:
+            program_id: The unique identifier of the program
+            topic_id: The unique identifier of the topic
+            timeout: Override the default request timeout (seconds).
+
+        Returns:
+            Topic
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
+        """
+        response = await self._client.request_async(
+            "GET",
+            self._api,
+            "/programs/{programId}/topics/{topicId}",
+            path_params={
+                "programId": program_id,
+                "topicId": topic_id,
+            },
+            timeout=timeout,
+        )
+        return Topic.model_validate(response.json())
 
     def delete_topic_by_id(
         self,
@@ -1434,6 +2105,14 @@ class Sustainability(BaseNamespace):
         """Delete a single topic
 
         Deletes a [topic](ref:sustainability#topic) given its ID
+
+        Args:
+            program_id: The unique identifier of the program
+            topic_id: The unique identifier of the topic
+            timeout: Override the default request timeout (seconds).
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
         """
         return self._client.request(
             "DELETE",
@@ -1456,6 +2135,14 @@ class Sustainability(BaseNamespace):
         """Delete a single topic (async)
 
         Deletes a [topic](ref:sustainability#topic) given its ID
+
+        Args:
+            program_id: The unique identifier of the program
+            topic_id: The unique identifier of the topic
+            timeout: Override the default request timeout (seconds).
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
         """
         return await self._client.request_async(
             "DELETE",

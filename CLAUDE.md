@@ -23,7 +23,7 @@ make generate-models     # Generate Pydantic models only
 make generate-operations # Generate operation namespaces only
 
 # Testing
-make test                # All tests (unit + integration) — 164 tests
+make test                # All tests (unit + integration) — 184 tests
 make test-unit           # Unit tests only
 make test-integration    # Integration tests only
 make test-cov            # Coverage report for core modules
@@ -112,8 +112,9 @@ src/workiva/
 │   └── wdata.py        # ~2.2k lines — Pydantic v2 models (GENERATED)
 └── _operations/
     ├── _base.py        # BaseNamespace(client, api) — shared base class
-    ├── files.py         # 36 namespace files, one per OAS tag (GENERATED)
-    ├── chain.py         # Each has sync + async methods
+    ├── files.py         # 18 namespace files (GENERATED)
+    ├── chains.py        # Chains: all OAS tags merged into single flat namespace
+    ├── wdata.py         # Wdata: all OAS tags merged into single flat namespace
     └── ...              # 357 operations total across all namespaces
 ```
 
@@ -181,7 +182,7 @@ async with Workiva(client_id="...", client_secret="...", region=Region.US) as cl
 
 ## Testing
 
-Tests live in `tests/` (outside `src/`, safe from regeneration). 164 tests total.
+Tests live in `tests/` (outside `src/`, safe from regeneration). 184 tests total.
 
 ```
 tests/

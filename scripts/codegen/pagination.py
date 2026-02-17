@@ -57,7 +57,7 @@ _PLATFORM_NEXT = PaginationConfig(
     pattern=PaginationPattern.PLATFORM_NEXT,
     cursor_param="next",
     cursor_response_path="@nextLink",
-    items_path="value",
+    items_path="data",
 )
 
 _PLATFORM_JSONAPI = PaginationConfig(
@@ -71,7 +71,7 @@ _CHAINS_CURSOR = PaginationConfig(
     pattern=PaginationPattern.CHAINS_CURSOR,
     cursor_param="cursor",
     cursor_response_path="data.cursor",
-    items_path="data.items",
+    items_path="data.chainExecutors",
 )
 
 _CHAINS_PAGE = PaginationConfig(

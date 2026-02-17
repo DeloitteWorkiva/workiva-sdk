@@ -11,6 +11,12 @@ import httpx
 
 from workiva._constants import _API
 from workiva._operations._base import BaseNamespace
+from workiva.models.platform import (
+    Permission,
+    PermissionsListResult,
+)
+
+__all__ = ["Permissions"]
 
 
 class Permissions(BaseNamespace):
@@ -22,45 +28,69 @@ class Permissions(BaseNamespace):
         self,
         *,
         timeout: Optional[float] = None,
-    ) -> httpx.Response:
+    ) -> PermissionsListResult:
         """Retrieve a list of all available permissions
 
         Returns a list of permissions.
+
+        Returns:
+            PermissionsListResult
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
         """
-        return self._client.request(
+        response = self._client.request(
             "GET",
             self._api,
             "/permissions",
             timeout=timeout,
         )
+        return PermissionsListResult.model_validate(response.json())
 
     async def get_permissions_async(
         self,
         *,
         timeout: Optional[float] = None,
-    ) -> httpx.Response:
+    ) -> PermissionsListResult:
         """Retrieve a list of all available permissions (async)
 
         Returns a list of permissions.
+
+        Returns:
+            PermissionsListResult
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
         """
-        return await self._client.request_async(
+        response = await self._client.request_async(
             "GET",
             self._api,
             "/permissions",
             timeout=timeout,
         )
+        return PermissionsListResult.model_validate(response.json())
 
     def get_permission_by_id(
         self,
         *,
         permission_id: str,
         timeout: Optional[float] = None,
-    ) -> httpx.Response:
+    ) -> Permission:
         """Retrieve a single permission
 
         Retrieves a permission given its ID
+
+        Args:
+            permission_id: The unique identifier of the permission
+            timeout: Override the default request timeout (seconds).
+
+        Returns:
+            Permission
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
         """
-        return self._client.request(
+        response = self._client.request(
             "GET",
             self._api,
             "/permissions/{permissionId}",
@@ -69,18 +99,29 @@ class Permissions(BaseNamespace):
             },
             timeout=timeout,
         )
+        return Permission.model_validate(response.json())
 
     async def get_permission_by_id_async(
         self,
         *,
         permission_id: str,
         timeout: Optional[float] = None,
-    ) -> httpx.Response:
+    ) -> Permission:
         """Retrieve a single permission (async)
 
         Retrieves a permission given its ID
+
+        Args:
+            permission_id: The unique identifier of the permission
+            timeout: Override the default request timeout (seconds).
+
+        Returns:
+            Permission
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
         """
-        return await self._client.request_async(
+        response = await self._client.request_async(
             "GET",
             self._api,
             "/permissions/{permissionId}",
@@ -89,3 +130,4 @@ class Permissions(BaseNamespace):
             },
             timeout=timeout,
         )
+        return Permission.model_validate(response.json())

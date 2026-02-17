@@ -11,15 +11,27 @@ import httpx
 
 from workiva._constants import _API
 from workiva._operations._base import BaseNamespace
+from workiva._pagination import (
+    extract_next_link,
+    paginate_all,
+    paginate_all_async,
+)
 from workiva.models.platform import (
+    Document,
     DocumentExport,
     DocumentFiltersReapplication,
+    DocumentsListResult,
     LinksPublicationOptions,
+    MilestoneListResult,
+    ResourcePermissionsListResult,
     ResourcePermissionsModification,
     Section,
     SectionCopy,
     SectionsEdits,
+    SectionsListResult,
 )
+
+__all__ = ["Documents"]
 
 
 class Documents(BaseNamespace):
@@ -33,25 +45,41 @@ class Documents(BaseNamespace):
         filter_: Optional[str] = None,
         order_by: Optional[str] = None,
         maxpagesize: Optional[int] = 1000,
-        next_: Optional[str] = None,
         timeout: Optional[float] = None,
-    ) -> httpx.Response:
+    ) -> DocumentsListResult:
         """Retrieve a list of documents
 
         Returns a paginated list of [documents](ref:documents#document).
+
+        Args:
+            filter_: The properties to filter the results by.
+            order_by: One or more comma-separated expressions to indicate the order in which to sort the results.
+            maxpagesize: The maximum number of results to retrieve
+            timeout: Override the default request timeout (seconds).
+
+        Returns:
+            DocumentsListResult
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
         """
-        return self._client.request(
-            "GET",
-            self._api,
-            "/documents",
-            query_params={
-                "$filter": filter_,
-                "$orderBy": order_by,
-                "$maxpagesize": maxpagesize,
-                "$next": next_,
-            },
-            timeout=timeout,
-        )
+
+        def _fetch(_cursor: str | None) -> httpx.Response:
+            return self._client.request(
+                "GET",
+                self._api,
+                "/documents",
+                query_params={
+                    "$filter": filter_,
+                    "$orderBy": order_by,
+                    "$maxpagesize": maxpagesize,
+                    "$next": _cursor,
+                },
+                timeout=timeout,
+            )
+
+        _body = paginate_all(_fetch, extract_next_link, "data")
+        return DocumentsListResult.model_validate(_body)
 
     async def get_documents_async(
         self,
@@ -59,73 +87,41 @@ class Documents(BaseNamespace):
         filter_: Optional[str] = None,
         order_by: Optional[str] = None,
         maxpagesize: Optional[int] = 1000,
-        next_: Optional[str] = None,
         timeout: Optional[float] = None,
-    ) -> httpx.Response:
+    ) -> DocumentsListResult:
         """Retrieve a list of documents (async)
 
         Returns a paginated list of [documents](ref:documents#document).
+
+        Args:
+            filter_: The properties to filter the results by.
+            order_by: One or more comma-separated expressions to indicate the order in which to sort the results.
+            maxpagesize: The maximum number of results to retrieve
+            timeout: Override the default request timeout (seconds).
+
+        Returns:
+            DocumentsListResult
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
         """
-        return await self._client.request_async(
-            "GET",
-            self._api,
-            "/documents",
-            query_params={
-                "$filter": filter_,
-                "$orderBy": order_by,
-                "$maxpagesize": maxpagesize,
-                "$next": next_,
-            },
-            timeout=timeout,
-        )
 
-    def get_document_by_id(
-        self,
-        *,
-        document_id: str,
-        expand: Optional[str] = None,
-        timeout: Optional[float] = None,
-    ) -> httpx.Response:
-        """Retrieve a single document
+        async def _fetch(_cursor: str | None) -> httpx.Response:
+            return await self._client.request_async(
+                "GET",
+                self._api,
+                "/documents",
+                query_params={
+                    "$filter": filter_,
+                    "$orderBy": order_by,
+                    "$maxpagesize": maxpagesize,
+                    "$next": _cursor,
+                },
+                timeout=timeout,
+            )
 
-        Retrieves a [document](ref:documents#document) given its ID.
-        """
-        return self._client.request(
-            "GET",
-            self._api,
-            "/documents/{documentId}",
-            path_params={
-                "documentId": document_id,
-            },
-            query_params={
-                "$expand": expand,
-            },
-            timeout=timeout,
-        )
-
-    async def get_document_by_id_async(
-        self,
-        *,
-        document_id: str,
-        expand: Optional[str] = None,
-        timeout: Optional[float] = None,
-    ) -> httpx.Response:
-        """Retrieve a single document (async)
-
-        Retrieves a [document](ref:documents#document) given its ID.
-        """
-        return await self._client.request_async(
-            "GET",
-            self._api,
-            "/documents/{documentId}",
-            path_params={
-                "documentId": document_id,
-            },
-            query_params={
-                "$expand": expand,
-            },
-            timeout=timeout,
-        )
+        _body = await paginate_all_async(_fetch, extract_next_link, "data")
+        return DocumentsListResult.model_validate(_body)
 
     def partially_update_document_by_id(
         self,
@@ -217,6 +213,18 @@ class Documents(BaseNamespace):
           }
         ]
         ```
+
+        Args:
+            document_id: The unique identifier of the document
+            body: Request body.
+            timeout: Override the default request timeout (seconds).
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
+
+        Note:
+            This is a long-running operation (HTTP 202). Use
+            ``client.wait(response).result()`` to poll until completion.
         """
         return self._client.request(
             "PATCH",
@@ -319,6 +327,18 @@ class Documents(BaseNamespace):
           }
         ]
         ```
+
+        Args:
+            document_id: The unique identifier of the document
+            body: Request body.
+            timeout: Override the default request timeout (seconds).
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
+
+        Note:
+            This is a long-running operation (HTTP 202). Use
+            ``await client.wait(response).result_async()`` to poll until completion.
         """
         return await self._client.request_async(
             "PATCH",
@@ -330,6 +350,78 @@ class Documents(BaseNamespace):
             json_body=body,
             timeout=timeout,
         )
+
+    def get_document_by_id(
+        self,
+        *,
+        document_id: str,
+        expand: Optional[str] = None,
+        timeout: Optional[float] = None,
+    ) -> Document:
+        """Retrieve a single document
+
+        Retrieves a [document](ref:documents#document) given its ID.
+
+        Args:
+            document_id: The unique identifier of the document
+            expand: Returns related resources inline with the main resource
+            timeout: Override the default request timeout (seconds).
+
+        Returns:
+            Document
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
+        """
+        response = self._client.request(
+            "GET",
+            self._api,
+            "/documents/{documentId}",
+            path_params={
+                "documentId": document_id,
+            },
+            query_params={
+                "$expand": expand,
+            },
+            timeout=timeout,
+        )
+        return Document.model_validate(response.json())
+
+    async def get_document_by_id_async(
+        self,
+        *,
+        document_id: str,
+        expand: Optional[str] = None,
+        timeout: Optional[float] = None,
+    ) -> Document:
+        """Retrieve a single document (async)
+
+        Retrieves a [document](ref:documents#document) given its ID.
+
+        Args:
+            document_id: The unique identifier of the document
+            expand: Returns related resources inline with the main resource
+            timeout: Override the default request timeout (seconds).
+
+        Returns:
+            Document
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
+        """
+        response = await self._client.request_async(
+            "GET",
+            self._api,
+            "/documents/{documentId}",
+            path_params={
+                "documentId": document_id,
+            },
+            query_params={
+                "$expand": expand,
+            },
+            timeout=timeout,
+        )
+        return Document.model_validate(response.json())
 
     def document_export(
         self,
@@ -354,6 +446,18 @@ class Documents(BaseNamespace):
         `resourceURL` with the same authentication credentials and flow as the
         export request. For more details, see [Authentication
         documentation](ref:authentication).
+
+        Args:
+            document_id: The unique identifier of the document
+            body: Request body.
+            timeout: Override the default request timeout (seconds).
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
+
+        Note:
+            This is a long-running operation (HTTP 202). Use
+            ``client.wait(response).result()`` to poll until completion.
         """
         return self._client.request(
             "POST",
@@ -389,6 +493,18 @@ class Documents(BaseNamespace):
         `resourceURL` with the same authentication credentials and flow as the
         export request. For more details, see [Authentication
         documentation](ref:authentication).
+
+        Args:
+            document_id: The unique identifier of the document
+            body: Request body.
+            timeout: Override the default request timeout (seconds).
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
+
+        Note:
+            This is a long-running operation (HTTP 202). Use
+            ``await client.wait(response).result_async()`` to poll until completion.
         """
         return await self._client.request_async(
             "POST",
@@ -421,6 +537,18 @@ class Documents(BaseNamespace):
         which indicates where to poll for results.
         For more details on long-running job polling, see [Operations
         endpoint](ref:getoperationbyid).
+
+        Args:
+            document_id: The unique identifier of the document
+            body: Request body.
+            timeout: Override the default request timeout (seconds).
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
+
+        Note:
+            This is a long-running operation (HTTP 202). Use
+            ``client.wait(response).result()`` to poll until completion.
         """
         return self._client.request(
             "POST",
@@ -453,6 +581,18 @@ class Documents(BaseNamespace):
         which indicates where to poll for results.
         For more details on long-running job polling, see [Operations
         endpoint](ref:getoperationbyid).
+
+        Args:
+            document_id: The unique identifier of the document
+            body: Request body.
+            timeout: Override the default request timeout (seconds).
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
+
+        Note:
+            This is a long-running operation (HTTP 202). Use
+            ``await client.wait(response).result_async()`` to poll until completion.
         """
         return await self._client.request_async(
             "POST",
@@ -480,6 +620,18 @@ class Documents(BaseNamespace):
         The response also includes a `Location` header, which indicates where to
         poll for operation results. For more details on long-running job
         polling, see [Operations endpoint](ref:getoperationbyid).
+
+        Args:
+            document_id: The unique identifier of the document
+            body: Request body.
+            timeout: Override the default request timeout (seconds).
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
+
+        Note:
+            This is a long-running operation (HTTP 202). Use
+            ``client.wait(response).result()`` to poll until completion.
         """
         return self._client.request(
             "POST",
@@ -507,6 +659,18 @@ class Documents(BaseNamespace):
         The response also includes a `Location` header, which indicates where to
         poll for operation results. For more details on long-running job
         polling, see [Operations endpoint](ref:getoperationbyid).
+
+        Args:
+            document_id: The unique identifier of the document
+            body: Request body.
+            timeout: Override the default request timeout (seconds).
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
+
+        Note:
+            This is a long-running operation (HTTP 202). Use
+            ``await client.wait(response).result_async()`` to poll until completion.
         """
         return await self._client.request_async(
             "POST",
@@ -523,49 +687,77 @@ class Documents(BaseNamespace):
         self,
         *,
         document_id: str,
-        next_: Optional[str] = None,
         timeout: Optional[float] = None,
-    ) -> httpx.Response:
+    ) -> MilestoneListResult:
         """Retrieve a list of milestones for a document
 
         Returns [MilestoneListResult](ref:milestones#milestonelistresult).
+
+        Args:
+            document_id: The unique identifier of the document
+            timeout: Override the default request timeout (seconds).
+
+        Returns:
+            MilestoneListResult
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
         """
-        return self._client.request(
-            "GET",
-            self._api,
-            "/documents/{documentId}/milestones",
-            path_params={
-                "documentId": document_id,
-            },
-            query_params={
-                "$next": next_,
-            },
-            timeout=timeout,
-        )
+
+        def _fetch(_cursor: str | None) -> httpx.Response:
+            return self._client.request(
+                "GET",
+                self._api,
+                "/documents/{documentId}/milestones",
+                path_params={
+                    "documentId": document_id,
+                },
+                query_params={
+                    "$next": _cursor,
+                },
+                timeout=timeout,
+            )
+
+        _body = paginate_all(_fetch, extract_next_link, "data")
+        return MilestoneListResult.model_validate(_body)
 
     async def get_document_milestones_async(
         self,
         *,
         document_id: str,
-        next_: Optional[str] = None,
         timeout: Optional[float] = None,
-    ) -> httpx.Response:
+    ) -> MilestoneListResult:
         """Retrieve a list of milestones for a document (async)
 
         Returns [MilestoneListResult](ref:milestones#milestonelistresult).
+
+        Args:
+            document_id: The unique identifier of the document
+            timeout: Override the default request timeout (seconds).
+
+        Returns:
+            MilestoneListResult
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
         """
-        return await self._client.request_async(
-            "GET",
-            self._api,
-            "/documents/{documentId}/milestones",
-            path_params={
-                "documentId": document_id,
-            },
-            query_params={
-                "$next": next_,
-            },
-            timeout=timeout,
-        )
+
+        async def _fetch(_cursor: str | None) -> httpx.Response:
+            return await self._client.request_async(
+                "GET",
+                self._api,
+                "/documents/{documentId}/milestones",
+                path_params={
+                    "documentId": document_id,
+                },
+                query_params={
+                    "$next": _cursor,
+                },
+                timeout=timeout,
+            )
+
+        _body = await paginate_all_async(_fetch, extract_next_link, "data")
+        return MilestoneListResult.model_validate(_body)
 
     def get_document_permissions(
         self,
@@ -573,27 +765,43 @@ class Documents(BaseNamespace):
         document_id: str,
         filter_: Optional[str] = None,
         maxpagesize: Optional[int] = 1000,
-        next_: Optional[str] = None,
         timeout: Optional[float] = None,
-    ) -> httpx.Response:
+    ) -> ResourcePermissionsListResult:
         """Retrieve permissions for a document
 
         Retrieves a paginated list of permissions for a given document
+
+        Args:
+            document_id: The unique identifier of the document
+            filter_: The properties to filter the results by.
+            maxpagesize: The maximum number of results to retrieve
+            timeout: Override the default request timeout (seconds).
+
+        Returns:
+            ResourcePermissionsListResult
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
         """
-        return self._client.request(
-            "GET",
-            self._api,
-            "/documents/{documentId}/permissions",
-            path_params={
-                "documentId": document_id,
-            },
-            query_params={
-                "$filter": filter_,
-                "$maxpagesize": maxpagesize,
-                "$next": next_,
-            },
-            timeout=timeout,
-        )
+
+        def _fetch(_cursor: str | None) -> httpx.Response:
+            return self._client.request(
+                "GET",
+                self._api,
+                "/documents/{documentId}/permissions",
+                path_params={
+                    "documentId": document_id,
+                },
+                query_params={
+                    "$filter": filter_,
+                    "$maxpagesize": maxpagesize,
+                    "$next": _cursor,
+                },
+                timeout=timeout,
+            )
+
+        _body = paginate_all(_fetch, extract_next_link, "data")
+        return ResourcePermissionsListResult.model_validate(_body)
 
     async def get_document_permissions_async(
         self,
@@ -601,27 +809,43 @@ class Documents(BaseNamespace):
         document_id: str,
         filter_: Optional[str] = None,
         maxpagesize: Optional[int] = 1000,
-        next_: Optional[str] = None,
         timeout: Optional[float] = None,
-    ) -> httpx.Response:
+    ) -> ResourcePermissionsListResult:
         """Retrieve permissions for a document (async)
 
         Retrieves a paginated list of permissions for a given document
+
+        Args:
+            document_id: The unique identifier of the document
+            filter_: The properties to filter the results by.
+            maxpagesize: The maximum number of results to retrieve
+            timeout: Override the default request timeout (seconds).
+
+        Returns:
+            ResourcePermissionsListResult
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
         """
-        return await self._client.request_async(
-            "GET",
-            self._api,
-            "/documents/{documentId}/permissions",
-            path_params={
-                "documentId": document_id,
-            },
-            query_params={
-                "$filter": filter_,
-                "$maxpagesize": maxpagesize,
-                "$next": next_,
-            },
-            timeout=timeout,
-        )
+
+        async def _fetch(_cursor: str | None) -> httpx.Response:
+            return await self._client.request_async(
+                "GET",
+                self._api,
+                "/documents/{documentId}/permissions",
+                path_params={
+                    "documentId": document_id,
+                },
+                query_params={
+                    "$filter": filter_,
+                    "$maxpagesize": maxpagesize,
+                    "$next": _cursor,
+                },
+                timeout=timeout,
+            )
+
+        _body = await paginate_all_async(_fetch, extract_next_link, "data")
+        return ResourcePermissionsListResult.model_validate(_body)
 
     def document_permissions_modification(
         self,
@@ -638,6 +862,14 @@ class Documents(BaseNamespace):
         explicitly revoked. Then, the new permission needs to be assigned. This
         can be done in a single request by sending `toAssign` and `toRevoke` in
         the request body._
+
+        Args:
+            document_id: The unique identifier of the document
+            body: Request body.
+            timeout: Override the default request timeout (seconds).
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
         """
         return self._client.request(
             "POST",
@@ -665,6 +897,14 @@ class Documents(BaseNamespace):
         explicitly revoked. Then, the new permission needs to be assigned. This
         can be done in a single request by sending `toAssign` and `toRevoke` in
         the request body._
+
+        Args:
+            document_id: The unique identifier of the document
+            body: Request body.
+            timeout: Override the default request timeout (seconds).
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
         """
         return await self._client.request_async(
             "POST",
@@ -683,27 +923,43 @@ class Documents(BaseNamespace):
         document_id: str,
         revision: Optional[str] = None,
         maxpagesize: Optional[int] = 1000,
-        next_: Optional[str] = None,
         timeout: Optional[float] = None,
-    ) -> httpx.Response:
+    ) -> SectionsListResult:
         """Retrieve a list of sections
 
         Returns a list of [sections](ref:documents#section).
+
+        Args:
+            document_id: The unique identifier of the document
+            revision: Returns resources at a specific revision
+            maxpagesize: The maximum number of results to retrieve
+            timeout: Override the default request timeout (seconds).
+
+        Returns:
+            SectionsListResult
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
         """
-        return self._client.request(
-            "GET",
-            self._api,
-            "/documents/{documentId}/sections",
-            path_params={
-                "documentId": document_id,
-            },
-            query_params={
-                "$revision": revision,
-                "$maxpagesize": maxpagesize,
-                "$next": next_,
-            },
-            timeout=timeout,
-        )
+
+        def _fetch(_cursor: str | None) -> httpx.Response:
+            return self._client.request(
+                "GET",
+                self._api,
+                "/documents/{documentId}/sections",
+                path_params={
+                    "documentId": document_id,
+                },
+                query_params={
+                    "$revision": revision,
+                    "$maxpagesize": maxpagesize,
+                    "$next": _cursor,
+                },
+                timeout=timeout,
+            )
+
+        _body = paginate_all(_fetch, extract_next_link, "data")
+        return SectionsListResult.model_validate(_body)
 
     async def get_sections_async(
         self,
@@ -711,27 +967,43 @@ class Documents(BaseNamespace):
         document_id: str,
         revision: Optional[str] = None,
         maxpagesize: Optional[int] = 1000,
-        next_: Optional[str] = None,
         timeout: Optional[float] = None,
-    ) -> httpx.Response:
+    ) -> SectionsListResult:
         """Retrieve a list of sections (async)
 
         Returns a list of [sections](ref:documents#section).
+
+        Args:
+            document_id: The unique identifier of the document
+            revision: Returns resources at a specific revision
+            maxpagesize: The maximum number of results to retrieve
+            timeout: Override the default request timeout (seconds).
+
+        Returns:
+            SectionsListResult
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
         """
-        return await self._client.request_async(
-            "GET",
-            self._api,
-            "/documents/{documentId}/sections",
-            path_params={
-                "documentId": document_id,
-            },
-            query_params={
-                "$revision": revision,
-                "$maxpagesize": maxpagesize,
-                "$next": next_,
-            },
-            timeout=timeout,
-        )
+
+        async def _fetch(_cursor: str | None) -> httpx.Response:
+            return await self._client.request_async(
+                "GET",
+                self._api,
+                "/documents/{documentId}/sections",
+                path_params={
+                    "documentId": document_id,
+                },
+                query_params={
+                    "$revision": revision,
+                    "$maxpagesize": maxpagesize,
+                    "$next": _cursor,
+                },
+                timeout=timeout,
+            )
+
+        _body = await paginate_all_async(_fetch, extract_next_link, "data")
+        return SectionsListResult.model_validate(_body)
 
     def create_section(
         self,
@@ -739,14 +1011,25 @@ class Documents(BaseNamespace):
         document_id: str,
         body: Section,
         timeout: Optional[float] = None,
-    ) -> httpx.Response:
+    ) -> Section:
         """Create a new section in a document
 
         Creates a new [section](ref:documents#section) in a
         [document](ref:documents#document), given its properties. By default,
         the new section appears at the top-most position.
+
+        Args:
+            document_id: The unique identifier of the document
+            body: Request body.
+            timeout: Override the default request timeout (seconds).
+
+        Returns:
+            Section
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
         """
-        return self._client.request(
+        response = self._client.request(
             "POST",
             self._api,
             "/documents/{documentId}/sections",
@@ -756,6 +1039,7 @@ class Documents(BaseNamespace):
             json_body=body,
             timeout=timeout,
         )
+        return Section.model_validate(response.json())
 
     async def create_section_async(
         self,
@@ -763,14 +1047,25 @@ class Documents(BaseNamespace):
         document_id: str,
         body: Section,
         timeout: Optional[float] = None,
-    ) -> httpx.Response:
+    ) -> Section:
         """Create a new section in a document (async)
 
         Creates a new [section](ref:documents#section) in a
         [document](ref:documents#document), given its properties. By default,
         the new section appears at the top-most position.
+
+        Args:
+            document_id: The unique identifier of the document
+            body: Request body.
+            timeout: Override the default request timeout (seconds).
+
+        Returns:
+            Section
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
         """
-        return await self._client.request_async(
+        response = await self._client.request_async(
             "POST",
             self._api,
             "/documents/{documentId}/sections",
@@ -780,62 +1075,7 @@ class Documents(BaseNamespace):
             json_body=body,
             timeout=timeout,
         )
-
-    def get_section_by_id(
-        self,
-        *,
-        document_id: str,
-        section_id: str,
-        expand: Optional[str] = None,
-        revision: Optional[str] = None,
-        timeout: Optional[float] = None,
-    ) -> httpx.Response:
-        """Retrieve a single section
-
-        Retrieves a [section](ref:documents#section) given its ID.
-        """
-        return self._client.request(
-            "GET",
-            self._api,
-            "/documents/{documentId}/sections/{sectionId}",
-            path_params={
-                "documentId": document_id,
-                "sectionId": section_id,
-            },
-            query_params={
-                "$expand": expand,
-                "$revision": revision,
-            },
-            timeout=timeout,
-        )
-
-    async def get_section_by_id_async(
-        self,
-        *,
-        document_id: str,
-        section_id: str,
-        expand: Optional[str] = None,
-        revision: Optional[str] = None,
-        timeout: Optional[float] = None,
-    ) -> httpx.Response:
-        """Retrieve a single section (async)
-
-        Retrieves a [section](ref:documents#section) given its ID.
-        """
-        return await self._client.request_async(
-            "GET",
-            self._api,
-            "/documents/{documentId}/sections/{sectionId}",
-            path_params={
-                "documentId": document_id,
-                "sectionId": section_id,
-            },
-            query_params={
-                "$expand": expand,
-                "$revision": revision,
-            },
-            timeout=timeout,
-        )
+        return Section.model_validate(response.json())
 
     def partially_update_section_by_id(
         self,
@@ -1014,6 +1254,19 @@ class Documents(BaseNamespace):
           }
         ]
         ```
+
+        Args:
+            document_id: The unique identifier of the document
+            section_id: The unique identifier of the section
+            body: Request body.
+            timeout: Override the default request timeout (seconds).
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
+
+        Note:
+            This is a long-running operation (HTTP 202). Use
+            ``client.wait(response).result()`` to poll until completion.
         """
         return self._client.request(
             "PATCH",
@@ -1204,6 +1457,19 @@ class Documents(BaseNamespace):
           }
         ]
         ```
+
+        Args:
+            document_id: The unique identifier of the document
+            section_id: The unique identifier of the section
+            body: Request body.
+            timeout: Override the default request timeout (seconds).
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
+
+        Note:
+            This is a long-running operation (HTTP 202). Use
+            ``await client.wait(response).result_async()`` to poll until completion.
         """
         return await self._client.request_async(
             "PATCH",
@@ -1217,6 +1483,90 @@ class Documents(BaseNamespace):
             timeout=timeout,
         )
 
+    def get_section_by_id(
+        self,
+        *,
+        document_id: str,
+        section_id: str,
+        expand: Optional[str] = None,
+        revision: Optional[str] = None,
+        timeout: Optional[float] = None,
+    ) -> Section:
+        """Retrieve a single section
+
+        Retrieves a [section](ref:documents#section) given its ID.
+
+        Args:
+            document_id: The unique identifier of the document
+            section_id: The unique identifier of the section
+            expand: Returns related resources inline with the main resource
+            revision: Returns resources at a specific revision
+            timeout: Override the default request timeout (seconds).
+
+        Returns:
+            Section
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
+        """
+        response = self._client.request(
+            "GET",
+            self._api,
+            "/documents/{documentId}/sections/{sectionId}",
+            path_params={
+                "documentId": document_id,
+                "sectionId": section_id,
+            },
+            query_params={
+                "$expand": expand,
+                "$revision": revision,
+            },
+            timeout=timeout,
+        )
+        return Section.model_validate(response.json())
+
+    async def get_section_by_id_async(
+        self,
+        *,
+        document_id: str,
+        section_id: str,
+        expand: Optional[str] = None,
+        revision: Optional[str] = None,
+        timeout: Optional[float] = None,
+    ) -> Section:
+        """Retrieve a single section (async)
+
+        Retrieves a [section](ref:documents#section) given its ID.
+
+        Args:
+            document_id: The unique identifier of the document
+            section_id: The unique identifier of the section
+            expand: Returns related resources inline with the main resource
+            revision: Returns resources at a specific revision
+            timeout: Override the default request timeout (seconds).
+
+        Returns:
+            Section
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
+        """
+        response = await self._client.request_async(
+            "GET",
+            self._api,
+            "/documents/{documentId}/sections/{sectionId}",
+            path_params={
+                "documentId": document_id,
+                "sectionId": section_id,
+            },
+            query_params={
+                "$expand": expand,
+                "$revision": revision,
+            },
+            timeout=timeout,
+        )
+        return Section.model_validate(response.json())
+
     def delete_section_by_id(
         self,
         *,
@@ -1227,6 +1577,14 @@ class Documents(BaseNamespace):
         """Delete a single section
 
         Deletes a [section](ref:documents#section) given its ID.
+
+        Args:
+            document_id: The unique identifier of the document
+            section_id: The unique identifier of the section
+            timeout: Override the default request timeout (seconds).
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
         """
         return self._client.request(
             "DELETE",
@@ -1249,6 +1607,14 @@ class Documents(BaseNamespace):
         """Delete a single section (async)
 
         Deletes a [section](ref:documents#section) given its ID.
+
+        Args:
+            document_id: The unique identifier of the document
+            section_id: The unique identifier of the section
+            timeout: Override the default request timeout (seconds).
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
         """
         return await self._client.request_async(
             "DELETE",
@@ -1280,6 +1646,19 @@ class Documents(BaseNamespace):
         formatting from a style guide. Unless otherwise specified, the copy
         appears at the top level of its destination document, with an index of
         0, and with the same name as the original section.
+
+        Args:
+            document_id: The unique identifier of the document
+            section_id: The unique identifier of the section
+            body: Request body.
+            timeout: Override the default request timeout (seconds).
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
+
+        Note:
+            This is a long-running operation (HTTP 202). Use
+            ``client.wait(response).result()`` to poll until completion.
         """
         return self._client.request(
             "POST",
@@ -1312,6 +1691,19 @@ class Documents(BaseNamespace):
         formatting from a style guide. Unless otherwise specified, the copy
         appears at the top level of its destination document, with an index of
         0, and with the same name as the original section.
+
+        Args:
+            document_id: The unique identifier of the document
+            section_id: The unique identifier of the section
+            body: Request body.
+            timeout: Override the default request timeout (seconds).
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
+
+        Note:
+            This is a long-running operation (HTTP 202). Use
+            ``await client.wait(response).result_async()`` to poll until completion.
         """
         return await self._client.request_async(
             "POST",
@@ -1342,6 +1734,18 @@ class Documents(BaseNamespace):
         results. For more details on long-running job polling, see [Operations
         endpoint](ref:getoperationbyid). When the update completes, its status
         will be `completed`.
+
+        Args:
+            document_id: The unique identifier of the document
+            body: Request body.
+            timeout: Override the default request timeout (seconds).
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
+
+        Note:
+            This is a long-running operation (HTTP 202). Use
+            ``client.wait(response).result()`` to poll until completion.
         """
         return self._client.request(
             "POST",
@@ -1371,6 +1775,18 @@ class Documents(BaseNamespace):
         results. For more details on long-running job polling, see [Operations
         endpoint](ref:getoperationbyid). When the update completes, its status
         will be `completed`.
+
+        Args:
+            document_id: The unique identifier of the document
+            body: Request body.
+            timeout: Override the default request timeout (seconds).
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
+
+        Note:
+            This is a long-running operation (HTTP 202). Use
+            ``await client.wait(response).result_async()`` to poll until completion.
         """
         return await self._client.request_async(
             "POST",
@@ -1390,29 +1806,46 @@ class Documents(BaseNamespace):
         section_id: str,
         filter_: Optional[str] = None,
         maxpagesize: Optional[int] = 1000,
-        next_: Optional[str] = None,
         timeout: Optional[float] = None,
-    ) -> httpx.Response:
+    ) -> ResourcePermissionsListResult:
         """Retrieve permissions for a section in a document
 
         Retrieves a paginated list of permissions for the given section in a
         document
+
+        Args:
+            document_id: The unique identifier of the document
+            section_id: The unique identifier of the section
+            filter_: The properties to filter the results by.
+            maxpagesize: The maximum number of results to retrieve
+            timeout: Override the default request timeout (seconds).
+
+        Returns:
+            ResourcePermissionsListResult
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
         """
-        return self._client.request(
-            "GET",
-            self._api,
-            "/documents/{documentId}/sections/{sectionId}/permissions",
-            path_params={
-                "documentId": document_id,
-                "sectionId": section_id,
-            },
-            query_params={
-                "$filter": filter_,
-                "$maxpagesize": maxpagesize,
-                "$next": next_,
-            },
-            timeout=timeout,
-        )
+
+        def _fetch(_cursor: str | None) -> httpx.Response:
+            return self._client.request(
+                "GET",
+                self._api,
+                "/documents/{documentId}/sections/{sectionId}/permissions",
+                path_params={
+                    "documentId": document_id,
+                    "sectionId": section_id,
+                },
+                query_params={
+                    "$filter": filter_,
+                    "$maxpagesize": maxpagesize,
+                    "$next": _cursor,
+                },
+                timeout=timeout,
+            )
+
+        _body = paginate_all(_fetch, extract_next_link, "data")
+        return ResourcePermissionsListResult.model_validate(_body)
 
     async def get_section_permissions_async(
         self,
@@ -1421,29 +1854,46 @@ class Documents(BaseNamespace):
         section_id: str,
         filter_: Optional[str] = None,
         maxpagesize: Optional[int] = 1000,
-        next_: Optional[str] = None,
         timeout: Optional[float] = None,
-    ) -> httpx.Response:
+    ) -> ResourcePermissionsListResult:
         """Retrieve permissions for a section in a document (async)
 
         Retrieves a paginated list of permissions for the given section in a
         document
+
+        Args:
+            document_id: The unique identifier of the document
+            section_id: The unique identifier of the section
+            filter_: The properties to filter the results by.
+            maxpagesize: The maximum number of results to retrieve
+            timeout: Override the default request timeout (seconds).
+
+        Returns:
+            ResourcePermissionsListResult
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
         """
-        return await self._client.request_async(
-            "GET",
-            self._api,
-            "/documents/{documentId}/sections/{sectionId}/permissions",
-            path_params={
-                "documentId": document_id,
-                "sectionId": section_id,
-            },
-            query_params={
-                "$filter": filter_,
-                "$maxpagesize": maxpagesize,
-                "$next": next_,
-            },
-            timeout=timeout,
-        )
+
+        async def _fetch(_cursor: str | None) -> httpx.Response:
+            return await self._client.request_async(
+                "GET",
+                self._api,
+                "/documents/{documentId}/sections/{sectionId}/permissions",
+                path_params={
+                    "documentId": document_id,
+                    "sectionId": section_id,
+                },
+                query_params={
+                    "$filter": filter_,
+                    "$maxpagesize": maxpagesize,
+                    "$next": _cursor,
+                },
+                timeout=timeout,
+            )
+
+        _body = await paginate_all_async(_fetch, extract_next_link, "data")
+        return ResourcePermissionsListResult.model_validate(_body)
 
     def section_permissions_modification(
         self,
@@ -1461,6 +1911,15 @@ class Documents(BaseNamespace):
         explicitly revoked. Then, the new permission needs to be assigned. This
         can be done in a single request by sending `toAssign` and `toRevoke` in
         the request body._
+
+        Args:
+            document_id: The unique identifier of the document
+            section_id: The unique identifier of the section
+            body: Request body.
+            timeout: Override the default request timeout (seconds).
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
         """
         return self._client.request(
             "POST",
@@ -1490,6 +1949,15 @@ class Documents(BaseNamespace):
         explicitly revoked. Then, the new permission needs to be assigned. This
         can be done in a single request by sending `toAssign` and `toRevoke` in
         the request body._
+
+        Args:
+            document_id: The unique identifier of the document
+            section_id: The unique identifier of the section
+            body: Request body.
+            timeout: Override the default request timeout (seconds).
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
         """
         return await self._client.request_async(
             "POST",

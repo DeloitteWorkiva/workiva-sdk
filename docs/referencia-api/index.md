@@ -1,73 +1,107 @@
 # Referencia de API
 
-El SDK organiza las operaciones en 17 namespaces, accesibles como propiedades del cliente.
+El SDK organiza las 357 operaciones en **18 namespaces**, accesibles como atributos del cliente. Los namespaces se cargan de forma lazy -- solo se importan cuando los usas.
 
 ```python
 from workiva import Workiva
 
 with Workiva(client_id="...", client_secret="...") as client:
-    client.activities       # Actividades de organización/workspace
-    client.admin            # Usuarios, workspaces, grupos, roles
-    client.chains           # Automatización de flujos
-    client.content          # Tablas, imágenes, links, rich text
-    client.documents        # Documentos y secciones
-    client.files            # Archivos y carpetas
-    client.graph            # Integrated Risk (registros, tipos)
-    client.iam              # Tokens OAuth2
-    client.milestones       # Hitos
-    client.operations       # Estado de operaciones asíncronas
-    client.permissions      # Permisos
-    client.presentations    # Presentaciones y slides
-    client.reports          # Reportes administrativos
-    client.spreadsheets     # Hojas de cálculo y sheets
-    client.sustainability   # Métricas ESG
-    client.tasks            # Tareas
-    client.test_forms       # Formularios de prueba
-    client.wdata            # Wdata: queries, tablas, imports
+    # Platform (16 namespaces)
+    client.activities
+    client.admin
+    client.content
+    client.documents
+    client.files
+    client.graph
+    client.iam
+    client.milestones
+    client.operations
+    client.permissions
+    client.presentations
+    client.reports
+    client.spreadsheets
+    client.sustainability
+    client.tasks
+    client.test_forms
+
+    # Chains (1 namespace)
+    client.chains
+
+    # Wdata (1 namespace)
+    client.wdata
 ```
 
-## Resumen por namespace
+## Platform (16 namespaces)
 
-| Namespace | API | Operaciones | Descripción |
-|-----------|-----|-------------|-------------|
-| [`activities`](activities.md) | Platform | 4 | Actividades de org y workspace |
-| [`admin`](admin.md) | Platform | 33 | Usuarios, workspaces, grupos, roles |
-| [`chains`](chains.md) | Chains | 24 | Automatización de cadenas |
-| [`content`](content.md) | Platform | 30 | Tablas, imágenes, links, rich text |
-| [`documents`](documents.md) | Platform | 16 | Documentos y secciones |
-| [`files`](files.md) | Platform | 12 | Archivos y carpetas |
-| [`graph`](graph.md) | Platform | 6 | Integrated Risk |
-| [`iam`](iam.md) | Platform | 1 | Token OAuth2 |
-| [`milestones`](milestones.md) | Platform | 4 | Hitos |
-| [`operations`](operations.md) | Platform | 26+ | Resultados de operaciones |
-| [`permissions`](permissions.md) | Platform | 2 | Permisos |
-| [`presentations`](presentations.md) | Platform | 12 | Presentaciones y slides |
-| [`reports`](reports.md) | Platform | 1 | Reportes administrativos |
-| [`spreadsheets`](spreadsheets.md) | Platform | 22 | Hojas de cálculo |
-| [`sustainability`](sustainability.md) | Platform | 24 | Métricas ESG |
-| [`tasks`](tasks.md) | Platform | 6 | Gestión de tareas |
-| [`test_forms`](test-forms.md) | Platform | 29 | Formularios de prueba |
-| [`wdata`](wdata.md) | Wdata | 56 | Queries, tablas, imports/exports |
+| Namespace | Atributo | Operaciones | Descripcion |
+|-----------|----------|-------------|-------------|
+| [`Activities`](activities.md) | `client.activities` | 4 | Actividades de org y workspace |
+| [`Admin`](admin.md) | `client.admin` | 33 | Usuarios, workspaces, grupos, roles |
+| [`Content`](content.md) | `client.content` | 30 | Tablas, imagenes, links, rich text |
+| [`Documents`](documents.md) | `client.documents` | 16 | Documentos y secciones |
+| [`Files`](files.md) | `client.files` | 12 | Archivos y carpetas |
+| [`Graph`](graph.md) | `client.graph` | 6 | Integrated Risk |
+| [`IAM`](iam.md) | `client.iam` | 1 | Token OAuth2 |
+| [`Milestones`](milestones.md) | `client.milestones` | 4 | Hitos |
+| [`Operations`](operations.md) | `client.operations` | 26+ | Resultados de operaciones |
+| [`Permissions`](permissions.md) | `client.permissions` | 2 | Permisos |
+| [`Presentations`](presentations.md) | `client.presentations` | 12 | Presentaciones y slides |
+| [`Reports`](reports.md) | `client.reports` | 1 | Reportes administrativos |
+| [`Spreadsheets`](spreadsheets.md) | `client.spreadsheets` | 22 | Hojas de calculo |
+| [`Sustainability`](sustainability.md) | `client.sustainability` | 24 | Metricas ESG |
+| [`Tasks`](tasks.md) | `client.tasks` | 6 | Gestion de tareas |
+| [`Test Forms`](test-forms.md) | `client.test_forms` | 29 | Formularios de prueba |
 
-## Parámetros comunes
+## Chains (1 namespace)
 
-Todos los métodos aceptan estos parámetros opcionales:
+| Namespace | Atributo | Operaciones | Descripcion |
+|-----------|----------|-------------|-------------|
+| [`Chains`](chains.md) | `client.chains` | 29 | Cadenas, ejecuciones, usuarios, permisos, entornos, workspaces |
 
-| Parámetro | Tipo | Descripción |
+## Wdata (1 namespace)
+
+| Namespace | Atributo | Operaciones | Descripcion |
+|-----------|----------|-------------|-------------|
+| [`Wdata`](wdata.md) | `client.wdata` | 83 | Tablas, queries, archivos, carpetas, conexiones, parametros, tags |
+
+## Parametro comun
+
+Todos los metodos aceptan un parametro opcional:
+
+| Parametro | Tipo | Descripcion |
 |-----------|------|-------------|
-| `retries` | `RetryConfig` | Sobreescribir config de reintentos |
-| `server_url` | `str` | Sobreescribir URL del servidor |
-| `timeout_ms` | `int` | Timeout en milisegundos |
-| `http_headers` | `dict[str, str]` | Headers HTTP adicionales |
+| `timeout` | `float \| None` | Timeout en segundos (sobreescribe el global) |
 
 ## Variantes async
 
-Cada método tiene su variante async con sufijo `_async`:
+Cada metodo tiene su variante async con sufijo `_async`:
 
 ```python
 # Sync
-response = client.files.get_files()
+result = client.files.get_files()
 
 # Async
-response = await client.files.get_files_async()
+result = await client.files.get_files_async()
+```
+
+## Respuestas tipadas
+
+Todas las operaciones que devuelven JSON retornan modelos Pydantic v2:
+
+```python
+# Devuelve FilesListResult (modelo tipado)
+result = client.files.get_files()
+# result.data es list[File]
+
+# Devuelve File (modelo tipado)
+file = client.files.get_file_by_id(file_id="abc")
+# file.name, file.kind, etc.
+```
+
+Las operaciones que devuelven HTTP 202 (larga duracion) o 204 (sin contenido) retornan `httpx.Response`:
+
+```python
+# Devuelve httpx.Response (HTTP 202)
+response = client.files.copy_file(file_id="abc", body=body)
+# Usa client.wait(response).result() para obtener el resultado
 ```

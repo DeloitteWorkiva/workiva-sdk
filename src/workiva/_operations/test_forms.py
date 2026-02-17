@@ -12,12 +12,23 @@ import httpx
 from workiva._constants import _API
 from workiva._operations._base import BaseNamespace
 from workiva.models.platform import (
+    GraphAttachment,
     GraphAttachmentExport,
+    GraphAttachmentsListResult,
     GraphAttachmentUpload,
+    GraphAttachmentUploadResponse,
+    MatricesListResult,
     Matrix,
     MatrixSample,
+    MatrixSamplesListResult,
+    TestForm,
     TestFormExport,
+    TestFormsListResult,
+    TestPhase,
+    TestPhasesListResult,
 )
+
+__all__ = ["TestForms"]
 
 
 class TestForms(BaseNamespace):
@@ -30,12 +41,22 @@ class TestForms(BaseNamespace):
         *,
         expand: Optional[str] = None,
         timeout: Optional[float] = None,
-    ) -> httpx.Response:
+    ) -> TestFormsListResult:
         """Retrieve a list of test forms
 
         Retrieves a list of [test forms](ref:testforms#testform).
+
+        Args:
+            expand: Returns related resources inline with the main resource
+            timeout: Override the default request timeout (seconds).
+
+        Returns:
+            TestFormsListResult
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
         """
-        return self._client.request(
+        response = self._client.request(
             "GET",
             self._api,
             "/testForms",
@@ -44,18 +65,29 @@ class TestForms(BaseNamespace):
             },
             timeout=timeout,
         )
+        return TestFormsListResult.model_validate(response.json())
 
     async def get_test_forms_async(
         self,
         *,
         expand: Optional[str] = None,
         timeout: Optional[float] = None,
-    ) -> httpx.Response:
+    ) -> TestFormsListResult:
         """Retrieve a list of test forms (async)
 
         Retrieves a list of [test forms](ref:testforms#testform).
+
+        Args:
+            expand: Returns related resources inline with the main resource
+            timeout: Override the default request timeout (seconds).
+
+        Returns:
+            TestFormsListResult
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
         """
-        return await self._client.request_async(
+        response = await self._client.request_async(
             "GET",
             self._api,
             "/testForms",
@@ -64,6 +96,7 @@ class TestForms(BaseNamespace):
             },
             timeout=timeout,
         )
+        return TestFormsListResult.model_validate(response.json())
 
     def get_test_form_by_id(
         self,
@@ -71,12 +104,23 @@ class TestForms(BaseNamespace):
         test_form_id: str,
         expand: Optional[str] = None,
         timeout: Optional[float] = None,
-    ) -> httpx.Response:
+    ) -> TestForm:
         """Retrieve a single test form
 
         Retrieves a [test form](ref:testforms#testform) given its ID.
+
+        Args:
+            test_form_id: The unique identifier of the test form
+            expand: Returns related resources inline with the main resource
+            timeout: Override the default request timeout (seconds).
+
+        Returns:
+            TestForm
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
         """
-        return self._client.request(
+        response = self._client.request(
             "GET",
             self._api,
             "/testForms/{testFormId}",
@@ -88,6 +132,7 @@ class TestForms(BaseNamespace):
             },
             timeout=timeout,
         )
+        return TestForm.model_validate(response.json())
 
     async def get_test_form_by_id_async(
         self,
@@ -95,12 +140,23 @@ class TestForms(BaseNamespace):
         test_form_id: str,
         expand: Optional[str] = None,
         timeout: Optional[float] = None,
-    ) -> httpx.Response:
+    ) -> TestForm:
         """Retrieve a single test form (async)
 
         Retrieves a [test form](ref:testforms#testform) given its ID.
+
+        Args:
+            test_form_id: The unique identifier of the test form
+            expand: Returns related resources inline with the main resource
+            timeout: Override the default request timeout (seconds).
+
+        Returns:
+            TestForm
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
         """
-        return await self._client.request_async(
+        response = await self._client.request_async(
             "GET",
             self._api,
             "/testForms/{testFormId}",
@@ -112,6 +168,7 @@ class TestForms(BaseNamespace):
             },
             timeout=timeout,
         )
+        return TestForm.model_validate(response.json())
 
     def test_form_export(
         self,
@@ -132,6 +189,18 @@ class TestForms(BaseNamespace):
         `resourceURL` with the same authentication credentials and flow as the
         export request. For more details, see [Authentication
         documentation](ref:authentication).
+
+        Args:
+            test_form_id: The unique identifier of the test form
+            body: Request body.
+            timeout: Override the default request timeout (seconds).
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
+
+        Note:
+            This is a long-running operation (HTTP 202). Use
+            ``client.wait(response).result()`` to poll until completion.
         """
         return self._client.request(
             "POST",
@@ -163,6 +232,18 @@ class TestForms(BaseNamespace):
         `resourceURL` with the same authentication credentials and flow as the
         export request. For more details, see [Authentication
         documentation](ref:authentication).
+
+        Args:
+            test_form_id: The unique identifier of the test form
+            body: Request body.
+            timeout: Override the default request timeout (seconds).
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
+
+        Note:
+            This is a long-running operation (HTTP 202). Use
+            ``await client.wait(response).result_async()`` to poll until completion.
         """
         return await self._client.request_async(
             "POST",
@@ -181,12 +262,23 @@ class TestForms(BaseNamespace):
         test_form_id: str,
         expand: Optional[str] = None,
         timeout: Optional[float] = None,
-    ) -> httpx.Response:
+    ) -> TestPhasesListResult:
         """Retrieve a list of test phases
 
         Returns a list of [test phases](ref:testforms#testphase).
+
+        Args:
+            test_form_id: The unique identifier of the test form
+            expand: Returns related resources inline with the main resource
+            timeout: Override the default request timeout (seconds).
+
+        Returns:
+            TestPhasesListResult
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
         """
-        return self._client.request(
+        response = self._client.request(
             "GET",
             self._api,
             "/testForms/{testFormId}/testPhases",
@@ -198,6 +290,7 @@ class TestForms(BaseNamespace):
             },
             timeout=timeout,
         )
+        return TestPhasesListResult.model_validate(response.json())
 
     async def get_test_phases_async(
         self,
@@ -205,12 +298,23 @@ class TestForms(BaseNamespace):
         test_form_id: str,
         expand: Optional[str] = None,
         timeout: Optional[float] = None,
-    ) -> httpx.Response:
+    ) -> TestPhasesListResult:
         """Retrieve a list of test phases (async)
 
         Returns a list of [test phases](ref:testforms#testphase).
+
+        Args:
+            test_form_id: The unique identifier of the test form
+            expand: Returns related resources inline with the main resource
+            timeout: Override the default request timeout (seconds).
+
+        Returns:
+            TestPhasesListResult
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
         """
-        return await self._client.request_async(
+        response = await self._client.request_async(
             "GET",
             self._api,
             "/testForms/{testFormId}/testPhases",
@@ -222,6 +326,7 @@ class TestForms(BaseNamespace):
             },
             timeout=timeout,
         )
+        return TestPhasesListResult.model_validate(response.json())
 
     def get_test_phase_by_id(
         self,
@@ -230,12 +335,24 @@ class TestForms(BaseNamespace):
         test_phase_id: str,
         expand: Optional[str] = None,
         timeout: Optional[float] = None,
-    ) -> httpx.Response:
+    ) -> TestPhase:
         """Retrive a single test phase
 
         Retrieves a [test phase](ref:testforms#testphase) given its ID.
+
+        Args:
+            test_form_id: The unique identifier of the test form
+            test_phase_id: The unique identifier of the test phase
+            expand: Returns related resources inline with the main resource
+            timeout: Override the default request timeout (seconds).
+
+        Returns:
+            TestPhase
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
         """
-        return self._client.request(
+        response = self._client.request(
             "GET",
             self._api,
             "/testForms/{testFormId}/testPhases/{testPhaseId}",
@@ -248,6 +365,7 @@ class TestForms(BaseNamespace):
             },
             timeout=timeout,
         )
+        return TestPhase.model_validate(response.json())
 
     async def get_test_phase_by_id_async(
         self,
@@ -256,12 +374,24 @@ class TestForms(BaseNamespace):
         test_phase_id: str,
         expand: Optional[str] = None,
         timeout: Optional[float] = None,
-    ) -> httpx.Response:
+    ) -> TestPhase:
         """Retrive a single test phase (async)
 
         Retrieves a [test phase](ref:testforms#testphase) given its ID.
+
+        Args:
+            test_form_id: The unique identifier of the test form
+            test_phase_id: The unique identifier of the test phase
+            expand: Returns related resources inline with the main resource
+            timeout: Override the default request timeout (seconds).
+
+        Returns:
+            TestPhase
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
         """
-        return await self._client.request_async(
+        response = await self._client.request_async(
             "GET",
             self._api,
             "/testForms/{testFormId}/testPhases/{testPhaseId}",
@@ -274,6 +404,7 @@ class TestForms(BaseNamespace):
             },
             timeout=timeout,
         )
+        return TestPhase.model_validate(response.json())
 
     def test_phase_attachment_upload(
         self,
@@ -282,7 +413,7 @@ class TestForms(BaseNamespace):
         test_phase_id: str,
         body: GraphAttachmentUpload,
         timeout: Optional[float] = None,
-    ) -> httpx.Response:
+    ) -> GraphAttachmentUploadResponse:
         """Initiate a test phase attachment upload
 
         Starts the process to upload and attach a file to a [test
@@ -296,8 +427,20 @@ class TestForms(BaseNamespace):
         The response also includes a `Location` header, which indicates where to
         poll for operation results. For more details on long-running job
         polling, see [Operations endpoint](ref:getoperationbyid).
+
+        Args:
+            test_form_id: The unique identifier of the test form
+            test_phase_id: The unique identifier of the test phase
+            body: Request body.
+            timeout: Override the default request timeout (seconds).
+
+        Returns:
+            GraphAttachmentUploadResponse
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
         """
-        return self._client.request(
+        response = self._client.request(
             "POST",
             self._api,
             "/testForms/{testFormId}/testPhases/{testPhaseId}/attachmentUpload",
@@ -308,6 +451,7 @@ class TestForms(BaseNamespace):
             json_body=body,
             timeout=timeout,
         )
+        return GraphAttachmentUploadResponse.model_validate(response.json())
 
     async def test_phase_attachment_upload_async(
         self,
@@ -316,7 +460,7 @@ class TestForms(BaseNamespace):
         test_phase_id: str,
         body: GraphAttachmentUpload,
         timeout: Optional[float] = None,
-    ) -> httpx.Response:
+    ) -> GraphAttachmentUploadResponse:
         """Initiate a test phase attachment upload (async)
 
         Starts the process to upload and attach a file to a [test
@@ -330,8 +474,20 @@ class TestForms(BaseNamespace):
         The response also includes a `Location` header, which indicates where to
         poll for operation results. For more details on long-running job
         polling, see [Operations endpoint](ref:getoperationbyid).
+
+        Args:
+            test_form_id: The unique identifier of the test form
+            test_phase_id: The unique identifier of the test phase
+            body: Request body.
+            timeout: Override the default request timeout (seconds).
+
+        Returns:
+            GraphAttachmentUploadResponse
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
         """
-        return await self._client.request_async(
+        response = await self._client.request_async(
             "POST",
             self._api,
             "/testForms/{testFormId}/testPhases/{testPhaseId}/attachmentUpload",
@@ -342,6 +498,7 @@ class TestForms(BaseNamespace):
             json_body=body,
             timeout=timeout,
         )
+        return GraphAttachmentUploadResponse.model_validate(response.json())
 
     def get_test_phase_attachments(
         self,
@@ -349,13 +506,24 @@ class TestForms(BaseNamespace):
         test_form_id: str,
         test_phase_id: str,
         timeout: Optional[float] = None,
-    ) -> httpx.Response:
+    ) -> GraphAttachmentsListResult:
         """Retrieve a list of test phase attachments
 
         Returns a list of [attachments](ref:testforms#graphattachment) for a
         [test phase](ref:testforms#testphase).
+
+        Args:
+            test_form_id: The unique identifier of the test form
+            test_phase_id: The unique identifier of the test phase
+            timeout: Override the default request timeout (seconds).
+
+        Returns:
+            GraphAttachmentsListResult
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
         """
-        return self._client.request(
+        response = self._client.request(
             "GET",
             self._api,
             "/testForms/{testFormId}/testPhases/{testPhaseId}/attachments",
@@ -365,6 +533,7 @@ class TestForms(BaseNamespace):
             },
             timeout=timeout,
         )
+        return GraphAttachmentsListResult.model_validate(response.json())
 
     async def get_test_phase_attachments_async(
         self,
@@ -372,13 +541,24 @@ class TestForms(BaseNamespace):
         test_form_id: str,
         test_phase_id: str,
         timeout: Optional[float] = None,
-    ) -> httpx.Response:
+    ) -> GraphAttachmentsListResult:
         """Retrieve a list of test phase attachments (async)
 
         Returns a list of [attachments](ref:testforms#graphattachment) for a
         [test phase](ref:testforms#testphase).
+
+        Args:
+            test_form_id: The unique identifier of the test form
+            test_phase_id: The unique identifier of the test phase
+            timeout: Override the default request timeout (seconds).
+
+        Returns:
+            GraphAttachmentsListResult
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
         """
-        return await self._client.request_async(
+        response = await self._client.request_async(
             "GET",
             self._api,
             "/testForms/{testFormId}/testPhases/{testPhaseId}/attachments",
@@ -388,6 +568,7 @@ class TestForms(BaseNamespace):
             },
             timeout=timeout,
         )
+        return GraphAttachmentsListResult.model_validate(response.json())
 
     def get_test_phase_attachment_by_id(
         self,
@@ -396,12 +577,24 @@ class TestForms(BaseNamespace):
         test_phase_id: str,
         attachment_id: str,
         timeout: Optional[float] = None,
-    ) -> httpx.Response:
+    ) -> GraphAttachment:
         """Retrieve a single test phase attachment
 
         Retrieve a single [attachment](ref:testforms#graphattachment) by its ID.
+
+        Args:
+            test_form_id: The unique identifier of the test form
+            test_phase_id: The unique identifier of the test phase
+            attachment_id: The unique identifier of the attachment
+            timeout: Override the default request timeout (seconds).
+
+        Returns:
+            GraphAttachment
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
         """
-        return self._client.request(
+        response = self._client.request(
             "GET",
             self._api,
             "/testForms/{testFormId}/testPhases/{testPhaseId}/attachments/{attachmentId}",
@@ -412,6 +605,7 @@ class TestForms(BaseNamespace):
             },
             timeout=timeout,
         )
+        return GraphAttachment.model_validate(response.json())
 
     async def get_test_phase_attachment_by_id_async(
         self,
@@ -420,12 +614,24 @@ class TestForms(BaseNamespace):
         test_phase_id: str,
         attachment_id: str,
         timeout: Optional[float] = None,
-    ) -> httpx.Response:
+    ) -> GraphAttachment:
         """Retrieve a single test phase attachment (async)
 
         Retrieve a single [attachment](ref:testforms#graphattachment) by its ID.
+
+        Args:
+            test_form_id: The unique identifier of the test form
+            test_phase_id: The unique identifier of the test phase
+            attachment_id: The unique identifier of the attachment
+            timeout: Override the default request timeout (seconds).
+
+        Returns:
+            GraphAttachment
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
         """
-        return await self._client.request_async(
+        response = await self._client.request_async(
             "GET",
             self._api,
             "/testForms/{testFormId}/testPhases/{testPhaseId}/attachments/{attachmentId}",
@@ -436,6 +642,7 @@ class TestForms(BaseNamespace):
             },
             timeout=timeout,
         )
+        return GraphAttachment.model_validate(response.json())
 
     def test_phase_attachment_download_by_id(
         self,
@@ -458,6 +665,19 @@ class TestForms(BaseNamespace):
         with the same authentication credentials and flow as the download
         request. For more details, see [Authentication
         documentation](ref:authentication).
+
+        Args:
+            test_form_id: The unique identifier of the test form
+            test_phase_id: The unique identifier of the test phase
+            attachment_id: The unique identifier of the attachment
+            timeout: Override the default request timeout (seconds).
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
+
+        Note:
+            This is a long-running operation (HTTP 202). Use
+            ``client.wait(response).result()`` to poll until completion.
         """
         return self._client.request(
             "POST",
@@ -492,6 +712,19 @@ class TestForms(BaseNamespace):
         with the same authentication credentials and flow as the download
         request. For more details, see [Authentication
         documentation](ref:authentication).
+
+        Args:
+            test_form_id: The unique identifier of the test form
+            test_phase_id: The unique identifier of the test phase
+            attachment_id: The unique identifier of the attachment
+            timeout: Override the default request timeout (seconds).
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
+
+        Note:
+            This is a long-running operation (HTTP 202). Use
+            ``await client.wait(response).result_async()`` to poll until completion.
         """
         return await self._client.request_async(
             "POST",
@@ -527,6 +760,20 @@ class TestForms(BaseNamespace):
         `resourceURL` with the same authentication credentials and flow as the
         export request. For more details, see [Authentication
         documentation](ref:authentication).
+
+        Args:
+            test_form_id: The unique identifier of the test form
+            test_phase_id: The unique identifier of the test phase
+            attachment_id: The unique identifier of the attachment
+            body: Request body.
+            timeout: Override the default request timeout (seconds).
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
+
+        Note:
+            This is a long-running operation (HTTP 202). Use
+            ``client.wait(response).result()`` to poll until completion.
         """
         return self._client.request(
             "POST",
@@ -563,6 +810,20 @@ class TestForms(BaseNamespace):
         `resourceURL` with the same authentication credentials and flow as the
         export request. For more details, see [Authentication
         documentation](ref:authentication).
+
+        Args:
+            test_form_id: The unique identifier of the test form
+            test_phase_id: The unique identifier of the test phase
+            attachment_id: The unique identifier of the attachment
+            body: Request body.
+            timeout: Override the default request timeout (seconds).
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
+
+        Note:
+            This is a long-running operation (HTTP 202). Use
+            ``await client.wait(response).result_async()`` to poll until completion.
         """
         return await self._client.request_async(
             "POST",
@@ -584,12 +845,24 @@ class TestForms(BaseNamespace):
         test_phase_id: str,
         expand: Optional[str] = None,
         timeout: Optional[float] = None,
-    ) -> httpx.Response:
+    ) -> MatricesListResult:
         """Retrieve a list of matrices
 
         Returns a list of [matrices](ref:testforms#matrix).
+
+        Args:
+            test_form_id: The unique identifier of the test form
+            test_phase_id: The unique identifier of the test phase
+            expand: Returns related resources inline with the main resource
+            timeout: Override the default request timeout (seconds).
+
+        Returns:
+            MatricesListResult
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
         """
-        return self._client.request(
+        response = self._client.request(
             "GET",
             self._api,
             "/testForms/{testFormId}/testPhases/{testPhaseId}/matrices",
@@ -602,6 +875,7 @@ class TestForms(BaseNamespace):
             },
             timeout=timeout,
         )
+        return MatricesListResult.model_validate(response.json())
 
     async def get_matrices_async(
         self,
@@ -610,12 +884,24 @@ class TestForms(BaseNamespace):
         test_phase_id: str,
         expand: Optional[str] = None,
         timeout: Optional[float] = None,
-    ) -> httpx.Response:
+    ) -> MatricesListResult:
         """Retrieve a list of matrices (async)
 
         Returns a list of [matrices](ref:testforms#matrix).
+
+        Args:
+            test_form_id: The unique identifier of the test form
+            test_phase_id: The unique identifier of the test phase
+            expand: Returns related resources inline with the main resource
+            timeout: Override the default request timeout (seconds).
+
+        Returns:
+            MatricesListResult
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
         """
-        return await self._client.request_async(
+        response = await self._client.request_async(
             "GET",
             self._api,
             "/testForms/{testFormId}/testPhases/{testPhaseId}/matrices",
@@ -628,6 +914,7 @@ class TestForms(BaseNamespace):
             },
             timeout=timeout,
         )
+        return MatricesListResult.model_validate(response.json())
 
     def create_matrix(
         self,
@@ -636,14 +923,26 @@ class TestForms(BaseNamespace):
         test_phase_id: str,
         body: Matrix,
         timeout: Optional[float] = None,
-    ) -> httpx.Response:
+    ) -> Matrix:
         """Create a new matrix
 
         Create a new empty [matrix](ref:testforms#matrix). The `id` field for
         the matrix and its columns should be left blank; this will be populated
         by the endpoint.
+
+        Args:
+            test_form_id: The unique identifier of the test form
+            test_phase_id: The unique identifier of the test phase
+            body: Request body.
+            timeout: Override the default request timeout (seconds).
+
+        Returns:
+            Matrix
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
         """
-        return self._client.request(
+        response = self._client.request(
             "POST",
             self._api,
             "/testForms/{testFormId}/testPhases/{testPhaseId}/matrices",
@@ -654,6 +953,7 @@ class TestForms(BaseNamespace):
             json_body=body,
             timeout=timeout,
         )
+        return Matrix.model_validate(response.json())
 
     async def create_matrix_async(
         self,
@@ -662,14 +962,26 @@ class TestForms(BaseNamespace):
         test_phase_id: str,
         body: Matrix,
         timeout: Optional[float] = None,
-    ) -> httpx.Response:
+    ) -> Matrix:
         """Create a new matrix (async)
 
         Create a new empty [matrix](ref:testforms#matrix). The `id` field for
         the matrix and its columns should be left blank; this will be populated
         by the endpoint.
+
+        Args:
+            test_form_id: The unique identifier of the test form
+            test_phase_id: The unique identifier of the test phase
+            body: Request body.
+            timeout: Override the default request timeout (seconds).
+
+        Returns:
+            Matrix
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
         """
-        return await self._client.request_async(
+        response = await self._client.request_async(
             "POST",
             self._api,
             "/testForms/{testFormId}/testPhases/{testPhaseId}/matrices",
@@ -680,6 +992,7 @@ class TestForms(BaseNamespace):
             json_body=body,
             timeout=timeout,
         )
+        return Matrix.model_validate(response.json())
 
     def get_matrix_by_id(
         self,
@@ -689,12 +1002,25 @@ class TestForms(BaseNamespace):
         matrix_id: str,
         expand: Optional[str] = None,
         timeout: Optional[float] = None,
-    ) -> httpx.Response:
+    ) -> Matrix:
         """Retrieve a single matrix
 
         Retrieves a [matrix](ref:testforms#matrix) given its ID.
+
+        Args:
+            test_form_id: The unique identifier of the test form
+            test_phase_id: The unique identifier of the test phase
+            matrix_id: The unique identifier of the matrix
+            expand: Returns related resources inline with the main resource
+            timeout: Override the default request timeout (seconds).
+
+        Returns:
+            Matrix
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
         """
-        return self._client.request(
+        response = self._client.request(
             "GET",
             self._api,
             "/testForms/{testFormId}/testPhases/{testPhaseId}/matrices/{matrixId}",
@@ -708,6 +1034,7 @@ class TestForms(BaseNamespace):
             },
             timeout=timeout,
         )
+        return Matrix.model_validate(response.json())
 
     async def get_matrix_by_id_async(
         self,
@@ -717,12 +1044,25 @@ class TestForms(BaseNamespace):
         matrix_id: str,
         expand: Optional[str] = None,
         timeout: Optional[float] = None,
-    ) -> httpx.Response:
+    ) -> Matrix:
         """Retrieve a single matrix (async)
 
         Retrieves a [matrix](ref:testforms#matrix) given its ID.
+
+        Args:
+            test_form_id: The unique identifier of the test form
+            test_phase_id: The unique identifier of the test phase
+            matrix_id: The unique identifier of the matrix
+            expand: Returns related resources inline with the main resource
+            timeout: Override the default request timeout (seconds).
+
+        Returns:
+            Matrix
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
         """
-        return await self._client.request_async(
+        response = await self._client.request_async(
             "GET",
             self._api,
             "/testForms/{testFormId}/testPhases/{testPhaseId}/matrices/{matrixId}",
@@ -736,6 +1076,7 @@ class TestForms(BaseNamespace):
             },
             timeout=timeout,
         )
+        return Matrix.model_validate(response.json())
 
     def matrix_attachment_upload(
         self,
@@ -745,7 +1086,7 @@ class TestForms(BaseNamespace):
         matrix_id: str,
         body: GraphAttachmentUpload,
         timeout: Optional[float] = None,
-    ) -> httpx.Response:
+    ) -> GraphAttachmentUploadResponse:
         """Initiate a matrix attachment upload
 
         Starts the process to upload and attach a file to a
@@ -759,8 +1100,21 @@ class TestForms(BaseNamespace):
         The response also includes a `Location` header, which indicates where to
         poll for operation results. For more details on long-running job
         polling, see [Operations endpoint](ref:getoperationbyid).
+
+        Args:
+            test_form_id: The unique identifier of the test form
+            test_phase_id: The unique identifier of the test phase
+            matrix_id: The unique identifier of the matrix
+            body: Request body.
+            timeout: Override the default request timeout (seconds).
+
+        Returns:
+            GraphAttachmentUploadResponse
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
         """
-        return self._client.request(
+        response = self._client.request(
             "POST",
             self._api,
             "/testForms/{testFormId}/testPhases/{testPhaseId}/matrices/{matrixId}/attachmentUpload",
@@ -772,6 +1126,7 @@ class TestForms(BaseNamespace):
             json_body=body,
             timeout=timeout,
         )
+        return GraphAttachmentUploadResponse.model_validate(response.json())
 
     async def matrix_attachment_upload_async(
         self,
@@ -781,7 +1136,7 @@ class TestForms(BaseNamespace):
         matrix_id: str,
         body: GraphAttachmentUpload,
         timeout: Optional[float] = None,
-    ) -> httpx.Response:
+    ) -> GraphAttachmentUploadResponse:
         """Initiate a matrix attachment upload (async)
 
         Starts the process to upload and attach a file to a
@@ -795,8 +1150,21 @@ class TestForms(BaseNamespace):
         The response also includes a `Location` header, which indicates where to
         poll for operation results. For more details on long-running job
         polling, see [Operations endpoint](ref:getoperationbyid).
+
+        Args:
+            test_form_id: The unique identifier of the test form
+            test_phase_id: The unique identifier of the test phase
+            matrix_id: The unique identifier of the matrix
+            body: Request body.
+            timeout: Override the default request timeout (seconds).
+
+        Returns:
+            GraphAttachmentUploadResponse
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
         """
-        return await self._client.request_async(
+        response = await self._client.request_async(
             "POST",
             self._api,
             "/testForms/{testFormId}/testPhases/{testPhaseId}/matrices/{matrixId}/attachmentUpload",
@@ -808,6 +1176,7 @@ class TestForms(BaseNamespace):
             json_body=body,
             timeout=timeout,
         )
+        return GraphAttachmentUploadResponse.model_validate(response.json())
 
     def get_matrix_attachments(
         self,
@@ -816,13 +1185,25 @@ class TestForms(BaseNamespace):
         test_phase_id: str,
         matrix_id: str,
         timeout: Optional[float] = None,
-    ) -> httpx.Response:
+    ) -> GraphAttachmentsListResult:
         """Retrieve a list of matrix attachments
 
         Returns a list of [attachments](ref:testforms#graphattachment) for a
         matrix.
+
+        Args:
+            test_form_id: The unique identifier of the test form
+            test_phase_id: The unique identifier of the test phase
+            matrix_id: The unique identifier of the matrix
+            timeout: Override the default request timeout (seconds).
+
+        Returns:
+            GraphAttachmentsListResult
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
         """
-        return self._client.request(
+        response = self._client.request(
             "GET",
             self._api,
             "/testForms/{testFormId}/testPhases/{testPhaseId}/matrices/{matrixId}/attachments",
@@ -833,6 +1214,7 @@ class TestForms(BaseNamespace):
             },
             timeout=timeout,
         )
+        return GraphAttachmentsListResult.model_validate(response.json())
 
     async def get_matrix_attachments_async(
         self,
@@ -841,13 +1223,25 @@ class TestForms(BaseNamespace):
         test_phase_id: str,
         matrix_id: str,
         timeout: Optional[float] = None,
-    ) -> httpx.Response:
+    ) -> GraphAttachmentsListResult:
         """Retrieve a list of matrix attachments (async)
 
         Returns a list of [attachments](ref:testforms#graphattachment) for a
         matrix.
+
+        Args:
+            test_form_id: The unique identifier of the test form
+            test_phase_id: The unique identifier of the test phase
+            matrix_id: The unique identifier of the matrix
+            timeout: Override the default request timeout (seconds).
+
+        Returns:
+            GraphAttachmentsListResult
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
         """
-        return await self._client.request_async(
+        response = await self._client.request_async(
             "GET",
             self._api,
             "/testForms/{testFormId}/testPhases/{testPhaseId}/matrices/{matrixId}/attachments",
@@ -858,6 +1252,7 @@ class TestForms(BaseNamespace):
             },
             timeout=timeout,
         )
+        return GraphAttachmentsListResult.model_validate(response.json())
 
     def get_matrix_attachment_by_id(
         self,
@@ -867,12 +1262,25 @@ class TestForms(BaseNamespace):
         matrix_id: str,
         attachment_id: str,
         timeout: Optional[float] = None,
-    ) -> httpx.Response:
+    ) -> GraphAttachment:
         """Retrieve a single matrix attachment
 
         Retrieve a single [attachment](ref:testforms#graphattachment) by its ID.
+
+        Args:
+            test_form_id: The unique identifier of the test form
+            test_phase_id: The unique identifier of the test phase
+            matrix_id: The unique identifier of the matrix
+            attachment_id: The unique identifier of the attachment
+            timeout: Override the default request timeout (seconds).
+
+        Returns:
+            GraphAttachment
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
         """
-        return self._client.request(
+        response = self._client.request(
             "GET",
             self._api,
             "/testForms/{testFormId}/testPhases/{testPhaseId}/matrices/{matrixId}/attachments/{attachmentId}",
@@ -884,6 +1292,7 @@ class TestForms(BaseNamespace):
             },
             timeout=timeout,
         )
+        return GraphAttachment.model_validate(response.json())
 
     async def get_matrix_attachment_by_id_async(
         self,
@@ -893,12 +1302,25 @@ class TestForms(BaseNamespace):
         matrix_id: str,
         attachment_id: str,
         timeout: Optional[float] = None,
-    ) -> httpx.Response:
+    ) -> GraphAttachment:
         """Retrieve a single matrix attachment (async)
 
         Retrieve a single [attachment](ref:testforms#graphattachment) by its ID.
+
+        Args:
+            test_form_id: The unique identifier of the test form
+            test_phase_id: The unique identifier of the test phase
+            matrix_id: The unique identifier of the matrix
+            attachment_id: The unique identifier of the attachment
+            timeout: Override the default request timeout (seconds).
+
+        Returns:
+            GraphAttachment
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
         """
-        return await self._client.request_async(
+        response = await self._client.request_async(
             "GET",
             self._api,
             "/testForms/{testFormId}/testPhases/{testPhaseId}/matrices/{matrixId}/attachments/{attachmentId}",
@@ -910,6 +1332,7 @@ class TestForms(BaseNamespace):
             },
             timeout=timeout,
         )
+        return GraphAttachment.model_validate(response.json())
 
     def matrix_attachment_download_by_id(
         self,
@@ -933,6 +1356,20 @@ class TestForms(BaseNamespace):
         with the same authentication credentials and flow as the download
         request. For more details, see [Authentication
         documentation](ref:authentication).
+
+        Args:
+            test_form_id: The unique identifier of the test form
+            test_phase_id: The unique identifier of the test phase
+            matrix_id: The unique identifier of the matrix
+            attachment_id: The unique identifier of the attachment
+            timeout: Override the default request timeout (seconds).
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
+
+        Note:
+            This is a long-running operation (HTTP 202). Use
+            ``client.wait(response).result()`` to poll until completion.
         """
         return self._client.request(
             "POST",
@@ -969,6 +1406,20 @@ class TestForms(BaseNamespace):
         with the same authentication credentials and flow as the download
         request. For more details, see [Authentication
         documentation](ref:authentication).
+
+        Args:
+            test_form_id: The unique identifier of the test form
+            test_phase_id: The unique identifier of the test phase
+            matrix_id: The unique identifier of the matrix
+            attachment_id: The unique identifier of the attachment
+            timeout: Override the default request timeout (seconds).
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
+
+        Note:
+            This is a long-running operation (HTTP 202). Use
+            ``await client.wait(response).result_async()`` to poll until completion.
         """
         return await self._client.request_async(
             "POST",
@@ -1006,6 +1457,21 @@ class TestForms(BaseNamespace):
         `resourceURL` with the same authentication credentials and flow as the
         export request. For more details, see [Authentication
         documentation](ref:authentication).
+
+        Args:
+            test_form_id: The unique identifier of the test form
+            test_phase_id: The unique identifier of the test phase
+            matrix_id: The unique identifier of the matrix
+            attachment_id: The unique identifier of the attachment
+            body: Request body.
+            timeout: Override the default request timeout (seconds).
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
+
+        Note:
+            This is a long-running operation (HTTP 202). Use
+            ``client.wait(response).result()`` to poll until completion.
         """
         return self._client.request(
             "POST",
@@ -1044,6 +1510,21 @@ class TestForms(BaseNamespace):
         `resourceURL` with the same authentication credentials and flow as the
         export request. For more details, see [Authentication
         documentation](ref:authentication).
+
+        Args:
+            test_form_id: The unique identifier of the test form
+            test_phase_id: The unique identifier of the test phase
+            matrix_id: The unique identifier of the matrix
+            attachment_id: The unique identifier of the attachment
+            body: Request body.
+            timeout: Override the default request timeout (seconds).
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
+
+        Note:
+            This is a long-running operation (HTTP 202). Use
+            ``await client.wait(response).result_async()`` to poll until completion.
         """
         return await self._client.request_async(
             "POST",
@@ -1067,12 +1548,25 @@ class TestForms(BaseNamespace):
         matrix_id: str,
         expand: Optional[str] = None,
         timeout: Optional[float] = None,
-    ) -> httpx.Response:
+    ) -> MatrixSamplesListResult:
         """Retrieve a list of samples
 
         Returns a list of [samples](ref:testforms#matrixsample).
+
+        Args:
+            test_form_id: The unique identifier of the test form
+            test_phase_id: The unique identifier of the test phase
+            matrix_id: The unique identifier of the matrix
+            expand: Returns related resources inline with the main resource
+            timeout: Override the default request timeout (seconds).
+
+        Returns:
+            MatrixSamplesListResult
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
         """
-        return self._client.request(
+        response = self._client.request(
             "GET",
             self._api,
             "/testForms/{testFormId}/testPhases/{testPhaseId}/matrices/{matrixId}/samples",
@@ -1086,6 +1580,7 @@ class TestForms(BaseNamespace):
             },
             timeout=timeout,
         )
+        return MatrixSamplesListResult.model_validate(response.json())
 
     async def get_samples_async(
         self,
@@ -1095,12 +1590,25 @@ class TestForms(BaseNamespace):
         matrix_id: str,
         expand: Optional[str] = None,
         timeout: Optional[float] = None,
-    ) -> httpx.Response:
+    ) -> MatrixSamplesListResult:
         """Retrieve a list of samples (async)
 
         Returns a list of [samples](ref:testforms#matrixsample).
+
+        Args:
+            test_form_id: The unique identifier of the test form
+            test_phase_id: The unique identifier of the test phase
+            matrix_id: The unique identifier of the matrix
+            expand: Returns related resources inline with the main resource
+            timeout: Override the default request timeout (seconds).
+
+        Returns:
+            MatrixSamplesListResult
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
         """
-        return await self._client.request_async(
+        response = await self._client.request_async(
             "GET",
             self._api,
             "/testForms/{testFormId}/testPhases/{testPhaseId}/matrices/{matrixId}/samples",
@@ -1114,6 +1622,7 @@ class TestForms(BaseNamespace):
             },
             timeout=timeout,
         )
+        return MatrixSamplesListResult.model_validate(response.json())
 
     def create_sample(
         self,
@@ -1123,14 +1632,27 @@ class TestForms(BaseNamespace):
         matrix_id: str,
         body: MatrixSample,
         timeout: Optional[float] = None,
-    ) -> httpx.Response:
+    ) -> MatrixSample:
         """Create a new sample
 
         Create a new [sample](ref:testforms#matrixsample) in a
         [matrix](ref:testforms#matrix). The new sample will be appended to the
         end of the matrix.
+
+        Args:
+            test_form_id: The unique identifier of the test form
+            test_phase_id: The unique identifier of the test phase
+            matrix_id: The unique identifier of the matrix
+            body: Request body.
+            timeout: Override the default request timeout (seconds).
+
+        Returns:
+            MatrixSample
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
         """
-        return self._client.request(
+        response = self._client.request(
             "POST",
             self._api,
             "/testForms/{testFormId}/testPhases/{testPhaseId}/matrices/{matrixId}/samples",
@@ -1142,6 +1664,7 @@ class TestForms(BaseNamespace):
             json_body=body,
             timeout=timeout,
         )
+        return MatrixSample.model_validate(response.json())
 
     async def create_sample_async(
         self,
@@ -1151,14 +1674,27 @@ class TestForms(BaseNamespace):
         matrix_id: str,
         body: MatrixSample,
         timeout: Optional[float] = None,
-    ) -> httpx.Response:
+    ) -> MatrixSample:
         """Create a new sample (async)
 
         Create a new [sample](ref:testforms#matrixsample) in a
         [matrix](ref:testforms#matrix). The new sample will be appended to the
         end of the matrix.
+
+        Args:
+            test_form_id: The unique identifier of the test form
+            test_phase_id: The unique identifier of the test phase
+            matrix_id: The unique identifier of the matrix
+            body: Request body.
+            timeout: Override the default request timeout (seconds).
+
+        Returns:
+            MatrixSample
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
         """
-        return await self._client.request_async(
+        response = await self._client.request_async(
             "POST",
             self._api,
             "/testForms/{testFormId}/testPhases/{testPhaseId}/matrices/{matrixId}/samples",
@@ -1170,6 +1706,7 @@ class TestForms(BaseNamespace):
             json_body=body,
             timeout=timeout,
         )
+        return MatrixSample.model_validate(response.json())
 
     def sample_insertion(
         self,
@@ -1186,6 +1723,20 @@ class TestForms(BaseNamespace):
         [matrix](ref:testforms#matrix), and appends new samples to the end of
         the matrix. You can leave columns empty for later use. For new samples,
         provide no IDs; the endpoint generates them.
+
+        Args:
+            test_form_id: The unique identifier of the test form
+            test_phase_id: The unique identifier of the test phase
+            matrix_id: The unique identifier of the matrix
+            body: Request body.
+            timeout: Override the default request timeout (seconds).
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
+
+        Note:
+            This is a long-running operation (HTTP 202). Use
+            ``client.wait(response).result()`` to poll until completion.
         """
         return self._client.request(
             "POST",
@@ -1215,6 +1766,20 @@ class TestForms(BaseNamespace):
         [matrix](ref:testforms#matrix), and appends new samples to the end of
         the matrix. You can leave columns empty for later use. For new samples,
         provide no IDs; the endpoint generates them.
+
+        Args:
+            test_form_id: The unique identifier of the test form
+            test_phase_id: The unique identifier of the test phase
+            matrix_id: The unique identifier of the matrix
+            body: Request body.
+            timeout: Override the default request timeout (seconds).
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
+
+        Note:
+            This is a long-running operation (HTTP 202). Use
+            ``await client.wait(response).result_async()`` to poll until completion.
         """
         return await self._client.request_async(
             "POST",
@@ -1243,6 +1808,20 @@ class TestForms(BaseNamespace):
         Updates multiple [samples](ref:testforms#matrixsamples), with the
         requestBody of each specifying columns to update by their IDs. Columns
         not included in the request remain as-is.
+
+        Args:
+            test_form_id: The unique identifier of the test form
+            test_phase_id: The unique identifier of the test phase
+            matrix_id: The unique identifier of the matrix
+            body: Request body.
+            timeout: Override the default request timeout (seconds).
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
+
+        Note:
+            This is a long-running operation (HTTP 202). Use
+            ``client.wait(response).result()`` to poll until completion.
         """
         return self._client.request(
             "POST",
@@ -1271,6 +1850,20 @@ class TestForms(BaseNamespace):
         Updates multiple [samples](ref:testforms#matrixsamples), with the
         requestBody of each specifying columns to update by their IDs. Columns
         not included in the request remain as-is.
+
+        Args:
+            test_form_id: The unique identifier of the test form
+            test_phase_id: The unique identifier of the test phase
+            matrix_id: The unique identifier of the matrix
+            body: Request body.
+            timeout: Override the default request timeout (seconds).
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
+
+        Note:
+            This is a long-running operation (HTTP 202). Use
+            ``await client.wait(response).result_async()`` to poll until completion.
         """
         return await self._client.request_async(
             "POST",
@@ -1285,66 +1878,6 @@ class TestForms(BaseNamespace):
             timeout=timeout,
         )
 
-    def get_sample_by_id(
-        self,
-        *,
-        test_form_id: str,
-        test_phase_id: str,
-        matrix_id: str,
-        sample_id: str,
-        expand: Optional[str] = None,
-        timeout: Optional[float] = None,
-    ) -> httpx.Response:
-        """Retrieve a single sample
-
-        Retrieves a [sample](ref:testforms#matrixsample) given its ID.
-        """
-        return self._client.request(
-            "GET",
-            self._api,
-            "/testForms/{testFormId}/testPhases/{testPhaseId}/matrices/{matrixId}/samples/{sampleId}",
-            path_params={
-                "testFormId": test_form_id,
-                "testPhaseId": test_phase_id,
-                "matrixId": matrix_id,
-                "sampleId": sample_id,
-            },
-            query_params={
-                "$expand": expand,
-            },
-            timeout=timeout,
-        )
-
-    async def get_sample_by_id_async(
-        self,
-        *,
-        test_form_id: str,
-        test_phase_id: str,
-        matrix_id: str,
-        sample_id: str,
-        expand: Optional[str] = None,
-        timeout: Optional[float] = None,
-    ) -> httpx.Response:
-        """Retrieve a single sample (async)
-
-        Retrieves a [sample](ref:testforms#matrixsample) given its ID.
-        """
-        return await self._client.request_async(
-            "GET",
-            self._api,
-            "/testForms/{testFormId}/testPhases/{testPhaseId}/matrices/{matrixId}/samples/{sampleId}",
-            path_params={
-                "testFormId": test_form_id,
-                "testPhaseId": test_phase_id,
-                "matrixId": matrix_id,
-                "sampleId": sample_id,
-            },
-            query_params={
-                "$expand": expand,
-            },
-            timeout=timeout,
-        )
-
     def partially_update_sample_by_id(
         self,
         *,
@@ -1354,7 +1887,7 @@ class TestForms(BaseNamespace):
         sample_id: str,
         body: list[Any],
         timeout: Optional[float] = None,
-    ) -> httpx.Response:
+    ) -> MatrixSample:
         """Partially update a single sample
 
         Partially updates the properties of a
@@ -1365,8 +1898,22 @@ class TestForms(BaseNamespace):
         |---|---|
         |`/dataValues/<index>/value`|`replace`|
         |`/resultValues/<index>/value`|`replace`|
+
+        Args:
+            test_form_id: The unique identifier of the test form
+            test_phase_id: The unique identifier of the test phase
+            matrix_id: The unique identifier of the matrix
+            sample_id: The unique identifier of the sample
+            body: Request body.
+            timeout: Override the default request timeout (seconds).
+
+        Returns:
+            MatrixSample
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
         """
-        return self._client.request(
+        response = self._client.request(
             "PATCH",
             self._api,
             "/testForms/{testFormId}/testPhases/{testPhaseId}/matrices/{matrixId}/samples/{sampleId}",
@@ -1379,6 +1926,7 @@ class TestForms(BaseNamespace):
             json_body=body,
             timeout=timeout,
         )
+        return MatrixSample.model_validate(response.json())
 
     async def partially_update_sample_by_id_async(
         self,
@@ -1389,7 +1937,7 @@ class TestForms(BaseNamespace):
         sample_id: str,
         body: list[Any],
         timeout: Optional[float] = None,
-    ) -> httpx.Response:
+    ) -> MatrixSample:
         """Partially update a single sample (async)
 
         Partially updates the properties of a
@@ -1400,8 +1948,22 @@ class TestForms(BaseNamespace):
         |---|---|
         |`/dataValues/<index>/value`|`replace`|
         |`/resultValues/<index>/value`|`replace`|
+
+        Args:
+            test_form_id: The unique identifier of the test form
+            test_phase_id: The unique identifier of the test phase
+            matrix_id: The unique identifier of the matrix
+            sample_id: The unique identifier of the sample
+            body: Request body.
+            timeout: Override the default request timeout (seconds).
+
+        Returns:
+            MatrixSample
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
         """
-        return await self._client.request_async(
+        response = await self._client.request_async(
             "PATCH",
             self._api,
             "/testForms/{testFormId}/testPhases/{testPhaseId}/matrices/{matrixId}/samples/{sampleId}",
@@ -1414,6 +1976,97 @@ class TestForms(BaseNamespace):
             json_body=body,
             timeout=timeout,
         )
+        return MatrixSample.model_validate(response.json())
+
+    def get_sample_by_id(
+        self,
+        *,
+        test_form_id: str,
+        test_phase_id: str,
+        matrix_id: str,
+        sample_id: str,
+        expand: Optional[str] = None,
+        timeout: Optional[float] = None,
+    ) -> MatrixSample:
+        """Retrieve a single sample
+
+        Retrieves a [sample](ref:testforms#matrixsample) given its ID.
+
+        Args:
+            test_form_id: The unique identifier of the test form
+            test_phase_id: The unique identifier of the test phase
+            matrix_id: The unique identifier of the matrix
+            sample_id: The unique identifier of the sample
+            expand: Returns related resources inline with the main resource
+            timeout: Override the default request timeout (seconds).
+
+        Returns:
+            MatrixSample
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
+        """
+        response = self._client.request(
+            "GET",
+            self._api,
+            "/testForms/{testFormId}/testPhases/{testPhaseId}/matrices/{matrixId}/samples/{sampleId}",
+            path_params={
+                "testFormId": test_form_id,
+                "testPhaseId": test_phase_id,
+                "matrixId": matrix_id,
+                "sampleId": sample_id,
+            },
+            query_params={
+                "$expand": expand,
+            },
+            timeout=timeout,
+        )
+        return MatrixSample.model_validate(response.json())
+
+    async def get_sample_by_id_async(
+        self,
+        *,
+        test_form_id: str,
+        test_phase_id: str,
+        matrix_id: str,
+        sample_id: str,
+        expand: Optional[str] = None,
+        timeout: Optional[float] = None,
+    ) -> MatrixSample:
+        """Retrieve a single sample (async)
+
+        Retrieves a [sample](ref:testforms#matrixsample) given its ID.
+
+        Args:
+            test_form_id: The unique identifier of the test form
+            test_phase_id: The unique identifier of the test phase
+            matrix_id: The unique identifier of the matrix
+            sample_id: The unique identifier of the sample
+            expand: Returns related resources inline with the main resource
+            timeout: Override the default request timeout (seconds).
+
+        Returns:
+            MatrixSample
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
+        """
+        response = await self._client.request_async(
+            "GET",
+            self._api,
+            "/testForms/{testFormId}/testPhases/{testPhaseId}/matrices/{matrixId}/samples/{sampleId}",
+            path_params={
+                "testFormId": test_form_id,
+                "testPhaseId": test_phase_id,
+                "matrixId": matrix_id,
+                "sampleId": sample_id,
+            },
+            query_params={
+                "$expand": expand,
+            },
+            timeout=timeout,
+        )
+        return MatrixSample.model_validate(response.json())
 
     def sample_attachment_upload(
         self,
@@ -1424,7 +2077,7 @@ class TestForms(BaseNamespace):
         sample_id: str,
         body: GraphAttachmentUpload,
         timeout: Optional[float] = None,
-    ) -> httpx.Response:
+    ) -> GraphAttachmentUploadResponse:
         """Initiate an upload of a sample attachment
 
         Starts the process to upload and attach a file to a
@@ -1438,8 +2091,22 @@ class TestForms(BaseNamespace):
         The response also includes a `Location` header, which indicates where to
         poll for operation results. For more details on long-running job
         polling, see [Operations endpoint](ref:getoperationbyid).
+
+        Args:
+            test_form_id: The unique identifier of the test form
+            test_phase_id: The unique identifier of the test phase
+            matrix_id: The unique identifier of the matrix
+            sample_id: The unique identifier of the sample
+            body: Request body.
+            timeout: Override the default request timeout (seconds).
+
+        Returns:
+            GraphAttachmentUploadResponse
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
         """
-        return self._client.request(
+        response = self._client.request(
             "POST",
             self._api,
             "/testForms/{testFormId}/testPhases/{testPhaseId}/matrices/{matrixId}/samples/{sampleId}/attachmentUpload",
@@ -1452,6 +2119,7 @@ class TestForms(BaseNamespace):
             json_body=body,
             timeout=timeout,
         )
+        return GraphAttachmentUploadResponse.model_validate(response.json())
 
     async def sample_attachment_upload_async(
         self,
@@ -1462,7 +2130,7 @@ class TestForms(BaseNamespace):
         sample_id: str,
         body: GraphAttachmentUpload,
         timeout: Optional[float] = None,
-    ) -> httpx.Response:
+    ) -> GraphAttachmentUploadResponse:
         """Initiate an upload of a sample attachment (async)
 
         Starts the process to upload and attach a file to a
@@ -1476,8 +2144,22 @@ class TestForms(BaseNamespace):
         The response also includes a `Location` header, which indicates where to
         poll for operation results. For more details on long-running job
         polling, see [Operations endpoint](ref:getoperationbyid).
+
+        Args:
+            test_form_id: The unique identifier of the test form
+            test_phase_id: The unique identifier of the test phase
+            matrix_id: The unique identifier of the matrix
+            sample_id: The unique identifier of the sample
+            body: Request body.
+            timeout: Override the default request timeout (seconds).
+
+        Returns:
+            GraphAttachmentUploadResponse
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
         """
-        return await self._client.request_async(
+        response = await self._client.request_async(
             "POST",
             self._api,
             "/testForms/{testFormId}/testPhases/{testPhaseId}/matrices/{matrixId}/samples/{sampleId}/attachmentUpload",
@@ -1490,6 +2172,7 @@ class TestForms(BaseNamespace):
             json_body=body,
             timeout=timeout,
         )
+        return GraphAttachmentUploadResponse.model_validate(response.json())
 
     def get_sample_attachments(
         self,
@@ -1499,13 +2182,26 @@ class TestForms(BaseNamespace):
         matrix_id: str,
         sample_id: str,
         timeout: Optional[float] = None,
-    ) -> httpx.Response:
+    ) -> GraphAttachmentsListResult:
         """Retrieve a list of sample attachments
 
         Returns a list of [attachments](ref:testforms#graphattachment) for a
         [sample](ref:testforms#matrixsample).
+
+        Args:
+            test_form_id: The unique identifier of the test form
+            test_phase_id: The unique identifier of the test phase
+            matrix_id: The unique identifier of the matrix
+            sample_id: The unique identifier of the sample
+            timeout: Override the default request timeout (seconds).
+
+        Returns:
+            GraphAttachmentsListResult
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
         """
-        return self._client.request(
+        response = self._client.request(
             "GET",
             self._api,
             "/testForms/{testFormId}/testPhases/{testPhaseId}/matrices/{matrixId}/samples/{sampleId}/attachments",
@@ -1517,6 +2213,7 @@ class TestForms(BaseNamespace):
             },
             timeout=timeout,
         )
+        return GraphAttachmentsListResult.model_validate(response.json())
 
     async def get_sample_attachments_async(
         self,
@@ -1526,13 +2223,26 @@ class TestForms(BaseNamespace):
         matrix_id: str,
         sample_id: str,
         timeout: Optional[float] = None,
-    ) -> httpx.Response:
+    ) -> GraphAttachmentsListResult:
         """Retrieve a list of sample attachments (async)
 
         Returns a list of [attachments](ref:testforms#graphattachment) for a
         [sample](ref:testforms#matrixsample).
+
+        Args:
+            test_form_id: The unique identifier of the test form
+            test_phase_id: The unique identifier of the test phase
+            matrix_id: The unique identifier of the matrix
+            sample_id: The unique identifier of the sample
+            timeout: Override the default request timeout (seconds).
+
+        Returns:
+            GraphAttachmentsListResult
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
         """
-        return await self._client.request_async(
+        response = await self._client.request_async(
             "GET",
             self._api,
             "/testForms/{testFormId}/testPhases/{testPhaseId}/matrices/{matrixId}/samples/{sampleId}/attachments",
@@ -1544,6 +2254,7 @@ class TestForms(BaseNamespace):
             },
             timeout=timeout,
         )
+        return GraphAttachmentsListResult.model_validate(response.json())
 
     def get_sample_attachment_by_id(
         self,
@@ -1554,12 +2265,26 @@ class TestForms(BaseNamespace):
         sample_id: str,
         attachment_id: str,
         timeout: Optional[float] = None,
-    ) -> httpx.Response:
+    ) -> GraphAttachment:
         """Retrieve a single sample attachment
 
         Retrieve a single [attachment](ref:testforms#graphattachment) by its ID.
+
+        Args:
+            test_form_id: The unique identifier of the test form
+            test_phase_id: The unique identifier of the test phase
+            matrix_id: The unique identifier of the matrix
+            sample_id: The unique identifier of the sample
+            attachment_id: The unique identifier of the attachment
+            timeout: Override the default request timeout (seconds).
+
+        Returns:
+            GraphAttachment
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
         """
-        return self._client.request(
+        response = self._client.request(
             "GET",
             self._api,
             "/testForms/{testFormId}/testPhases/{testPhaseId}/matrices/{matrixId}/samples/{sampleId}/attachments/{attachmentId}",
@@ -1572,6 +2297,7 @@ class TestForms(BaseNamespace):
             },
             timeout=timeout,
         )
+        return GraphAttachment.model_validate(response.json())
 
     async def get_sample_attachment_by_id_async(
         self,
@@ -1582,12 +2308,26 @@ class TestForms(BaseNamespace):
         sample_id: str,
         attachment_id: str,
         timeout: Optional[float] = None,
-    ) -> httpx.Response:
+    ) -> GraphAttachment:
         """Retrieve a single sample attachment (async)
 
         Retrieve a single [attachment](ref:testforms#graphattachment) by its ID.
+
+        Args:
+            test_form_id: The unique identifier of the test form
+            test_phase_id: The unique identifier of the test phase
+            matrix_id: The unique identifier of the matrix
+            sample_id: The unique identifier of the sample
+            attachment_id: The unique identifier of the attachment
+            timeout: Override the default request timeout (seconds).
+
+        Returns:
+            GraphAttachment
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
         """
-        return await self._client.request_async(
+        response = await self._client.request_async(
             "GET",
             self._api,
             "/testForms/{testFormId}/testPhases/{testPhaseId}/matrices/{matrixId}/samples/{sampleId}/attachments/{attachmentId}",
@@ -1600,6 +2340,7 @@ class TestForms(BaseNamespace):
             },
             timeout=timeout,
         )
+        return GraphAttachment.model_validate(response.json())
 
     def sample_attachment_download_by_id(
         self,
@@ -1624,6 +2365,21 @@ class TestForms(BaseNamespace):
         with the same authentication credentials and flow as the download
         request. For more details, see [Authentication
         documentation](ref:authentication).
+
+        Args:
+            test_form_id: The unique identifier of the test form
+            test_phase_id: The unique identifier of the test phase
+            matrix_id: The unique identifier of the matrix
+            sample_id: The unique identifier of the sample
+            attachment_id: The unique identifier of the attachment
+            timeout: Override the default request timeout (seconds).
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
+
+        Note:
+            This is a long-running operation (HTTP 202). Use
+            ``client.wait(response).result()`` to poll until completion.
         """
         return self._client.request(
             "POST",
@@ -1662,6 +2418,21 @@ class TestForms(BaseNamespace):
         with the same authentication credentials and flow as the download
         request. For more details, see [Authentication
         documentation](ref:authentication).
+
+        Args:
+            test_form_id: The unique identifier of the test form
+            test_phase_id: The unique identifier of the test phase
+            matrix_id: The unique identifier of the matrix
+            sample_id: The unique identifier of the sample
+            attachment_id: The unique identifier of the attachment
+            timeout: Override the default request timeout (seconds).
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
+
+        Note:
+            This is a long-running operation (HTTP 202). Use
+            ``await client.wait(response).result_async()`` to poll until completion.
         """
         return await self._client.request_async(
             "POST",
@@ -1701,6 +2472,22 @@ class TestForms(BaseNamespace):
         `resourceURL` with the same authentication credentials and flow as the
         export request. For more details, see [Authentication
         documentation](ref:authentication).
+
+        Args:
+            test_form_id: The unique identifier of the test form
+            test_phase_id: The unique identifier of the test phase
+            matrix_id: The unique identifier of the matrix
+            sample_id: The unique identifier of the sample
+            attachment_id: The unique identifier of the attachment
+            body: Request body.
+            timeout: Override the default request timeout (seconds).
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
+
+        Note:
+            This is a long-running operation (HTTP 202). Use
+            ``client.wait(response).result()`` to poll until completion.
         """
         return self._client.request(
             "POST",
@@ -1741,6 +2528,22 @@ class TestForms(BaseNamespace):
         `resourceURL` with the same authentication credentials and flow as the
         export request. For more details, see [Authentication
         documentation](ref:authentication).
+
+        Args:
+            test_form_id: The unique identifier of the test form
+            test_phase_id: The unique identifier of the test phase
+            matrix_id: The unique identifier of the matrix
+            sample_id: The unique identifier of the sample
+            attachment_id: The unique identifier of the attachment
+            body: Request body.
+            timeout: Override the default request timeout (seconds).
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
+
+        Note:
+            This is a long-running operation (HTTP 202). Use
+            ``await client.wait(response).result_async()`` to poll until completion.
         """
         return await self._client.request_async(
             "POST",

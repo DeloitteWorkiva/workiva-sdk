@@ -1,32 +1,19 @@
-"""Pagination generators for the Workiva SDK.
+"""Pagination helpers for the Workiva SDK.
 
-Standard Python generators for iterating over paginated API responses.
-Each pagination pattern maps to a cursor-extraction strategy.
+Provides cursor-extraction strategies and aggregation functions that fetch
+ALL pages and return a single merged dict ready for Pydantic parsing.
 
-Usage in generated code::
-
-    def get_files_all(self, **kwargs) -> Generator[File, None, None]:
-        yield from paginate(
-            fetch=lambda cursor: self.get_files(next=cursor, **kwargs),
-            extract_cursor=extract_next_link,
-            extract_items=lambda r: r.value or [],
-        )
+Each pagination pattern maps to an extractor that reads the "next cursor"
+from the response body.  ``paginate_all`` / ``paginate_all_async`` loop
+through every page, accumulate items, and return the final body with all
+items merged — so one ``Model.model_validate(body)`` call is all you need.
 """
 
 from __future__ import annotations
 
-from typing import (
-    Any,
-    AsyncGenerator,
-    Awaitable,
-    Callable,
-    Generator,
-    Optional,
-    TypeVar,
-)
+from typing import Any, Callable, Optional
 
-T = TypeVar("T")
-R = TypeVar("R")  # Response type
+import httpx
 
 
 # -- Cursor extractors (one per pagination pattern) --------------------------
@@ -68,63 +55,117 @@ def extract_wdata_cursor(body: dict[str, Any]) -> Optional[str]:
     return None
 
 
-# -- Generic paginator -------------------------------------------------------
+# -- Nested dict helpers -----------------------------------------------------
 
 
-def paginate(
-    fetch: Callable[[Optional[str]], R],
+def _get_nested(d: dict[str, Any], path: str) -> Any:
+    """Get a value from a nested dict using dot-separated path."""
+    for key in path.split("."):
+        if isinstance(d, dict):
+            d = d.get(key, {})
+        else:
+            return []
+    return d
+
+
+def _set_nested(d: dict[str, Any], path: str, value: Any) -> None:
+    """Set a value in a nested dict using dot-separated path."""
+    keys = path.split(".")
+    for key in keys[:-1]:
+        d = d.setdefault(key, {})
+    d[keys[-1]] = value
+
+
+# -- Aggregation functions ---------------------------------------------------
+
+
+_MAX_PAGES = 1000
+"""Safety limit to prevent infinite pagination loops."""
+
+
+def paginate_all(
+    fetch: Callable[[Optional[str]], httpx.Response],
     extract_cursor: Callable[[dict[str, Any]], Optional[str]],
-    extract_items: Callable[[R], list[T]],
-    get_body: Callable[[R], dict[str, Any]],
-    initial_cursor: Optional[str] = None,
-) -> Generator[T, None, None]:
-    """Sync pagination generator.
+    items_path: str,
+    max_pages: int = _MAX_PAGES,
+) -> dict[str, Any]:
+    """Fetch ALL pages and return merged response body with all items.
+
+    Loops through every page at the raw dict level, accumulates items,
+    then returns the LAST response body with the items field replaced
+    by all accumulated items.
 
     Args:
-        fetch: Function that takes a cursor (or None for first page) and
-            returns a response object.
-        extract_cursor: Extracts the next cursor from the raw response body.
-        extract_items: Extracts the list of items from the response.
-        get_body: Extracts the raw dict body from the response (for cursor parsing).
-        initial_cursor: Starting cursor value (None for first page).
+        fetch: Calls the API with an optional cursor. Returns httpx.Response.
+        extract_cursor: Extracts the next cursor from the response body dict.
+        items_path: Dot-separated path to the items list (e.g. "data",
+            "body", "data.chainExecutors").
+        max_pages: Safety limit to prevent infinite loops (default 1000).
 
-    Yields:
-        Individual items from each page.
+    Returns:
+        Merged response body dict with all items aggregated.
+
+    Raises:
+        RuntimeError: If ``max_pages`` is exceeded (likely a bug in the API).
     """
-    cursor = initial_cursor
-    while True:
+    all_items: list[Any] = []
+    final_body: dict[str, Any] = {}
+    cursor: Optional[str] = None
+
+    for page in range(max_pages):
         response = fetch(cursor)
-        items = extract_items(response)
-        yield from items
-
-        body = get_body(response)
+        body = response.json()
+        final_body = body
+        items = _get_nested(body, items_path)
+        if isinstance(items, list):
+            all_items.extend(items)
         cursor = extract_cursor(body)
         if cursor is None:
             break
+    else:
+        raise RuntimeError(
+            f"Pagination exceeded {max_pages} pages — aborting to prevent "
+            f"infinite loop. Use API parameters to limit results, or pass "
+            f"max_pages= to increase the limit."
+        )
+
+    _set_nested(final_body, items_path, all_items)
+    return final_body
 
 
-async def paginate_async(
-    fetch: Callable[[Optional[str]], Awaitable[R]],
+async def paginate_all_async(
+    fetch: Callable[[Optional[str]], Any],
     extract_cursor: Callable[[dict[str, Any]], Optional[str]],
-    extract_items: Callable[[R], list[T]],
-    get_body: Callable[[R], dict[str, Any]],
-    initial_cursor: Optional[str] = None,
-) -> AsyncGenerator[T, None]:
-    """Async pagination generator.
+    items_path: str,
+    max_pages: int = _MAX_PAGES,
+) -> dict[str, Any]:
+    """Async version of :func:`paginate_all`.
 
-    Same interface as ``paginate()`` but ``fetch`` is an async callable.
+    Same semantics — fetches ALL pages, returns merged body dict.
 
-    Yields:
-        Individual items from each page.
+    Raises:
+        RuntimeError: If ``max_pages`` is exceeded (likely a bug in the API).
     """
-    cursor = initial_cursor
-    while True:
-        response = await fetch(cursor)
-        items = extract_items(response)
-        for item in items:
-            yield item
+    all_items: list[Any] = []
+    final_body: dict[str, Any] = {}
+    cursor: Optional[str] = None
 
-        body = get_body(response)
+    for page in range(max_pages):
+        response = await fetch(cursor)
+        body = response.json()
+        final_body = body
+        items = _get_nested(body, items_path)
+        if isinstance(items, list):
+            all_items.extend(items)
         cursor = extract_cursor(body)
         if cursor is None:
             break
+    else:
+        raise RuntimeError(
+            f"Pagination exceeded {max_pages} pages — aborting to prevent "
+            f"infinite loop. Use API parameters to limit results, or pass "
+            f"max_pages= to increase the limit."
+        )
+
+    _set_nested(final_body, items_path, all_items)
+    return final_body

@@ -11,6 +11,16 @@ import httpx
 
 from workiva._constants import _API
 from workiva._operations._base import BaseNamespace
+from workiva._pagination import (
+    extract_jsonapi_next,
+    paginate_all,
+    paginate_all_async,
+)
+from workiva.models.platform import (
+    GetOrgReportUsersResponse,
+)
+
+__all__ = ["Reports"]
 
 
 class Reports(BaseNamespace):
@@ -25,7 +35,7 @@ class Reports(BaseNamespace):
         page_after: Optional[str] = None,
         page_size: Optional[int] = 100,
         timeout: Optional[float] = None,
-    ) -> httpx.Response:
+    ) -> GetOrgReportUsersResponse:
         """List organization users
 
         Similar to an organization admin's "People View" export, this returns a
@@ -41,20 +51,38 @@ class Reports(BaseNamespace):
         Organizations</strong> from the left-hand menu, and search for and
         select the organization. <br /><br /> <strong>Requires the calling user
         to be an organization admin</strong>.
+
+        Args:
+            organization_id: The unique identifier of the organization
+            page_after: Paging cursor
+            page_size: Number of items to return. Maximum of 1000.
+            timeout: Override the default request timeout (seconds).
+
+        Returns:
+            GetOrgReportUsersResponse
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 405, 415, 500, 501, 503).
         """
-        return self._client.request(
-            "GET",
-            self._api,
-            "/organizations/{organizationId}/orgReportUsers",
-            path_params={
-                "organizationId": organization_id,
-            },
-            query_params={
-                "page[after]": page_after,
-                "page[size]": page_size,
-            },
-            timeout=timeout,
-        )
+
+        def _fetch(_cursor: str | None) -> httpx.Response:
+            return self._client.request(
+                "GET",
+                self._api,
+                "/organizations/{organizationId}/orgReportUsers",
+                path_params={
+                    "organizationId": organization_id,
+                },
+                query_params={
+                    "page[after]": page_after,
+                    "page[size]": page_size,
+                    "next": _cursor,
+                },
+                timeout=timeout,
+            )
+
+        _body = paginate_all(_fetch, extract_jsonapi_next, "data")
+        return GetOrgReportUsersResponse.model_validate(_body)
 
     async def get_org_report_users_async(
         self,
@@ -63,7 +91,7 @@ class Reports(BaseNamespace):
         page_after: Optional[str] = None,
         page_size: Optional[int] = 100,
         timeout: Optional[float] = None,
-    ) -> httpx.Response:
+    ) -> GetOrgReportUsersResponse:
         """List organization users (async)
 
         Similar to an organization admin's "People View" export, this returns a
@@ -79,17 +107,35 @@ class Reports(BaseNamespace):
         Organizations</strong> from the left-hand menu, and search for and
         select the organization. <br /><br /> <strong>Requires the calling user
         to be an organization admin</strong>.
+
+        Args:
+            organization_id: The unique identifier of the organization
+            page_after: Paging cursor
+            page_size: Number of items to return. Maximum of 1000.
+            timeout: Override the default request timeout (seconds).
+
+        Returns:
+            GetOrgReportUsersResponse
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 405, 415, 500, 501, 503).
         """
-        return await self._client.request_async(
-            "GET",
-            self._api,
-            "/organizations/{organizationId}/orgReportUsers",
-            path_params={
-                "organizationId": organization_id,
-            },
-            query_params={
-                "page[after]": page_after,
-                "page[size]": page_size,
-            },
-            timeout=timeout,
-        )
+
+        async def _fetch(_cursor: str | None) -> httpx.Response:
+            return await self._client.request_async(
+                "GET",
+                self._api,
+                "/organizations/{organizationId}/orgReportUsers",
+                path_params={
+                    "organizationId": organization_id,
+                },
+                query_params={
+                    "page[after]": page_after,
+                    "page[size]": page_size,
+                    "next": _cursor,
+                },
+                timeout=timeout,
+            )
+
+        _body = await paginate_all_async(_fetch, extract_jsonapi_next, "data")
+        return GetOrgReportUsersResponse.model_validate(_body)

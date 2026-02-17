@@ -11,6 +11,11 @@ import httpx
 
 from workiva._constants import _API
 from workiva._operations._base import BaseNamespace
+from workiva.models.platform import (
+    BearerToken,
+)
+
+__all__ = ["Iam"]
 
 
 class Iam(BaseNamespace):
@@ -23,7 +28,7 @@ class Iam(BaseNamespace):
         *,
         body: Optional[dict[str, Any]] = None,
         timeout: Optional[float] = None,
-    ) -> httpx.Response:
+    ) -> BearerToken:
         """Retrieve a token
 
         Include the client_id and client_secret in the body of the request as
@@ -35,21 +40,28 @@ class Iam(BaseNamespace):
         client of the scope of the actual access token issued. The actual
         `scope` returned may not match the `scope` requested. Subsequent
         requests to Workiva APIs are authorized using the bearer token.
+
+        Returns:
+            BearerToken
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401).
         """
-        return self._client.request(
+        response = self._client.request(
             "POST",
             self._api,
             "/oauth2/token",
-            json_body=body,
+            data=body,
             timeout=timeout,
         )
+        return BearerToken.model_validate(response.json())
 
     async def token_request_async(
         self,
         *,
         body: Optional[dict[str, Any]] = None,
         timeout: Optional[float] = None,
-    ) -> httpx.Response:
+    ) -> BearerToken:
         """Retrieve a token (async)
 
         Include the client_id and client_secret in the body of the request as
@@ -61,11 +73,18 @@ class Iam(BaseNamespace):
         client of the scope of the actual access token issued. The actual
         `scope` returned may not match the `scope` requested. Subsequent
         requests to Workiva APIs are authorized using the bearer token.
+
+        Returns:
+            BearerToken
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401).
         """
-        return await self._client.request_async(
+        response = await self._client.request_async(
             "POST",
             self._api,
             "/oauth2/token",
-            json_body=body,
+            data=body,
             timeout=timeout,
         )
+        return BearerToken.model_validate(response.json())

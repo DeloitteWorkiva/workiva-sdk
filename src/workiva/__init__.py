@@ -1,4 +1,11 @@
-"""Workiva Python SDK — Unified client for Platform, Chains, and Wdata APIs."""
+"""Workiva Python SDK — Unified client for Platform, Chains, and Wdata APIs.
+
+Models can be imported from their respective submodules::
+
+    from workiva.models.platform import File, Operation
+    from workiva.models.chains import ChainResponse
+    from workiva.models.wdata import TableDto
+"""
 
 from workiva._auth import TokenAcquisitionError
 from workiva._constants import Region
@@ -15,6 +22,7 @@ from workiva._errors import (
 from workiva._version import __user_agent__, __version__
 from workiva.client import Workiva
 from workiva.exceptions import OperationCancelled, OperationFailed, OperationTimeout
+from workiva.models import chains, platform, wdata
 from workiva.polling import OperationPoller
 
 __all__ = [
@@ -34,4 +42,8 @@ __all__ = [
     "RateLimitError",
     "ServerError",
     "TokenAcquisitionError",
+    "models",
+    "platform",
+    "chains",
+    "wdata",
 ]

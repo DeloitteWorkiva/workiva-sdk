@@ -1,47 +1,45 @@
 # Documents
 
-`client.documents` — Gestión de documentos y sus secciones en la plataforma Workiva.
-
-Los documentos permiten organizar y revisar datos con texto enlazado, documentos e imágenes de forma colaborativa.
+`client.documents` -- Gestion de documentos y sus secciones en la plataforma Workiva.
 
 ## Operaciones
 
 ### Documentos
 
-| Método | Descripción | Paginado |
+| Metodo | Descripcion | Paginado |
 |--------|-------------|----------|
-| `get_documents` | Listar documentos | Sí |
+| `get_documents` | Listar documentos | Si |
 | `get_document_by_id` | Obtener documento por ID | No |
 | `partially_update_document_by_id` | Actualizar documento parcialmente | No |
 | `document_export` | Exportar documento | No |
 | `document_filters_reapplication` | Reaplicar filtros del documento | No |
 | `document_links_publication` | Publicar links del documento | No |
 | `document_permissions_modification` | Modificar permisos del documento | No |
-| `get_document_milestones` | Listar milestones del documento | Sí |
-| `get_document_permissions` | Listar permisos del documento | Sí |
+| `get_document_milestones` | Listar milestones del documento | Si |
+| `get_document_permissions` | Listar permisos del documento | Si |
 
 ### Secciones
 
-| Método | Descripción | Paginado |
+| Metodo | Descripcion | Paginado |
 |--------|-------------|----------|
-| `get_sections` | Listar secciones | Sí |
-| `get_section_by_id` | Obtener sección por ID | No |
-| `create_section` | Crear sección | No |
-| `copy_section` | Copiar sección | No |
-| `partially_update_section_by_id` | Actualizar sección parcialmente | No |
-| `delete_section_by_id` | Eliminar sección | No |
+| `get_sections` | Listar secciones | Si |
+| `get_section_by_id` | Obtener seccion por ID | No |
+| `create_section` | Crear seccion | No |
+| `copy_section` | Copiar seccion | No |
+| `partially_update_section_by_id` | Actualizar seccion parcialmente | No |
+| `delete_section_by_id` | Eliminar seccion | No |
 | `edit_sections` | Editar secciones | No |
-| `section_permissions_modification` | Modificar permisos de sección | No |
-| `get_section_permissions` | Listar permisos de sección | Sí |
+| `section_permissions_modification` | Modificar permisos de seccion | No |
+| `get_section_permissions` | Listar permisos de seccion | Si |
 
 ## Ejemplos
 
-### Listar documentos
+### Listar documentos (auto-paginacion)
 
 ```python
-response = client.documents.get_documents()
+result = client.documents.get_documents()
 
-for doc in response.result.data:
+for doc in result.data:
     print(f"{doc.name} (ID: {doc.id})")
 ```
 
@@ -50,35 +48,31 @@ for doc in response.result.data:
 ```python
 response = client.documents.document_export(
     document_id="doc-123",
-    document_export={
-        "format": "pdf",
-    },
+    body={"format": "pdf"},
 )
 
-# Operación 202
+# Operacion 202
 operation = client.wait(response).result(timeout=120)
 print(f"Exportado: {operation.resource_url}")
 ```
 
-### Crear sección
+### Crear seccion
 
 ```python
-response = client.documents.create_section(
+section = client.documents.create_section(
     document_id="doc-123",
-    section={
-        "name": "Nueva Sección",
-    },
+    body={"name": "Nueva Seccion"},
 )
-print(f"Sección creada: {response.result.id}")
+print(f"Seccion creada: {section.id}")
 ```
 
-### Copiar sección (operación 202)
+### Copiar seccion (operacion 202)
 
 ```python
 response = client.documents.copy_section(
     document_id="doc-123",
     section_id="sec-456",
-    section_copy={"destination_document_id": "doc-789"},
+    body={"destination_document_id": "doc-789"},
 )
 
 operation = client.wait(response).result(timeout=300)

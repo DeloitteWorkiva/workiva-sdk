@@ -1,23 +1,37 @@
+{% set cursor_spec_name = op.cursor_param_name %}
+{% set has_json_response = op.success_response and op.success_response.content_type == 'application/json' and op.success_response.python_type != 'None' %}
+{% set return_type = op.success_response.python_type if has_json_response else 'httpx.Response' %}
+{% set is_list_return = has_json_response and op.success_response.is_list %}
     async def {{ op.method_name }}_async(
         self,
         *,
 {% for p in op.params if p.location == 'path' %}
         {{ p.python_name }}: {{ p.python_type }},
 {% endfor %}
-{% for p in op.params if p.location == 'query' and p.required %}
+{% for p in op.params if p.location == 'query' and p.required and p.name != cursor_spec_name %}
+        {{ p.python_name }}: {{ p.python_type }},
+{% endfor %}
+{% for p in op.header_params if p.required %}
         {{ p.python_name }}: {{ p.python_type }},
 {% endfor %}
 {% if op.has_body and op.request_body.required %}
         body: {{ op.request_body.python_type }},
 {% endif %}
-{% for p in op.params if p.location == 'query' and not p.required %}
+{% for p in op.params if p.location == 'query' and not p.required and p.name != cursor_spec_name %}
+        {{ p.python_name }}: {{ p.python_type }} = {{ p.default or 'None' }},
+{% endfor %}
+{% for p in op.header_params if not p.required %}
         {{ p.python_name }}: {{ p.python_type }} = {{ p.default or 'None' }},
 {% endfor %}
 {% if op.has_body and not op.request_body.required %}
         body: Optional[{{ op.request_body.python_type }}] = None,
 {% endif %}
         timeout: Optional[float] = None,
-    ) -> httpx.Response:
+{% if is_list_return %}
+    ) -> list[{{ op.success_response.python_type | replace('list[', '') | replace(']', '') }}]:
+{% else %}
+    ) -> {{ return_type }}:
+{% endif %}
         """{{ op.summary }} (async)
 {% if op.description %}
 
@@ -28,7 +42,118 @@
         .. deprecated::
             This operation is deprecated.
 {% endif %}
+{% if op.params %}
+
+        Args:
+{% for p in op.params if p.location == 'path' %}
+            {{ p.python_name }}: {{ p.description or '' }}
+{% endfor %}
+{% for p in op.params if p.location == 'query' and p.name != cursor_spec_name %}
+            {{ p.python_name }}: {{ p.description or '' }}
+{% endfor %}
+{% for p in op.header_params %}
+            {{ p.python_name }}: {{ p.description or '' }}
+{% endfor %}
+{% if op.has_body %}
+            body: Request body.
+{% endif %}
+            timeout: Override the default request timeout (seconds).
+{% endif %}
+{% if has_json_response %}
+
+        Returns:
+            {{ return_type }}
+{% endif %}
+{% if op.error_codes %}
+
+        Raises:
+            WorkivaAPIError: On API errors ({{ op.error_codes | join(', ') }}).
+{% endif %}
+{% if not has_json_response and op.success_response and op.success_response.status_code == '202' %}
+
+        Note:
+            This is a long-running operation (HTTP 202). Use
+            ``await client.wait(response).result_async()`` to poll until completion.
+{% endif %}
+{% if op.has_body and op.request_body.content_type == 'multipart/form-data' %}
+
+        Note:
+            This operation uses multipart/form-data. Pass ``body`` as a dict
+            mapping field names to values. For file fields use a tuple::
+
+                body = {
+                    "file": ("filename.csv", open("filename.csv", "rb")),
+                    "field": "value",
+                }
+{% endif %}
         """
+{% if op.pagination and has_json_response %}
+        async def _fetch(_cursor: str | None) -> httpx.Response:
+            return await self._client.request_async(
+                "{{ op.http_method }}",
+                self._api,
+                "{{ op.path }}",
+{% if op.path_params %}
+                path_params={{ '{' }}{% for p in op.path_params %}"{{ p.name.strip('{}') }}": {{ p.python_name }}, {% endfor %}{{ '}' }},
+{% endif %}
+                query_params={{ '{' }}{% for p in op.query_params if p.name != cursor_spec_name %}"{{ p.name }}": {{ p.python_name }}, {% endfor %}"{{ cursor_spec_name }}": _cursor, {{ '}' }},
+{% if op.has_body %}
+{% if op.request_body.content_type == 'application/json' %}
+                json_body=body,
+{% elif op.request_body.content_type == 'application/octet-stream' %}
+                content=body,
+{% elif op.request_body.content_type == 'multipart/form-data' %}
+                files=body,
+{% elif op.request_body.content_type == 'application/x-www-form-urlencoded' %}
+                data=body,
+{% else %}
+                json_body=body,
+{% endif %}
+{% endif %}
+{% if op.header_params %}
+                headers={{ '{' }}{% for p in op.header_params %}"{{ p.name }}": {{ p.python_name }}, {% endfor %}{{ '}' }},
+{% endif %}
+                timeout=timeout,
+            )
+
+        _body = await paginate_all_async(_fetch, {{ op.pagination.extractor_func }}, "{{ op.pagination.items_path }}")
+        return {{ op.success_response.python_type }}.model_validate(_body)
+{% elif has_json_response %}
+        response = await self._client.request_async(
+            "{{ op.http_method }}",
+            self._api,
+            "{{ op.path }}",
+{% if op.path_params %}
+            path_params={{ '{' }}{% for p in op.path_params %}"{{ p.name.strip('{}') }}": {{ p.python_name }}, {% endfor %}{{ '}' }},
+{% endif %}
+{% if op.query_params %}
+            query_params={{ '{' }}{% for p in op.query_params %}"{{ p.name }}": {{ p.python_name }}, {% endfor %}{{ '}' }},
+{% endif %}
+{% if op.has_body %}
+{% if op.request_body.content_type == 'application/json' %}
+            json_body=body,
+{% elif op.request_body.content_type == 'application/octet-stream' %}
+            content=body,
+{% elif op.request_body.content_type == 'multipart/form-data' %}
+            files=body,
+{% elif op.request_body.content_type == 'application/x-www-form-urlencoded' %}
+            data=body,
+{% else %}
+            json_body=body,
+{% endif %}
+{% endif %}
+{% if op.header_params %}
+            headers={{ '{' }}{% for p in op.header_params %}"{{ p.name }}": {{ p.python_name }}, {% endfor %}{{ '}' }},
+{% endif %}
+            timeout=timeout,
+        )
+{% if is_list_return %}
+{% set inner_type = op.success_response.python_type | replace('list[', '') | replace(']', '') %}
+        return [{{ inner_type }}.model_validate(item) for item in response.json()]
+{% else %}
+        return {{ op.success_response.python_type }}.model_validate(response.json())
+{% endif %}
+{% else %}
         return await self._client.request_async(
             "{{ op.http_method }}",
             self._api,
@@ -46,9 +171,15 @@
             content=body,
 {% elif op.request_body.content_type == 'multipart/form-data' %}
             files=body,
+{% elif op.request_body.content_type == 'application/x-www-form-urlencoded' %}
+            data=body,
 {% else %}
             json_body=body,
 {% endif %}
 {% endif %}
+{% if op.header_params %}
+            headers={{ '{' }}{% for p in op.header_params %}"{{ p.name }}": {{ p.python_name }}, {% endfor %}{{ '}' }},
+{% endif %}
             timeout=timeout,
         )
+{% endif %}

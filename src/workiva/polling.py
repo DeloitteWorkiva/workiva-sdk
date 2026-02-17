@@ -2,8 +2,10 @@
 
 Usage::
 
-    response = client.files.copy_file(file_id="abc", file_copy=params)
+    response = client.files.copy_file(file_id="abc", body=params)
     operation = client.wait(response).result(timeout=300)
+    print(operation.status)       # "completed"
+    print(operation.resource_url)  # link to the result
 """
 
 from __future__ import annotations
@@ -19,6 +21,7 @@ from workiva.exceptions import (
     OperationFailed,
     OperationTimeout,
 )
+from workiva.models.platform import Operation
 
 if TYPE_CHECKING:
     from workiva.client import Workiva
@@ -78,7 +81,7 @@ class OperationPoller:
         self._operation_id = operation_id
         self._retry_after = initial_retry_after
         self._response_body = response_body
-        self._last_operation: Optional[dict[str, Any]] = None
+        self._last_operation: Optional[Operation] = None
 
     # -- Properties ----------------------------------------------------------
 
@@ -93,7 +96,7 @@ class OperationPoller:
         return self._response_body
 
     @property
-    def last_operation(self) -> Optional[dict[str, Any]]:
+    def last_operation(self) -> Optional[Operation]:
         """The most recent operation snapshot, or ``None`` if never polled."""
         return self._last_operation
 
@@ -103,37 +106,21 @@ class OperationPoller:
         """Whether the operation has reached a terminal status (no API call)."""
         if self._last_operation is None:
             return False
-        return self._last_operation.get("status") in _TERMINAL_STATUSES
+        return self._last_operation.status in _TERMINAL_STATUSES
 
-    def _check_terminal(self, operation: dict[str, Any]) -> None:
+    def _check_terminal(self, operation: Operation) -> None:
         """Raise if the operation reached a terminal failure/cancelled state."""
-        status = operation.get("status")
-        if status == "failed":
-            raise OperationFailed(self._to_operation_model(operation))
-        if status == "cancelled":
-            raise OperationCancelled(self._to_operation_model(operation))
-
-    @staticmethod
-    def _to_operation_model(data: dict[str, Any]) -> Any:
-        """Convert raw dict to a lightweight namespace for exception attributes.
-
-        Uses SimpleNamespace instead of the Pydantic Operation model to avoid
-        coupling the polling loop to model validation. The exceptions only
-        access ``.id``, ``.details``, ``.code``, ``.target``, ``.message``.
-        """
-        from types import SimpleNamespace
-
-        op = SimpleNamespace(**data)
-        if hasattr(op, "details") and isinstance(op.details, list):
-            op.details = [SimpleNamespace(**d) if isinstance(d, dict) else d for d in op.details]
-        return op
+        if operation.status == "failed":
+            raise OperationFailed(operation)
+        if operation.status == "cancelled":
+            raise OperationCancelled(operation)
 
     # -- Sync ----------------------------------------------------------------
 
-    def poll(self) -> dict[str, Any]:
+    def poll(self) -> Operation:
         """Execute a single poll request (sync).
 
-        Updates internal state and returns the operation dict.
+        Updates internal state and returns the typed :class:`Operation`.
         Raises :class:`OperationFailed` or :class:`OperationCancelled` on
         terminal failure states.
         """
@@ -143,7 +130,7 @@ class OperationPoller:
             "/operations/{operationId}",
             path_params={"operationId": self._operation_id},
         )
-        operation = response.json()
+        operation = Operation.model_validate(response.json())
         self._last_operation = operation
         self._retry_after = _get_retry_after(
             dict(response.headers), self._retry_after
@@ -151,33 +138,33 @@ class OperationPoller:
         self._check_terminal(operation)
         return operation
 
-    def result(self, timeout: float = 300) -> dict[str, Any]:
+    def result(self, timeout: float = 300) -> Operation:
         """Poll until terminal state or timeout (sync).
 
-        Returns the completed operation on success.
+        Returns the completed :class:`Operation` on success.
         Raises :class:`OperationTimeout` if ``timeout`` seconds elapse.
         Raises :class:`OperationFailed` / :class:`OperationCancelled` on failure.
         """
         deadline = time.monotonic() + timeout
         while True:
             operation = self.poll()
-            if operation.get("status") == "completed":
+            if operation.status == "completed":
                 return operation
             remaining = deadline - time.monotonic()
             if remaining <= 0:
                 raise OperationTimeout(
                     self._operation_id,
                     timeout,
-                    operation.get("status"),
+                    operation.status,
                 )
             time.sleep(min(self._retry_after, remaining))
 
     # -- Async ---------------------------------------------------------------
 
-    async def poll_async(self) -> dict[str, Any]:
+    async def poll_async(self) -> Operation:
         """Execute a single poll request (async).
 
-        Updates internal state and returns the operation dict.
+        Updates internal state and returns the typed :class:`Operation`.
         Raises :class:`OperationFailed` or :class:`OperationCancelled` on
         terminal failure states.
         """
@@ -187,7 +174,7 @@ class OperationPoller:
             "/operations/{operationId}",
             path_params={"operationId": self._operation_id},
         )
-        operation = response.json()
+        operation = Operation.model_validate(response.json())
         self._last_operation = operation
         self._retry_after = _get_retry_after(
             dict(response.headers), self._retry_after
@@ -195,23 +182,23 @@ class OperationPoller:
         self._check_terminal(operation)
         return operation
 
-    async def result_async(self, timeout: float = 300) -> dict[str, Any]:
+    async def result_async(self, timeout: float = 300) -> Operation:
         """Poll until terminal state or timeout (async).
 
-        Returns the completed operation on success.
+        Returns the completed :class:`Operation` on success.
         Raises :class:`OperationTimeout` if ``timeout`` seconds elapse.
         Raises :class:`OperationFailed` / :class:`OperationCancelled` on failure.
         """
         deadline = time.monotonic() + timeout
         while True:
             operation = await self.poll_async()
-            if operation.get("status") == "completed":
+            if operation.status == "completed":
                 return operation
             remaining = deadline - time.monotonic()
             if remaining <= 0:
                 raise OperationTimeout(
                     self._operation_id,
                     timeout,
-                    operation.get("status"),
+                    operation.status,
                 )
             await asyncio.sleep(min(self._retry_after, remaining))

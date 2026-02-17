@@ -1,56 +1,56 @@
 # Sustainability
 
-`client.sustainability` — Gestión de programas, métricas, dimensiones y temas ESG.
+`client.sustainability` -- Gestion de programas, metricas, dimensiones y temas ESG.
 
 ## Operaciones
 
 ### Programas
 
-| Método | Descripción | Paginado |
+| Metodo | Descripcion | Paginado |
 |--------|-------------|----------|
-| `get_programs` | Listar programas | Sí |
+| `get_programs` | Listar programas | Si |
 | `get_program_by_id` | Obtener programa por ID | No |
 | `create_program` | Crear programa | No |
 | `partially_update_program_by_id` | Actualizar programa | No |
-| `get_program_permissions` | Permisos de programa | Sí |
+| `get_program_permissions` | Permisos de programa | Si |
 | `program_permissions_modification` | Modificar permisos | No |
 
-### Métricas
+### Metricas
 
-| Método | Descripción | Paginado |
+| Metodo | Descripcion | Paginado |
 |--------|-------------|----------|
-| `get_metrics` | Listar métricas | Sí |
-| `get_metric_by_id` | Obtener métrica por ID | No |
-| `create_metric` | Crear métrica | No |
-| `partially_update_metric_by_id` | Actualizar métrica | No |
-| `delete_metric_by_id` | Eliminar métrica | No |
+| `get_metrics` | Listar metricas | Si |
+| `get_metric_by_id` | Obtener metrica por ID | No |
+| `create_metric` | Crear metrica | No |
+| `partially_update_metric_by_id` | Actualizar metrica | No |
+| `delete_metric_by_id` | Eliminar metrica | No |
 
-### Valores de métricas
+### Valores de metricas
 
-| Método | Descripción | Paginado |
+| Metodo | Descripcion | Paginado |
 |--------|-------------|----------|
-| `get_values` | Listar valores | Sí |
+| `get_values` | Listar valores | Si |
 | `get_metric_value_by_id` | Obtener valor por ID | No |
 | `create_value` | Crear valor | No |
 | `partially_update_metric_value_by_id` | Actualizar valor | No |
 | `delete_metric_value_by_id` | Eliminar valor | No |
 | `batch_upsertion_metric_values` | Upsert batch de valores | No |
-| `batch_deletion_metric_values` | Eliminación batch de valores | No |
+| `batch_deletion_metric_values` | Eliminacion batch de valores | No |
 
 ### Dimensiones
 
-| Método | Descripción | Paginado |
+| Metodo | Descripcion | Paginado |
 |--------|-------------|----------|
-| `get_dimensions` | Listar dimensiones | Sí |
-| `get_dimension_by_id` | Obtener dimensión por ID | No |
-| `create_dimension` | Crear dimensión | No |
-| `partially_update_dimension_by_id` | Actualizar dimensión | No |
+| `get_dimensions` | Listar dimensiones | Si |
+| `get_dimension_by_id` | Obtener dimension por ID | No |
+| `create_dimension` | Crear dimension | No |
+| `partially_update_dimension_by_id` | Actualizar dimension | No |
 
 ### Temas (Topics)
 
-| Método | Descripción | Paginado |
+| Metodo | Descripcion | Paginado |
 |--------|-------------|----------|
-| `get_topics` | Listar temas | Sí |
+| `get_topics` | Listar temas | Si |
 | `get_topic_by_id` | Obtener tema por ID | No |
 | `create_topic` | Crear tema | No |
 | `partially_update_topic_by_id` | Actualizar tema | No |
@@ -58,23 +58,23 @@
 
 ## Ejemplos
 
-### Listar programas ESG
+### Listar programas ESG (auto-paginacion)
 
 ```python
-response = client.sustainability.get_programs()
+result = client.sustainability.get_programs()
 
-for program in response.result.data:
+for program in result.data:
     print(f"{program.name} (ID: {program.id})")
 ```
 
-### Crear métrica
+### Crear metrica
 
 ```python
-response = client.sustainability.create_metric(
+metric = client.sustainability.create_metric(
     program_id="prog-123",
-    metric={"name": "Emisiones CO2", "unit": "toneladas"},
+    body={"name": "Emisiones CO2", "unit": "toneladas"},
 )
-print(f"Métrica creada: {response.result.id}")
+print(f"Metrica creada: {metric.id}")
 ```
 
 ### Upsert batch de valores
@@ -82,9 +82,9 @@ print(f"Métrica creada: {response.result.id}")
 ```python
 response = client.sustainability.batch_upsertion_metric_values(
     program_id="prog-123",
-    metric_value_batch_upsert=values_data,
+    body=values_data,
 )
 
-# Operación 202
+# Operacion 202
 operation = client.wait(response).result(timeout=120)
 ```

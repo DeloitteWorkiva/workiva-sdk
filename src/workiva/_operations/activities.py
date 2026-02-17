@@ -11,6 +11,19 @@ import httpx
 
 from workiva._constants import _API
 from workiva._operations._base import BaseNamespace
+from workiva._pagination import (
+    extract_next_link,
+    paginate_all,
+    paginate_all_async,
+)
+from workiva.models.platform import (
+    ActivitiesListResult,
+    Activity,
+    ActivityAction,
+    ActivityActionsListResult,
+)
+
+__all__ = ["Activities"]
 
 
 class Activities(BaseNamespace):
@@ -23,7 +36,7 @@ class Activities(BaseNamespace):
         *,
         activity_id: str,
         timeout: Optional[float] = None,
-    ) -> httpx.Response:
+    ) -> Activity:
         """Retrieve a single activity
 
         Retrieves an activity given its ID.
@@ -35,8 +48,18 @@ class Activities(BaseNamespace):
         ActivityAction `alias` field to determine if an activity is relevant to
         your use case.
         :::
+
+        Args:
+            activity_id: The unique identifier of the activity
+            timeout: Override the default request timeout (seconds).
+
+        Returns:
+            Activity
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
         """
-        return self._client.request(
+        response = self._client.request(
             "GET",
             self._api,
             "/activities/{activityId}",
@@ -45,13 +68,14 @@ class Activities(BaseNamespace):
             },
             timeout=timeout,
         )
+        return Activity.model_validate(response.json())
 
     async def get_activity_by_id_async(
         self,
         *,
         activity_id: str,
         timeout: Optional[float] = None,
-    ) -> httpx.Response:
+    ) -> Activity:
         """Retrieve a single activity (async)
 
         Retrieves an activity given its ID.
@@ -63,8 +87,18 @@ class Activities(BaseNamespace):
         ActivityAction `alias` field to determine if an activity is relevant to
         your use case.
         :::
+
+        Args:
+            activity_id: The unique identifier of the activity
+            timeout: Override the default request timeout (seconds).
+
+        Returns:
+            Activity
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
         """
-        return await self._client.request_async(
+        response = await self._client.request_async(
             "GET",
             self._api,
             "/activities/{activityId}",
@@ -73,15 +107,15 @@ class Activities(BaseNamespace):
             },
             timeout=timeout,
         )
+        return Activity.model_validate(response.json())
 
     def get_activity_actions(
         self,
         *,
         maxpagesize: Optional[int] = 1000,
-        next_: Optional[str] = None,
         order_by: Optional[str] = None,
         timeout: Optional[float] = None,
-    ) -> httpx.Response:
+    ) -> ActivityActionsListResult:
         """Retrieve a list of activity actions
 
         Retrieves a list of actions performed that may produce activities.
@@ -93,27 +127,42 @@ class Activities(BaseNamespace):
         ActivityAction `alias` field to determine if an activity is relevant to
         your use case.
         :::
+
+        Args:
+            maxpagesize: The maximum number of results to retrieve
+            order_by: One or more comma-separated expressions to indicate the order in which to sort the results.
+            timeout: Override the default request timeout (seconds).
+
+        Returns:
+            ActivityActionsListResult
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
         """
-        return self._client.request(
-            "GET",
-            self._api,
-            "/activityActions",
-            query_params={
-                "$maxpagesize": maxpagesize,
-                "$next": next_,
-                "$orderBy": order_by,
-            },
-            timeout=timeout,
-        )
+
+        def _fetch(_cursor: str | None) -> httpx.Response:
+            return self._client.request(
+                "GET",
+                self._api,
+                "/activityActions",
+                query_params={
+                    "$maxpagesize": maxpagesize,
+                    "$orderBy": order_by,
+                    "$next": _cursor,
+                },
+                timeout=timeout,
+            )
+
+        _body = paginate_all(_fetch, extract_next_link, "data")
+        return ActivityActionsListResult.model_validate(_body)
 
     async def get_activity_actions_async(
         self,
         *,
         maxpagesize: Optional[int] = 1000,
-        next_: Optional[str] = None,
         order_by: Optional[str] = None,
         timeout: Optional[float] = None,
-    ) -> httpx.Response:
+    ) -> ActivityActionsListResult:
         """Retrieve a list of activity actions (async)
 
         Retrieves a list of actions performed that may produce activities.
@@ -125,25 +174,41 @@ class Activities(BaseNamespace):
         ActivityAction `alias` field to determine if an activity is relevant to
         your use case.
         :::
+
+        Args:
+            maxpagesize: The maximum number of results to retrieve
+            order_by: One or more comma-separated expressions to indicate the order in which to sort the results.
+            timeout: Override the default request timeout (seconds).
+
+        Returns:
+            ActivityActionsListResult
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
         """
-        return await self._client.request_async(
-            "GET",
-            self._api,
-            "/activityActions",
-            query_params={
-                "$maxpagesize": maxpagesize,
-                "$next": next_,
-                "$orderBy": order_by,
-            },
-            timeout=timeout,
-        )
+
+        async def _fetch(_cursor: str | None) -> httpx.Response:
+            return await self._client.request_async(
+                "GET",
+                self._api,
+                "/activityActions",
+                query_params={
+                    "$maxpagesize": maxpagesize,
+                    "$orderBy": order_by,
+                    "$next": _cursor,
+                },
+                timeout=timeout,
+            )
+
+        _body = await paginate_all_async(_fetch, extract_next_link, "data")
+        return ActivityActionsListResult.model_validate(_body)
 
     def get_activity_action_by_id(
         self,
         *,
         activity_action_id: str,
         timeout: Optional[float] = None,
-    ) -> httpx.Response:
+    ) -> ActivityAction:
         """Retrieve a single activity action
 
         Returns an action performed, given its ID
@@ -155,8 +220,18 @@ class Activities(BaseNamespace):
         ActivityAction `alias` field to determine if an activity is relevant to
         your use case.
         :::
+
+        Args:
+            activity_action_id: The unique identifier of the activity action
+            timeout: Override the default request timeout (seconds).
+
+        Returns:
+            ActivityAction
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
         """
-        return self._client.request(
+        response = self._client.request(
             "GET",
             self._api,
             "/activityActions/{activityActionId}",
@@ -165,13 +240,14 @@ class Activities(BaseNamespace):
             },
             timeout=timeout,
         )
+        return ActivityAction.model_validate(response.json())
 
     async def get_activity_action_by_id_async(
         self,
         *,
         activity_action_id: str,
         timeout: Optional[float] = None,
-    ) -> httpx.Response:
+    ) -> ActivityAction:
         """Retrieve a single activity action (async)
 
         Returns an action performed, given its ID
@@ -183,8 +259,18 @@ class Activities(BaseNamespace):
         ActivityAction `alias` field to determine if an activity is relevant to
         your use case.
         :::
+
+        Args:
+            activity_action_id: The unique identifier of the activity action
+            timeout: Override the default request timeout (seconds).
+
+        Returns:
+            ActivityAction
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
         """
-        return await self._client.request_async(
+        response = await self._client.request_async(
             "GET",
             self._api,
             "/activityActions/{activityActionId}",
@@ -193,6 +279,7 @@ class Activities(BaseNamespace):
             },
             timeout=timeout,
         )
+        return ActivityAction.model_validate(response.json())
 
     def get_organization_activities(
         self,
@@ -200,10 +287,9 @@ class Activities(BaseNamespace):
         organization_id: str,
         filter_: Optional[str] = None,
         maxpagesize: Optional[int] = 1000,
-        next_: Optional[str] = None,
         order_by: Optional[str] = None,
         timeout: Optional[float] = None,
-    ) -> httpx.Response:
+    ) -> ActivitiesListResult:
         """Retrieve a list of activities for an organization
 
         Returns a paginated list of activities for a given organization.
@@ -215,22 +301,40 @@ class Activities(BaseNamespace):
         ActivityAction `alias` field to determine if an activity is relevant to
         your use case.
         :::
+
+        Args:
+            organization_id: The unique identifier of the organization
+            filter_: The properties to filter the results by.
+            maxpagesize: The maximum number of results to retrieve
+            order_by: One or more comma-separated expressions to indicate the order in which to sort the results.
+            timeout: Override the default request timeout (seconds).
+
+        Returns:
+            ActivitiesListResult
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
         """
-        return self._client.request(
-            "GET",
-            self._api,
-            "/organizations/{organizationId}/activities",
-            path_params={
-                "organizationId": organization_id,
-            },
-            query_params={
-                "$filter": filter_,
-                "$maxpagesize": maxpagesize,
-                "$next": next_,
-                "$orderBy": order_by,
-            },
-            timeout=timeout,
-        )
+
+        def _fetch(_cursor: str | None) -> httpx.Response:
+            return self._client.request(
+                "GET",
+                self._api,
+                "/organizations/{organizationId}/activities",
+                path_params={
+                    "organizationId": organization_id,
+                },
+                query_params={
+                    "$filter": filter_,
+                    "$maxpagesize": maxpagesize,
+                    "$orderBy": order_by,
+                    "$next": _cursor,
+                },
+                timeout=timeout,
+            )
+
+        _body = paginate_all(_fetch, extract_next_link, "data")
+        return ActivitiesListResult.model_validate(_body)
 
     async def get_organization_activities_async(
         self,
@@ -238,10 +342,9 @@ class Activities(BaseNamespace):
         organization_id: str,
         filter_: Optional[str] = None,
         maxpagesize: Optional[int] = 1000,
-        next_: Optional[str] = None,
         order_by: Optional[str] = None,
         timeout: Optional[float] = None,
-    ) -> httpx.Response:
+    ) -> ActivitiesListResult:
         """Retrieve a list of activities for an organization (async)
 
         Returns a paginated list of activities for a given organization.
@@ -253,22 +356,40 @@ class Activities(BaseNamespace):
         ActivityAction `alias` field to determine if an activity is relevant to
         your use case.
         :::
+
+        Args:
+            organization_id: The unique identifier of the organization
+            filter_: The properties to filter the results by.
+            maxpagesize: The maximum number of results to retrieve
+            order_by: One or more comma-separated expressions to indicate the order in which to sort the results.
+            timeout: Override the default request timeout (seconds).
+
+        Returns:
+            ActivitiesListResult
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
         """
-        return await self._client.request_async(
-            "GET",
-            self._api,
-            "/organizations/{organizationId}/activities",
-            path_params={
-                "organizationId": organization_id,
-            },
-            query_params={
-                "$filter": filter_,
-                "$maxpagesize": maxpagesize,
-                "$next": next_,
-                "$orderBy": order_by,
-            },
-            timeout=timeout,
-        )
+
+        async def _fetch(_cursor: str | None) -> httpx.Response:
+            return await self._client.request_async(
+                "GET",
+                self._api,
+                "/organizations/{organizationId}/activities",
+                path_params={
+                    "organizationId": organization_id,
+                },
+                query_params={
+                    "$filter": filter_,
+                    "$maxpagesize": maxpagesize,
+                    "$orderBy": order_by,
+                    "$next": _cursor,
+                },
+                timeout=timeout,
+            )
+
+        _body = await paginate_all_async(_fetch, extract_next_link, "data")
+        return ActivitiesListResult.model_validate(_body)
 
     def get_organization_workspace_activities(
         self,
@@ -277,10 +398,9 @@ class Activities(BaseNamespace):
         workspace_id: str,
         filter_: Optional[str] = None,
         maxpagesize: Optional[int] = 1000,
-        next_: Optional[str] = None,
         order_by: Optional[str] = None,
         timeout: Optional[float] = None,
-    ) -> httpx.Response:
+    ) -> ActivitiesListResult:
         """Retrieve a list of activities for a workspace
 
         Returns a paginated list of activities for a given organization and
@@ -293,23 +413,42 @@ class Activities(BaseNamespace):
         ActivityAction `alias` field to determine if an activity is relevant to
         your use case.
         :::
+
+        Args:
+            organization_id: The unique identifier of the organization
+            workspace_id: The unique identifier of the workspace
+            filter_: The properties to filter the results by.
+            maxpagesize: The maximum number of results to retrieve
+            order_by: One or more comma-separated expressions to indicate the order in which to sort the results.
+            timeout: Override the default request timeout (seconds).
+
+        Returns:
+            ActivitiesListResult
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
         """
-        return self._client.request(
-            "GET",
-            self._api,
-            "/organizations/{organizationId}/workspaces/{workspaceId}/activities",
-            path_params={
-                "organizationId": organization_id,
-                "workspaceId": workspace_id,
-            },
-            query_params={
-                "$filter": filter_,
-                "$maxpagesize": maxpagesize,
-                "$next": next_,
-                "$orderBy": order_by,
-            },
-            timeout=timeout,
-        )
+
+        def _fetch(_cursor: str | None) -> httpx.Response:
+            return self._client.request(
+                "GET",
+                self._api,
+                "/organizations/{organizationId}/workspaces/{workspaceId}/activities",
+                path_params={
+                    "organizationId": organization_id,
+                    "workspaceId": workspace_id,
+                },
+                query_params={
+                    "$filter": filter_,
+                    "$maxpagesize": maxpagesize,
+                    "$orderBy": order_by,
+                    "$next": _cursor,
+                },
+                timeout=timeout,
+            )
+
+        _body = paginate_all(_fetch, extract_next_link, "data")
+        return ActivitiesListResult.model_validate(_body)
 
     async def get_organization_workspace_activities_async(
         self,
@@ -318,10 +457,9 @@ class Activities(BaseNamespace):
         workspace_id: str,
         filter_: Optional[str] = None,
         maxpagesize: Optional[int] = 1000,
-        next_: Optional[str] = None,
         order_by: Optional[str] = None,
         timeout: Optional[float] = None,
-    ) -> httpx.Response:
+    ) -> ActivitiesListResult:
         """Retrieve a list of activities for a workspace (async)
 
         Returns a paginated list of activities for a given organization and
@@ -334,20 +472,39 @@ class Activities(BaseNamespace):
         ActivityAction `alias` field to determine if an activity is relevant to
         your use case.
         :::
+
+        Args:
+            organization_id: The unique identifier of the organization
+            workspace_id: The unique identifier of the workspace
+            filter_: The properties to filter the results by.
+            maxpagesize: The maximum number of results to retrieve
+            order_by: One or more comma-separated expressions to indicate the order in which to sort the results.
+            timeout: Override the default request timeout (seconds).
+
+        Returns:
+            ActivitiesListResult
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
         """
-        return await self._client.request_async(
-            "GET",
-            self._api,
-            "/organizations/{organizationId}/workspaces/{workspaceId}/activities",
-            path_params={
-                "organizationId": organization_id,
-                "workspaceId": workspace_id,
-            },
-            query_params={
-                "$filter": filter_,
-                "$maxpagesize": maxpagesize,
-                "$next": next_,
-                "$orderBy": order_by,
-            },
-            timeout=timeout,
-        )
+
+        async def _fetch(_cursor: str | None) -> httpx.Response:
+            return await self._client.request_async(
+                "GET",
+                self._api,
+                "/organizations/{organizationId}/workspaces/{workspaceId}/activities",
+                path_params={
+                    "organizationId": organization_id,
+                    "workspaceId": workspace_id,
+                },
+                query_params={
+                    "$filter": filter_,
+                    "$maxpagesize": maxpagesize,
+                    "$orderBy": order_by,
+                    "$next": _cursor,
+                },
+                timeout=timeout,
+            )
+
+        _body = await paginate_all_async(_fetch, extract_next_link, "data")
+        return ActivitiesListResult.model_validate(_body)

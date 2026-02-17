@@ -114,12 +114,27 @@ class OperationSpec:
         return [p for p in self.params if p.location == "query"]
 
     @property
+    def header_params(self) -> list[ParamSpec]:
+        return [p for p in self.params if p.location == "header"]
+
+    @property
     def has_body(self) -> bool:
         return self.request_body is not None
 
     @property
     def returns_list(self) -> bool:
         return self.success_response is not None and self.success_response.is_list
+
+    @property
+    def cursor_param_name(self) -> Optional[str]:
+        """The actual spec name of the pagination cursor query param, or None."""
+        if not self.pagination:
+            return None
+        clean = self.pagination.cursor_param  # e.g. "next", "cursor", "page"
+        for p in self.params:
+            if p.location == "query" and p.name.lstrip("$") == clean:
+                return p.name  # Exact spec name, e.g. "$next"
+        return self.pagination.cursor_param  # fallback
 
 
 def _get_python_type(schema: dict[str, Any], spec: dict[str, Any]) -> str:
@@ -160,7 +175,14 @@ def _extract_param(
     if "$ref" in schema:
         schema = _resolve_ref(schema["$ref"], spec)
 
-    python_type = _get_python_type(schema, spec)
+    # Check for enum values — use Literal[...] instead of plain str
+    enum_values = schema.get("enum")
+    if enum_values and schema.get("type") == "string":
+        quoted = ", ".join(f'"{v}"' for v in enum_values)
+        python_type = f"Literal[{quoted}]"
+    else:
+        python_type = _get_python_type(schema, spec)
+
     required = param_data.get("required", False)
 
     # Handle default values
@@ -357,8 +379,15 @@ def parse_spec(
             scopes = _extract_scopes(operation, spec)
 
             # Determine tag (namespace)
+            # Chains and Wdata merge all OAS tags into a single flat namespace
+            # (e.g. "Table Management", "Query Management" → "wdata").
+            # Platform keeps one namespace per tag.
+            _MERGE_TAGS = {"chains", "wdata"}
             tags = operation.get("tags", [api])
-            tag = _snake_case(tags[0]) if tags else api
+            if api in _MERGE_TAGS:
+                tag = api
+            else:
+                tag = _snake_case(tags[0]) if tags else api
 
             method_name = _get_method_name(operation_id, api)
 

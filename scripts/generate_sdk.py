@@ -156,11 +156,22 @@ class BaseNamespace:
             )
             description = f"{class_name} operations."
 
-            # Collect model types used as body parameters
+            # Collect model types used as body parameters AND response types
             model_types: set[str] = set()
+            has_pagination = False
+            has_list_response = False
+            has_literal = False
             for op in operations:
                 if op.request_body and op.request_body.python_type:
                     _collect_model_types(op.request_body.python_type, model_types)
+                if op.success_response and op.success_response.python_type and op.success_response.python_type != "None":
+                    _collect_model_types(op.success_response.python_type, model_types)
+                if op.pagination:
+                    has_pagination = True
+                if op.success_response and op.success_response.is_list:
+                    has_list_response = True
+                if any("Literal[" in p.python_type for p in op.params):
+                    has_literal = True
 
             # Render template
             source = namespace_template.render(
@@ -170,6 +181,9 @@ class BaseNamespace:
                 description=description,
                 operations=operations,
                 model_imports=sorted(model_types),
+                has_pagination=has_pagination,
+                has_list_response=has_list_response,
+                has_literal=has_literal,
             )
 
             # Validate syntax
