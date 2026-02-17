@@ -6,16 +6,117 @@ Each API (platform, chains, wdata) gets its own model namespace under
 
 from __future__ import annotations
 
+import os
+import re
 import shutil
 import subprocess
 import sys
+import tempfile
 from pathlib import Path
+
+import yaml
+
+
+# ---------------------------------------------------------------------------
+# Rename map for platform.py collision classes
+# ---------------------------------------------------------------------------
+# datamodel-code-generator appends numeric suffixes when multiple schemas
+# share a name.  This map restores meaningful names.
+_PLATFORM_RENAMES: dict[str, str] = {
+    "Section1": "Section",
+    "Section": "SectionHyperlink",
+    "Slide1": "Slide",
+    "Slide": "SlideHyperlink",
+    "Sheet1": "Sheet",
+    "Sheet": "SheetHyperlink",
+    "WorkspaceMembership1": "WorkspaceMembership",
+    "WorkspaceMembership": "WorkspaceMembershipRef",
+    "Dimensions2": "DimensionsCompact",
+}
+
+# Numeric-suffix classes that are acceptable as-is (too generic to rename).
+_KNOWN_SUFFIXED: set[str] = {"Datum1", "Links1", "PageNumber1"}
+
+
+# ---------------------------------------------------------------------------
+# Pre-processing: fix type+$ref coexistence in OAS specs
+# ---------------------------------------------------------------------------
+def _preprocess_spec(spec_path: Path) -> Path:
+    """Fix ``type`` + ``$ref`` coexistence and return a cleaned temp file.
+
+    Some OAS specs (e.g. chains.yaml) place ``type: object`` alongside a
+    ``$ref`` at the same schema level — an invalid pattern that causes
+    datamodel-code-generator to create empty wrapper classes (``Data1``,
+    ``Data2``, …).  Stripping ``type`` (and ``properties``) when ``$ref``
+    is present lets the generator use the referenced schema directly.
+
+    The original spec file is never modified.
+    """
+    spec = yaml.safe_load(spec_path.read_text())
+
+    def _strip_type_alongside_ref(node: object) -> None:
+        if isinstance(node, dict):
+            if "$ref" in node and "type" in node:
+                node.pop("type", None)
+                node.pop("properties", None)
+            for v in node.values():
+                _strip_type_alongside_ref(v)
+        elif isinstance(node, list):
+            for item in node:
+                _strip_type_alongside_ref(item)
+
+    _strip_type_alongside_ref(spec)
+
+    fd, tmp_path = tempfile.mkstemp(suffix=spec_path.suffix)
+    os.close(fd)
+    tmp = Path(tmp_path)
+    tmp.write_text(yaml.dump(spec, default_flow_style=False, sort_keys=False))
+    return tmp
+
+
+# ---------------------------------------------------------------------------
+# Post-processing: rename collision classes in platform.py
+# ---------------------------------------------------------------------------
+def _rename_collision_classes(source: str) -> str:
+    """Two-phase placeholder swap to handle bidirectional renames safely."""
+    # Phase 1: old names → unique placeholders (longest-first to avoid partial matches)
+    placeholders = {old: f"__RENAME_{i}__" for i, old in enumerate(_PLATFORM_RENAMES)}
+    pattern = re.compile(
+        r"\b("
+        + "|".join(re.escape(k) for k in sorted(placeholders, key=len, reverse=True))
+        + r")\b"
+    )
+    result = pattern.sub(lambda m: placeholders[m.group(0)], source)
+
+    # Phase 2: placeholders → final names
+    for old, placeholder in placeholders.items():
+        result = result.replace(placeholder, _PLATFORM_RENAMES[old])
+    return result
+
+
+# ---------------------------------------------------------------------------
+# Guardrail: detect unexpected numeric-suffix classes
+# ---------------------------------------------------------------------------
+def _check_numeric_suffixes(filepath: Path, known: set[str]) -> None:
+    """Fail if unexpected numeric-suffix classes appear after generation."""
+    source = filepath.read_text()
+    found = set(re.findall(r"^class (\w+\d+)\(", source, re.MULTILINE))
+    unexpected = found - known
+    if unexpected:
+        raise RuntimeError(
+            f"New collision classes detected in {filepath.name}: "
+            f"{sorted(unexpected)}.  "
+            f"Add them to _PLATFORM_RENAMES or _KNOWN_SUFFIXED in models.py."
+        )
 
 
 def generate_models(
     spec_path: Path,
     output_dir: Path,
     api_name: str,
+    *,
+    post_processors: list[callable] | None = None,
+    known_suffixed: set[str] | None = None,
 ) -> None:
     """Run datamodel-code-generator for a single OpenAPI spec.
 
@@ -23,6 +124,10 @@ def generate_models(
         spec_path: Path to the OpenAPI YAML file.
         output_dir: Base output directory (e.g. src/workiva/models/).
         api_name: Sub-directory name (platform, chains, wdata).
+        post_processors: Optional callables ``(str) -> str`` applied to the
+            generated source before the standard fixups.
+        known_suffixed: Set of numeric-suffix class names to allow.  If
+            *None*, the guardrail is skipped.
     """
     target_file = output_dir / f"{api_name}.py"
 
@@ -71,10 +176,21 @@ def generate_models(
         print(f"[ERROR] {api_name}: output file not created")
         return
 
-    # Post-process generated models
+    # Apply custom post-processors (e.g. rename collision classes)
+    if post_processors:
+        source = target_file.read_text()
+        for processor in post_processors:
+            source = processor(source)
+        target_file.write_text(source)
+
+    # Standard post-processing fixups
     _fix_self_references(target_file)
     _fix_non_optional_none_defaults(target_file)
     _fix_override_without_default(target_file)
+
+    # Guardrail: detect unexpected numeric-suffix classes
+    if known_suffixed is not None:
+        _check_numeric_suffixes(target_file, known_suffixed)
 
     line_count = len(target_file.read_text().splitlines())
     print(f"[OK] {api_name}: {target_file.name} ({line_count} lines)")
@@ -85,7 +201,7 @@ def _fix_self_references(filepath: Path) -> None:
 
     Python 3.14 (PEP 749) defers annotation evaluation, but Pydantic 2.12
     eagerly evaluates them during class construction. Self-referencing types
-    like ``children: Optional[List[Section1]] = None`` fail because ``Section1``
+    like ``children: Optional[List[Section]] = None`` fail because ``Section``
     isn't in scope yet during its own class body.
 
     Fix: wrap self-references in string quotes so Pydantic defers resolution
@@ -203,4 +319,29 @@ def generate_all_models(
         if not spec_path.exists():
             print(f"[WARN] Spec not found: {spec_path}, skipping {api_name}")
             continue
-        generate_models(spec_path, output_dir, api_name)
+
+        effective_spec = spec_path
+        post_processors: list[callable] | None = None
+        known: set[str] | None = set()  # guardrail on by default
+
+        if api_name == "chains":
+            # Pre-process: strip type+$ref coexistence that creates Data* wrappers
+            effective_spec = _preprocess_spec(spec_path)
+            print(f"[codegen] Pre-processed {spec_path.name} → {effective_spec}")
+
+        if api_name == "platform":
+            post_processors = [_rename_collision_classes]
+            known = _KNOWN_SUFFIXED | set(_PLATFORM_RENAMES.values())
+
+        try:
+            generate_models(
+                effective_spec,
+                output_dir,
+                api_name,
+                post_processors=post_processors,
+                known_suffixed=known,
+            )
+        finally:
+            # Clean up temp file if we created one
+            if effective_spec != spec_path and effective_spec.exists():
+                effective_spec.unlink()

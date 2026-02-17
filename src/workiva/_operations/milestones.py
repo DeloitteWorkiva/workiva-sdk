@@ -145,96 +145,6 @@ class Milestones(BaseNamespace):
             timeout=timeout,
         )
 
-    def partially_update_milestone_by_id(
-        self,
-        *,
-        milestone_id: str,
-        body: list[Any],
-        timeout: Optional[float] = None,
-    ) -> Milestone:
-        """Partially updates a milestone
-
-        Partially updates a [`Milestone`](ref:milestones#milestone) with a given
-        id.
-
-        ### Options
-        | Path                   | PATCH Operations Supported         | Value
-        Type             |
-        |------------------------|------------------------------------|---------
-        ---------------|
-        | `/title`               | `replace`                          | `string`
-        |
-        | `/remarks`             | `replace`                          |
-        `string`, `null`       |
-
-        Args:
-            milestone_id: The unique identifier of a milestone.
-            body: Request body.
-            timeout: Override the default request timeout (seconds).
-
-        Returns:
-            Milestone
-
-        Raises:
-            WorkivaAPIError: On API errors (400, 401, 403, 404, 500).
-        """
-        response = self._client.request(
-            "PATCH",
-            self._api,
-            "/milestones/{milestoneId}",
-            path_params={
-                "milestoneId": milestone_id,
-            },
-            json_body=body,
-            timeout=timeout,
-        )
-        return Milestone.model_validate(response.json())
-
-    async def partially_update_milestone_by_id_async(
-        self,
-        *,
-        milestone_id: str,
-        body: list[Any],
-        timeout: Optional[float] = None,
-    ) -> Milestone:
-        """Partially updates a milestone (async)
-
-        Partially updates a [`Milestone`](ref:milestones#milestone) with a given
-        id.
-
-        ### Options
-        | Path                   | PATCH Operations Supported         | Value
-        Type             |
-        |------------------------|------------------------------------|---------
-        ---------------|
-        | `/title`               | `replace`                          | `string`
-        |
-        | `/remarks`             | `replace`                          |
-        `string`, `null`       |
-
-        Args:
-            milestone_id: The unique identifier of a milestone.
-            body: Request body.
-            timeout: Override the default request timeout (seconds).
-
-        Returns:
-            Milestone
-
-        Raises:
-            WorkivaAPIError: On API errors (400, 401, 403, 404, 500).
-        """
-        response = await self._client.request_async(
-            "PATCH",
-            self._api,
-            "/milestones/{milestoneId}",
-            path_params={
-                "milestoneId": milestone_id,
-            },
-            json_body=body,
-            timeout=timeout,
-        )
-        return Milestone.model_validate(response.json())
-
     def delete_milestone_by_id(
         self,
         *,
@@ -347,6 +257,96 @@ class Milestones(BaseNamespace):
             path_params={
                 "milestoneId": milestone_id,
             },
+            timeout=timeout,
+        )
+        return Milestone.model_validate(response.json())
+
+    def partially_update_milestone_by_id(
+        self,
+        *,
+        milestone_id: str,
+        body: list[Any],
+        timeout: Optional[float] = None,
+    ) -> Milestone:
+        """Partially updates a milestone
+
+        Partially updates a [`Milestone`](ref:milestones#milestone) with a given
+        id.
+
+        ### Options
+        | Path                   | PATCH Operations Supported         | Value
+        Type             |
+        |------------------------|------------------------------------|---------
+        ---------------|
+        | `/title`               | `replace`                          | `string`
+        |
+        | `/remarks`             | `replace`                          |
+        `string`, `null`       |
+
+        Args:
+            milestone_id: The unique identifier of a milestone.
+            body: Request body.
+            timeout: Override the default request timeout (seconds).
+
+        Returns:
+            Milestone
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 500).
+        """
+        response = self._client.request(
+            "PATCH",
+            self._api,
+            "/milestones/{milestoneId}",
+            path_params={
+                "milestoneId": milestone_id,
+            },
+            json_body=body,
+            timeout=timeout,
+        )
+        return Milestone.model_validate(response.json())
+
+    async def partially_update_milestone_by_id_async(
+        self,
+        *,
+        milestone_id: str,
+        body: list[Any],
+        timeout: Optional[float] = None,
+    ) -> Milestone:
+        """Partially updates a milestone (async)
+
+        Partially updates a [`Milestone`](ref:milestones#milestone) with a given
+        id.
+
+        ### Options
+        | Path                   | PATCH Operations Supported         | Value
+        Type             |
+        |------------------------|------------------------------------|---------
+        ---------------|
+        | `/title`               | `replace`                          | `string`
+        |
+        | `/remarks`             | `replace`                          |
+        `string`, `null`       |
+
+        Args:
+            milestone_id: The unique identifier of a milestone.
+            body: Request body.
+            timeout: Override the default request timeout (seconds).
+
+        Returns:
+            Milestone
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 500).
+        """
+        response = await self._client.request_async(
+            "PATCH",
+            self._api,
+            "/milestones/{milestoneId}",
+            path_params={
+                "milestoneId": milestone_id,
+            },
+            json_body=body,
             timeout=timeout,
         )
         return Milestone.model_validate(response.json())

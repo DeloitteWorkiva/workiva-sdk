@@ -147,6 +147,78 @@ class Spreadsheets(BaseNamespace):
         _body_result = await paginate_all_async(_fetch, extract_next_link, "data")
         return SpreadsheetsListResult.model_validate(_body_result)
 
+    def get_spreadsheet_by_id(
+        self,
+        *,
+        spreadsheet_id: str,
+        revision: Optional[str] = None,
+        timeout: Optional[float] = None,
+    ) -> Spreadsheet:
+        """Retrieve a single spreadsheet
+
+        Retrieves a [spreadsheet](ref:spreadsheets#spreadsheet) given its ID.
+
+        Args:
+            spreadsheet_id: The unique identifier of the spreadsheet
+            revision: Returns resources at a specific revision
+            timeout: Override the default request timeout (seconds).
+
+        Returns:
+            Spreadsheet
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
+        """
+        response = self._client.request(
+            "GET",
+            self._api,
+            "/spreadsheets/{spreadsheetId}",
+            path_params={
+                "spreadsheetId": spreadsheet_id,
+            },
+            query_params={
+                "$revision": revision,
+            },
+            timeout=timeout,
+        )
+        return Spreadsheet.model_validate(response.json())
+
+    async def get_spreadsheet_by_id_async(
+        self,
+        *,
+        spreadsheet_id: str,
+        revision: Optional[str] = None,
+        timeout: Optional[float] = None,
+    ) -> Spreadsheet:
+        """Retrieve a single spreadsheet (async)
+
+        Retrieves a [spreadsheet](ref:spreadsheets#spreadsheet) given its ID.
+
+        Args:
+            spreadsheet_id: The unique identifier of the spreadsheet
+            revision: Returns resources at a specific revision
+            timeout: Override the default request timeout (seconds).
+
+        Returns:
+            Spreadsheet
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
+        """
+        response = await self._client.request_async(
+            "GET",
+            self._api,
+            "/spreadsheets/{spreadsheetId}",
+            path_params={
+                "spreadsheetId": spreadsheet_id,
+            },
+            query_params={
+                "$revision": revision,
+            },
+            timeout=timeout,
+        )
+        return Spreadsheet.model_validate(response.json())
+
     def partially_update_spreadsheet_by_id(
         self,
         *,
@@ -384,78 +456,6 @@ class Spreadsheets(BaseNamespace):
             json_body=body,
             timeout=timeout,
         )
-
-    def get_spreadsheet_by_id(
-        self,
-        *,
-        spreadsheet_id: str,
-        revision: Optional[str] = None,
-        timeout: Optional[float] = None,
-    ) -> Spreadsheet:
-        """Retrieve a single spreadsheet
-
-        Retrieves a [spreadsheet](ref:spreadsheets#spreadsheet) given its ID.
-
-        Args:
-            spreadsheet_id: The unique identifier of the spreadsheet
-            revision: Returns resources at a specific revision
-            timeout: Override the default request timeout (seconds).
-
-        Returns:
-            Spreadsheet
-
-        Raises:
-            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
-        """
-        response = self._client.request(
-            "GET",
-            self._api,
-            "/spreadsheets/{spreadsheetId}",
-            path_params={
-                "spreadsheetId": spreadsheet_id,
-            },
-            query_params={
-                "$revision": revision,
-            },
-            timeout=timeout,
-        )
-        return Spreadsheet.model_validate(response.json())
-
-    async def get_spreadsheet_by_id_async(
-        self,
-        *,
-        spreadsheet_id: str,
-        revision: Optional[str] = None,
-        timeout: Optional[float] = None,
-    ) -> Spreadsheet:
-        """Retrieve a single spreadsheet (async)
-
-        Retrieves a [spreadsheet](ref:spreadsheets#spreadsheet) given its ID.
-
-        Args:
-            spreadsheet_id: The unique identifier of the spreadsheet
-            revision: Returns resources at a specific revision
-            timeout: Override the default request timeout (seconds).
-
-        Returns:
-            Spreadsheet
-
-        Raises:
-            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
-        """
-        response = await self._client.request_async(
-            "GET",
-            self._api,
-            "/spreadsheets/{spreadsheetId}",
-            path_params={
-                "spreadsheetId": spreadsheet_id,
-            },
-            query_params={
-                "$revision": revision,
-            },
-            timeout=timeout,
-        )
-        return Spreadsheet.model_validate(response.json())
 
     def get_datasets(
         self,
@@ -1181,6 +1181,94 @@ class Spreadsheets(BaseNamespace):
             timeout=timeout,
         )
 
+    def get_sheets(
+        self,
+        *,
+        spreadsheet_id: str,
+        revision: Optional[str] = None,
+        maxpagesize: Optional[int] = 1000,
+        timeout: Optional[float] = None,
+    ) -> SheetsListResult:
+        """Retrieve a list of sheets
+
+        Returns a list of [sheets](ref:spreadsheets#sheet).
+
+        Args:
+            spreadsheet_id: The unique identifier of the spreadsheet
+            revision: Returns resources at a specific revision
+            maxpagesize: The maximum number of results to retrieve
+            timeout: Override the default request timeout (seconds).
+
+        Returns:
+            SheetsListResult
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
+        """
+
+        def _fetch(_cursor: str | None) -> httpx.Response:
+            return self._client.request(
+                "GET",
+                self._api,
+                "/spreadsheets/{spreadsheetId}/sheets",
+                path_params={
+                    "spreadsheetId": spreadsheet_id,
+                },
+                query_params={
+                    "$revision": revision,
+                    "$maxpagesize": maxpagesize,
+                    "$next": _cursor,
+                },
+                timeout=timeout,
+            )
+
+        _body_result = paginate_all(_fetch, extract_next_link, "data")
+        return SheetsListResult.model_validate(_body_result)
+
+    async def get_sheets_async(
+        self,
+        *,
+        spreadsheet_id: str,
+        revision: Optional[str] = None,
+        maxpagesize: Optional[int] = 1000,
+        timeout: Optional[float] = None,
+    ) -> SheetsListResult:
+        """Retrieve a list of sheets (async)
+
+        Returns a list of [sheets](ref:spreadsheets#sheet).
+
+        Args:
+            spreadsheet_id: The unique identifier of the spreadsheet
+            revision: Returns resources at a specific revision
+            maxpagesize: The maximum number of results to retrieve
+            timeout: Override the default request timeout (seconds).
+
+        Returns:
+            SheetsListResult
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
+        """
+
+        async def _fetch(_cursor: str | None) -> httpx.Response:
+            return await self._client.request_async(
+                "GET",
+                self._api,
+                "/spreadsheets/{spreadsheetId}/sheets",
+                path_params={
+                    "spreadsheetId": spreadsheet_id,
+                },
+                query_params={
+                    "$revision": revision,
+                    "$maxpagesize": maxpagesize,
+                    "$next": _cursor,
+                },
+                timeout=timeout,
+            )
+
+        _body_result = await paginate_all_async(_fetch, extract_next_link, "data")
+        return SheetsListResult.model_validate(_body_result)
+
     def create_sheet(
         self,
         *,
@@ -1311,93 +1399,143 @@ class Spreadsheets(BaseNamespace):
         )
         return Sheet.model_validate(response.json())
 
-    def get_sheets(
+    def delete_sheet_by_id(
         self,
         *,
         spreadsheet_id: str,
-        revision: Optional[str] = None,
-        maxpagesize: Optional[int] = 1000,
+        sheet_id: str,
         timeout: Optional[float] = None,
-    ) -> SheetsListResult:
-        """Retrieve a list of sheets
+    ) -> httpx.Response:
+        """Delete a single sheet
 
-        Returns a list of [sheets](ref:spreadsheets#sheet).
+        Deletes a [sheet](ref:spreadsheets#sheet) given its ID.
 
         Args:
             spreadsheet_id: The unique identifier of the spreadsheet
-            revision: Returns resources at a specific revision
-            maxpagesize: The maximum number of results to retrieve
+            sheet_id: The unique identifier of the sheet
             timeout: Override the default request timeout (seconds).
-
-        Returns:
-            SheetsListResult
 
         Raises:
             WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
         """
+        return self._client.request(
+            "DELETE",
+            self._api,
+            "/spreadsheets/{spreadsheetId}/sheets/{sheetId}",
+            path_params={
+                "spreadsheetId": spreadsheet_id,
+                "sheetId": sheet_id,
+            },
+            timeout=timeout,
+        )
 
-        def _fetch(_cursor: str | None) -> httpx.Response:
-            return self._client.request(
-                "GET",
-                self._api,
-                "/spreadsheets/{spreadsheetId}/sheets",
-                path_params={
-                    "spreadsheetId": spreadsheet_id,
-                },
-                query_params={
-                    "$revision": revision,
-                    "$maxpagesize": maxpagesize,
-                    "$next": _cursor,
-                },
-                timeout=timeout,
-            )
-
-        _body_result = paginate_all(_fetch, extract_next_link, "data")
-        return SheetsListResult.model_validate(_body_result)
-
-    async def get_sheets_async(
+    async def delete_sheet_by_id_async(
         self,
         *,
         spreadsheet_id: str,
-        revision: Optional[str] = None,
-        maxpagesize: Optional[int] = 1000,
+        sheet_id: str,
         timeout: Optional[float] = None,
-    ) -> SheetsListResult:
-        """Retrieve a list of sheets (async)
+    ) -> httpx.Response:
+        """Delete a single sheet (async)
 
-        Returns a list of [sheets](ref:spreadsheets#sheet).
+        Deletes a [sheet](ref:spreadsheets#sheet) given its ID.
 
         Args:
             spreadsheet_id: The unique identifier of the spreadsheet
-            revision: Returns resources at a specific revision
-            maxpagesize: The maximum number of results to retrieve
+            sheet_id: The unique identifier of the sheet
             timeout: Override the default request timeout (seconds).
-
-        Returns:
-            SheetsListResult
 
         Raises:
             WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
         """
+        return await self._client.request_async(
+            "DELETE",
+            self._api,
+            "/spreadsheets/{spreadsheetId}/sheets/{sheetId}",
+            path_params={
+                "spreadsheetId": spreadsheet_id,
+                "sheetId": sheet_id,
+            },
+            timeout=timeout,
+        )
 
-        async def _fetch(_cursor: str | None) -> httpx.Response:
-            return await self._client.request_async(
-                "GET",
-                self._api,
-                "/spreadsheets/{spreadsheetId}/sheets",
-                path_params={
-                    "spreadsheetId": spreadsheet_id,
-                },
-                query_params={
-                    "$revision": revision,
-                    "$maxpagesize": maxpagesize,
-                    "$next": _cursor,
-                },
-                timeout=timeout,
-            )
+    def get_sheet_by_id(
+        self,
+        *,
+        spreadsheet_id: str,
+        sheet_id: str,
+        revision: Optional[str] = None,
+        timeout: Optional[float] = None,
+    ) -> Sheet:
+        """Retrieve a single sheet
 
-        _body_result = await paginate_all_async(_fetch, extract_next_link, "data")
-        return SheetsListResult.model_validate(_body_result)
+        Retrieves a [sheet](ref:spreadsheets#sheet) given its ID.
+
+        Args:
+            spreadsheet_id: The unique identifier of the spreadsheet
+            sheet_id: The unique identifier of the sheet
+            revision: Returns resources at a specific revision
+            timeout: Override the default request timeout (seconds).
+
+        Returns:
+            Sheet
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
+        """
+        response = self._client.request(
+            "GET",
+            self._api,
+            "/spreadsheets/{spreadsheetId}/sheets/{sheetId}",
+            path_params={
+                "spreadsheetId": spreadsheet_id,
+                "sheetId": sheet_id,
+            },
+            query_params={
+                "$revision": revision,
+            },
+            timeout=timeout,
+        )
+        return Sheet.model_validate(response.json())
+
+    async def get_sheet_by_id_async(
+        self,
+        *,
+        spreadsheet_id: str,
+        sheet_id: str,
+        revision: Optional[str] = None,
+        timeout: Optional[float] = None,
+    ) -> Sheet:
+        """Retrieve a single sheet (async)
+
+        Retrieves a [sheet](ref:spreadsheets#sheet) given its ID.
+
+        Args:
+            spreadsheet_id: The unique identifier of the spreadsheet
+            sheet_id: The unique identifier of the sheet
+            revision: Returns resources at a specific revision
+            timeout: Override the default request timeout (seconds).
+
+        Returns:
+            Sheet
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
+        """
+        response = await self._client.request_async(
+            "GET",
+            self._api,
+            "/spreadsheets/{spreadsheetId}/sheets/{sheetId}",
+            path_params={
+                "spreadsheetId": spreadsheet_id,
+                "sheetId": sheet_id,
+            },
+            query_params={
+                "$revision": revision,
+            },
+            timeout=timeout,
+        )
+        return Sheet.model_validate(response.json())
 
     def partially_update_sheet_by_id(
         self,
@@ -1726,144 +1864,6 @@ class Spreadsheets(BaseNamespace):
             json_body=body,
             timeout=timeout,
         )
-
-    def delete_sheet_by_id(
-        self,
-        *,
-        spreadsheet_id: str,
-        sheet_id: str,
-        timeout: Optional[float] = None,
-    ) -> httpx.Response:
-        """Delete a single sheet
-
-        Deletes a [sheet](ref:spreadsheets#sheet) given its ID.
-
-        Args:
-            spreadsheet_id: The unique identifier of the spreadsheet
-            sheet_id: The unique identifier of the sheet
-            timeout: Override the default request timeout (seconds).
-
-        Raises:
-            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
-        """
-        return self._client.request(
-            "DELETE",
-            self._api,
-            "/spreadsheets/{spreadsheetId}/sheets/{sheetId}",
-            path_params={
-                "spreadsheetId": spreadsheet_id,
-                "sheetId": sheet_id,
-            },
-            timeout=timeout,
-        )
-
-    async def delete_sheet_by_id_async(
-        self,
-        *,
-        spreadsheet_id: str,
-        sheet_id: str,
-        timeout: Optional[float] = None,
-    ) -> httpx.Response:
-        """Delete a single sheet (async)
-
-        Deletes a [sheet](ref:spreadsheets#sheet) given its ID.
-
-        Args:
-            spreadsheet_id: The unique identifier of the spreadsheet
-            sheet_id: The unique identifier of the sheet
-            timeout: Override the default request timeout (seconds).
-
-        Raises:
-            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
-        """
-        return await self._client.request_async(
-            "DELETE",
-            self._api,
-            "/spreadsheets/{spreadsheetId}/sheets/{sheetId}",
-            path_params={
-                "spreadsheetId": spreadsheet_id,
-                "sheetId": sheet_id,
-            },
-            timeout=timeout,
-        )
-
-    def get_sheet_by_id(
-        self,
-        *,
-        spreadsheet_id: str,
-        sheet_id: str,
-        revision: Optional[str] = None,
-        timeout: Optional[float] = None,
-    ) -> Sheet:
-        """Retrieve a single sheet
-
-        Retrieves a [sheet](ref:spreadsheets#sheet) given its ID.
-
-        Args:
-            spreadsheet_id: The unique identifier of the spreadsheet
-            sheet_id: The unique identifier of the sheet
-            revision: Returns resources at a specific revision
-            timeout: Override the default request timeout (seconds).
-
-        Returns:
-            Sheet
-
-        Raises:
-            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
-        """
-        response = self._client.request(
-            "GET",
-            self._api,
-            "/spreadsheets/{spreadsheetId}/sheets/{sheetId}",
-            path_params={
-                "spreadsheetId": spreadsheet_id,
-                "sheetId": sheet_id,
-            },
-            query_params={
-                "$revision": revision,
-            },
-            timeout=timeout,
-        )
-        return Sheet.model_validate(response.json())
-
-    async def get_sheet_by_id_async(
-        self,
-        *,
-        spreadsheet_id: str,
-        sheet_id: str,
-        revision: Optional[str] = None,
-        timeout: Optional[float] = None,
-    ) -> Sheet:
-        """Retrieve a single sheet (async)
-
-        Retrieves a [sheet](ref:spreadsheets#sheet) given its ID.
-
-        Args:
-            spreadsheet_id: The unique identifier of the spreadsheet
-            sheet_id: The unique identifier of the sheet
-            revision: Returns resources at a specific revision
-            timeout: Override the default request timeout (seconds).
-
-        Returns:
-            Sheet
-
-        Raises:
-            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
-        """
-        response = await self._client.request_async(
-            "GET",
-            self._api,
-            "/spreadsheets/{spreadsheetId}/sheets/{sheetId}",
-            path_params={
-                "spreadsheetId": spreadsheet_id,
-                "sheetId": sheet_id,
-            },
-            query_params={
-                "$revision": revision,
-            },
-            timeout=timeout,
-        )
-        return Sheet.model_validate(response.json())
 
     def copy_sheet(
         self,
@@ -2631,6 +2631,110 @@ class Spreadsheets(BaseNamespace):
             timeout=timeout,
         )
 
+    def get_values_by_range(
+        self,
+        *,
+        spreadsheet_id: str,
+        sheet_id: str,
+        range: str,
+        maxcellsperpage: Optional[int] = 50000,
+        valuestyle: Optional[Literal["raw", "calculated"]] = "calculated",
+        timeout: Optional[float] = None,
+    ) -> RangeValuesListResult:
+        """Retrieve a list of range values
+
+        Returns the paginated values for a specified range.
+        When you retrieve values from a range, Ones scale is used regardless of
+        the cell's scale formatting.
+
+        Args:
+            spreadsheet_id: The unique identifier of the spreadsheet
+            sheet_id: The unique identifier of the sheet
+            range: The range of values, in A1-style notation
+            maxcellsperpage: The maximum number of cells to retrieve. The default is 50000. The maximum allowed value is 50000.
+            valuestyle: Whether to retrieve `raw` or `calculated` cell values. For example, if a cell's value is `=1+1`, `raw` retrieves the value `=1+1`, while `calculated` retrieves `2`.
+            timeout: Override the default request timeout (seconds).
+
+        Returns:
+            RangeValuesListResult
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
+        """
+
+        def _fetch(_cursor: str | None) -> httpx.Response:
+            return self._client.request(
+                "GET",
+                self._api,
+                "/spreadsheets/{spreadsheetId}/sheets/{sheetId}/values/{range}",
+                path_params={
+                    "spreadsheetId": spreadsheet_id,
+                    "sheetId": sheet_id,
+                    "range": range,
+                },
+                query_params={
+                    "$maxcellsperpage": maxcellsperpage,
+                    "$valuestyle": valuestyle,
+                    "$next": _cursor,
+                },
+                timeout=timeout,
+            )
+
+        _body_result = paginate_all(_fetch, extract_next_link, "data")
+        return RangeValuesListResult.model_validate(_body_result)
+
+    async def get_values_by_range_async(
+        self,
+        *,
+        spreadsheet_id: str,
+        sheet_id: str,
+        range: str,
+        maxcellsperpage: Optional[int] = 50000,
+        valuestyle: Optional[Literal["raw", "calculated"]] = "calculated",
+        timeout: Optional[float] = None,
+    ) -> RangeValuesListResult:
+        """Retrieve a list of range values (async)
+
+        Returns the paginated values for a specified range.
+        When you retrieve values from a range, Ones scale is used regardless of
+        the cell's scale formatting.
+
+        Args:
+            spreadsheet_id: The unique identifier of the spreadsheet
+            sheet_id: The unique identifier of the sheet
+            range: The range of values, in A1-style notation
+            maxcellsperpage: The maximum number of cells to retrieve. The default is 50000. The maximum allowed value is 50000.
+            valuestyle: Whether to retrieve `raw` or `calculated` cell values. For example, if a cell's value is `=1+1`, `raw` retrieves the value `=1+1`, while `calculated` retrieves `2`.
+            timeout: Override the default request timeout (seconds).
+
+        Returns:
+            RangeValuesListResult
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
+        """
+
+        async def _fetch(_cursor: str | None) -> httpx.Response:
+            return await self._client.request_async(
+                "GET",
+                self._api,
+                "/spreadsheets/{spreadsheetId}/sheets/{sheetId}/values/{range}",
+                path_params={
+                    "spreadsheetId": spreadsheet_id,
+                    "sheetId": sheet_id,
+                    "range": range,
+                },
+                query_params={
+                    "$maxcellsperpage": maxcellsperpage,
+                    "$valuestyle": valuestyle,
+                    "$next": _cursor,
+                },
+                timeout=timeout,
+            )
+
+        _body_result = await paginate_all_async(_fetch, extract_next_link, "data")
+        return RangeValuesListResult.model_validate(_body_result)
+
     def update_values_by_range(
         self,
         *,
@@ -2742,107 +2846,3 @@ class Spreadsheets(BaseNamespace):
             json_body=_body or None,
             timeout=timeout,
         )
-
-    def get_values_by_range(
-        self,
-        *,
-        spreadsheet_id: str,
-        sheet_id: str,
-        range: str,
-        maxcellsperpage: Optional[int] = 50000,
-        valuestyle: Optional[Literal["raw", "calculated"]] = "calculated",
-        timeout: Optional[float] = None,
-    ) -> RangeValuesListResult:
-        """Retrieve a list of range values
-
-        Returns the paginated values for a specified range.
-        When you retrieve values from a range, Ones scale is used regardless of
-        the cell's scale formatting.
-
-        Args:
-            spreadsheet_id: The unique identifier of the spreadsheet
-            sheet_id: The unique identifier of the sheet
-            range: The range of values, in A1-style notation
-            maxcellsperpage: The maximum number of cells to retrieve. The default is 50000. The maximum allowed value is 50000.
-            valuestyle: Whether to retrieve `raw` or `calculated` cell values. For example, if a cell's value is `=1+1`, `raw` retrieves the value `=1+1`, while `calculated` retrieves `2`.
-            timeout: Override the default request timeout (seconds).
-
-        Returns:
-            RangeValuesListResult
-
-        Raises:
-            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
-        """
-
-        def _fetch(_cursor: str | None) -> httpx.Response:
-            return self._client.request(
-                "GET",
-                self._api,
-                "/spreadsheets/{spreadsheetId}/sheets/{sheetId}/values/{range}",
-                path_params={
-                    "spreadsheetId": spreadsheet_id,
-                    "sheetId": sheet_id,
-                    "range": range,
-                },
-                query_params={
-                    "$maxcellsperpage": maxcellsperpage,
-                    "$valuestyle": valuestyle,
-                    "$next": _cursor,
-                },
-                timeout=timeout,
-            )
-
-        _body_result = paginate_all(_fetch, extract_next_link, "data")
-        return RangeValuesListResult.model_validate(_body_result)
-
-    async def get_values_by_range_async(
-        self,
-        *,
-        spreadsheet_id: str,
-        sheet_id: str,
-        range: str,
-        maxcellsperpage: Optional[int] = 50000,
-        valuestyle: Optional[Literal["raw", "calculated"]] = "calculated",
-        timeout: Optional[float] = None,
-    ) -> RangeValuesListResult:
-        """Retrieve a list of range values (async)
-
-        Returns the paginated values for a specified range.
-        When you retrieve values from a range, Ones scale is used regardless of
-        the cell's scale formatting.
-
-        Args:
-            spreadsheet_id: The unique identifier of the spreadsheet
-            sheet_id: The unique identifier of the sheet
-            range: The range of values, in A1-style notation
-            maxcellsperpage: The maximum number of cells to retrieve. The default is 50000. The maximum allowed value is 50000.
-            valuestyle: Whether to retrieve `raw` or `calculated` cell values. For example, if a cell's value is `=1+1`, `raw` retrieves the value `=1+1`, while `calculated` retrieves `2`.
-            timeout: Override the default request timeout (seconds).
-
-        Returns:
-            RangeValuesListResult
-
-        Raises:
-            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
-        """
-
-        async def _fetch(_cursor: str | None) -> httpx.Response:
-            return await self._client.request_async(
-                "GET",
-                self._api,
-                "/spreadsheets/{spreadsheetId}/sheets/{sheetId}/values/{range}",
-                path_params={
-                    "spreadsheetId": spreadsheet_id,
-                    "sheetId": sheet_id,
-                    "range": range,
-                },
-                query_params={
-                    "$maxcellsperpage": maxcellsperpage,
-                    "$valuestyle": valuestyle,
-                    "$next": _cursor,
-                },
-                timeout=timeout,
-            )
-
-        _body_result = await paginate_all_async(_fetch, extract_next_link, "data")
-        return RangeValuesListResult.model_validate(_body_result)

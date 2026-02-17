@@ -1338,6 +1338,112 @@ class Wdata(BaseNamespace):
         _body_result = await paginate_all_async(_fetch, extract_wdata_cursor, "body")
         return PagedResponseFolderableDto.model_validate(_body_result)
 
+    def get_files(
+        self,
+        *,
+        table_id: str,
+        limit: Optional[int] = None,
+        offset: Optional[int] = None,
+        sort_order: Optional[Literal["asc", "desc"]] = None,
+        sort_by: Optional[Literal["asc", "desc"]] = None,
+        search_text: Optional[str] = None,
+        timeout: Optional[float] = None,
+    ) -> PagedResponseFileMetaDto:
+        """Retrieve a list of files
+
+        Returns a paged list of all files associated with the provided table ID,
+        as well
+        as metadata associated with each file.
+
+        Args:
+            table_id: The unique table identifier associated with this file
+            limit: The number of files to return, from 1 to 1000; by default, 1000
+            offset: The item to start with on the page, greater than or equal to 0; by default, 0
+            sort_order: The sort order for the files being returned
+            sort_by: The column to use the sort order on
+            search_text: The text to filter the results upon; matching the file name
+            timeout: Override the default request timeout (seconds).
+
+        Returns:
+            PagedResponseFileMetaDto
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 423, 429, 500).
+        """
+
+        def _fetch(_cursor: str | None) -> httpx.Response:
+            return self._client.request(
+                "GET",
+                self._api,
+                "/api/v1/file",
+                query_params={
+                    "tableId": table_id,
+                    "limit": limit,
+                    "offset": offset,
+                    "sortOrder": sort_order,
+                    "sortBy": sort_by,
+                    "searchText": search_text,
+                    "cursor": _cursor,
+                },
+                timeout=timeout,
+            )
+
+        _body_result = paginate_all(_fetch, extract_wdata_cursor, "body")
+        return PagedResponseFileMetaDto.model_validate(_body_result)
+
+    async def get_files_async(
+        self,
+        *,
+        table_id: str,
+        limit: Optional[int] = None,
+        offset: Optional[int] = None,
+        sort_order: Optional[Literal["asc", "desc"]] = None,
+        sort_by: Optional[Literal["asc", "desc"]] = None,
+        search_text: Optional[str] = None,
+        timeout: Optional[float] = None,
+    ) -> PagedResponseFileMetaDto:
+        """Retrieve a list of files (async)
+
+        Returns a paged list of all files associated with the provided table ID,
+        as well
+        as metadata associated with each file.
+
+        Args:
+            table_id: The unique table identifier associated with this file
+            limit: The number of files to return, from 1 to 1000; by default, 1000
+            offset: The item to start with on the page, greater than or equal to 0; by default, 0
+            sort_order: The sort order for the files being returned
+            sort_by: The column to use the sort order on
+            search_text: The text to filter the results upon; matching the file name
+            timeout: Override the default request timeout (seconds).
+
+        Returns:
+            PagedResponseFileMetaDto
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 423, 429, 500).
+        """
+
+        async def _fetch(_cursor: str | None) -> httpx.Response:
+            return await self._client.request_async(
+                "GET",
+                self._api,
+                "/api/v1/file",
+                query_params={
+                    "tableId": table_id,
+                    "limit": limit,
+                    "offset": offset,
+                    "sortOrder": sort_order,
+                    "sortBy": sort_by,
+                    "searchText": search_text,
+                    "cursor": _cursor,
+                },
+                timeout=timeout,
+            )
+
+        _body_result = await paginate_all_async(_fetch, extract_wdata_cursor, "body")
+        return PagedResponseFileMetaDto.model_validate(_body_result)
+
     def upload_file(
         self,
         *,
@@ -1477,112 +1583,6 @@ class Wdata(BaseNamespace):
             timeout=timeout,
         )
         return BaseResponseFileMetaDto.model_validate(response.json())
-
-    def get_files(
-        self,
-        *,
-        table_id: str,
-        limit: Optional[int] = None,
-        offset: Optional[int] = None,
-        sort_order: Optional[Literal["asc", "desc"]] = None,
-        sort_by: Optional[Literal["asc", "desc"]] = None,
-        search_text: Optional[str] = None,
-        timeout: Optional[float] = None,
-    ) -> PagedResponseFileMetaDto:
-        """Retrieve a list of files
-
-        Returns a paged list of all files associated with the provided table ID,
-        as well
-        as metadata associated with each file.
-
-        Args:
-            table_id: The unique table identifier associated with this file
-            limit: The number of files to return, from 1 to 1000; by default, 1000
-            offset: The item to start with on the page, greater than or equal to 0; by default, 0
-            sort_order: The sort order for the files being returned
-            sort_by: The column to use the sort order on
-            search_text: The text to filter the results upon; matching the file name
-            timeout: Override the default request timeout (seconds).
-
-        Returns:
-            PagedResponseFileMetaDto
-
-        Raises:
-            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 423, 429, 500).
-        """
-
-        def _fetch(_cursor: str | None) -> httpx.Response:
-            return self._client.request(
-                "GET",
-                self._api,
-                "/api/v1/file",
-                query_params={
-                    "tableId": table_id,
-                    "limit": limit,
-                    "offset": offset,
-                    "sortOrder": sort_order,
-                    "sortBy": sort_by,
-                    "searchText": search_text,
-                    "cursor": _cursor,
-                },
-                timeout=timeout,
-            )
-
-        _body_result = paginate_all(_fetch, extract_wdata_cursor, "body")
-        return PagedResponseFileMetaDto.model_validate(_body_result)
-
-    async def get_files_async(
-        self,
-        *,
-        table_id: str,
-        limit: Optional[int] = None,
-        offset: Optional[int] = None,
-        sort_order: Optional[Literal["asc", "desc"]] = None,
-        sort_by: Optional[Literal["asc", "desc"]] = None,
-        search_text: Optional[str] = None,
-        timeout: Optional[float] = None,
-    ) -> PagedResponseFileMetaDto:
-        """Retrieve a list of files (async)
-
-        Returns a paged list of all files associated with the provided table ID,
-        as well
-        as metadata associated with each file.
-
-        Args:
-            table_id: The unique table identifier associated with this file
-            limit: The number of files to return, from 1 to 1000; by default, 1000
-            offset: The item to start with on the page, greater than or equal to 0; by default, 0
-            sort_order: The sort order for the files being returned
-            sort_by: The column to use the sort order on
-            search_text: The text to filter the results upon; matching the file name
-            timeout: Override the default request timeout (seconds).
-
-        Returns:
-            PagedResponseFileMetaDto
-
-        Raises:
-            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 423, 429, 500).
-        """
-
-        async def _fetch(_cursor: str | None) -> httpx.Response:
-            return await self._client.request_async(
-                "GET",
-                self._api,
-                "/api/v1/file",
-                query_params={
-                    "tableId": table_id,
-                    "limit": limit,
-                    "offset": offset,
-                    "sortOrder": sort_order,
-                    "sortBy": sort_by,
-                    "searchText": search_text,
-                    "cursor": _cursor,
-                },
-                timeout=timeout,
-            )
-
-        _body_result = await paginate_all_async(_fetch, extract_wdata_cursor, "body")
-        return PagedResponseFileMetaDto.model_validate(_body_result)
 
     def validate_filename(
         self,
@@ -2026,80 +2026,6 @@ class Wdata(BaseNamespace):
         )
         return BaseResponseSpreadsheetInfoDto.model_validate(response.json())
 
-    def create_folder(
-        self,
-        *,
-        name: str,
-        description: Optional[str] = None,
-        timeout: Optional[float] = None,
-    ) -> BaseResponseFolderDto:
-        """Create a new folder
-
-        Creates a folder using the provided information and returns the folder
-        meta.
-
-        Args:
-            name: The name of the folder
-            description: A description of the folder
-            timeout: Override the default request timeout (seconds).
-
-        Returns:
-            BaseResponseFolderDto
-
-        Raises:
-            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 423, 429, 500).
-        """
-        _body: dict[str, Any] = {}
-        if name is not None:
-            _body["name"] = name
-        if description is not None:
-            _body["description"] = description
-        response = self._client.request(
-            "POST",
-            self._api,
-            "/api/v1/folder",
-            json_body=_body or None,
-            timeout=timeout,
-        )
-        return BaseResponseFolderDto.model_validate(response.json())
-
-    async def create_folder_async(
-        self,
-        *,
-        name: str,
-        description: Optional[str] = None,
-        timeout: Optional[float] = None,
-    ) -> BaseResponseFolderDto:
-        """Create a new folder (async)
-
-        Creates a folder using the provided information and returns the folder
-        meta.
-
-        Args:
-            name: The name of the folder
-            description: A description of the folder
-            timeout: Override the default request timeout (seconds).
-
-        Returns:
-            BaseResponseFolderDto
-
-        Raises:
-            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 423, 429, 500).
-        """
-        _body: dict[str, Any] = {}
-        if name is not None:
-            _body["name"] = name
-        if description is not None:
-            _body["description"] = description
-        response = await self._client.request_async(
-            "POST",
-            self._api,
-            "/api/v1/folder",
-            json_body=_body or None,
-            timeout=timeout,
-        )
-        return BaseResponseFolderDto.model_validate(response.json())
-
     def list_folders(
         self,
         *,
@@ -2178,6 +2104,80 @@ class Wdata(BaseNamespace):
         _body_result = await paginate_all_async(_fetch, extract_wdata_cursor, "body")
         return PagedResponseFolderDto.model_validate(_body_result)
 
+    def create_folder(
+        self,
+        *,
+        name: str,
+        description: Optional[str] = None,
+        timeout: Optional[float] = None,
+    ) -> BaseResponseFolderDto:
+        """Create a new folder
+
+        Creates a folder using the provided information and returns the folder
+        meta.
+
+        Args:
+            name: The name of the folder
+            description: A description of the folder
+            timeout: Override the default request timeout (seconds).
+
+        Returns:
+            BaseResponseFolderDto
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 423, 429, 500).
+        """
+        _body: dict[str, Any] = {}
+        if name is not None:
+            _body["name"] = name
+        if description is not None:
+            _body["description"] = description
+        response = self._client.request(
+            "POST",
+            self._api,
+            "/api/v1/folder",
+            json_body=_body or None,
+            timeout=timeout,
+        )
+        return BaseResponseFolderDto.model_validate(response.json())
+
+    async def create_folder_async(
+        self,
+        *,
+        name: str,
+        description: Optional[str] = None,
+        timeout: Optional[float] = None,
+    ) -> BaseResponseFolderDto:
+        """Create a new folder (async)
+
+        Creates a folder using the provided information and returns the folder
+        meta.
+
+        Args:
+            name: The name of the folder
+            description: A description of the folder
+            timeout: Override the default request timeout (seconds).
+
+        Returns:
+            BaseResponseFolderDto
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 423, 429, 500).
+        """
+        _body: dict[str, Any] = {}
+        if name is not None:
+            _body["name"] = name
+        if description is not None:
+            _body["description"] = description
+        response = await self._client.request_async(
+            "POST",
+            self._api,
+            "/api/v1/folder",
+            json_body=_body or None,
+            timeout=timeout,
+        )
+        return BaseResponseFolderDto.model_validate(response.json())
+
     def delete_folder(
         self,
         *,
@@ -2243,6 +2243,70 @@ class Wdata(BaseNamespace):
             timeout=timeout,
         )
         return BaseResponseString.model_validate(response.json())
+
+    def get_folder(
+        self,
+        *,
+        folder_id: str,
+        timeout: Optional[float] = None,
+    ) -> BaseResponseFolderDto:
+        """Retrieve a single folder
+
+        Returns a folder with the provided ID, or a 404 if no matching folder is
+        found.
+
+        Args:
+            folder_id: The unique identifier of the folder
+            timeout: Override the default request timeout (seconds).
+
+        Returns:
+            BaseResponseFolderDto
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 423, 429, 500).
+        """
+        response = self._client.request(
+            "GET",
+            self._api,
+            "/api/v1/folder/{folderId}",
+            path_params={
+                "folderId": folder_id,
+            },
+            timeout=timeout,
+        )
+        return BaseResponseFolderDto.model_validate(response.json())
+
+    async def get_folder_async(
+        self,
+        *,
+        folder_id: str,
+        timeout: Optional[float] = None,
+    ) -> BaseResponseFolderDto:
+        """Retrieve a single folder (async)
+
+        Returns a folder with the provided ID, or a 404 if no matching folder is
+        found.
+
+        Args:
+            folder_id: The unique identifier of the folder
+            timeout: Override the default request timeout (seconds).
+
+        Returns:
+            BaseResponseFolderDto
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 423, 429, 500).
+        """
+        response = await self._client.request_async(
+            "GET",
+            self._api,
+            "/api/v1/folder/{folderId}",
+            path_params={
+                "folderId": folder_id,
+            },
+            timeout=timeout,
+        )
+        return BaseResponseFolderDto.model_validate(response.json())
 
     def update_folder(
         self,
@@ -2329,150 +2393,6 @@ class Wdata(BaseNamespace):
             timeout=timeout,
         )
         return BaseResponseFolderDto.model_validate(response.json())
-
-    def get_folder(
-        self,
-        *,
-        folder_id: str,
-        timeout: Optional[float] = None,
-    ) -> BaseResponseFolderDto:
-        """Retrieve a single folder
-
-        Returns a folder with the provided ID, or a 404 if no matching folder is
-        found.
-
-        Args:
-            folder_id: The unique identifier of the folder
-            timeout: Override the default request timeout (seconds).
-
-        Returns:
-            BaseResponseFolderDto
-
-        Raises:
-            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 423, 429, 500).
-        """
-        response = self._client.request(
-            "GET",
-            self._api,
-            "/api/v1/folder/{folderId}",
-            path_params={
-                "folderId": folder_id,
-            },
-            timeout=timeout,
-        )
-        return BaseResponseFolderDto.model_validate(response.json())
-
-    async def get_folder_async(
-        self,
-        *,
-        folder_id: str,
-        timeout: Optional[float] = None,
-    ) -> BaseResponseFolderDto:
-        """Retrieve a single folder (async)
-
-        Returns a folder with the provided ID, or a 404 if no matching folder is
-        found.
-
-        Args:
-            folder_id: The unique identifier of the folder
-            timeout: Override the default request timeout (seconds).
-
-        Returns:
-            BaseResponseFolderDto
-
-        Raises:
-            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 423, 429, 500).
-        """
-        response = await self._client.request_async(
-            "GET",
-            self._api,
-            "/api/v1/folder/{folderId}",
-            path_params={
-                "folderId": folder_id,
-            },
-            timeout=timeout,
-        )
-        return BaseResponseFolderDto.model_validate(response.json())
-
-    def set_children(
-        self,
-        *,
-        folder_id: str,
-        body: list[FolderableDto],
-        timeout: Optional[float] = None,
-    ) -> BaseResponseCollectionFolderableDto:
-        """Move content into a folder
-
-        Sets the children of a folder using the entities' types and IDs provided
-        in the
-        body. If the entities previously resided under a folder, including the
-        root,
-        they move to the folder with the provided ID. If the provided ID is
-        'null',
-        the entities move to the root folder.
-
-        Args:
-            folder_id: The unique identifier of the folder
-            body: Request body.
-            timeout: Override the default request timeout (seconds).
-
-        Returns:
-            BaseResponseCollectionFolderableDto
-
-        Raises:
-            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 423, 429, 500).
-        """
-        response = self._client.request(
-            "POST",
-            self._api,
-            "/api/v1/folder/{folderId}/children",
-            path_params={
-                "folderId": folder_id,
-            },
-            json_body=body,
-            timeout=timeout,
-        )
-        return BaseResponseCollectionFolderableDto.model_validate(response.json())
-
-    async def set_children_async(
-        self,
-        *,
-        folder_id: str,
-        body: list[FolderableDto],
-        timeout: Optional[float] = None,
-    ) -> BaseResponseCollectionFolderableDto:
-        """Move content into a folder (async)
-
-        Sets the children of a folder using the entities' types and IDs provided
-        in the
-        body. If the entities previously resided under a folder, including the
-        root,
-        they move to the folder with the provided ID. If the provided ID is
-        'null',
-        the entities move to the root folder.
-
-        Args:
-            folder_id: The unique identifier of the folder
-            body: Request body.
-            timeout: Override the default request timeout (seconds).
-
-        Returns:
-            BaseResponseCollectionFolderableDto
-
-        Raises:
-            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 423, 429, 500).
-        """
-        response = await self._client.request_async(
-            "POST",
-            self._api,
-            "/api/v1/folder/{folderId}/children",
-            path_params={
-                "folderId": folder_id,
-            },
-            json_body=body,
-            timeout=timeout,
-        )
-        return BaseResponseCollectionFolderableDto.model_validate(response.json())
 
     def list_children(
         self,
@@ -2569,6 +2489,170 @@ class Wdata(BaseNamespace):
 
         _body_result = await paginate_all_async(_fetch, extract_wdata_cursor, "body")
         return PagedResponseFolderableDto.model_validate(_body_result)
+
+    def set_children(
+        self,
+        *,
+        folder_id: str,
+        body: list[FolderableDto],
+        timeout: Optional[float] = None,
+    ) -> BaseResponseCollectionFolderableDto:
+        """Move content into a folder
+
+        Sets the children of a folder using the entities' types and IDs provided
+        in the
+        body. If the entities previously resided under a folder, including the
+        root,
+        they move to the folder with the provided ID. If the provided ID is
+        'null',
+        the entities move to the root folder.
+
+        Args:
+            folder_id: The unique identifier of the folder
+            body: Request body.
+            timeout: Override the default request timeout (seconds).
+
+        Returns:
+            BaseResponseCollectionFolderableDto
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 423, 429, 500).
+        """
+        response = self._client.request(
+            "POST",
+            self._api,
+            "/api/v1/folder/{folderId}/children",
+            path_params={
+                "folderId": folder_id,
+            },
+            json_body=body,
+            timeout=timeout,
+        )
+        return BaseResponseCollectionFolderableDto.model_validate(response.json())
+
+    async def set_children_async(
+        self,
+        *,
+        folder_id: str,
+        body: list[FolderableDto],
+        timeout: Optional[float] = None,
+    ) -> BaseResponseCollectionFolderableDto:
+        """Move content into a folder (async)
+
+        Sets the children of a folder using the entities' types and IDs provided
+        in the
+        body. If the entities previously resided under a folder, including the
+        root,
+        they move to the folder with the provided ID. If the provided ID is
+        'null',
+        the entities move to the root folder.
+
+        Args:
+            folder_id: The unique identifier of the folder
+            body: Request body.
+            timeout: Override the default request timeout (seconds).
+
+        Returns:
+            BaseResponseCollectionFolderableDto
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 423, 429, 500).
+        """
+        response = await self._client.request_async(
+            "POST",
+            self._api,
+            "/api/v1/folder/{folderId}/children",
+            path_params={
+                "folderId": folder_id,
+            },
+            json_body=body,
+            timeout=timeout,
+        )
+        return BaseResponseCollectionFolderableDto.model_validate(response.json())
+
+    def list_parameters(
+        self,
+        *,
+        limit: Optional[int] = 1000,
+        offset: Optional[int] = None,
+        timeout: Optional[float] = None,
+    ) -> PagedResponseGlobalParameterDto:
+        """Get Parameters
+
+                Returns a list of all parameters associated with the workspace.  By
+                default, these
+                parameters are ordered by their names in ascending order.
+
+                Args:
+                    limit: The number of parameters to return, must be between 1 and 1000, will default
+        to 1000
+                    offset: The item to start with on the page, must be greater than or equal to 0, will default to 0
+                    timeout: Override the default request timeout (seconds).
+
+                Returns:
+                    PagedResponseGlobalParameterDto
+
+                Raises:
+                    WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 423, 429, 500).
+        """
+
+        def _fetch(_cursor: str | None) -> httpx.Response:
+            return self._client.request(
+                "GET",
+                self._api,
+                "/api/v1/parameter",
+                query_params={
+                    "limit": limit,
+                    "offset": offset,
+                    "cursor": _cursor,
+                },
+                timeout=timeout,
+            )
+
+        _body_result = paginate_all(_fetch, extract_wdata_cursor, "body")
+        return PagedResponseGlobalParameterDto.model_validate(_body_result)
+
+    async def list_parameters_async(
+        self,
+        *,
+        limit: Optional[int] = 1000,
+        offset: Optional[int] = None,
+        timeout: Optional[float] = None,
+    ) -> PagedResponseGlobalParameterDto:
+        """Get Parameters (async)
+
+                Returns a list of all parameters associated with the workspace.  By
+                default, these
+                parameters are ordered by their names in ascending order.
+
+                Args:
+                    limit: The number of parameters to return, must be between 1 and 1000, will default
+        to 1000
+                    offset: The item to start with on the page, must be greater than or equal to 0, will default to 0
+                    timeout: Override the default request timeout (seconds).
+
+                Returns:
+                    PagedResponseGlobalParameterDto
+
+                Raises:
+                    WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 423, 429, 500).
+        """
+
+        async def _fetch(_cursor: str | None) -> httpx.Response:
+            return await self._client.request_async(
+                "GET",
+                self._api,
+                "/api/v1/parameter",
+                query_params={
+                    "limit": limit,
+                    "offset": offset,
+                    "cursor": _cursor,
+                },
+                timeout=timeout,
+            )
+
+        _body_result = await paginate_all_async(_fetch, extract_wdata_cursor, "body")
+        return PagedResponseGlobalParameterDto.model_validate(_body_result)
 
     def create_parameter(
         self,
@@ -2720,90 +2804,6 @@ class Wdata(BaseNamespace):
         )
         return BaseResponseGlobalParameterDto.model_validate(response.json())
 
-    def list_parameters(
-        self,
-        *,
-        limit: Optional[int] = 1000,
-        offset: Optional[int] = None,
-        timeout: Optional[float] = None,
-    ) -> PagedResponseGlobalParameterDto:
-        """Get Parameters
-
-                Returns a list of all parameters associated with the workspace.  By
-                default, these
-                parameters are ordered by their names in ascending order.
-
-                Args:
-                    limit: The number of parameters to return, must be between 1 and 1000, will default
-        to 1000
-                    offset: The item to start with on the page, must be greater than or equal to 0, will default to 0
-                    timeout: Override the default request timeout (seconds).
-
-                Returns:
-                    PagedResponseGlobalParameterDto
-
-                Raises:
-                    WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 423, 429, 500).
-        """
-
-        def _fetch(_cursor: str | None) -> httpx.Response:
-            return self._client.request(
-                "GET",
-                self._api,
-                "/api/v1/parameter",
-                query_params={
-                    "limit": limit,
-                    "offset": offset,
-                    "cursor": _cursor,
-                },
-                timeout=timeout,
-            )
-
-        _body_result = paginate_all(_fetch, extract_wdata_cursor, "body")
-        return PagedResponseGlobalParameterDto.model_validate(_body_result)
-
-    async def list_parameters_async(
-        self,
-        *,
-        limit: Optional[int] = 1000,
-        offset: Optional[int] = None,
-        timeout: Optional[float] = None,
-    ) -> PagedResponseGlobalParameterDto:
-        """Get Parameters (async)
-
-                Returns a list of all parameters associated with the workspace.  By
-                default, these
-                parameters are ordered by their names in ascending order.
-
-                Args:
-                    limit: The number of parameters to return, must be between 1 and 1000, will default
-        to 1000
-                    offset: The item to start with on the page, must be greater than or equal to 0, will default to 0
-                    timeout: Override the default request timeout (seconds).
-
-                Returns:
-                    PagedResponseGlobalParameterDto
-
-                Raises:
-                    WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 423, 429, 500).
-        """
-
-        async def _fetch(_cursor: str | None) -> httpx.Response:
-            return await self._client.request_async(
-                "GET",
-                self._api,
-                "/api/v1/parameter",
-                query_params={
-                    "limit": limit,
-                    "offset": offset,
-                    "cursor": _cursor,
-                },
-                timeout=timeout,
-            )
-
-        _body_result = await paginate_all_async(_fetch, extract_wdata_cursor, "body")
-        return PagedResponseGlobalParameterDto.model_validate(_body_result)
-
     def delete_parameter(
         self,
         *,
@@ -2867,6 +2867,70 @@ class Wdata(BaseNamespace):
             timeout=timeout,
         )
         return BaseResponseString.model_validate(response.json())
+
+    def get_parameter(
+        self,
+        *,
+        parameter_id: str,
+        timeout: Optional[float] = None,
+    ) -> BaseResponseGlobalParameterDto:
+        """Get Parameter
+
+        Returns a parameter matching the provided parameter ID.  If no matching
+        entity can be found, a 404 status is returned.
+
+        Args:
+            parameter_id: The unique identifier of the parameter
+            timeout: Override the default request timeout (seconds).
+
+        Returns:
+            BaseResponseGlobalParameterDto
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 423, 429, 500).
+        """
+        response = self._client.request(
+            "GET",
+            self._api,
+            "/api/v1/parameter/{parameterId}",
+            path_params={
+                "parameterId": parameter_id,
+            },
+            timeout=timeout,
+        )
+        return BaseResponseGlobalParameterDto.model_validate(response.json())
+
+    async def get_parameter_async(
+        self,
+        *,
+        parameter_id: str,
+        timeout: Optional[float] = None,
+    ) -> BaseResponseGlobalParameterDto:
+        """Get Parameter (async)
+
+        Returns a parameter matching the provided parameter ID.  If no matching
+        entity can be found, a 404 status is returned.
+
+        Args:
+            parameter_id: The unique identifier of the parameter
+            timeout: Override the default request timeout (seconds).
+
+        Returns:
+            BaseResponseGlobalParameterDto
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 423, 429, 500).
+        """
+        response = await self._client.request_async(
+            "GET",
+            self._api,
+            "/api/v1/parameter/{parameterId}",
+            path_params={
+                "parameterId": parameter_id,
+            },
+            timeout=timeout,
+        )
+        return BaseResponseGlobalParameterDto.model_validate(response.json())
 
     def update_parameter(
         self,
@@ -3026,69 +3090,93 @@ class Wdata(BaseNamespace):
         )
         return BaseResponseGlobalParameterDto.model_validate(response.json())
 
-    def get_parameter(
+    def list_pivot_views(
         self,
         *,
-        parameter_id: str,
+        query_id: str,
+        limit: Optional[int] = 1000,
+        offset: Optional[int] = None,
         timeout: Optional[float] = None,
-    ) -> BaseResponseGlobalParameterDto:
-        """Get Parameter
+    ) -> PagedResponsePivotViewDto:
+        """Retrieve a list of pivot views
 
-        Returns a parameter matching the provided parameter ID.  If no matching
-        entity can be found, a 404 status is returned.
+        Returns a paged list of views in the workspace of the request. If
+        queryId is provided, the results are limited to only views associated
+        with the query ID.
 
         Args:
-            parameter_id: The unique identifier of the parameter
+            query_id: The unique query identifier to filter the views
+            limit: The number of views to return, from 1 to 1000; by default, 1000
+            offset: The item to start with on the page, greater than or equal to 0; by default, 0
             timeout: Override the default request timeout (seconds).
 
         Returns:
-            BaseResponseGlobalParameterDto
+            PagedResponsePivotViewDto
 
         Raises:
             WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 423, 429, 500).
         """
-        response = self._client.request(
-            "GET",
-            self._api,
-            "/api/v1/parameter/{parameterId}",
-            path_params={
-                "parameterId": parameter_id,
-            },
-            timeout=timeout,
-        )
-        return BaseResponseGlobalParameterDto.model_validate(response.json())
 
-    async def get_parameter_async(
+        def _fetch(_cursor: str | None) -> httpx.Response:
+            return self._client.request(
+                "GET",
+                self._api,
+                "/api/v1/pivotview",
+                query_params={
+                    "queryId": query_id,
+                    "limit": limit,
+                    "offset": offset,
+                    "cursor": _cursor,
+                },
+                timeout=timeout,
+            )
+
+        _body_result = paginate_all(_fetch, extract_wdata_cursor, "body")
+        return PagedResponsePivotViewDto.model_validate(_body_result)
+
+    async def list_pivot_views_async(
         self,
         *,
-        parameter_id: str,
+        query_id: str,
+        limit: Optional[int] = 1000,
+        offset: Optional[int] = None,
         timeout: Optional[float] = None,
-    ) -> BaseResponseGlobalParameterDto:
-        """Get Parameter (async)
+    ) -> PagedResponsePivotViewDto:
+        """Retrieve a list of pivot views (async)
 
-        Returns a parameter matching the provided parameter ID.  If no matching
-        entity can be found, a 404 status is returned.
+        Returns a paged list of views in the workspace of the request. If
+        queryId is provided, the results are limited to only views associated
+        with the query ID.
 
         Args:
-            parameter_id: The unique identifier of the parameter
+            query_id: The unique query identifier to filter the views
+            limit: The number of views to return, from 1 to 1000; by default, 1000
+            offset: The item to start with on the page, greater than or equal to 0; by default, 0
             timeout: Override the default request timeout (seconds).
 
         Returns:
-            BaseResponseGlobalParameterDto
+            PagedResponsePivotViewDto
 
         Raises:
             WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 423, 429, 500).
         """
-        response = await self._client.request_async(
-            "GET",
-            self._api,
-            "/api/v1/parameter/{parameterId}",
-            path_params={
-                "parameterId": parameter_id,
-            },
-            timeout=timeout,
-        )
-        return BaseResponseGlobalParameterDto.model_validate(response.json())
+
+        async def _fetch(_cursor: str | None) -> httpx.Response:
+            return await self._client.request_async(
+                "GET",
+                self._api,
+                "/api/v1/pivotview",
+                query_params={
+                    "queryId": query_id,
+                    "limit": limit,
+                    "offset": offset,
+                    "cursor": _cursor,
+                },
+                timeout=timeout,
+            )
+
+        _body_result = await paginate_all_async(_fetch, extract_wdata_cursor, "body")
+        return PagedResponsePivotViewDto.model_validate(_body_result)
 
     def create_pivot_view(
         self,
@@ -3204,94 +3292,6 @@ class Wdata(BaseNamespace):
         )
         return BaseResponsePivotViewDto.model_validate(response.json())
 
-    def list_pivot_views(
-        self,
-        *,
-        query_id: str,
-        limit: Optional[int] = 1000,
-        offset: Optional[int] = None,
-        timeout: Optional[float] = None,
-    ) -> PagedResponsePivotViewDto:
-        """Retrieve a list of pivot views
-
-        Returns a paged list of views in the workspace of the request. If
-        queryId is provided, the results are limited to only views associated
-        with the query ID.
-
-        Args:
-            query_id: The unique query identifier to filter the views
-            limit: The number of views to return, from 1 to 1000; by default, 1000
-            offset: The item to start with on the page, greater than or equal to 0; by default, 0
-            timeout: Override the default request timeout (seconds).
-
-        Returns:
-            PagedResponsePivotViewDto
-
-        Raises:
-            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 423, 429, 500).
-        """
-
-        def _fetch(_cursor: str | None) -> httpx.Response:
-            return self._client.request(
-                "GET",
-                self._api,
-                "/api/v1/pivotview",
-                query_params={
-                    "queryId": query_id,
-                    "limit": limit,
-                    "offset": offset,
-                    "cursor": _cursor,
-                },
-                timeout=timeout,
-            )
-
-        _body_result = paginate_all(_fetch, extract_wdata_cursor, "body")
-        return PagedResponsePivotViewDto.model_validate(_body_result)
-
-    async def list_pivot_views_async(
-        self,
-        *,
-        query_id: str,
-        limit: Optional[int] = 1000,
-        offset: Optional[int] = None,
-        timeout: Optional[float] = None,
-    ) -> PagedResponsePivotViewDto:
-        """Retrieve a list of pivot views (async)
-
-        Returns a paged list of views in the workspace of the request. If
-        queryId is provided, the results are limited to only views associated
-        with the query ID.
-
-        Args:
-            query_id: The unique query identifier to filter the views
-            limit: The number of views to return, from 1 to 1000; by default, 1000
-            offset: The item to start with on the page, greater than or equal to 0; by default, 0
-            timeout: Override the default request timeout (seconds).
-
-        Returns:
-            PagedResponsePivotViewDto
-
-        Raises:
-            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 423, 429, 500).
-        """
-
-        async def _fetch(_cursor: str | None) -> httpx.Response:
-            return await self._client.request_async(
-                "GET",
-                self._api,
-                "/api/v1/pivotview",
-                query_params={
-                    "queryId": query_id,
-                    "limit": limit,
-                    "offset": offset,
-                    "cursor": _cursor,
-                },
-                timeout=timeout,
-            )
-
-        _body_result = await paginate_all_async(_fetch, extract_wdata_cursor, "body")
-        return PagedResponsePivotViewDto.model_validate(_body_result)
-
     def delete_pivot_view(
         self,
         *,
@@ -3361,6 +3361,68 @@ class Wdata(BaseNamespace):
             timeout=timeout,
         )
         return BaseResponseString.model_validate(response.json())
+
+    def get_pivot_view(
+        self,
+        *,
+        pivot_view_id: str,
+        timeout: Optional[float] = None,
+    ) -> BaseResponsePivotViewDto:
+        """Retrieve a single pivot view
+
+        Returns a view with the provided ID, or a 404 if no view matches the ID.
+
+        Args:
+            pivot_view_id: The unique identifier of the pivot view
+            timeout: Override the default request timeout (seconds).
+
+        Returns:
+            BaseResponsePivotViewDto
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 423, 429, 500).
+        """
+        response = self._client.request(
+            "GET",
+            self._api,
+            "/api/v1/pivotview/{pivotViewId}",
+            path_params={
+                "pivotViewId": pivot_view_id,
+            },
+            timeout=timeout,
+        )
+        return BaseResponsePivotViewDto.model_validate(response.json())
+
+    async def get_pivot_view_async(
+        self,
+        *,
+        pivot_view_id: str,
+        timeout: Optional[float] = None,
+    ) -> BaseResponsePivotViewDto:
+        """Retrieve a single pivot view (async)
+
+        Returns a view with the provided ID, or a 404 if no view matches the ID.
+
+        Args:
+            pivot_view_id: The unique identifier of the pivot view
+            timeout: Override the default request timeout (seconds).
+
+        Returns:
+            BaseResponsePivotViewDto
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 423, 429, 500).
+        """
+        response = await self._client.request_async(
+            "GET",
+            self._api,
+            "/api/v1/pivotview/{pivotViewId}",
+            path_params={
+                "pivotViewId": pivot_view_id,
+            },
+            timeout=timeout,
+        )
+        return BaseResponsePivotViewDto.model_validate(response.json())
 
     def update_pivot_view(
         self,
@@ -3476,67 +3538,93 @@ class Wdata(BaseNamespace):
         )
         return BaseResponsePivotViewDto.model_validate(response.json())
 
-    def get_pivot_view(
+    def list_queries(
         self,
         *,
-        pivot_view_id: str,
+        limit: Optional[int] = 1000,
+        offset: Optional[int] = None,
+        ids: Optional[list[str]] = None,
         timeout: Optional[float] = None,
-    ) -> BaseResponsePivotViewDto:
-        """Retrieve a single pivot view
+    ) -> PagedResponseQueryDto:
+        """Retrieve list of queries
 
-        Returns a view with the provided ID, or a 404 if no view matches the ID.
+        Returns a list of all non-temporary queries associated with the
+        workspace. By default, these queries are ordered by their names, in
+        ascending order.
 
         Args:
-            pivot_view_id: The unique identifier of the pivot view
+            limit: The number of queries to return, from 1 to 1000; by default, 1000
+            offset: The item to start with on the page, greater than or equal to 0; by default, 0
+            ids: A list of ids to filter the returned list by
             timeout: Override the default request timeout (seconds).
 
         Returns:
-            BaseResponsePivotViewDto
+            PagedResponseQueryDto
 
         Raises:
             WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 423, 429, 500).
         """
-        response = self._client.request(
-            "GET",
-            self._api,
-            "/api/v1/pivotview/{pivotViewId}",
-            path_params={
-                "pivotViewId": pivot_view_id,
-            },
-            timeout=timeout,
-        )
-        return BaseResponsePivotViewDto.model_validate(response.json())
 
-    async def get_pivot_view_async(
+        def _fetch(_cursor: str | None) -> httpx.Response:
+            return self._client.request(
+                "GET",
+                self._api,
+                "/api/v1/query",
+                query_params={
+                    "limit": limit,
+                    "offset": offset,
+                    "ids": ids,
+                    "cursor": _cursor,
+                },
+                timeout=timeout,
+            )
+
+        _body_result = paginate_all(_fetch, extract_wdata_cursor, "body")
+        return PagedResponseQueryDto.model_validate(_body_result)
+
+    async def list_queries_async(
         self,
         *,
-        pivot_view_id: str,
+        limit: Optional[int] = 1000,
+        offset: Optional[int] = None,
+        ids: Optional[list[str]] = None,
         timeout: Optional[float] = None,
-    ) -> BaseResponsePivotViewDto:
-        """Retrieve a single pivot view (async)
+    ) -> PagedResponseQueryDto:
+        """Retrieve list of queries (async)
 
-        Returns a view with the provided ID, or a 404 if no view matches the ID.
+        Returns a list of all non-temporary queries associated with the
+        workspace. By default, these queries are ordered by their names, in
+        ascending order.
 
         Args:
-            pivot_view_id: The unique identifier of the pivot view
+            limit: The number of queries to return, from 1 to 1000; by default, 1000
+            offset: The item to start with on the page, greater than or equal to 0; by default, 0
+            ids: A list of ids to filter the returned list by
             timeout: Override the default request timeout (seconds).
 
         Returns:
-            BaseResponsePivotViewDto
+            PagedResponseQueryDto
 
         Raises:
             WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 423, 429, 500).
         """
-        response = await self._client.request_async(
-            "GET",
-            self._api,
-            "/api/v1/pivotview/{pivotViewId}",
-            path_params={
-                "pivotViewId": pivot_view_id,
-            },
-            timeout=timeout,
-        )
-        return BaseResponsePivotViewDto.model_validate(response.json())
+
+        async def _fetch(_cursor: str | None) -> httpx.Response:
+            return await self._client.request_async(
+                "GET",
+                self._api,
+                "/api/v1/query",
+                query_params={
+                    "limit": limit,
+                    "offset": offset,
+                    "ids": ids,
+                    "cursor": _cursor,
+                },
+                timeout=timeout,
+            )
+
+        _body_result = await paginate_all_async(_fetch, extract_wdata_cursor, "body")
+        return PagedResponseQueryDto.model_validate(_body_result)
 
     def create_query(
         self,
@@ -3673,94 +3761,6 @@ class Wdata(BaseNamespace):
             timeout=timeout,
         )
         return BaseResponseQueryDto.model_validate(response.json())
-
-    def list_queries(
-        self,
-        *,
-        limit: Optional[int] = 1000,
-        offset: Optional[int] = None,
-        ids: Optional[list[str]] = None,
-        timeout: Optional[float] = None,
-    ) -> PagedResponseQueryDto:
-        """Retrieve list of queries
-
-        Returns a list of all non-temporary queries associated with the
-        workspace. By default, these queries are ordered by their names, in
-        ascending order.
-
-        Args:
-            limit: The number of queries to return, from 1 to 1000; by default, 1000
-            offset: The item to start with on the page, greater than or equal to 0; by default, 0
-            ids: A list of ids to filter the returned list by
-            timeout: Override the default request timeout (seconds).
-
-        Returns:
-            PagedResponseQueryDto
-
-        Raises:
-            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 423, 429, 500).
-        """
-
-        def _fetch(_cursor: str | None) -> httpx.Response:
-            return self._client.request(
-                "GET",
-                self._api,
-                "/api/v1/query",
-                query_params={
-                    "limit": limit,
-                    "offset": offset,
-                    "ids": ids,
-                    "cursor": _cursor,
-                },
-                timeout=timeout,
-            )
-
-        _body_result = paginate_all(_fetch, extract_wdata_cursor, "body")
-        return PagedResponseQueryDto.model_validate(_body_result)
-
-    async def list_queries_async(
-        self,
-        *,
-        limit: Optional[int] = 1000,
-        offset: Optional[int] = None,
-        ids: Optional[list[str]] = None,
-        timeout: Optional[float] = None,
-    ) -> PagedResponseQueryDto:
-        """Retrieve list of queries (async)
-
-        Returns a list of all non-temporary queries associated with the
-        workspace. By default, these queries are ordered by their names, in
-        ascending order.
-
-        Args:
-            limit: The number of queries to return, from 1 to 1000; by default, 1000
-            offset: The item to start with on the page, greater than or equal to 0; by default, 0
-            ids: A list of ids to filter the returned list by
-            timeout: Override the default request timeout (seconds).
-
-        Returns:
-            PagedResponseQueryDto
-
-        Raises:
-            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 423, 429, 500).
-        """
-
-        async def _fetch(_cursor: str | None) -> httpx.Response:
-            return await self._client.request_async(
-                "GET",
-                self._api,
-                "/api/v1/query",
-                query_params={
-                    "limit": limit,
-                    "offset": offset,
-                    "ids": ids,
-                    "cursor": _cursor,
-                },
-                timeout=timeout,
-            )
-
-        _body_result = await paginate_all_async(_fetch, extract_wdata_cursor, "body")
-        return PagedResponseQueryDto.model_validate(_body_result)
 
     def get_query_column_data(
         self,
@@ -4024,6 +4024,70 @@ class Wdata(BaseNamespace):
         )
         return BaseResponseString.model_validate(response.json())
 
+    def get_query(
+        self,
+        *,
+        query_id: str,
+        timeout: Optional[float] = None,
+    ) -> BaseResponseQueryDto:
+        """Retrieve a single query
+
+        Returns a query that matches the provided ID, or a 404 if no matching
+        query is found.
+
+        Args:
+            query_id: The unique identifier of the query
+            timeout: Override the default request timeout (seconds).
+
+        Returns:
+            BaseResponseQueryDto
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 423, 429, 500).
+        """
+        response = self._client.request(
+            "GET",
+            self._api,
+            "/api/v1/query/{queryId}",
+            path_params={
+                "queryId": query_id,
+            },
+            timeout=timeout,
+        )
+        return BaseResponseQueryDto.model_validate(response.json())
+
+    async def get_query_async(
+        self,
+        *,
+        query_id: str,
+        timeout: Optional[float] = None,
+    ) -> BaseResponseQueryDto:
+        """Retrieve a single query (async)
+
+        Returns a query that matches the provided ID, or a 404 if no matching
+        query is found.
+
+        Args:
+            query_id: The unique identifier of the query
+            timeout: Override the default request timeout (seconds).
+
+        Returns:
+            BaseResponseQueryDto
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 423, 429, 500).
+        """
+        response = await self._client.request_async(
+            "GET",
+            self._api,
+            "/api/v1/query/{queryId}",
+            path_params={
+                "queryId": query_id,
+            },
+            timeout=timeout,
+        )
+        return BaseResponseQueryDto.model_validate(response.json())
+
     def update_query(
         self,
         *,
@@ -4162,70 +4226,6 @@ class Wdata(BaseNamespace):
                 "queryId": query_id,
             },
             json_body=_body or None,
-            timeout=timeout,
-        )
-        return BaseResponseQueryDto.model_validate(response.json())
-
-    def get_query(
-        self,
-        *,
-        query_id: str,
-        timeout: Optional[float] = None,
-    ) -> BaseResponseQueryDto:
-        """Retrieve a single query
-
-        Returns a query that matches the provided ID, or a 404 if no matching
-        query is found.
-
-        Args:
-            query_id: The unique identifier of the query
-            timeout: Override the default request timeout (seconds).
-
-        Returns:
-            BaseResponseQueryDto
-
-        Raises:
-            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 423, 429, 500).
-        """
-        response = self._client.request(
-            "GET",
-            self._api,
-            "/api/v1/query/{queryId}",
-            path_params={
-                "queryId": query_id,
-            },
-            timeout=timeout,
-        )
-        return BaseResponseQueryDto.model_validate(response.json())
-
-    async def get_query_async(
-        self,
-        *,
-        query_id: str,
-        timeout: Optional[float] = None,
-    ) -> BaseResponseQueryDto:
-        """Retrieve a single query (async)
-
-        Returns a query that matches the provided ID, or a 404 if no matching
-        query is found.
-
-        Args:
-            query_id: The unique identifier of the query
-            timeout: Override the default request timeout (seconds).
-
-        Returns:
-            BaseResponseQueryDto
-
-        Raises:
-            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 423, 429, 500).
-        """
-        response = await self._client.request_async(
-            "GET",
-            self._api,
-            "/api/v1/query/{queryId}",
-            path_params={
-                "queryId": query_id,
-            },
             timeout=timeout,
         )
         return BaseResponseQueryDto.model_validate(response.json())
@@ -4482,6 +4482,100 @@ class Wdata(BaseNamespace):
         )
         return BaseResponseDescribeQueryResponseDto.model_validate(response.json())
 
+    def list_query_results(
+        self,
+        *,
+        query_id: str,
+        user_specific: Optional[bool] = False,
+        limit: Optional[str] = None,
+        offset: Optional[int] = 0,
+        timeout: Optional[float] = None,
+    ) -> PagedResponseQueryResultDto:
+        """Retrieve a list of query results
+
+        Returns a paged list of query results that match the provided query ID,
+        or an empty
+        list if no matching query is found.
+
+        Args:
+            query_id: The unique identifier of the query
+            user_specific: Limit results to those created by the current user
+            limit: The number of query results to return, from 1 to 1000; by default, 1000
+            offset: The item to start with on the page, greater than or equal to 0; by default, 0
+            timeout: Override the default request timeout (seconds).
+
+        Returns:
+            PagedResponseQueryResultDto
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 423, 429, 500).
+        """
+
+        def _fetch(_cursor: str | None) -> httpx.Response:
+            return self._client.request(
+                "GET",
+                self._api,
+                "/api/v1/queryresult",
+                query_params={
+                    "queryId": query_id,
+                    "userSpecific": user_specific,
+                    "limit": limit,
+                    "offset": offset,
+                    "cursor": _cursor,
+                },
+                timeout=timeout,
+            )
+
+        _body_result = paginate_all(_fetch, extract_wdata_cursor, "body")
+        return PagedResponseQueryResultDto.model_validate(_body_result)
+
+    async def list_query_results_async(
+        self,
+        *,
+        query_id: str,
+        user_specific: Optional[bool] = False,
+        limit: Optional[str] = None,
+        offset: Optional[int] = 0,
+        timeout: Optional[float] = None,
+    ) -> PagedResponseQueryResultDto:
+        """Retrieve a list of query results (async)
+
+        Returns a paged list of query results that match the provided query ID,
+        or an empty
+        list if no matching query is found.
+
+        Args:
+            query_id: The unique identifier of the query
+            user_specific: Limit results to those created by the current user
+            limit: The number of query results to return, from 1 to 1000; by default, 1000
+            offset: The item to start with on the page, greater than or equal to 0; by default, 0
+            timeout: Override the default request timeout (seconds).
+
+        Returns:
+            PagedResponseQueryResultDto
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 423, 429, 500).
+        """
+
+        async def _fetch(_cursor: str | None) -> httpx.Response:
+            return await self._client.request_async(
+                "GET",
+                self._api,
+                "/api/v1/queryresult",
+                query_params={
+                    "queryId": query_id,
+                    "userSpecific": user_specific,
+                    "limit": limit,
+                    "offset": offset,
+                    "cursor": _cursor,
+                },
+                timeout=timeout,
+            )
+
+        _body_result = await paginate_all_async(_fetch, extract_wdata_cursor, "body")
+        return PagedResponseQueryResultDto.model_validate(_body_result)
+
     def run_query(
         self,
         *,
@@ -4577,100 +4671,6 @@ class Wdata(BaseNamespace):
             timeout=timeout,
         )
         return BaseResponseQueryResultDto.model_validate(response.json())
-
-    def list_query_results(
-        self,
-        *,
-        query_id: str,
-        user_specific: Optional[bool] = False,
-        limit: Optional[str] = None,
-        offset: Optional[int] = 0,
-        timeout: Optional[float] = None,
-    ) -> PagedResponseQueryResultDto:
-        """Retrieve a list of query results
-
-        Returns a paged list of query results that match the provided query ID,
-        or an empty
-        list if no matching query is found.
-
-        Args:
-            query_id: The unique identifier of the query
-            user_specific: Limit results to those created by the current user
-            limit: The number of query results to return, from 1 to 1000; by default, 1000
-            offset: The item to start with on the page, greater than or equal to 0; by default, 0
-            timeout: Override the default request timeout (seconds).
-
-        Returns:
-            PagedResponseQueryResultDto
-
-        Raises:
-            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 423, 429, 500).
-        """
-
-        def _fetch(_cursor: str | None) -> httpx.Response:
-            return self._client.request(
-                "GET",
-                self._api,
-                "/api/v1/queryresult",
-                query_params={
-                    "queryId": query_id,
-                    "userSpecific": user_specific,
-                    "limit": limit,
-                    "offset": offset,
-                    "cursor": _cursor,
-                },
-                timeout=timeout,
-            )
-
-        _body_result = paginate_all(_fetch, extract_wdata_cursor, "body")
-        return PagedResponseQueryResultDto.model_validate(_body_result)
-
-    async def list_query_results_async(
-        self,
-        *,
-        query_id: str,
-        user_specific: Optional[bool] = False,
-        limit: Optional[str] = None,
-        offset: Optional[int] = 0,
-        timeout: Optional[float] = None,
-    ) -> PagedResponseQueryResultDto:
-        """Retrieve a list of query results (async)
-
-        Returns a paged list of query results that match the provided query ID,
-        or an empty
-        list if no matching query is found.
-
-        Args:
-            query_id: The unique identifier of the query
-            user_specific: Limit results to those created by the current user
-            limit: The number of query results to return, from 1 to 1000; by default, 1000
-            offset: The item to start with on the page, greater than or equal to 0; by default, 0
-            timeout: Override the default request timeout (seconds).
-
-        Returns:
-            PagedResponseQueryResultDto
-
-        Raises:
-            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 423, 429, 500).
-        """
-
-        async def _fetch(_cursor: str | None) -> httpx.Response:
-            return await self._client.request_async(
-                "GET",
-                self._api,
-                "/api/v1/queryresult",
-                query_params={
-                    "queryId": query_id,
-                    "userSpecific": user_specific,
-                    "limit": limit,
-                    "offset": offset,
-                    "cursor": _cursor,
-                },
-                timeout=timeout,
-            )
-
-        _body_result = await paginate_all_async(_fetch, extract_wdata_cursor, "body")
-        return PagedResponseQueryResultDto.model_validate(_body_result)
 
     def cancel_query(
         self,
@@ -4960,6 +4960,84 @@ class Wdata(BaseNamespace):
         )
         return BaseResponseString.model_validate(response.json())
 
+    def list_select_lists(
+        self,
+        *,
+        limit: Optional[int] = None,
+        offset: Optional[int] = None,
+        timeout: Optional[float] = None,
+    ) -> PagedResponseSelectListDto:
+        """Retrieve a list of select lists
+
+        Returns a list of select lists associated with the workspace.
+
+        Args:
+            limit: The number of select lists to return, from 1 to 1000; by default, 1000
+            offset: The item to start with on the page, greater than or equal to 0; by default, 0
+            timeout: Override the default request timeout (seconds).
+
+        Returns:
+            PagedResponseSelectListDto
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 423, 429, 500).
+        """
+
+        def _fetch(_cursor: str | None) -> httpx.Response:
+            return self._client.request(
+                "GET",
+                self._api,
+                "/api/v1/selectlist",
+                query_params={
+                    "limit": limit,
+                    "offset": offset,
+                    "cursor": _cursor,
+                },
+                timeout=timeout,
+            )
+
+        _body_result = paginate_all(_fetch, extract_wdata_cursor, "body")
+        return PagedResponseSelectListDto.model_validate(_body_result)
+
+    async def list_select_lists_async(
+        self,
+        *,
+        limit: Optional[int] = None,
+        offset: Optional[int] = None,
+        timeout: Optional[float] = None,
+    ) -> PagedResponseSelectListDto:
+        """Retrieve a list of select lists (async)
+
+        Returns a list of select lists associated with the workspace.
+
+        Args:
+            limit: The number of select lists to return, from 1 to 1000; by default, 1000
+            offset: The item to start with on the page, greater than or equal to 0; by default, 0
+            timeout: Override the default request timeout (seconds).
+
+        Returns:
+            PagedResponseSelectListDto
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 423, 429, 500).
+        """
+
+        async def _fetch(_cursor: str | None) -> httpx.Response:
+            return await self._client.request_async(
+                "GET",
+                self._api,
+                "/api/v1/selectlist",
+                query_params={
+                    "limit": limit,
+                    "offset": offset,
+                    "cursor": _cursor,
+                },
+                timeout=timeout,
+            )
+
+        _body_result = await paginate_all_async(_fetch, extract_wdata_cursor, "body")
+        return PagedResponseSelectListDto.model_validate(_body_result)
+
     def create_select_list(
         self,
         *,
@@ -5084,84 +5162,6 @@ class Wdata(BaseNamespace):
         )
         return BaseResponseSelectListDto.model_validate(response.json())
 
-    def list_select_lists(
-        self,
-        *,
-        limit: Optional[int] = None,
-        offset: Optional[int] = None,
-        timeout: Optional[float] = None,
-    ) -> PagedResponseSelectListDto:
-        """Retrieve a list of select lists
-
-        Returns a list of select lists associated with the workspace.
-
-        Args:
-            limit: The number of select lists to return, from 1 to 1000; by default, 1000
-            offset: The item to start with on the page, greater than or equal to 0; by default, 0
-            timeout: Override the default request timeout (seconds).
-
-        Returns:
-            PagedResponseSelectListDto
-
-        Raises:
-            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 423, 429, 500).
-        """
-
-        def _fetch(_cursor: str | None) -> httpx.Response:
-            return self._client.request(
-                "GET",
-                self._api,
-                "/api/v1/selectlist",
-                query_params={
-                    "limit": limit,
-                    "offset": offset,
-                    "cursor": _cursor,
-                },
-                timeout=timeout,
-            )
-
-        _body_result = paginate_all(_fetch, extract_wdata_cursor, "body")
-        return PagedResponseSelectListDto.model_validate(_body_result)
-
-    async def list_select_lists_async(
-        self,
-        *,
-        limit: Optional[int] = None,
-        offset: Optional[int] = None,
-        timeout: Optional[float] = None,
-    ) -> PagedResponseSelectListDto:
-        """Retrieve a list of select lists (async)
-
-        Returns a list of select lists associated with the workspace.
-
-        Args:
-            limit: The number of select lists to return, from 1 to 1000; by default, 1000
-            offset: The item to start with on the page, greater than or equal to 0; by default, 0
-            timeout: Override the default request timeout (seconds).
-
-        Returns:
-            PagedResponseSelectListDto
-
-        Raises:
-            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 423, 429, 500).
-        """
-
-        async def _fetch(_cursor: str | None) -> httpx.Response:
-            return await self._client.request_async(
-                "GET",
-                self._api,
-                "/api/v1/selectlist",
-                query_params={
-                    "limit": limit,
-                    "offset": offset,
-                    "cursor": _cursor,
-                },
-                timeout=timeout,
-            )
-
-        _body_result = await paginate_all_async(_fetch, extract_wdata_cursor, "body")
-        return PagedResponseSelectListDto.model_validate(_body_result)
-
     def delete(
         self,
         *,
@@ -5227,6 +5227,72 @@ class Wdata(BaseNamespace):
             timeout=timeout,
         )
         return BaseResponseString.model_validate(response.json())
+
+    def get_select_list(
+        self,
+        *,
+        select_list_id: str,
+        timeout: Optional[float] = None,
+    ) -> BaseResponseSelectListDto:
+        """Retrieve a single select list
+
+        Returns a select list that matches the provided ID, or a 404 if no
+        matching select
+        list is found.
+
+        Args:
+            select_list_id: The unique identifier of the select list
+            timeout: Override the default request timeout (seconds).
+
+        Returns:
+            BaseResponseSelectListDto
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 423, 429, 500).
+        """
+        response = self._client.request(
+            "GET",
+            self._api,
+            "/api/v1/selectlist/{selectListId}",
+            path_params={
+                "selectListId": select_list_id,
+            },
+            timeout=timeout,
+        )
+        return BaseResponseSelectListDto.model_validate(response.json())
+
+    async def get_select_list_async(
+        self,
+        *,
+        select_list_id: str,
+        timeout: Optional[float] = None,
+    ) -> BaseResponseSelectListDto:
+        """Retrieve a single select list (async)
+
+        Returns a select list that matches the provided ID, or a 404 if no
+        matching select
+        list is found.
+
+        Args:
+            select_list_id: The unique identifier of the select list
+            timeout: Override the default request timeout (seconds).
+
+        Returns:
+            BaseResponseSelectListDto
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 423, 429, 500).
+        """
+        response = await self._client.request_async(
+            "GET",
+            self._api,
+            "/api/v1/selectlist/{selectListId}",
+            path_params={
+                "selectListId": select_list_id,
+            },
+            timeout=timeout,
+        )
+        return BaseResponseSelectListDto.model_validate(response.json())
 
     def update_select_list(
         self,
@@ -5364,146 +5430,6 @@ class Wdata(BaseNamespace):
         )
         return BaseResponseSelectListDto.model_validate(response.json())
 
-    def get_select_list(
-        self,
-        *,
-        select_list_id: str,
-        timeout: Optional[float] = None,
-    ) -> BaseResponseSelectListDto:
-        """Retrieve a single select list
-
-        Returns a select list that matches the provided ID, or a 404 if no
-        matching select
-        list is found.
-
-        Args:
-            select_list_id: The unique identifier of the select list
-            timeout: Override the default request timeout (seconds).
-
-        Returns:
-            BaseResponseSelectListDto
-
-        Raises:
-            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 423, 429, 500).
-        """
-        response = self._client.request(
-            "GET",
-            self._api,
-            "/api/v1/selectlist/{selectListId}",
-            path_params={
-                "selectListId": select_list_id,
-            },
-            timeout=timeout,
-        )
-        return BaseResponseSelectListDto.model_validate(response.json())
-
-    async def get_select_list_async(
-        self,
-        *,
-        select_list_id: str,
-        timeout: Optional[float] = None,
-    ) -> BaseResponseSelectListDto:
-        """Retrieve a single select list (async)
-
-        Returns a select list that matches the provided ID, or a 404 if no
-        matching select
-        list is found.
-
-        Args:
-            select_list_id: The unique identifier of the select list
-            timeout: Override the default request timeout (seconds).
-
-        Returns:
-            BaseResponseSelectListDto
-
-        Raises:
-            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 423, 429, 500).
-        """
-        response = await self._client.request_async(
-            "GET",
-            self._api,
-            "/api/v1/selectlist/{selectListId}",
-            path_params={
-                "selectListId": select_list_id,
-            },
-            timeout=timeout,
-        )
-        return BaseResponseSelectListDto.model_validate(response.json())
-
-    def create_shared_table(
-        self,
-        *,
-        destination_workspace_id: str,
-        source_table_id: str,
-        timeout: Optional[float] = None,
-    ) -> BaseResponseSharedTableDto:
-        """Create a new shared table
-
-        Creates a shared table instance between the workspace of the request and
-        the workspace provided in the body.
-
-        Args:
-            destination_workspace_id: The id of the workspace being shared to.
-            source_table_id: The id of the table being shared.
-            timeout: Override the default request timeout (seconds).
-
-        Returns:
-            BaseResponseSharedTableDto
-
-        Raises:
-            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 423, 429, 500).
-        """
-        _body: dict[str, Any] = {}
-        if destination_workspace_id is not None:
-            _body["destinationWorkspaceId"] = destination_workspace_id
-        if source_table_id is not None:
-            _body["sourceTableId"] = source_table_id
-        response = self._client.request(
-            "POST",
-            self._api,
-            "/api/v1/sharedtable",
-            json_body=_body or None,
-            timeout=timeout,
-        )
-        return BaseResponseSharedTableDto.model_validate(response.json())
-
-    async def create_shared_table_async(
-        self,
-        *,
-        destination_workspace_id: str,
-        source_table_id: str,
-        timeout: Optional[float] = None,
-    ) -> BaseResponseSharedTableDto:
-        """Create a new shared table (async)
-
-        Creates a shared table instance between the workspace of the request and
-        the workspace provided in the body.
-
-        Args:
-            destination_workspace_id: The id of the workspace being shared to.
-            source_table_id: The id of the table being shared.
-            timeout: Override the default request timeout (seconds).
-
-        Returns:
-            BaseResponseSharedTableDto
-
-        Raises:
-            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 423, 429, 500).
-        """
-        _body: dict[str, Any] = {}
-        if destination_workspace_id is not None:
-            _body["destinationWorkspaceId"] = destination_workspace_id
-        if source_table_id is not None:
-            _body["sourceTableId"] = source_table_id
-        response = await self._client.request_async(
-            "POST",
-            self._api,
-            "/api/v1/sharedtable",
-            json_body=_body or None,
-            timeout=timeout,
-        )
-        return BaseResponseSharedTableDto.model_validate(response.json())
-
     def list_shared_tables(
         self,
         *,
@@ -5599,6 +5525,80 @@ class Wdata(BaseNamespace):
 
         _body_result = await paginate_all_async(_fetch, extract_wdata_cursor, "body")
         return PagedResponseSharedTableDto.model_validate(_body_result)
+
+    def create_shared_table(
+        self,
+        *,
+        destination_workspace_id: str,
+        source_table_id: str,
+        timeout: Optional[float] = None,
+    ) -> BaseResponseSharedTableDto:
+        """Create a new shared table
+
+        Creates a shared table instance between the workspace of the request and
+        the workspace provided in the body.
+
+        Args:
+            destination_workspace_id: The id of the workspace being shared to.
+            source_table_id: The id of the table being shared.
+            timeout: Override the default request timeout (seconds).
+
+        Returns:
+            BaseResponseSharedTableDto
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 423, 429, 500).
+        """
+        _body: dict[str, Any] = {}
+        if destination_workspace_id is not None:
+            _body["destinationWorkspaceId"] = destination_workspace_id
+        if source_table_id is not None:
+            _body["sourceTableId"] = source_table_id
+        response = self._client.request(
+            "POST",
+            self._api,
+            "/api/v1/sharedtable",
+            json_body=_body or None,
+            timeout=timeout,
+        )
+        return BaseResponseSharedTableDto.model_validate(response.json())
+
+    async def create_shared_table_async(
+        self,
+        *,
+        destination_workspace_id: str,
+        source_table_id: str,
+        timeout: Optional[float] = None,
+    ) -> BaseResponseSharedTableDto:
+        """Create a new shared table (async)
+
+        Creates a shared table instance between the workspace of the request and
+        the workspace provided in the body.
+
+        Args:
+            destination_workspace_id: The id of the workspace being shared to.
+            source_table_id: The id of the table being shared.
+            timeout: Override the default request timeout (seconds).
+
+        Returns:
+            BaseResponseSharedTableDto
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 423, 429, 500).
+        """
+        _body: dict[str, Any] = {}
+        if destination_workspace_id is not None:
+            _body["destinationWorkspaceId"] = destination_workspace_id
+        if source_table_id is not None:
+            _body["sourceTableId"] = source_table_id
+        response = await self._client.request_async(
+            "POST",
+            self._api,
+            "/api/v1/sharedtable",
+            json_body=_body or None,
+            timeout=timeout,
+        )
+        return BaseResponseSharedTableDto.model_validate(response.json())
 
     def delete_shared_table(
         self,
@@ -5744,6 +5744,90 @@ class Wdata(BaseNamespace):
         )
         return BaseResponseSharedTableDto.model_validate(response.json())
 
+    def get_tables(
+        self,
+        *,
+        include_shared: Optional[bool] = False,
+        limit: Optional[int] = 1000,
+        offset: Optional[int] = None,
+        timeout: Optional[float] = None,
+    ) -> PagedResponseTableDto:
+        """Retrieve a list of tables
+
+        Returns all tables available in the workspace.
+
+        Args:
+            include_shared: If true, returns all tables shared with the workspace associated with the request. If false, returns only tables the workspace owns.
+            limit: the number of folders to return, from 1 to 1000; by default, 1000
+            offset: The item to start with on the page, must be greater than or equal to 0, will default to 0
+            timeout: Override the default request timeout (seconds).
+
+        Returns:
+            PagedResponseTableDto
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 423, 429, 500).
+        """
+
+        def _fetch(_cursor: str | None) -> httpx.Response:
+            return self._client.request(
+                "GET",
+                self._api,
+                "/api/v1/table",
+                query_params={
+                    "includeShared": include_shared,
+                    "limit": limit,
+                    "offset": offset,
+                    "cursor": _cursor,
+                },
+                timeout=timeout,
+            )
+
+        _body_result = paginate_all(_fetch, extract_wdata_cursor, "body")
+        return PagedResponseTableDto.model_validate(_body_result)
+
+    async def get_tables_async(
+        self,
+        *,
+        include_shared: Optional[bool] = False,
+        limit: Optional[int] = 1000,
+        offset: Optional[int] = None,
+        timeout: Optional[float] = None,
+    ) -> PagedResponseTableDto:
+        """Retrieve a list of tables (async)
+
+        Returns all tables available in the workspace.
+
+        Args:
+            include_shared: If true, returns all tables shared with the workspace associated with the request. If false, returns only tables the workspace owns.
+            limit: the number of folders to return, from 1 to 1000; by default, 1000
+            offset: The item to start with on the page, must be greater than or equal to 0, will default to 0
+            timeout: Override the default request timeout (seconds).
+
+        Returns:
+            PagedResponseTableDto
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 423, 429, 500).
+        """
+
+        async def _fetch(_cursor: str | None) -> httpx.Response:
+            return await self._client.request_async(
+                "GET",
+                self._api,
+                "/api/v1/table",
+                query_params={
+                    "includeShared": include_shared,
+                    "limit": limit,
+                    "offset": offset,
+                    "cursor": _cursor,
+                },
+                timeout=timeout,
+            )
+
+        _body_result = await paginate_all_async(_fetch, extract_wdata_cursor, "body")
+        return PagedResponseTableDto.model_validate(_body_result)
+
     def create_table(
         self,
         *,
@@ -5864,90 +5948,6 @@ class Wdata(BaseNamespace):
         )
         return BaseResponseTableDto.model_validate(response.json())
 
-    def get_tables(
-        self,
-        *,
-        include_shared: Optional[bool] = False,
-        limit: Optional[int] = 1000,
-        offset: Optional[int] = None,
-        timeout: Optional[float] = None,
-    ) -> PagedResponseTableDto:
-        """Retrieve a list of tables
-
-        Returns all tables available in the workspace.
-
-        Args:
-            include_shared: If true, returns all tables shared with the workspace associated with the request. If false, returns only tables the workspace owns.
-            limit: the number of folders to return, from 1 to 1000; by default, 1000
-            offset: The item to start with on the page, must be greater than or equal to 0, will default to 0
-            timeout: Override the default request timeout (seconds).
-
-        Returns:
-            PagedResponseTableDto
-
-        Raises:
-            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 423, 429, 500).
-        """
-
-        def _fetch(_cursor: str | None) -> httpx.Response:
-            return self._client.request(
-                "GET",
-                self._api,
-                "/api/v1/table",
-                query_params={
-                    "includeShared": include_shared,
-                    "limit": limit,
-                    "offset": offset,
-                    "cursor": _cursor,
-                },
-                timeout=timeout,
-            )
-
-        _body_result = paginate_all(_fetch, extract_wdata_cursor, "body")
-        return PagedResponseTableDto.model_validate(_body_result)
-
-    async def get_tables_async(
-        self,
-        *,
-        include_shared: Optional[bool] = False,
-        limit: Optional[int] = 1000,
-        offset: Optional[int] = None,
-        timeout: Optional[float] = None,
-    ) -> PagedResponseTableDto:
-        """Retrieve a list of tables (async)
-
-        Returns all tables available in the workspace.
-
-        Args:
-            include_shared: If true, returns all tables shared with the workspace associated with the request. If false, returns only tables the workspace owns.
-            limit: the number of folders to return, from 1 to 1000; by default, 1000
-            offset: The item to start with on the page, must be greater than or equal to 0, will default to 0
-            timeout: Override the default request timeout (seconds).
-
-        Returns:
-            PagedResponseTableDto
-
-        Raises:
-            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 423, 429, 500).
-        """
-
-        async def _fetch(_cursor: str | None) -> httpx.Response:
-            return await self._client.request_async(
-                "GET",
-                self._api,
-                "/api/v1/table",
-                query_params={
-                    "includeShared": include_shared,
-                    "limit": limit,
-                    "offset": offset,
-                    "cursor": _cursor,
-                },
-                timeout=timeout,
-            )
-
-        _body_result = await paginate_all_async(_fetch, extract_wdata_cursor, "body")
-        return PagedResponseTableDto.model_validate(_body_result)
-
     def delete_table(
         self,
         *,
@@ -6009,6 +6009,70 @@ class Wdata(BaseNamespace):
             timeout=timeout,
         )
         return BaseResponseString.model_validate(response.json())
+
+    def get_table(
+        self,
+        *,
+        table_id: str,
+        timeout: Optional[float] = None,
+    ) -> BaseResponseTableDto:
+        """Retrieve a single table
+
+        Returns a table with the provided ID, or a 404 if no such table is
+        found.
+
+        Args:
+            table_id: The unique identifier of the table
+            timeout: Override the default request timeout (seconds).
+
+        Returns:
+            BaseResponseTableDto
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 423, 429, 500).
+        """
+        response = self._client.request(
+            "GET",
+            self._api,
+            "/api/v1/table/{tableId}",
+            path_params={
+                "tableId": table_id,
+            },
+            timeout=timeout,
+        )
+        return BaseResponseTableDto.model_validate(response.json())
+
+    async def get_table_async(
+        self,
+        *,
+        table_id: str,
+        timeout: Optional[float] = None,
+    ) -> BaseResponseTableDto:
+        """Retrieve a single table (async)
+
+        Returns a table with the provided ID, or a 404 if no such table is
+        found.
+
+        Args:
+            table_id: The unique identifier of the table
+            timeout: Override the default request timeout (seconds).
+
+        Returns:
+            BaseResponseTableDto
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 423, 429, 500).
+        """
+        response = await self._client.request_async(
+            "GET",
+            self._api,
+            "/api/v1/table/{tableId}",
+            path_params={
+                "tableId": table_id,
+            },
+            timeout=timeout,
+        )
+        return BaseResponseTableDto.model_validate(response.json())
 
     def update_table(
         self,
@@ -6160,70 +6224,6 @@ class Wdata(BaseNamespace):
                 "tableId": table_id,
             },
             json_body=_body or None,
-            timeout=timeout,
-        )
-        return BaseResponseTableDto.model_validate(response.json())
-
-    def get_table(
-        self,
-        *,
-        table_id: str,
-        timeout: Optional[float] = None,
-    ) -> BaseResponseTableDto:
-        """Retrieve a single table
-
-        Returns a table with the provided ID, or a 404 if no such table is
-        found.
-
-        Args:
-            table_id: The unique identifier of the table
-            timeout: Override the default request timeout (seconds).
-
-        Returns:
-            BaseResponseTableDto
-
-        Raises:
-            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 423, 429, 500).
-        """
-        response = self._client.request(
-            "GET",
-            self._api,
-            "/api/v1/table/{tableId}",
-            path_params={
-                "tableId": table_id,
-            },
-            timeout=timeout,
-        )
-        return BaseResponseTableDto.model_validate(response.json())
-
-    async def get_table_async(
-        self,
-        *,
-        table_id: str,
-        timeout: Optional[float] = None,
-    ) -> BaseResponseTableDto:
-        """Retrieve a single table (async)
-
-        Returns a table with the provided ID, or a 404 if no such table is
-        found.
-
-        Args:
-            table_id: The unique identifier of the table
-            timeout: Override the default request timeout (seconds).
-
-        Returns:
-            BaseResponseTableDto
-
-        Raises:
-            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 423, 429, 500).
-        """
-        response = await self._client.request_async(
-            "GET",
-            self._api,
-            "/api/v1/table/{tableId}",
-            path_params={
-                "tableId": table_id,
-            },
             timeout=timeout,
         )
         return BaseResponseTableDto.model_validate(response.json())
@@ -6694,80 +6694,6 @@ class Wdata(BaseNamespace):
         )
         return BaseResponseFileMetaDto.model_validate(response.json())
 
-    def create_tag(
-        self,
-        *,
-        key: str,
-        values: Optional[list[str]] = None,
-        timeout: Optional[float] = None,
-    ) -> BaseResponseTagDto:
-        """Create a new tag
-
-        Creates a tag. If another tag already has the same key, returns a 409.
-        There is a limit of 300 values for a tag.
-
-        Args:
-            key: Value for the key, maximum 100 characters in length
-            values: Set of values for the tag
-            timeout: Override the default request timeout (seconds).
-
-        Returns:
-            BaseResponseTagDto
-
-        Raises:
-            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 423, 429, 500).
-        """
-        _body: dict[str, Any] = {}
-        if key is not None:
-            _body["key"] = key
-        if values is not None:
-            _body["values"] = values
-        response = self._client.request(
-            "POST",
-            self._api,
-            "/api/v1/tag",
-            json_body=_body or None,
-            timeout=timeout,
-        )
-        return BaseResponseTagDto.model_validate(response.json())
-
-    async def create_tag_async(
-        self,
-        *,
-        key: str,
-        values: Optional[list[str]] = None,
-        timeout: Optional[float] = None,
-    ) -> BaseResponseTagDto:
-        """Create a new tag (async)
-
-        Creates a tag. If another tag already has the same key, returns a 409.
-        There is a limit of 300 values for a tag.
-
-        Args:
-            key: Value for the key, maximum 100 characters in length
-            values: Set of values for the tag
-            timeout: Override the default request timeout (seconds).
-
-        Returns:
-            BaseResponseTagDto
-
-        Raises:
-            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 423, 429, 500).
-        """
-        _body: dict[str, Any] = {}
-        if key is not None:
-            _body["key"] = key
-        if values is not None:
-            _body["values"] = values
-        response = await self._client.request_async(
-            "POST",
-            self._api,
-            "/api/v1/tag",
-            json_body=_body or None,
-            timeout=timeout,
-        )
-        return BaseResponseTagDto.model_validate(response.json())
-
     def list_tags(
         self,
         *,
@@ -6847,6 +6773,80 @@ class Wdata(BaseNamespace):
 
         _body_result = await paginate_all_async(_fetch, extract_wdata_cursor, "body")
         return PagedResponseTagDto.model_validate(_body_result)
+
+    def create_tag(
+        self,
+        *,
+        key: str,
+        values: Optional[list[str]] = None,
+        timeout: Optional[float] = None,
+    ) -> BaseResponseTagDto:
+        """Create a new tag
+
+        Creates a tag. If another tag already has the same key, returns a 409.
+        There is a limit of 300 values for a tag.
+
+        Args:
+            key: Value for the key, maximum 100 characters in length
+            values: Set of values for the tag
+            timeout: Override the default request timeout (seconds).
+
+        Returns:
+            BaseResponseTagDto
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 423, 429, 500).
+        """
+        _body: dict[str, Any] = {}
+        if key is not None:
+            _body["key"] = key
+        if values is not None:
+            _body["values"] = values
+        response = self._client.request(
+            "POST",
+            self._api,
+            "/api/v1/tag",
+            json_body=_body or None,
+            timeout=timeout,
+        )
+        return BaseResponseTagDto.model_validate(response.json())
+
+    async def create_tag_async(
+        self,
+        *,
+        key: str,
+        values: Optional[list[str]] = None,
+        timeout: Optional[float] = None,
+    ) -> BaseResponseTagDto:
+        """Create a new tag (async)
+
+        Creates a tag. If another tag already has the same key, returns a 409.
+        There is a limit of 300 values for a tag.
+
+        Args:
+            key: Value for the key, maximum 100 characters in length
+            values: Set of values for the tag
+            timeout: Override the default request timeout (seconds).
+
+        Returns:
+            BaseResponseTagDto
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 423, 429, 500).
+        """
+        _body: dict[str, Any] = {}
+        if key is not None:
+            _body["key"] = key
+        if values is not None:
+            _body["values"] = values
+        response = await self._client.request_async(
+            "POST",
+            self._api,
+            "/api/v1/tag",
+            json_body=_body or None,
+            timeout=timeout,
+        )
+        return BaseResponseTagDto.model_validate(response.json())
 
     def delete_tag(
         self,

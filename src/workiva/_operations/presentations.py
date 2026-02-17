@@ -35,6 +35,78 @@ class Presentations(BaseNamespace):
 
     _api: _API = _API.PLATFORM
 
+    def get_presentation_by_id(
+        self,
+        *,
+        presentation_id: str,
+        revision: Optional[str] = None,
+        timeout: Optional[float] = None,
+    ) -> Presentation:
+        """Retrieve a single presentation
+
+        Retrieves a presentation given its ID.
+
+        Args:
+            presentation_id: The unique identifier of the presentation
+            revision: Returns resources at a specific revision
+            timeout: Override the default request timeout (seconds).
+
+        Returns:
+            Presentation
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
+        """
+        response = self._client.request(
+            "GET",
+            self._api,
+            "/presentations/{presentationId}",
+            path_params={
+                "presentationId": presentation_id,
+            },
+            query_params={
+                "$revision": revision,
+            },
+            timeout=timeout,
+        )
+        return Presentation.model_validate(response.json())
+
+    async def get_presentation_by_id_async(
+        self,
+        *,
+        presentation_id: str,
+        revision: Optional[str] = None,
+        timeout: Optional[float] = None,
+    ) -> Presentation:
+        """Retrieve a single presentation (async)
+
+        Retrieves a presentation given its ID.
+
+        Args:
+            presentation_id: The unique identifier of the presentation
+            revision: Returns resources at a specific revision
+            timeout: Override the default request timeout (seconds).
+
+        Returns:
+            Presentation
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
+        """
+        response = await self._client.request_async(
+            "GET",
+            self._api,
+            "/presentations/{presentationId}",
+            path_params={
+                "presentationId": presentation_id,
+            },
+            query_params={
+                "$revision": revision,
+            },
+            timeout=timeout,
+        )
+        return Presentation.model_validate(response.json())
+
     def partially_update_presentation_by_id(
         self,
         *,
@@ -280,78 +352,6 @@ class Presentations(BaseNamespace):
             json_body=body,
             timeout=timeout,
         )
-
-    def get_presentation_by_id(
-        self,
-        *,
-        presentation_id: str,
-        revision: Optional[str] = None,
-        timeout: Optional[float] = None,
-    ) -> Presentation:
-        """Retrieve a single presentation
-
-        Retrieves a presentation given its ID.
-
-        Args:
-            presentation_id: The unique identifier of the presentation
-            revision: Returns resources at a specific revision
-            timeout: Override the default request timeout (seconds).
-
-        Returns:
-            Presentation
-
-        Raises:
-            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
-        """
-        response = self._client.request(
-            "GET",
-            self._api,
-            "/presentations/{presentationId}",
-            path_params={
-                "presentationId": presentation_id,
-            },
-            query_params={
-                "$revision": revision,
-            },
-            timeout=timeout,
-        )
-        return Presentation.model_validate(response.json())
-
-    async def get_presentation_by_id_async(
-        self,
-        *,
-        presentation_id: str,
-        revision: Optional[str] = None,
-        timeout: Optional[float] = None,
-    ) -> Presentation:
-        """Retrieve a single presentation (async)
-
-        Retrieves a presentation given its ID.
-
-        Args:
-            presentation_id: The unique identifier of the presentation
-            revision: Returns resources at a specific revision
-            timeout: Override the default request timeout (seconds).
-
-        Returns:
-            Presentation
-
-        Raises:
-            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
-        """
-        response = await self._client.request_async(
-            "GET",
-            self._api,
-            "/presentations/{presentationId}",
-            path_params={
-                "presentationId": presentation_id,
-            },
-            query_params={
-                "$revision": revision,
-            },
-            timeout=timeout,
-        )
-        return Presentation.model_validate(response.json())
 
     def presentation_export(
         self,
@@ -817,6 +817,84 @@ class Presentations(BaseNamespace):
         _body_result = await paginate_all_async(_fetch, extract_next_link, "data")
         return SlideLayoutsListResult.model_validate(_body_result)
 
+    def get_slide_layout_by_id(
+        self,
+        *,
+        presentation_id: str,
+        slide_layout_id: str,
+        revision: Optional[str] = None,
+        timeout: Optional[float] = None,
+    ) -> SlideLayout:
+        """Retrieve a single slide layout
+
+        Retrieves a slide layout given its ID.
+
+        Args:
+            presentation_id: The unique identifier of the presentation
+            slide_layout_id: The unique identifier of the slide layout
+            revision: Returns resources at a specific revision
+            timeout: Override the default request timeout (seconds).
+
+        Returns:
+            SlideLayout
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
+        """
+        response = self._client.request(
+            "GET",
+            self._api,
+            "/presentations/{presentationId}/slideLayouts/{slideLayoutId}",
+            path_params={
+                "presentationId": presentation_id,
+                "slideLayoutId": slide_layout_id,
+            },
+            query_params={
+                "$revision": revision,
+            },
+            timeout=timeout,
+        )
+        return SlideLayout.model_validate(response.json())
+
+    async def get_slide_layout_by_id_async(
+        self,
+        *,
+        presentation_id: str,
+        slide_layout_id: str,
+        revision: Optional[str] = None,
+        timeout: Optional[float] = None,
+    ) -> SlideLayout:
+        """Retrieve a single slide layout (async)
+
+        Retrieves a slide layout given its ID.
+
+        Args:
+            presentation_id: The unique identifier of the presentation
+            slide_layout_id: The unique identifier of the slide layout
+            revision: Returns resources at a specific revision
+            timeout: Override the default request timeout (seconds).
+
+        Returns:
+            SlideLayout
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
+        """
+        response = await self._client.request_async(
+            "GET",
+            self._api,
+            "/presentations/{presentationId}/slideLayouts/{slideLayoutId}",
+            path_params={
+                "presentationId": presentation_id,
+                "slideLayoutId": slide_layout_id,
+            },
+            query_params={
+                "$revision": revision,
+            },
+            timeout=timeout,
+        )
+        return SlideLayout.model_validate(response.json())
+
     def partially_update_slide_layout_by_id(
         self,
         *,
@@ -917,84 +995,6 @@ class Presentations(BaseNamespace):
             timeout=timeout,
         )
 
-    def get_slide_layout_by_id(
-        self,
-        *,
-        presentation_id: str,
-        slide_layout_id: str,
-        revision: Optional[str] = None,
-        timeout: Optional[float] = None,
-    ) -> SlideLayout:
-        """Retrieve a single slide layout
-
-        Retrieves a slide layout given its ID.
-
-        Args:
-            presentation_id: The unique identifier of the presentation
-            slide_layout_id: The unique identifier of the slide layout
-            revision: Returns resources at a specific revision
-            timeout: Override the default request timeout (seconds).
-
-        Returns:
-            SlideLayout
-
-        Raises:
-            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
-        """
-        response = self._client.request(
-            "GET",
-            self._api,
-            "/presentations/{presentationId}/slideLayouts/{slideLayoutId}",
-            path_params={
-                "presentationId": presentation_id,
-                "slideLayoutId": slide_layout_id,
-            },
-            query_params={
-                "$revision": revision,
-            },
-            timeout=timeout,
-        )
-        return SlideLayout.model_validate(response.json())
-
-    async def get_slide_layout_by_id_async(
-        self,
-        *,
-        presentation_id: str,
-        slide_layout_id: str,
-        revision: Optional[str] = None,
-        timeout: Optional[float] = None,
-    ) -> SlideLayout:
-        """Retrieve a single slide layout (async)
-
-        Retrieves a slide layout given its ID.
-
-        Args:
-            presentation_id: The unique identifier of the presentation
-            slide_layout_id: The unique identifier of the slide layout
-            revision: Returns resources at a specific revision
-            timeout: Override the default request timeout (seconds).
-
-        Returns:
-            SlideLayout
-
-        Raises:
-            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
-        """
-        response = await self._client.request_async(
-            "GET",
-            self._api,
-            "/presentations/{presentationId}/slideLayouts/{slideLayoutId}",
-            path_params={
-                "presentationId": presentation_id,
-                "slideLayoutId": slide_layout_id,
-            },
-            query_params={
-                "$revision": revision,
-            },
-            timeout=timeout,
-        )
-        return SlideLayout.model_validate(response.json())
-
     def get_slides(
         self,
         *,
@@ -1082,6 +1082,84 @@ class Presentations(BaseNamespace):
 
         _body_result = await paginate_all_async(_fetch, extract_next_link, "data")
         return SlidesListResult.model_validate(_body_result)
+
+    def get_slide_by_id(
+        self,
+        *,
+        presentation_id: str,
+        slide_id: str,
+        revision: Optional[str] = None,
+        timeout: Optional[float] = None,
+    ) -> Slide:
+        """Retrieve a single slide
+
+        Retrieves a slide given its ID.
+
+        Args:
+            presentation_id: The unique identifier of the presentation
+            slide_id: The unique identifier of the slide
+            revision: Returns resources at a specific revision
+            timeout: Override the default request timeout (seconds).
+
+        Returns:
+            Slide
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
+        """
+        response = self._client.request(
+            "GET",
+            self._api,
+            "/presentations/{presentationId}/slides/{slideId}",
+            path_params={
+                "presentationId": presentation_id,
+                "slideId": slide_id,
+            },
+            query_params={
+                "$revision": revision,
+            },
+            timeout=timeout,
+        )
+        return Slide.model_validate(response.json())
+
+    async def get_slide_by_id_async(
+        self,
+        *,
+        presentation_id: str,
+        slide_id: str,
+        revision: Optional[str] = None,
+        timeout: Optional[float] = None,
+    ) -> Slide:
+        """Retrieve a single slide (async)
+
+        Retrieves a slide given its ID.
+
+        Args:
+            presentation_id: The unique identifier of the presentation
+            slide_id: The unique identifier of the slide
+            revision: Returns resources at a specific revision
+            timeout: Override the default request timeout (seconds).
+
+        Returns:
+            Slide
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
+        """
+        response = await self._client.request_async(
+            "GET",
+            self._api,
+            "/presentations/{presentationId}/slides/{slideId}",
+            path_params={
+                "presentationId": presentation_id,
+                "slideId": slide_id,
+            },
+            query_params={
+                "$revision": revision,
+            },
+            timeout=timeout,
+        )
+        return Slide.model_validate(response.json())
 
     def partially_update_slide_by_id(
         self,
@@ -1364,81 +1442,3 @@ class Presentations(BaseNamespace):
             json_body=body,
             timeout=timeout,
         )
-
-    def get_slide_by_id(
-        self,
-        *,
-        presentation_id: str,
-        slide_id: str,
-        revision: Optional[str] = None,
-        timeout: Optional[float] = None,
-    ) -> Slide:
-        """Retrieve a single slide
-
-        Retrieves a slide given its ID.
-
-        Args:
-            presentation_id: The unique identifier of the presentation
-            slide_id: The unique identifier of the slide
-            revision: Returns resources at a specific revision
-            timeout: Override the default request timeout (seconds).
-
-        Returns:
-            Slide
-
-        Raises:
-            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
-        """
-        response = self._client.request(
-            "GET",
-            self._api,
-            "/presentations/{presentationId}/slides/{slideId}",
-            path_params={
-                "presentationId": presentation_id,
-                "slideId": slide_id,
-            },
-            query_params={
-                "$revision": revision,
-            },
-            timeout=timeout,
-        )
-        return Slide.model_validate(response.json())
-
-    async def get_slide_by_id_async(
-        self,
-        *,
-        presentation_id: str,
-        slide_id: str,
-        revision: Optional[str] = None,
-        timeout: Optional[float] = None,
-    ) -> Slide:
-        """Retrieve a single slide (async)
-
-        Retrieves a slide given its ID.
-
-        Args:
-            presentation_id: The unique identifier of the presentation
-            slide_id: The unique identifier of the slide
-            revision: Returns resources at a specific revision
-            timeout: Override the default request timeout (seconds).
-
-        Returns:
-            Slide
-
-        Raises:
-            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
-        """
-        response = await self._client.request_async(
-            "GET",
-            self._api,
-            "/presentations/{presentationId}/slides/{slideId}",
-            path_params={
-                "presentationId": presentation_id,
-                "slideId": slide_id,
-            },
-            query_params={
-                "$revision": revision,
-            },
-            timeout=timeout,
-        )
-        return Slide.model_validate(response.json())

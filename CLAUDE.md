@@ -61,6 +61,9 @@ oas/wdata.yaml    ─┘  │
 **`scripts/codegen/models.py`** — Wraps `datamodel-code-generator` CLI:
 - Targets Pydantic v2 with strict nullable, extra fields allowed, enum-as-literal
 - Applies self-reference fix for Python 3.14 compatibility (PEP 749)
+- Pre-processes chains spec to fix `type`+`$ref` coexistence (eliminates `Data*` wrapper classes)
+- Renames collision classes in platform (e.g. `Section1` → `Section`, `Section` → `SectionHyperlink`)
+- Guardrail: fails build if unexpected numeric-suffix classes appear after generation
 - One model file per API: `platform.py` (~10k lines), `chains.py`, `wdata.py`
 
 **`scripts/codegen/operations.py`** — OAS parser + Jinja2 renderer:

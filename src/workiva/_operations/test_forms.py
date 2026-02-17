@@ -855,6 +855,84 @@ class TestForms(BaseNamespace):
             timeout=timeout,
         )
 
+    def get_matrices(
+        self,
+        *,
+        test_form_id: str,
+        test_phase_id: str,
+        expand: Optional[str] = None,
+        timeout: Optional[float] = None,
+    ) -> MatricesListResult:
+        """Retrieve a list of matrices
+
+        Returns a list of [matrices](ref:testforms#matrix).
+
+        Args:
+            test_form_id: The unique identifier of the test form
+            test_phase_id: The unique identifier of the test phase
+            expand: Returns related resources inline with the main resource
+            timeout: Override the default request timeout (seconds).
+
+        Returns:
+            MatricesListResult
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
+        """
+        response = self._client.request(
+            "GET",
+            self._api,
+            "/testForms/{testFormId}/testPhases/{testPhaseId}/matrices",
+            path_params={
+                "testFormId": test_form_id,
+                "testPhaseId": test_phase_id,
+            },
+            query_params={
+                "$expand": expand,
+            },
+            timeout=timeout,
+        )
+        return MatricesListResult.model_validate(response.json())
+
+    async def get_matrices_async(
+        self,
+        *,
+        test_form_id: str,
+        test_phase_id: str,
+        expand: Optional[str] = None,
+        timeout: Optional[float] = None,
+    ) -> MatricesListResult:
+        """Retrieve a list of matrices (async)
+
+        Returns a list of [matrices](ref:testforms#matrix).
+
+        Args:
+            test_form_id: The unique identifier of the test form
+            test_phase_id: The unique identifier of the test phase
+            expand: Returns related resources inline with the main resource
+            timeout: Override the default request timeout (seconds).
+
+        Returns:
+            MatricesListResult
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
+        """
+        response = await self._client.request_async(
+            "GET",
+            self._api,
+            "/testForms/{testFormId}/testPhases/{testPhaseId}/matrices",
+            path_params={
+                "testFormId": test_form_id,
+                "testPhaseId": test_phase_id,
+            },
+            query_params={
+                "$expand": expand,
+            },
+            timeout=timeout,
+        )
+        return MatricesListResult.model_validate(response.json())
+
     def create_matrix(
         self,
         *,
@@ -954,84 +1032,6 @@ class TestForms(BaseNamespace):
             timeout=timeout,
         )
         return Matrix.model_validate(response.json())
-
-    def get_matrices(
-        self,
-        *,
-        test_form_id: str,
-        test_phase_id: str,
-        expand: Optional[str] = None,
-        timeout: Optional[float] = None,
-    ) -> MatricesListResult:
-        """Retrieve a list of matrices
-
-        Returns a list of [matrices](ref:testforms#matrix).
-
-        Args:
-            test_form_id: The unique identifier of the test form
-            test_phase_id: The unique identifier of the test phase
-            expand: Returns related resources inline with the main resource
-            timeout: Override the default request timeout (seconds).
-
-        Returns:
-            MatricesListResult
-
-        Raises:
-            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
-        """
-        response = self._client.request(
-            "GET",
-            self._api,
-            "/testForms/{testFormId}/testPhases/{testPhaseId}/matrices",
-            path_params={
-                "testFormId": test_form_id,
-                "testPhaseId": test_phase_id,
-            },
-            query_params={
-                "$expand": expand,
-            },
-            timeout=timeout,
-        )
-        return MatricesListResult.model_validate(response.json())
-
-    async def get_matrices_async(
-        self,
-        *,
-        test_form_id: str,
-        test_phase_id: str,
-        expand: Optional[str] = None,
-        timeout: Optional[float] = None,
-    ) -> MatricesListResult:
-        """Retrieve a list of matrices (async)
-
-        Returns a list of [matrices](ref:testforms#matrix).
-
-        Args:
-            test_form_id: The unique identifier of the test form
-            test_phase_id: The unique identifier of the test phase
-            expand: Returns related resources inline with the main resource
-            timeout: Override the default request timeout (seconds).
-
-        Returns:
-            MatricesListResult
-
-        Raises:
-            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
-        """
-        response = await self._client.request_async(
-            "GET",
-            self._api,
-            "/testForms/{testFormId}/testPhases/{testPhaseId}/matrices",
-            path_params={
-                "testFormId": test_form_id,
-                "testPhaseId": test_phase_id,
-            },
-            query_params={
-                "$expand": expand,
-            },
-            timeout=timeout,
-        )
-        return MatricesListResult.model_validate(response.json())
 
     def get_matrix_by_id(
         self,
@@ -1591,6 +1591,90 @@ class TestForms(BaseNamespace):
             timeout=timeout,
         )
 
+    def get_samples(
+        self,
+        *,
+        test_form_id: str,
+        test_phase_id: str,
+        matrix_id: str,
+        expand: Optional[str] = None,
+        timeout: Optional[float] = None,
+    ) -> MatrixSamplesListResult:
+        """Retrieve a list of samples
+
+        Returns a list of [samples](ref:testforms#matrixsample).
+
+        Args:
+            test_form_id: The unique identifier of the test form
+            test_phase_id: The unique identifier of the test phase
+            matrix_id: The unique identifier of the matrix
+            expand: Returns related resources inline with the main resource
+            timeout: Override the default request timeout (seconds).
+
+        Returns:
+            MatrixSamplesListResult
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
+        """
+        response = self._client.request(
+            "GET",
+            self._api,
+            "/testForms/{testFormId}/testPhases/{testPhaseId}/matrices/{matrixId}/samples",
+            path_params={
+                "testFormId": test_form_id,
+                "testPhaseId": test_phase_id,
+                "matrixId": matrix_id,
+            },
+            query_params={
+                "$expand": expand,
+            },
+            timeout=timeout,
+        )
+        return MatrixSamplesListResult.model_validate(response.json())
+
+    async def get_samples_async(
+        self,
+        *,
+        test_form_id: str,
+        test_phase_id: str,
+        matrix_id: str,
+        expand: Optional[str] = None,
+        timeout: Optional[float] = None,
+    ) -> MatrixSamplesListResult:
+        """Retrieve a list of samples (async)
+
+        Returns a list of [samples](ref:testforms#matrixsample).
+
+        Args:
+            test_form_id: The unique identifier of the test form
+            test_phase_id: The unique identifier of the test phase
+            matrix_id: The unique identifier of the matrix
+            expand: Returns related resources inline with the main resource
+            timeout: Override the default request timeout (seconds).
+
+        Returns:
+            MatrixSamplesListResult
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
+        """
+        response = await self._client.request_async(
+            "GET",
+            self._api,
+            "/testForms/{testFormId}/testPhases/{testPhaseId}/matrices/{matrixId}/samples",
+            path_params={
+                "testFormId": test_form_id,
+                "testPhaseId": test_phase_id,
+                "matrixId": matrix_id,
+            },
+            query_params={
+                "$expand": expand,
+            },
+            timeout=timeout,
+        )
+        return MatrixSamplesListResult.model_validate(response.json())
+
     def create_sample(
         self,
         *,
@@ -1696,90 +1780,6 @@ class TestForms(BaseNamespace):
             timeout=timeout,
         )
         return MatrixSample.model_validate(response.json())
-
-    def get_samples(
-        self,
-        *,
-        test_form_id: str,
-        test_phase_id: str,
-        matrix_id: str,
-        expand: Optional[str] = None,
-        timeout: Optional[float] = None,
-    ) -> MatrixSamplesListResult:
-        """Retrieve a list of samples
-
-        Returns a list of [samples](ref:testforms#matrixsample).
-
-        Args:
-            test_form_id: The unique identifier of the test form
-            test_phase_id: The unique identifier of the test phase
-            matrix_id: The unique identifier of the matrix
-            expand: Returns related resources inline with the main resource
-            timeout: Override the default request timeout (seconds).
-
-        Returns:
-            MatrixSamplesListResult
-
-        Raises:
-            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
-        """
-        response = self._client.request(
-            "GET",
-            self._api,
-            "/testForms/{testFormId}/testPhases/{testPhaseId}/matrices/{matrixId}/samples",
-            path_params={
-                "testFormId": test_form_id,
-                "testPhaseId": test_phase_id,
-                "matrixId": matrix_id,
-            },
-            query_params={
-                "$expand": expand,
-            },
-            timeout=timeout,
-        )
-        return MatrixSamplesListResult.model_validate(response.json())
-
-    async def get_samples_async(
-        self,
-        *,
-        test_form_id: str,
-        test_phase_id: str,
-        matrix_id: str,
-        expand: Optional[str] = None,
-        timeout: Optional[float] = None,
-    ) -> MatrixSamplesListResult:
-        """Retrieve a list of samples (async)
-
-        Returns a list of [samples](ref:testforms#matrixsample).
-
-        Args:
-            test_form_id: The unique identifier of the test form
-            test_phase_id: The unique identifier of the test phase
-            matrix_id: The unique identifier of the matrix
-            expand: Returns related resources inline with the main resource
-            timeout: Override the default request timeout (seconds).
-
-        Returns:
-            MatrixSamplesListResult
-
-        Raises:
-            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
-        """
-        response = await self._client.request_async(
-            "GET",
-            self._api,
-            "/testForms/{testFormId}/testPhases/{testPhaseId}/matrices/{matrixId}/samples",
-            path_params={
-                "testFormId": test_form_id,
-                "testPhaseId": test_phase_id,
-                "matrixId": matrix_id,
-            },
-            query_params={
-                "$expand": expand,
-            },
-            timeout=timeout,
-        )
-        return MatrixSamplesListResult.model_validate(response.json())
 
     def sample_insertion(
         self,
@@ -1951,6 +1951,96 @@ class TestForms(BaseNamespace):
             timeout=timeout,
         )
 
+    def get_sample_by_id(
+        self,
+        *,
+        test_form_id: str,
+        test_phase_id: str,
+        matrix_id: str,
+        sample_id: str,
+        expand: Optional[str] = None,
+        timeout: Optional[float] = None,
+    ) -> MatrixSample:
+        """Retrieve a single sample
+
+        Retrieves a [sample](ref:testforms#matrixsample) given its ID.
+
+        Args:
+            test_form_id: The unique identifier of the test form
+            test_phase_id: The unique identifier of the test phase
+            matrix_id: The unique identifier of the matrix
+            sample_id: The unique identifier of the sample
+            expand: Returns related resources inline with the main resource
+            timeout: Override the default request timeout (seconds).
+
+        Returns:
+            MatrixSample
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
+        """
+        response = self._client.request(
+            "GET",
+            self._api,
+            "/testForms/{testFormId}/testPhases/{testPhaseId}/matrices/{matrixId}/samples/{sampleId}",
+            path_params={
+                "testFormId": test_form_id,
+                "testPhaseId": test_phase_id,
+                "matrixId": matrix_id,
+                "sampleId": sample_id,
+            },
+            query_params={
+                "$expand": expand,
+            },
+            timeout=timeout,
+        )
+        return MatrixSample.model_validate(response.json())
+
+    async def get_sample_by_id_async(
+        self,
+        *,
+        test_form_id: str,
+        test_phase_id: str,
+        matrix_id: str,
+        sample_id: str,
+        expand: Optional[str] = None,
+        timeout: Optional[float] = None,
+    ) -> MatrixSample:
+        """Retrieve a single sample (async)
+
+        Retrieves a [sample](ref:testforms#matrixsample) given its ID.
+
+        Args:
+            test_form_id: The unique identifier of the test form
+            test_phase_id: The unique identifier of the test phase
+            matrix_id: The unique identifier of the matrix
+            sample_id: The unique identifier of the sample
+            expand: Returns related resources inline with the main resource
+            timeout: Override the default request timeout (seconds).
+
+        Returns:
+            MatrixSample
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
+        """
+        response = await self._client.request_async(
+            "GET",
+            self._api,
+            "/testForms/{testFormId}/testPhases/{testPhaseId}/matrices/{matrixId}/samples/{sampleId}",
+            path_params={
+                "testFormId": test_form_id,
+                "testPhaseId": test_phase_id,
+                "matrixId": matrix_id,
+                "sampleId": sample_id,
+            },
+            query_params={
+                "$expand": expand,
+            },
+            timeout=timeout,
+        )
+        return MatrixSample.model_validate(response.json())
+
     def partially_update_sample_by_id(
         self,
         *,
@@ -2047,96 +2137,6 @@ class TestForms(BaseNamespace):
                 "sampleId": sample_id,
             },
             json_body=body,
-            timeout=timeout,
-        )
-        return MatrixSample.model_validate(response.json())
-
-    def get_sample_by_id(
-        self,
-        *,
-        test_form_id: str,
-        test_phase_id: str,
-        matrix_id: str,
-        sample_id: str,
-        expand: Optional[str] = None,
-        timeout: Optional[float] = None,
-    ) -> MatrixSample:
-        """Retrieve a single sample
-
-        Retrieves a [sample](ref:testforms#matrixsample) given its ID.
-
-        Args:
-            test_form_id: The unique identifier of the test form
-            test_phase_id: The unique identifier of the test phase
-            matrix_id: The unique identifier of the matrix
-            sample_id: The unique identifier of the sample
-            expand: Returns related resources inline with the main resource
-            timeout: Override the default request timeout (seconds).
-
-        Returns:
-            MatrixSample
-
-        Raises:
-            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
-        """
-        response = self._client.request(
-            "GET",
-            self._api,
-            "/testForms/{testFormId}/testPhases/{testPhaseId}/matrices/{matrixId}/samples/{sampleId}",
-            path_params={
-                "testFormId": test_form_id,
-                "testPhaseId": test_phase_id,
-                "matrixId": matrix_id,
-                "sampleId": sample_id,
-            },
-            query_params={
-                "$expand": expand,
-            },
-            timeout=timeout,
-        )
-        return MatrixSample.model_validate(response.json())
-
-    async def get_sample_by_id_async(
-        self,
-        *,
-        test_form_id: str,
-        test_phase_id: str,
-        matrix_id: str,
-        sample_id: str,
-        expand: Optional[str] = None,
-        timeout: Optional[float] = None,
-    ) -> MatrixSample:
-        """Retrieve a single sample (async)
-
-        Retrieves a [sample](ref:testforms#matrixsample) given its ID.
-
-        Args:
-            test_form_id: The unique identifier of the test form
-            test_phase_id: The unique identifier of the test phase
-            matrix_id: The unique identifier of the matrix
-            sample_id: The unique identifier of the sample
-            expand: Returns related resources inline with the main resource
-            timeout: Override the default request timeout (seconds).
-
-        Returns:
-            MatrixSample
-
-        Raises:
-            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
-        """
-        response = await self._client.request_async(
-            "GET",
-            self._api,
-            "/testForms/{testFormId}/testPhases/{testPhaseId}/matrices/{matrixId}/samples/{sampleId}",
-            path_params={
-                "testFormId": test_form_id,
-                "testPhaseId": test_phase_id,
-                "matrixId": matrix_id,
-                "sampleId": sample_id,
-            },
-            query_params={
-                "$expand": expand,
-            },
             timeout=timeout,
         )
         return MatrixSample.model_validate(response.json())
