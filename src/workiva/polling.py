@@ -2,7 +2,7 @@
 
 Usage::
 
-    response = client.files.copy_file(file_id="abc", body=params)
+    response = client.files.copy_file(file_id="abc", destination_container="folder-123")
     operation = client.wait(response).result(timeout=300)
     print(operation.status)       # "completed"
     print(operation.resource_url)  # link to the result

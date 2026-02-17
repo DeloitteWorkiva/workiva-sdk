@@ -14,7 +14,7 @@ Usage::
         client.wdata.get_tables()
 
         # Long-running operations (202)
-        response = client.files.copy_file(file_id="abc", body=params)
+        response = client.files.copy_file(file_id="abc", destination_container="folder-123")
         operation = client.wait(response).result(timeout=300)
 """
 
