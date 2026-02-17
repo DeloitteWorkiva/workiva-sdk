@@ -1,7 +1,7 @@
 
 [project]
 name = "workiva"
-version = "0.6.2"
+version = "0.6.3"
 description = "Workiva Python SDK - Unified client for Platform, Chains, and Wdata APIs"
 authors = [{ name = "Jorge Revenga", email = "jrevengamartindevida@deloitte.es" },]
 readme = "README.md"
