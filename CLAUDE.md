@@ -171,12 +171,12 @@ from workiva import Workiva, Region
 
 # Sync usage
 with Workiva(client_id="...", client_secret="...") as client:
-    response = client.files.copy_file(file_id="abc", body=params)
+    response = client.files.copy_file(file_id="abc", destination_container="folder-123")
     operation = client.wait(response).result(timeout=300)
 
 # Async usage
 async with Workiva(client_id="...", client_secret="...", region=Region.US) as client:
-    response = await client.files.copy_file_async(file_id="abc", body=params)
+    response = await client.files.copy_file_async(file_id="abc", destination_container="folder-123")
     operation = await client.wait(response).result_async(timeout=300)
 ```
 
