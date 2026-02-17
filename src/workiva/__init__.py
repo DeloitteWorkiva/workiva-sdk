@@ -22,7 +22,6 @@ from workiva._errors import (
 from workiva._version import __user_agent__, __version__
 from workiva.client import Workiva
 from workiva.exceptions import OperationCancelled, OperationFailed, OperationTimeout
-from workiva.models import chains, platform, wdata
 from workiva.polling import OperationPoller
 
 __all__ = [
@@ -42,8 +41,4 @@ __all__ = [
     "RateLimitError",
     "ServerError",
     "TokenAcquisitionError",
-    "models",
-    "platform",
-    "chains",
-    "wdata",
 ]

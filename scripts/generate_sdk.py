@@ -83,7 +83,7 @@ def _format_source(source: str) -> str:
         import black
 
         source = black.format_str(source, mode=black.Mode(
-            target_versions={black.TargetVersion.PY310},
+            target_versions={black.TargetVersion.PY310},  # pyright: ignore[reportPrivateImportUsage]
             line_length=100,
         ))
     except ImportError:

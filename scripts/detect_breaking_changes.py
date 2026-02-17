@@ -17,7 +17,7 @@ from __future__ import annotations
 
 import ast
 import sys
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from enum import Enum
 from pathlib import Path
 
@@ -66,14 +66,8 @@ class ModelInfo:
 
 @dataclass
 class ParsedModels:
-    enums: dict[str, EnumInfo] | None = None
-    models: dict[str, ModelInfo] | None = None
-
-    def __post_init__(self) -> None:
-        if self.enums is None:
-            self.enums = {}
-        if self.models is None:
-            self.models = {}
+    enums: dict[str, EnumInfo] = field(default_factory=dict)
+    models: dict[str, ModelInfo] = field(default_factory=dict)
 
 
 def _annotation_to_str(node: ast.expr | None) -> str:
@@ -327,7 +321,7 @@ def detect_schema_collisions(oas_dir: Path) -> list[Change]:
         print("WARNING: PyYAML not available, skipping schema collision check", file=sys.stderr)
         return changes
 
-    spec_schemas: dict[str, dict[str, set[str]]] = {}  # spec_name → {schema_name: set}
+    spec_schemas: dict[str, set[str]] = {}  # spec_name → {schema_names}
 
     for spec_file in sorted(oas_dir.glob("*.yaml")):
         if spec_file.name.endswith("_processed.yaml") or spec_file.name == "merged.yaml":
@@ -340,7 +334,7 @@ def detect_schema_collisions(oas_dir: Path) -> list[Change]:
             print(f"WARNING: Could not parse {spec_file}: {e}", file=sys.stderr)
             continue
 
-        schemas = set()
+        schemas: set[str] = set()
         if spec and "components" in spec and "schemas" in spec["components"]:
             schemas = set(spec["components"]["schemas"].keys())
 
