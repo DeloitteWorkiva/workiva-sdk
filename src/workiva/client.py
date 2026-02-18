@@ -21,6 +21,7 @@ Usage::
 from __future__ import annotations
 
 import importlib
+import types
 from typing import TYPE_CHECKING, Any, Optional
 
 import httpx
@@ -81,7 +82,7 @@ class Workiva:
 
     # Maps attribute name → (module_path, class_name)
     # Auto-populated from generated namespace files.
-    _NAMESPACE_MAP: dict[str, tuple[str, str]] = {
+    _NAMESPACE_MAP: types.MappingProxyType[str, tuple[str, str]] = types.MappingProxyType({
         # Platform namespaces
         "activities": ("workiva._operations.activities", "Activities"),
         "admin": ("workiva._operations.admin", "Admin"),
@@ -103,7 +104,7 @@ class Workiva:
         "chains": ("workiva._operations.chains", "Chains"),
         # Wdata — all OAS tags merged into single namespace
         "wdata": ("workiva._operations.wdata", "Wdata"),
-    }
+    })
 
     def __init__(
         self,
@@ -130,6 +131,10 @@ class Workiva:
             async_client=async_client,
         )
         self._config = config
+
+    def __repr__(self) -> str:
+        region = self._config.region.value
+        return f"Workiva(region={region!r})"
 
     # -- Namespace lazy-loading ------------------------------------------------
 

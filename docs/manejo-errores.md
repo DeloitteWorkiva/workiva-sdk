@@ -5,7 +5,7 @@ El SDK define una jerarquia de excepciones que cubre errores de API, errores de 
 ## Jerarquia de excepciones
 
 ```
-Exception
+WorkivaError(Exception)             # Base para TODOS los errores del SDK
 ├── WorkivaAPIError                 # Base para errores HTTP de la API
 │   ├── BadRequestError             # 400
 │   ├── AuthenticationError         # 401
@@ -14,15 +14,33 @@ Exception
 │   ├── ConflictError               # 409
 │   ├── RateLimitError              # 429
 │   └── ServerError                 # 5xx
-├── TokenAcquisitionError           # Error al obtener token OAuth2
+└── TokenAcquisitionError           # Error al obtener token OAuth2
+
+Exception
 ├── OperationFailed                 # Polling: status == "failed"
 ├── OperationCancelled              # Polling: status == "cancelled"
 └── OperationTimeout                # Polling: timeout excedido
 ```
 
-## `WorkivaAPIError` -- La base
+> **`WorkivaError`** es la clase base comun para errores de API y errores de autenticacion. Puedes hacer `except WorkivaError` para atrapar ambos en un solo handler.
 
-Todos los errores HTTP de la API heredan de `WorkivaAPIError`:
+## `WorkivaError` -- La raiz
+
+`WorkivaError` es la excepcion base de todo el SDK. Atrapa tanto errores HTTP como errores de token:
+
+```python
+from workiva import WorkivaError
+
+try:
+    result = client.files.get_file_by_id(file_id="no-existe")
+except WorkivaError as e:
+    # Atrapa WorkivaAPIError, TokenAcquisitionError, y todas sus subclases
+    print(f"Error del SDK: {e}")
+```
+
+## `WorkivaAPIError` -- Errores HTTP
+
+Todos los errores HTTP de la API heredan de `WorkivaAPIError` (que a su vez hereda de `WorkivaError`):
 
 ```python
 from workiva import WorkivaAPIError
@@ -146,7 +164,7 @@ except TokenAcquisitionError as e:
 
 ## Excepciones de polling
 
-Estas NO heredan de `WorkivaAPIError` -- son `Exception` directas, relacionadas con operaciones de larga duracion:
+Estas NO heredan de `WorkivaError` -- son `Exception` directas, relacionadas con operaciones de larga duracion:
 
 ### `OperationFailed`
 
@@ -230,6 +248,7 @@ except httpx.TimeoutException:
 ```python
 from workiva import (
     Workiva,
+    WorkivaError,
     WorkivaAPIError,
     NotFoundError,
     BadRequestError,
@@ -268,9 +287,9 @@ with Workiva(client_id="...", client_secret="...") as client:
         # Timeout de polling
         print(f"Timeout despues de {e.timeout}s")
 
-    except WorkivaAPIError as e:
-        # Cualquier otro error HTTP de la API
-        print(f"Error API [{e.status_code}]: {e}")
+    except WorkivaError as e:
+        # Cualquier error del SDK (API + token)
+        print(f"Error SDK: {e}")
 ```
 
 ## Imports
@@ -279,6 +298,8 @@ Todas las excepciones se exportan desde el paquete raiz:
 
 ```python
 from workiva import (
+    # Base del SDK
+    WorkivaError,
     # Errores de API
     WorkivaAPIError,
     BadRequestError,

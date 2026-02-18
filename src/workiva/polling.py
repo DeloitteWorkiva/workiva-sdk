@@ -26,7 +26,7 @@ from workiva.models.platform import Operation
 if TYPE_CHECKING:
     from workiva.client import Workiva
 
-_OPERATION_ID_RE = re.compile(r"/operations/([a-zA-Z0-9\-]+)")
+_OPERATION_ID_RE = re.compile(r"/operations/([^/\s]+)")
 
 _TERMINAL_STATUSES = frozenset({"completed", "cancelled", "failed"})
 
@@ -51,17 +51,35 @@ def _extract_operation_id(headers: dict[str, Any]) -> str:
 
 
 def _get_retry_after(headers: dict[str, Any], default: float = 2.0) -> float:
-    """Parse ``retry-after`` header, capped to ``_MAX_RETRY_AFTER``."""
+    """Parse ``retry-after`` header, capped to ``_MAX_RETRY_AFTER``.
+
+    Supports both numeric seconds and HTTP-date formats.
+    """
     value = headers.get("retry-after")
     if value is None:
         return default
     if isinstance(value, list):
         value = value[0]
+
+    # Try numeric seconds first
     try:
         seconds = float(value)
+        return min(max(seconds, 0), _MAX_RETRY_AFTER)
     except (TypeError, ValueError):
-        return default
-    return min(max(seconds, 0), _MAX_RETRY_AFTER)
+        pass
+
+    # Try HTTP-date format
+    try:
+        from datetime import datetime
+        from email.utils import parsedate_to_datetime
+
+        retry_date = parsedate_to_datetime(str(value))
+        delta = (retry_date - datetime.now(retry_date.tzinfo)).total_seconds()
+        return min(max(delta, 0), _MAX_RETRY_AFTER)
+    except (ValueError, TypeError):
+        pass
+
+    return default
 
 
 class OperationPoller:

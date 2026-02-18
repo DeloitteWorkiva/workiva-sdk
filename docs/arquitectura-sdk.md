@@ -83,12 +83,12 @@ Cada namespace tiene un `_api: _API` que se resuelve al base URL correcto segun 
 
 | Archivo | Descripcion |
 |---------|-------------|
-| `_auth.py` | OAuth2 client_credentials via `httpx.Auth` |
-| `_client.py` | BaseClient (httpx wrapper con retry, auth, headers) |
-| `_retry.py` | RetryTransport + AsyncRetryTransport |
-| `_errors.py` | WorkivaAPIError hierarchy |
-| `_pagination.py` | `paginate_all()` / `paginate_all_async()` con max_pages guard |
-| `_config.py` | SDKConfig, RetryConfig |
+| `_auth.py` | OAuth2 client_credentials via `httpx.Auth`, token client reutilizable |
+| `_client.py` | BaseClient (httpx wrapper con retry, auth, headers, thread-safe lazy init) |
+| `_retry.py` | RetryTransport + AsyncRetryTransport (max_retries + max_elapsed_ms) |
+| `_errors.py` | `WorkivaError` (raiz) → `WorkivaAPIError` hierarchy + `raise_for_status()` |
+| `_pagination.py` | `paginate_all()` / `paginate_all_async()` + lazy generators con max_pages guard |
+| `_config.py` | SDKConfig, RetryConfig (frozen dataclasses) |
 | `_constants.py` | Region enum, SERVERS, API_VERSION |
 | `client.py` | Clase `Workiva` con lazy-loading y `wait()` |
 | `polling.py` | `OperationPoller` con sync/async polling, typed `Operation` |
@@ -126,6 +126,8 @@ El flujo de autenticacion usa `httpx.Auth`:
 5. **Wdata cursor**: Campo `cursor` en response body
 
 El paginator itera todas las paginas a nivel de dict, acumula items, y retorna el body final con todos los items mergeados. Un solo `Model.model_validate(body)` al final.
+
+Tambien existen `paginate_lazy()` / `paginate_lazy_async()` que hacen `yield` item por item sin acumular todo en memoria, utiles para datasets grandes.
 
 ## Comandos utiles
 

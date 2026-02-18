@@ -11,15 +11,15 @@ def _detail_str(detail: OperationDetail) -> str:
     """Format a single OperationDetail into a human-readable string."""
     parts: list[str] = []
 
-    code = getattr(detail, "code", None)
+    code = detail.code
     if code is not None:
         parts.append(f"[{code}]")
 
-    target = getattr(detail, "target", None)
+    target = detail.target
     if target is not None:
         parts.append(f"({target})")
 
-    message = getattr(detail, "message", None)
+    message = detail.message
     if message is not None:
         parts.append(str(message))
 
@@ -36,13 +36,13 @@ class OperationFailed(Exception):
 
     @staticmethod
     def _extract_details(operation: Operation) -> list[OperationDetail]:
-        raw = getattr(operation, "details", None)
+        raw = operation.details
         if raw is None:
             return []
         return list(raw)
 
     def _build_message(self) -> str:
-        op_id = getattr(self.operation, "id", None) or "unknown"
+        op_id = self.operation.id or "unknown"
         if not self.details:
             return f"Operation {op_id} failed"
         detail_lines = [f"  {_detail_str(d)}" for d in self.details]
@@ -54,7 +54,7 @@ class OperationCancelled(Exception):
 
     def __init__(self, operation: Operation) -> None:
         self.operation = operation
-        op_id = getattr(operation, "id", None) or "unknown"
+        op_id = operation.id or "unknown"
         super().__init__(f"Operation {op_id} was cancelled")
 
 

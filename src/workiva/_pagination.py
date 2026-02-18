@@ -11,7 +11,7 @@ items merged — so one ``Model.model_validate(body)`` call is all you need.
 
 from __future__ import annotations
 
-from typing import Any, Callable, Optional
+from typing import Any, AsyncGenerator, Callable, Generator, Optional
 
 import httpx
 
@@ -169,3 +169,80 @@ async def paginate_all_async(
 
     _set_nested(final_body, items_path, all_items)
     return final_body
+
+
+def paginate_lazy(
+    fetch: Callable[[Optional[str]], httpx.Response],
+    extract_cursor: Callable[[dict[str, Any]], Optional[str]],
+    items_path: str,
+    max_pages: int = _MAX_PAGES,
+) -> Generator[Any, None, None]:
+    """Yield items lazily one page at a time (sync).
+
+    Unlike :func:`paginate_all`, items are yielded as they are fetched
+    instead of being accumulated in memory. Use this for large datasets
+    where loading all pages at once could cause memory issues.
+
+    Args:
+        fetch: Calls the API with an optional cursor. Returns httpx.Response.
+        extract_cursor: Extracts the next cursor from the response body dict.
+        items_path: Dot-separated path to the items list.
+        max_pages: Safety limit to prevent infinite loops (default 1000).
+
+    Yields:
+        Individual items from each page.
+
+    Raises:
+        RuntimeError: If ``max_pages`` is exceeded.
+    """
+    cursor: Optional[str] = None
+
+    for page in range(max_pages):
+        response = fetch(cursor)
+        body = response.json()
+        items = _get_nested(body, items_path)
+        if isinstance(items, list):
+            yield from items
+        cursor = extract_cursor(body)
+        if cursor is None:
+            return
+    raise RuntimeError(
+        f"Pagination exceeded {max_pages} pages — aborting to prevent "
+        f"infinite loop. Use API parameters to limit results, or pass "
+        f"max_pages= to increase the limit."
+    )
+
+
+async def paginate_lazy_async(
+    fetch: Callable[[Optional[str]], Any],
+    extract_cursor: Callable[[dict[str, Any]], Optional[str]],
+    items_path: str,
+    max_pages: int = _MAX_PAGES,
+) -> AsyncGenerator[Any, None]:
+    """Yield items lazily one page at a time (async).
+
+    Async version of :func:`paginate_lazy`.
+
+    Yields:
+        Individual items from each page.
+
+    Raises:
+        RuntimeError: If ``max_pages`` is exceeded.
+    """
+    cursor: Optional[str] = None
+
+    for page in range(max_pages):
+        response = await fetch(cursor)
+        body = response.json()
+        items = _get_nested(body, items_path)
+        if isinstance(items, list):
+            for item in items:
+                yield item
+        cursor = extract_cursor(body)
+        if cursor is None:
+            return
+    raise RuntimeError(
+        f"Pagination exceeded {max_pages} pages — aborting to prevent "
+        f"infinite loop. Use API parameters to limit results, or pass "
+        f"max_pages= to increase the limit."
+    )

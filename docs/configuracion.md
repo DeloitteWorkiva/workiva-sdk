@@ -83,8 +83,7 @@ result = client.spreadsheets.get_spreadsheet(
 El SDK incluye un sistema de reintentos con backoff exponencial implementado como transport de httpx. Se configura a traves de `SDKConfig` y `RetryConfig`:
 
 ```python
-from workiva import Workiva, Region
-from workiva._config import SDKConfig, RetryConfig
+from workiva import Workiva, Region, SDKConfig, RetryConfig
 
 client = Workiva(
     client_id="...",
@@ -93,6 +92,7 @@ client = Workiva(
         region=Region.EU,
         timeout_s=30,
         retry=RetryConfig(
+            max_retries=5,                 # Maximo 5 reintentos
             initial_interval_ms=500,       # 500ms intervalo inicial
             max_interval_ms=30_000,        # 30 segundos maximo entre reintentos
             exponent=1.5,                  # Factor exponencial
@@ -108,12 +108,15 @@ client = Workiva(
 
 | Parametro | Default | Descripcion |
 |-----------|---------|-------------|
+| `max_retries` | `5` | Numero maximo de reintentos por request |
 | `initial_interval_ms` | `500` | Intervalo inicial entre reintentos (ms) |
 | `max_interval_ms` | `30_000` | Intervalo maximo entre reintentos (ms) |
 | `exponent` | `1.5` | Factor de crecimiento exponencial |
 | `max_elapsed_ms` | `120_000` | Tiempo maximo total para reintentos (ms) |
 | `retry_connection_errors` | `True` | Reintentar ante `ConnectError` y `TimeoutException` |
 | `status_codes` | `(429, 500, 502, 503, 504)` | Codigos HTTP que activan reintento |
+
+> El retry loop se detiene cuando se alcanza `max_retries` O `max_elapsed_ms`, lo que ocurra primero.
 
 ### Calculo del intervalo
 
@@ -132,6 +135,7 @@ Si no configuras nada, el SDK usa estos valores por defecto:
 
 ```python
 RetryConfig(
+    max_retries=5,
     initial_interval_ms=500,
     max_interval_ms=30_000,
     exponent=1.5,
@@ -148,7 +152,7 @@ RetryConfig(
 Para desactivar completamente los reintentos:
 
 ```python
-from workiva._config import SDKConfig, RetryConfig
+from workiva import SDKConfig, RetryConfig
 
 client = Workiva(
     client_id="...",
@@ -243,11 +247,10 @@ finally:
 
 ## SDKConfig completo
 
-`SDKConfig` agrupa toda la configuracion del SDK en un solo dataclass:
+`SDKConfig` agrupa toda la configuracion del SDK en un solo dataclass inmutable (`frozen=True`):
 
 ```python
-from workiva._config import SDKConfig, RetryConfig
-from workiva._constants import Region
+from workiva import SDKConfig, RetryConfig, Region
 
 config = SDKConfig(
     region=Region.US,        # Region del servidor
@@ -261,7 +264,8 @@ config = SDKConfig(
 | `region` | `Region` | `Region.EU` | Region del servidor |
 | `timeout_s` | `Optional[float]` | `None` | Timeout global (segundos). `None` = sin limite |
 | `retry` | `RetryConfig` | `RetryConfig()` | Configuracion de reintentos |
-| `logger` | `logging.Logger` | `logging.getLogger("workiva")` | Logger para el SDK |
+
+> `SDKConfig` y `RetryConfig` son inmutables (`frozen=True`). Si necesitas cambiar la configuracion, crea una nueva instancia.
 
 ### Relacion entre `timeout` y `config`
 

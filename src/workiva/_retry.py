@@ -90,7 +90,7 @@ class RetryTransport(httpx.BaseTransport):
                 if not self._config.retry_connection_errors:
                     raise
                 elapsed = round(time.time() * 1000) - start_ms
-                if elapsed > self._config.max_elapsed_ms:
+                if elapsed > self._config.max_elapsed_ms or attempt >= self._config.max_retries:
                     raise
                 sleep = _sleep_interval(self._config, attempt)
                 time.sleep(sleep)
@@ -101,7 +101,7 @@ class RetryTransport(httpx.BaseTransport):
                 return response
 
             elapsed = round(time.time() * 1000) - start_ms
-            if elapsed > self._config.max_elapsed_ms:
+            if elapsed > self._config.max_elapsed_ms or attempt >= self._config.max_retries:
                 return response
 
             retry_after = _parse_retry_after(response)
@@ -136,7 +136,7 @@ class AsyncRetryTransport(httpx.AsyncBaseTransport):
                 if not self._config.retry_connection_errors:
                     raise
                 elapsed = round(time.time() * 1000) - start_ms
-                if elapsed > self._config.max_elapsed_ms:
+                if elapsed > self._config.max_elapsed_ms or attempt >= self._config.max_retries:
                     raise
                 sleep = _sleep_interval(self._config, attempt)
                 await asyncio.sleep(sleep)
@@ -147,7 +147,7 @@ class AsyncRetryTransport(httpx.AsyncBaseTransport):
                 return response
 
             elapsed = round(time.time() * 1000) - start_ms
-            if elapsed > self._config.max_elapsed_ms:
+            if elapsed > self._config.max_elapsed_ms or attempt >= self._config.max_retries:
                 return response
 
             retry_after = _parse_retry_after(response)

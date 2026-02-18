@@ -46,8 +46,7 @@ Internamente, `Workiva` crea una instancia de `OAuth2ClientCredentials(httpx.Aut
 ### Constructor completo
 
 ```python
-from workiva import Workiva, Region
-from workiva._config import SDKConfig
+from workiva import Workiva, Region, SDKConfig
 
 client = Workiva(
     client_id="tu_client_id",
@@ -182,8 +181,7 @@ El SDK inyecta automaticamente el header `X-Version: 2026-01-01` en cada solicit
 Si las credenciales son invalidas o el servidor de tokens no responde:
 
 ```python
-from workiva import Workiva
-from workiva._auth import TokenAcquisitionError
+from workiva import Workiva, TokenAcquisitionError
 
 try:
     with Workiva(client_id="invalido", client_secret="invalido") as client:
@@ -192,7 +190,7 @@ except TokenAcquisitionError as e:
     print(f"Error de autenticacion: {e}")
 ```
 
-`TokenAcquisitionError` se lanza cuando:
+`TokenAcquisitionError` hereda de `WorkivaError`, la excepcion base del SDK. Se lanza cuando:
 
 - El servidor de tokens responde con un status no-2xx
 - El `token_type` no es `"bearer"`

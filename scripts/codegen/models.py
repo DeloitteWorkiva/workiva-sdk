@@ -13,6 +13,7 @@ import subprocess
 import sys
 import tempfile
 from pathlib import Path
+from typing import Callable
 
 import yaml
 
@@ -115,7 +116,7 @@ def generate_models(
     output_dir: Path,
     api_name: str,
     *,
-    post_processors: list[callable] | None = None,
+    post_processors: list[Callable[[str], str]] | None = None,
     known_suffixed: set[str] | None = None,
 ) -> None:
     """Run datamodel-code-generator for a single OpenAPI spec.
@@ -321,7 +322,7 @@ def generate_all_models(
             continue
 
         effective_spec = spec_path
-        post_processors: list[callable] | None = None
+        post_processors: list[Callable[[str], str]] | None = None
         known: set[str] | None = set()  # guardrail on by default
 
         if api_name == "chains":

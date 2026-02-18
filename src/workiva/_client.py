@@ -11,6 +11,9 @@ Wraps ``httpx.Client`` and ``httpx.AsyncClient`` with:
 from __future__ import annotations
 
 import re
+import threading
+import warnings
+from enum import Enum
 from typing import Any, Optional
 from urllib.parse import quote
 
@@ -29,14 +32,17 @@ _PATH_PARAM_RE = re.compile(r"\{(\w+)\}")
 
 
 def _deep_serialize(value: Any) -> Any:
-    """Recursively serialize Pydantic models within dicts/lists.
+    """Recursively serialize Pydantic models and Enums within dicts/lists.
 
     When flat body params contain nested Pydantic model instances
     (e.g. ``options=FileCopyOptions(...)``), httpx can't serialize them.
     This converts them to plain dicts suitable for JSON encoding.
+    Enum values are extracted via ``.value`` so they serialize as primitives.
     """
     if isinstance(value, PydanticBaseModel):
         return value.model_dump(by_alias=True, exclude_none=True)
+    if isinstance(value, Enum):
+        return value.value
     if isinstance(value, list):
         return [_deep_serialize(v) for v in value]
     if isinstance(value, dict):
@@ -85,6 +91,8 @@ class BaseClient:
             else httpx.Timeout(None)
         )
 
+        self._init_lock = threading.Lock()
+
         # -- Sync client (lazy or supplied) ------------------------------------
         self._client_supplied = client is not None
         self._client: Optional[httpx.Client] = client
@@ -95,38 +103,48 @@ class BaseClient:
         self._async_client: Optional[httpx.AsyncClient] = async_client
         self._async_client_created = async_client is not None
 
+    def __repr__(self) -> str:
+        region = self._config.region.value
+        sync_state = "connected" if self._client_created else "not connected"
+        async_state = "connected" if self._async_client_created else "not connected"
+        return f"BaseClient(region={region!r}, sync={sync_state}, async={async_state})"
+
     def _get_sync_client(self) -> httpx.Client:
         """Return the sync client, creating it on first use."""
         if self._client is None:
-            transport = RetryTransport(
-                httpx.HTTPTransport(), self._config.retry
-            )
-            self._client = httpx.Client(
-                transport=transport,
-                auth=self._auth,
-                timeout=self._timeout,
-                follow_redirects=True,
-                event_hooks={"request": [_version_header_hook]},
-                headers={"User-Agent": __user_agent__},
-            )
-            self._client_created = True
+            with self._init_lock:
+                if self._client is None:  # Double-check after acquiring lock
+                    transport = RetryTransport(
+                        httpx.HTTPTransport(), self._config.retry
+                    )
+                    self._client = httpx.Client(
+                        transport=transport,
+                        auth=self._auth,
+                        timeout=self._timeout,
+                        follow_redirects=True,
+                        event_hooks={"request": [_version_header_hook]},
+                        headers={"User-Agent": __user_agent__},
+                    )
+                    self._client_created = True
         return self._client
 
     def _get_async_client(self) -> httpx.AsyncClient:
         """Return the async client, creating it on first use."""
         if self._async_client is None:
-            async_transport = AsyncRetryTransport(
-                httpx.AsyncHTTPTransport(), self._config.retry
-            )
-            self._async_client = httpx.AsyncClient(
-                transport=async_transport,
-                auth=self._auth,
-                timeout=self._timeout,
-                follow_redirects=True,
-                event_hooks={"request": [_async_version_header_hook]},
-                headers={"User-Agent": __user_agent__},
-            )
-            self._async_client_created = True
+            with self._init_lock:
+                if self._async_client is None:  # Double-check after acquiring lock
+                    async_transport = AsyncRetryTransport(
+                        httpx.AsyncHTTPTransport(), self._config.retry
+                    )
+                    self._async_client = httpx.AsyncClient(
+                        transport=async_transport,
+                        auth=self._auth,
+                        timeout=self._timeout,
+                        follow_redirects=True,
+                        event_hooks={"request": [_async_version_header_hook]},
+                        headers={"User-Agent": __user_agent__},
+                    )
+                    self._async_client_created = True
         return self._async_client
 
     # -- URL building ----------------------------------------------------------
@@ -257,13 +275,16 @@ class BaseClient:
     # -- Lifecycle -------------------------------------------------------------
 
     def close(self) -> None:
-        """Close the sync client (if we created it).
-
-        With lazy initialization, the async client is only created if
-        async methods were called — and won't exist in sync-only usage.
-        """
+        """Close HTTP clients we created. Warns if async client was used without aclose()."""
         if self._client_created and not self._client_supplied and self._client is not None:
             self._client.close()
+        if self._async_client_created and not self._async_client_supplied and self._async_client is not None:
+            warnings.warn(
+                "Async client was created but close() was called instead of aclose(). "
+                "Use 'async with' or call aclose() to properly clean up async resources.",
+                ResourceWarning,
+                stacklevel=2,
+            )
 
     async def aclose(self) -> None:
         """Close both clients (if we created them).

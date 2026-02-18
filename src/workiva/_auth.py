@@ -16,6 +16,7 @@ from typing import Any, AsyncGenerator, ClassVar, Generator, Optional
 import httpx
 
 from workiva._constants import API_VERSION
+from workiva._errors import WorkivaError
 
 
 @dataclass
@@ -67,6 +68,7 @@ class OAuth2ClientCredentials(httpx.Auth):
             f"{client_id}:{client_secret}".encode(),
             usedforsecurity=False,
         ).hexdigest()
+        self._token_client: Optional[httpx.Client] = None
 
     # -- httpx.Auth interface --------------------------------------------------
 
@@ -124,26 +126,23 @@ class OAuth2ClientCredentials(httpx.Auth):
             self._cache.pop(self._session_key, None)
 
     def _fetch_token(self) -> _CachedToken:
-        """Make a sync POST to the token endpoint.
-
-        Always uses a sync httpx.Client. In async contexts,
-        ``async_auth_flow`` wraps this call with ``asyncio.to_thread``
-        to avoid blocking the event loop.
-        """
+        """Make a sync POST to the token endpoint."""
         payload = {
             "grant_type": "client_credentials",
             "client_id": self._client_id,
             "client_secret": self._client_secret,
         }
-        kwargs: dict[str, Any] = {}
-        if self._token_transport is not None:
-            kwargs["transport"] = self._token_transport
-        with httpx.Client(**kwargs) as client:
-            resp = client.post(
-                self._token_url,
-                data=payload,
-                headers={"X-Version": API_VERSION},
-            )
+        if self._token_client is None:
+            kwargs: dict[str, Any] = {}
+            if self._token_transport is not None:
+                kwargs["transport"] = self._token_transport
+            self._token_client = httpx.Client(**kwargs)
+
+        resp = self._token_client.post(
+            self._token_url,
+            data=payload,
+            headers={"X-Version": API_VERSION},
+        )
 
         if not (200 <= resp.status_code < 300):
             raise TokenAcquisitionError(
@@ -183,5 +182,5 @@ class OAuth2ClientCredentials(httpx.Auth):
             cls._client_locks.clear()
 
 
-class TokenAcquisitionError(Exception):
+class TokenAcquisitionError(WorkivaError):
     """Raised when OAuth2 token acquisition fails."""

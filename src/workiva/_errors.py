@@ -11,7 +11,15 @@ from typing import Any, Optional
 import httpx
 
 
-class WorkivaAPIError(Exception):
+class WorkivaError(Exception):
+    """Base exception for all Workiva SDK errors.
+
+    Catch this to handle any error raised by the SDK,
+    including both API errors and token acquisition failures.
+    """
+
+
+class WorkivaAPIError(WorkivaError):
     """Base exception for all Workiva API errors.
 
     Attributes:

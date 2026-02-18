@@ -8,6 +8,7 @@ Models can be imported from their respective submodules::
 """
 
 from workiva._auth import TokenAcquisitionError
+from workiva._config import RetryConfig, SDKConfig
 from workiva._constants import Region
 from workiva._errors import (
     AuthenticationError,
@@ -18,6 +19,7 @@ from workiva._errors import (
     RateLimitError,
     ServerError,
     WorkivaAPIError,
+    WorkivaError,
 )
 from workiva._version import __user_agent__, __version__
 from workiva.client import Workiva
@@ -28,10 +30,13 @@ __all__ = [
     "__version__",
     "Workiva",
     "Region",
+    "SDKConfig",
+    "RetryConfig",
     "OperationPoller",
     "OperationFailed",
     "OperationCancelled",
     "OperationTimeout",
+    "WorkivaError",
     "WorkivaAPIError",
     "AuthenticationError",
     "BadRequestError",

@@ -128,6 +128,24 @@ async def main():
 asyncio.run(main())
 ```
 
+## Paginacion lazy (avanzado)
+
+El SDK tambien ofrece generadores lazy que hacen `yield` item por item sin acumular todo en memoria. Utiles para datasets muy grandes:
+
+```python
+from workiva._pagination import paginate_lazy, paginate_lazy_async
+
+# Sync — itera items uno a uno
+for item in paginate_lazy(fetch_fn, extract_cursor, items_path="data"):
+    process(item)
+
+# Async
+async for item in paginate_lazy_async(fetch_fn, extract_cursor, items_path="data"):
+    await process(item)
+```
+
+> **Nota:** Los generadores lazy son funciones de infraestructura interna (`_pagination.py`). Los metodos generados del SDK usan `paginate_all()` que devuelve todos los items de golpe. Los lazy generators estan disponibles para uso avanzado cuando necesitas control sobre el consumo de memoria.
+
 ## Endpoints paginados por API
 
 ### Platform (~61 endpoints)

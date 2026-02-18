@@ -45,7 +45,13 @@ TOKEN_PATH = "/oauth2/token"
 
 def get_base_url(api: _API, region: Region) -> str:
     """Resolve the base URL for a given API and region."""
-    return SERVERS[(api, region)]
+    try:
+        return SERVERS[(api, region)]
+    except KeyError:
+        raise ValueError(
+            f"No server configured for API {api.value!r} in region {region.value!r}. "
+            f"Valid regions: {', '.join(r.value for r in Region)}"
+        ) from None
 
 
 def get_token_url(region: Region) -> str:

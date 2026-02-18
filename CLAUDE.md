@@ -102,13 +102,13 @@ src/workiva/
 ├── client.py           # Workiva class — namespace access + .wait() polling
 ├── polling.py          # OperationPoller — sync/async polling with retry-after
 ├── exceptions.py       # OperationFailed, OperationCancelled, OperationTimeout
-├── _client.py          # BaseClient — httpx wrapper (lazy sync/async clients)
-├── _auth.py            # OAuth2ClientCredentials(httpx.Auth) — ClassVar token cache
-├── _config.py          # SDKConfig + RetryConfig dataclasses
+├── _client.py          # BaseClient — httpx wrapper (thread-safe lazy sync/async clients)
+├── _auth.py            # OAuth2ClientCredentials(httpx.Auth) — ClassVar token cache, reusable token client
+├── _config.py          # SDKConfig + RetryConfig frozen dataclasses
 ├── _constants.py       # Region enum, SERVERS dict, API_VERSION, get_base_url()
-├── _errors.py          # WorkivaAPIError hierarchy + raise_for_status()
-├── _retry.py           # RetryTransport + AsyncRetryTransport (exponential backoff)
-├── _pagination.py      # paginate() / paginate_async() generators
+├── _errors.py          # WorkivaError (root) → WorkivaAPIError hierarchy + raise_for_status()
+├── _retry.py           # RetryTransport + AsyncRetryTransport (exponential backoff + max_retries)
+├── _pagination.py      # paginate() / paginate_async() + lazy generators
 ├── models/
 │   ├── platform.py     # ~10k lines — Pydantic v2 models (GENERATED)
 │   ├── chains.py       # ~760 lines — Pydantic v2 models (GENERATED)
@@ -130,13 +130,13 @@ src/workiva/
 | `client.py` | `Workiva` class — namespace lazy-loading, `.wait()` polling |
 | `polling.py` | `OperationPoller` — sync/async poll with timeout, retry-after |
 | `exceptions.py` | `OperationFailed`, `OperationCancelled`, `OperationTimeout` |
-| `_client.py` | `BaseClient` — httpx wrapper, lazy client init, URL building |
-| `_auth.py` | `OAuth2ClientCredentials(httpx.Auth)` — token cache + refresh |
-| `_config.py` | `SDKConfig`, `RetryConfig` dataclasses |
+| `_client.py` | `BaseClient` — httpx wrapper, thread-safe lazy client init, URL building |
+| `_auth.py` | `OAuth2ClientCredentials(httpx.Auth)` — token cache + refresh, reusable token client |
+| `_config.py` | `SDKConfig`, `RetryConfig` frozen dataclasses |
 | `_constants.py` | `Region`, `_API`, `SERVERS`, `API_VERSION` |
-| `_errors.py` | `WorkivaAPIError` hierarchy + `raise_for_status()` |
-| `_retry.py` | `RetryTransport` + `AsyncRetryTransport` |
-| `_pagination.py` | `paginate()` / `paginate_async()` generators |
+| `_errors.py` | `WorkivaError` (root) → `WorkivaAPIError` hierarchy + `raise_for_status()` |
+| `_retry.py` | `RetryTransport` + `AsyncRetryTransport` (max_retries + max_elapsed_ms) |
+| `_pagination.py` | `paginate()` / `paginate_async()` + lazy generators |
 | `__init__.py` | Public API exports |
 | `_version.py` | Version constants |
 
@@ -152,6 +152,7 @@ src/workiva/
 All 3 APIs share the same bearer token from `/oauth2/token` (API version 2026-01-01). The `OAuth2ClientCredentials(httpx.Auth)` class handles this automatically:
 
 - **Token cache**: `ClassVar` dict keyed by `(client_id, token_url)` — global across all SDK instances in a process
+- **Token client**: Lazy instance-level `httpx.Client` reused across token refreshes (avoids TCP handshake per refresh)
 - **Thread safety**: `threading.Lock` per cache key for concurrent token acquisition
 - **Async safety**: `async_auth_flow` wraps token fetch with `asyncio.to_thread` to avoid blocking the event loop
 - **401 retry**: Both `sync_auth_flow` and `async_auth_flow` invalidate + re-fetch on 401

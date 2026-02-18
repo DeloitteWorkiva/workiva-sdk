@@ -6,6 +6,7 @@ Jinja2 code generation. Each operation becomes an OperationSpec dataclass.
 
 from __future__ import annotations
 
+import keyword
 import re
 from dataclasses import dataclass, field
 from pathlib import Path
@@ -36,7 +37,7 @@ def _snake_case(name: str) -> str:
     s2 = re.sub(r"([a-z\d])([A-Z])", r"\1_\2", s1)
     result = re.sub(r"_+", "_", s2).strip("_").lower()
     # Avoid Python keywords
-    if result in ("filter", "type", "id", "format", "class", "import", "from", "next"):
+    if keyword.iskeyword(result) or result in ("filter", "type", "id", "format", "next"):
         result += "_"
     return result
 
