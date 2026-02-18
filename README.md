@@ -2,7 +2,7 @@
 
 # Workiva SDK
 
-[![PyPI](https://img.shields.io/pypi/v/workiva?v=0.6.5)](https://pypi.org/project/workiva/)
+[![PyPI](https://img.shields.io/pypi/v/workiva?v=0.6.6)](https://pypi.org/project/workiva/)
 [![Python 3.10+](https://img.shields.io/badge/python-3.10%2B-blue)](https://pypi.org/project/workiva/)
 [![Tests](https://img.shields.io/badge/tests-100%25-brightgreen)]()
 [![Coverage](https://img.shields.io/badge/coverage-90%25-brightgreen)]()
