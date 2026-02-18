@@ -250,7 +250,7 @@ gh release create vX.Y.Z --title "vX.Y.Z" --notes "Release notes here"
 
 **CI handles the rest**: `.github/workflows/publish.yml` triggers on `release: [published]`,
 runs tests, builds the wheel, and publishes to PyPI via `gh-action-pypi-publish` using
-the `PYPI_API_TOKEN` secret in the `pypi` environment.
+Trusted Publishers (OIDC) in the `pypi` environment.
 
 ### What triggers a new version
 
@@ -270,8 +270,8 @@ All 3 are updated atomically by `scripts/bump_version.py`.
 
 ### PyPI credentials
 
-- **CI**: `PYPI_API_TOKEN` as GitHub secret in the `pypi` environment
-- **API token**: generate at https://pypi.org/manage/account/token/
+- **CI**: Trusted Publishers (OIDC) — configured on PyPI for `DeloitteWorkiva/workiva-sdk` workflow `publish.yml` in `pypi` environment
+- **No API token needed**: OIDC eliminates static secrets. To reconfigure: https://pypi.org/manage/project/workiva/settings/publishing/
 
 ## File Survival Matrix
 
