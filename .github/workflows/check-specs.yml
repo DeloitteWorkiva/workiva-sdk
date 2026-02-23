@@ -137,39 +137,15 @@ jobs:
           app-id: ${{ secrets.APP_ID }}
           private-key: ${{ secrets.APP_PRIVATE_KEY }}
 
-      - name: Approve PR via GitHub App
+      - name: Merge PR and create release
         if: steps.check.outputs.changed == 'true' && steps.breaking.outputs.found == 'false' && steps.safe-pr.outputs.pull-request-number
         env:
           GH_TOKEN: ${{ steps.app-token.outputs.token }}
         run: |
-          gh pr review ${{ steps.safe-pr.outputs.pull-request-number }} --approve \
-            --body "Automated approval: all tests passed, no breaking changes detected."
-
-      - name: Auto-merge and release
-        if: steps.check.outputs.changed == 'true' && steps.breaking.outputs.found == 'false' && steps.safe-pr.outputs.pull-request-number
-        env:
-          GH_TOKEN: ${{ secrets.AUTO_MERGE_TOKEN }}
-        run: |
           pr_number=${{ steps.safe-pr.outputs.pull-request-number }}
 
-          echo "Enabling auto-merge for PR #${pr_number}..."
-          gh pr merge "${pr_number}" --squash --delete-branch --auto
-
-          echo "Waiting for merge to complete..."
-          for i in $(seq 1 30); do
-            state=$(gh pr view "${pr_number}" --json state --jq '.state')
-            if [ "$state" = "MERGED" ]; then
-              echo "PR #${pr_number} merged successfully."
-              break
-            fi
-            echo "  Attempt ${i}/30: PR state is '${state}', waiting 20s..."
-            sleep 20
-          done
-
-          if [ "$state" != "MERGED" ]; then
-            echo "::error::PR #${pr_number} did not merge within timeout. State: ${state}"
-            exit 1
-          fi
+          echo "Merging PR #${pr_number} via GitHub App (ruleset bypass)..."
+          gh pr merge "${pr_number}" --squash --delete-branch
 
           echo "Creating release v${{ steps.bump.outputs.version }}..."
           gh release create "v${{ steps.bump.outputs.version }}" \
