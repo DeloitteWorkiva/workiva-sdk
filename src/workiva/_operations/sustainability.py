@@ -944,66 +944,6 @@ class Sustainability(BaseNamespace):
         )
         return Metric.model_validate(response.json())
 
-    def delete_metric_by_id(
-        self,
-        *,
-        program_id: str,
-        metric_id: str,
-        timeout: Optional[float] = None,
-    ) -> httpx.Response:
-        """Delete a single metric
-
-        Deletes a [metric](ref:sustainability#metric) given its ID
-
-        Args:
-            program_id: The unique identifier of the program
-            metric_id: The unique identifier of the metric
-            timeout: Override the default request timeout (seconds).
-
-        Raises:
-            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
-        """
-        return self._client.request(
-            "DELETE",
-            self._api,
-            "/programs/{programId}/metrics/{metricId}",
-            path_params={
-                "programId": program_id,
-                "metricId": metric_id,
-            },
-            timeout=timeout,
-        )
-
-    async def delete_metric_by_id_async(
-        self,
-        *,
-        program_id: str,
-        metric_id: str,
-        timeout: Optional[float] = None,
-    ) -> httpx.Response:
-        """Delete a single metric (async)
-
-        Deletes a [metric](ref:sustainability#metric) given its ID
-
-        Args:
-            program_id: The unique identifier of the program
-            metric_id: The unique identifier of the metric
-            timeout: Override the default request timeout (seconds).
-
-        Raises:
-            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
-        """
-        return await self._client.request_async(
-            "DELETE",
-            self._api,
-            "/programs/{programId}/metrics/{metricId}",
-            path_params={
-                "programId": program_id,
-                "metricId": metric_id,
-            },
-            timeout=timeout,
-        )
-
     def get_metric_by_id(
         self,
         *,
@@ -1071,6 +1011,66 @@ class Sustainability(BaseNamespace):
             timeout=timeout,
         )
         return Metric.model_validate(response.json())
+
+    def delete_metric_by_id(
+        self,
+        *,
+        program_id: str,
+        metric_id: str,
+        timeout: Optional[float] = None,
+    ) -> httpx.Response:
+        """Delete a single metric
+
+        Deletes a [metric](ref:sustainability#metric) given its ID
+
+        Args:
+            program_id: The unique identifier of the program
+            metric_id: The unique identifier of the metric
+            timeout: Override the default request timeout (seconds).
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
+        """
+        return self._client.request(
+            "DELETE",
+            self._api,
+            "/programs/{programId}/metrics/{metricId}",
+            path_params={
+                "programId": program_id,
+                "metricId": metric_id,
+            },
+            timeout=timeout,
+        )
+
+    async def delete_metric_by_id_async(
+        self,
+        *,
+        program_id: str,
+        metric_id: str,
+        timeout: Optional[float] = None,
+    ) -> httpx.Response:
+        """Delete a single metric (async)
+
+        Deletes a [metric](ref:sustainability#metric) given its ID
+
+        Args:
+            program_id: The unique identifier of the program
+            metric_id: The unique identifier of the metric
+            timeout: Override the default request timeout (seconds).
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
+        """
+        return await self._client.request_async(
+            "DELETE",
+            self._api,
+            "/programs/{programId}/metrics/{metricId}",
+            path_params={
+                "programId": program_id,
+                "metricId": metric_id,
+            },
+            timeout=timeout,
+        )
 
     def partially_update_metric_by_id(
         self,
@@ -1452,74 +1452,6 @@ class Sustainability(BaseNamespace):
         )
         return MetricValue.model_validate(response.json())
 
-    def delete_metric_value_by_id(
-        self,
-        *,
-        program_id: str,
-        metric_id: str,
-        metric_value_id: str,
-        timeout: Optional[float] = None,
-    ) -> httpx.Response:
-        """Delete a single metric value
-
-        Deletes a [metric value](ref:sustainability#metricvalue) value given its
-        ID
-
-        Args:
-            program_id: The unique identifier of the program
-            metric_id: The unique identifier of the metric
-            metric_value_id: The unique identifier of the value
-            timeout: Override the default request timeout (seconds).
-
-        Raises:
-            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
-        """
-        return self._client.request(
-            "DELETE",
-            self._api,
-            "/programs/{programId}/metrics/{metricId}/values/{metricValueId}",
-            path_params={
-                "programId": program_id,
-                "metricId": metric_id,
-                "metricValueId": metric_value_id,
-            },
-            timeout=timeout,
-        )
-
-    async def delete_metric_value_by_id_async(
-        self,
-        *,
-        program_id: str,
-        metric_id: str,
-        metric_value_id: str,
-        timeout: Optional[float] = None,
-    ) -> httpx.Response:
-        """Delete a single metric value (async)
-
-        Deletes a [metric value](ref:sustainability#metricvalue) value given its
-        ID
-
-        Args:
-            program_id: The unique identifier of the program
-            metric_id: The unique identifier of the metric
-            metric_value_id: The unique identifier of the value
-            timeout: Override the default request timeout (seconds).
-
-        Raises:
-            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
-        """
-        return await self._client.request_async(
-            "DELETE",
-            self._api,
-            "/programs/{programId}/metrics/{metricId}/values/{metricValueId}",
-            path_params={
-                "programId": program_id,
-                "metricId": metric_id,
-                "metricValueId": metric_value_id,
-            },
-            timeout=timeout,
-        )
-
     def get_metric_value_by_id(
         self,
         *,
@@ -1595,6 +1527,74 @@ class Sustainability(BaseNamespace):
             timeout=timeout,
         )
         return MetricValue.model_validate(response.json())
+
+    def delete_metric_value_by_id(
+        self,
+        *,
+        program_id: str,
+        metric_id: str,
+        metric_value_id: str,
+        timeout: Optional[float] = None,
+    ) -> httpx.Response:
+        """Delete a single metric value
+
+        Deletes a [metric value](ref:sustainability#metricvalue) value given its
+        ID
+
+        Args:
+            program_id: The unique identifier of the program
+            metric_id: The unique identifier of the metric
+            metric_value_id: The unique identifier of the value
+            timeout: Override the default request timeout (seconds).
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
+        """
+        return self._client.request(
+            "DELETE",
+            self._api,
+            "/programs/{programId}/metrics/{metricId}/values/{metricValueId}",
+            path_params={
+                "programId": program_id,
+                "metricId": metric_id,
+                "metricValueId": metric_value_id,
+            },
+            timeout=timeout,
+        )
+
+    async def delete_metric_value_by_id_async(
+        self,
+        *,
+        program_id: str,
+        metric_id: str,
+        metric_value_id: str,
+        timeout: Optional[float] = None,
+    ) -> httpx.Response:
+        """Delete a single metric value (async)
+
+        Deletes a [metric value](ref:sustainability#metricvalue) value given its
+        ID
+
+        Args:
+            program_id: The unique identifier of the program
+            metric_id: The unique identifier of the metric
+            metric_value_id: The unique identifier of the value
+            timeout: Override the default request timeout (seconds).
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
+        """
+        return await self._client.request_async(
+            "DELETE",
+            self._api,
+            "/programs/{programId}/metrics/{metricId}/values/{metricValueId}",
+            path_params={
+                "programId": program_id,
+                "metricId": metric_id,
+                "metricValueId": metric_value_id,
+            },
+            timeout=timeout,
+        )
 
     def partially_update_metric_value_by_id(
         self,
@@ -2236,66 +2236,6 @@ class Sustainability(BaseNamespace):
         )
         return Topic.model_validate(response.json())
 
-    def delete_topic_by_id(
-        self,
-        *,
-        program_id: str,
-        topic_id: str,
-        timeout: Optional[float] = None,
-    ) -> httpx.Response:
-        """Delete a single topic
-
-        Deletes a [topic](ref:sustainability#topic) given its ID
-
-        Args:
-            program_id: The unique identifier of the program
-            topic_id: The unique identifier of the topic
-            timeout: Override the default request timeout (seconds).
-
-        Raises:
-            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
-        """
-        return self._client.request(
-            "DELETE",
-            self._api,
-            "/programs/{programId}/topics/{topicId}",
-            path_params={
-                "programId": program_id,
-                "topicId": topic_id,
-            },
-            timeout=timeout,
-        )
-
-    async def delete_topic_by_id_async(
-        self,
-        *,
-        program_id: str,
-        topic_id: str,
-        timeout: Optional[float] = None,
-    ) -> httpx.Response:
-        """Delete a single topic (async)
-
-        Deletes a [topic](ref:sustainability#topic) given its ID
-
-        Args:
-            program_id: The unique identifier of the program
-            topic_id: The unique identifier of the topic
-            timeout: Override the default request timeout (seconds).
-
-        Raises:
-            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
-        """
-        return await self._client.request_async(
-            "DELETE",
-            self._api,
-            "/programs/{programId}/topics/{topicId}",
-            path_params={
-                "programId": program_id,
-                "topicId": topic_id,
-            },
-            timeout=timeout,
-        )
-
     def get_topic_by_id(
         self,
         *,
@@ -2363,6 +2303,66 @@ class Sustainability(BaseNamespace):
             timeout=timeout,
         )
         return Topic.model_validate(response.json())
+
+    def delete_topic_by_id(
+        self,
+        *,
+        program_id: str,
+        topic_id: str,
+        timeout: Optional[float] = None,
+    ) -> httpx.Response:
+        """Delete a single topic
+
+        Deletes a [topic](ref:sustainability#topic) given its ID
+
+        Args:
+            program_id: The unique identifier of the program
+            topic_id: The unique identifier of the topic
+            timeout: Override the default request timeout (seconds).
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
+        """
+        return self._client.request(
+            "DELETE",
+            self._api,
+            "/programs/{programId}/topics/{topicId}",
+            path_params={
+                "programId": program_id,
+                "topicId": topic_id,
+            },
+            timeout=timeout,
+        )
+
+    async def delete_topic_by_id_async(
+        self,
+        *,
+        program_id: str,
+        topic_id: str,
+        timeout: Optional[float] = None,
+    ) -> httpx.Response:
+        """Delete a single topic (async)
+
+        Deletes a [topic](ref:sustainability#topic) given its ID
+
+        Args:
+            program_id: The unique identifier of the program
+            topic_id: The unique identifier of the topic
+            timeout: Override the default request timeout (seconds).
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
+        """
+        return await self._client.request_async(
+            "DELETE",
+            self._api,
+            "/programs/{programId}/topics/{topicId}",
+            path_params={
+                "programId": program_id,
+                "topicId": topic_id,
+            },
+            timeout=timeout,
+        )
 
     def partially_update_topic_by_id(
         self,

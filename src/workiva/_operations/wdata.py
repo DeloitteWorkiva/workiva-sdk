@@ -1656,6 +1656,72 @@ class Wdata(BaseNamespace):
         )
         return BaseResponseString.model_validate(response.json())
 
+    def get_file(
+        self,
+        *,
+        file_id: str,
+        timeout: Optional[float] = None,
+    ) -> BaseResponseFileMetaDto:
+        """Retrieve a single file
+
+        Returns the file meta that matches the provided ID, or a 404 if an
+        associated file
+        can't be found.
+
+        Args:
+            file_id: The unique identifier of the file
+            timeout: Override the default request timeout (seconds).
+
+        Returns:
+            BaseResponseFileMetaDto
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 423, 429, 500).
+        """
+        response = self._client.request(
+            "GET",
+            self._api,
+            "/api/v1/file/{fileId}",
+            path_params={
+                "fileId": file_id,
+            },
+            timeout=timeout,
+        )
+        return BaseResponseFileMetaDto.model_validate(response.json())
+
+    async def get_file_async(
+        self,
+        *,
+        file_id: str,
+        timeout: Optional[float] = None,
+    ) -> BaseResponseFileMetaDto:
+        """Retrieve a single file (async)
+
+        Returns the file meta that matches the provided ID, or a 404 if an
+        associated file
+        can't be found.
+
+        Args:
+            file_id: The unique identifier of the file
+            timeout: Override the default request timeout (seconds).
+
+        Returns:
+            BaseResponseFileMetaDto
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 423, 429, 500).
+        """
+        response = await self._client.request_async(
+            "GET",
+            self._api,
+            "/api/v1/file/{fileId}",
+            path_params={
+                "fileId": file_id,
+            },
+            timeout=timeout,
+        )
+        return BaseResponseFileMetaDto.model_validate(response.json())
+
     def delete_file(
         self,
         *,
@@ -1723,72 +1789,6 @@ class Wdata(BaseNamespace):
             timeout=timeout,
         )
         return BaseResponseString.model_validate(response.json())
-
-    def get_file(
-        self,
-        *,
-        file_id: str,
-        timeout: Optional[float] = None,
-    ) -> BaseResponseFileMetaDto:
-        """Retrieve a single file
-
-        Returns the file meta that matches the provided ID, or a 404 if an
-        associated file
-        can't be found.
-
-        Args:
-            file_id: The unique identifier of the file
-            timeout: Override the default request timeout (seconds).
-
-        Returns:
-            BaseResponseFileMetaDto
-
-        Raises:
-            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 423, 429, 500).
-        """
-        response = self._client.request(
-            "GET",
-            self._api,
-            "/api/v1/file/{fileId}",
-            path_params={
-                "fileId": file_id,
-            },
-            timeout=timeout,
-        )
-        return BaseResponseFileMetaDto.model_validate(response.json())
-
-    async def get_file_async(
-        self,
-        *,
-        file_id: str,
-        timeout: Optional[float] = None,
-    ) -> BaseResponseFileMetaDto:
-        """Retrieve a single file (async)
-
-        Returns the file meta that matches the provided ID, or a 404 if an
-        associated file
-        can't be found.
-
-        Args:
-            file_id: The unique identifier of the file
-            timeout: Override the default request timeout (seconds).
-
-        Returns:
-            BaseResponseFileMetaDto
-
-        Raises:
-            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 423, 429, 500).
-        """
-        response = await self._client.request_async(
-            "GET",
-            self._api,
-            "/api/v1/file/{fileId}",
-            path_params={
-                "fileId": file_id,
-            },
-            timeout=timeout,
-        )
-        return BaseResponseFileMetaDto.model_validate(response.json())
 
     def download_file_1(
         self,
@@ -2178,72 +2178,6 @@ class Wdata(BaseNamespace):
         )
         return BaseResponseFolderDto.model_validate(response.json())
 
-    def delete_folder(
-        self,
-        *,
-        folder_id: str,
-        timeout: Optional[float] = None,
-    ) -> BaseResponseString:
-        """Delete a single folder
-
-        Deletes the folder with the provided ID.  If the folder is not found,
-        this is a
-        no-op. <b>All files and sub-folders are also recursively deleted.</b>
-
-        Args:
-            folder_id: The unique identifier of the folder
-            timeout: Override the default request timeout (seconds).
-
-        Returns:
-            BaseResponseString
-
-        Raises:
-            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 423, 429, 500).
-        """
-        response = self._client.request(
-            "DELETE",
-            self._api,
-            "/api/v1/folder/{folderId}",
-            path_params={
-                "folderId": folder_id,
-            },
-            timeout=timeout,
-        )
-        return BaseResponseString.model_validate(response.json())
-
-    async def delete_folder_async(
-        self,
-        *,
-        folder_id: str,
-        timeout: Optional[float] = None,
-    ) -> BaseResponseString:
-        """Delete a single folder (async)
-
-        Deletes the folder with the provided ID.  If the folder is not found,
-        this is a
-        no-op. <b>All files and sub-folders are also recursively deleted.</b>
-
-        Args:
-            folder_id: The unique identifier of the folder
-            timeout: Override the default request timeout (seconds).
-
-        Returns:
-            BaseResponseString
-
-        Raises:
-            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 423, 429, 500).
-        """
-        response = await self._client.request_async(
-            "DELETE",
-            self._api,
-            "/api/v1/folder/{folderId}",
-            path_params={
-                "folderId": folder_id,
-            },
-            timeout=timeout,
-        )
-        return BaseResponseString.model_validate(response.json())
-
     def get_folder(
         self,
         *,
@@ -2393,6 +2327,72 @@ class Wdata(BaseNamespace):
             timeout=timeout,
         )
         return BaseResponseFolderDto.model_validate(response.json())
+
+    def delete_folder(
+        self,
+        *,
+        folder_id: str,
+        timeout: Optional[float] = None,
+    ) -> BaseResponseString:
+        """Delete a single folder
+
+        Deletes the folder with the provided ID.  If the folder is not found,
+        this is a
+        no-op. <b>All files and sub-folders are also recursively deleted.</b>
+
+        Args:
+            folder_id: The unique identifier of the folder
+            timeout: Override the default request timeout (seconds).
+
+        Returns:
+            BaseResponseString
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 423, 429, 500).
+        """
+        response = self._client.request(
+            "DELETE",
+            self._api,
+            "/api/v1/folder/{folderId}",
+            path_params={
+                "folderId": folder_id,
+            },
+            timeout=timeout,
+        )
+        return BaseResponseString.model_validate(response.json())
+
+    async def delete_folder_async(
+        self,
+        *,
+        folder_id: str,
+        timeout: Optional[float] = None,
+    ) -> BaseResponseString:
+        """Delete a single folder (async)
+
+        Deletes the folder with the provided ID.  If the folder is not found,
+        this is a
+        no-op. <b>All files and sub-folders are also recursively deleted.</b>
+
+        Args:
+            folder_id: The unique identifier of the folder
+            timeout: Override the default request timeout (seconds).
+
+        Returns:
+            BaseResponseString
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 423, 429, 500).
+        """
+        response = await self._client.request_async(
+            "DELETE",
+            self._api,
+            "/api/v1/folder/{folderId}",
+            path_params={
+                "folderId": folder_id,
+            },
+            timeout=timeout,
+        )
+        return BaseResponseString.model_validate(response.json())
 
     def list_children(
         self,
@@ -2804,70 +2804,6 @@ class Wdata(BaseNamespace):
         )
         return BaseResponseGlobalParameterDto.model_validate(response.json())
 
-    def delete_parameter(
-        self,
-        *,
-        parameter_id: str,
-        timeout: Optional[float] = None,
-    ) -> BaseResponseString:
-        """Delete Parameter
-
-        Deletes the parameter with the provided parameter ID.  If the parameter
-        is not found, this is a no-op.
-
-        Args:
-            parameter_id: The unique identifier of the parameter
-            timeout: Override the default request timeout (seconds).
-
-        Returns:
-            BaseResponseString
-
-        Raises:
-            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 423, 429, 500).
-        """
-        response = self._client.request(
-            "DELETE",
-            self._api,
-            "/api/v1/parameter/{parameterId}",
-            path_params={
-                "parameterId": parameter_id,
-            },
-            timeout=timeout,
-        )
-        return BaseResponseString.model_validate(response.json())
-
-    async def delete_parameter_async(
-        self,
-        *,
-        parameter_id: str,
-        timeout: Optional[float] = None,
-    ) -> BaseResponseString:
-        """Delete Parameter (async)
-
-        Deletes the parameter with the provided parameter ID.  If the parameter
-        is not found, this is a no-op.
-
-        Args:
-            parameter_id: The unique identifier of the parameter
-            timeout: Override the default request timeout (seconds).
-
-        Returns:
-            BaseResponseString
-
-        Raises:
-            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 423, 429, 500).
-        """
-        response = await self._client.request_async(
-            "DELETE",
-            self._api,
-            "/api/v1/parameter/{parameterId}",
-            path_params={
-                "parameterId": parameter_id,
-            },
-            timeout=timeout,
-        )
-        return BaseResponseString.model_validate(response.json())
-
     def get_parameter(
         self,
         *,
@@ -3090,6 +3026,70 @@ class Wdata(BaseNamespace):
         )
         return BaseResponseGlobalParameterDto.model_validate(response.json())
 
+    def delete_parameter(
+        self,
+        *,
+        parameter_id: str,
+        timeout: Optional[float] = None,
+    ) -> BaseResponseString:
+        """Delete Parameter
+
+        Deletes the parameter with the provided parameter ID.  If the parameter
+        is not found, this is a no-op.
+
+        Args:
+            parameter_id: The unique identifier of the parameter
+            timeout: Override the default request timeout (seconds).
+
+        Returns:
+            BaseResponseString
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 423, 429, 500).
+        """
+        response = self._client.request(
+            "DELETE",
+            self._api,
+            "/api/v1/parameter/{parameterId}",
+            path_params={
+                "parameterId": parameter_id,
+            },
+            timeout=timeout,
+        )
+        return BaseResponseString.model_validate(response.json())
+
+    async def delete_parameter_async(
+        self,
+        *,
+        parameter_id: str,
+        timeout: Optional[float] = None,
+    ) -> BaseResponseString:
+        """Delete Parameter (async)
+
+        Deletes the parameter with the provided parameter ID.  If the parameter
+        is not found, this is a no-op.
+
+        Args:
+            parameter_id: The unique identifier of the parameter
+            timeout: Override the default request timeout (seconds).
+
+        Returns:
+            BaseResponseString
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 423, 429, 500).
+        """
+        response = await self._client.request_async(
+            "DELETE",
+            self._api,
+            "/api/v1/parameter/{parameterId}",
+            path_params={
+                "parameterId": parameter_id,
+            },
+            timeout=timeout,
+        )
+        return BaseResponseString.model_validate(response.json())
+
     def list_pivot_views(
         self,
         *,
@@ -3292,76 +3292,6 @@ class Wdata(BaseNamespace):
         )
         return BaseResponsePivotViewDto.model_validate(response.json())
 
-    def delete_pivot_view(
-        self,
-        *,
-        pivot_view_id: str,
-        timeout: Optional[float] = None,
-    ) -> BaseResponseString:
-        """Delete a single pivot view
-
-        Deletes a view that matches the provided ID.  This is an administrative
-        method and
-        should be assumed a hard-delete, given no capability to restore a
-        deleted view is
-        available.  A no-op if no such view exists.
-
-        Args:
-            pivot_view_id: The unique identifier of the pivot view
-            timeout: Override the default request timeout (seconds).
-
-        Returns:
-            BaseResponseString
-
-        Raises:
-            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 423, 429, 500).
-        """
-        response = self._client.request(
-            "DELETE",
-            self._api,
-            "/api/v1/pivotview/{pivotViewId}",
-            path_params={
-                "pivotViewId": pivot_view_id,
-            },
-            timeout=timeout,
-        )
-        return BaseResponseString.model_validate(response.json())
-
-    async def delete_pivot_view_async(
-        self,
-        *,
-        pivot_view_id: str,
-        timeout: Optional[float] = None,
-    ) -> BaseResponseString:
-        """Delete a single pivot view (async)
-
-        Deletes a view that matches the provided ID.  This is an administrative
-        method and
-        should be assumed a hard-delete, given no capability to restore a
-        deleted view is
-        available.  A no-op if no such view exists.
-
-        Args:
-            pivot_view_id: The unique identifier of the pivot view
-            timeout: Override the default request timeout (seconds).
-
-        Returns:
-            BaseResponseString
-
-        Raises:
-            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 423, 429, 500).
-        """
-        response = await self._client.request_async(
-            "DELETE",
-            self._api,
-            "/api/v1/pivotview/{pivotViewId}",
-            path_params={
-                "pivotViewId": pivot_view_id,
-            },
-            timeout=timeout,
-        )
-        return BaseResponseString.model_validate(response.json())
-
     def get_pivot_view(
         self,
         *,
@@ -3537,6 +3467,76 @@ class Wdata(BaseNamespace):
             timeout=timeout,
         )
         return BaseResponsePivotViewDto.model_validate(response.json())
+
+    def delete_pivot_view(
+        self,
+        *,
+        pivot_view_id: str,
+        timeout: Optional[float] = None,
+    ) -> BaseResponseString:
+        """Delete a single pivot view
+
+        Deletes a view that matches the provided ID.  This is an administrative
+        method and
+        should be assumed a hard-delete, given no capability to restore a
+        deleted view is
+        available.  A no-op if no such view exists.
+
+        Args:
+            pivot_view_id: The unique identifier of the pivot view
+            timeout: Override the default request timeout (seconds).
+
+        Returns:
+            BaseResponseString
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 423, 429, 500).
+        """
+        response = self._client.request(
+            "DELETE",
+            self._api,
+            "/api/v1/pivotview/{pivotViewId}",
+            path_params={
+                "pivotViewId": pivot_view_id,
+            },
+            timeout=timeout,
+        )
+        return BaseResponseString.model_validate(response.json())
+
+    async def delete_pivot_view_async(
+        self,
+        *,
+        pivot_view_id: str,
+        timeout: Optional[float] = None,
+    ) -> BaseResponseString:
+        """Delete a single pivot view (async)
+
+        Deletes a view that matches the provided ID.  This is an administrative
+        method and
+        should be assumed a hard-delete, given no capability to restore a
+        deleted view is
+        available.  A no-op if no such view exists.
+
+        Args:
+            pivot_view_id: The unique identifier of the pivot view
+            timeout: Override the default request timeout (seconds).
+
+        Returns:
+            BaseResponseString
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 423, 429, 500).
+        """
+        response = await self._client.request_async(
+            "DELETE",
+            self._api,
+            "/api/v1/pivotview/{pivotViewId}",
+            path_params={
+                "pivotViewId": pivot_view_id,
+            },
+            timeout=timeout,
+        )
+        return BaseResponseString.model_validate(response.json())
 
     def list_queries(
         self,
@@ -3958,72 +3958,6 @@ class Wdata(BaseNamespace):
         )
         return BaseResponseQueryDto.model_validate(response.json())
 
-    def delete_query(
-        self,
-        *,
-        query_id: str,
-        timeout: Optional[float] = None,
-    ) -> BaseResponseString:
-        """Delete a single query
-
-        Deletes the query that matches the provided ID. If no such query is
-        found, this is
-        a no-op.
-
-        Args:
-            query_id: The unique identifier of the query
-            timeout: Override the default request timeout (seconds).
-
-        Returns:
-            BaseResponseString
-
-        Raises:
-            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 423, 429, 500).
-        """
-        response = self._client.request(
-            "DELETE",
-            self._api,
-            "/api/v1/query/{queryId}",
-            path_params={
-                "queryId": query_id,
-            },
-            timeout=timeout,
-        )
-        return BaseResponseString.model_validate(response.json())
-
-    async def delete_query_async(
-        self,
-        *,
-        query_id: str,
-        timeout: Optional[float] = None,
-    ) -> BaseResponseString:
-        """Delete a single query (async)
-
-        Deletes the query that matches the provided ID. If no such query is
-        found, this is
-        a no-op.
-
-        Args:
-            query_id: The unique identifier of the query
-            timeout: Override the default request timeout (seconds).
-
-        Returns:
-            BaseResponseString
-
-        Raises:
-            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 423, 429, 500).
-        """
-        response = await self._client.request_async(
-            "DELETE",
-            self._api,
-            "/api/v1/query/{queryId}",
-            path_params={
-                "queryId": query_id,
-            },
-            timeout=timeout,
-        )
-        return BaseResponseString.model_validate(response.json())
-
     def get_query(
         self,
         *,
@@ -4229,6 +4163,72 @@ class Wdata(BaseNamespace):
             timeout=timeout,
         )
         return BaseResponseQueryDto.model_validate(response.json())
+
+    def delete_query(
+        self,
+        *,
+        query_id: str,
+        timeout: Optional[float] = None,
+    ) -> BaseResponseString:
+        """Delete a single query
+
+        Deletes the query that matches the provided ID. If no such query is
+        found, this is
+        a no-op.
+
+        Args:
+            query_id: The unique identifier of the query
+            timeout: Override the default request timeout (seconds).
+
+        Returns:
+            BaseResponseString
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 423, 429, 500).
+        """
+        response = self._client.request(
+            "DELETE",
+            self._api,
+            "/api/v1/query/{queryId}",
+            path_params={
+                "queryId": query_id,
+            },
+            timeout=timeout,
+        )
+        return BaseResponseString.model_validate(response.json())
+
+    async def delete_query_async(
+        self,
+        *,
+        query_id: str,
+        timeout: Optional[float] = None,
+    ) -> BaseResponseString:
+        """Delete a single query (async)
+
+        Deletes the query that matches the provided ID. If no such query is
+        found, this is
+        a no-op.
+
+        Args:
+            query_id: The unique identifier of the query
+            timeout: Override the default request timeout (seconds).
+
+        Returns:
+            BaseResponseString
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 423, 429, 500).
+        """
+        response = await self._client.request_async(
+            "DELETE",
+            self._api,
+            "/api/v1/query/{queryId}",
+            path_params={
+                "queryId": query_id,
+            },
+            timeout=timeout,
+        )
+        return BaseResponseString.model_validate(response.json())
 
     def get_dependencies(
         self,
@@ -4672,72 +4672,6 @@ class Wdata(BaseNamespace):
         )
         return BaseResponseQueryResultDto.model_validate(response.json())
 
-    def cancel_query(
-        self,
-        *,
-        query_result_id: str,
-        timeout: Optional[float] = None,
-    ) -> BaseResponseQueryResultDto:
-        """Cancel a running query
-
-        Cancels a running query based on the provided result ID, and returns a
-        cancelled
-        result unless the query's already in a COMPLETED state.
-
-        Args:
-            query_result_id: The unique identifier of the query result
-            timeout: Override the default request timeout (seconds).
-
-        Returns:
-            BaseResponseQueryResultDto
-
-        Raises:
-            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 423, 429, 500).
-        """
-        response = self._client.request(
-            "DELETE",
-            self._api,
-            "/api/v1/queryresult/{queryResultId}",
-            path_params={
-                "queryResultId": query_result_id,
-            },
-            timeout=timeout,
-        )
-        return BaseResponseQueryResultDto.model_validate(response.json())
-
-    async def cancel_query_async(
-        self,
-        *,
-        query_result_id: str,
-        timeout: Optional[float] = None,
-    ) -> BaseResponseQueryResultDto:
-        """Cancel a running query (async)
-
-        Cancels a running query based on the provided result ID, and returns a
-        cancelled
-        result unless the query's already in a COMPLETED state.
-
-        Args:
-            query_result_id: The unique identifier of the query result
-            timeout: Override the default request timeout (seconds).
-
-        Returns:
-            BaseResponseQueryResultDto
-
-        Raises:
-            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 423, 429, 500).
-        """
-        response = await self._client.request_async(
-            "DELETE",
-            self._api,
-            "/api/v1/queryresult/{queryResultId}",
-            path_params={
-                "queryResultId": query_result_id,
-            },
-            timeout=timeout,
-        )
-        return BaseResponseQueryResultDto.model_validate(response.json())
-
     def get_query_result(
         self,
         *,
@@ -4795,6 +4729,72 @@ class Wdata(BaseNamespace):
         """
         response = await self._client.request_async(
             "GET",
+            self._api,
+            "/api/v1/queryresult/{queryResultId}",
+            path_params={
+                "queryResultId": query_result_id,
+            },
+            timeout=timeout,
+        )
+        return BaseResponseQueryResultDto.model_validate(response.json())
+
+    def cancel_query(
+        self,
+        *,
+        query_result_id: str,
+        timeout: Optional[float] = None,
+    ) -> BaseResponseQueryResultDto:
+        """Cancel a running query
+
+        Cancels a running query based on the provided result ID, and returns a
+        cancelled
+        result unless the query's already in a COMPLETED state.
+
+        Args:
+            query_result_id: The unique identifier of the query result
+            timeout: Override the default request timeout (seconds).
+
+        Returns:
+            BaseResponseQueryResultDto
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 423, 429, 500).
+        """
+        response = self._client.request(
+            "DELETE",
+            self._api,
+            "/api/v1/queryresult/{queryResultId}",
+            path_params={
+                "queryResultId": query_result_id,
+            },
+            timeout=timeout,
+        )
+        return BaseResponseQueryResultDto.model_validate(response.json())
+
+    async def cancel_query_async(
+        self,
+        *,
+        query_result_id: str,
+        timeout: Optional[float] = None,
+    ) -> BaseResponseQueryResultDto:
+        """Cancel a running query (async)
+
+        Cancels a running query based on the provided result ID, and returns a
+        cancelled
+        result unless the query's already in a COMPLETED state.
+
+        Args:
+            query_result_id: The unique identifier of the query result
+            timeout: Override the default request timeout (seconds).
+
+        Returns:
+            BaseResponseQueryResultDto
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 423, 429, 500).
+        """
+        response = await self._client.request_async(
+            "DELETE",
             self._api,
             "/api/v1/queryresult/{queryResultId}",
             path_params={
@@ -5162,72 +5162,6 @@ class Wdata(BaseNamespace):
         )
         return BaseResponseSelectListDto.model_validate(response.json())
 
-    def delete(
-        self,
-        *,
-        select_list_id: str,
-        timeout: Optional[float] = None,
-    ) -> BaseResponseString:
-        """Delete a single select list
-
-        Deletes a select list with the provided ID. If no such select list
-        exists, this is
-        a no-op.
-
-        Args:
-            select_list_id: The unique identifier of the select list
-            timeout: Override the default request timeout (seconds).
-
-        Returns:
-            BaseResponseString
-
-        Raises:
-            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 423, 429, 500).
-        """
-        response = self._client.request(
-            "DELETE",
-            self._api,
-            "/api/v1/selectlist/{selectListId}",
-            path_params={
-                "selectListId": select_list_id,
-            },
-            timeout=timeout,
-        )
-        return BaseResponseString.model_validate(response.json())
-
-    async def delete_async(
-        self,
-        *,
-        select_list_id: str,
-        timeout: Optional[float] = None,
-    ) -> BaseResponseString:
-        """Delete a single select list (async)
-
-        Deletes a select list with the provided ID. If no such select list
-        exists, this is
-        a no-op.
-
-        Args:
-            select_list_id: The unique identifier of the select list
-            timeout: Override the default request timeout (seconds).
-
-        Returns:
-            BaseResponseString
-
-        Raises:
-            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 423, 429, 500).
-        """
-        response = await self._client.request_async(
-            "DELETE",
-            self._api,
-            "/api/v1/selectlist/{selectListId}",
-            path_params={
-                "selectListId": select_list_id,
-            },
-            timeout=timeout,
-        )
-        return BaseResponseString.model_validate(response.json())
-
     def get_select_list(
         self,
         *,
@@ -5430,6 +5364,72 @@ class Wdata(BaseNamespace):
         )
         return BaseResponseSelectListDto.model_validate(response.json())
 
+    def delete(
+        self,
+        *,
+        select_list_id: str,
+        timeout: Optional[float] = None,
+    ) -> BaseResponseString:
+        """Delete a single select list
+
+        Deletes a select list with the provided ID. If no such select list
+        exists, this is
+        a no-op.
+
+        Args:
+            select_list_id: The unique identifier of the select list
+            timeout: Override the default request timeout (seconds).
+
+        Returns:
+            BaseResponseString
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 423, 429, 500).
+        """
+        response = self._client.request(
+            "DELETE",
+            self._api,
+            "/api/v1/selectlist/{selectListId}",
+            path_params={
+                "selectListId": select_list_id,
+            },
+            timeout=timeout,
+        )
+        return BaseResponseString.model_validate(response.json())
+
+    async def delete_async(
+        self,
+        *,
+        select_list_id: str,
+        timeout: Optional[float] = None,
+    ) -> BaseResponseString:
+        """Delete a single select list (async)
+
+        Deletes a select list with the provided ID. If no such select list
+        exists, this is
+        a no-op.
+
+        Args:
+            select_list_id: The unique identifier of the select list
+            timeout: Override the default request timeout (seconds).
+
+        Returns:
+            BaseResponseString
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 423, 429, 500).
+        """
+        response = await self._client.request_async(
+            "DELETE",
+            self._api,
+            "/api/v1/selectlist/{selectListId}",
+            path_params={
+                "selectListId": select_list_id,
+            },
+            timeout=timeout,
+        )
+        return BaseResponseString.model_validate(response.json())
+
     def list_shared_tables(
         self,
         *,
@@ -5600,76 +5600,6 @@ class Wdata(BaseNamespace):
         )
         return BaseResponseSharedTableDto.model_validate(response.json())
 
-    def delete_shared_table(
-        self,
-        *,
-        shared_table_id: str,
-        timeout: Optional[float] = None,
-    ) -> BaseResponseString:
-        """Delete a single shared table
-
-        Deletes the linkages between the source and destination of a shared
-        table that matches
-        the provided ID; the actual table itself is left intact. If no such
-        shared table exists,
-        this is a no-op.
-
-        Args:
-            shared_table_id: The unique identifier of the shared table
-            timeout: Override the default request timeout (seconds).
-
-        Returns:
-            BaseResponseString
-
-        Raises:
-            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 423, 429, 500).
-        """
-        response = self._client.request(
-            "DELETE",
-            self._api,
-            "/api/v1/sharedtable/{sharedTableId}",
-            path_params={
-                "sharedTableId": shared_table_id,
-            },
-            timeout=timeout,
-        )
-        return BaseResponseString.model_validate(response.json())
-
-    async def delete_shared_table_async(
-        self,
-        *,
-        shared_table_id: str,
-        timeout: Optional[float] = None,
-    ) -> BaseResponseString:
-        """Delete a single shared table (async)
-
-        Deletes the linkages between the source and destination of a shared
-        table that matches
-        the provided ID; the actual table itself is left intact. If no such
-        shared table exists,
-        this is a no-op.
-
-        Args:
-            shared_table_id: The unique identifier of the shared table
-            timeout: Override the default request timeout (seconds).
-
-        Returns:
-            BaseResponseString
-
-        Raises:
-            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 423, 429, 500).
-        """
-        response = await self._client.request_async(
-            "DELETE",
-            self._api,
-            "/api/v1/sharedtable/{sharedTableId}",
-            path_params={
-                "sharedTableId": shared_table_id,
-            },
-            timeout=timeout,
-        )
-        return BaseResponseString.model_validate(response.json())
-
     def get_shared_table(
         self,
         *,
@@ -5743,6 +5673,76 @@ class Wdata(BaseNamespace):
             timeout=timeout,
         )
         return BaseResponseSharedTableDto.model_validate(response.json())
+
+    def delete_shared_table(
+        self,
+        *,
+        shared_table_id: str,
+        timeout: Optional[float] = None,
+    ) -> BaseResponseString:
+        """Delete a single shared table
+
+        Deletes the linkages between the source and destination of a shared
+        table that matches
+        the provided ID; the actual table itself is left intact. If no such
+        shared table exists,
+        this is a no-op.
+
+        Args:
+            shared_table_id: The unique identifier of the shared table
+            timeout: Override the default request timeout (seconds).
+
+        Returns:
+            BaseResponseString
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 423, 429, 500).
+        """
+        response = self._client.request(
+            "DELETE",
+            self._api,
+            "/api/v1/sharedtable/{sharedTableId}",
+            path_params={
+                "sharedTableId": shared_table_id,
+            },
+            timeout=timeout,
+        )
+        return BaseResponseString.model_validate(response.json())
+
+    async def delete_shared_table_async(
+        self,
+        *,
+        shared_table_id: str,
+        timeout: Optional[float] = None,
+    ) -> BaseResponseString:
+        """Delete a single shared table (async)
+
+        Deletes the linkages between the source and destination of a shared
+        table that matches
+        the provided ID; the actual table itself is left intact. If no such
+        shared table exists,
+        this is a no-op.
+
+        Args:
+            shared_table_id: The unique identifier of the shared table
+            timeout: Override the default request timeout (seconds).
+
+        Returns:
+            BaseResponseString
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 423, 429, 500).
+        """
+        response = await self._client.request_async(
+            "DELETE",
+            self._api,
+            "/api/v1/sharedtable/{sharedTableId}",
+            path_params={
+                "sharedTableId": shared_table_id,
+            },
+            timeout=timeout,
+        )
+        return BaseResponseString.model_validate(response.json())
 
     def get_tables(
         self,
@@ -5947,68 +5947,6 @@ class Wdata(BaseNamespace):
             timeout=timeout,
         )
         return BaseResponseTableDto.model_validate(response.json())
-
-    def delete_table(
-        self,
-        *,
-        table_id: str,
-        timeout: Optional[float] = None,
-    ) -> BaseResponseString:
-        """Delete a single table
-
-        Soft-deletes the table with the provided ID.
-
-        Args:
-            table_id: The unique identifier of the table
-            timeout: Override the default request timeout (seconds).
-
-        Returns:
-            BaseResponseString
-
-        Raises:
-            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 423, 429, 500).
-        """
-        response = self._client.request(
-            "DELETE",
-            self._api,
-            "/api/v1/table/{tableId}",
-            path_params={
-                "tableId": table_id,
-            },
-            timeout=timeout,
-        )
-        return BaseResponseString.model_validate(response.json())
-
-    async def delete_table_async(
-        self,
-        *,
-        table_id: str,
-        timeout: Optional[float] = None,
-    ) -> BaseResponseString:
-        """Delete a single table (async)
-
-        Soft-deletes the table with the provided ID.
-
-        Args:
-            table_id: The unique identifier of the table
-            timeout: Override the default request timeout (seconds).
-
-        Returns:
-            BaseResponseString
-
-        Raises:
-            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 423, 429, 500).
-        """
-        response = await self._client.request_async(
-            "DELETE",
-            self._api,
-            "/api/v1/table/{tableId}",
-            path_params={
-                "tableId": table_id,
-            },
-            timeout=timeout,
-        )
-        return BaseResponseString.model_validate(response.json())
 
     def get_table(
         self,
@@ -6227,6 +6165,68 @@ class Wdata(BaseNamespace):
             timeout=timeout,
         )
         return BaseResponseTableDto.model_validate(response.json())
+
+    def delete_table(
+        self,
+        *,
+        table_id: str,
+        timeout: Optional[float] = None,
+    ) -> BaseResponseString:
+        """Delete a single table
+
+        Soft-deletes the table with the provided ID.
+
+        Args:
+            table_id: The unique identifier of the table
+            timeout: Override the default request timeout (seconds).
+
+        Returns:
+            BaseResponseString
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 423, 429, 500).
+        """
+        response = self._client.request(
+            "DELETE",
+            self._api,
+            "/api/v1/table/{tableId}",
+            path_params={
+                "tableId": table_id,
+            },
+            timeout=timeout,
+        )
+        return BaseResponseString.model_validate(response.json())
+
+    async def delete_table_async(
+        self,
+        *,
+        table_id: str,
+        timeout: Optional[float] = None,
+    ) -> BaseResponseString:
+        """Delete a single table (async)
+
+        Soft-deletes the table with the provided ID.
+
+        Args:
+            table_id: The unique identifier of the table
+            timeout: Override the default request timeout (seconds).
+
+        Returns:
+            BaseResponseString
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 423, 429, 500).
+        """
+        response = await self._client.request_async(
+            "DELETE",
+            self._api,
+            "/api/v1/table/{tableId}",
+            path_params={
+                "tableId": table_id,
+            },
+            timeout=timeout,
+        )
+        return BaseResponseString.model_validate(response.json())
 
     def get_dependents(
         self,
@@ -6848,70 +6848,6 @@ class Wdata(BaseNamespace):
         )
         return BaseResponseTagDto.model_validate(response.json())
 
-    def delete_tag(
-        self,
-        *,
-        tag_id: str,
-        timeout: Optional[float] = None,
-    ) -> BaseResponseString:
-        """Delete a single tag
-
-        Deletes the tag with the provided ID. If no such tag is found, this is a
-        no-op.
-
-        Args:
-            tag_id: The unique identifier of the tag
-            timeout: Override the default request timeout (seconds).
-
-        Returns:
-            BaseResponseString
-
-        Raises:
-            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 423, 429, 500).
-        """
-        response = self._client.request(
-            "DELETE",
-            self._api,
-            "/api/v1/tag/{tagId}",
-            path_params={
-                "tagId": tag_id,
-            },
-            timeout=timeout,
-        )
-        return BaseResponseString.model_validate(response.json())
-
-    async def delete_tag_async(
-        self,
-        *,
-        tag_id: str,
-        timeout: Optional[float] = None,
-    ) -> BaseResponseString:
-        """Delete a single tag (async)
-
-        Deletes the tag with the provided ID. If no such tag is found, this is a
-        no-op.
-
-        Args:
-            tag_id: The unique identifier of the tag
-            timeout: Override the default request timeout (seconds).
-
-        Returns:
-            BaseResponseString
-
-        Raises:
-            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 423, 429, 500).
-        """
-        response = await self._client.request_async(
-            "DELETE",
-            self._api,
-            "/api/v1/tag/{tagId}",
-            path_params={
-                "tagId": tag_id,
-            },
-            timeout=timeout,
-        )
-        return BaseResponseString.model_validate(response.json())
-
     def update_tag(
         self,
         *,
@@ -6999,6 +6935,70 @@ class Wdata(BaseNamespace):
             timeout=timeout,
         )
         return BaseResponseTagDto.model_validate(response.json())
+
+    def delete_tag(
+        self,
+        *,
+        tag_id: str,
+        timeout: Optional[float] = None,
+    ) -> BaseResponseString:
+        """Delete a single tag
+
+        Deletes the tag with the provided ID. If no such tag is found, this is a
+        no-op.
+
+        Args:
+            tag_id: The unique identifier of the tag
+            timeout: Override the default request timeout (seconds).
+
+        Returns:
+            BaseResponseString
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 423, 429, 500).
+        """
+        response = self._client.request(
+            "DELETE",
+            self._api,
+            "/api/v1/tag/{tagId}",
+            path_params={
+                "tagId": tag_id,
+            },
+            timeout=timeout,
+        )
+        return BaseResponseString.model_validate(response.json())
+
+    async def delete_tag_async(
+        self,
+        *,
+        tag_id: str,
+        timeout: Optional[float] = None,
+    ) -> BaseResponseString:
+        """Delete a single tag (async)
+
+        Deletes the tag with the provided ID. If no such tag is found, this is a
+        no-op.
+
+        Args:
+            tag_id: The unique identifier of the tag
+            timeout: Override the default request timeout (seconds).
+
+        Returns:
+            BaseResponseString
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 423, 429, 500).
+        """
+        response = await self._client.request_async(
+            "DELETE",
+            self._api,
+            "/api/v1/tag/{tagId}",
+            path_params={
+                "tagId": tag_id,
+            },
+            timeout=timeout,
+        )
+        return BaseResponseString.model_validate(response.json())
 
     def create_token(
         self,

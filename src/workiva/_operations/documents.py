@@ -1206,66 +1206,6 @@ class Documents(BaseNamespace):
         )
         return Section.model_validate(response.json())
 
-    def delete_section_by_id(
-        self,
-        *,
-        document_id: str,
-        section_id: str,
-        timeout: Optional[float] = None,
-    ) -> httpx.Response:
-        """Delete a single section
-
-        Deletes a [section](ref:documents#section) given its ID.
-
-        Args:
-            document_id: The unique identifier of the document
-            section_id: The unique identifier of the section
-            timeout: Override the default request timeout (seconds).
-
-        Raises:
-            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
-        """
-        return self._client.request(
-            "DELETE",
-            self._api,
-            "/documents/{documentId}/sections/{sectionId}",
-            path_params={
-                "documentId": document_id,
-                "sectionId": section_id,
-            },
-            timeout=timeout,
-        )
-
-    async def delete_section_by_id_async(
-        self,
-        *,
-        document_id: str,
-        section_id: str,
-        timeout: Optional[float] = None,
-    ) -> httpx.Response:
-        """Delete a single section (async)
-
-        Deletes a [section](ref:documents#section) given its ID.
-
-        Args:
-            document_id: The unique identifier of the document
-            section_id: The unique identifier of the section
-            timeout: Override the default request timeout (seconds).
-
-        Raises:
-            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
-        """
-        return await self._client.request_async(
-            "DELETE",
-            self._api,
-            "/documents/{documentId}/sections/{sectionId}",
-            path_params={
-                "documentId": document_id,
-                "sectionId": section_id,
-            },
-            timeout=timeout,
-        )
-
     def get_section_by_id(
         self,
         *,
@@ -1349,6 +1289,66 @@ class Documents(BaseNamespace):
             timeout=timeout,
         )
         return Section.model_validate(response.json())
+
+    def delete_section_by_id(
+        self,
+        *,
+        document_id: str,
+        section_id: str,
+        timeout: Optional[float] = None,
+    ) -> httpx.Response:
+        """Delete a single section
+
+        Deletes a [section](ref:documents#section) given its ID.
+
+        Args:
+            document_id: The unique identifier of the document
+            section_id: The unique identifier of the section
+            timeout: Override the default request timeout (seconds).
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
+        """
+        return self._client.request(
+            "DELETE",
+            self._api,
+            "/documents/{documentId}/sections/{sectionId}",
+            path_params={
+                "documentId": document_id,
+                "sectionId": section_id,
+            },
+            timeout=timeout,
+        )
+
+    async def delete_section_by_id_async(
+        self,
+        *,
+        document_id: str,
+        section_id: str,
+        timeout: Optional[float] = None,
+    ) -> httpx.Response:
+        """Delete a single section (async)
+
+        Deletes a [section](ref:documents#section) given its ID.
+
+        Args:
+            document_id: The unique identifier of the document
+            section_id: The unique identifier of the section
+            timeout: Override the default request timeout (seconds).
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
+        """
+        return await self._client.request_async(
+            "DELETE",
+            self._api,
+            "/documents/{documentId}/sections/{sectionId}",
+            path_params={
+                "documentId": document_id,
+                "sectionId": section_id,
+            },
+            timeout=timeout,
+        )
 
     def partially_update_section_by_id(
         self,

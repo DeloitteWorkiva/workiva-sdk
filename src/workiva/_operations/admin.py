@@ -681,66 +681,6 @@ class Admin(BaseNamespace):
         )
         return OrganizationUser.model_validate(response.json())
 
-    def delete_organization_user_by_id(
-        self,
-        *,
-        organization_id: str,
-        user_id: str,
-        timeout: Optional[float] = None,
-    ) -> httpx.Response:
-        """Delete an organization user
-
-        Delete a user from an organization
-
-        Args:
-            organization_id: The unique identifier of the organization
-            user_id: The unique identifier of the user
-            timeout: Override the default request timeout (seconds).
-
-        Raises:
-            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
-        """
-        return self._client.request(
-            "DELETE",
-            self._api,
-            "/organizations/{organizationId}/users/{userId}",
-            path_params={
-                "organizationId": organization_id,
-                "userId": user_id,
-            },
-            timeout=timeout,
-        )
-
-    async def delete_organization_user_by_id_async(
-        self,
-        *,
-        organization_id: str,
-        user_id: str,
-        timeout: Optional[float] = None,
-    ) -> httpx.Response:
-        """Delete an organization user (async)
-
-        Delete a user from an organization
-
-        Args:
-            organization_id: The unique identifier of the organization
-            user_id: The unique identifier of the user
-            timeout: Override the default request timeout (seconds).
-
-        Raises:
-            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
-        """
-        return await self._client.request_async(
-            "DELETE",
-            self._api,
-            "/organizations/{organizationId}/users/{userId}",
-            path_params={
-                "organizationId": organization_id,
-                "userId": user_id,
-            },
-            timeout=timeout,
-        )
-
     def get_organization_user_by_id(
         self,
         *,
@@ -808,6 +748,66 @@ class Admin(BaseNamespace):
             timeout=timeout,
         )
         return OrganizationUser.model_validate(response.json())
+
+    def delete_organization_user_by_id(
+        self,
+        *,
+        organization_id: str,
+        user_id: str,
+        timeout: Optional[float] = None,
+    ) -> httpx.Response:
+        """Delete an organization user
+
+        Delete a user from an organization
+
+        Args:
+            organization_id: The unique identifier of the organization
+            user_id: The unique identifier of the user
+            timeout: Override the default request timeout (seconds).
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
+        """
+        return self._client.request(
+            "DELETE",
+            self._api,
+            "/organizations/{organizationId}/users/{userId}",
+            path_params={
+                "organizationId": organization_id,
+                "userId": user_id,
+            },
+            timeout=timeout,
+        )
+
+    async def delete_organization_user_by_id_async(
+        self,
+        *,
+        organization_id: str,
+        user_id: str,
+        timeout: Optional[float] = None,
+    ) -> httpx.Response:
+        """Delete an organization user (async)
+
+        Delete a user from an organization
+
+        Args:
+            organization_id: The unique identifier of the organization
+            user_id: The unique identifier of the user
+            timeout: Override the default request timeout (seconds).
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
+        """
+        return await self._client.request_async(
+            "DELETE",
+            self._api,
+            "/organizations/{organizationId}/users/{userId}",
+            path_params={
+                "organizationId": organization_id,
+                "userId": user_id,
+            },
+            timeout=timeout,
+        )
 
     def partially_update_organization_user_by_id(
         self,
@@ -1625,72 +1625,6 @@ class Admin(BaseNamespace):
         )
         return WorkspaceGroup.model_validate(response.json())
 
-    def delete_workspace_group_by_id(
-        self,
-        *,
-        organization_id: str,
-        workspace_id: str,
-        group_id: str,
-        timeout: Optional[float] = None,
-    ) -> httpx.Response:
-        """Delete a single group
-
-        Deletes a group given its ID.
-
-        Args:
-            organization_id: The unique identifier of the organization
-            workspace_id: The unique identifier of the workspace
-            group_id: The unique identifier of the group
-            timeout: Override the default request timeout (seconds).
-
-        Raises:
-            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
-        """
-        return self._client.request(
-            "DELETE",
-            self._api,
-            "/organizations/{organizationId}/workspaces/{workspaceId}/groups/{groupId}",
-            path_params={
-                "organizationId": organization_id,
-                "workspaceId": workspace_id,
-                "groupId": group_id,
-            },
-            timeout=timeout,
-        )
-
-    async def delete_workspace_group_by_id_async(
-        self,
-        *,
-        organization_id: str,
-        workspace_id: str,
-        group_id: str,
-        timeout: Optional[float] = None,
-    ) -> httpx.Response:
-        """Delete a single group (async)
-
-        Deletes a group given its ID.
-
-        Args:
-            organization_id: The unique identifier of the organization
-            workspace_id: The unique identifier of the workspace
-            group_id: The unique identifier of the group
-            timeout: Override the default request timeout (seconds).
-
-        Raises:
-            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
-        """
-        return await self._client.request_async(
-            "DELETE",
-            self._api,
-            "/organizations/{organizationId}/workspaces/{workspaceId}/groups/{groupId}",
-            path_params={
-                "organizationId": organization_id,
-                "workspaceId": workspace_id,
-                "groupId": group_id,
-            },
-            timeout=timeout,
-        )
-
     def get_workspace_group_by_id(
         self,
         *,
@@ -1774,6 +1708,72 @@ class Admin(BaseNamespace):
             timeout=timeout,
         )
         return WorkspaceGroup.model_validate(response.json())
+
+    def delete_workspace_group_by_id(
+        self,
+        *,
+        organization_id: str,
+        workspace_id: str,
+        group_id: str,
+        timeout: Optional[float] = None,
+    ) -> httpx.Response:
+        """Delete a single group
+
+        Deletes a group given its ID.
+
+        Args:
+            organization_id: The unique identifier of the organization
+            workspace_id: The unique identifier of the workspace
+            group_id: The unique identifier of the group
+            timeout: Override the default request timeout (seconds).
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
+        """
+        return self._client.request(
+            "DELETE",
+            self._api,
+            "/organizations/{organizationId}/workspaces/{workspaceId}/groups/{groupId}",
+            path_params={
+                "organizationId": organization_id,
+                "workspaceId": workspace_id,
+                "groupId": group_id,
+            },
+            timeout=timeout,
+        )
+
+    async def delete_workspace_group_by_id_async(
+        self,
+        *,
+        organization_id: str,
+        workspace_id: str,
+        group_id: str,
+        timeout: Optional[float] = None,
+    ) -> httpx.Response:
+        """Delete a single group (async)
+
+        Deletes a group given its ID.
+
+        Args:
+            organization_id: The unique identifier of the organization
+            workspace_id: The unique identifier of the workspace
+            group_id: The unique identifier of the group
+            timeout: Override the default request timeout (seconds).
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
+        """
+        return await self._client.request_async(
+            "DELETE",
+            self._api,
+            "/organizations/{organizationId}/workspaces/{workspaceId}/groups/{groupId}",
+            path_params={
+                "organizationId": organization_id,
+                "workspaceId": workspace_id,
+                "groupId": group_id,
+            },
+            timeout=timeout,
+        )
 
     def partially_update_workspace_group_by_id(
         self,
@@ -2317,72 +2317,6 @@ class Admin(BaseNamespace):
         )
         return WorkspaceMembership.model_validate(response.json())
 
-    def delete_workspace_membership_by_id(
-        self,
-        *,
-        organization_id: str,
-        workspace_id: str,
-        workspace_membership_id: str,
-        timeout: Optional[float] = None,
-    ) -> httpx.Response:
-        """Delete a workspace membership
-
-        Revoke a user's membership to a `Workspace`.
-
-        Args:
-            organization_id: The unique identifier of the organization
-            workspace_id: The unique identifier of the workspace
-            workspace_membership_id: The unique identifier of the workspace membership
-            timeout: Override the default request timeout (seconds).
-
-        Raises:
-            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
-        """
-        return self._client.request(
-            "DELETE",
-            self._api,
-            "/organizations/{organizationId}/workspaces/{workspaceId}/memberships/{workspaceMembershipId}",
-            path_params={
-                "organizationId": organization_id,
-                "workspaceId": workspace_id,
-                "workspaceMembershipId": workspace_membership_id,
-            },
-            timeout=timeout,
-        )
-
-    async def delete_workspace_membership_by_id_async(
-        self,
-        *,
-        organization_id: str,
-        workspace_id: str,
-        workspace_membership_id: str,
-        timeout: Optional[float] = None,
-    ) -> httpx.Response:
-        """Delete a workspace membership (async)
-
-        Revoke a user's membership to a `Workspace`.
-
-        Args:
-            organization_id: The unique identifier of the organization
-            workspace_id: The unique identifier of the workspace
-            workspace_membership_id: The unique identifier of the workspace membership
-            timeout: Override the default request timeout (seconds).
-
-        Raises:
-            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
-        """
-        return await self._client.request_async(
-            "DELETE",
-            self._api,
-            "/organizations/{organizationId}/workspaces/{workspaceId}/memberships/{workspaceMembershipId}",
-            path_params={
-                "organizationId": organization_id,
-                "workspaceId": workspace_id,
-                "workspaceMembershipId": workspace_membership_id,
-            },
-            timeout=timeout,
-        )
-
     def get_workspace_membership_by_id(
         self,
         *,
@@ -2456,6 +2390,72 @@ class Admin(BaseNamespace):
             timeout=timeout,
         )
         return WorkspaceMembership.model_validate(response.json())
+
+    def delete_workspace_membership_by_id(
+        self,
+        *,
+        organization_id: str,
+        workspace_id: str,
+        workspace_membership_id: str,
+        timeout: Optional[float] = None,
+    ) -> httpx.Response:
+        """Delete a workspace membership
+
+        Revoke a user's membership to a `Workspace`.
+
+        Args:
+            organization_id: The unique identifier of the organization
+            workspace_id: The unique identifier of the workspace
+            workspace_membership_id: The unique identifier of the workspace membership
+            timeout: Override the default request timeout (seconds).
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
+        """
+        return self._client.request(
+            "DELETE",
+            self._api,
+            "/organizations/{organizationId}/workspaces/{workspaceId}/memberships/{workspaceMembershipId}",
+            path_params={
+                "organizationId": organization_id,
+                "workspaceId": workspace_id,
+                "workspaceMembershipId": workspace_membership_id,
+            },
+            timeout=timeout,
+        )
+
+    async def delete_workspace_membership_by_id_async(
+        self,
+        *,
+        organization_id: str,
+        workspace_id: str,
+        workspace_membership_id: str,
+        timeout: Optional[float] = None,
+    ) -> httpx.Response:
+        """Delete a workspace membership (async)
+
+        Revoke a user's membership to a `Workspace`.
+
+        Args:
+            organization_id: The unique identifier of the organization
+            workspace_id: The unique identifier of the workspace
+            workspace_membership_id: The unique identifier of the workspace membership
+            timeout: Override the default request timeout (seconds).
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
+        """
+        return await self._client.request_async(
+            "DELETE",
+            self._api,
+            "/organizations/{organizationId}/workspaces/{workspaceId}/memberships/{workspaceMembershipId}",
+            path_params={
+                "organizationId": organization_id,
+                "workspaceId": workspace_id,
+                "workspaceMembershipId": workspace_membership_id,
+            },
+            timeout=timeout,
+        )
 
     def get_organization_workspace_membership_roles(
         self,
