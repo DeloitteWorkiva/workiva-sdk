@@ -250,60 +250,6 @@ class Tasks(BaseNamespace):
         )
         return Task.model_validate(response.json())
 
-    def delete_task_by_id(
-        self,
-        *,
-        task_id: str,
-        timeout: Optional[float] = None,
-    ) -> httpx.Response:
-        """Delete a single task
-
-        Deletes a [task](ref:tasks#task) given its ID
-
-        Args:
-            task_id: The unique identifier of the task
-            timeout: Override the default request timeout (seconds).
-
-        Raises:
-            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
-        """
-        return self._client.request(
-            "DELETE",
-            self._api,
-            "/tasks/{taskId}",
-            path_params={
-                "taskId": task_id,
-            },
-            timeout=timeout,
-        )
-
-    async def delete_task_by_id_async(
-        self,
-        *,
-        task_id: str,
-        timeout: Optional[float] = None,
-    ) -> httpx.Response:
-        """Delete a single task (async)
-
-        Deletes a [task](ref:tasks#task) given its ID
-
-        Args:
-            task_id: The unique identifier of the task
-            timeout: Override the default request timeout (seconds).
-
-        Raises:
-            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
-        """
-        return await self._client.request_async(
-            "DELETE",
-            self._api,
-            "/tasks/{taskId}",
-            path_params={
-                "taskId": task_id,
-            },
-            timeout=timeout,
-        )
-
     def get_task_by_id(
         self,
         *,
@@ -365,6 +311,60 @@ class Tasks(BaseNamespace):
             timeout=timeout,
         )
         return Task.model_validate(response.json())
+
+    def delete_task_by_id(
+        self,
+        *,
+        task_id: str,
+        timeout: Optional[float] = None,
+    ) -> httpx.Response:
+        """Delete a single task
+
+        Deletes a [task](ref:tasks#task) given its ID
+
+        Args:
+            task_id: The unique identifier of the task
+            timeout: Override the default request timeout (seconds).
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
+        """
+        return self._client.request(
+            "DELETE",
+            self._api,
+            "/tasks/{taskId}",
+            path_params={
+                "taskId": task_id,
+            },
+            timeout=timeout,
+        )
+
+    async def delete_task_by_id_async(
+        self,
+        *,
+        task_id: str,
+        timeout: Optional[float] = None,
+    ) -> httpx.Response:
+        """Delete a single task (async)
+
+        Deletes a [task](ref:tasks#task) given its ID
+
+        Args:
+            task_id: The unique identifier of the task
+            timeout: Override the default request timeout (seconds).
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
+        """
+        return await self._client.request_async(
+            "DELETE",
+            self._api,
+            "/tasks/{taskId}",
+            path_params={
+                "taskId": task_id,
+            },
+            timeout=timeout,
+        )
 
     def partially_update_task_by_id(
         self,

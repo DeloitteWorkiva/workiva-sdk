@@ -893,6 +893,12 @@ components:
           type: string
           maxLength: 255
           minLength: 0
+        listType:
+          description: |-
+            If the parameter is of type select, this is the type of the select list. This is
+            read only and is for identifying a static or entity select list.
+          type: string
+          readOnly: true
         mode:
           description: The mode of the parameter
           type: string
@@ -1701,6 +1707,11 @@ components:
           type: string
           maxLength: 255
           minLength: 0
+        listType:
+          description: |-
+            If the query parameter is of type select, this is the listType and is either
+            static or external_legal_entity.
+          type: string
         mode:
           description: The mode of the query parameter
           type: string

@@ -1399,66 +1399,6 @@ class Spreadsheets(BaseNamespace):
         )
         return Sheet.model_validate(response.json())
 
-    def delete_sheet_by_id(
-        self,
-        *,
-        spreadsheet_id: str,
-        sheet_id: str,
-        timeout: Optional[float] = None,
-    ) -> httpx.Response:
-        """Delete a single sheet
-
-        Deletes a [sheet](ref:spreadsheets#sheet) given its ID.
-
-        Args:
-            spreadsheet_id: The unique identifier of the spreadsheet
-            sheet_id: The unique identifier of the sheet
-            timeout: Override the default request timeout (seconds).
-
-        Raises:
-            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
-        """
-        return self._client.request(
-            "DELETE",
-            self._api,
-            "/spreadsheets/{spreadsheetId}/sheets/{sheetId}",
-            path_params={
-                "spreadsheetId": spreadsheet_id,
-                "sheetId": sheet_id,
-            },
-            timeout=timeout,
-        )
-
-    async def delete_sheet_by_id_async(
-        self,
-        *,
-        spreadsheet_id: str,
-        sheet_id: str,
-        timeout: Optional[float] = None,
-    ) -> httpx.Response:
-        """Delete a single sheet (async)
-
-        Deletes a [sheet](ref:spreadsheets#sheet) given its ID.
-
-        Args:
-            spreadsheet_id: The unique identifier of the spreadsheet
-            sheet_id: The unique identifier of the sheet
-            timeout: Override the default request timeout (seconds).
-
-        Raises:
-            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
-        """
-        return await self._client.request_async(
-            "DELETE",
-            self._api,
-            "/spreadsheets/{spreadsheetId}/sheets/{sheetId}",
-            path_params={
-                "spreadsheetId": spreadsheet_id,
-                "sheetId": sheet_id,
-            },
-            timeout=timeout,
-        )
-
     def get_sheet_by_id(
         self,
         *,
@@ -1536,6 +1476,66 @@ class Spreadsheets(BaseNamespace):
             timeout=timeout,
         )
         return Sheet.model_validate(response.json())
+
+    def delete_sheet_by_id(
+        self,
+        *,
+        spreadsheet_id: str,
+        sheet_id: str,
+        timeout: Optional[float] = None,
+    ) -> httpx.Response:
+        """Delete a single sheet
+
+        Deletes a [sheet](ref:spreadsheets#sheet) given its ID.
+
+        Args:
+            spreadsheet_id: The unique identifier of the spreadsheet
+            sheet_id: The unique identifier of the sheet
+            timeout: Override the default request timeout (seconds).
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
+        """
+        return self._client.request(
+            "DELETE",
+            self._api,
+            "/spreadsheets/{spreadsheetId}/sheets/{sheetId}",
+            path_params={
+                "spreadsheetId": spreadsheet_id,
+                "sheetId": sheet_id,
+            },
+            timeout=timeout,
+        )
+
+    async def delete_sheet_by_id_async(
+        self,
+        *,
+        spreadsheet_id: str,
+        sheet_id: str,
+        timeout: Optional[float] = None,
+    ) -> httpx.Response:
+        """Delete a single sheet (async)
+
+        Deletes a [sheet](ref:spreadsheets#sheet) given its ID.
+
+        Args:
+            spreadsheet_id: The unique identifier of the spreadsheet
+            sheet_id: The unique identifier of the sheet
+            timeout: Override the default request timeout (seconds).
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
+        """
+        return await self._client.request_async(
+            "DELETE",
+            self._api,
+            "/spreadsheets/{spreadsheetId}/sheets/{sheetId}",
+            path_params={
+                "spreadsheetId": spreadsheet_id,
+                "sheetId": sheet_id,
+            },
+            timeout=timeout,
+        )
 
     def partially_update_sheet_by_id(
         self,
