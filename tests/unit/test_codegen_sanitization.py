@@ -8,7 +8,7 @@ import pytest
 # Add scripts/ to path so codegen package is importable (same as generate_sdk.py)
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent.parent / "scripts"))
 
-from codegen.operations import (
+from codegen.sanitize import (
     _sanitize_string_literal,
     _sanitize_docstring,
     _validate_identifier,
