@@ -18,6 +18,37 @@ from codegen.pagination import PaginationConfig, resolve_pagination
 
 HTTP_METHODS = {"get", "post", "put", "delete", "patch", "head", "options", "trace"}
 
+
+# ---------------------------------------------------------------------------
+# Sanitization helpers — guard against OAS-spec injection into generated code
+# ---------------------------------------------------------------------------
+
+def _sanitize_string_literal(value: str) -> str:
+    """Escape characters that would break a Python string literal."""
+    return value.replace("\\", "\\\\").replace('"', '\\"')
+
+
+def _sanitize_docstring(value: str) -> str:
+    """Escape triple-quote sequences in docstrings."""
+    return value.replace('"""', r'\"\"\"')
+
+
+def _validate_identifier(name: str, context: str) -> str:
+    """Validate that a name is a valid Python identifier. Raise on failure."""
+    if not name.isidentifier():
+        raise ValueError(f"Invalid Python identifier from OAS spec ({context}): {name!r}")
+    return name
+
+
+_SAFE_ENUM_RE = re.compile(r'^[a-zA-Z0-9_\-. /,:;()+@#&=*!?]+$')
+
+
+def _validate_enum_value(value: str) -> str:
+    """Validate enum value contains only safe characters."""
+    if not _SAFE_ENUM_RE.match(value):
+        raise ValueError(f"Unsafe enum value in OAS spec: {value!r}")
+    return _sanitize_string_literal(value)
+
 # Map of OpenAPI type → Python type annotation
 TYPE_MAP: dict[str, str] = {
     "string": "str",
@@ -170,7 +201,8 @@ def _get_python_type(schema: dict[str, Any], spec: dict[str, Any]) -> str:
             return TYPE_MAP[resolved["type"]]
         # Extract model name from #/components/schemas/ModelName
         parts = ref.split("/")
-        return parts[-1] if parts else "Any"
+        model_name = parts[-1] if parts else "Any"
+        return _validate_identifier(model_name, f"$ref={ref}")
 
     schema_type = schema.get("type", "object")
     if schema_type == "array":
@@ -200,7 +232,7 @@ def _extract_param(
     # Check for enum values — use Literal[...] instead of plain str
     enum_values = schema.get("enum")
     if enum_values and schema.get("type") == "string":
-        quoted = ", ".join(f'"{v}"' for v in enum_values)
+        quoted = ", ".join(f'"{_validate_enum_value(v)}"' for v in enum_values)
         python_type = f"Literal[{quoted}]"
     else:
         python_type = _get_python_type(schema, spec)
@@ -228,7 +260,7 @@ def _extract_param(
     python_name = _snake_case(override or clean_name)
 
     return ParamSpec(
-        name=name,
+        name=_sanitize_string_literal(name),
         python_name=python_name,
         location=param_data.get("in", "query"),
         required=required,
@@ -328,7 +360,7 @@ def _extract_body_fields(
         description = prop_schema.get("description", "")
 
         fields.append(BodyFieldSpec(
-            name=prop_name,
+            name=_sanitize_string_literal(prop_name),
             python_name=python_name,
             python_type=python_type,
             required=prop_name in required_set and not prop_schema.get("readOnly", False),
@@ -360,7 +392,7 @@ def _resolve_body_field_type(prop_schema: dict[str, Any], spec: dict[str, Any]) 
     # Enum → Literal[...]
     enum_values = prop_schema.get("enum")
     if enum_values and prop_schema.get("type") == "string":
-        quoted = ", ".join(f'"{v}"' for v in enum_values)
+        quoted = ", ".join(f'"{_validate_enum_value(v)}"' for v in enum_values)
         return f"Literal[{quoted}]"
 
     # Primitives
@@ -513,9 +545,9 @@ def parse_spec(
                 operation_id=operation_id,
                 method_name=method_name,
                 http_method=method.upper(),
-                path=path,
-                summary=operation.get("summary", ""),
-                description=operation.get("description", ""),
+                path=_sanitize_string_literal(path),
+                summary=_sanitize_docstring(operation.get("summary", "")),
+                description=_sanitize_docstring(operation.get("description", "")),
                 tags=tags,
                 params=params,
                 request_body=request_body,

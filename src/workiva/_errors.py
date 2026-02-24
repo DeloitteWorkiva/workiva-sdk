@@ -81,6 +81,19 @@ _STATUS_MAP: dict[int, type[WorkivaAPIError]] = {
 }
 
 
+def _redact_response(response: httpx.Response) -> httpx.Response:
+    """Return response with Authorization header redacted from the request."""
+    try:
+        request = response.request
+    except RuntimeError:
+        return response
+    if request and "authorization" in request.headers:
+        headers = dict(request.headers)
+        headers["authorization"] = "[REDACTED]"
+        request.headers = httpx.Headers(headers)
+    return response
+
+
 def raise_for_status(response: httpx.Response) -> None:
     """Raise the appropriate WorkivaAPIError for non-2xx responses.
 
@@ -112,7 +125,7 @@ def raise_for_status(response: httpx.Response) -> None:
     raise exc_cls(
         message,
         status_code=status,
-        response=response,
+        response=_redact_response(response),
         body=body,
     )
 

@@ -44,9 +44,23 @@ def _parse_retry_after(response: httpx.Response) -> Optional[float]:
     return None
 
 
+_IDEMPOTENT_METHODS = frozenset({"GET", "HEAD", "OPTIONS", "PUT", "DELETE"})
+
+
 def _should_retry(status_code: int, config: RetryConfig) -> bool:
     """Check if the status code matches any retry-eligible code."""
     return status_code in config.status_codes
+
+
+def _should_retry_method(request: httpx.Request, status_code: int, config: RetryConfig) -> bool:
+    """Check if a request should be retried based on method and status code."""
+    if not _should_retry(status_code, config):
+        return False
+    # Always retry 429 (rate limit) regardless of method
+    if status_code == 429:
+        return True
+    # For server errors (5xx), only retry idempotent methods
+    return request.method in _IDEMPOTENT_METHODS
 
 
 def _sleep_interval(
@@ -97,7 +111,7 @@ class RetryTransport(httpx.BaseTransport):
                 attempt += 1
                 continue
 
-            if not _should_retry(response.status_code, self._config):
+            if not _should_retry_method(request, response.status_code, self._config):
                 return response
 
             elapsed = round(time.time() * 1000) - start_ms
@@ -143,7 +157,7 @@ class AsyncRetryTransport(httpx.AsyncBaseTransport):
                 attempt += 1
                 continue
 
-            if not _should_retry(response.status_code, self._config):
+            if not _should_retry_method(request, response.status_code, self._config):
                 return response
 
             elapsed = round(time.time() * 1000) - start_ms

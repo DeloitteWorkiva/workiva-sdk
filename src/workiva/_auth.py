@@ -64,9 +64,8 @@ class OAuth2ClientCredentials(httpx.Auth):
         self._client_secret = client_secret
         self._token_url = token_url
         self._token_transport = token_transport
-        self._session_key = hashlib.md5(
+        self._session_key = hashlib.sha256(
             f"{client_id}:{client_secret}".encode(),
-            usedforsecurity=False,
         ).hexdigest()
         self._token_client: Optional[httpx.Client] = None
 
@@ -136,7 +135,10 @@ class OAuth2ClientCredentials(httpx.Auth):
             kwargs: dict[str, Any] = {}
             if self._token_transport is not None:
                 kwargs["transport"] = self._token_transport
-            self._token_client = httpx.Client(**kwargs)
+            self._token_client = httpx.Client(
+                timeout=httpx.Timeout(30.0, connect=10.0),
+                **kwargs,
+            )
 
         resp = self._token_client.post(
             self._token_url,
@@ -146,8 +148,7 @@ class OAuth2ClientCredentials(httpx.Auth):
 
         if not (200 <= resp.status_code < 300):
             raise TokenAcquisitionError(
-                f"Token request failed with status {resp.status_code}: "
-                f"{resp.text[:500]}"
+                f"Token request failed with status {resp.status_code}"
             )
 
         data = resp.json()
@@ -180,6 +181,12 @@ class OAuth2ClientCredentials(httpx.Auth):
         with cls._global_lock:
             cls._cache.clear()
             cls._client_locks.clear()
+
+    def close(self) -> None:
+        """Close the internal token client, releasing connections."""
+        if self._token_client is not None:
+            self._token_client.close()
+            self._token_client = None
 
 
 class TokenAcquisitionError(WorkivaError):

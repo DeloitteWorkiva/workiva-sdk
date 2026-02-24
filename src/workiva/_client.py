@@ -276,6 +276,7 @@ class BaseClient:
 
     def close(self) -> None:
         """Close HTTP clients we created. Warns if async client was used without aclose()."""
+        self._auth.close()
         if self._client_created and not self._client_supplied and self._client is not None:
             self._client.close()
         if self._async_client_created and not self._async_client_supplied and self._async_client is not None:
@@ -292,6 +293,7 @@ class BaseClient:
         Handles the case where sync methods were used for token
         acquisition before switching to async.
         """
+        self._auth.close()
         if self._async_client_created and not self._async_client_supplied and self._async_client is not None:
             await self._async_client.aclose()
         if self._client_created and not self._client_supplied and self._client is not None:

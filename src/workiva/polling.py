@@ -32,6 +32,8 @@ _TERMINAL_STATUSES = frozenset({"completed", "cancelled", "failed"})
 
 _MAX_RETRY_AFTER = 60.0
 
+_MIN_RETRY_AFTER = 1.0  # Prevent tight polling loops
+
 
 def _extract_operation_id(headers: dict[str, Any]) -> str:
     """Extract the operation ID from the ``location`` response header."""
@@ -64,7 +66,7 @@ def _get_retry_after(headers: dict[str, Any], default: float = 2.0) -> float:
     # Try numeric seconds first
     try:
         seconds = float(value)
-        return min(max(seconds, 0), _MAX_RETRY_AFTER)
+        return min(max(seconds, _MIN_RETRY_AFTER), _MAX_RETRY_AFTER)
     except (TypeError, ValueError):
         pass
 
@@ -75,7 +77,7 @@ def _get_retry_after(headers: dict[str, Any], default: float = 2.0) -> float:
 
         retry_date = parsedate_to_datetime(str(value))
         delta = (retry_date - datetime.now(retry_date.tzinfo)).total_seconds()
-        return min(max(delta, 0), _MAX_RETRY_AFTER)
+        return min(max(delta, _MIN_RETRY_AFTER), _MAX_RETRY_AFTER)
     except (ValueError, TypeError):
         pass
 

@@ -13,6 +13,7 @@ from workiva._retry import (
     RetryTransport,
     _parse_retry_after,
     _should_retry,
+    _should_retry_method,
     _sleep_interval,
 )
 
@@ -111,6 +112,77 @@ class TestRetryTransport:
 
         response = transport.handle_request(httpx.Request("GET", "https://example.com"))
         assert response.status_code == 500
+
+
+class TestIdempotencyAwareRetry:
+    """POST should not be retried on 5xx, but should on 429."""
+
+    def test_post_500_not_retried(self):
+        """POST + 500 → should NOT retry (non-idempotent + server error)."""
+        inner = MagicMock()
+        inner.handle_request.return_value = httpx.Response(500)
+        config = RetryConfig(initial_interval_ms=1, max_elapsed_ms=5000)
+        transport = RetryTransport(inner, config)
+
+        response = transport.handle_request(httpx.Request("POST", "https://example.com"))
+        assert response.status_code == 500
+        assert inner.handle_request.call_count == 1
+
+    def test_post_429_retried(self):
+        """POST + 429 → SHOULD retry (rate limit always retried)."""
+        inner = MagicMock()
+        inner.handle_request.side_effect = [
+            httpx.Response(429, headers={"retry-after": "0"}),
+            httpx.Response(200),
+        ]
+        config = RetryConfig(initial_interval_ms=1, max_elapsed_ms=5000)
+        transport = RetryTransport(inner, config)
+
+        response = transport.handle_request(httpx.Request("POST", "https://example.com"))
+        assert response.status_code == 200
+        assert inner.handle_request.call_count == 2
+
+    def test_get_500_retried(self):
+        """GET + 500 → SHOULD retry (idempotent)."""
+        inner = MagicMock()
+        inner.handle_request.side_effect = [
+            httpx.Response(500),
+            httpx.Response(200),
+        ]
+        config = RetryConfig(initial_interval_ms=1, max_elapsed_ms=5000)
+        transport = RetryTransport(inner, config)
+
+        response = transport.handle_request(httpx.Request("GET", "https://example.com"))
+        assert response.status_code == 200
+        assert inner.handle_request.call_count == 2
+
+    def test_get_429_retried(self):
+        """GET + 429 → SHOULD retry."""
+        inner = MagicMock()
+        inner.handle_request.side_effect = [
+            httpx.Response(429, headers={"retry-after": "0"}),
+            httpx.Response(200),
+        ]
+        config = RetryConfig(initial_interval_ms=1, max_elapsed_ms=5000)
+        transport = RetryTransport(inner, config)
+
+        response = transport.handle_request(httpx.Request("GET", "https://example.com"))
+        assert response.status_code == 200
+        assert inner.handle_request.call_count == 2
+
+    def test_put_502_retried(self):
+        """PUT + 502 → SHOULD retry (idempotent)."""
+        inner = MagicMock()
+        inner.handle_request.side_effect = [
+            httpx.Response(502),
+            httpx.Response(200),
+        ]
+        config = RetryConfig(initial_interval_ms=1, max_elapsed_ms=5000)
+        transport = RetryTransport(inner, config)
+
+        response = transport.handle_request(httpx.Request("PUT", "https://example.com"))
+        assert response.status_code == 200
+        assert inner.handle_request.call_count == 2
 
 
 class TestRegionRouting:

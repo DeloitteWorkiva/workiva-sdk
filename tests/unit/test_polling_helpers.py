@@ -48,8 +48,8 @@ class TestGetRetryAfter:
     def test_capped_at_max(self):
         assert _get_retry_after({"retry-after": "120"}) == 60.0
 
-    def test_negative_clamped_to_zero(self):
-        assert _get_retry_after({"retry-after": "-5"}) == 0.0
+    def test_negative_clamped_to_minimum(self):
+        assert _get_retry_after({"retry-after": "-5"}) == 1.0
 
     def test_invalid_returns_default(self):
         assert _get_retry_after({"retry-after": "not-a-number"}) == 2.0
@@ -61,4 +61,24 @@ class TestGetRetryAfter:
         assert _get_retry_after({"retry-after": "1.5"}) == 1.5
 
     def test_zero_value(self):
-        assert _get_retry_after({"retry-after": "0"}) == 0.0
+        assert _get_retry_after({"retry-after": "0"}) == 1.0
+
+
+class TestRetryAfterMinimumFloor:
+    """Retry-After values below 1.0 should be floored to 1.0."""
+
+    def test_zero_retry_after_floored(self):
+        """Retry-After: 0 → should return 1.0."""
+        assert _get_retry_after({"retry-after": "0"}) == 1.0
+
+    def test_half_second_floored(self):
+        """Retry-After: 0.5 → should return 1.0."""
+        assert _get_retry_after({"retry-after": "0.5"}) == 1.0
+
+    def test_above_minimum_unchanged(self):
+        """Retry-After: 2.0 → should stay 2.0."""
+        assert _get_retry_after({"retry-after": "2.0"}) == 2.0
+
+    def test_exactly_one_unchanged(self):
+        """Retry-After: 1.0 → should stay 1.0."""
+        assert _get_retry_after({"retry-after": "1.0"}) == 1.0

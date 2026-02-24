@@ -6,6 +6,7 @@ Each API (platform, chains, wdata) gets its own model namespace under
 
 from __future__ import annotations
 
+import ast
 import os
 import re
 import shutil
@@ -193,7 +194,14 @@ def generate_models(
     if known_suffixed is not None:
         _check_numeric_suffixes(target_file, known_suffixed)
 
-    line_count = len(target_file.read_text().splitlines())
+    # Validate generated code is syntactically correct
+    source = target_file.read_text()
+    try:
+        ast.parse(source)
+    except SyntaxError as e:
+        raise RuntimeError(f"Generated model {target_file} has syntax errors: {e}") from e
+
+    line_count = len(source.splitlines())
     print(f"[OK] {api_name}: {target_file.name} ({line_count} lines)")
 
 

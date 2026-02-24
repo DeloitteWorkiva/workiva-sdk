@@ -25,7 +25,8 @@ from codegen.operations import parse_spec, _snake_case
 
 # Try to import jinja2 and formatting tools
 try:
-    from jinja2 import Environment, FileSystemLoader
+    from jinja2 import FileSystemLoader
+    from jinja2.sandbox import SandboxedEnvironment
 except ImportError:
     print("[ERROR] jinja2 not installed. Run: uv pip install jinja2")
     sys.exit(1)
@@ -100,7 +101,7 @@ def _format_source(source: str) -> str:
 
 
 def generate_operations(
-    env: Environment,
+    env: SandboxedEnvironment,
 ) -> int:
     """Parse all specs and generate namespace files.
 
@@ -232,7 +233,7 @@ def main() -> None:
 
     if do_operations:
         print("\n--- Phase 2: Generate Operations ---")
-        env = Environment(
+        env = SandboxedEnvironment(
             loader=FileSystemLoader(str(TEMPLATES_DIR)),
             trim_blocks=True,
             lstrip_blocks=True,
