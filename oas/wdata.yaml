@@ -917,6 +917,14 @@ components:
             Denotes if this parameter can be overridden later in the process, either when the
             query is created or executed.  The default is true; it can be overridden.
           type: boolean
+        scope:
+          description: 'The scope of the parameter (global, local, or system)'
+          type: string
+          enum:
+            - global
+            - local
+            - system
+          readOnly: true
         selectListId:
           description: |-
             If mode is select, this must be populated and is a reference to a select list from
@@ -2398,8 +2406,8 @@ paths:
             '*/*':
               schema:
                 oneOf:
-                  - $ref: '#/components/schemas/SingleError'
                   - $ref: '#/components/schemas/MultiError'
+                  - $ref: '#/components/schemas/SingleError'
         '401':
           description: Unauthorized
           content:
@@ -2467,8 +2475,8 @@ paths:
             '*/*':
               schema:
                 oneOf:
-                  - $ref: '#/components/schemas/SingleError'
                   - $ref: '#/components/schemas/MultiError'
+                  - $ref: '#/components/schemas/SingleError'
         '401':
           description: Unauthorized
           content:
@@ -2650,8 +2658,8 @@ paths:
             '*/*':
               schema:
                 oneOf:
-                  - $ref: '#/components/schemas/SingleError'
                   - $ref: '#/components/schemas/MultiError'
+                  - $ref: '#/components/schemas/SingleError'
         '401':
           description: Unauthorized
           content:
@@ -2733,8 +2741,8 @@ paths:
             '*/*':
               schema:
                 oneOf:
-                  - $ref: '#/components/schemas/SingleError'
                   - $ref: '#/components/schemas/MultiError'
+                  - $ref: '#/components/schemas/SingleError'
         '401':
           description: Unauthorized
           content:
@@ -2814,8 +2822,8 @@ paths:
             '*/*':
               schema:
                 oneOf:
-                  - $ref: '#/components/schemas/SingleError'
                   - $ref: '#/components/schemas/MultiError'
+                  - $ref: '#/components/schemas/SingleError'
         '401':
           description: Unauthorized
           content:
@@ -3093,8 +3101,8 @@ paths:
             '*/*':
               schema:
                 oneOf:
-                  - $ref: '#/components/schemas/SingleError'
                   - $ref: '#/components/schemas/MultiError'
+                  - $ref: '#/components/schemas/SingleError'
         '401':
           description: Unauthorized
           content:
@@ -3332,8 +3340,8 @@ paths:
             '*/*':
               schema:
                 oneOf:
-                  - $ref: '#/components/schemas/SingleError'
                   - $ref: '#/components/schemas/MultiError'
+                  - $ref: '#/components/schemas/SingleError'
         '401':
           description: Unauthorized
           content:
@@ -3494,8 +3502,8 @@ paths:
             '*/*':
               schema:
                 oneOf:
-                  - $ref: '#/components/schemas/SingleError'
                   - $ref: '#/components/schemas/MultiError'
+                  - $ref: '#/components/schemas/SingleError'
         '401':
           description: Unauthorized
           content:
@@ -3610,8 +3618,8 @@ paths:
             '*/*':
               schema:
                 oneOf:
-                  - $ref: '#/components/schemas/SingleError'
                   - $ref: '#/components/schemas/MultiError'
+                  - $ref: '#/components/schemas/SingleError'
         '401':
           description: Unauthorized
           content:
@@ -3732,8 +3740,8 @@ paths:
             '*/*':
               schema:
                 oneOf:
-                  - $ref: '#/components/schemas/SingleError'
                   - $ref: '#/components/schemas/MultiError'
+                  - $ref: '#/components/schemas/SingleError'
         '401':
           description: Unauthorized
           content:
@@ -3930,8 +3938,8 @@ paths:
             '*/*':
               schema:
                 oneOf:
-                  - $ref: '#/components/schemas/SingleError'
                   - $ref: '#/components/schemas/MultiError'
+                  - $ref: '#/components/schemas/SingleError'
         '401':
           description: Unauthorized
           content:
@@ -4005,8 +4013,8 @@ paths:
             '*/*':
               schema:
                 oneOf:
-                  - $ref: '#/components/schemas/SingleError'
                   - $ref: '#/components/schemas/MultiError'
+                  - $ref: '#/components/schemas/SingleError'
         '401':
           description: Unauthorized
           content:
@@ -4079,8 +4087,8 @@ paths:
             '*/*':
               schema:
                 oneOf:
-                  - $ref: '#/components/schemas/SingleError'
                   - $ref: '#/components/schemas/MultiError'
+                  - $ref: '#/components/schemas/SingleError'
         '401':
           description: Unauthorized
           content:
@@ -4252,8 +4260,8 @@ paths:
             '*/*':
               schema:
                 oneOf:
-                  - $ref: '#/components/schemas/SingleError'
                   - $ref: '#/components/schemas/MultiError'
+                  - $ref: '#/components/schemas/SingleError'
         '401':
           description: Unauthorized
           content:
@@ -4424,8 +4432,8 @@ paths:
             '*/*':
               schema:
                 oneOf:
-                  - $ref: '#/components/schemas/SingleError'
                   - $ref: '#/components/schemas/MultiError'
+                  - $ref: '#/components/schemas/SingleError'
         '401':
           description: Unauthorized
           content:
@@ -4569,8 +4577,8 @@ paths:
             '*/*':
               schema:
                 oneOf:
-                  - $ref: '#/components/schemas/SingleError'
                   - $ref: '#/components/schemas/MultiError'
+                  - $ref: '#/components/schemas/SingleError'
         '401':
           description: Unauthorized
           content:
@@ -4641,8 +4649,8 @@ paths:
             '*/*':
               schema:
                 oneOf:
-                  - $ref: '#/components/schemas/SingleError'
                   - $ref: '#/components/schemas/MultiError'
+                  - $ref: '#/components/schemas/SingleError'
         '401':
           description: Unauthorized
           content:
@@ -4820,8 +4828,8 @@ paths:
             '*/*':
               schema:
                 oneOf:
-                  - $ref: '#/components/schemas/SingleError'
                   - $ref: '#/components/schemas/MultiError'
+                  - $ref: '#/components/schemas/SingleError'
         '401':
           description: Unauthorized
           content:
@@ -4998,8 +5006,8 @@ paths:
             '*/*':
               schema:
                 oneOf:
-                  - $ref: '#/components/schemas/SingleError'
                   - $ref: '#/components/schemas/MultiError'
+                  - $ref: '#/components/schemas/SingleError'
         '401':
           description: Unauthorized
           content:
@@ -5141,8 +5149,8 @@ paths:
             '*/*':
               schema:
                 oneOf:
-                  - $ref: '#/components/schemas/SingleError'
                   - $ref: '#/components/schemas/MultiError'
+                  - $ref: '#/components/schemas/SingleError'
         '401':
           description: Unauthorized
           content:
@@ -5213,8 +5221,8 @@ paths:
             '*/*':
               schema:
                 oneOf:
-                  - $ref: '#/components/schemas/SingleError'
                   - $ref: '#/components/schemas/MultiError'
+                  - $ref: '#/components/schemas/SingleError'
         '401':
           description: Unauthorized
           content:
@@ -5387,8 +5395,8 @@ paths:
             '*/*':
               schema:
                 oneOf:
-                  - $ref: '#/components/schemas/SingleError'
                   - $ref: '#/components/schemas/MultiError'
+                  - $ref: '#/components/schemas/SingleError'
         '401':
           description: Unauthorized
           content:
@@ -5538,8 +5546,8 @@ paths:
             '*/*':
               schema:
                 oneOf:
-                  - $ref: '#/components/schemas/SingleError'
                   - $ref: '#/components/schemas/MultiError'
+                  - $ref: '#/components/schemas/SingleError'
         '401':
           description: Unauthorized
           content:
@@ -5610,8 +5618,8 @@ paths:
             '*/*':
               schema:
                 oneOf:
-                  - $ref: '#/components/schemas/SingleError'
                   - $ref: '#/components/schemas/MultiError'
+                  - $ref: '#/components/schemas/SingleError'
         '401':
           description: Unauthorized
           content:
@@ -5788,8 +5796,8 @@ paths:
             '*/*':
               schema:
                 oneOf:
-                  - $ref: '#/components/schemas/SingleError'
                   - $ref: '#/components/schemas/MultiError'
+                  - $ref: '#/components/schemas/SingleError'
         '401':
           description: Unauthorized
           content:
@@ -6080,8 +6088,8 @@ paths:
             '*/*':
               schema:
                 oneOf:
-                  - $ref: '#/components/schemas/SingleError'
                   - $ref: '#/components/schemas/MultiError'
+                  - $ref: '#/components/schemas/SingleError'
         '401':
           description: Unauthorized
           content:
@@ -6152,8 +6160,8 @@ paths:
             '*/*':
               schema:
                 oneOf:
-                  - $ref: '#/components/schemas/SingleError'
                   - $ref: '#/components/schemas/MultiError'
+                  - $ref: '#/components/schemas/SingleError'
         '401':
           description: Unauthorized
           content:
@@ -6328,8 +6336,8 @@ paths:
             '*/*':
               schema:
                 oneOf:
-                  - $ref: '#/components/schemas/SingleError'
                   - $ref: '#/components/schemas/MultiError'
+                  - $ref: '#/components/schemas/SingleError'
         '401':
           description: Unauthorized
           content:
@@ -6425,8 +6433,8 @@ paths:
             '*/*':
               schema:
                 oneOf:
-                  - $ref: '#/components/schemas/SingleError'
                   - $ref: '#/components/schemas/MultiError'
+                  - $ref: '#/components/schemas/SingleError'
         '401':
           description: Unauthorized
           content:
@@ -6500,8 +6508,8 @@ paths:
             '*/*':
               schema:
                 oneOf:
-                  - $ref: '#/components/schemas/SingleError'
                   - $ref: '#/components/schemas/MultiError'
+                  - $ref: '#/components/schemas/SingleError'
         '401':
           description: Unauthorized
           content:
@@ -6605,8 +6613,8 @@ paths:
             '*/*':
               schema:
                 oneOf:
-                  - $ref: '#/components/schemas/SingleError'
                   - $ref: '#/components/schemas/MultiError'
+                  - $ref: '#/components/schemas/SingleError'
         '401':
           description: Unauthorized
           content:
@@ -6825,8 +6833,8 @@ paths:
             '*/*':
               schema:
                 oneOf:
-                  - $ref: '#/components/schemas/SingleError'
                   - $ref: '#/components/schemas/MultiError'
+                  - $ref: '#/components/schemas/SingleError'
         '401':
           description: Unauthorized
           content:
@@ -7070,8 +7078,8 @@ paths:
             '*/*':
               schema:
                 oneOf:
-                  - $ref: '#/components/schemas/SingleError'
                   - $ref: '#/components/schemas/MultiError'
+                  - $ref: '#/components/schemas/SingleError'
         '401':
           description: Unauthorized
           content:
@@ -7215,8 +7223,8 @@ paths:
             '*/*':
               schema:
                 oneOf:
-                  - $ref: '#/components/schemas/SingleError'
                   - $ref: '#/components/schemas/MultiError'
+                  - $ref: '#/components/schemas/SingleError'
         '401':
           description: Unauthorized
           content:
@@ -7289,8 +7297,8 @@ paths:
             '*/*':
               schema:
                 oneOf:
-                  - $ref: '#/components/schemas/SingleError'
                   - $ref: '#/components/schemas/MultiError'
+                  - $ref: '#/components/schemas/SingleError'
         '401':
           description: Unauthorized
           content:
@@ -7474,8 +7482,8 @@ paths:
             '*/*':
               schema:
                 oneOf:
-                  - $ref: '#/components/schemas/SingleError'
                   - $ref: '#/components/schemas/MultiError'
+                  - $ref: '#/components/schemas/SingleError'
         '401':
           description: Unauthorized
           content:
@@ -7620,8 +7628,8 @@ paths:
             '*/*':
               schema:
                 oneOf:
-                  - $ref: '#/components/schemas/SingleError'
                   - $ref: '#/components/schemas/MultiError'
+                  - $ref: '#/components/schemas/SingleError'
         '401':
           description: Unauthorized
           content:
@@ -7698,8 +7706,8 @@ paths:
             '*/*':
               schema:
                 oneOf:
-                  - $ref: '#/components/schemas/SingleError'
                   - $ref: '#/components/schemas/MultiError'
+                  - $ref: '#/components/schemas/SingleError'
         '401':
           description: Unauthorized
           content:
@@ -7796,8 +7804,8 @@ paths:
             '*/*':
               schema:
                 oneOf:
-                  - $ref: '#/components/schemas/SingleError'
                   - $ref: '#/components/schemas/MultiError'
+                  - $ref: '#/components/schemas/SingleError'
         '401':
           description: Unauthorized
           content:
@@ -7939,8 +7947,8 @@ paths:
             '*/*':
               schema:
                 oneOf:
-                  - $ref: '#/components/schemas/SingleError'
                   - $ref: '#/components/schemas/MultiError'
+                  - $ref: '#/components/schemas/SingleError'
         '401':
           description: Unauthorized
           content:
@@ -8011,8 +8019,8 @@ paths:
             '*/*':
               schema:
                 oneOf:
-                  - $ref: '#/components/schemas/SingleError'
                   - $ref: '#/components/schemas/MultiError'
+                  - $ref: '#/components/schemas/SingleError'
         '401':
           description: Unauthorized
           content:
@@ -8199,8 +8207,8 @@ paths:
             '*/*':
               schema:
                 oneOf:
-                  - $ref: '#/components/schemas/SingleError'
                   - $ref: '#/components/schemas/MultiError'
+                  - $ref: '#/components/schemas/SingleError'
         '401':
           description: Unauthorized
           content:
@@ -8438,8 +8446,8 @@ paths:
             '*/*':
               schema:
                 oneOf:
-                  - $ref: '#/components/schemas/SingleError'
                   - $ref: '#/components/schemas/MultiError'
+                  - $ref: '#/components/schemas/SingleError'
         '401':
           description: Unauthorized
           content:
@@ -8609,8 +8617,8 @@ paths:
             '*/*':
               schema:
                 oneOf:
-                  - $ref: '#/components/schemas/SingleError'
                   - $ref: '#/components/schemas/MultiError'
+                  - $ref: '#/components/schemas/SingleError'
         '401':
           description: Unauthorized
           content:
@@ -8752,8 +8760,8 @@ paths:
             '*/*':
               schema:
                 oneOf:
-                  - $ref: '#/components/schemas/SingleError'
                   - $ref: '#/components/schemas/MultiError'
+                  - $ref: '#/components/schemas/SingleError'
         '401':
           description: Unauthorized
           content:
@@ -9125,8 +9133,8 @@ paths:
             '*/*':
               schema:
                 oneOf:
-                  - $ref: '#/components/schemas/SingleError'
                   - $ref: '#/components/schemas/MultiError'
+                  - $ref: '#/components/schemas/SingleError'
         '401':
           description: Unauthorized
           content:

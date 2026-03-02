@@ -145,6 +145,68 @@ class Milestones(BaseNamespace):
             timeout=timeout,
         )
 
+    def get_milestone_by_id(
+        self,
+        *,
+        milestone_id: str,
+        timeout: Optional[float] = None,
+    ) -> Milestone:
+        """Retrieve a milestone by id
+
+        Returns a [`Milestone`](ref:milestones#milestone) given its id
+
+        Args:
+            milestone_id: The unique identifier of a milestone.
+            timeout: Override the default request timeout (seconds).
+
+        Returns:
+            Milestone
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
+        """
+        response = self._client.request(
+            "GET",
+            self._api,
+            "/milestones/{milestoneId}",
+            path_params={
+                "milestoneId": milestone_id,
+            },
+            timeout=timeout,
+        )
+        return Milestone.model_validate(response.json())
+
+    async def get_milestone_by_id_async(
+        self,
+        *,
+        milestone_id: str,
+        timeout: Optional[float] = None,
+    ) -> Milestone:
+        """Retrieve a milestone by id (async)
+
+        Returns a [`Milestone`](ref:milestones#milestone) given its id
+
+        Args:
+            milestone_id: The unique identifier of a milestone.
+            timeout: Override the default request timeout (seconds).
+
+        Returns:
+            Milestone
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
+        """
+        response = await self._client.request_async(
+            "GET",
+            self._api,
+            "/milestones/{milestoneId}",
+            path_params={
+                "milestoneId": milestone_id,
+            },
+            timeout=timeout,
+        )
+        return Milestone.model_validate(response.json())
+
     def partially_update_milestone_by_id(
         self,
         *,
@@ -288,65 +350,3 @@ class Milestones(BaseNamespace):
             },
             timeout=timeout,
         )
-
-    def get_milestone_by_id(
-        self,
-        *,
-        milestone_id: str,
-        timeout: Optional[float] = None,
-    ) -> Milestone:
-        """Retrieve a milestone by id
-
-        Returns a [`Milestone`](ref:milestones#milestone) given its id
-
-        Args:
-            milestone_id: The unique identifier of a milestone.
-            timeout: Override the default request timeout (seconds).
-
-        Returns:
-            Milestone
-
-        Raises:
-            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
-        """
-        response = self._client.request(
-            "GET",
-            self._api,
-            "/milestones/{milestoneId}",
-            path_params={
-                "milestoneId": milestone_id,
-            },
-            timeout=timeout,
-        )
-        return Milestone.model_validate(response.json())
-
-    async def get_milestone_by_id_async(
-        self,
-        *,
-        milestone_id: str,
-        timeout: Optional[float] = None,
-    ) -> Milestone:
-        """Retrieve a milestone by id (async)
-
-        Returns a [`Milestone`](ref:milestones#milestone) given its id
-
-        Args:
-            milestone_id: The unique identifier of a milestone.
-            timeout: Override the default request timeout (seconds).
-
-        Returns:
-            Milestone
-
-        Raises:
-            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
-        """
-        response = await self._client.request_async(
-            "GET",
-            self._api,
-            "/milestones/{milestoneId}",
-            path_params={
-                "milestoneId": milestone_id,
-            },
-            timeout=timeout,
-        )
-        return Milestone.model_validate(response.json())

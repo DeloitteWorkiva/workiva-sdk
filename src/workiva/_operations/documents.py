@@ -122,6 +122,78 @@ class Documents(BaseNamespace):
         _body_result = await paginate_all_async(_fetch, extract_next_link, "data")
         return DocumentsListResult.model_validate(_body_result)
 
+    def get_document_by_id(
+        self,
+        *,
+        document_id: str,
+        expand: Optional[str] = None,
+        timeout: Optional[float] = None,
+    ) -> Document:
+        """Retrieve a single document
+
+        Retrieves a [document](ref:documents#document) given its ID.
+
+        Args:
+            document_id: The unique identifier of the document
+            expand: Returns related resources inline with the main resource
+            timeout: Override the default request timeout (seconds).
+
+        Returns:
+            Document
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
+        """
+        response = self._client.request(
+            "GET",
+            self._api,
+            "/documents/{documentId}",
+            path_params={
+                "documentId": document_id,
+            },
+            query_params={
+                "$expand": expand,
+            },
+            timeout=timeout,
+        )
+        return Document.model_validate(response.json())
+
+    async def get_document_by_id_async(
+        self,
+        *,
+        document_id: str,
+        expand: Optional[str] = None,
+        timeout: Optional[float] = None,
+    ) -> Document:
+        """Retrieve a single document (async)
+
+        Retrieves a [document](ref:documents#document) given its ID.
+
+        Args:
+            document_id: The unique identifier of the document
+            expand: Returns related resources inline with the main resource
+            timeout: Override the default request timeout (seconds).
+
+        Returns:
+            Document
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
+        """
+        response = await self._client.request_async(
+            "GET",
+            self._api,
+            "/documents/{documentId}",
+            path_params={
+                "documentId": document_id,
+            },
+            query_params={
+                "$expand": expand,
+            },
+            timeout=timeout,
+        )
+        return Document.model_validate(response.json())
+
     def partially_update_document_by_id(
         self,
         *,
@@ -349,78 +421,6 @@ class Documents(BaseNamespace):
             json_body=body,
             timeout=timeout,
         )
-
-    def get_document_by_id(
-        self,
-        *,
-        document_id: str,
-        expand: Optional[str] = None,
-        timeout: Optional[float] = None,
-    ) -> Document:
-        """Retrieve a single document
-
-        Retrieves a [document](ref:documents#document) given its ID.
-
-        Args:
-            document_id: The unique identifier of the document
-            expand: Returns related resources inline with the main resource
-            timeout: Override the default request timeout (seconds).
-
-        Returns:
-            Document
-
-        Raises:
-            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
-        """
-        response = self._client.request(
-            "GET",
-            self._api,
-            "/documents/{documentId}",
-            path_params={
-                "documentId": document_id,
-            },
-            query_params={
-                "$expand": expand,
-            },
-            timeout=timeout,
-        )
-        return Document.model_validate(response.json())
-
-    async def get_document_by_id_async(
-        self,
-        *,
-        document_id: str,
-        expand: Optional[str] = None,
-        timeout: Optional[float] = None,
-    ) -> Document:
-        """Retrieve a single document (async)
-
-        Retrieves a [document](ref:documents#document) given its ID.
-
-        Args:
-            document_id: The unique identifier of the document
-            expand: Returns related resources inline with the main resource
-            timeout: Override the default request timeout (seconds).
-
-        Returns:
-            Document
-
-        Raises:
-            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
-        """
-        response = await self._client.request_async(
-            "GET",
-            self._api,
-            "/documents/{documentId}",
-            path_params={
-                "documentId": document_id,
-            },
-            query_params={
-                "$expand": expand,
-            },
-            timeout=timeout,
-        )
-        return Document.model_validate(response.json())
 
     def document_export(
         self,
@@ -990,6 +990,94 @@ class Documents(BaseNamespace):
             timeout=timeout,
         )
 
+    def get_sections(
+        self,
+        *,
+        document_id: str,
+        revision: Optional[str] = None,
+        maxpagesize: Optional[int] = 1000,
+        timeout: Optional[float] = None,
+    ) -> SectionsListResult:
+        """Retrieve a list of sections
+
+        Returns a list of [sections](ref:documents#section).
+
+        Args:
+            document_id: The unique identifier of the document
+            revision: Returns resources at a specific revision
+            maxpagesize: The maximum number of results to retrieve
+            timeout: Override the default request timeout (seconds).
+
+        Returns:
+            SectionsListResult
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
+        """
+
+        def _fetch(_cursor: str | None) -> httpx.Response:
+            return self._client.request(
+                "GET",
+                self._api,
+                "/documents/{documentId}/sections",
+                path_params={
+                    "documentId": document_id,
+                },
+                query_params={
+                    "$revision": revision,
+                    "$maxpagesize": maxpagesize,
+                    "$next": _cursor,
+                },
+                timeout=timeout,
+            )
+
+        _body_result = paginate_all(_fetch, extract_next_link, "data")
+        return SectionsListResult.model_validate(_body_result)
+
+    async def get_sections_async(
+        self,
+        *,
+        document_id: str,
+        revision: Optional[str] = None,
+        maxpagesize: Optional[int] = 1000,
+        timeout: Optional[float] = None,
+    ) -> SectionsListResult:
+        """Retrieve a list of sections (async)
+
+        Returns a list of [sections](ref:documents#section).
+
+        Args:
+            document_id: The unique identifier of the document
+            revision: Returns resources at a specific revision
+            maxpagesize: The maximum number of results to retrieve
+            timeout: Override the default request timeout (seconds).
+
+        Returns:
+            SectionsListResult
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
+        """
+
+        async def _fetch(_cursor: str | None) -> httpx.Response:
+            return await self._client.request_async(
+                "GET",
+                self._api,
+                "/documents/{documentId}/sections",
+                path_params={
+                    "documentId": document_id,
+                },
+                query_params={
+                    "$revision": revision,
+                    "$maxpagesize": maxpagesize,
+                    "$next": _cursor,
+                },
+                timeout=timeout,
+            )
+
+        _body_result = await paginate_all_async(_fetch, extract_next_link, "data")
+        return SectionsListResult.model_validate(_body_result)
+
     def create_section(
         self,
         *,
@@ -1118,93 +1206,89 @@ class Documents(BaseNamespace):
         )
         return Section.model_validate(response.json())
 
-    def get_sections(
+    def get_section_by_id(
         self,
         *,
         document_id: str,
+        section_id: str,
+        expand: Optional[str] = None,
         revision: Optional[str] = None,
-        maxpagesize: Optional[int] = 1000,
         timeout: Optional[float] = None,
-    ) -> SectionsListResult:
-        """Retrieve a list of sections
+    ) -> Section:
+        """Retrieve a single section
 
-        Returns a list of [sections](ref:documents#section).
+        Retrieves a [section](ref:documents#section) given its ID.
 
         Args:
             document_id: The unique identifier of the document
+            section_id: The unique identifier of the section
+            expand: Returns related resources inline with the main resource
             revision: Returns resources at a specific revision
-            maxpagesize: The maximum number of results to retrieve
             timeout: Override the default request timeout (seconds).
 
         Returns:
-            SectionsListResult
+            Section
 
         Raises:
             WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
         """
+        response = self._client.request(
+            "GET",
+            self._api,
+            "/documents/{documentId}/sections/{sectionId}",
+            path_params={
+                "documentId": document_id,
+                "sectionId": section_id,
+            },
+            query_params={
+                "$expand": expand,
+                "$revision": revision,
+            },
+            timeout=timeout,
+        )
+        return Section.model_validate(response.json())
 
-        def _fetch(_cursor: str | None) -> httpx.Response:
-            return self._client.request(
-                "GET",
-                self._api,
-                "/documents/{documentId}/sections",
-                path_params={
-                    "documentId": document_id,
-                },
-                query_params={
-                    "$revision": revision,
-                    "$maxpagesize": maxpagesize,
-                    "$next": _cursor,
-                },
-                timeout=timeout,
-            )
-
-        _body_result = paginate_all(_fetch, extract_next_link, "data")
-        return SectionsListResult.model_validate(_body_result)
-
-    async def get_sections_async(
+    async def get_section_by_id_async(
         self,
         *,
         document_id: str,
+        section_id: str,
+        expand: Optional[str] = None,
         revision: Optional[str] = None,
-        maxpagesize: Optional[int] = 1000,
         timeout: Optional[float] = None,
-    ) -> SectionsListResult:
-        """Retrieve a list of sections (async)
+    ) -> Section:
+        """Retrieve a single section (async)
 
-        Returns a list of [sections](ref:documents#section).
+        Retrieves a [section](ref:documents#section) given its ID.
 
         Args:
             document_id: The unique identifier of the document
+            section_id: The unique identifier of the section
+            expand: Returns related resources inline with the main resource
             revision: Returns resources at a specific revision
-            maxpagesize: The maximum number of results to retrieve
             timeout: Override the default request timeout (seconds).
 
         Returns:
-            SectionsListResult
+            Section
 
         Raises:
             WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
         """
-
-        async def _fetch(_cursor: str | None) -> httpx.Response:
-            return await self._client.request_async(
-                "GET",
-                self._api,
-                "/documents/{documentId}/sections",
-                path_params={
-                    "documentId": document_id,
-                },
-                query_params={
-                    "$revision": revision,
-                    "$maxpagesize": maxpagesize,
-                    "$next": _cursor,
-                },
-                timeout=timeout,
-            )
-
-        _body_result = await paginate_all_async(_fetch, extract_next_link, "data")
-        return SectionsListResult.model_validate(_body_result)
+        response = await self._client.request_async(
+            "GET",
+            self._api,
+            "/documents/{documentId}/sections/{sectionId}",
+            path_params={
+                "documentId": document_id,
+                "sectionId": section_id,
+            },
+            query_params={
+                "$expand": expand,
+                "$revision": revision,
+            },
+            timeout=timeout,
+        )
+        return Section.model_validate(response.json())
 
     def partially_update_section_by_id(
         self,
@@ -1671,90 +1755,6 @@ class Documents(BaseNamespace):
             },
             timeout=timeout,
         )
-
-    def get_section_by_id(
-        self,
-        *,
-        document_id: str,
-        section_id: str,
-        expand: Optional[str] = None,
-        revision: Optional[str] = None,
-        timeout: Optional[float] = None,
-    ) -> Section:
-        """Retrieve a single section
-
-        Retrieves a [section](ref:documents#section) given its ID.
-
-        Args:
-            document_id: The unique identifier of the document
-            section_id: The unique identifier of the section
-            expand: Returns related resources inline with the main resource
-            revision: Returns resources at a specific revision
-            timeout: Override the default request timeout (seconds).
-
-        Returns:
-            Section
-
-        Raises:
-            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
-        """
-        response = self._client.request(
-            "GET",
-            self._api,
-            "/documents/{documentId}/sections/{sectionId}",
-            path_params={
-                "documentId": document_id,
-                "sectionId": section_id,
-            },
-            query_params={
-                "$expand": expand,
-                "$revision": revision,
-            },
-            timeout=timeout,
-        )
-        return Section.model_validate(response.json())
-
-    async def get_section_by_id_async(
-        self,
-        *,
-        document_id: str,
-        section_id: str,
-        expand: Optional[str] = None,
-        revision: Optional[str] = None,
-        timeout: Optional[float] = None,
-    ) -> Section:
-        """Retrieve a single section (async)
-
-        Retrieves a [section](ref:documents#section) given its ID.
-
-        Args:
-            document_id: The unique identifier of the document
-            section_id: The unique identifier of the section
-            expand: Returns related resources inline with the main resource
-            revision: Returns resources at a specific revision
-            timeout: Override the default request timeout (seconds).
-
-        Returns:
-            Section
-
-        Raises:
-            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
-        """
-        response = await self._client.request_async(
-            "GET",
-            self._api,
-            "/documents/{documentId}/sections/{sectionId}",
-            path_params={
-                "documentId": document_id,
-                "sectionId": section_id,
-            },
-            query_params={
-                "$expand": expand,
-                "$revision": revision,
-            },
-            timeout=timeout,
-        )
-        return Section.model_validate(response.json())
 
     def copy_section(
         self,
