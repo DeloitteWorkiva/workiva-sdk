@@ -3351,6 +3351,78 @@ class Content(BaseNamespace):
             timeout=timeout,
         )
 
+    def get_table_properties(
+        self,
+        *,
+        table_id: str,
+        revision: Optional[str] = None,
+        timeout: Optional[float] = None,
+    ) -> TableProperties:
+        """Retrieve a table's properties by id
+
+        Returns a [`TableProperties`](ref:content#tableproperties) for a table
+
+        Args:
+            table_id: The unique identifier for the table
+            revision: Returns resources at a specific revision
+            timeout: Override the default request timeout (seconds).
+
+        Returns:
+            TableProperties
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
+        """
+        response = self._client.request(
+            "GET",
+            self._api,
+            "/content/tables/{tableId}/properties",
+            path_params={
+                "tableId": table_id,
+            },
+            query_params={
+                "$revision": revision,
+            },
+            timeout=timeout,
+        )
+        return TableProperties.model_validate(response.json())
+
+    async def get_table_properties_async(
+        self,
+        *,
+        table_id: str,
+        revision: Optional[str] = None,
+        timeout: Optional[float] = None,
+    ) -> TableProperties:
+        """Retrieve a table's properties by id (async)
+
+        Returns a [`TableProperties`](ref:content#tableproperties) for a table
+
+        Args:
+            table_id: The unique identifier for the table
+            revision: Returns resources at a specific revision
+            timeout: Override the default request timeout (seconds).
+
+        Returns:
+            TableProperties
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
+        """
+        response = await self._client.request_async(
+            "GET",
+            self._api,
+            "/content/tables/{tableId}/properties",
+            path_params={
+                "tableId": table_id,
+            },
+            query_params={
+                "$revision": revision,
+            },
+            timeout=timeout,
+        )
+        return TableProperties.model_validate(response.json())
+
     def partially_update_table_properties(
         self,
         *,
@@ -3442,78 +3514,6 @@ class Content(BaseNamespace):
             json_body=body,
             timeout=timeout,
         )
-
-    def get_table_properties(
-        self,
-        *,
-        table_id: str,
-        revision: Optional[str] = None,
-        timeout: Optional[float] = None,
-    ) -> TableProperties:
-        """Retrieve a table's properties by id
-
-        Returns a [`TableProperties`](ref:content#tableproperties) for a table
-
-        Args:
-            table_id: The unique identifier for the table
-            revision: Returns resources at a specific revision
-            timeout: Override the default request timeout (seconds).
-
-        Returns:
-            TableProperties
-
-        Raises:
-            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
-        """
-        response = self._client.request(
-            "GET",
-            self._api,
-            "/content/tables/{tableId}/properties",
-            path_params={
-                "tableId": table_id,
-            },
-            query_params={
-                "$revision": revision,
-            },
-            timeout=timeout,
-        )
-        return TableProperties.model_validate(response.json())
-
-    async def get_table_properties_async(
-        self,
-        *,
-        table_id: str,
-        revision: Optional[str] = None,
-        timeout: Optional[float] = None,
-    ) -> TableProperties:
-        """Retrieve a table's properties by id (async)
-
-        Returns a [`TableProperties`](ref:content#tableproperties) for a table
-
-        Args:
-            table_id: The unique identifier for the table
-            revision: Returns resources at a specific revision
-            timeout: Override the default request timeout (seconds).
-
-        Returns:
-            TableProperties
-
-        Raises:
-            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
-        """
-        response = await self._client.request_async(
-            "GET",
-            self._api,
-            "/content/tables/{tableId}/properties",
-            path_params={
-                "tableId": table_id,
-            },
-            query_params={
-                "$revision": revision,
-            },
-            timeout=timeout,
-        )
-        return TableProperties.model_validate(response.json())
 
     def get_row_properties(
         self,
