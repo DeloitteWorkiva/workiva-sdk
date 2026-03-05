@@ -19,7 +19,7 @@ Permite consultar acciones realizadas en la organizacion o workspace: logins, ca
 ### Listar actividades de la organizacion (auto-paginacion)
 
 ```python
-result = client.activities.get_organization_activities()
+result = client.activities.get_organization_activities(organization_id="org-123")
 
 for activity in result.data:
     print(f"{activity.id}: {activity.action}")
@@ -36,6 +36,7 @@ print(activity)
 
 ```python
 result = client.activities.get_organization_workspace_activities(
+    organization_id="org-123",
     workspace_id="ws-456",
 )
 ```

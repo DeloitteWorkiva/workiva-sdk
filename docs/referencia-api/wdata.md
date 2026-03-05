@@ -100,15 +100,68 @@ Todas las operaciones de la API de Wdata estan disponibles en un **unico namespa
 | `update_parameter` | Actualizar parametro | No |
 | `delete_parameter` | Eliminar parametro | No |
 
-### Otros
+### Vistas pivot
 
-- **Vistas pivot** -- CRUD + listado paginado (`list_pivot_views`, `get_pivot_view`, etc.)
-- **Listas de seleccion** -- CRUD + listado paginado (`list_select_lists`, `get_select_list`, etc.)
-- **Tags** -- CRUD + listado paginado (`list_tags`, `get_tag`, etc.)
-- **Tokens** -- Tokens de Wdata (`create_token`, etc.)
-- **Tareas administrativas** -- Import/export workspace, delete (`import_data`, `delete_workspace`, etc.)
-- **Utilidades** -- Search paginado, parse_date, get_errors paginado (`search`, `parse_date`, `get_errors`, etc.)
-- **Health check** -- `health_check`
+| Metodo | Descripcion | Paginado |
+|--------|-------------|----------|
+| `list_pivot_views` | Listar vistas pivot | Si |
+| `get_pivot_view` | Obtener vista pivot por ID | No |
+| `create_pivot_view` | Crear vista pivot | No |
+| `update_pivot_view` | Actualizar vista pivot | No |
+| `delete_pivot_view` | Eliminar vista pivot | No |
+
+### Listas de seleccion
+
+| Metodo | Descripcion | Paginado |
+|--------|-------------|----------|
+| `list_select_lists` | Listar listas de seleccion | Si |
+| `get_select_list` | Obtener lista de seleccion por ID | No |
+| `create_select_list` | Crear lista de seleccion | No |
+| `update_select_list` | Actualizar lista de seleccion | No |
+| `delete` | Eliminar lista de seleccion | No |
+
+### Tags
+
+| Metodo | Descripcion | Paginado |
+|--------|-------------|----------|
+| `list_tags` | Listar tags | Si |
+| `create_tag` | Crear tag | No |
+| `update_tag` | Actualizar tag | No |
+| `delete_tag` | Eliminar tag | No |
+
+### Import/Export de tablas
+
+| Metodo | Descripcion | Paginado |
+|--------|-------------|----------|
+| `import_file` | Importar archivo a tabla | No |
+| `unimport_file` | Desimportar archivo de tabla | No |
+| `get_import_info` | Informacion de importacion de tabla | No |
+| `import_from_spreadsheets` | Importar desde spreadsheet a tabla | No |
+| `export_file_to_spreadsheets` | Exportar archivo a spreadsheet | No |
+
+### Tokens y descargas
+
+| Metodo | Descripcion | Paginado |
+|--------|-------------|----------|
+| `create_token` | Crear token de descarga | No |
+| `download_file` | Descargar archivo por token | No |
+
+### Administracion de workspace
+
+| Metodo | Descripcion | Paginado |
+|--------|-------------|----------|
+| `import_data` | Importar datos al workspace | No |
+| `export_workspace` | Exportar workspace completo | No |
+| `delete_workspace` | Eliminar workspace | No |
+
+### Utilidades
+
+| Metodo | Descripcion | Paginado |
+|--------|-------------|----------|
+| `search` | Buscar entidades | Si |
+| `get_errors` | Listar errores de importacion | Si |
+| `parse_date` | Parsear fecha | No |
+| `health_check` | Estado del servicio | No |
 
 ## Ejemplos
 

@@ -58,7 +58,7 @@
 ### Listar formularios de prueba
 
 ```python
-result = client.test_forms.get_test_forms(workspace_id="ws-123")
+result = client.test_forms.get_test_forms()
 
 for form in result.data:
     print(f"Formulario: {form.name} (ID: {form.id})")

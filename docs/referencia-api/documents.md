@@ -6,31 +6,31 @@
 
 ### Documentos
 
-| Metodo | Descripcion | Paginado |
-|--------|-------------|----------|
-| `get_documents` | Listar documentos | Si |
-| `get_document_by_id` | Obtener documento por ID | No |
-| `partially_update_document_by_id` | Actualizar documento parcialmente | No |
-| `document_export` | Exportar documento | No |
-| `document_filters_reapplication` | Reaplicar filtros del documento | No |
-| `document_links_publication` | Publicar links del documento | No |
-| `document_permissions_modification` | Modificar permisos del documento | No |
-| `get_document_milestones` | Listar milestones del documento | Si |
-| `get_document_permissions` | Listar permisos del documento | Si |
+| Metodo | Descripcion | Paginado | 202 |
+|--------|-------------|----------|-----|
+| `get_documents` | Listar documentos | Si | No |
+| `get_document_by_id` | Obtener documento por ID | No | No |
+| `partially_update_document_by_id` | Actualizar documento parcialmente | No | No |
+| `document_export` | Exportar documento | No | Si |
+| `document_filters_reapplication` | Reaplicar filtros del documento | No | Si |
+| `document_links_publication` | Publicar links del documento | No | Si |
+| `document_permissions_modification` | Modificar permisos del documento | No | Si |
+| `get_document_milestones` | Listar milestones del documento | Si | No |
+| `get_document_permissions` | Listar permisos del documento | Si | No |
 
 ### Secciones
 
-| Metodo | Descripcion | Paginado |
-|--------|-------------|----------|
-| `get_sections` | Listar secciones | Si |
-| `get_section_by_id` | Obtener seccion por ID | No |
-| `create_section` | Crear seccion | No |
-| `copy_section` | Copiar seccion | No |
-| `partially_update_section_by_id` | Actualizar seccion parcialmente | No |
-| `delete_section_by_id` | Eliminar seccion | No |
-| `edit_sections` | Editar secciones | No |
-| `section_permissions_modification` | Modificar permisos de seccion | No |
-| `get_section_permissions` | Listar permisos de seccion | Si |
+| Metodo | Descripcion | Paginado | 202 |
+|--------|-------------|----------|-----|
+| `get_sections` | Listar secciones | Si | No |
+| `get_section_by_id` | Obtener seccion por ID | No | No |
+| `create_section` | Crear seccion | No | No |
+| `copy_section` | Copiar seccion | No | Si |
+| `partially_update_section_by_id` | Actualizar seccion parcialmente | No | No |
+| `delete_section_by_id` | Eliminar seccion | No | No |
+| `edit_sections` | Editar secciones | No | Si |
+| `section_permissions_modification` | Modificar permisos de seccion | No | Si |
+| `get_section_permissions` | Listar permisos de seccion | Si | No |
 
 ## Ejemplos
 

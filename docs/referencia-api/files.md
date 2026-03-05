@@ -16,8 +16,8 @@
 | `file_permissions_modification` | Modificar permisos | No | Si |
 | `get_file_permissions` | Listar permisos del archivo | Si | No |
 | `get_trashed_files` | Listar archivos en papelera | Si | No |
-| `trash_file_by_id` | Mover archivo a papelera | No | No |
-| `restore_file_by_id` | Restaurar archivo de papelera | No | No |
+| `trash_file_by_id` | Mover archivo a papelera | No | Si |
+| `restore_file_by_id` | Restaurar archivo de papelera | No | Si |
 
 ## Ejemplos
 
@@ -84,18 +84,25 @@ operation = client.wait(response).result(timeout=120)
 print(f"URL de descarga: {operation.resource_url}")
 ```
 
-### Papelera
+### Papelera (operaciones 202)
 
 ```python
+from workiva.models.platform import FileTrashOptions, FileRestoreOptions
+
 # Mover a papelera
-client.files.trash_file_by_id(file_id="file-123")
+response = client.files.trash_file_by_id(
+    file_id="file-123",
+    body=FileTrashOptions(),
+)
+client.wait(response).result(timeout=120)
 
 # Listar archivos en papelera (auto-paginacion)
 result = client.files.get_trashed_files()
 
 # Restaurar
-client.files.restore_file_by_id(
+response = client.files.restore_file_by_id(
     file_id="file-123",
-    body={"destination_folder_id": "folder-456"},
+    body=FileRestoreOptions(destination_folder_id="folder-456"),
 )
+client.wait(response).result(timeout=120)
 ```

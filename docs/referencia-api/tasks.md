@@ -23,7 +23,7 @@ Las tareas permiten organizar proyectos, asignar responsabilidades y controlar p
 result = client.tasks.get_tasks()
 
 for task in result.data:
-    print(f"{task.name} - {task.status}")
+    print(f"{task.title} - {task.status}")
 ```
 
 ### Crear tarea
@@ -41,7 +41,7 @@ print(f"Tarea creada: {task.id}")
 ```python
 client.tasks.partially_update_task_by_id(
     task_id="task-123",
-    body=[{"op": "replace", "path": "/status", "value": "completed"}],
+    body=[{"op": "replace", "path": "/title", "value": "Revisar reporte Q4 - Actualizado"}],
 )
 ```
 
