@@ -133,6 +133,7 @@ try:
     client.files.get_files()
 except RateLimitError as e:
     print(f"Rate limit: {e}")
+    print(f"Reintentar en {e.retry_after} segundos")
     # El SDK reintenta automaticamente con backoff,
     # solo llegas aqui si se agotan los reintentos
 ```

@@ -109,7 +109,7 @@ El flujo de autenticacion usa `httpx.Auth`:
 
 1. SDK se inicializa con `client_id` + `client_secret`
 2. `OAuth2ClientCredentials.sync_auth_flow()` / `async_auth_flow()` intercepta cada request
-3. Busca un token cacheado (cache global por `md5(client_id:secret)`)
+3. Busca un token cacheado (cache global por `sha256(client_id:secret)`)
 4. Si no hay token valido, hace `POST /oauth2/token` (siempre sync, en async via `asyncio.to_thread`)
 5. Cachea el token con expiry buffer de 60s
 6. Agrega `Authorization: Bearer {token}` al request

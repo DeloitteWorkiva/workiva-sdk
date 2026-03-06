@@ -65,16 +65,16 @@ with Workiva(client_id="tu_client_id", client_secret="tu_client_secret") as clie
 | Activities | `client.activities` | `client.activities.get_activities(...)` |
 | Admin | `client.admin` | `client.admin.get_workspaces(...)` |
 | Content | `client.content` | `client.content.get_content(...)` |
-| Documents | `client.documents` | `client.documents.get_document(...)` |
+| Documents | `client.documents` | `client.documents.get_document_by_id(...)` |
 | Files | `client.files` | `client.files.get_files()` |
 | Graph | `client.graph` | `client.graph.get_graph(...)` |
 | IAM | `client.iam` | `client.iam.get_users(...)` |
 | Milestones | `client.milestones` | `client.milestones.get_milestones(...)` |
 | Operations | `client.operations` | `client.operations.get_operation_by_id(...)` |
 | Permissions | `client.permissions` | `client.permissions.get_permissions(...)` |
-| Presentations | `client.presentations` | `client.presentations.get_presentation(...)` |
+| Presentations | `client.presentations` | `client.presentations.get_presentation_by_id(...)` |
 | Reports | `client.reports` | `client.reports.get_reports(...)` |
-| Spreadsheets | `client.spreadsheets` | `client.spreadsheets.get_spreadsheet(...)` |
+| Spreadsheets | `client.spreadsheets` | `client.spreadsheets.get_spreadsheet_by_id(...)` |
 | Sustainability | `client.sustainability` | `client.sustainability.get_metrics(...)` |
 | Tasks | `client.tasks` | `client.tasks.get_tasks(...)` |
 | Test Forms | `client.test_forms` | `client.test_forms.get_test_forms(...)` |
@@ -105,6 +105,6 @@ Las operaciones que devuelven HTTP 202 (operaciones de larga duracion) o 204 (si
 
 ## Version actual
 
-- **SDK**: 0.6.1
+- **SDK**: 0.6.9
 - **Python target**: 3.10+
 - **Codegen**: datamodel-code-generator + Jinja2 (sin Speakeasy ni openapi-generator)

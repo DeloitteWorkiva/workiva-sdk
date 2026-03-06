@@ -46,14 +46,14 @@ Internamente, `Workiva` crea una instancia de `OAuth2ClientCredentials(httpx.Aut
 ### Constructor completo
 
 ```python
-from workiva import Workiva, Region, SDKConfig
+from workiva import Workiva, Region, RetryConfig
 
 client = Workiva(
     client_id="tu_client_id",
     client_secret="tu_client_secret",
     region=Region.EU,          # Region.EU | Region.US | Region.APAC
     timeout=30,                # Timeout global en segundos (opcional)
-    config=SDKConfig(...),     # Configuracion avanzada (opcional)
+    retry=RetryConfig(...),    # Configuracion de reintentos (opcional)
     client=httpx.Client(...),  # Cliente sync custom (opcional)
     async_client=httpx.AsyncClient(...),  # Cliente async custom (opcional)
 )
@@ -64,7 +64,7 @@ client = Workiva(
 El SDK cachea los tokens de acceso de forma **global** a nivel de proceso:
 
 - La cache es un `ClassVar` en `OAuth2ClientCredentials` -- compartida entre TODAS las instancias del SDK
-- La clave de cache es un hash MD5 de `client_id:client_secret` (no se almacenan credenciales en texto plano)
+- La clave de cache es un hash SHA-256 de `client_id:client_secret` (no se almacenan credenciales en texto plano)
 - Si creas multiples instancias de `Workiva` con las mismas credenciales, reutilizan el mismo token
 - Los tokens se refrescan automaticamente 60 segundos antes de expirar
 
@@ -80,7 +80,7 @@ client2 = Workiva(client_id="abc", client_secret="xyz")
 ```
 _cache: ClassVar[dict[str, _CachedToken]]
 
-Clave:   MD5("client_id:client_secret")
+Clave:   SHA-256("client_id:client_secret")
 Valor:   _CachedToken(access_token="...", expires_at=epoch_float)
 
 Flujo:

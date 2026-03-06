@@ -43,12 +43,67 @@ with Workiva(client_id="...", client_secret="...") as client:
     # Chains API
     chains = client.chains.get_chains()
 
-    # Operaciones de larga duracion (202)
+    # Operaciones de larga duracion (202) — modo simple
+    operation = client.files.copy_file(
+        file_id="abc", destination_container="folder-123", wait=True
+    )
+
+    # O con polling manual
     response = client.files.copy_file(file_id="abc", destination_container="folder-123")
     operation = client.wait(response).result(timeout=300)
 ```
 
 Respuestas tipadas, auto-paginacion transparente, reintentos, multi-region — todo documentado en las [guias](https://deloitteworkiva.github.io/workiva-sdk/).
+
+## Reintentos y Rate Limiting
+
+El SDK incluye reintentos automaticos con backoff exponencial. Funciona sin configuracion adicional:
+
+```python
+from workiva import Workiva, RetryConfig
+
+# Configuracion por defecto (sin cambios necesarios)
+# 5 reintentos, backoff exponencial, 429/5xx automaticos
+with Workiva(client_id="...", client_secret="...") as client:
+    client.sustainability.create_metric(...)  # reintentos automaticos en 429
+
+# Configuracion personalizada para operaciones pesadas
+with Workiva(
+    client_id="...",
+    client_secret="...",
+    retry=RetryConfig(
+        max_retries=10,
+        max_interval_ms=60_000,
+        max_elapsed_ms=300_000,
+    ),
+) as client:
+    ...
+```
+
+### RetryConfig por defecto
+
+| Parametro | Default | Descripcion |
+|-----------|---------|-------------|
+| `max_retries` | 5 | Numero maximo de reintentos |
+| `initial_interval_ms` | 500 | Intervalo inicial entre reintentos (ms) |
+| `max_interval_ms` | 30,000 | Intervalo maximo entre reintentos (ms) |
+| `exponent` | 1.5 | Factor de backoff exponencial |
+| `max_elapsed_ms` | 120,000 | Tiempo maximo total de reintentos (ms) |
+| `status_codes` | 429, 500, 502, 503, 504 | Codigos HTTP que disparan reintento |
+
+### Excepciones tipadas
+
+```python
+from workiva import RateLimitError, WorkivaAPIError
+
+try:
+    client.sustainability.create_metric(...)
+except RateLimitError as e:
+    # 429 — solo se lanza si se agotan TODOS los reintentos
+    print(f"Rate limited. Retry after {e.retry_after}s")
+except WorkivaAPIError as e:
+    print(f"API error {e.status_code}: {e}")
+```
 
 ## APIs
 

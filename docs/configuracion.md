@@ -70,7 +70,7 @@ Cada metodo acepta un parametro `timeout` que sobreescribe el timeout global par
 result = client.files.get_files(timeout=60)
 
 # Timeout de 5 minutos para una operacion pesada
-result = client.spreadsheets.get_spreadsheet(
+result = client.spreadsheets.get_spreadsheet_by_id(
     spreadsheet_id="abc",
     timeout=300,
 )
@@ -80,26 +80,24 @@ result = client.spreadsheets.get_spreadsheet(
 
 ## Reintentos
 
-El SDK incluye un sistema de reintentos con backoff exponencial implementado como transport de httpx. Se configura a traves de `SDKConfig` y `RetryConfig`:
+El SDK incluye un sistema de reintentos con backoff exponencial implementado como transport de httpx. Se configura a traves de `RetryConfig`:
 
 ```python
-from workiva import Workiva, Region, SDKConfig, RetryConfig
+from workiva import Workiva, Region, RetryConfig
 
 client = Workiva(
     client_id="...",
     client_secret="...",
-    config=SDKConfig(
-        region=Region.EU,
-        timeout_s=30,
-        retry=RetryConfig(
-            max_retries=5,                 # Maximo 5 reintentos
-            initial_interval_ms=500,       # 500ms intervalo inicial
-            max_interval_ms=30_000,        # 30 segundos maximo entre reintentos
-            exponent=1.5,                  # Factor exponencial
-            max_elapsed_ms=120_000,        # 2 minutos maximo total
-            retry_connection_errors=True,  # Reintentar errores de conexion
-            status_codes=(429, 500, 502, 503, 504),  # Codigos a reintentar
-        ),
+    region=Region.EU,
+    timeout=30,
+    retry=RetryConfig(
+        max_retries=5,                 # Maximo 5 reintentos
+        initial_interval_ms=500,       # 500ms intervalo inicial
+        max_interval_ms=30_000,        # 30 segundos maximo entre reintentos
+        exponent=1.5,                  # Factor exponencial
+        max_elapsed_ms=120_000,        # 2 minutos maximo total
+        retry_connection_errors=True,  # Reintentar errores de conexion
+        status_codes=(429, 500, 502, 503, 504),  # Codigos a reintentar
     ),
 )
 ```
@@ -152,17 +150,15 @@ RetryConfig(
 Para desactivar completamente los reintentos:
 
 ```python
-from workiva import SDKConfig, RetryConfig
+from workiva import Workiva, RetryConfig
 
 client = Workiva(
     client_id="...",
     client_secret="...",
-    config=SDKConfig(
-        retry=RetryConfig(
-            max_elapsed_ms=0,
-            retry_connection_errors=False,
-            status_codes=(),
-        ),
+    retry=RetryConfig(
+        max_elapsed_ms=0,
+        retry_connection_errors=False,
+        status_codes=(),
     ),
 )
 ```
@@ -245,52 +241,35 @@ finally:
     # await client.aclose()  # Async
 ```
 
-## SDKConfig completo
+## Constructor completo
 
-`SDKConfig` agrupa toda la configuracion del SDK en un solo dataclass inmutable (`frozen=True`):
+El constructor de `Workiva` acepta todos los parametros de configuracion directamente:
 
 ```python
-from workiva import SDKConfig, RetryConfig, Region
+from workiva import Workiva, Region, RetryConfig
 
-config = SDKConfig(
-    region=Region.US,        # Region del servidor
-    timeout_s=30.0,          # Timeout global en segundos
-    retry=RetryConfig(...),  # Configuracion de reintentos
+client = Workiva(
+    client_id="...",
+    client_secret="...",
+    region=Region.US,            # Region del servidor
+    timeout=30.0,                # Timeout global en segundos
+    retry=RetryConfig(...),      # Configuracion de reintentos
+    client=httpx.Client(...),    # Cliente sync custom (opcional)
+    async_client=httpx.AsyncClient(...),  # Cliente async custom (opcional)
 )
 ```
 
-| Campo | Tipo | Default | Descripcion |
-|-------|------|---------|-------------|
+| Parametro | Tipo | Default | Descripcion |
+|-----------|------|---------|-------------|
+| `client_id` | `str` | (requerido) | ID de cliente OAuth2 |
+| `client_secret` | `str` | (requerido) | Secreto de cliente OAuth2 |
 | `region` | `Region` | `Region.EU` | Region del servidor |
-| `timeout_s` | `Optional[float]` | `None` | Timeout global (segundos). `None` = sin limite |
-| `retry` | `RetryConfig` | `RetryConfig()` | Configuracion de reintentos |
+| `timeout` | `Optional[float]` | `None` | Timeout global (segundos). `None` = sin limite |
+| `retry` | `Optional[RetryConfig]` | `RetryConfig()` | Configuracion de reintentos |
+| `client` | `Optional[httpx.Client]` | `None` | Cliente sync custom |
+| `async_client` | `Optional[httpx.AsyncClient]` | `None` | Cliente async custom |
 
-> `SDKConfig` y `RetryConfig` son inmutables (`frozen=True`). Si necesitas cambiar la configuracion, crea una nueva instancia.
-
-### Relacion entre `timeout` y `config`
-
-Si pasas tanto `timeout=` como `config=` al constructor de `Workiva`, el `config` tiene prioridad:
-
-```python
-# El timeout del config prevalece (timeout=30 se ignora)
-client = Workiva(
-    client_id="...",
-    client_secret="...",
-    timeout=30,
-    config=SDKConfig(timeout_s=60),  # Este gana
-)
-```
-
-Si pasas `timeout=` sin `config=`, el SDK crea un `SDKConfig` internamente con ese timeout:
-
-```python
-# Internamente: SDKConfig(region=Region.EU, timeout_s=30)
-client = Workiva(
-    client_id="...",
-    client_secret="...",
-    timeout=30,
-)
-```
+> `RetryConfig` es inmutable (`frozen=True`). Si necesitas cambiar la configuracion, crea una nueva instancia.
 
 ## Siguiente paso
 
