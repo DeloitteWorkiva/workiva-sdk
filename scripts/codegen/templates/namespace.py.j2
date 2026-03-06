@@ -35,6 +35,13 @@ from workiva.models.{{ api }} import (
 {% endfor %}
 )
 {% endif %}
+{% if typeddict_imports %}
+from workiva.models.{{ api }}_types import (
+{% for td in typeddict_imports %}
+    {{ td }},
+{% endfor %}
+)
+{% endif %}
 
 
 __all__ = ["{{ class_name }}"]

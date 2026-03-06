@@ -9,6 +9,11 @@ with full IDE autocompletion, instead of importing Pydantic models.
 from typing import Any, Literal, Required, TypedDict
 
 
+class FolderableDtoParam(TypedDict, total=False):
+    id_: Required[str]
+    type_: Required[int]
+
+
 class HierarchyMetadataParam(TypedDict, total=False):
     child_column_id: Required[str]
     parent_column_id: Required[str]
@@ -63,6 +68,15 @@ class QueryParameterDtoParam(TypedDict, total=False):
         ]
     ]
     value: dict[str, Any]
+
+
+class RefreshConnectionDtoParam(TypedDict, total=False):
+    connection_id: str
+    destination_parameters: dict[str, Any]
+    source_parameters: dict[str, Any]
+    use_previous_destination_parameters: bool
+    use_previous_source_parameters: bool
+    workspace_id: str
 
 
 class TableSchemaParam(TypedDict, total=False):

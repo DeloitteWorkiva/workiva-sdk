@@ -275,3 +275,136 @@ class TestGenerateTypedDictsForApi:
         }
         results = generate_typeddicts_for_api(spec, {"StatusEnum"})
         assert results == {}
+
+
+class TestOperationAcceptsDicts:
+    """Tests that generated operations accept TypedDict dicts in their signatures."""
+
+    def test_copy_file_accepts_dict_for_options(self):
+        """copy_file should accept FileCopyOptionsParam in its type hints."""
+        import inspect
+
+        from workiva._operations.files import Files
+
+        sig = inspect.signature(Files.copy_file)
+        options_param = sig.parameters["options"]
+        ann = str(options_param.annotation)
+        assert "FileCopyOptionsParam" in ann
+
+    def test_permissions_mod_accepts_dict_for_list(self):
+        """file_permissions_modification should accept TypedDict for list params."""
+        import inspect
+
+        from workiva._operations.files import Files
+
+        sig = inspect.signature(Files.file_permissions_modification)
+        param = sig.parameters["to_assign"]
+        ann = str(param.annotation)
+        assert "ResourcePermissionParam" in ann
+
+    def test_restore_file_body_accepts_dict(self):
+        """restore_file_by_id non-flat body should accept FileRestoreOptionsParam."""
+        import inspect
+
+        from workiva._operations.files import Files
+
+        sig = inspect.signature(Files.restore_file_by_id)
+        param = sig.parameters["body"]
+        ann = str(param.annotation)
+        assert "FileRestoreOptionsParam" in ann
+
+    def test_async_variant_also_has_union(self):
+        """Async methods should also accept TypedDict params."""
+        import inspect
+
+        from workiva._operations.files import Files
+
+        sig = inspect.signature(Files.copy_file_async)
+        options_param = sig.parameters["options"]
+        ann = str(options_param.annotation)
+        assert "FileCopyOptionsParam" in ann
+
+    def test_namespace_without_body_has_no_typeddict_imports(self):
+        """Namespaces with no body fields should not import TypedDict types."""
+        import inspect
+
+        source = inspect.getsource(
+            __import__("workiva._operations.activities", fromlist=["Activities"])
+        )
+        assert "_types import" not in source
+
+
+class TestSnakeToCamel:
+    """Tests for the _snake_to_camel helper."""
+
+    def test_converts_snake_to_camel(self):
+        from workiva._client import _snake_to_camel
+
+        assert _snake_to_camel("shallow_copy") == "shallowCopy"
+        assert _snake_to_camel("include_comments") == "includeComments"
+
+    def test_single_word(self):
+        from workiva._client import _snake_to_camel
+
+        assert _snake_to_camel("name") == "name"
+
+    def test_multiple_underscores(self):
+        from workiva._client import _snake_to_camel
+
+        assert _snake_to_camel("a_b_c") == "aBC"
+
+    def test_trailing_underscore(self):
+        """Trailing underscore (keyword suffix) produces empty-string part."""
+        from workiva._client import _snake_to_camel
+
+        # "type_" -> parts = ["type", ""] -> "type" + "" = "type"
+        assert _snake_to_camel("type_") == "type"
+
+
+class TestDeepSerializeSnakeConversion:
+    """Tests for snake_case → camelCase key conversion in _deep_serialize."""
+
+    def test_dict_snake_keys_converted(self):
+        from workiva._client import _deep_serialize
+
+        result = _deep_serialize({"shallow_copy": True, "include_comments": False})
+        assert result == {"shallowCopy": True, "includeComments": False}
+
+    def test_dict_camel_keys_unchanged(self):
+        from workiva._client import _deep_serialize
+
+        result = _deep_serialize({"shallowCopy": True})
+        assert result == {"shallowCopy": True}
+
+    def test_nested_dict_converted(self):
+        from workiva._client import _deep_serialize
+
+        result = _deep_serialize({"outer_key": {"inner_key": "value"}})
+        assert result == {"outerKey": {"innerKey": "value"}}
+
+    def test_list_of_dicts_converted(self):
+        from workiva._client import _deep_serialize
+
+        result = _deep_serialize([{"snake_key": 1}, {"another_key": 2}])
+        assert result == [{"snakeKey": 1}, {"anotherKey": 2}]
+
+    def test_mixed_keys(self):
+        """Keys with underscores are converted; keys without are not."""
+        from workiva._client import _deep_serialize
+
+        result = _deep_serialize({"camelCase": 1, "snake_case": 2})
+        assert result == {"camelCase": 1, "snakeCase": 2}
+
+    def test_pydantic_model_still_works(self):
+        """Pydantic models are still serialized via model_dump."""
+        from pydantic import BaseModel as PydanticBaseModel
+
+        from workiva._client import _deep_serialize
+
+        class TestModel(PydanticBaseModel):
+            my_field: str = "hello"
+
+        result = _deep_serialize(TestModel())
+        # model_dump(by_alias=True) — field name depends on alias config
+        assert isinstance(result, dict)
+        assert "hello" in result.values()

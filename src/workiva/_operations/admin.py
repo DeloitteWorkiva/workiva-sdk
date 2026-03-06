@@ -37,6 +37,12 @@ from workiva.models.platform import (
     WorkspacesListResult,
     WorkspaceSolutionsListResult,
 )
+from workiva.models.platform_types import (
+    OrganizationUserParam,
+    SolutionParam,
+    WorkspaceMembershipCreationOptionsParam,
+    WorkspaceParam,
+)
 from workiva.polling import _poll_until_done, _poll_until_done_async
 
 __all__ = ["Admin"]
@@ -1282,7 +1288,7 @@ class Admin(BaseNamespace):
         *,
         organization_id: str,
         name: Optional[str] = None,
-        solutions: Optional[list[Solution]] = None,
+        solutions: Optional[list[Solution | SolutionParam]] = None,
         timeout: Optional[float] = None,
     ) -> Workspace:
         """Create a new workspace
@@ -1323,7 +1329,7 @@ class Admin(BaseNamespace):
         *,
         organization_id: str,
         name: Optional[str] = None,
-        solutions: Optional[list[Solution]] = None,
+        solutions: Optional[list[Solution | SolutionParam]] = None,
         timeout: Optional[float] = None,
     ) -> Workspace:
         """Create a new workspace (async)
@@ -2210,8 +2216,8 @@ class Admin(BaseNamespace):
         *,
         organization_id: str,
         workspace_id: str,
-        user: Optional[OrganizationUser] = None,
-        workspace: Optional[Workspace] = None,
+        user: Optional[OrganizationUser | OrganizationUserParam] = None,
+        workspace: Optional[Workspace | WorkspaceParam] = None,
         timeout: Optional[float] = None,
     ) -> WorkspaceMembership:
         """Create a new workspace membership
@@ -2254,8 +2260,8 @@ class Admin(BaseNamespace):
         *,
         organization_id: str,
         workspace_id: str,
-        user: Optional[OrganizationUser] = None,
-        workspace: Optional[Workspace] = None,
+        user: Optional[OrganizationUser | OrganizationUserParam] = None,
+        workspace: Optional[Workspace | WorkspaceParam] = None,
         timeout: Optional[float] = None,
     ) -> WorkspaceMembership:
         """Create a new workspace membership (async)
@@ -2392,7 +2398,9 @@ class Admin(BaseNamespace):
         *,
         organization_id: str,
         workspace_id: str,
-        options: Optional[WorkspaceMembershipCreationOptions] = None,
+        options: Optional[
+            WorkspaceMembershipCreationOptions | WorkspaceMembershipCreationOptionsParam
+        ] = None,
         user: Optional[str] = None,
         timeout: Optional[float] = None,
     ) -> WorkspaceMembership:
@@ -2437,7 +2445,9 @@ class Admin(BaseNamespace):
         *,
         organization_id: str,
         workspace_id: str,
-        options: Optional[WorkspaceMembershipCreationOptions] = None,
+        options: Optional[
+            WorkspaceMembershipCreationOptions | WorkspaceMembershipCreationOptionsParam
+        ] = None,
         user: Optional[str] = None,
         timeout: Optional[float] = None,
     ) -> WorkspaceMembership:

@@ -63,6 +63,16 @@ from workiva.models.wdata import (
     TableSchema,
     UniqueConstraintDto,
 )
+from workiva.models.wdata_types import (
+    FolderableDtoParam,
+    HierarchyMetadataParam,
+    PivotDefinitionDtoParam,
+    QueryDtoParam,
+    QueryParameterDtoParam,
+    RefreshConnectionDtoParam,
+    TableSchemaParam,
+    UniqueConstraintDtoParam,
+)
 
 __all__ = ["Wdata"]
 
@@ -811,7 +821,7 @@ class Wdata(BaseNamespace):
     def refresh_batch(
         self,
         *,
-        body: list[RefreshConnectionDto],
+        body: list[RefreshConnectionDto | RefreshConnectionDtoParam],
         cancel_unwritables: Optional[bool] = None,
         timeout: Optional[float] = None,
     ) -> BaseResponseRefreshBatchDto:
@@ -853,7 +863,7 @@ class Wdata(BaseNamespace):
     async def refresh_batch_async(
         self,
         *,
-        body: list[RefreshConnectionDto],
+        body: list[RefreshConnectionDto | RefreshConnectionDtoParam],
         cancel_unwritables: Optional[bool] = None,
         timeout: Optional[float] = None,
     ) -> BaseResponseRefreshBatchDto:
@@ -2180,6 +2190,92 @@ class Wdata(BaseNamespace):
         _body_result = await paginate_all_async(_fetch, extract_wdata_cursor, "body")
         return PagedResponseFolderDto.model_validate(_body_result)
 
+    def update_folder(
+        self,
+        *,
+        folder_id: str,
+        name: str,
+        description: Optional[str] = None,
+        timeout: Optional[float] = None,
+    ) -> BaseResponseFolderDto:
+        """Update a single folder
+
+        Updates the folder that matches the provided ID with the details
+        provided in the
+        body.
+
+        Args:
+            folder_id: The unique identifier of the folder
+            name: The name of the folder
+            description: A description of the folder
+            timeout: Override the default request timeout (seconds).
+
+        Returns:
+            BaseResponseFolderDto
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 423, 429, 500).
+        """
+        _body: dict[str, Any] = {}
+        if name is not None:
+            _body["name"] = name
+        if description is not None:
+            _body["description"] = description
+        response = self._client.request(
+            "PUT",
+            self._api,
+            "/api/v1/folder/{folderId}",
+            path_params={
+                "folderId": folder_id,
+            },
+            json_body=_body or None,
+            timeout=timeout,
+        )
+        return BaseResponseFolderDto.model_validate(response.json())
+
+    async def update_folder_async(
+        self,
+        *,
+        folder_id: str,
+        name: str,
+        description: Optional[str] = None,
+        timeout: Optional[float] = None,
+    ) -> BaseResponseFolderDto:
+        """Update a single folder (async)
+
+        Updates the folder that matches the provided ID with the details
+        provided in the
+        body.
+
+        Args:
+            folder_id: The unique identifier of the folder
+            name: The name of the folder
+            description: A description of the folder
+            timeout: Override the default request timeout (seconds).
+
+        Returns:
+            BaseResponseFolderDto
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 423, 429, 500).
+        """
+        _body: dict[str, Any] = {}
+        if name is not None:
+            _body["name"] = name
+        if description is not None:
+            _body["description"] = description
+        response = await self._client.request_async(
+            "PUT",
+            self._api,
+            "/api/v1/folder/{folderId}",
+            path_params={
+                "folderId": folder_id,
+            },
+            json_body=_body or None,
+            timeout=timeout,
+        )
+        return BaseResponseFolderDto.model_validate(response.json())
+
     def delete_folder(
         self,
         *,
@@ -2310,97 +2406,11 @@ class Wdata(BaseNamespace):
         )
         return BaseResponseFolderDto.model_validate(response.json())
 
-    def update_folder(
-        self,
-        *,
-        folder_id: str,
-        name: str,
-        description: Optional[str] = None,
-        timeout: Optional[float] = None,
-    ) -> BaseResponseFolderDto:
-        """Update a single folder
-
-        Updates the folder that matches the provided ID with the details
-        provided in the
-        body.
-
-        Args:
-            folder_id: The unique identifier of the folder
-            name: The name of the folder
-            description: A description of the folder
-            timeout: Override the default request timeout (seconds).
-
-        Returns:
-            BaseResponseFolderDto
-
-        Raises:
-            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 423, 429, 500).
-        """
-        _body: dict[str, Any] = {}
-        if name is not None:
-            _body["name"] = name
-        if description is not None:
-            _body["description"] = description
-        response = self._client.request(
-            "PUT",
-            self._api,
-            "/api/v1/folder/{folderId}",
-            path_params={
-                "folderId": folder_id,
-            },
-            json_body=_body or None,
-            timeout=timeout,
-        )
-        return BaseResponseFolderDto.model_validate(response.json())
-
-    async def update_folder_async(
-        self,
-        *,
-        folder_id: str,
-        name: str,
-        description: Optional[str] = None,
-        timeout: Optional[float] = None,
-    ) -> BaseResponseFolderDto:
-        """Update a single folder (async)
-
-        Updates the folder that matches the provided ID with the details
-        provided in the
-        body.
-
-        Args:
-            folder_id: The unique identifier of the folder
-            name: The name of the folder
-            description: A description of the folder
-            timeout: Override the default request timeout (seconds).
-
-        Returns:
-            BaseResponseFolderDto
-
-        Raises:
-            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 423, 429, 500).
-        """
-        _body: dict[str, Any] = {}
-        if name is not None:
-            _body["name"] = name
-        if description is not None:
-            _body["description"] = description
-        response = await self._client.request_async(
-            "PUT",
-            self._api,
-            "/api/v1/folder/{folderId}",
-            path_params={
-                "folderId": folder_id,
-            },
-            json_body=_body or None,
-            timeout=timeout,
-        )
-        return BaseResponseFolderDto.model_validate(response.json())
-
     def set_children(
         self,
         *,
         folder_id: str,
-        body: list[FolderableDto],
+        body: list[FolderableDto | FolderableDtoParam],
         timeout: Optional[float] = None,
     ) -> BaseResponseCollectionFolderableDto:
         """Move content into a folder
@@ -2440,7 +2450,7 @@ class Wdata(BaseNamespace):
         self,
         *,
         folder_id: str,
-        body: list[FolderableDto],
+        body: list[FolderableDto | FolderableDtoParam],
         timeout: Optional[float] = None,
     ) -> BaseResponseCollectionFolderableDto:
         """Move content into a folder (async)
@@ -2806,134 +2816,6 @@ class Wdata(BaseNamespace):
         _body_result = await paginate_all_async(_fetch, extract_wdata_cursor, "body")
         return PagedResponseGlobalParameterDto.model_validate(_body_result)
 
-    def delete_parameter(
-        self,
-        *,
-        parameter_id: str,
-        timeout: Optional[float] = None,
-    ) -> BaseResponseString:
-        """Delete Parameter
-
-        Deletes the parameter with the provided parameter ID.  If the parameter
-        is not found, this is a no-op.
-
-        Args:
-            parameter_id: The unique identifier of the parameter
-            timeout: Override the default request timeout (seconds).
-
-        Returns:
-            BaseResponseString
-
-        Raises:
-            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 423, 429, 500).
-        """
-        response = self._client.request(
-            "DELETE",
-            self._api,
-            "/api/v1/parameter/{parameterId}",
-            path_params={
-                "parameterId": parameter_id,
-            },
-            timeout=timeout,
-        )
-        return BaseResponseString.model_validate(response.json())
-
-    async def delete_parameter_async(
-        self,
-        *,
-        parameter_id: str,
-        timeout: Optional[float] = None,
-    ) -> BaseResponseString:
-        """Delete Parameter (async)
-
-        Deletes the parameter with the provided parameter ID.  If the parameter
-        is not found, this is a no-op.
-
-        Args:
-            parameter_id: The unique identifier of the parameter
-            timeout: Override the default request timeout (seconds).
-
-        Returns:
-            BaseResponseString
-
-        Raises:
-            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 423, 429, 500).
-        """
-        response = await self._client.request_async(
-            "DELETE",
-            self._api,
-            "/api/v1/parameter/{parameterId}",
-            path_params={
-                "parameterId": parameter_id,
-            },
-            timeout=timeout,
-        )
-        return BaseResponseString.model_validate(response.json())
-
-    def get_parameter(
-        self,
-        *,
-        parameter_id: str,
-        timeout: Optional[float] = None,
-    ) -> BaseResponseGlobalParameterDto:
-        """Get Parameter
-
-        Returns a parameter matching the provided parameter ID.  If no matching
-        entity can be found, a 404 status is returned.
-
-        Args:
-            parameter_id: The unique identifier of the parameter
-            timeout: Override the default request timeout (seconds).
-
-        Returns:
-            BaseResponseGlobalParameterDto
-
-        Raises:
-            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 423, 429, 500).
-        """
-        response = self._client.request(
-            "GET",
-            self._api,
-            "/api/v1/parameter/{parameterId}",
-            path_params={
-                "parameterId": parameter_id,
-            },
-            timeout=timeout,
-        )
-        return BaseResponseGlobalParameterDto.model_validate(response.json())
-
-    async def get_parameter_async(
-        self,
-        *,
-        parameter_id: str,
-        timeout: Optional[float] = None,
-    ) -> BaseResponseGlobalParameterDto:
-        """Get Parameter (async)
-
-        Returns a parameter matching the provided parameter ID.  If no matching
-        entity can be found, a 404 status is returned.
-
-        Args:
-            parameter_id: The unique identifier of the parameter
-            timeout: Override the default request timeout (seconds).
-
-        Returns:
-            BaseResponseGlobalParameterDto
-
-        Raises:
-            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 423, 429, 500).
-        """
-        response = await self._client.request_async(
-            "GET",
-            self._api,
-            "/api/v1/parameter/{parameterId}",
-            path_params={
-                "parameterId": parameter_id,
-            },
-            timeout=timeout,
-        )
-        return BaseResponseGlobalParameterDto.model_validate(response.json())
-
     def update_parameter(
         self,
         *,
@@ -3088,6 +2970,134 @@ class Wdata(BaseNamespace):
                 "parameterId": parameter_id,
             },
             json_body=_body or None,
+            timeout=timeout,
+        )
+        return BaseResponseGlobalParameterDto.model_validate(response.json())
+
+    def delete_parameter(
+        self,
+        *,
+        parameter_id: str,
+        timeout: Optional[float] = None,
+    ) -> BaseResponseString:
+        """Delete Parameter
+
+        Deletes the parameter with the provided parameter ID.  If the parameter
+        is not found, this is a no-op.
+
+        Args:
+            parameter_id: The unique identifier of the parameter
+            timeout: Override the default request timeout (seconds).
+
+        Returns:
+            BaseResponseString
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 423, 429, 500).
+        """
+        response = self._client.request(
+            "DELETE",
+            self._api,
+            "/api/v1/parameter/{parameterId}",
+            path_params={
+                "parameterId": parameter_id,
+            },
+            timeout=timeout,
+        )
+        return BaseResponseString.model_validate(response.json())
+
+    async def delete_parameter_async(
+        self,
+        *,
+        parameter_id: str,
+        timeout: Optional[float] = None,
+    ) -> BaseResponseString:
+        """Delete Parameter (async)
+
+        Deletes the parameter with the provided parameter ID.  If the parameter
+        is not found, this is a no-op.
+
+        Args:
+            parameter_id: The unique identifier of the parameter
+            timeout: Override the default request timeout (seconds).
+
+        Returns:
+            BaseResponseString
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 423, 429, 500).
+        """
+        response = await self._client.request_async(
+            "DELETE",
+            self._api,
+            "/api/v1/parameter/{parameterId}",
+            path_params={
+                "parameterId": parameter_id,
+            },
+            timeout=timeout,
+        )
+        return BaseResponseString.model_validate(response.json())
+
+    def get_parameter(
+        self,
+        *,
+        parameter_id: str,
+        timeout: Optional[float] = None,
+    ) -> BaseResponseGlobalParameterDto:
+        """Get Parameter
+
+        Returns a parameter matching the provided parameter ID.  If no matching
+        entity can be found, a 404 status is returned.
+
+        Args:
+            parameter_id: The unique identifier of the parameter
+            timeout: Override the default request timeout (seconds).
+
+        Returns:
+            BaseResponseGlobalParameterDto
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 423, 429, 500).
+        """
+        response = self._client.request(
+            "GET",
+            self._api,
+            "/api/v1/parameter/{parameterId}",
+            path_params={
+                "parameterId": parameter_id,
+            },
+            timeout=timeout,
+        )
+        return BaseResponseGlobalParameterDto.model_validate(response.json())
+
+    async def get_parameter_async(
+        self,
+        *,
+        parameter_id: str,
+        timeout: Optional[float] = None,
+    ) -> BaseResponseGlobalParameterDto:
+        """Get Parameter (async)
+
+        Returns a parameter matching the provided parameter ID.  If no matching
+        entity can be found, a 404 status is returned.
+
+        Args:
+            parameter_id: The unique identifier of the parameter
+            timeout: Override the default request timeout (seconds).
+
+        Returns:
+            BaseResponseGlobalParameterDto
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 423, 429, 500).
+        """
+        response = await self._client.request_async(
+            "GET",
+            self._api,
+            "/api/v1/parameter/{parameterId}",
+            path_params={
+                "parameterId": parameter_id,
+            },
             timeout=timeout,
         )
         return BaseResponseGlobalParameterDto.model_validate(response.json())
@@ -3294,6 +3304,120 @@ class Wdata(BaseNamespace):
         _body_result = await paginate_all_async(_fetch, extract_wdata_cursor, "body")
         return PagedResponsePivotViewDto.model_validate(_body_result)
 
+    def update_pivot_view(
+        self,
+        *,
+        pivot_view_id: str,
+        name: str,
+        query_id: str,
+        additional_meta: Optional[dict[str, Any]] = None,
+        description: Optional[str] = None,
+        query_result_id: Optional[str] = None,
+        timeout: Optional[float] = None,
+    ) -> BaseResponsePivotViewDto:
+        """Update a single pivot view
+
+                Updates the view that matches the provided ID with the details provided
+                in the
+                body. The associated query can't be updated, so providing the query ID
+                has no effect.
+
+                Args:
+                    pivot_view_id: The unique identifier of the pivot view
+                    name: Name of the pivot view. The maximum size is 255 characters.
+                    query_id: The query to associate with this pivot view. This value is required and cannot be
+        updated after the pivot is created. Any attempt to update the query ID is ignored.
+                    additional_meta: User-defined metadata to attach to the pivot view. This is any arbitrary JSON object and is not required.
+                    description: The description of the pivot view
+                    query_result_id: An optional query result id to associate with this pivot view. If associated, saving a pivot view will cause an existence check on the related query result.  This value is not required. The query id on the query result must match this pivot's query ID.
+                    timeout: Override the default request timeout (seconds).
+
+                Returns:
+                    BaseResponsePivotViewDto
+
+                Raises:
+                    WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 423, 429, 500).
+        """
+        _body: dict[str, Any] = {}
+        if name is not None:
+            _body["name"] = name
+        if query_id is not None:
+            _body["queryId"] = query_id
+        if additional_meta is not None:
+            _body["additionalMeta"] = additional_meta
+        if description is not None:
+            _body["description"] = description
+        if query_result_id is not None:
+            _body["queryResultId"] = query_result_id
+        response = self._client.request(
+            "PUT",
+            self._api,
+            "/api/v1/pivotview/{pivotViewId}",
+            path_params={
+                "pivotViewId": pivot_view_id,
+            },
+            json_body=_body or None,
+            timeout=timeout,
+        )
+        return BaseResponsePivotViewDto.model_validate(response.json())
+
+    async def update_pivot_view_async(
+        self,
+        *,
+        pivot_view_id: str,
+        name: str,
+        query_id: str,
+        additional_meta: Optional[dict[str, Any]] = None,
+        description: Optional[str] = None,
+        query_result_id: Optional[str] = None,
+        timeout: Optional[float] = None,
+    ) -> BaseResponsePivotViewDto:
+        """Update a single pivot view (async)
+
+                Updates the view that matches the provided ID with the details provided
+                in the
+                body. The associated query can't be updated, so providing the query ID
+                has no effect.
+
+                Args:
+                    pivot_view_id: The unique identifier of the pivot view
+                    name: Name of the pivot view. The maximum size is 255 characters.
+                    query_id: The query to associate with this pivot view. This value is required and cannot be
+        updated after the pivot is created. Any attempt to update the query ID is ignored.
+                    additional_meta: User-defined metadata to attach to the pivot view. This is any arbitrary JSON object and is not required.
+                    description: The description of the pivot view
+                    query_result_id: An optional query result id to associate with this pivot view. If associated, saving a pivot view will cause an existence check on the related query result.  This value is not required. The query id on the query result must match this pivot's query ID.
+                    timeout: Override the default request timeout (seconds).
+
+                Returns:
+                    BaseResponsePivotViewDto
+
+                Raises:
+                    WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 423, 429, 500).
+        """
+        _body: dict[str, Any] = {}
+        if name is not None:
+            _body["name"] = name
+        if query_id is not None:
+            _body["queryId"] = query_id
+        if additional_meta is not None:
+            _body["additionalMeta"] = additional_meta
+        if description is not None:
+            _body["description"] = description
+        if query_result_id is not None:
+            _body["queryResultId"] = query_result_id
+        response = await self._client.request_async(
+            "PUT",
+            self._api,
+            "/api/v1/pivotview/{pivotViewId}",
+            path_params={
+                "pivotViewId": pivot_view_id,
+            },
+            json_body=_body or None,
+            timeout=timeout,
+        )
+        return BaseResponsePivotViewDto.model_validate(response.json())
+
     def delete_pivot_view(
         self,
         *,
@@ -3426,130 +3550,16 @@ class Wdata(BaseNamespace):
         )
         return BaseResponsePivotViewDto.model_validate(response.json())
 
-    def update_pivot_view(
-        self,
-        *,
-        pivot_view_id: str,
-        name: str,
-        query_id: str,
-        additional_meta: Optional[dict[str, Any]] = None,
-        description: Optional[str] = None,
-        query_result_id: Optional[str] = None,
-        timeout: Optional[float] = None,
-    ) -> BaseResponsePivotViewDto:
-        """Update a single pivot view
-
-                Updates the view that matches the provided ID with the details provided
-                in the
-                body. The associated query can't be updated, so providing the query ID
-                has no effect.
-
-                Args:
-                    pivot_view_id: The unique identifier of the pivot view
-                    name: Name of the pivot view. The maximum size is 255 characters.
-                    query_id: The query to associate with this pivot view. This value is required and cannot be
-        updated after the pivot is created. Any attempt to update the query ID is ignored.
-                    additional_meta: User-defined metadata to attach to the pivot view. This is any arbitrary JSON object and is not required.
-                    description: The description of the pivot view
-                    query_result_id: An optional query result id to associate with this pivot view. If associated, saving a pivot view will cause an existence check on the related query result.  This value is not required. The query id on the query result must match this pivot's query ID.
-                    timeout: Override the default request timeout (seconds).
-
-                Returns:
-                    BaseResponsePivotViewDto
-
-                Raises:
-                    WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 423, 429, 500).
-        """
-        _body: dict[str, Any] = {}
-        if name is not None:
-            _body["name"] = name
-        if query_id is not None:
-            _body["queryId"] = query_id
-        if additional_meta is not None:
-            _body["additionalMeta"] = additional_meta
-        if description is not None:
-            _body["description"] = description
-        if query_result_id is not None:
-            _body["queryResultId"] = query_result_id
-        response = self._client.request(
-            "PUT",
-            self._api,
-            "/api/v1/pivotview/{pivotViewId}",
-            path_params={
-                "pivotViewId": pivot_view_id,
-            },
-            json_body=_body or None,
-            timeout=timeout,
-        )
-        return BaseResponsePivotViewDto.model_validate(response.json())
-
-    async def update_pivot_view_async(
-        self,
-        *,
-        pivot_view_id: str,
-        name: str,
-        query_id: str,
-        additional_meta: Optional[dict[str, Any]] = None,
-        description: Optional[str] = None,
-        query_result_id: Optional[str] = None,
-        timeout: Optional[float] = None,
-    ) -> BaseResponsePivotViewDto:
-        """Update a single pivot view (async)
-
-                Updates the view that matches the provided ID with the details provided
-                in the
-                body. The associated query can't be updated, so providing the query ID
-                has no effect.
-
-                Args:
-                    pivot_view_id: The unique identifier of the pivot view
-                    name: Name of the pivot view. The maximum size is 255 characters.
-                    query_id: The query to associate with this pivot view. This value is required and cannot be
-        updated after the pivot is created. Any attempt to update the query ID is ignored.
-                    additional_meta: User-defined metadata to attach to the pivot view. This is any arbitrary JSON object and is not required.
-                    description: The description of the pivot view
-                    query_result_id: An optional query result id to associate with this pivot view. If associated, saving a pivot view will cause an existence check on the related query result.  This value is not required. The query id on the query result must match this pivot's query ID.
-                    timeout: Override the default request timeout (seconds).
-
-                Returns:
-                    BaseResponsePivotViewDto
-
-                Raises:
-                    WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 423, 429, 500).
-        """
-        _body: dict[str, Any] = {}
-        if name is not None:
-            _body["name"] = name
-        if query_id is not None:
-            _body["queryId"] = query_id
-        if additional_meta is not None:
-            _body["additionalMeta"] = additional_meta
-        if description is not None:
-            _body["description"] = description
-        if query_result_id is not None:
-            _body["queryResultId"] = query_result_id
-        response = await self._client.request_async(
-            "PUT",
-            self._api,
-            "/api/v1/pivotview/{pivotViewId}",
-            path_params={
-                "pivotViewId": pivot_view_id,
-            },
-            json_body=_body or None,
-            timeout=timeout,
-        )
-        return BaseResponsePivotViewDto.model_validate(response.json())
-
     def create_query(
         self,
         *,
         name: str,
         query_text: str,
-        definition: Optional[PivotDefinitionDto] = None,
+        definition: Optional[PivotDefinitionDto | PivotDefinitionDtoParam] = None,
         description: Optional[str] = None,
         history_revision: Optional[int] = None,
         is_shared: Optional[bool] = None,
-        parameters: Optional[list[QueryParameterDto]] = None,
+        parameters: Optional[list[QueryParameterDto | QueryParameterDtoParam]] = None,
         primary_query_result_id: Optional[str] = None,
         temporary: Optional[bool] = None,
         timeout: Optional[float] = None,
@@ -3613,11 +3623,11 @@ class Wdata(BaseNamespace):
         *,
         name: str,
         query_text: str,
-        definition: Optional[PivotDefinitionDto] = None,
+        definition: Optional[PivotDefinitionDto | PivotDefinitionDtoParam] = None,
         description: Optional[str] = None,
         history_revision: Optional[int] = None,
         is_shared: Optional[bool] = None,
-        parameters: Optional[list[QueryParameterDto]] = None,
+        parameters: Optional[list[QueryParameterDto | QueryParameterDtoParam]] = None,
         primary_query_result_id: Optional[str] = None,
         temporary: Optional[bool] = None,
         timeout: Optional[float] = None,
@@ -3837,11 +3847,11 @@ class Wdata(BaseNamespace):
         *,
         name: str,
         query_text: str,
-        definition: Optional[PivotDefinitionDto] = None,
+        definition: Optional[PivotDefinitionDto | PivotDefinitionDtoParam] = None,
         description: Optional[str] = None,
         history_revision: Optional[int] = None,
         is_shared: Optional[bool] = None,
-        parameters: Optional[list[QueryParameterDto]] = None,
+        parameters: Optional[list[QueryParameterDto | QueryParameterDtoParam]] = None,
         primary_query_result_id: Optional[str] = None,
         temporary: Optional[bool] = None,
         timeout: Optional[float] = None,
@@ -3901,11 +3911,11 @@ class Wdata(BaseNamespace):
         *,
         name: str,
         query_text: str,
-        definition: Optional[PivotDefinitionDto] = None,
+        definition: Optional[PivotDefinitionDto | PivotDefinitionDtoParam] = None,
         description: Optional[str] = None,
         history_revision: Optional[int] = None,
         is_shared: Optional[bool] = None,
-        parameters: Optional[list[QueryParameterDto]] = None,
+        parameters: Optional[list[QueryParameterDto | QueryParameterDtoParam]] = None,
         primary_query_result_id: Optional[str] = None,
         temporary: Optional[bool] = None,
         timeout: Optional[float] = None,
@@ -3955,6 +3965,148 @@ class Wdata(BaseNamespace):
             "POST",
             self._api,
             "/api/v1/query/validation",
+            json_body=_body or None,
+            timeout=timeout,
+        )
+        return BaseResponseQueryDto.model_validate(response.json())
+
+    def update_query(
+        self,
+        *,
+        query_id: str,
+        name: str,
+        query_text: str,
+        definition: Optional[PivotDefinitionDto | PivotDefinitionDtoParam] = None,
+        description: Optional[str] = None,
+        history_revision: Optional[int] = None,
+        is_shared: Optional[bool] = None,
+        parameters: Optional[list[QueryParameterDto | QueryParameterDtoParam]] = None,
+        primary_query_result_id: Optional[str] = None,
+        temporary: Optional[bool] = None,
+        timeout: Optional[float] = None,
+    ) -> BaseResponseQueryDto:
+        """Update a single query
+
+        Updates the query that matches the provided ID with the details provided
+        in the
+        body.
+
+        Args:
+            query_id: The unique identifier of the query
+            name: The name of the query
+            query_text: Max size is 30000 characters.  Is required.  Must be a valid DML statement.
+            definition: The pivot view's definition
+            description: The description of the query
+            history_revision: Historical revision number of this entity
+            is_shared: Whether or not this query is being shared.
+            parameters: The query parameters
+            primary_query_result_id: The identifier of the primary query result
+            temporary: Denotes if this query is meant to be temporary.  Default is false.
+            timeout: Override the default request timeout (seconds).
+
+        Returns:
+            BaseResponseQueryDto
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 423, 429, 500).
+        """
+        _body: dict[str, Any] = {}
+        if name is not None:
+            _body["name"] = name
+        if query_text is not None:
+            _body["queryText"] = query_text
+        if definition is not None:
+            _body["definition"] = definition
+        if description is not None:
+            _body["description"] = description
+        if history_revision is not None:
+            _body["historyRevision"] = history_revision
+        if is_shared is not None:
+            _body["isShared"] = is_shared
+        if parameters is not None:
+            _body["parameters"] = parameters
+        if primary_query_result_id is not None:
+            _body["primaryQueryResultId"] = primary_query_result_id
+        if temporary is not None:
+            _body["temporary"] = temporary
+        response = self._client.request(
+            "PUT",
+            self._api,
+            "/api/v1/query/{queryId}",
+            path_params={
+                "queryId": query_id,
+            },
+            json_body=_body or None,
+            timeout=timeout,
+        )
+        return BaseResponseQueryDto.model_validate(response.json())
+
+    async def update_query_async(
+        self,
+        *,
+        query_id: str,
+        name: str,
+        query_text: str,
+        definition: Optional[PivotDefinitionDto | PivotDefinitionDtoParam] = None,
+        description: Optional[str] = None,
+        history_revision: Optional[int] = None,
+        is_shared: Optional[bool] = None,
+        parameters: Optional[list[QueryParameterDto | QueryParameterDtoParam]] = None,
+        primary_query_result_id: Optional[str] = None,
+        temporary: Optional[bool] = None,
+        timeout: Optional[float] = None,
+    ) -> BaseResponseQueryDto:
+        """Update a single query (async)
+
+        Updates the query that matches the provided ID with the details provided
+        in the
+        body.
+
+        Args:
+            query_id: The unique identifier of the query
+            name: The name of the query
+            query_text: Max size is 30000 characters.  Is required.  Must be a valid DML statement.
+            definition: The pivot view's definition
+            description: The description of the query
+            history_revision: Historical revision number of this entity
+            is_shared: Whether or not this query is being shared.
+            parameters: The query parameters
+            primary_query_result_id: The identifier of the primary query result
+            temporary: Denotes if this query is meant to be temporary.  Default is false.
+            timeout: Override the default request timeout (seconds).
+
+        Returns:
+            BaseResponseQueryDto
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 423, 429, 500).
+        """
+        _body: dict[str, Any] = {}
+        if name is not None:
+            _body["name"] = name
+        if query_text is not None:
+            _body["queryText"] = query_text
+        if definition is not None:
+            _body["definition"] = definition
+        if description is not None:
+            _body["description"] = description
+        if history_revision is not None:
+            _body["historyRevision"] = history_revision
+        if is_shared is not None:
+            _body["isShared"] = is_shared
+        if parameters is not None:
+            _body["parameters"] = parameters
+        if primary_query_result_id is not None:
+            _body["primaryQueryResultId"] = primary_query_result_id
+        if temporary is not None:
+            _body["temporary"] = temporary
+        response = await self._client.request_async(
+            "PUT",
+            self._api,
+            "/api/v1/query/{queryId}",
+            path_params={
+                "queryId": query_id,
+            },
             json_body=_body or None,
             timeout=timeout,
         )
@@ -4086,148 +4238,6 @@ class Wdata(BaseNamespace):
             path_params={
                 "queryId": query_id,
             },
-            timeout=timeout,
-        )
-        return BaseResponseQueryDto.model_validate(response.json())
-
-    def update_query(
-        self,
-        *,
-        query_id: str,
-        name: str,
-        query_text: str,
-        definition: Optional[PivotDefinitionDto] = None,
-        description: Optional[str] = None,
-        history_revision: Optional[int] = None,
-        is_shared: Optional[bool] = None,
-        parameters: Optional[list[QueryParameterDto]] = None,
-        primary_query_result_id: Optional[str] = None,
-        temporary: Optional[bool] = None,
-        timeout: Optional[float] = None,
-    ) -> BaseResponseQueryDto:
-        """Update a single query
-
-        Updates the query that matches the provided ID with the details provided
-        in the
-        body.
-
-        Args:
-            query_id: The unique identifier of the query
-            name: The name of the query
-            query_text: Max size is 30000 characters.  Is required.  Must be a valid DML statement.
-            definition: The pivot view's definition
-            description: The description of the query
-            history_revision: Historical revision number of this entity
-            is_shared: Whether or not this query is being shared.
-            parameters: The query parameters
-            primary_query_result_id: The identifier of the primary query result
-            temporary: Denotes if this query is meant to be temporary.  Default is false.
-            timeout: Override the default request timeout (seconds).
-
-        Returns:
-            BaseResponseQueryDto
-
-        Raises:
-            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 423, 429, 500).
-        """
-        _body: dict[str, Any] = {}
-        if name is not None:
-            _body["name"] = name
-        if query_text is not None:
-            _body["queryText"] = query_text
-        if definition is not None:
-            _body["definition"] = definition
-        if description is not None:
-            _body["description"] = description
-        if history_revision is not None:
-            _body["historyRevision"] = history_revision
-        if is_shared is not None:
-            _body["isShared"] = is_shared
-        if parameters is not None:
-            _body["parameters"] = parameters
-        if primary_query_result_id is not None:
-            _body["primaryQueryResultId"] = primary_query_result_id
-        if temporary is not None:
-            _body["temporary"] = temporary
-        response = self._client.request(
-            "PUT",
-            self._api,
-            "/api/v1/query/{queryId}",
-            path_params={
-                "queryId": query_id,
-            },
-            json_body=_body or None,
-            timeout=timeout,
-        )
-        return BaseResponseQueryDto.model_validate(response.json())
-
-    async def update_query_async(
-        self,
-        *,
-        query_id: str,
-        name: str,
-        query_text: str,
-        definition: Optional[PivotDefinitionDto] = None,
-        description: Optional[str] = None,
-        history_revision: Optional[int] = None,
-        is_shared: Optional[bool] = None,
-        parameters: Optional[list[QueryParameterDto]] = None,
-        primary_query_result_id: Optional[str] = None,
-        temporary: Optional[bool] = None,
-        timeout: Optional[float] = None,
-    ) -> BaseResponseQueryDto:
-        """Update a single query (async)
-
-        Updates the query that matches the provided ID with the details provided
-        in the
-        body.
-
-        Args:
-            query_id: The unique identifier of the query
-            name: The name of the query
-            query_text: Max size is 30000 characters.  Is required.  Must be a valid DML statement.
-            definition: The pivot view's definition
-            description: The description of the query
-            history_revision: Historical revision number of this entity
-            is_shared: Whether or not this query is being shared.
-            parameters: The query parameters
-            primary_query_result_id: The identifier of the primary query result
-            temporary: Denotes if this query is meant to be temporary.  Default is false.
-            timeout: Override the default request timeout (seconds).
-
-        Returns:
-            BaseResponseQueryDto
-
-        Raises:
-            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 423, 429, 500).
-        """
-        _body: dict[str, Any] = {}
-        if name is not None:
-            _body["name"] = name
-        if query_text is not None:
-            _body["queryText"] = query_text
-        if definition is not None:
-            _body["definition"] = definition
-        if description is not None:
-            _body["description"] = description
-        if history_revision is not None:
-            _body["historyRevision"] = history_revision
-        if is_shared is not None:
-            _body["isShared"] = is_shared
-        if parameters is not None:
-            _body["parameters"] = parameters
-        if primary_query_result_id is not None:
-            _body["primaryQueryResultId"] = primary_query_result_id
-        if temporary is not None:
-            _body["temporary"] = temporary
-        response = await self._client.request_async(
-            "PUT",
-            self._api,
-            "/api/v1/query/{queryId}",
-            path_params={
-                "queryId": query_id,
-            },
-            json_body=_body or None,
             timeout=timeout,
         )
         return BaseResponseQueryDto.model_validate(response.json())
@@ -4490,7 +4500,7 @@ class Wdata(BaseNamespace):
         query_id: str,
         is_explain: Optional[bool] = None,
         parameters: Optional[dict[str, Any]] = None,
-        query_dto: Optional[QueryDto] = None,
+        query_dto: Optional[QueryDto | QueryDtoParam] = None,
         timeout: Optional[float] = None,
     ) -> BaseResponseQueryResultDto:
         """Execute a query
@@ -4538,7 +4548,7 @@ class Wdata(BaseNamespace):
         query_id: str,
         is_explain: Optional[bool] = None,
         parameters: Optional[dict[str, Any]] = None,
-        query_dto: Optional[QueryDto] = None,
+        query_dto: Optional[QueryDto | QueryDtoParam] = None,
         timeout: Optional[float] = None,
     ) -> BaseResponseQueryResultDto:
         """Execute a query (async)
@@ -5166,138 +5176,6 @@ class Wdata(BaseNamespace):
         _body_result = await paginate_all_async(_fetch, extract_wdata_cursor, "body")
         return PagedResponseSelectListDto.model_validate(_body_result)
 
-    def delete(
-        self,
-        *,
-        select_list_id: str,
-        timeout: Optional[float] = None,
-    ) -> BaseResponseString:
-        """Delete a single select list
-
-        Deletes a select list with the provided ID. If no such select list
-        exists, this is
-        a no-op.
-
-        Args:
-            select_list_id: The unique identifier of the select list
-            timeout: Override the default request timeout (seconds).
-
-        Returns:
-            BaseResponseString
-
-        Raises:
-            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 423, 429, 500).
-        """
-        response = self._client.request(
-            "DELETE",
-            self._api,
-            "/api/v1/selectlist/{selectListId}",
-            path_params={
-                "selectListId": select_list_id,
-            },
-            timeout=timeout,
-        )
-        return BaseResponseString.model_validate(response.json())
-
-    async def delete_async(
-        self,
-        *,
-        select_list_id: str,
-        timeout: Optional[float] = None,
-    ) -> BaseResponseString:
-        """Delete a single select list (async)
-
-        Deletes a select list with the provided ID. If no such select list
-        exists, this is
-        a no-op.
-
-        Args:
-            select_list_id: The unique identifier of the select list
-            timeout: Override the default request timeout (seconds).
-
-        Returns:
-            BaseResponseString
-
-        Raises:
-            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 423, 429, 500).
-        """
-        response = await self._client.request_async(
-            "DELETE",
-            self._api,
-            "/api/v1/selectlist/{selectListId}",
-            path_params={
-                "selectListId": select_list_id,
-            },
-            timeout=timeout,
-        )
-        return BaseResponseString.model_validate(response.json())
-
-    def get_select_list(
-        self,
-        *,
-        select_list_id: str,
-        timeout: Optional[float] = None,
-    ) -> BaseResponseSelectListDto:
-        """Retrieve a single select list
-
-        Returns a select list that matches the provided ID, or a 404 if no
-        matching select
-        list is found.
-
-        Args:
-            select_list_id: The unique identifier of the select list
-            timeout: Override the default request timeout (seconds).
-
-        Returns:
-            BaseResponseSelectListDto
-
-        Raises:
-            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 423, 429, 500).
-        """
-        response = self._client.request(
-            "GET",
-            self._api,
-            "/api/v1/selectlist/{selectListId}",
-            path_params={
-                "selectListId": select_list_id,
-            },
-            timeout=timeout,
-        )
-        return BaseResponseSelectListDto.model_validate(response.json())
-
-    async def get_select_list_async(
-        self,
-        *,
-        select_list_id: str,
-        timeout: Optional[float] = None,
-    ) -> BaseResponseSelectListDto:
-        """Retrieve a single select list (async)
-
-        Returns a select list that matches the provided ID, or a 404 if no
-        matching select
-        list is found.
-
-        Args:
-            select_list_id: The unique identifier of the select list
-            timeout: Override the default request timeout (seconds).
-
-        Returns:
-            BaseResponseSelectListDto
-
-        Raises:
-            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 423, 429, 500).
-        """
-        response = await self._client.request_async(
-            "GET",
-            self._api,
-            "/api/v1/selectlist/{selectListId}",
-            path_params={
-                "selectListId": select_list_id,
-            },
-            timeout=timeout,
-        )
-        return BaseResponseSelectListDto.model_validate(response.json())
-
     def update_select_list(
         self,
         *,
@@ -5430,6 +5308,138 @@ class Wdata(BaseNamespace):
                 "selectListId": select_list_id,
             },
             json_body=_body or None,
+            timeout=timeout,
+        )
+        return BaseResponseSelectListDto.model_validate(response.json())
+
+    def delete(
+        self,
+        *,
+        select_list_id: str,
+        timeout: Optional[float] = None,
+    ) -> BaseResponseString:
+        """Delete a single select list
+
+        Deletes a select list with the provided ID. If no such select list
+        exists, this is
+        a no-op.
+
+        Args:
+            select_list_id: The unique identifier of the select list
+            timeout: Override the default request timeout (seconds).
+
+        Returns:
+            BaseResponseString
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 423, 429, 500).
+        """
+        response = self._client.request(
+            "DELETE",
+            self._api,
+            "/api/v1/selectlist/{selectListId}",
+            path_params={
+                "selectListId": select_list_id,
+            },
+            timeout=timeout,
+        )
+        return BaseResponseString.model_validate(response.json())
+
+    async def delete_async(
+        self,
+        *,
+        select_list_id: str,
+        timeout: Optional[float] = None,
+    ) -> BaseResponseString:
+        """Delete a single select list (async)
+
+        Deletes a select list with the provided ID. If no such select list
+        exists, this is
+        a no-op.
+
+        Args:
+            select_list_id: The unique identifier of the select list
+            timeout: Override the default request timeout (seconds).
+
+        Returns:
+            BaseResponseString
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 423, 429, 500).
+        """
+        response = await self._client.request_async(
+            "DELETE",
+            self._api,
+            "/api/v1/selectlist/{selectListId}",
+            path_params={
+                "selectListId": select_list_id,
+            },
+            timeout=timeout,
+        )
+        return BaseResponseString.model_validate(response.json())
+
+    def get_select_list(
+        self,
+        *,
+        select_list_id: str,
+        timeout: Optional[float] = None,
+    ) -> BaseResponseSelectListDto:
+        """Retrieve a single select list
+
+        Returns a select list that matches the provided ID, or a 404 if no
+        matching select
+        list is found.
+
+        Args:
+            select_list_id: The unique identifier of the select list
+            timeout: Override the default request timeout (seconds).
+
+        Returns:
+            BaseResponseSelectListDto
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 423, 429, 500).
+        """
+        response = self._client.request(
+            "GET",
+            self._api,
+            "/api/v1/selectlist/{selectListId}",
+            path_params={
+                "selectListId": select_list_id,
+            },
+            timeout=timeout,
+        )
+        return BaseResponseSelectListDto.model_validate(response.json())
+
+    async def get_select_list_async(
+        self,
+        *,
+        select_list_id: str,
+        timeout: Optional[float] = None,
+    ) -> BaseResponseSelectListDto:
+        """Retrieve a single select list (async)
+
+        Returns a select list that matches the provided ID, or a 404 if no
+        matching select
+        list is found.
+
+        Args:
+            select_list_id: The unique identifier of the select list
+            timeout: Override the default request timeout (seconds).
+
+        Returns:
+            BaseResponseSelectListDto
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 423, 429, 500).
+        """
+        response = await self._client.request_async(
+            "GET",
+            self._api,
+            "/api/v1/selectlist/{selectListId}",
+            path_params={
+                "selectListId": select_list_id,
+            },
             timeout=timeout,
         )
         return BaseResponseSelectListDto.model_validate(response.json())
@@ -5752,12 +5762,12 @@ class Wdata(BaseNamespace):
         self,
         *,
         name: str,
-        table_schema: TableSchema,
+        table_schema: TableSchema | TableSchemaParam,
         type_: Literal["data", "lookup", "hierarchy"],
-        unique_table_constraints: list[UniqueConstraintDto],
+        unique_table_constraints: list[UniqueConstraintDto | UniqueConstraintDtoParam],
         dataset_updated: Optional[str] = None,
         description: Optional[str] = None,
-        hierarchy_metadata: Optional[HierarchyMetadata] = None,
+        hierarchy_metadata: Optional[HierarchyMetadata | HierarchyMetadataParam] = None,
         timeout: Optional[float] = None,
     ) -> BaseResponseTableDto:
         """Create a new table
@@ -5812,12 +5822,12 @@ class Wdata(BaseNamespace):
         self,
         *,
         name: str,
-        table_schema: TableSchema,
+        table_schema: TableSchema | TableSchemaParam,
         type_: Literal["data", "lookup", "hierarchy"],
-        unique_table_constraints: list[UniqueConstraintDto],
+        unique_table_constraints: list[UniqueConstraintDto | UniqueConstraintDtoParam],
         dataset_updated: Optional[str] = None,
         description: Optional[str] = None,
-        hierarchy_metadata: Optional[HierarchyMetadata] = None,
+        hierarchy_metadata: Optional[HierarchyMetadata | HierarchyMetadataParam] = None,
         timeout: Optional[float] = None,
     ) -> BaseResponseTableDto:
         """Create a new table (async)
@@ -5952,6 +5962,160 @@ class Wdata(BaseNamespace):
         _body_result = await paginate_all_async(_fetch, extract_wdata_cursor, "body")
         return PagedResponseTableDto.model_validate(_body_result)
 
+    def update_table(
+        self,
+        *,
+        table_id: str,
+        name: str,
+        table_schema: TableSchema | TableSchemaParam,
+        type_: Literal["data", "lookup", "hierarchy"],
+        unique_table_constraints: list[UniqueConstraintDto | UniqueConstraintDtoParam],
+        dataset_updated: Optional[str] = None,
+        description: Optional[str] = None,
+        hierarchy_metadata: Optional[HierarchyMetadata | HierarchyMetadataParam] = None,
+        timeout: Optional[float] = None,
+    ) -> BaseResponseTableDto:
+        """Update a single table
+
+                Updates an existing table with the provided information. Include all
+                user-defined
+                table columns with the request. For type, specify either a dimension or
+                data table.
+                In the interface, data tables appear as fact tables.
+                * If the table has no imported
+                data, user-defined columns not included with the request are deleted,
+                and columns are
+                sorted according to their order in the request.
+                * If the table has imported data,
+                any columns with names not already in the table are considered new. This
+                equality
+                check is case-insensitive. Any new columns appear after other user-
+                defined columns,
+                but before any meta columns, which start with `_`.
+
+                Args:
+                    table_id: The unique identifier of the table
+                    name: May be at most 150 characters in length
+                    table_schema: The schema to apply
+                    type_: The type of table
+                    unique_table_constraints: A property indicating the unique constraints on the table.
+                    dataset_updated: The last time that the data set for this table was modified.
+                    description: May be at most 255 characters in length
+                    hierarchy_metadata: For hierarchical tables, this object specifies the parent and child column identifiers.
+        Only required for tables of type "hierarchy."
+
+                    timeout: Override the default request timeout (seconds).
+
+                Returns:
+                    BaseResponseTableDto
+
+                Raises:
+                    WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 423, 429, 500).
+        """
+        _body: dict[str, Any] = {}
+        if name is not None:
+            _body["name"] = name
+        if table_schema is not None:
+            _body["tableSchema"] = table_schema
+        if type_ is not None:
+            _body["type"] = type_
+        if unique_table_constraints is not None:
+            _body["uniqueTableConstraints"] = unique_table_constraints
+        if dataset_updated is not None:
+            _body["datasetUpdated"] = dataset_updated
+        if description is not None:
+            _body["description"] = description
+        if hierarchy_metadata is not None:
+            _body["hierarchyMetadata"] = hierarchy_metadata
+        response = self._client.request(
+            "PUT",
+            self._api,
+            "/api/v1/table/{tableId}",
+            path_params={
+                "tableId": table_id,
+            },
+            json_body=_body or None,
+            timeout=timeout,
+        )
+        return BaseResponseTableDto.model_validate(response.json())
+
+    async def update_table_async(
+        self,
+        *,
+        table_id: str,
+        name: str,
+        table_schema: TableSchema | TableSchemaParam,
+        type_: Literal["data", "lookup", "hierarchy"],
+        unique_table_constraints: list[UniqueConstraintDto | UniqueConstraintDtoParam],
+        dataset_updated: Optional[str] = None,
+        description: Optional[str] = None,
+        hierarchy_metadata: Optional[HierarchyMetadata | HierarchyMetadataParam] = None,
+        timeout: Optional[float] = None,
+    ) -> BaseResponseTableDto:
+        """Update a single table (async)
+
+                Updates an existing table with the provided information. Include all
+                user-defined
+                table columns with the request. For type, specify either a dimension or
+                data table.
+                In the interface, data tables appear as fact tables.
+                * If the table has no imported
+                data, user-defined columns not included with the request are deleted,
+                and columns are
+                sorted according to their order in the request.
+                * If the table has imported data,
+                any columns with names not already in the table are considered new. This
+                equality
+                check is case-insensitive. Any new columns appear after other user-
+                defined columns,
+                but before any meta columns, which start with `_`.
+
+                Args:
+                    table_id: The unique identifier of the table
+                    name: May be at most 150 characters in length
+                    table_schema: The schema to apply
+                    type_: The type of table
+                    unique_table_constraints: A property indicating the unique constraints on the table.
+                    dataset_updated: The last time that the data set for this table was modified.
+                    description: May be at most 255 characters in length
+                    hierarchy_metadata: For hierarchical tables, this object specifies the parent and child column identifiers.
+        Only required for tables of type "hierarchy."
+
+                    timeout: Override the default request timeout (seconds).
+
+                Returns:
+                    BaseResponseTableDto
+
+                Raises:
+                    WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 423, 429, 500).
+        """
+        _body: dict[str, Any] = {}
+        if name is not None:
+            _body["name"] = name
+        if table_schema is not None:
+            _body["tableSchema"] = table_schema
+        if type_ is not None:
+            _body["type"] = type_
+        if unique_table_constraints is not None:
+            _body["uniqueTableConstraints"] = unique_table_constraints
+        if dataset_updated is not None:
+            _body["datasetUpdated"] = dataset_updated
+        if description is not None:
+            _body["description"] = description
+        if hierarchy_metadata is not None:
+            _body["hierarchyMetadata"] = hierarchy_metadata
+        response = await self._client.request_async(
+            "PUT",
+            self._api,
+            "/api/v1/table/{tableId}",
+            path_params={
+                "tableId": table_id,
+            },
+            json_body=_body or None,
+            timeout=timeout,
+        )
+        return BaseResponseTableDto.model_validate(response.json())
+
     def delete_table(
         self,
         *,
@@ -6074,160 +6238,6 @@ class Wdata(BaseNamespace):
             path_params={
                 "tableId": table_id,
             },
-            timeout=timeout,
-        )
-        return BaseResponseTableDto.model_validate(response.json())
-
-    def update_table(
-        self,
-        *,
-        table_id: str,
-        name: str,
-        table_schema: TableSchema,
-        type_: Literal["data", "lookup", "hierarchy"],
-        unique_table_constraints: list[UniqueConstraintDto],
-        dataset_updated: Optional[str] = None,
-        description: Optional[str] = None,
-        hierarchy_metadata: Optional[HierarchyMetadata] = None,
-        timeout: Optional[float] = None,
-    ) -> BaseResponseTableDto:
-        """Update a single table
-
-                Updates an existing table with the provided information. Include all
-                user-defined
-                table columns with the request. For type, specify either a dimension or
-                data table.
-                In the interface, data tables appear as fact tables.
-                * If the table has no imported
-                data, user-defined columns not included with the request are deleted,
-                and columns are
-                sorted according to their order in the request.
-                * If the table has imported data,
-                any columns with names not already in the table are considered new. This
-                equality
-                check is case-insensitive. Any new columns appear after other user-
-                defined columns,
-                but before any meta columns, which start with `_`.
-
-                Args:
-                    table_id: The unique identifier of the table
-                    name: May be at most 150 characters in length
-                    table_schema: The schema to apply
-                    type_: The type of table
-                    unique_table_constraints: A property indicating the unique constraints on the table.
-                    dataset_updated: The last time that the data set for this table was modified.
-                    description: May be at most 255 characters in length
-                    hierarchy_metadata: For hierarchical tables, this object specifies the parent and child column identifiers.
-        Only required for tables of type "hierarchy."
-
-                    timeout: Override the default request timeout (seconds).
-
-                Returns:
-                    BaseResponseTableDto
-
-                Raises:
-                    WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 423, 429, 500).
-        """
-        _body: dict[str, Any] = {}
-        if name is not None:
-            _body["name"] = name
-        if table_schema is not None:
-            _body["tableSchema"] = table_schema
-        if type_ is not None:
-            _body["type"] = type_
-        if unique_table_constraints is not None:
-            _body["uniqueTableConstraints"] = unique_table_constraints
-        if dataset_updated is not None:
-            _body["datasetUpdated"] = dataset_updated
-        if description is not None:
-            _body["description"] = description
-        if hierarchy_metadata is not None:
-            _body["hierarchyMetadata"] = hierarchy_metadata
-        response = self._client.request(
-            "PUT",
-            self._api,
-            "/api/v1/table/{tableId}",
-            path_params={
-                "tableId": table_id,
-            },
-            json_body=_body or None,
-            timeout=timeout,
-        )
-        return BaseResponseTableDto.model_validate(response.json())
-
-    async def update_table_async(
-        self,
-        *,
-        table_id: str,
-        name: str,
-        table_schema: TableSchema,
-        type_: Literal["data", "lookup", "hierarchy"],
-        unique_table_constraints: list[UniqueConstraintDto],
-        dataset_updated: Optional[str] = None,
-        description: Optional[str] = None,
-        hierarchy_metadata: Optional[HierarchyMetadata] = None,
-        timeout: Optional[float] = None,
-    ) -> BaseResponseTableDto:
-        """Update a single table (async)
-
-                Updates an existing table with the provided information. Include all
-                user-defined
-                table columns with the request. For type, specify either a dimension or
-                data table.
-                In the interface, data tables appear as fact tables.
-                * If the table has no imported
-                data, user-defined columns not included with the request are deleted,
-                and columns are
-                sorted according to their order in the request.
-                * If the table has imported data,
-                any columns with names not already in the table are considered new. This
-                equality
-                check is case-insensitive. Any new columns appear after other user-
-                defined columns,
-                but before any meta columns, which start with `_`.
-
-                Args:
-                    table_id: The unique identifier of the table
-                    name: May be at most 150 characters in length
-                    table_schema: The schema to apply
-                    type_: The type of table
-                    unique_table_constraints: A property indicating the unique constraints on the table.
-                    dataset_updated: The last time that the data set for this table was modified.
-                    description: May be at most 255 characters in length
-                    hierarchy_metadata: For hierarchical tables, this object specifies the parent and child column identifiers.
-        Only required for tables of type "hierarchy."
-
-                    timeout: Override the default request timeout (seconds).
-
-                Returns:
-                    BaseResponseTableDto
-
-                Raises:
-                    WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 423, 429, 500).
-        """
-        _body: dict[str, Any] = {}
-        if name is not None:
-            _body["name"] = name
-        if table_schema is not None:
-            _body["tableSchema"] = table_schema
-        if type_ is not None:
-            _body["type"] = type_
-        if unique_table_constraints is not None:
-            _body["uniqueTableConstraints"] = unique_table_constraints
-        if dataset_updated is not None:
-            _body["datasetUpdated"] = dataset_updated
-        if description is not None:
-            _body["description"] = description
-        if hierarchy_metadata is not None:
-            _body["hierarchyMetadata"] = hierarchy_metadata
-        response = await self._client.request_async(
-            "PUT",
-            self._api,
-            "/api/v1/table/{tableId}",
-            path_params={
-                "tableId": table_id,
-            },
-            json_body=_body or None,
             timeout=timeout,
         )
         return BaseResponseTableDto.model_validate(response.json())
@@ -6852,70 +6862,6 @@ class Wdata(BaseNamespace):
         _body_result = await paginate_all_async(_fetch, extract_wdata_cursor, "body")
         return PagedResponseTagDto.model_validate(_body_result)
 
-    def delete_tag(
-        self,
-        *,
-        tag_id: str,
-        timeout: Optional[float] = None,
-    ) -> BaseResponseString:
-        """Delete a single tag
-
-        Deletes the tag with the provided ID. If no such tag is found, this is a
-        no-op.
-
-        Args:
-            tag_id: The unique identifier of the tag
-            timeout: Override the default request timeout (seconds).
-
-        Returns:
-            BaseResponseString
-
-        Raises:
-            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 423, 429, 500).
-        """
-        response = self._client.request(
-            "DELETE",
-            self._api,
-            "/api/v1/tag/{tagId}",
-            path_params={
-                "tagId": tag_id,
-            },
-            timeout=timeout,
-        )
-        return BaseResponseString.model_validate(response.json())
-
-    async def delete_tag_async(
-        self,
-        *,
-        tag_id: str,
-        timeout: Optional[float] = None,
-    ) -> BaseResponseString:
-        """Delete a single tag (async)
-
-        Deletes the tag with the provided ID. If no such tag is found, this is a
-        no-op.
-
-        Args:
-            tag_id: The unique identifier of the tag
-            timeout: Override the default request timeout (seconds).
-
-        Returns:
-            BaseResponseString
-
-        Raises:
-            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 423, 429, 500).
-        """
-        response = await self._client.request_async(
-            "DELETE",
-            self._api,
-            "/api/v1/tag/{tagId}",
-            path_params={
-                "tagId": tag_id,
-            },
-            timeout=timeout,
-        )
-        return BaseResponseString.model_validate(response.json())
-
     def update_tag(
         self,
         *,
@@ -7003,6 +6949,70 @@ class Wdata(BaseNamespace):
             timeout=timeout,
         )
         return BaseResponseTagDto.model_validate(response.json())
+
+    def delete_tag(
+        self,
+        *,
+        tag_id: str,
+        timeout: Optional[float] = None,
+    ) -> BaseResponseString:
+        """Delete a single tag
+
+        Deletes the tag with the provided ID. If no such tag is found, this is a
+        no-op.
+
+        Args:
+            tag_id: The unique identifier of the tag
+            timeout: Override the default request timeout (seconds).
+
+        Returns:
+            BaseResponseString
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 423, 429, 500).
+        """
+        response = self._client.request(
+            "DELETE",
+            self._api,
+            "/api/v1/tag/{tagId}",
+            path_params={
+                "tagId": tag_id,
+            },
+            timeout=timeout,
+        )
+        return BaseResponseString.model_validate(response.json())
+
+    async def delete_tag_async(
+        self,
+        *,
+        tag_id: str,
+        timeout: Optional[float] = None,
+    ) -> BaseResponseString:
+        """Delete a single tag (async)
+
+        Deletes the tag with the provided ID. If no such tag is found, this is a
+        no-op.
+
+        Args:
+            tag_id: The unique identifier of the tag
+            timeout: Override the default request timeout (seconds).
+
+        Returns:
+            BaseResponseString
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 423, 429, 500).
+        """
+        response = await self._client.request_async(
+            "DELETE",
+            self._api,
+            "/api/v1/tag/{tagId}",
+            path_params={
+                "tagId": tag_id,
+            },
+            timeout=timeout,
+        )
+        return BaseResponseString.model_validate(response.json())
 
     def create_token(
         self,

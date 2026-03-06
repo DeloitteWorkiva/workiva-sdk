@@ -103,6 +103,44 @@ def _format_source(source: str) -> str:
     return source
 
 
+def _collect_api_input_models() -> dict[str, set[str]]:
+    """Collect input model names per API that have TypedDict equivalents.
+
+    For each API, parses the spec and collects model names used as body
+    field types in operations.  Then filters to only those that exist as
+    object schemas (i.e. schemas with ``properties``) — the same subset
+    that ``generate_typeddicts_for_api`` will emit TypedDicts for.
+
+    Returns:
+        Mapping of API name → set of model class names.
+    """
+    result: dict[str, set[str]] = {}
+    for api, spec_filename in API_SPECS.items():
+        spec_path = OAS_DIR / spec_filename
+        if not spec_path.exists():
+            continue
+
+        with open(spec_path) as f:
+            spec = yaml.safe_load(f)
+
+        groups = parse_spec(spec_path, api)
+        models: set[str] = set()
+        for _tag, operations in groups.items():
+            for op in operations:
+                if op.body_fields:
+                    for bf in op.body_fields:
+                        _collect_model_types(bf.python_type, models)
+                if op.has_body and not op.has_flat_body and op.request_body and op.request_body.python_type:
+                    _collect_model_types(op.request_body.python_type, models)
+
+        # Only keep models that exist as object schemas in the spec
+        schemas = spec.get("components", {}).get("schemas", {})
+        models = {m for m in models if m in schemas and "properties" in schemas.get(m, {})}
+        if models:
+            result[api] = models
+    return result
+
+
 def generate_operations(
     env: SandboxedEnvironment,
 ) -> int:
@@ -113,6 +151,9 @@ def generate_operations(
     """
     total_ops = 0
     OPERATIONS_DIR.mkdir(parents=True, exist_ok=True)
+
+    # Pre-compute which models have TypedDict equivalents per API
+    api_typeddict_models = _collect_api_input_models()
 
     # Ensure __init__.py exists
     init_path = OPERATIONS_DIR / "__init__.py"
@@ -194,6 +235,18 @@ class BaseNamespace:
                 ):
                     has_long_running = True
 
+            # Collect TypedDict union types for this namespace
+            input_model_types: set[str] = set()
+            for op in operations:
+                if op.body_fields:
+                    for bf in op.body_fields:
+                        _collect_model_types(bf.python_type, input_model_types)
+                if op.has_body and not op.has_flat_body and op.request_body and op.request_body.python_type:
+                    _collect_model_types(op.request_body.python_type, input_model_types)
+            # Only keep types that actually have generated TypedDicts
+            input_model_types &= api_typeddict_models.get(api, set())
+            typeddict_imports = sorted(f"{t}Param" for t in input_model_types)
+
             # Render template
             source = namespace_template.render(
                 api=api,
@@ -205,6 +258,8 @@ class BaseNamespace:
                 has_pagination=has_pagination,
                 has_literal=has_literal,
                 has_long_running=has_long_running,
+                input_model_types=input_model_types,
+                typeddict_imports=typeddict_imports,
             )
 
             # Validate syntax
@@ -236,7 +291,7 @@ def generate_typeddict_files(env: SandboxedEnvironment) -> None:
         with open(spec_path) as f:
             spec = yaml.safe_load(f)
 
-        # Collect input model names from operations
+        # Collect input model names from operations (flat body fields + non-flat body)
         groups = parse_spec(spec_path, api)
         input_models: set[str] = set()
         for tag, operations in groups.items():
@@ -244,6 +299,8 @@ def generate_typeddict_files(env: SandboxedEnvironment) -> None:
                 if op.body_fields:
                     for bf in op.body_fields:
                         _collect_model_types(bf.python_type, input_models)
+                if op.has_body and not op.has_flat_body and op.request_body and op.request_body.python_type:
+                    _collect_model_types(op.request_body.python_type, input_models)
 
         if not input_models:
             print(f"  [SKIP] {api}: no input models")

@@ -31,6 +31,16 @@ from workiva._version import __user_agent__
 _PATH_PARAM_RE = re.compile(r"\{(\w+)\}")
 
 
+def _snake_to_camel(name: str) -> str:
+    """Convert snake_case to camelCase.
+
+    Only called when the key contains an underscore. Keys that are
+    already camelCase (no underscore) are never passed to this function.
+    """
+    parts = name.split("_")
+    return parts[0] + "".join(p.capitalize() for p in parts[1:])
+
+
 def _deep_serialize(value: Any) -> Any:
     """Recursively serialize Pydantic models and Enums within dicts/lists.
 
@@ -38,6 +48,10 @@ def _deep_serialize(value: Any) -> Any:
     (e.g. ``options=FileCopyOptions(...)``), httpx can't serialize them.
     This converts them to plain dicts suitable for JSON encoding.
     Enum values are extracted via ``.value`` so they serialize as primitives.
+
+    Dict keys containing underscores are converted from snake_case to
+    camelCase so that TypedDict/plain-dict inputs with snake_case keys
+    are serialized with the camelCase keys the API expects.
     """
     if isinstance(value, PydanticBaseModel):
         return value.model_dump(by_alias=True, exclude_none=True)
@@ -46,7 +60,10 @@ def _deep_serialize(value: Any) -> Any:
     if isinstance(value, list):
         return [_deep_serialize(v) for v in value]
     if isinstance(value, dict):
-        return {k: _deep_serialize(v) for k, v in value.items()}
+        return {
+            (_snake_to_camel(k) if "_" in k else k): _deep_serialize(v)
+            for k, v in value.items()
+        }
     return value
 
 

@@ -1,4 +1,4 @@
-{% from '_params.py.j2' import render_params %}
+{% from '_params.py.j2' import render_params with context %}
 {% set cursor_spec_name = op.cursor_param_name %}
 {% set has_json_response = op.success_response and op.success_response.content_type == 'application/json' and op.success_response.python_type != 'None' %}
 {% set return_type = op.success_response.python_type if has_json_response else 'httpx.Response' %}

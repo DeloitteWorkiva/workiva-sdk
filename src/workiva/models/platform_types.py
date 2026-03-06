@@ -103,6 +103,14 @@ class FileCopyOptionsParam(TypedDict, total=False):
     shallow_copy: bool
 
 
+class FileRestoreOptionsParam(TypedDict, total=False):
+    pass
+
+
+class FileTrashOptionsParam(TypedDict, total=False):
+    pass
+
+
 class FolderExportParam(TypedDict, total=False):
     email_on_complete: bool
     include_attachments: bool

@@ -34,6 +34,13 @@ from workiva.models.platform import (
     Topic,
     TopicsListResult,
 )
+from workiva.models.platform_types import (
+    DimensionValueParam,
+    FrameworkReferenceParam,
+    MetricValueParam,
+    ResourcePermissionParam,
+    TagParam,
+)
 from workiva.polling import _poll_until_done, _poll_until_done_async
 
 __all__ = ["Sustainability"]
@@ -340,7 +347,7 @@ class Sustainability(BaseNamespace):
         program_id: str,
         active: Optional[bool] = None,
         name: Optional[str] = None,
-        values: Optional[list[DimensionValue]] = None,
+        values: Optional[list[DimensionValue | DimensionValueParam]] = None,
         timeout: Optional[float] = None,
     ) -> Dimension:
         """Create a new dimension
@@ -386,7 +393,7 @@ class Sustainability(BaseNamespace):
         program_id: str,
         active: Optional[bool] = None,
         name: Optional[str] = None,
-        values: Optional[list[DimensionValue]] = None,
+        values: Optional[list[DimensionValue | DimensionValueParam]] = None,
         timeout: Optional[float] = None,
     ) -> Dimension:
         """Create a new dimension (async)
@@ -686,13 +693,13 @@ class Sustainability(BaseNamespace):
         code: Optional[int] = None,
         data_type: Optional[Literal["text", "number", "date", "currency", "percent"]] = None,
         description: Optional[str] = None,
-        framework_references: Optional[list[FrameworkReference]] = None,
+        framework_references: Optional[list[FrameworkReference | FrameworkReferenceParam]] = None,
         id_: Optional[str] = None,
         index: Optional[int] = None,
         name: Optional[str] = None,
         require_notes: Optional[bool] = None,
         require_supporting_attachments: Optional[bool] = None,
-        tags: Optional[list[Tag]] = None,
+        tags: Optional[list[Tag | TagParam]] = None,
         topic: Optional[str] = None,
         unit: Optional[str] = None,
         timeout: Optional[float] = None,
@@ -773,13 +780,13 @@ class Sustainability(BaseNamespace):
         code: Optional[int] = None,
         data_type: Optional[Literal["text", "number", "date", "currency", "percent"]] = None,
         description: Optional[str] = None,
-        framework_references: Optional[list[FrameworkReference]] = None,
+        framework_references: Optional[list[FrameworkReference | FrameworkReferenceParam]] = None,
         id_: Optional[str] = None,
         index: Optional[int] = None,
         name: Optional[str] = None,
         require_notes: Optional[bool] = None,
         require_supporting_attachments: Optional[bool] = None,
-        tags: Optional[list[Tag]] = None,
+        tags: Optional[list[Tag | TagParam]] = None,
         topic: Optional[str] = None,
         unit: Optional[str] = None,
         timeout: Optional[float] = None,
@@ -1701,7 +1708,7 @@ class Sustainability(BaseNamespace):
         *,
         program_id: str,
         metric_id: str,
-        data: Optional[list[MetricValue]] = None,
+        data: Optional[list[MetricValue | MetricValueParam]] = None,
         timeout: Optional[float] = None,
     ) -> None:
         """Initiate a batch deletion of metric values
@@ -1742,7 +1749,7 @@ class Sustainability(BaseNamespace):
         *,
         program_id: str,
         metric_id: str,
-        data: Optional[list[MetricValue]] = None,
+        data: Optional[list[MetricValue | MetricValueParam]] = None,
         timeout: Optional[float] = None,
     ) -> None:
         """Initiate a batch deletion of metric values (async)
@@ -1784,7 +1791,7 @@ class Sustainability(BaseNamespace):
         *,
         program_id: str,
         metric_id: str,
-        data: Optional[list[MetricValue]] = None,
+        data: Optional[list[MetricValue | MetricValueParam]] = None,
         timeout: Optional[float] = None,
         wait: Literal[False] = ...,
         wait_timeout: float = 300,
@@ -1796,7 +1803,7 @@ class Sustainability(BaseNamespace):
         *,
         program_id: str,
         metric_id: str,
-        data: Optional[list[MetricValue]] = None,
+        data: Optional[list[MetricValue | MetricValueParam]] = None,
         timeout: Optional[float] = None,
         wait: Literal[True] = ...,
         wait_timeout: float = 300,
@@ -1807,7 +1814,7 @@ class Sustainability(BaseNamespace):
         *,
         program_id: str,
         metric_id: str,
-        data: Optional[list[MetricValue]] = None,
+        data: Optional[list[MetricValue | MetricValueParam]] = None,
         timeout: Optional[float] = None,
         wait: bool = False,
         wait_timeout: float = 300,
@@ -1876,7 +1883,7 @@ class Sustainability(BaseNamespace):
         *,
         program_id: str,
         metric_id: str,
-        data: Optional[list[MetricValue]] = None,
+        data: Optional[list[MetricValue | MetricValueParam]] = None,
         timeout: Optional[float] = None,
         wait: Literal[False] = ...,
         wait_timeout: float = 300,
@@ -1888,7 +1895,7 @@ class Sustainability(BaseNamespace):
         *,
         program_id: str,
         metric_id: str,
-        data: Optional[list[MetricValue]] = None,
+        data: Optional[list[MetricValue | MetricValueParam]] = None,
         timeout: Optional[float] = None,
         wait: Literal[True] = ...,
         wait_timeout: float = 300,
@@ -1899,7 +1906,7 @@ class Sustainability(BaseNamespace):
         *,
         program_id: str,
         metric_id: str,
-        data: Optional[list[MetricValue]] = None,
+        data: Optional[list[MetricValue | MetricValueParam]] = None,
         timeout: Optional[float] = None,
         wait: bool = False,
         wait_timeout: float = 300,
@@ -2056,8 +2063,8 @@ class Sustainability(BaseNamespace):
         self,
         *,
         program_id: str,
-        to_assign: Optional[list[ResourcePermission]] = None,
-        to_revoke: Optional[list[ResourcePermission]] = None,
+        to_assign: Optional[list[ResourcePermission | ResourcePermissionParam]] = None,
+        to_revoke: Optional[list[ResourcePermission | ResourcePermissionParam]] = None,
         timeout: Optional[float] = None,
     ) -> None:
         """Modify permissions on a program
@@ -2099,8 +2106,8 @@ class Sustainability(BaseNamespace):
         self,
         *,
         program_id: str,
-        to_assign: Optional[list[ResourcePermission]] = None,
-        to_revoke: Optional[list[ResourcePermission]] = None,
+        to_assign: Optional[list[ResourcePermission | ResourcePermissionParam]] = None,
+        to_revoke: Optional[list[ResourcePermission | ResourcePermissionParam]] = None,
         timeout: Optional[float] = None,
     ) -> None:
         """Modify permissions on a program (async)

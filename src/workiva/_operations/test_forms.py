@@ -27,6 +27,10 @@ from workiva.models.platform import (
     TestPhase,
     TestPhasesListResult,
 )
+from workiva.models.platform_types import (
+    MatrixColumnParam,
+    SampleCellParam,
+)
 from workiva.polling import _poll_until_done, _poll_until_done_async
 
 __all__ = ["TestForms"]
@@ -1090,9 +1094,9 @@ class TestForms(BaseNamespace):
         *,
         test_form_id: str,
         test_phase_id: str,
-        data_columns: Optional[list[MatrixColumn]] = None,
+        data_columns: Optional[list[MatrixColumn | MatrixColumnParam]] = None,
         name: Optional[str] = None,
-        result_columns: Optional[list[MatrixColumn]] = None,
+        result_columns: Optional[list[MatrixColumn | MatrixColumnParam]] = None,
         timeout: Optional[float] = None,
     ) -> Matrix:
         """Create a new matrix
@@ -1140,9 +1144,9 @@ class TestForms(BaseNamespace):
         *,
         test_form_id: str,
         test_phase_id: str,
-        data_columns: Optional[list[MatrixColumn]] = None,
+        data_columns: Optional[list[MatrixColumn | MatrixColumnParam]] = None,
         name: Optional[str] = None,
-        result_columns: Optional[list[MatrixColumn]] = None,
+        result_columns: Optional[list[MatrixColumn | MatrixColumnParam]] = None,
         timeout: Optional[float] = None,
     ) -> Matrix:
         """Create a new matrix (async)
@@ -1991,9 +1995,9 @@ class TestForms(BaseNamespace):
         test_form_id: str,
         test_phase_id: str,
         matrix_id: str,
-        data_values: Optional[list[SampleCell]] = None,
+        data_values: Optional[list[SampleCell | SampleCellParam]] = None,
         id_: Optional[str] = None,
-        result_values: Optional[list[SampleCell]] = None,
+        result_values: Optional[list[SampleCell | SampleCellParam]] = None,
         timeout: Optional[float] = None,
     ) -> MatrixSample:
         """Create a new sample
@@ -2044,9 +2048,9 @@ class TestForms(BaseNamespace):
         test_form_id: str,
         test_phase_id: str,
         matrix_id: str,
-        data_values: Optional[list[SampleCell]] = None,
+        data_values: Optional[list[SampleCell | SampleCellParam]] = None,
         id_: Optional[str] = None,
-        result_values: Optional[list[SampleCell]] = None,
+        result_values: Optional[list[SampleCell | SampleCellParam]] = None,
         timeout: Optional[float] = None,
     ) -> MatrixSample:
         """Create a new sample (async)

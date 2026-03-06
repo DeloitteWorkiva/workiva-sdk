@@ -22,10 +22,24 @@ wait_default    – default value for `wait` (e.g. "False", "..." )
         {{ p.python_name }}: {{ p.python_type }},
 {% endfor %}
 {% for bf in op.body_fields if bf.required %}
+{% if bf.python_type in input_model_types %}
+        {{ bf.python_name }}: {{ bf.python_type }} | {{ bf.python_type }}Param,
+{% elif bf.python_type.startswith('list[') and bf.python_type[5:-1] in input_model_types %}
+{% set inner = bf.python_type[5:-1] %}
+        {{ bf.python_name }}: list[{{ inner }} | {{ inner }}Param],
+{% else %}
         {{ bf.python_name }}: {{ bf.python_type }},
+{% endif %}
 {% endfor %}
 {% if op.has_body and not op.has_flat_body and op.request_body.required %}
+{% if op.request_body.python_type in input_model_types %}
+        body: {{ op.request_body.python_type }} | {{ op.request_body.python_type }}Param,
+{% elif op.request_body.python_type.startswith('list[') and op.request_body.python_type[5:-1] in input_model_types %}
+{% set inner = op.request_body.python_type[5:-1] %}
+        body: list[{{ inner }} | {{ inner }}Param],
+{% else %}
         body: {{ op.request_body.python_type }},
+{% endif %}
 {% endif %}
 {% for p in op.params if p.location == 'query' and not p.required and p.name != cursor_spec_name %}
         {{ p.python_name }}: {{ p.python_type }} = {{ p.default or 'None' }},
@@ -34,10 +48,24 @@ wait_default    – default value for `wait` (e.g. "False", "..." )
         {{ p.python_name }}: {{ p.python_type }} = {{ p.default or 'None' }},
 {% endfor %}
 {% for bf in op.body_fields if not bf.required %}
+{% if bf.python_type in input_model_types %}
+        {{ bf.python_name }}: Optional[{{ bf.python_type }} | {{ bf.python_type }}Param] = None,
+{% elif bf.python_type.startswith('list[') and bf.python_type[5:-1] in input_model_types %}
+{% set inner = bf.python_type[5:-1] %}
+        {{ bf.python_name }}: Optional[list[{{ inner }} | {{ inner }}Param]] = None,
+{% else %}
         {{ bf.python_name }}: Optional[{{ bf.python_type }}] = None,
+{% endif %}
 {% endfor %}
 {% if op.has_body and not op.has_flat_body and not op.request_body.required %}
+{% if op.request_body.python_type in input_model_types %}
+        body: Optional[{{ op.request_body.python_type }} | {{ op.request_body.python_type }}Param] = None,
+{% elif op.request_body.python_type.startswith('list[') and op.request_body.python_type[5:-1] in input_model_types %}
+{% set inner = op.request_body.python_type[5:-1] %}
+        body: Optional[list[{{ inner }} | {{ inner }}Param]] = None,
+{% else %}
         body: Optional[{{ op.request_body.python_type }}] = None,
+{% endif %}
 {% endif %}
         timeout: Optional[float] = None,
 {% if include_wait %}

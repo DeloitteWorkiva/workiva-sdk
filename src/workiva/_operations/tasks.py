@@ -23,6 +23,11 @@ from workiva.models.platform import (
     TasksListResult,
     TaskUser,
 )
+from workiva.models.platform_types import (
+    TaskApprovalStepParam,
+    TaskLocationParam,
+    TaskUserParam,
+)
 
 __all__ = ["Tasks"]
 
@@ -36,11 +41,11 @@ class Tasks(BaseNamespace):
         self,
         *,
         title: str,
-        approval_steps: Optional[list[TaskApprovalStep]] = None,
-        assignees: Optional[list[TaskUser]] = None,
+        approval_steps: Optional[list[TaskApprovalStep | TaskApprovalStepParam]] = None,
+        assignees: Optional[list[TaskUser | TaskUserParam]] = None,
         description: Optional[str] = None,
         due_date: Optional[str] = None,
-        location: Optional[TaskLocation] = None,
+        location: Optional[TaskLocation | TaskLocationParam] = None,
         notifications_disabled: Optional[bool] = None,
         status: Optional[str] = None,
         timeout: Optional[float] = None,
@@ -98,11 +103,11 @@ class Tasks(BaseNamespace):
         self,
         *,
         title: str,
-        approval_steps: Optional[list[TaskApprovalStep]] = None,
-        assignees: Optional[list[TaskUser]] = None,
+        approval_steps: Optional[list[TaskApprovalStep | TaskApprovalStepParam]] = None,
+        assignees: Optional[list[TaskUser | TaskUserParam]] = None,
         description: Optional[str] = None,
         due_date: Optional[str] = None,
-        location: Optional[TaskLocation] = None,
+        location: Optional[TaskLocation | TaskLocationParam] = None,
         notifications_disabled: Optional[bool] = None,
         status: Optional[str] = None,
         timeout: Optional[float] = None,
