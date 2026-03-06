@@ -8,7 +8,7 @@
 [![Coverage](https://img.shields.io/badge/coverage-90%25-brightgreen)]()
 [![Docs](https://img.shields.io/badge/docs-GitHub%20Pages-blue)](https://deloitteworkiva.github.io/workiva-sdk/)
 
-**3 APIs. 18 namespaces. 357 operaciones. Un solo cliente Python.**
+**3 APIs. 18 namespaces. 359 operaciones. Un solo cliente Python.**
 
 [Documentación](https://deloitteworkiva.github.io/workiva-sdk/) · [Quick Start](https://deloitteworkiva.github.io/workiva-sdk/inicio-rapido/) · [API Reference](https://deloitteworkiva.github.io/workiva-sdk/referencia-api/)
 
@@ -126,7 +126,7 @@ except WorkivaAPIError as e:
 
 | | API | Namespaces | Operaciones |
 |---|-----|-----------|:-----------:|
-| :gear: | **Platform** | `files`, `documents`, `spreadsheets`, `admin`, `permissions`, `tasks`, `presentations`, `milestones`, `activities`, `content`, `graph`, `sustainability`, `test_forms`, `reports`, `operations`, `iam` | 280+ |
+| :gear: | **Platform** | `files`, `documents`, `spreadsheets`, `admin`, `permissions`, `tasks`, `presentations`, `milestones`, `activities`, `content`, `graph`, `sustainability`, `test_forms`, `reports`, `operations`, `iam` | 247 |
 | :link: | **Chains** | `chains` | 29 |
 | :bar_chart: | **Wdata** | `wdata` | 83 |
 
