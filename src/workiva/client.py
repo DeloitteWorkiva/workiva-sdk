@@ -191,18 +191,13 @@ class Workiva:
                 f"If you used wait=True, the operation already returns an "
                 f"Operation directly — no need to call wait()."
             )
-        if isinstance(response, httpx.Response):
-            headers = dict(response.headers)
-            body = None
-            try:
-                body = response.json()
-            except (ValueError, RuntimeError):
-                pass
-        else:
-            headers = getattr(response, "headers", {})
-            if not isinstance(headers, dict):
-                headers = dict(headers)
-            body = getattr(response, "result", None)
+
+        headers = dict(response.headers)
+        body = None
+        try:
+            body = response.json()
+        except (ValueError, RuntimeError):
+            pass
 
         operation_id = _extract_operation_id(headers)
         retry_after = _get_retry_after(headers)
