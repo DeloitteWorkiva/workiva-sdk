@@ -57,20 +57,13 @@ Respuestas tipadas, auto-paginacion transparente, reintentos, multi-region — t
 
 ### Parametros de entrada
 
-La mayoria de operaciones aceptan dicts planos — no necesitas importar modelos:
+Los parametros de entrada aceptan dicts planos con autocompletado — no necesitas importar modelos:
 
 ```python
-# Dicts planos con autocompletado en el IDE
+# Dict plano — sin imports
 client.files.copy_file(
     file_id="abc",
     options={"shallow_copy": True, "include_comments": True},
-)
-
-# Los modelos Pydantic tambien funcionan para quien los prefiera
-from workiva.models.platform import FileCopyOptions
-client.files.copy_file(
-    file_id="abc",
-    options=FileCopyOptions(shallow_copy=True),
 )
 
 # Para tipado explicito (opcional):

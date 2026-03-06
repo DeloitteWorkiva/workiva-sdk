@@ -105,7 +105,7 @@ Las operaciones que devuelven HTTP 202 (operaciones de larga duracion) o 204 (si
 
 ### Dicts como parametros de entrada
 
-Los parametros de entrada aceptan **dicts planos** ademas de modelos Pydantic — no necesitas importar nada para empezar:
+Los parametros de entrada aceptan **dicts planos** con autocompletado completo en el IDE — no necesitas importar nada:
 
 ```python
 # Dict plano — sin imports de modelos
@@ -114,15 +114,16 @@ client.files.copy_file(
     options={"shallow_copy": True, "include_comments": True},
 )
 
-# Modelo Pydantic — para quien prefiera validacion estricta
-from workiva.models.platform import FileCopyOptions
-client.files.copy_file(file_id="abc", options=FileCopyOptions(shallow_copy=True))
+# Para tipado explicito (opcional):
+from workiva.models import FileCopyOptionsParam
+opts: FileCopyOptionsParam = {"shallow_copy": True}
+client.files.copy_file(file_id="abc", options=opts)
 ```
 
-Los type hints de cada metodo usan `Union[Model, TypedDict]`, asi que ambas formas tienen autocompletado completo en el IDE.
+Los type hints usan TypedDict para entrada y modelos Pydantic para salida — el mismo patron que Stripe y OpenAI.
 
 ## Version actual
 
-- **SDK**: 0.6.9
+- **SDK**: 0.6.10
 - **Python target**: 3.10+
 - **Codegen**: datamodel-code-generator + Jinja2 (sin Speakeasy ni openapi-generator)

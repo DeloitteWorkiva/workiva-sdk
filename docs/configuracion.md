@@ -78,7 +78,7 @@ result = client.spreadsheets.get_spreadsheet_by_id(
 
 > **No existen** parametros `retries=`, `server_url=` ni `http_headers=` per-operation. El unico parametro extra que aceptan todos los metodos es `timeout`.
 
-> **Tip:** Los parametros de cuerpo (body) aceptan dicts planos ademas de modelos Pydantic. No necesitas importar modelos para llamadas sencillas. Consulta la seccion [Dicts como parametros de entrada](index.md#dicts-como-parametros-de-entrada) para mas detalles.
+> **Tip:** Los parametros de cuerpo (body) aceptan dicts planos con autocompletado TypedDict. No necesitas importar modelos. Consulta la seccion [Dicts como parametros de entrada](index.md#dicts-como-parametros-de-entrada) para mas detalles.
 
 ## Reintentos
 
