@@ -23,7 +23,7 @@ make generate-models     # Generate Pydantic models only
 make generate-operations # Generate operation namespaces only
 
 # Testing
-make test                # All tests (unit + integration) — 184 tests
+make test                # All tests (unit + integration) — 392 tests
 make test-unit           # Unit tests only
 make test-integration    # Integration tests only
 make test-cov            # Coverage report for core modules
@@ -44,17 +44,17 @@ uv sync --group codegen  # Install codegen deps (for generation)
 ### Pipeline: Spec → SDK
 
 ```
-                  ┌─ codegen/models.py ─────→ models/{api}.py (Pydantic v2)
+                  ┌─ codegen/models.py ──────→ models/{api}.py (Pydantic v2)
 oas/platform.yaml ─┐  │
-oas/chains.yaml   ─┼→ generate_sdk.py ─┤
-oas/wdata.yaml    ─┘  │
-                  └─ codegen/operations.py ─→ _operations/{namespace}.py (Jinja2)
-                       codegen/pagination.py    (pagination config)
+oas/chains.yaml   ─┼→ generate_sdk.py ─┼─ codegen/operations.py ─→ _operations/{namespace}.py (Jinja2)
+oas/wdata.yaml    ─┘  │                │  codegen/pagination.py    (pagination config)
+                  └─ codegen/typeddicts.py ─→ models/{api}_types.py (TypedDict)
 ```
 
 **`scripts/generate_sdk.py`** — Master codegen orchestrator:
 - Phase 1: Invokes `datamodel-code-generator` per spec → Pydantic v2 models
 - Phase 2: Parses OAS specs → groups operations by tag → renders Jinja2 templates
+- Phase 3: Generates TypedDict input types from OAS schemas → `{api}_types.py`
 - Post-processing: `ast.parse()` validation + Black + isort formatting
 - Supports `--models-only` and `--operations-only` for partial regeneration
 
@@ -70,6 +70,12 @@ oas/wdata.yaml    ─┘  │
 - Parses each spec into `OperationSpec` dataclasses (params, body, response, pagination)
 - Groups operations by OAS tag → one namespace file per tag
 - Renders sync + async methods using `templates/operation_sync.py.j2` and `operation_async.py.j2`
+
+**`scripts/codegen/typeddicts.py`** — TypedDict generator for input params:
+- Generates TypedDict classes from OAS schemas for models used as method input parameters
+- Input params accept only TypedDict (dicts), not Pydantic models (Stripe/OpenAI pattern)
+- Handles enums as `Literal[...]`, skips `readOnly` fields, resolves `$ref` and `allOf`
+- Files deliberately omit `from __future__ import annotations` (PEP 563 breaks `Required[]` at runtime)
 
 **`scripts/codegen/pagination.py`** — Pagination pattern configuration:
 - 5 patterns: `PLATFORM_NEXT`, `PLATFORM_JSONAPI`, `CHAINS_CURSOR`, `CHAINS_PAGE`, `WDATA_CURSOR`
@@ -110,15 +116,18 @@ src/workiva/
 ├── _retry.py           # RetryTransport + AsyncRetryTransport (exponential backoff + max_retries)
 ├── _pagination.py      # paginate() / paginate_async() + lazy generators
 ├── models/
-│   ├── platform.py     # ~10k lines — Pydantic v2 models (GENERATED)
-│   ├── chains.py       # ~760 lines — Pydantic v2 models (GENERATED)
-│   └── wdata.py        # ~2.2k lines — Pydantic v2 models (GENERATED)
+│   ├── __init__.py         # Re-exports all TypedDict types (hand-written)
+│   ├── platform.py         # ~10k lines — Pydantic v2 models (GENERATED)
+│   ├── platform_types.py   # 74 TypedDict input types (GENERATED)
+│   ├── chains.py           # ~760 lines — Pydantic v2 models (GENERATED)
+│   ├── wdata.py            # ~2.2k lines — Pydantic v2 models (GENERATED)
+│   └── wdata_types.py      # 8 TypedDict input types (GENERATED)
 └── _operations/
     ├── _base.py        # BaseNamespace(client, api) — shared base class
     ├── files.py         # 18 namespace files (GENERATED)
     ├── chains.py        # Chains: all OAS tags merged into single flat namespace
     ├── wdata.py         # Wdata: all OAS tags merged into single flat namespace
-    └── ...              # 357 operations total across all namespaces
+    └── ...              # 359 operations total across all namespaces
 ```
 
 ### Generated vs Hand-Written Code
@@ -144,8 +153,18 @@ src/workiva/
 
 | Directory | Content |
 |-----------|---------|
-| `models/*.py` | Pydantic v2 models from `datamodel-code-generator` |
+| `models/{api}.py` | Pydantic v2 models from `datamodel-code-generator` |
+| `models/{api}_types.py` | TypedDict input types from `codegen/typeddicts.py` |
 | `_operations/*.py` (except `_base.py`) | Operation namespaces from Jinja2 templates |
+
+### Input/Output Type Pattern
+
+The SDK follows the Stripe/OpenAI pattern: **TypedDict for input, Pydantic for output.**
+
+- Input params accept only `TypedDictParam` (plain dicts) — NOT Pydantic models
+- Output (responses) are Pydantic v2 models with validation and methods
+- `_deep_serialize()` in `_client.py` converts snake_case dict keys to camelCase before sending
+- TypedDict types are re-exported from `workiva.models` for convenience
 
 ### Auth
 
@@ -173,10 +192,22 @@ All 3 APIs share the same bearer token from `/oauth2/token` (API version 2026-01
 ```python
 from workiva import Workiva, Region
 
-# Sync usage
+# Sync — input params are plain dicts (TypedDict), responses are Pydantic models
 with Workiva(client_id="...", client_secret="...") as client:
+    # Simple call — wait=True blocks until operation completes
+    operation = client.files.copy_file(
+        file_id="abc", destination_container="folder-123", wait=True
+    )
+
+    # Manual polling
     response = client.files.copy_file(file_id="abc", destination_container="folder-123")
     operation = client.wait(response).result(timeout=300)
+
+    # Dict inputs with snake_case keys (auto-converted to camelCase)
+    client.spreadsheets.create_sheet(
+        spreadsheet_id="abc",
+        parent={"id": "sheet-id"},  # TypedDict, not Pydantic model
+    )
 
 # Async usage
 async with Workiva(client_id="...", client_secret="...", region=Region.US) as client:
@@ -186,23 +217,26 @@ async with Workiva(client_id="...", client_secret="...", region=Region.US) as cl
 
 ## Testing
 
-Tests live in `tests/` (outside `src/`, safe from regeneration). 184 tests total.
+Tests live in `tests/` (outside `src/`, safe from regeneration). 392 tests total.
 
 ```
 tests/
-├── conftest.py                   # Autouse fixture: clears OAuth token cache between tests
+├── conftest.py                       # Autouse fixture: clears OAuth token cache between tests
 ├── unit/
-│   ├── test_base_client.py       # URL building, request prep, lazy init, multipart
-│   ├── test_errors.py            # raise_for_status, exception hierarchy, message parsing
-│   ├── test_exceptions.py        # OperationFailed/Cancelled/Timeout with edge cases
-│   ├── test_operation_poller.py  # poll, result, terminal states, timeout
-│   ├── test_pagination.py        # Cursor extraction, page iteration
-│   ├── test_polling_helpers.py   # _extract_operation_id, _get_retry_after
-│   ├── test_retry_transport.py   # Backoff, status codes, connection errors
-│   └── test_workiva_client.py    # Workiva class, namespace loading, .wait()
+│   ├── test_base_client.py           # URL building, request prep, lazy init, multipart
+│   ├── test_dict_input_e2e.py        # Dict→camelCase serialization, Pydantic/dict parity
+│   ├── test_errors.py                # raise_for_status, exception hierarchy, message parsing
+│   ├── test_exceptions.py            # OperationFailed/Cancelled/Timeout with edge cases
+│   ├── test_operation_poller.py      # poll, result, terminal states, timeout
+│   ├── test_pagination.py            # Cursor extraction, page iteration
+│   ├── test_polling_helpers.py       # _extract_operation_id, _get_retry_after
+│   ├── test_retry_transport.py       # Backoff, status codes, connection errors
+│   ├── test_typeddict_generation.py  # TypedDict generation, exports, snake→camel
+│   ├── test_wait_parameter.py        # wait=True for long-running operations
+│   └── test_workiva_client.py        # Workiva class, namespace loading, .wait()
 └── integration/
-    ├── test_auth_flow.py         # Full OAuth flow with MockTransport
-    └── test_async_flow.py        # Async auth, retry, 401 refresh, X-Version
+    ├── test_auth_flow.py             # Full OAuth flow with MockTransport
+    └── test_async_flow.py            # Async auth, retry, 401 refresh, X-Version
 ```
 
 ### Key testing patterns
@@ -280,5 +314,6 @@ All 3 are updated atomically by `scripts/bump_version.py`.
 | `oas/`, `scripts/`, `Makefile`, `tests/` | Yes (never touched) |
 | All hand-written modules (see table above) | Yes (never touched) |
 | `pyproject.toml`, `README.md` | Yes (never touched) |
-| `models/*.py` | No (regenerated by datamodel-code-generator) |
+| `models/{api}.py` | No (regenerated by datamodel-code-generator) |
+| `models/{api}_types.py` | No (regenerated by codegen/typeddicts.py) |
 | `_operations/*.py` (except `_base.py`) | No (regenerated by Jinja2 templates) |
