@@ -55,12 +55,14 @@ El parametro no limita el resultado final -- solo el tamano de cada request HTTP
 
 ## Limite de seguridad
 
-El SDK tiene un limite de seguridad de **1000 paginas** por operacion para prevenir bucles infinitos. Si se excede, lanza `RuntimeError`:
+El SDK tiene un limite de seguridad de **1000 paginas** por operacion para prevenir bucles infinitos. Si se excede, lanza `PaginationError`:
 
 ```python
+from workiva import PaginationError
+
 try:
     result = client.files.get_files()
-except RuntimeError as e:
+except PaginationError as e:
     print(f"Demasiadas paginas: {e}")
 ```
 

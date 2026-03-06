@@ -14,7 +14,8 @@ WorkivaError(Exception)             # Base para TODOS los errores del SDK
 │   ├── ConflictError               # 409
 │   ├── RateLimitError              # 429
 │   └── ServerError                 # 5xx
-└── TokenAcquisitionError           # Error al obtener token OAuth2
+├── TokenAcquisitionError           # Error al obtener token OAuth2
+└── PaginationError                 # Paginacion excedio el limite de seguridad
 
 Exception
 ├── OperationFailed                 # Polling: status == "failed"
@@ -162,6 +163,23 @@ try:
 except TokenAcquisitionError as e:
     print(f"No se pudo obtener el token: {e}")
 ```
+
+## `PaginationError`
+
+Lanzada cuando la paginacion automatica excede el limite de seguridad (1000 paginas):
+
+```python
+from workiva import PaginationError
+
+try:
+    result = client.files.get_files()
+except PaginationError as e:
+    print(f"Demasiadas paginas: {e}")
+```
+
+Esto normalmente indica un filtro incorrecto o un dataset inesperadamente grande. Usa parametros de la API (`maxpagesize`, filtros) para limitar los resultados.
+
+> `PaginationError` hereda de `WorkivaError`, asi que tambien se captura con `except WorkivaError`.
 
 ## Excepciones de polling
 
@@ -312,6 +330,8 @@ from workiva import (
     ServerError,
     # Errores de autenticacion
     TokenAcquisitionError,
+    # Paginacion
+    PaginationError,
     # Errores de polling
     OperationFailed,
     OperationCancelled,

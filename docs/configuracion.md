@@ -123,9 +123,11 @@ client = Workiva(
 El intervalo entre reintentos se calcula asi:
 
 ```
-intervalo = (initial_interval_ms / 1000) * (exponent ^ intento) + jitter_aleatorio(0, 1)
+intervalo = (initial_interval_ms / 1000) * (exponent ** intento) + random(0, 1)
 intervalo = min(intervalo, max_interval_ms / 1000)
 ```
+
+Donde `random(0, 1)` es un jitter aleatorio entre 0 y 1 segundo que evita que multiples clientes hagan reintentos sincronizados.
 
 Si la respuesta incluye un header `Retry-After`, el SDK respeta ese intervalo (con tope en `max_interval_ms`).
 
