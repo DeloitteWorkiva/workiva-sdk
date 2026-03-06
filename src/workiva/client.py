@@ -20,6 +20,7 @@ Usage::
 
 from __future__ import annotations
 
+import asyncio
 import importlib
 import types
 from typing import TYPE_CHECKING, Any, Optional
@@ -27,11 +28,13 @@ from typing import TYPE_CHECKING, Any, Optional
 import httpx
 
 from workiva._client import BaseClient
-from workiva._config import SDKConfig
+from workiva._config import RetryConfig, SDKConfig
 from workiva._constants import Region
 from workiva.polling import OperationPoller, _extract_operation_id, _get_retry_after
 
 if TYPE_CHECKING:
+    from workiva.models.platform import Operation
+
     from workiva._operations.activities import Activities
     from workiva._operations.admin import Admin
     from workiva._operations.chains import Chains
@@ -113,15 +116,20 @@ class Workiva:
         *,
         region: Region = Region.EU,
         timeout: Optional[float] = None,
-        config: Optional[SDKConfig] = None,
+        retry: Optional[RetryConfig] = None,
         client: Optional[httpx.Client] = None,
         async_client: Optional[httpx.AsyncClient] = None,
     ) -> None:
-        if config is None:
-            config = SDKConfig(
-                region=region,
-                timeout_s=timeout,
-            )
+        if not client_id or not isinstance(client_id, str):
+            raise ValueError("client_id must be a non-empty string")
+        if not client_secret or not isinstance(client_secret, str):
+            raise ValueError("client_secret must be a non-empty string")
+
+        config = SDKConfig(
+            region=region,
+            timeout_s=timeout,
+            retry=retry or RetryConfig(),
+        )
 
         self._base_client = BaseClient(
             client_id=client_id,
@@ -157,20 +165,32 @@ class Workiva:
 
     # -- Polling ---------------------------------------------------------------
 
-    def wait(self, response: Any) -> OperationPoller:
+    def wait(self, response: httpx.Response) -> OperationPoller:
         """Create an :class:`OperationPoller` from an HTTP 202 response.
 
         Extracts the operation ID from the ``Location`` header and the
         initial polling interval from the ``Retry-After`` header.
 
         Args:
-            response: An httpx.Response or any object with a ``headers`` dict
-                      (for backwards compatibility with generated responses).
+            response: The ``httpx.Response`` from a long-running operation
+                (copy_file, export_file, etc.) that returned HTTP 202.
 
         Returns:
             An :class:`OperationPoller` ready for ``.result()`` or
             ``.result_async()``.
+
+        Raises:
+            TypeError: If ``response`` is not an ``httpx.Response``.
         """
+        if not isinstance(response, httpx.Response):
+            actual_type = type(response).__name__
+            raise TypeError(
+                f"wait() expects an httpx.Response from a 202 operation, "
+                f"but got {actual_type}. Only long-running operations "
+                f"(copy_file, export_file, etc.) return pollable responses. "
+                f"If you used wait=True, the operation already returns an "
+                f"Operation directly — no need to call wait()."
+            )
         if isinstance(response, httpx.Response):
             headers = dict(response.headers)
             body = None
@@ -192,6 +212,61 @@ class Workiva:
             initial_retry_after=retry_after,
             response_body=body,
         )
+
+    # -- Batch helpers ---------------------------------------------------------
+
+    async def copy_sheets(
+        self,
+        *,
+        spreadsheet_id: str,
+        copies: list[dict[str, Any]],
+        wait_timeout: float = 300,
+        max_concurrency: int = 10,
+    ) -> list[Operation]:
+        """Copy multiple sheets concurrently using async (convenience method).
+
+        The Workiva API does not support batch sheet operations, so this
+        method launches ``copy_sheet_async`` calls concurrently with a
+        semaphore to limit parallelism.
+
+        Each dict in ``copies`` is passed as keyword arguments to
+        ``spreadsheets.copy_sheet_async``.  At minimum, each must include
+        ``sheet_id`` and ``spreadsheet`` (destination spreadsheet ID).
+
+        Args:
+            spreadsheet_id: Source spreadsheet ID.
+            copies: List of dicts with per-copy params (sheet_id,
+                spreadsheet, sheet_name, sheet_parent, sheet_index).
+            wait_timeout: Timeout per individual copy operation.
+            max_concurrency: Maximum concurrent copy operations.
+
+        Returns:
+            List of completed ``Operation`` objects (one per copy, in
+            the same order as ``copies``).
+
+        Example::
+
+            async with Workiva(client_id="...", client_secret="...") as w:
+                ops = await w.copy_sheets(
+                    spreadsheet_id=sid,
+                    copies=[
+                        {"sheet_id": tid, "spreadsheet": sid, "sheet_name": "Sheet A"},
+                        {"sheet_id": tid, "spreadsheet": sid, "sheet_name": "Sheet B"},
+                    ],
+                )
+        """
+        sem = asyncio.Semaphore(max_concurrency)
+
+        async def _copy_one(params: dict[str, Any]) -> Any:
+            async with sem:
+                return await self.spreadsheets.copy_sheet_async(
+                    spreadsheet_id=spreadsheet_id,
+                    wait=True,
+                    wait_timeout=wait_timeout,
+                    **params,
+                )
+
+        return list(await asyncio.gather(*[_copy_one(p) for p in copies]))
 
     # -- Context manager -------------------------------------------------------
 

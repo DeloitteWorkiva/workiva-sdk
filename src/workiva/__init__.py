@@ -23,14 +23,13 @@ from workiva._errors import (
 )
 from workiva._version import __user_agent__, __version__
 from workiva.client import Workiva
-from workiva.exceptions import OperationCancelled, OperationFailed, OperationTimeout
+from workiva.exceptions import OperationCancelled, OperationFailed, OperationTimeout, PaginationError
 from workiva.polling import OperationPoller
 
 __all__ = [
     "__version__",
     "Workiva",
     "Region",
-    "SDKConfig",
     "RetryConfig",
     "OperationPoller",
     "OperationFailed",
@@ -46,4 +45,5 @@ __all__ = [
     "RateLimitError",
     "ServerError",
     "TokenAcquisitionError",
+    "PaginationError",
 ]
