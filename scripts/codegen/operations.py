@@ -25,6 +25,13 @@ from codegen.sanitize import (
 
 HTTP_METHODS = {"get", "post", "put", "delete", "patch", "head", "options", "trace"}
 
+# Manual type overrides for body fields where the OAS uses inline schemas
+# instead of $ref, but a generated model exists.  (operationId, fieldName) → type
+_BODY_FIELD_TYPE_OVERRIDES: dict[tuple[str, str], str] = {
+    # MetricValueIdentifier.data uses inline items identical to MetricValue
+    ("batchDeletionMetricValues", "data"): "list[MetricValue]",
+}
+
 # Map of OpenAPI type → Python type annotation
 TYPE_MAP: dict[str, str] = {
     "string": "str",
@@ -128,6 +135,7 @@ class OperationSpec:
     scopes: list[str] = field(default_factory=list)
     deprecated: bool = False
     body_fields: list[BodyFieldSpec] = field(default_factory=list)
+    body_default_empty: bool = False
 
     @property
     def has_flat_body(self) -> bool:
@@ -287,6 +295,7 @@ def _extract_body_fields(
     body_spec: Optional[RequestBodySpec],
     spec: dict[str, Any],
     existing_param_names: set[str],
+    operation_id: str = "",
 ) -> list[BodyFieldSpec]:
     """Extract individual fields from a JSON body schema for flat param signatures.
 
@@ -324,8 +333,12 @@ def _extract_body_fields(
         if prop_schema.get("readOnly", False):
             continue
 
-        # Resolve type
-        python_type = _resolve_body_field_type(prop_schema, spec)
+        # Resolve type (manual override takes precedence)
+        override_key = (operation_id, prop_name)
+        if override_key in _BODY_FIELD_TYPE_OVERRIDES:
+            python_type = _BODY_FIELD_TYPE_OVERRIDES[override_key]
+        else:
+            python_type = _resolve_body_field_type(prop_schema, spec)
 
         python_name = _snake_case(prop_name)
 
@@ -494,7 +507,28 @@ def parse_spec(
 
             # Extract flat body fields (Stripe/OpenAI style)
             existing_param_names = {p.python_name for p in params}
-            body_fields = _extract_body_fields(request_body, spec, existing_param_names)
+            body_fields = _extract_body_fields(request_body, spec, existing_param_names, operation_id)
+
+            # If body schema has zero non-readOnly properties (empty schema),
+            # make it optional regardless of OAS required flag (#13).
+            if (
+                request_body
+                and request_body.required
+                and not body_fields
+                and request_body.schema_ref
+                and request_body.content_type == "application/json"
+            ):
+                resolved_body = _resolve_ref(request_body.schema_ref, spec)
+                schema_type = resolved_body.get("type", "object")
+                props = resolved_body.get("properties", {})
+                writable = [k for k, v in props.items() if not v.get("readOnly", False)]
+                if schema_type == "object" and not writable:
+                    request_body.required = False
+                    _body_default_empty = True
+                else:
+                    _body_default_empty = False
+            else:
+                _body_default_empty = False
 
             # Extract responses
             responses = operation.get("responses", {})
@@ -533,6 +567,7 @@ def parse_spec(
                 scopes=scopes,
                 deprecated=operation.get("deprecated", False),
                 body_fields=body_fields,
+                body_default_empty=_body_default_empty,
             )
 
             groups.setdefault(tag, []).append(op_spec)

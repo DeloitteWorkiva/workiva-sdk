@@ -163,6 +163,7 @@ def generate_models(
         "--capitalise-enum-members",
         "--strict-nullable",
         "--allow-extra-fields",
+        "--allow-population-by-field-name",
         "--disable-future-imports",
     ]
 

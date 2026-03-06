@@ -32,100 +32,6 @@ class Tasks(BaseNamespace):
 
     _api: _API = _API.PLATFORM
 
-    def get_tasks(
-        self,
-        *,
-        filter_: Optional[str] = None,
-        order_by: Optional[str] = None,
-        maxpagesize: Optional[int] = 1000,
-        timeout: Optional[float] = None,
-    ) -> TasksListResult:
-        """Retrieve a list of tasks
-
-        > Returns a paginated list of [tasks](ref:tasks#task). Currently this
-        endpoint returns general tasks
-        (such as those created as part of editing documents, sheets, and
-        presentations) and tasks that have been associated  with a
-        Sustainability Program.
-        It does not return tasks created as part of a process.
-
-        Args:
-            filter_: The properties to filter the results by.
-            order_by: One or more comma-separated expressions to indicate the order in which to sort the results.
-            maxpagesize: The maximum number of results to retrieve
-            timeout: Override the default request timeout (seconds).
-
-        Returns:
-            TasksListResult
-
-        Raises:
-            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
-        """
-
-        def _fetch(_cursor: str | None) -> httpx.Response:
-            return self._client.request(
-                "GET",
-                self._api,
-                "/tasks",
-                query_params={
-                    "$filter": filter_,
-                    "$orderBy": order_by,
-                    "$maxpagesize": maxpagesize,
-                    "$next": _cursor,
-                },
-                timeout=timeout,
-            )
-
-        _body_result = paginate_all(_fetch, extract_next_link, "data")
-        return TasksListResult.model_validate(_body_result)
-
-    async def get_tasks_async(
-        self,
-        *,
-        filter_: Optional[str] = None,
-        order_by: Optional[str] = None,
-        maxpagesize: Optional[int] = 1000,
-        timeout: Optional[float] = None,
-    ) -> TasksListResult:
-        """Retrieve a list of tasks (async)
-
-        > Returns a paginated list of [tasks](ref:tasks#task). Currently this
-        endpoint returns general tasks
-        (such as those created as part of editing documents, sheets, and
-        presentations) and tasks that have been associated  with a
-        Sustainability Program.
-        It does not return tasks created as part of a process.
-
-        Args:
-            filter_: The properties to filter the results by.
-            order_by: One or more comma-separated expressions to indicate the order in which to sort the results.
-            maxpagesize: The maximum number of results to retrieve
-            timeout: Override the default request timeout (seconds).
-
-        Returns:
-            TasksListResult
-
-        Raises:
-            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
-        """
-
-        async def _fetch(_cursor: str | None) -> httpx.Response:
-            return await self._client.request_async(
-                "GET",
-                self._api,
-                "/tasks",
-                query_params={
-                    "$filter": filter_,
-                    "$orderBy": order_by,
-                    "$maxpagesize": maxpagesize,
-                    "$next": _cursor,
-                },
-                timeout=timeout,
-            )
-
-        _body_result = await paginate_all_async(_fetch, extract_next_link, "data")
-        return TasksListResult.model_validate(_body_result)
-
     def create_task(
         self,
         *,
@@ -249,6 +155,156 @@ class Tasks(BaseNamespace):
             timeout=timeout,
         )
         return Task.model_validate(response.json())
+
+    def get_tasks(
+        self,
+        *,
+        filter_: Optional[str] = None,
+        order_by: Optional[str] = None,
+        maxpagesize: Optional[int] = 1000,
+        timeout: Optional[float] = None,
+    ) -> TasksListResult:
+        """Retrieve a list of tasks
+
+        > Returns a paginated list of [tasks](ref:tasks#task). Currently this
+        endpoint returns general tasks
+        (such as those created as part of editing documents, sheets, and
+        presentations) and tasks that have been associated  with a
+        Sustainability Program.
+        It does not return tasks created as part of a process.
+
+        Args:
+            filter_: The properties to filter the results by.
+            order_by: One or more comma-separated expressions to indicate the order in which to sort the results.
+            maxpagesize: The maximum number of results to retrieve
+            timeout: Override the default request timeout (seconds).
+
+        Returns:
+            TasksListResult
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
+        """
+
+        def _fetch(_cursor: str | None) -> httpx.Response:
+            return self._client.request(
+                "GET",
+                self._api,
+                "/tasks",
+                query_params={
+                    "$filter": filter_,
+                    "$orderBy": order_by,
+                    "$maxpagesize": maxpagesize,
+                    "$next": _cursor,
+                },
+                timeout=timeout,
+            )
+
+        _body_result = paginate_all(_fetch, extract_next_link, "data")
+        return TasksListResult.model_validate(_body_result)
+
+    async def get_tasks_async(
+        self,
+        *,
+        filter_: Optional[str] = None,
+        order_by: Optional[str] = None,
+        maxpagesize: Optional[int] = 1000,
+        timeout: Optional[float] = None,
+    ) -> TasksListResult:
+        """Retrieve a list of tasks (async)
+
+        > Returns a paginated list of [tasks](ref:tasks#task). Currently this
+        endpoint returns general tasks
+        (such as those created as part of editing documents, sheets, and
+        presentations) and tasks that have been associated  with a
+        Sustainability Program.
+        It does not return tasks created as part of a process.
+
+        Args:
+            filter_: The properties to filter the results by.
+            order_by: One or more comma-separated expressions to indicate the order in which to sort the results.
+            maxpagesize: The maximum number of results to retrieve
+            timeout: Override the default request timeout (seconds).
+
+        Returns:
+            TasksListResult
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
+        """
+
+        async def _fetch(_cursor: str | None) -> httpx.Response:
+            return await self._client.request_async(
+                "GET",
+                self._api,
+                "/tasks",
+                query_params={
+                    "$filter": filter_,
+                    "$orderBy": order_by,
+                    "$maxpagesize": maxpagesize,
+                    "$next": _cursor,
+                },
+                timeout=timeout,
+            )
+
+        _body_result = await paginate_all_async(_fetch, extract_next_link, "data")
+        return TasksListResult.model_validate(_body_result)
+
+    def delete_task_by_id(
+        self,
+        *,
+        task_id: str,
+        timeout: Optional[float] = None,
+    ) -> None:
+        """Delete a single task
+
+        Deletes a [task](ref:tasks#task) given its ID
+
+        Args:
+            task_id: The unique identifier of the task
+            timeout: Override the default request timeout (seconds).
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
+        """
+        self._client.request(
+            "DELETE",
+            self._api,
+            "/tasks/{taskId}",
+            path_params={
+                "taskId": task_id,
+            },
+            timeout=timeout,
+        )
+        return None
+
+    async def delete_task_by_id_async(
+        self,
+        *,
+        task_id: str,
+        timeout: Optional[float] = None,
+    ) -> None:
+        """Delete a single task (async)
+
+        Deletes a [task](ref:tasks#task) given its ID
+
+        Args:
+            task_id: The unique identifier of the task
+            timeout: Override the default request timeout (seconds).
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
+        """
+        await self._client.request_async(
+            "DELETE",
+            self._api,
+            "/tasks/{taskId}",
+            path_params={
+                "taskId": task_id,
+            },
+            timeout=timeout,
+        )
+        return None
 
     def get_task_by_id(
         self,
@@ -411,60 +467,6 @@ class Tasks(BaseNamespace):
             timeout=timeout,
         )
         return Task.model_validate(response.json())
-
-    def delete_task_by_id(
-        self,
-        *,
-        task_id: str,
-        timeout: Optional[float] = None,
-    ) -> httpx.Response:
-        """Delete a single task
-
-        Deletes a [task](ref:tasks#task) given its ID
-
-        Args:
-            task_id: The unique identifier of the task
-            timeout: Override the default request timeout (seconds).
-
-        Raises:
-            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
-        """
-        return self._client.request(
-            "DELETE",
-            self._api,
-            "/tasks/{taskId}",
-            path_params={
-                "taskId": task_id,
-            },
-            timeout=timeout,
-        )
-
-    async def delete_task_by_id_async(
-        self,
-        *,
-        task_id: str,
-        timeout: Optional[float] = None,
-    ) -> httpx.Response:
-        """Delete a single task (async)
-
-        Deletes a [task](ref:tasks#task) given its ID
-
-        Args:
-            task_id: The unique identifier of the task
-            timeout: Override the default request timeout (seconds).
-
-        Raises:
-            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
-        """
-        return await self._client.request_async(
-            "DELETE",
-            self._api,
-            "/tasks/{taskId}",
-            path_params={
-                "taskId": task_id,
-            },
-            timeout=timeout,
-        )
 
     def submit_task_action(
         self,

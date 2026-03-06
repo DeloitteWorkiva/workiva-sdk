@@ -1,40 +1,36 @@
+{% from '_params.py.j2' import render_params %}
 {% set cursor_spec_name = op.cursor_param_name %}
 {% set has_json_response = op.success_response and op.success_response.content_type == 'application/json' and op.success_response.python_type != 'None' %}
 {% set return_type = op.success_response.python_type if has_json_response else 'httpx.Response' %}
 {% set is_list_return = has_json_response and op.success_response.is_list %}
+{% set is_long_running = not has_json_response and op.success_response and op.success_response.status_code == '202' %}
+{% set is_void = not has_json_response and not is_long_running and op.success_response and op.success_response.status_code == '204' %}
+{% if is_long_running %}
+    @overload
     async def {{ op.method_name }}_async(
         self,
         *,
-{% for p in op.params if p.location == 'path' %}
-        {{ p.python_name }}: {{ p.python_type }},
-{% endfor %}
-{% for p in op.params if p.location == 'query' and p.required and p.name != cursor_spec_name %}
-        {{ p.python_name }}: {{ p.python_type }},
-{% endfor %}
-{% for p in op.header_params if p.required %}
-        {{ p.python_name }}: {{ p.python_type }},
-{% endfor %}
-{% for bf in op.body_fields if bf.required %}
-        {{ bf.python_name }}: {{ bf.python_type }},
-{% endfor %}
-{% if op.has_body and not op.has_flat_body and op.request_body.required %}
-        body: {{ op.request_body.python_type }},
+{{ render_params(op, cursor_spec_name, include_wait=true, wait_type="Literal[False]", wait_default="...") }}
+    ) -> httpx.Response: ...
+
+    @overload
+    async def {{ op.method_name }}_async(
+        self,
+        *,
+{{ render_params(op, cursor_spec_name, include_wait=true, wait_type="Literal[True]", wait_default="...") }}
+    ) -> Operation: ...
+
 {% endif %}
-{% for p in op.params if p.location == 'query' and not p.required and p.name != cursor_spec_name %}
-        {{ p.python_name }}: {{ p.python_type }} = {{ p.default or 'None' }},
-{% endfor %}
-{% for p in op.header_params if not p.required %}
-        {{ p.python_name }}: {{ p.python_type }} = {{ p.default or 'None' }},
-{% endfor %}
-{% for bf in op.body_fields if not bf.required %}
-        {{ bf.python_name }}: Optional[{{ bf.python_type }}] = None,
-{% endfor %}
-{% if op.has_body and not op.has_flat_body and not op.request_body.required %}
-        body: Optional[{{ op.request_body.python_type }}] = None,
-{% endif %}
-        timeout: Optional[float] = None,
+    async def {{ op.method_name }}_async(
+        self,
+        *,
+{{ render_params(op, cursor_spec_name, include_wait=is_long_running) }}
 {% if is_list_return %}
     ) -> list[{{ op.success_response.python_type | replace('list[', '') | replace(']', '') }}]:
+{% elif is_long_running %}
+    ) -> httpx.Response | Operation:
+{% elif is_void %}
+    ) -> None:
 {% else %}
     ) -> {{ return_type }}:
 {% endif %}
@@ -48,7 +44,7 @@
         .. deprecated::
             This operation is deprecated.
 {% endif %}
-{% if op.params or op.body_fields or (op.has_body and not op.has_flat_body) %}
+{% if op.params or op.body_fields or (op.has_body and not op.has_flat_body) or is_long_running %}
 
         Args:
 {% for p in op.params if p.location == 'path' %}
@@ -67,22 +63,34 @@
             body: Request body.
 {% endif %}
             timeout: Override the default request timeout (seconds).
+{% if is_long_running %}
+            wait: If True, poll until the operation completes and return
+                the ``Operation`` result. Defaults to False.
+            wait_timeout: Maximum seconds to wait when ``wait=True``.
+                Defaults to 300.
+{% endif %}
 {% endif %}
 {% if has_json_response %}
 
         Returns:
             {{ return_type }}
+{% elif is_long_running %}
+
+        Returns:
+            ``httpx.Response`` when ``wait=False``, ``Operation`` when
+            ``wait=True``.
 {% endif %}
 {% if op.error_codes %}
 
         Raises:
             WorkivaAPIError: On API errors ({{ op.error_codes | join(', ') }}).
 {% endif %}
-{% if not has_json_response and op.success_response and op.success_response.status_code == '202' %}
+{% if is_long_running %}
 
         Note:
-            This is a long-running operation (HTTP 202). Use
-            ``await client.wait(response).result_async()`` to poll until completion.
+            This is a long-running operation (HTTP 202). Pass ``wait=True``
+            to block until completion, or use
+            ``await client.wait(response).result_async()`` for manual polling.
 {% endif %}
 {% if op.has_body and op.request_body.content_type == 'multipart/form-data' %}
 
@@ -173,26 +181,8 @@
 {% else %}
         return {{ op.success_response.python_type }}.model_validate(response.json())
 {% endif %}
-{% else %}
-{% if op.has_flat_body %}
-        return await self._client.request_async(
-            "{{ op.http_method }}",
-            self._api,
-            "{{ op.path }}",
-{% if op.path_params %}
-            path_params={{ '{' }}{% for p in op.path_params %}"{{ p.name.strip('{}') }}": {{ p.python_name }}, {% endfor %}{{ '}' }},
-{% endif %}
-{% if op.query_params %}
-            query_params={{ '{' }}{% for p in op.query_params %}"{{ p.name }}": {{ p.python_name }}, {% endfor %}{{ '}' }},
-{% endif %}
-            json_body=_body or None,
-{% if op.header_params %}
-            headers={{ '{' }}{% for p in op.header_params %}"{{ p.name }}": {{ p.python_name }}, {% endfor %}{{ '}' }},
-{% endif %}
-            timeout=timeout,
-        )
-{% else %}
-        return await self._client.request_async(
+{% elif is_void %}
+        await self._client.request_async(
             "{{ op.http_method }}",
             self._api,
             "{{ op.path }}",
@@ -203,8 +193,14 @@
             query_params={{ '{' }}{% for p in op.query_params %}"{{ p.name }}": {{ p.python_name }}, {% endfor %}{{ '}' }},
 {% endif %}
 {% if op.has_body %}
-{% if op.request_body.content_type == 'application/json' %}
+{% if op.has_flat_body %}
+            json_body=_body or None,
+{% elif op.request_body.content_type == 'application/json' %}
+{% if op.body_default_empty %}
+            json_body=body if body is not None else {},
+{% else %}
             json_body=body,
+{% endif %}
 {% elif op.request_body.content_type == 'application/octet-stream' %}
             content=body,
 {% elif op.request_body.content_type == 'multipart/form-data' %}
@@ -220,5 +216,45 @@
 {% endif %}
             timeout=timeout,
         )
+        return None
+{% else %}
+        response = await self._client.request_async(
+            "{{ op.http_method }}",
+            self._api,
+            "{{ op.path }}",
+{% if op.path_params %}
+            path_params={{ '{' }}{% for p in op.path_params %}"{{ p.name.strip('{}') }}": {{ p.python_name }}, {% endfor %}{{ '}' }},
 {% endif %}
+{% if op.query_params %}
+            query_params={{ '{' }}{% for p in op.query_params %}"{{ p.name }}": {{ p.python_name }}, {% endfor %}{{ '}' }},
+{% endif %}
+{% if op.has_body %}
+{% if op.has_flat_body %}
+            json_body=_body or None,
+{% elif op.request_body.content_type == 'application/json' %}
+{% if op.body_default_empty %}
+            json_body=body if body is not None else {},
+{% else %}
+            json_body=body,
+{% endif %}
+{% elif op.request_body.content_type == 'application/octet-stream' %}
+            content=body,
+{% elif op.request_body.content_type == 'multipart/form-data' %}
+            files=body,
+{% elif op.request_body.content_type == 'application/x-www-form-urlencoded' %}
+            data=body,
+{% else %}
+            json_body=body,
+{% endif %}
+{% endif %}
+{% if op.header_params %}
+            headers={{ '{' }}{% for p in op.header_params %}"{{ p.name }}": {{ p.python_name }}, {% endfor %}{{ '}' }},
+{% endif %}
+            timeout=timeout,
+        )
+{% if is_long_running %}
+        if wait:
+            return await _poll_until_done_async(self._client, response, timeout=wait_timeout)
+{% endif %}
+        return response
 {% endif %}

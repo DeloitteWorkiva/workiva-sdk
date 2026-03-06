@@ -160,8 +160,8 @@ class BaseNamespace:
             # Collect model types used as body parameters AND response types
             model_types: set[str] = set()
             has_pagination = False
-            has_list_response = False
             has_literal = False
+            has_long_running = False
             for op in operations:
                 if op.request_body and op.request_body.python_type:
                     if op.body_fields:
@@ -175,12 +175,21 @@ class BaseNamespace:
                     _collect_model_types(op.success_response.python_type, model_types)
                 if op.pagination:
                     has_pagination = True
-                if op.success_response and op.success_response.is_list:
-                    has_list_response = True
                 if any("Literal[" in p.python_type for p in op.params):
                     has_literal = True
                 if any("Literal[" in bf.python_type for bf in op.body_fields):
                     has_literal = True
+                has_json_resp = (
+                    op.success_response
+                    and op.success_response.content_type == "application/json"
+                    and op.success_response.python_type != "None"
+                )
+                if (
+                    not has_json_resp
+                    and op.success_response
+                    and op.success_response.status_code == "202"
+                ):
+                    has_long_running = True
 
             # Render template
             source = namespace_template.render(
@@ -191,8 +200,8 @@ class BaseNamespace:
                 operations=operations,
                 model_imports=sorted(model_types),
                 has_pagination=has_pagination,
-                has_list_response=has_list_response,
                 has_literal=has_literal,
+                has_long_running=has_long_running,
             )
 
             # Validate syntax

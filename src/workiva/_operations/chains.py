@@ -71,7 +71,7 @@ class Chains(BaseNamespace):
         Raises:
             WorkivaAPIError: On API errors (400, 401, 404).
         """
-        return self._client.request(
+        response = self._client.request(
             "POST",
             self._api,
             "/v1/chains/{chain_id}/export",
@@ -83,6 +83,7 @@ class Chains(BaseNamespace):
             },
             timeout=timeout,
         )
+        return response
 
     async def export_chain_async(
         self,
@@ -109,7 +110,7 @@ class Chains(BaseNamespace):
         Raises:
             WorkivaAPIError: On API errors (400, 401, 404).
         """
-        return await self._client.request_async(
+        response = await self._client.request_async(
             "POST",
             self._api,
             "/v1/chains/{chain_id}/export",
@@ -121,6 +122,7 @@ class Chains(BaseNamespace):
             },
             timeout=timeout,
         )
+        return response
 
     def publish_chain(
         self,

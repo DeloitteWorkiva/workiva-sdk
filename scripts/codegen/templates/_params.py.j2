@@ -1,0 +1,47 @@
+{#- Reusable macro: render the parameter list for an operation.
+
+Used by @overload stubs AND the main method signature so the param
+list is defined in exactly one place.
+
+Parameters
+----------
+op              – OperationSpec dataclass
+cursor_spec_name – op.cursor_param_name (pre-computed by the caller)
+include_wait    – whether to emit the wait/wait_timeout params
+wait_type       – "bool" | "Literal[True]" | "Literal[False]" (for overloads)
+wait_default    – default value for `wait` (e.g. "False", "..." )
+-#}
+{% macro render_params(op, cursor_spec_name, include_wait=false, wait_type="bool", wait_default="False") %}
+{% for p in op.params if p.location == 'path' %}
+        {{ p.python_name }}: {{ p.python_type }},
+{% endfor %}
+{% for p in op.params if p.location == 'query' and p.required and p.name != cursor_spec_name %}
+        {{ p.python_name }}: {{ p.python_type }},
+{% endfor %}
+{% for p in op.header_params if p.required %}
+        {{ p.python_name }}: {{ p.python_type }},
+{% endfor %}
+{% for bf in op.body_fields if bf.required %}
+        {{ bf.python_name }}: {{ bf.python_type }},
+{% endfor %}
+{% if op.has_body and not op.has_flat_body and op.request_body.required %}
+        body: {{ op.request_body.python_type }},
+{% endif %}
+{% for p in op.params if p.location == 'query' and not p.required and p.name != cursor_spec_name %}
+        {{ p.python_name }}: {{ p.python_type }} = {{ p.default or 'None' }},
+{% endfor %}
+{% for p in op.header_params if not p.required %}
+        {{ p.python_name }}: {{ p.python_type }} = {{ p.default or 'None' }},
+{% endfor %}
+{% for bf in op.body_fields if not bf.required %}
+        {{ bf.python_name }}: Optional[{{ bf.python_type }}] = None,
+{% endfor %}
+{% if op.has_body and not op.has_flat_body and not op.request_body.required %}
+        body: Optional[{{ op.request_body.python_type }}] = None,
+{% endif %}
+        timeout: Optional[float] = None,
+{% if include_wait %}
+        wait: {{ wait_type }} = {{ wait_default }},
+        wait_timeout: float = 300,
+{% endif %}
+{% endmacro %}
