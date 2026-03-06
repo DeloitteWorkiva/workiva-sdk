@@ -188,6 +188,46 @@ class TestGenerateTypedDict:
         assert "filter_: str" in source
 
 
+class TestTypedDictFileGeneration:
+    """Tests for the generated TypedDict files (Phase 3 output)."""
+
+    def test_platform_types_file_exists(self):
+        """TypedDict file should be generated for platform API."""
+        types_file = Path("src/workiva/models/platform_types.py")
+        assert types_file.exists(), "platform_types.py not generated"
+
+    def test_platform_types_has_file_copy_options(self):
+        """FileCopyOptionsParam should be importable."""
+        from workiva.models.platform_types import FileCopyOptionsParam
+
+        assert FileCopyOptionsParam is not None
+
+    def test_typeddict_is_valid_typeddict(self):
+        """Generated class must be a real TypedDict."""
+        from workiva.models.platform_types import FileCopyOptionsParam
+
+        assert hasattr(FileCopyOptionsParam, "__optional_keys__")
+
+    def test_typeddict_accepts_snake_case_keys(self):
+        """TypedDict should use snake_case keys."""
+        from workiva.models.platform_types import FileCopyOptionsParam
+
+        opts: FileCopyOptionsParam = {"shallow_copy": True}
+        assert opts["shallow_copy"] is True
+
+    def test_wdata_types_file_exists(self):
+        """TypedDict file should be generated for wdata API."""
+        types_file = Path("src/workiva/models/wdata_types.py")
+        assert types_file.exists(), "wdata_types.py not generated"
+
+    def test_resource_permission_has_required_fields(self):
+        """ResourcePermissionParam should mark permission/principal as Required."""
+        from workiva.models.platform_types import ResourcePermissionParam
+
+        assert "permission" in ResourcePermissionParam.__required_keys__
+        assert "principal" in ResourcePermissionParam.__required_keys__
+
+
 class TestGenerateTypedDictsForApi:
     def test_generates_only_input_models(self):
         """Only models in input_model_names are generated."""

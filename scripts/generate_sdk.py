@@ -20,8 +20,11 @@ from pathlib import Path
 SCRIPTS_DIR = Path(__file__).parent
 sys.path.insert(0, str(SCRIPTS_DIR))
 
+import yaml
+
 from codegen.models import generate_all_models
 from codegen.operations import parse_spec, _snake_case
+from codegen.typeddicts import generate_typeddicts_for_api
 
 # Try to import jinja2 and formatting tools
 try:
@@ -221,6 +224,55 @@ class BaseNamespace:
     return total_ops
 
 
+def generate_typeddict_files(env: SandboxedEnvironment) -> None:
+    """Phase 3: Generate TypedDict input type files."""
+    typeddict_template = env.get_template("typeddicts.py.j2")
+
+    for api, spec_filename in API_SPECS.items():
+        spec_path = OAS_DIR / spec_filename
+        if not spec_path.exists():
+            continue
+
+        with open(spec_path) as f:
+            spec = yaml.safe_load(f)
+
+        # Collect input model names from operations
+        groups = parse_spec(spec_path, api)
+        input_models: set[str] = set()
+        for tag, operations in groups.items():
+            for op in operations:
+                if op.body_fields:
+                    for bf in op.body_fields:
+                        _collect_model_types(bf.python_type, input_models)
+
+        if not input_models:
+            print(f"  [SKIP] {api}: no input models")
+            continue
+
+        # Generate TypedDict sources
+        td_sources = generate_typeddicts_for_api(spec, input_models)
+        if not td_sources:
+            continue
+
+        # Render template
+        source = typeddict_template.render(
+            api=api,
+            typeddict_sources=list(td_sources.values()),
+        )
+
+        # Validate syntax
+        if not _validate_python(source, f"{api}_types.py"):
+            print(f"[ERROR] Skipping {api}_types.py due to syntax errors")
+            continue
+
+        source = _format_source(source)
+
+        # Write
+        output_path = MODELS_DIR / f"{api}_types.py"
+        output_path.write_text(source)
+        print(f"  [OK] {api}_types.py: {len(td_sources)} TypedDict classes")
+
+
 def main() -> None:
     import argparse
 
@@ -250,6 +302,9 @@ def main() -> None:
         )
         total = generate_operations(env)
         print(f"\n[DONE] Total operations generated: {total}")
+
+        print("\n--- Phase 3: Generate TypedDict Input Types ---")
+        generate_typeddict_files(env)
 
     print("\n" + "=" * 60)
     print("Generation complete!")
