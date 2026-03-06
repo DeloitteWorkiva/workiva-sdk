@@ -21,37 +21,12 @@ from workiva.models.platform import (
     MilestoneListResult,
     Operation,
     RangeValuesListResult,
-    ResourcePermission,
     ResourcePermissionsListResult,
     Sheet,
     SheetDataResult,
     SheetsListResult,
-    SheetUpdateApplyBorders,
-    SheetUpdateApplyFormats,
-    SheetUpdateClearBorders,
-    SheetUpdateClearFormats,
-    SheetUpdateDeleteColumns,
-    SheetUpdateDeleteRows,
-    SheetUpdateEditCells,
-    SheetUpdateEditRange,
-    SheetUpdateHideColumns,
-    SheetUpdateHideRows,
-    SheetUpdateInsertColumns,
-    SheetUpdateInsertRows,
-    SheetUpdateMergeRanges,
-    SheetUpdateResizeColumns,
-    SheetUpdateResizeColumnsToFit,
-    SheetUpdateResizeRows,
-    SheetUpdateResizeRowsToFit,
-    SheetUpdateUnhideColumns,
-    SheetUpdateUnhideRows,
-    SheetUpdateUnmergeRanges,
     Spreadsheet,
     SpreadsheetsListResult,
-    SpreadsheetToCsvOptions,
-    SpreadsheetToPdfOptions,
-    SpreadsheetToXlsxOptions,
-    TableRef,
 )
 from workiva.models.platform_types import (
     ResourcePermissionParam,
@@ -797,10 +772,10 @@ class Spreadsheets(BaseNamespace):
         *,
         spreadsheet_id: str,
         format_: Literal["pdf", "xlsx", "csv"],
-        csv_options: Optional[SpreadsheetToCsvOptions | SpreadsheetToCsvOptionsParam] = None,
-        pdf_options: Optional[SpreadsheetToPdfOptions | SpreadsheetToPdfOptionsParam] = None,
+        csv_options: Optional[SpreadsheetToCsvOptionsParam] = None,
+        pdf_options: Optional[SpreadsheetToPdfOptionsParam] = None,
         sheets: Optional[list[str]] = None,
-        xlsx_options: Optional[SpreadsheetToXlsxOptions | SpreadsheetToXlsxOptionsParam] = None,
+        xlsx_options: Optional[SpreadsheetToXlsxOptionsParam] = None,
         timeout: Optional[float] = None,
         wait: Literal[False] = ...,
         wait_timeout: float = 300,
@@ -812,10 +787,10 @@ class Spreadsheets(BaseNamespace):
         *,
         spreadsheet_id: str,
         format_: Literal["pdf", "xlsx", "csv"],
-        csv_options: Optional[SpreadsheetToCsvOptions | SpreadsheetToCsvOptionsParam] = None,
-        pdf_options: Optional[SpreadsheetToPdfOptions | SpreadsheetToPdfOptionsParam] = None,
+        csv_options: Optional[SpreadsheetToCsvOptionsParam] = None,
+        pdf_options: Optional[SpreadsheetToPdfOptionsParam] = None,
         sheets: Optional[list[str]] = None,
-        xlsx_options: Optional[SpreadsheetToXlsxOptions | SpreadsheetToXlsxOptionsParam] = None,
+        xlsx_options: Optional[SpreadsheetToXlsxOptionsParam] = None,
         timeout: Optional[float] = None,
         wait: Literal[True] = ...,
         wait_timeout: float = 300,
@@ -826,10 +801,10 @@ class Spreadsheets(BaseNamespace):
         *,
         spreadsheet_id: str,
         format_: Literal["pdf", "xlsx", "csv"],
-        csv_options: Optional[SpreadsheetToCsvOptions | SpreadsheetToCsvOptionsParam] = None,
-        pdf_options: Optional[SpreadsheetToPdfOptions | SpreadsheetToPdfOptionsParam] = None,
+        csv_options: Optional[SpreadsheetToCsvOptionsParam] = None,
+        pdf_options: Optional[SpreadsheetToPdfOptionsParam] = None,
         sheets: Optional[list[str]] = None,
-        xlsx_options: Optional[SpreadsheetToXlsxOptions | SpreadsheetToXlsxOptionsParam] = None,
+        xlsx_options: Optional[SpreadsheetToXlsxOptionsParam] = None,
         timeout: Optional[float] = None,
         wait: bool = False,
         wait_timeout: float = 300,
@@ -909,10 +884,10 @@ class Spreadsheets(BaseNamespace):
         *,
         spreadsheet_id: str,
         format_: Literal["pdf", "xlsx", "csv"],
-        csv_options: Optional[SpreadsheetToCsvOptions | SpreadsheetToCsvOptionsParam] = None,
-        pdf_options: Optional[SpreadsheetToPdfOptions | SpreadsheetToPdfOptionsParam] = None,
+        csv_options: Optional[SpreadsheetToCsvOptionsParam] = None,
+        pdf_options: Optional[SpreadsheetToPdfOptionsParam] = None,
         sheets: Optional[list[str]] = None,
-        xlsx_options: Optional[SpreadsheetToXlsxOptions | SpreadsheetToXlsxOptionsParam] = None,
+        xlsx_options: Optional[SpreadsheetToXlsxOptionsParam] = None,
         timeout: Optional[float] = None,
         wait: Literal[False] = ...,
         wait_timeout: float = 300,
@@ -924,10 +899,10 @@ class Spreadsheets(BaseNamespace):
         *,
         spreadsheet_id: str,
         format_: Literal["pdf", "xlsx", "csv"],
-        csv_options: Optional[SpreadsheetToCsvOptions | SpreadsheetToCsvOptionsParam] = None,
-        pdf_options: Optional[SpreadsheetToPdfOptions | SpreadsheetToPdfOptionsParam] = None,
+        csv_options: Optional[SpreadsheetToCsvOptionsParam] = None,
+        pdf_options: Optional[SpreadsheetToPdfOptionsParam] = None,
         sheets: Optional[list[str]] = None,
-        xlsx_options: Optional[SpreadsheetToXlsxOptions | SpreadsheetToXlsxOptionsParam] = None,
+        xlsx_options: Optional[SpreadsheetToXlsxOptionsParam] = None,
         timeout: Optional[float] = None,
         wait: Literal[True] = ...,
         wait_timeout: float = 300,
@@ -938,10 +913,10 @@ class Spreadsheets(BaseNamespace):
         *,
         spreadsheet_id: str,
         format_: Literal["pdf", "xlsx", "csv"],
-        csv_options: Optional[SpreadsheetToCsvOptions | SpreadsheetToCsvOptionsParam] = None,
-        pdf_options: Optional[SpreadsheetToPdfOptions | SpreadsheetToPdfOptionsParam] = None,
+        csv_options: Optional[SpreadsheetToCsvOptionsParam] = None,
+        pdf_options: Optional[SpreadsheetToPdfOptionsParam] = None,
         sheets: Optional[list[str]] = None,
-        xlsx_options: Optional[SpreadsheetToXlsxOptions | SpreadsheetToXlsxOptionsParam] = None,
+        xlsx_options: Optional[SpreadsheetToXlsxOptionsParam] = None,
         timeout: Optional[float] = None,
         wait: bool = False,
         wait_timeout: float = 300,
@@ -1507,8 +1482,8 @@ class Spreadsheets(BaseNamespace):
         self,
         *,
         spreadsheet_id: str,
-        to_assign: Optional[list[ResourcePermission | ResourcePermissionParam]] = None,
-        to_revoke: Optional[list[ResourcePermission | ResourcePermissionParam]] = None,
+        to_assign: Optional[list[ResourcePermissionParam]] = None,
+        to_revoke: Optional[list[ResourcePermissionParam]] = None,
         timeout: Optional[float] = None,
     ) -> None:
         """Modify permissions on a spreadsheet
@@ -1550,8 +1525,8 @@ class Spreadsheets(BaseNamespace):
         self,
         *,
         spreadsheet_id: str,
-        to_assign: Optional[list[ResourcePermission | ResourcePermissionParam]] = None,
-        to_revoke: Optional[list[ResourcePermission | ResourcePermissionParam]] = None,
+        to_assign: Optional[list[ResourcePermissionParam]] = None,
+        to_revoke: Optional[list[ResourcePermissionParam]] = None,
         timeout: Optional[float] = None,
     ) -> None:
         """Modify permissions on a spreadsheet (async)
@@ -1588,136 +1563,6 @@ class Spreadsheets(BaseNamespace):
             timeout=timeout,
         )
         return None
-
-    def create_sheet(
-        self,
-        *,
-        spreadsheet_id: str,
-        custom_fields: Optional[dict[str, Any]] = None,
-        id_: Optional[str] = None,
-        index: Optional[int] = None,
-        lock: Optional[str] = None,
-        name: Optional[str] = None,
-        parent: Optional[Sheet | SheetParam] = None,
-        table: Optional[TableRef | TableRefParam] = None,
-        timeout: Optional[float] = None,
-    ) -> Sheet:
-        """Create a new sheet in a spreadsheet
-
-        Creates a new [sheet](ref:spreadsheets#sheet) in a
-        [spreadsheet](ref:spreadsheets#spreadsheet), given its properties. If
-        the sheet name provided isn't unique, a number is appended to make it
-        unique. By default, creates a top-level sheet in the top-most position.
-
-        Args:
-            spreadsheet_id: The unique identifier of the spreadsheet
-            custom_fields: A map of ids to values representing Custom Fields on the sheet.
-
-            id_: The unique identifier of the sheet
-            index: The integer index of the sheet relative to its parent sheet or to the spreadsheet, if no parent sheet. To position a sheet at the end of its siblings, use the special value -1.
-            lock: The type of lock applied to this sheet, if any. Note this property is not tied to revision and will always reflect the sheet's current lock state. When this field is not present on the sheet object, the sheet is not locked.
-            name: The name of the sheet
-            parent:
-            table:
-            timeout: Override the default request timeout (seconds).
-
-        Returns:
-            Sheet
-
-        Raises:
-            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
-        """
-        _body: dict[str, Any] = {}
-        if custom_fields is not None:
-            _body["customFields"] = custom_fields
-        if id_ is not None:
-            _body["id"] = id_
-        if index is not None:
-            _body["index"] = index
-        if lock is not None:
-            _body["lock"] = lock
-        if name is not None:
-            _body["name"] = name
-        if parent is not None:
-            _body["parent"] = parent
-        if table is not None:
-            _body["table"] = table
-        response = self._client.request(
-            "POST",
-            self._api,
-            "/spreadsheets/{spreadsheetId}/sheets",
-            path_params={
-                "spreadsheetId": spreadsheet_id,
-            },
-            json_body=_body or None,
-            timeout=timeout,
-        )
-        return Sheet.model_validate(response.json())
-
-    async def create_sheet_async(
-        self,
-        *,
-        spreadsheet_id: str,
-        custom_fields: Optional[dict[str, Any]] = None,
-        id_: Optional[str] = None,
-        index: Optional[int] = None,
-        lock: Optional[str] = None,
-        name: Optional[str] = None,
-        parent: Optional[Sheet | SheetParam] = None,
-        table: Optional[TableRef | TableRefParam] = None,
-        timeout: Optional[float] = None,
-    ) -> Sheet:
-        """Create a new sheet in a spreadsheet (async)
-
-        Creates a new [sheet](ref:spreadsheets#sheet) in a
-        [spreadsheet](ref:spreadsheets#spreadsheet), given its properties. If
-        the sheet name provided isn't unique, a number is appended to make it
-        unique. By default, creates a top-level sheet in the top-most position.
-
-        Args:
-            spreadsheet_id: The unique identifier of the spreadsheet
-            custom_fields: A map of ids to values representing Custom Fields on the sheet.
-
-            id_: The unique identifier of the sheet
-            index: The integer index of the sheet relative to its parent sheet or to the spreadsheet, if no parent sheet. To position a sheet at the end of its siblings, use the special value -1.
-            lock: The type of lock applied to this sheet, if any. Note this property is not tied to revision and will always reflect the sheet's current lock state. When this field is not present on the sheet object, the sheet is not locked.
-            name: The name of the sheet
-            parent:
-            table:
-            timeout: Override the default request timeout (seconds).
-
-        Returns:
-            Sheet
-
-        Raises:
-            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
-        """
-        _body: dict[str, Any] = {}
-        if custom_fields is not None:
-            _body["customFields"] = custom_fields
-        if id_ is not None:
-            _body["id"] = id_
-        if index is not None:
-            _body["index"] = index
-        if lock is not None:
-            _body["lock"] = lock
-        if name is not None:
-            _body["name"] = name
-        if parent is not None:
-            _body["parent"] = parent
-        if table is not None:
-            _body["table"] = table
-        response = await self._client.request_async(
-            "POST",
-            self._api,
-            "/spreadsheets/{spreadsheetId}/sheets",
-            path_params={
-                "spreadsheetId": spreadsheet_id,
-            },
-            json_body=_body or None,
-            timeout=timeout,
-        )
-        return Sheet.model_validate(response.json())
 
     def get_sheets(
         self,
@@ -1807,67 +1652,135 @@ class Spreadsheets(BaseNamespace):
         _body_result = await paginate_all_async(_fetch, extract_next_link, "data")
         return SheetsListResult.model_validate(_body_result)
 
-    def delete_sheet_by_id(
+    def create_sheet(
         self,
         *,
         spreadsheet_id: str,
-        sheet_id: str,
+        custom_fields: Optional[dict[str, Any]] = None,
+        id_: Optional[str] = None,
+        index: Optional[int] = None,
+        lock: Optional[str] = None,
+        name: Optional[str] = None,
+        parent: Optional[SheetParam] = None,
+        table: Optional[TableRefParam] = None,
         timeout: Optional[float] = None,
-    ) -> None:
-        """Delete a single sheet
+    ) -> Sheet:
+        """Create a new sheet in a spreadsheet
 
-        Deletes a [sheet](ref:spreadsheets#sheet) given its ID.
+        Creates a new [sheet](ref:spreadsheets#sheet) in a
+        [spreadsheet](ref:spreadsheets#spreadsheet), given its properties. If
+        the sheet name provided isn't unique, a number is appended to make it
+        unique. By default, creates a top-level sheet in the top-most position.
 
         Args:
             spreadsheet_id: The unique identifier of the spreadsheet
-            sheet_id: The unique identifier of the sheet
+            custom_fields: A map of ids to values representing Custom Fields on the sheet.
+
+            id_: The unique identifier of the sheet
+            index: The integer index of the sheet relative to its parent sheet or to the spreadsheet, if no parent sheet. To position a sheet at the end of its siblings, use the special value -1.
+            lock: The type of lock applied to this sheet, if any. Note this property is not tied to revision and will always reflect the sheet's current lock state. When this field is not present on the sheet object, the sheet is not locked.
+            name: The name of the sheet
+            parent:
+            table:
             timeout: Override the default request timeout (seconds).
+
+        Returns:
+            Sheet
 
         Raises:
             WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
         """
-        self._client.request(
-            "DELETE",
+        _body: dict[str, Any] = {}
+        if custom_fields is not None:
+            _body["customFields"] = custom_fields
+        if id_ is not None:
+            _body["id"] = id_
+        if index is not None:
+            _body["index"] = index
+        if lock is not None:
+            _body["lock"] = lock
+        if name is not None:
+            _body["name"] = name
+        if parent is not None:
+            _body["parent"] = parent
+        if table is not None:
+            _body["table"] = table
+        response = self._client.request(
+            "POST",
             self._api,
-            "/spreadsheets/{spreadsheetId}/sheets/{sheetId}",
+            "/spreadsheets/{spreadsheetId}/sheets",
             path_params={
                 "spreadsheetId": spreadsheet_id,
-                "sheetId": sheet_id,
             },
+            json_body=_body or None,
             timeout=timeout,
         )
-        return None
+        return Sheet.model_validate(response.json())
 
-    async def delete_sheet_by_id_async(
+    async def create_sheet_async(
         self,
         *,
         spreadsheet_id: str,
-        sheet_id: str,
+        custom_fields: Optional[dict[str, Any]] = None,
+        id_: Optional[str] = None,
+        index: Optional[int] = None,
+        lock: Optional[str] = None,
+        name: Optional[str] = None,
+        parent: Optional[SheetParam] = None,
+        table: Optional[TableRefParam] = None,
         timeout: Optional[float] = None,
-    ) -> None:
-        """Delete a single sheet (async)
+    ) -> Sheet:
+        """Create a new sheet in a spreadsheet (async)
 
-        Deletes a [sheet](ref:spreadsheets#sheet) given its ID.
+        Creates a new [sheet](ref:spreadsheets#sheet) in a
+        [spreadsheet](ref:spreadsheets#spreadsheet), given its properties. If
+        the sheet name provided isn't unique, a number is appended to make it
+        unique. By default, creates a top-level sheet in the top-most position.
 
         Args:
             spreadsheet_id: The unique identifier of the spreadsheet
-            sheet_id: The unique identifier of the sheet
+            custom_fields: A map of ids to values representing Custom Fields on the sheet.
+
+            id_: The unique identifier of the sheet
+            index: The integer index of the sheet relative to its parent sheet or to the spreadsheet, if no parent sheet. To position a sheet at the end of its siblings, use the special value -1.
+            lock: The type of lock applied to this sheet, if any. Note this property is not tied to revision and will always reflect the sheet's current lock state. When this field is not present on the sheet object, the sheet is not locked.
+            name: The name of the sheet
+            parent:
+            table:
             timeout: Override the default request timeout (seconds).
+
+        Returns:
+            Sheet
 
         Raises:
             WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
         """
-        await self._client.request_async(
-            "DELETE",
+        _body: dict[str, Any] = {}
+        if custom_fields is not None:
+            _body["customFields"] = custom_fields
+        if id_ is not None:
+            _body["id"] = id_
+        if index is not None:
+            _body["index"] = index
+        if lock is not None:
+            _body["lock"] = lock
+        if name is not None:
+            _body["name"] = name
+        if parent is not None:
+            _body["parent"] = parent
+        if table is not None:
+            _body["table"] = table
+        response = await self._client.request_async(
+            "POST",
             self._api,
-            "/spreadsheets/{spreadsheetId}/sheets/{sheetId}",
+            "/spreadsheets/{spreadsheetId}/sheets",
             path_params={
                 "spreadsheetId": spreadsheet_id,
-                "sheetId": sheet_id,
             },
+            json_body=_body or None,
             timeout=timeout,
         )
-        return None
+        return Sheet.model_validate(response.json())
 
     def get_sheet_by_id(
         self,
@@ -2351,6 +2264,68 @@ class Spreadsheets(BaseNamespace):
             return await _poll_until_done_async(self._client, response, timeout=wait_timeout)
         return response
 
+    def delete_sheet_by_id(
+        self,
+        *,
+        spreadsheet_id: str,
+        sheet_id: str,
+        timeout: Optional[float] = None,
+    ) -> None:
+        """Delete a single sheet
+
+        Deletes a [sheet](ref:spreadsheets#sheet) given its ID.
+
+        Args:
+            spreadsheet_id: The unique identifier of the spreadsheet
+            sheet_id: The unique identifier of the sheet
+            timeout: Override the default request timeout (seconds).
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
+        """
+        self._client.request(
+            "DELETE",
+            self._api,
+            "/spreadsheets/{spreadsheetId}/sheets/{sheetId}",
+            path_params={
+                "spreadsheetId": spreadsheet_id,
+                "sheetId": sheet_id,
+            },
+            timeout=timeout,
+        )
+        return None
+
+    async def delete_sheet_by_id_async(
+        self,
+        *,
+        spreadsheet_id: str,
+        sheet_id: str,
+        timeout: Optional[float] = None,
+    ) -> None:
+        """Delete a single sheet (async)
+
+        Deletes a [sheet](ref:spreadsheets#sheet) given its ID.
+
+        Args:
+            spreadsheet_id: The unique identifier of the spreadsheet
+            sheet_id: The unique identifier of the sheet
+            timeout: Override the default request timeout (seconds).
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
+        """
+        await self._client.request_async(
+            "DELETE",
+            self._api,
+            "/spreadsheets/{spreadsheetId}/sheets/{sheetId}",
+            path_params={
+                "spreadsheetId": spreadsheet_id,
+                "sheetId": sheet_id,
+            },
+            timeout=timeout,
+        )
+        return None
+
     @overload
     def copy_sheet(
         self,
@@ -2832,8 +2807,8 @@ class Spreadsheets(BaseNamespace):
         *,
         spreadsheet_id: str,
         sheet_id: str,
-        to_assign: Optional[list[ResourcePermission | ResourcePermissionParam]] = None,
-        to_revoke: Optional[list[ResourcePermission | ResourcePermissionParam]] = None,
+        to_assign: Optional[list[ResourcePermissionParam]] = None,
+        to_revoke: Optional[list[ResourcePermissionParam]] = None,
         timeout: Optional[float] = None,
     ) -> None:
         """Modify permissions on a given sheet of a spreadsheet
@@ -2878,8 +2853,8 @@ class Spreadsheets(BaseNamespace):
         *,
         spreadsheet_id: str,
         sheet_id: str,
-        to_assign: Optional[list[ResourcePermission | ResourcePermissionParam]] = None,
-        to_revoke: Optional[list[ResourcePermission | ResourcePermissionParam]] = None,
+        to_assign: Optional[list[ResourcePermissionParam]] = None,
+        to_revoke: Optional[list[ResourcePermissionParam]] = None,
         timeout: Optional[float] = None,
     ) -> None:
         """Modify permissions on a given sheet of a spreadsheet (async)
@@ -3045,30 +3020,26 @@ class Spreadsheets(BaseNamespace):
         *,
         spreadsheet_id: str,
         sheet_id: str,
-        apply_borders: Optional[SheetUpdateApplyBorders | SheetUpdateApplyBordersParam] = None,
-        apply_formats: Optional[SheetUpdateApplyFormats | SheetUpdateApplyFormatsParam] = None,
-        clear_borders: Optional[SheetUpdateClearBorders | SheetUpdateClearBordersParam] = None,
-        clear_formats: Optional[SheetUpdateClearFormats | SheetUpdateClearFormatsParam] = None,
-        delete_columns: Optional[SheetUpdateDeleteColumns | SheetUpdateDeleteColumnsParam] = None,
-        delete_rows: Optional[SheetUpdateDeleteRows | SheetUpdateDeleteRowsParam] = None,
-        edit_cells: Optional[SheetUpdateEditCells | SheetUpdateEditCellsParam] = None,
-        edit_range: Optional[SheetUpdateEditRange | SheetUpdateEditRangeParam] = None,
-        hide_columns: Optional[SheetUpdateHideColumns | SheetUpdateHideColumnsParam] = None,
-        hide_rows: Optional[SheetUpdateHideRows | SheetUpdateHideRowsParam] = None,
-        insert_columns: Optional[SheetUpdateInsertColumns | SheetUpdateInsertColumnsParam] = None,
-        insert_rows: Optional[SheetUpdateInsertRows | SheetUpdateInsertRowsParam] = None,
-        merge_ranges: Optional[SheetUpdateMergeRanges | SheetUpdateMergeRangesParam] = None,
-        resize_columns: Optional[SheetUpdateResizeColumns | SheetUpdateResizeColumnsParam] = None,
-        resize_columns_to_fit: Optional[
-            SheetUpdateResizeColumnsToFit | SheetUpdateResizeColumnsToFitParam
-        ] = None,
-        resize_rows: Optional[SheetUpdateResizeRows | SheetUpdateResizeRowsParam] = None,
-        resize_rows_to_fit: Optional[
-            SheetUpdateResizeRowsToFit | SheetUpdateResizeRowsToFitParam
-        ] = None,
-        unhide_columns: Optional[SheetUpdateUnhideColumns | SheetUpdateUnhideColumnsParam] = None,
-        unhide_rows: Optional[SheetUpdateUnhideRows | SheetUpdateUnhideRowsParam] = None,
-        unmerge_ranges: Optional[SheetUpdateUnmergeRanges | SheetUpdateUnmergeRangesParam] = None,
+        apply_borders: Optional[SheetUpdateApplyBordersParam] = None,
+        apply_formats: Optional[SheetUpdateApplyFormatsParam] = None,
+        clear_borders: Optional[SheetUpdateClearBordersParam] = None,
+        clear_formats: Optional[SheetUpdateClearFormatsParam] = None,
+        delete_columns: Optional[SheetUpdateDeleteColumnsParam] = None,
+        delete_rows: Optional[SheetUpdateDeleteRowsParam] = None,
+        edit_cells: Optional[SheetUpdateEditCellsParam] = None,
+        edit_range: Optional[SheetUpdateEditRangeParam] = None,
+        hide_columns: Optional[SheetUpdateHideColumnsParam] = None,
+        hide_rows: Optional[SheetUpdateHideRowsParam] = None,
+        insert_columns: Optional[SheetUpdateInsertColumnsParam] = None,
+        insert_rows: Optional[SheetUpdateInsertRowsParam] = None,
+        merge_ranges: Optional[SheetUpdateMergeRangesParam] = None,
+        resize_columns: Optional[SheetUpdateResizeColumnsParam] = None,
+        resize_columns_to_fit: Optional[SheetUpdateResizeColumnsToFitParam] = None,
+        resize_rows: Optional[SheetUpdateResizeRowsParam] = None,
+        resize_rows_to_fit: Optional[SheetUpdateResizeRowsToFitParam] = None,
+        unhide_columns: Optional[SheetUpdateUnhideColumnsParam] = None,
+        unhide_rows: Optional[SheetUpdateUnhideRowsParam] = None,
+        unmerge_ranges: Optional[SheetUpdateUnmergeRangesParam] = None,
         timeout: Optional[float] = None,
         wait: Literal[False] = ...,
         wait_timeout: float = 300,
@@ -3080,30 +3051,26 @@ class Spreadsheets(BaseNamespace):
         *,
         spreadsheet_id: str,
         sheet_id: str,
-        apply_borders: Optional[SheetUpdateApplyBorders | SheetUpdateApplyBordersParam] = None,
-        apply_formats: Optional[SheetUpdateApplyFormats | SheetUpdateApplyFormatsParam] = None,
-        clear_borders: Optional[SheetUpdateClearBorders | SheetUpdateClearBordersParam] = None,
-        clear_formats: Optional[SheetUpdateClearFormats | SheetUpdateClearFormatsParam] = None,
-        delete_columns: Optional[SheetUpdateDeleteColumns | SheetUpdateDeleteColumnsParam] = None,
-        delete_rows: Optional[SheetUpdateDeleteRows | SheetUpdateDeleteRowsParam] = None,
-        edit_cells: Optional[SheetUpdateEditCells | SheetUpdateEditCellsParam] = None,
-        edit_range: Optional[SheetUpdateEditRange | SheetUpdateEditRangeParam] = None,
-        hide_columns: Optional[SheetUpdateHideColumns | SheetUpdateHideColumnsParam] = None,
-        hide_rows: Optional[SheetUpdateHideRows | SheetUpdateHideRowsParam] = None,
-        insert_columns: Optional[SheetUpdateInsertColumns | SheetUpdateInsertColumnsParam] = None,
-        insert_rows: Optional[SheetUpdateInsertRows | SheetUpdateInsertRowsParam] = None,
-        merge_ranges: Optional[SheetUpdateMergeRanges | SheetUpdateMergeRangesParam] = None,
-        resize_columns: Optional[SheetUpdateResizeColumns | SheetUpdateResizeColumnsParam] = None,
-        resize_columns_to_fit: Optional[
-            SheetUpdateResizeColumnsToFit | SheetUpdateResizeColumnsToFitParam
-        ] = None,
-        resize_rows: Optional[SheetUpdateResizeRows | SheetUpdateResizeRowsParam] = None,
-        resize_rows_to_fit: Optional[
-            SheetUpdateResizeRowsToFit | SheetUpdateResizeRowsToFitParam
-        ] = None,
-        unhide_columns: Optional[SheetUpdateUnhideColumns | SheetUpdateUnhideColumnsParam] = None,
-        unhide_rows: Optional[SheetUpdateUnhideRows | SheetUpdateUnhideRowsParam] = None,
-        unmerge_ranges: Optional[SheetUpdateUnmergeRanges | SheetUpdateUnmergeRangesParam] = None,
+        apply_borders: Optional[SheetUpdateApplyBordersParam] = None,
+        apply_formats: Optional[SheetUpdateApplyFormatsParam] = None,
+        clear_borders: Optional[SheetUpdateClearBordersParam] = None,
+        clear_formats: Optional[SheetUpdateClearFormatsParam] = None,
+        delete_columns: Optional[SheetUpdateDeleteColumnsParam] = None,
+        delete_rows: Optional[SheetUpdateDeleteRowsParam] = None,
+        edit_cells: Optional[SheetUpdateEditCellsParam] = None,
+        edit_range: Optional[SheetUpdateEditRangeParam] = None,
+        hide_columns: Optional[SheetUpdateHideColumnsParam] = None,
+        hide_rows: Optional[SheetUpdateHideRowsParam] = None,
+        insert_columns: Optional[SheetUpdateInsertColumnsParam] = None,
+        insert_rows: Optional[SheetUpdateInsertRowsParam] = None,
+        merge_ranges: Optional[SheetUpdateMergeRangesParam] = None,
+        resize_columns: Optional[SheetUpdateResizeColumnsParam] = None,
+        resize_columns_to_fit: Optional[SheetUpdateResizeColumnsToFitParam] = None,
+        resize_rows: Optional[SheetUpdateResizeRowsParam] = None,
+        resize_rows_to_fit: Optional[SheetUpdateResizeRowsToFitParam] = None,
+        unhide_columns: Optional[SheetUpdateUnhideColumnsParam] = None,
+        unhide_rows: Optional[SheetUpdateUnhideRowsParam] = None,
+        unmerge_ranges: Optional[SheetUpdateUnmergeRangesParam] = None,
         timeout: Optional[float] = None,
         wait: Literal[True] = ...,
         wait_timeout: float = 300,
@@ -3114,30 +3081,26 @@ class Spreadsheets(BaseNamespace):
         *,
         spreadsheet_id: str,
         sheet_id: str,
-        apply_borders: Optional[SheetUpdateApplyBorders | SheetUpdateApplyBordersParam] = None,
-        apply_formats: Optional[SheetUpdateApplyFormats | SheetUpdateApplyFormatsParam] = None,
-        clear_borders: Optional[SheetUpdateClearBorders | SheetUpdateClearBordersParam] = None,
-        clear_formats: Optional[SheetUpdateClearFormats | SheetUpdateClearFormatsParam] = None,
-        delete_columns: Optional[SheetUpdateDeleteColumns | SheetUpdateDeleteColumnsParam] = None,
-        delete_rows: Optional[SheetUpdateDeleteRows | SheetUpdateDeleteRowsParam] = None,
-        edit_cells: Optional[SheetUpdateEditCells | SheetUpdateEditCellsParam] = None,
-        edit_range: Optional[SheetUpdateEditRange | SheetUpdateEditRangeParam] = None,
-        hide_columns: Optional[SheetUpdateHideColumns | SheetUpdateHideColumnsParam] = None,
-        hide_rows: Optional[SheetUpdateHideRows | SheetUpdateHideRowsParam] = None,
-        insert_columns: Optional[SheetUpdateInsertColumns | SheetUpdateInsertColumnsParam] = None,
-        insert_rows: Optional[SheetUpdateInsertRows | SheetUpdateInsertRowsParam] = None,
-        merge_ranges: Optional[SheetUpdateMergeRanges | SheetUpdateMergeRangesParam] = None,
-        resize_columns: Optional[SheetUpdateResizeColumns | SheetUpdateResizeColumnsParam] = None,
-        resize_columns_to_fit: Optional[
-            SheetUpdateResizeColumnsToFit | SheetUpdateResizeColumnsToFitParam
-        ] = None,
-        resize_rows: Optional[SheetUpdateResizeRows | SheetUpdateResizeRowsParam] = None,
-        resize_rows_to_fit: Optional[
-            SheetUpdateResizeRowsToFit | SheetUpdateResizeRowsToFitParam
-        ] = None,
-        unhide_columns: Optional[SheetUpdateUnhideColumns | SheetUpdateUnhideColumnsParam] = None,
-        unhide_rows: Optional[SheetUpdateUnhideRows | SheetUpdateUnhideRowsParam] = None,
-        unmerge_ranges: Optional[SheetUpdateUnmergeRanges | SheetUpdateUnmergeRangesParam] = None,
+        apply_borders: Optional[SheetUpdateApplyBordersParam] = None,
+        apply_formats: Optional[SheetUpdateApplyFormatsParam] = None,
+        clear_borders: Optional[SheetUpdateClearBordersParam] = None,
+        clear_formats: Optional[SheetUpdateClearFormatsParam] = None,
+        delete_columns: Optional[SheetUpdateDeleteColumnsParam] = None,
+        delete_rows: Optional[SheetUpdateDeleteRowsParam] = None,
+        edit_cells: Optional[SheetUpdateEditCellsParam] = None,
+        edit_range: Optional[SheetUpdateEditRangeParam] = None,
+        hide_columns: Optional[SheetUpdateHideColumnsParam] = None,
+        hide_rows: Optional[SheetUpdateHideRowsParam] = None,
+        insert_columns: Optional[SheetUpdateInsertColumnsParam] = None,
+        insert_rows: Optional[SheetUpdateInsertRowsParam] = None,
+        merge_ranges: Optional[SheetUpdateMergeRangesParam] = None,
+        resize_columns: Optional[SheetUpdateResizeColumnsParam] = None,
+        resize_columns_to_fit: Optional[SheetUpdateResizeColumnsToFitParam] = None,
+        resize_rows: Optional[SheetUpdateResizeRowsParam] = None,
+        resize_rows_to_fit: Optional[SheetUpdateResizeRowsToFitParam] = None,
+        unhide_columns: Optional[SheetUpdateUnhideColumnsParam] = None,
+        unhide_rows: Optional[SheetUpdateUnhideRowsParam] = None,
+        unmerge_ranges: Optional[SheetUpdateUnmergeRangesParam] = None,
         timeout: Optional[float] = None,
         wait: bool = False,
         wait_timeout: float = 300,
@@ -3255,30 +3218,26 @@ class Spreadsheets(BaseNamespace):
         *,
         spreadsheet_id: str,
         sheet_id: str,
-        apply_borders: Optional[SheetUpdateApplyBorders | SheetUpdateApplyBordersParam] = None,
-        apply_formats: Optional[SheetUpdateApplyFormats | SheetUpdateApplyFormatsParam] = None,
-        clear_borders: Optional[SheetUpdateClearBorders | SheetUpdateClearBordersParam] = None,
-        clear_formats: Optional[SheetUpdateClearFormats | SheetUpdateClearFormatsParam] = None,
-        delete_columns: Optional[SheetUpdateDeleteColumns | SheetUpdateDeleteColumnsParam] = None,
-        delete_rows: Optional[SheetUpdateDeleteRows | SheetUpdateDeleteRowsParam] = None,
-        edit_cells: Optional[SheetUpdateEditCells | SheetUpdateEditCellsParam] = None,
-        edit_range: Optional[SheetUpdateEditRange | SheetUpdateEditRangeParam] = None,
-        hide_columns: Optional[SheetUpdateHideColumns | SheetUpdateHideColumnsParam] = None,
-        hide_rows: Optional[SheetUpdateHideRows | SheetUpdateHideRowsParam] = None,
-        insert_columns: Optional[SheetUpdateInsertColumns | SheetUpdateInsertColumnsParam] = None,
-        insert_rows: Optional[SheetUpdateInsertRows | SheetUpdateInsertRowsParam] = None,
-        merge_ranges: Optional[SheetUpdateMergeRanges | SheetUpdateMergeRangesParam] = None,
-        resize_columns: Optional[SheetUpdateResizeColumns | SheetUpdateResizeColumnsParam] = None,
-        resize_columns_to_fit: Optional[
-            SheetUpdateResizeColumnsToFit | SheetUpdateResizeColumnsToFitParam
-        ] = None,
-        resize_rows: Optional[SheetUpdateResizeRows | SheetUpdateResizeRowsParam] = None,
-        resize_rows_to_fit: Optional[
-            SheetUpdateResizeRowsToFit | SheetUpdateResizeRowsToFitParam
-        ] = None,
-        unhide_columns: Optional[SheetUpdateUnhideColumns | SheetUpdateUnhideColumnsParam] = None,
-        unhide_rows: Optional[SheetUpdateUnhideRows | SheetUpdateUnhideRowsParam] = None,
-        unmerge_ranges: Optional[SheetUpdateUnmergeRanges | SheetUpdateUnmergeRangesParam] = None,
+        apply_borders: Optional[SheetUpdateApplyBordersParam] = None,
+        apply_formats: Optional[SheetUpdateApplyFormatsParam] = None,
+        clear_borders: Optional[SheetUpdateClearBordersParam] = None,
+        clear_formats: Optional[SheetUpdateClearFormatsParam] = None,
+        delete_columns: Optional[SheetUpdateDeleteColumnsParam] = None,
+        delete_rows: Optional[SheetUpdateDeleteRowsParam] = None,
+        edit_cells: Optional[SheetUpdateEditCellsParam] = None,
+        edit_range: Optional[SheetUpdateEditRangeParam] = None,
+        hide_columns: Optional[SheetUpdateHideColumnsParam] = None,
+        hide_rows: Optional[SheetUpdateHideRowsParam] = None,
+        insert_columns: Optional[SheetUpdateInsertColumnsParam] = None,
+        insert_rows: Optional[SheetUpdateInsertRowsParam] = None,
+        merge_ranges: Optional[SheetUpdateMergeRangesParam] = None,
+        resize_columns: Optional[SheetUpdateResizeColumnsParam] = None,
+        resize_columns_to_fit: Optional[SheetUpdateResizeColumnsToFitParam] = None,
+        resize_rows: Optional[SheetUpdateResizeRowsParam] = None,
+        resize_rows_to_fit: Optional[SheetUpdateResizeRowsToFitParam] = None,
+        unhide_columns: Optional[SheetUpdateUnhideColumnsParam] = None,
+        unhide_rows: Optional[SheetUpdateUnhideRowsParam] = None,
+        unmerge_ranges: Optional[SheetUpdateUnmergeRangesParam] = None,
         timeout: Optional[float] = None,
         wait: Literal[False] = ...,
         wait_timeout: float = 300,
@@ -3290,30 +3249,26 @@ class Spreadsheets(BaseNamespace):
         *,
         spreadsheet_id: str,
         sheet_id: str,
-        apply_borders: Optional[SheetUpdateApplyBorders | SheetUpdateApplyBordersParam] = None,
-        apply_formats: Optional[SheetUpdateApplyFormats | SheetUpdateApplyFormatsParam] = None,
-        clear_borders: Optional[SheetUpdateClearBorders | SheetUpdateClearBordersParam] = None,
-        clear_formats: Optional[SheetUpdateClearFormats | SheetUpdateClearFormatsParam] = None,
-        delete_columns: Optional[SheetUpdateDeleteColumns | SheetUpdateDeleteColumnsParam] = None,
-        delete_rows: Optional[SheetUpdateDeleteRows | SheetUpdateDeleteRowsParam] = None,
-        edit_cells: Optional[SheetUpdateEditCells | SheetUpdateEditCellsParam] = None,
-        edit_range: Optional[SheetUpdateEditRange | SheetUpdateEditRangeParam] = None,
-        hide_columns: Optional[SheetUpdateHideColumns | SheetUpdateHideColumnsParam] = None,
-        hide_rows: Optional[SheetUpdateHideRows | SheetUpdateHideRowsParam] = None,
-        insert_columns: Optional[SheetUpdateInsertColumns | SheetUpdateInsertColumnsParam] = None,
-        insert_rows: Optional[SheetUpdateInsertRows | SheetUpdateInsertRowsParam] = None,
-        merge_ranges: Optional[SheetUpdateMergeRanges | SheetUpdateMergeRangesParam] = None,
-        resize_columns: Optional[SheetUpdateResizeColumns | SheetUpdateResizeColumnsParam] = None,
-        resize_columns_to_fit: Optional[
-            SheetUpdateResizeColumnsToFit | SheetUpdateResizeColumnsToFitParam
-        ] = None,
-        resize_rows: Optional[SheetUpdateResizeRows | SheetUpdateResizeRowsParam] = None,
-        resize_rows_to_fit: Optional[
-            SheetUpdateResizeRowsToFit | SheetUpdateResizeRowsToFitParam
-        ] = None,
-        unhide_columns: Optional[SheetUpdateUnhideColumns | SheetUpdateUnhideColumnsParam] = None,
-        unhide_rows: Optional[SheetUpdateUnhideRows | SheetUpdateUnhideRowsParam] = None,
-        unmerge_ranges: Optional[SheetUpdateUnmergeRanges | SheetUpdateUnmergeRangesParam] = None,
+        apply_borders: Optional[SheetUpdateApplyBordersParam] = None,
+        apply_formats: Optional[SheetUpdateApplyFormatsParam] = None,
+        clear_borders: Optional[SheetUpdateClearBordersParam] = None,
+        clear_formats: Optional[SheetUpdateClearFormatsParam] = None,
+        delete_columns: Optional[SheetUpdateDeleteColumnsParam] = None,
+        delete_rows: Optional[SheetUpdateDeleteRowsParam] = None,
+        edit_cells: Optional[SheetUpdateEditCellsParam] = None,
+        edit_range: Optional[SheetUpdateEditRangeParam] = None,
+        hide_columns: Optional[SheetUpdateHideColumnsParam] = None,
+        hide_rows: Optional[SheetUpdateHideRowsParam] = None,
+        insert_columns: Optional[SheetUpdateInsertColumnsParam] = None,
+        insert_rows: Optional[SheetUpdateInsertRowsParam] = None,
+        merge_ranges: Optional[SheetUpdateMergeRangesParam] = None,
+        resize_columns: Optional[SheetUpdateResizeColumnsParam] = None,
+        resize_columns_to_fit: Optional[SheetUpdateResizeColumnsToFitParam] = None,
+        resize_rows: Optional[SheetUpdateResizeRowsParam] = None,
+        resize_rows_to_fit: Optional[SheetUpdateResizeRowsToFitParam] = None,
+        unhide_columns: Optional[SheetUpdateUnhideColumnsParam] = None,
+        unhide_rows: Optional[SheetUpdateUnhideRowsParam] = None,
+        unmerge_ranges: Optional[SheetUpdateUnmergeRangesParam] = None,
         timeout: Optional[float] = None,
         wait: Literal[True] = ...,
         wait_timeout: float = 300,
@@ -3324,30 +3279,26 @@ class Spreadsheets(BaseNamespace):
         *,
         spreadsheet_id: str,
         sheet_id: str,
-        apply_borders: Optional[SheetUpdateApplyBorders | SheetUpdateApplyBordersParam] = None,
-        apply_formats: Optional[SheetUpdateApplyFormats | SheetUpdateApplyFormatsParam] = None,
-        clear_borders: Optional[SheetUpdateClearBorders | SheetUpdateClearBordersParam] = None,
-        clear_formats: Optional[SheetUpdateClearFormats | SheetUpdateClearFormatsParam] = None,
-        delete_columns: Optional[SheetUpdateDeleteColumns | SheetUpdateDeleteColumnsParam] = None,
-        delete_rows: Optional[SheetUpdateDeleteRows | SheetUpdateDeleteRowsParam] = None,
-        edit_cells: Optional[SheetUpdateEditCells | SheetUpdateEditCellsParam] = None,
-        edit_range: Optional[SheetUpdateEditRange | SheetUpdateEditRangeParam] = None,
-        hide_columns: Optional[SheetUpdateHideColumns | SheetUpdateHideColumnsParam] = None,
-        hide_rows: Optional[SheetUpdateHideRows | SheetUpdateHideRowsParam] = None,
-        insert_columns: Optional[SheetUpdateInsertColumns | SheetUpdateInsertColumnsParam] = None,
-        insert_rows: Optional[SheetUpdateInsertRows | SheetUpdateInsertRowsParam] = None,
-        merge_ranges: Optional[SheetUpdateMergeRanges | SheetUpdateMergeRangesParam] = None,
-        resize_columns: Optional[SheetUpdateResizeColumns | SheetUpdateResizeColumnsParam] = None,
-        resize_columns_to_fit: Optional[
-            SheetUpdateResizeColumnsToFit | SheetUpdateResizeColumnsToFitParam
-        ] = None,
-        resize_rows: Optional[SheetUpdateResizeRows | SheetUpdateResizeRowsParam] = None,
-        resize_rows_to_fit: Optional[
-            SheetUpdateResizeRowsToFit | SheetUpdateResizeRowsToFitParam
-        ] = None,
-        unhide_columns: Optional[SheetUpdateUnhideColumns | SheetUpdateUnhideColumnsParam] = None,
-        unhide_rows: Optional[SheetUpdateUnhideRows | SheetUpdateUnhideRowsParam] = None,
-        unmerge_ranges: Optional[SheetUpdateUnmergeRanges | SheetUpdateUnmergeRangesParam] = None,
+        apply_borders: Optional[SheetUpdateApplyBordersParam] = None,
+        apply_formats: Optional[SheetUpdateApplyFormatsParam] = None,
+        clear_borders: Optional[SheetUpdateClearBordersParam] = None,
+        clear_formats: Optional[SheetUpdateClearFormatsParam] = None,
+        delete_columns: Optional[SheetUpdateDeleteColumnsParam] = None,
+        delete_rows: Optional[SheetUpdateDeleteRowsParam] = None,
+        edit_cells: Optional[SheetUpdateEditCellsParam] = None,
+        edit_range: Optional[SheetUpdateEditRangeParam] = None,
+        hide_columns: Optional[SheetUpdateHideColumnsParam] = None,
+        hide_rows: Optional[SheetUpdateHideRowsParam] = None,
+        insert_columns: Optional[SheetUpdateInsertColumnsParam] = None,
+        insert_rows: Optional[SheetUpdateInsertRowsParam] = None,
+        merge_ranges: Optional[SheetUpdateMergeRangesParam] = None,
+        resize_columns: Optional[SheetUpdateResizeColumnsParam] = None,
+        resize_columns_to_fit: Optional[SheetUpdateResizeColumnsToFitParam] = None,
+        resize_rows: Optional[SheetUpdateResizeRowsParam] = None,
+        resize_rows_to_fit: Optional[SheetUpdateResizeRowsToFitParam] = None,
+        unhide_columns: Optional[SheetUpdateUnhideColumnsParam] = None,
+        unhide_rows: Optional[SheetUpdateUnhideRowsParam] = None,
+        unmerge_ranges: Optional[SheetUpdateUnmergeRangesParam] = None,
         timeout: Optional[float] = None,
         wait: bool = False,
         wait_timeout: float = 300,

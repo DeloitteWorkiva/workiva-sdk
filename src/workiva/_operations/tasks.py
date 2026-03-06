@@ -18,10 +18,7 @@ from workiva._pagination import (
 )
 from workiva.models.platform import (
     Task,
-    TaskApprovalStep,
-    TaskLocation,
     TasksListResult,
-    TaskUser,
 )
 from workiva.models.platform_types import (
     TaskApprovalStepParam,
@@ -36,130 +33,6 @@ class Tasks(BaseNamespace):
     """Tasks operations."""
 
     _api: _API = _API.PLATFORM
-
-    def create_task(
-        self,
-        *,
-        title: str,
-        approval_steps: Optional[list[TaskApprovalStep | TaskApprovalStepParam]] = None,
-        assignees: Optional[list[TaskUser | TaskUserParam]] = None,
-        description: Optional[str] = None,
-        due_date: Optional[str] = None,
-        location: Optional[TaskLocation | TaskLocationParam] = None,
-        notifications_disabled: Optional[bool] = None,
-        status: Optional[str] = None,
-        timeout: Optional[float] = None,
-    ) -> Task:
-        """Create a new task
-
-                Creates a new [task](ref:tasks#task) given its properties.
-
-                Args:
-                    title: The title of the task.
-                    approval_steps: The approval process for the task where applicable.
-                    assignees: A list of assignees for the task.
-                    description: The task description.
-                    due_date: An ISO 8601 datetime indicating a deadline for the task to be completed. Will be converted to UTC if another time zone is included.
-                    location:
-                    notifications_disabled: Suspend notifications during create/updates. Automated and manual reminders will still be sent. The default value is false.
-                    status: > The status for the task. The default value is Created. The status of the task will be updated automatically as it
-        > progresses through the multiple steps of the approval process.
-
-                    timeout: Override the default request timeout (seconds).
-
-                Returns:
-                    Task
-
-                Raises:
-                    WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
-        """
-        _body: dict[str, Any] = {}
-        if title is not None:
-            _body["title"] = title
-        if approval_steps is not None:
-            _body["approvalSteps"] = approval_steps
-        if assignees is not None:
-            _body["assignees"] = assignees
-        if description is not None:
-            _body["description"] = description
-        if due_date is not None:
-            _body["dueDate"] = due_date
-        if location is not None:
-            _body["location"] = location
-        if notifications_disabled is not None:
-            _body["notificationsDisabled"] = notifications_disabled
-        if status is not None:
-            _body["status"] = status
-        response = self._client.request(
-            "POST",
-            self._api,
-            "/tasks",
-            json_body=_body or None,
-            timeout=timeout,
-        )
-        return Task.model_validate(response.json())
-
-    async def create_task_async(
-        self,
-        *,
-        title: str,
-        approval_steps: Optional[list[TaskApprovalStep | TaskApprovalStepParam]] = None,
-        assignees: Optional[list[TaskUser | TaskUserParam]] = None,
-        description: Optional[str] = None,
-        due_date: Optional[str] = None,
-        location: Optional[TaskLocation | TaskLocationParam] = None,
-        notifications_disabled: Optional[bool] = None,
-        status: Optional[str] = None,
-        timeout: Optional[float] = None,
-    ) -> Task:
-        """Create a new task (async)
-
-                Creates a new [task](ref:tasks#task) given its properties.
-
-                Args:
-                    title: The title of the task.
-                    approval_steps: The approval process for the task where applicable.
-                    assignees: A list of assignees for the task.
-                    description: The task description.
-                    due_date: An ISO 8601 datetime indicating a deadline for the task to be completed. Will be converted to UTC if another time zone is included.
-                    location:
-                    notifications_disabled: Suspend notifications during create/updates. Automated and manual reminders will still be sent. The default value is false.
-                    status: > The status for the task. The default value is Created. The status of the task will be updated automatically as it
-        > progresses through the multiple steps of the approval process.
-
-                    timeout: Override the default request timeout (seconds).
-
-                Returns:
-                    Task
-
-                Raises:
-                    WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
-        """
-        _body: dict[str, Any] = {}
-        if title is not None:
-            _body["title"] = title
-        if approval_steps is not None:
-            _body["approvalSteps"] = approval_steps
-        if assignees is not None:
-            _body["assignees"] = assignees
-        if description is not None:
-            _body["description"] = description
-        if due_date is not None:
-            _body["dueDate"] = due_date
-        if location is not None:
-            _body["location"] = location
-        if notifications_disabled is not None:
-            _body["notificationsDisabled"] = notifications_disabled
-        if status is not None:
-            _body["status"] = status
-        response = await self._client.request_async(
-            "POST",
-            self._api,
-            "/tasks",
-            json_body=_body or None,
-            timeout=timeout,
-        )
-        return Task.model_validate(response.json())
 
     def get_tasks(
         self,
@@ -255,61 +128,129 @@ class Tasks(BaseNamespace):
         _body_result = await paginate_all_async(_fetch, extract_next_link, "data")
         return TasksListResult.model_validate(_body_result)
 
-    def delete_task_by_id(
+    def create_task(
         self,
         *,
-        task_id: str,
+        title: str,
+        approval_steps: Optional[list[TaskApprovalStepParam]] = None,
+        assignees: Optional[list[TaskUserParam]] = None,
+        description: Optional[str] = None,
+        due_date: Optional[str] = None,
+        location: Optional[TaskLocationParam] = None,
+        notifications_disabled: Optional[bool] = None,
+        status: Optional[str] = None,
         timeout: Optional[float] = None,
-    ) -> None:
-        """Delete a single task
+    ) -> Task:
+        """Create a new task
 
-        Deletes a [task](ref:tasks#task) given its ID
+                Creates a new [task](ref:tasks#task) given its properties.
 
-        Args:
-            task_id: The unique identifier of the task
-            timeout: Override the default request timeout (seconds).
+                Args:
+                    title: The title of the task.
+                    approval_steps: The approval process for the task where applicable.
+                    assignees: A list of assignees for the task.
+                    description: The task description.
+                    due_date: An ISO 8601 datetime indicating a deadline for the task to be completed. Will be converted to UTC if another time zone is included.
+                    location:
+                    notifications_disabled: Suspend notifications during create/updates. Automated and manual reminders will still be sent. The default value is false.
+                    status: > The status for the task. The default value is Created. The status of the task will be updated automatically as it
+        > progresses through the multiple steps of the approval process.
 
-        Raises:
-            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
+                    timeout: Override the default request timeout (seconds).
+
+                Returns:
+                    Task
+
+                Raises:
+                    WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
         """
-        self._client.request(
-            "DELETE",
+        _body: dict[str, Any] = {}
+        if title is not None:
+            _body["title"] = title
+        if approval_steps is not None:
+            _body["approvalSteps"] = approval_steps
+        if assignees is not None:
+            _body["assignees"] = assignees
+        if description is not None:
+            _body["description"] = description
+        if due_date is not None:
+            _body["dueDate"] = due_date
+        if location is not None:
+            _body["location"] = location
+        if notifications_disabled is not None:
+            _body["notificationsDisabled"] = notifications_disabled
+        if status is not None:
+            _body["status"] = status
+        response = self._client.request(
+            "POST",
             self._api,
-            "/tasks/{taskId}",
-            path_params={
-                "taskId": task_id,
-            },
+            "/tasks",
+            json_body=_body or None,
             timeout=timeout,
         )
-        return None
+        return Task.model_validate(response.json())
 
-    async def delete_task_by_id_async(
+    async def create_task_async(
         self,
         *,
-        task_id: str,
+        title: str,
+        approval_steps: Optional[list[TaskApprovalStepParam]] = None,
+        assignees: Optional[list[TaskUserParam]] = None,
+        description: Optional[str] = None,
+        due_date: Optional[str] = None,
+        location: Optional[TaskLocationParam] = None,
+        notifications_disabled: Optional[bool] = None,
+        status: Optional[str] = None,
         timeout: Optional[float] = None,
-    ) -> None:
-        """Delete a single task (async)
+    ) -> Task:
+        """Create a new task (async)
 
-        Deletes a [task](ref:tasks#task) given its ID
+                Creates a new [task](ref:tasks#task) given its properties.
 
-        Args:
-            task_id: The unique identifier of the task
-            timeout: Override the default request timeout (seconds).
+                Args:
+                    title: The title of the task.
+                    approval_steps: The approval process for the task where applicable.
+                    assignees: A list of assignees for the task.
+                    description: The task description.
+                    due_date: An ISO 8601 datetime indicating a deadline for the task to be completed. Will be converted to UTC if another time zone is included.
+                    location:
+                    notifications_disabled: Suspend notifications during create/updates. Automated and manual reminders will still be sent. The default value is false.
+                    status: > The status for the task. The default value is Created. The status of the task will be updated automatically as it
+        > progresses through the multiple steps of the approval process.
 
-        Raises:
-            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
+                    timeout: Override the default request timeout (seconds).
+
+                Returns:
+                    Task
+
+                Raises:
+                    WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
         """
-        await self._client.request_async(
-            "DELETE",
+        _body: dict[str, Any] = {}
+        if title is not None:
+            _body["title"] = title
+        if approval_steps is not None:
+            _body["approvalSteps"] = approval_steps
+        if assignees is not None:
+            _body["assignees"] = assignees
+        if description is not None:
+            _body["description"] = description
+        if due_date is not None:
+            _body["dueDate"] = due_date
+        if location is not None:
+            _body["location"] = location
+        if notifications_disabled is not None:
+            _body["notificationsDisabled"] = notifications_disabled
+        if status is not None:
+            _body["status"] = status
+        response = await self._client.request_async(
+            "POST",
             self._api,
-            "/tasks/{taskId}",
-            path_params={
-                "taskId": task_id,
-            },
+            "/tasks",
+            json_body=_body or None,
             timeout=timeout,
         )
-        return None
+        return Task.model_validate(response.json())
 
     def get_task_by_id(
         self,
@@ -472,6 +413,62 @@ class Tasks(BaseNamespace):
             timeout=timeout,
         )
         return Task.model_validate(response.json())
+
+    def delete_task_by_id(
+        self,
+        *,
+        task_id: str,
+        timeout: Optional[float] = None,
+    ) -> None:
+        """Delete a single task
+
+        Deletes a [task](ref:tasks#task) given its ID
+
+        Args:
+            task_id: The unique identifier of the task
+            timeout: Override the default request timeout (seconds).
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
+        """
+        self._client.request(
+            "DELETE",
+            self._api,
+            "/tasks/{taskId}",
+            path_params={
+                "taskId": task_id,
+            },
+            timeout=timeout,
+        )
+        return None
+
+    async def delete_task_by_id_async(
+        self,
+        *,
+        task_id: str,
+        timeout: Optional[float] = None,
+    ) -> None:
+        """Delete a single task (async)
+
+        Deletes a [task](ref:tasks#task) given its ID
+
+        Args:
+            task_id: The unique identifier of the task
+            timeout: Override the default request timeout (seconds).
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
+        """
+        await self._client.request_async(
+            "DELETE",
+            self._api,
+            "/tasks/{taskId}",
+            path_params={
+                "taskId": task_id,
+            },
+            timeout=timeout,
+        )
+        return None
 
     def submit_task_action(
         self,

@@ -17,21 +17,11 @@ from workiva._pagination import (
     paginate_all_async,
 )
 from workiva.models.platform import (
-    DocumentExport,
     File,
-    FileCopyOptions,
     FileImportResponse,
-    FileRestoreOptions,
     FilesListResult,
-    FileTrashOptions,
-    FolderExport,
     Operation,
-    PresentationExport,
-    ResourcePermission,
     ResourcePermissionsListResult,
-    SpreadsheetExport,
-    SupportingDocumentImportOptions,
-    WorkivaFileImportOptions,
 )
 from workiva.models.platform_types import (
     DocumentExportParam,
@@ -43,6 +33,7 @@ from workiva.models.platform_types import (
     ResourcePermissionParam,
     SpreadsheetExportParam,
     SupportingDocumentImportOptionsParam,
+    WorkivaFileExportParam,
     WorkivaFileImportOptionsParam,
 )
 from workiva.polling import _poll_until_done, _poll_until_done_async
@@ -54,6 +45,90 @@ class Files(BaseNamespace):
     """Files operations."""
 
     _api: _API = _API.PLATFORM
+
+    def get_files(
+        self,
+        *,
+        filter_: Optional[str] = None,
+        order_by: Optional[str] = None,
+        maxpagesize: Optional[int] = 1000,
+        timeout: Optional[float] = None,
+    ) -> FilesListResult:
+        """Retrieve a list of files
+
+        Returns a paginated list of [files](ref:files#file).
+
+        Args:
+            filter_: The properties to filter the results by.
+            order_by: One or more comma-separated expressions to indicate the order in which to sort the results.
+            maxpagesize: The maximum number of results to retrieve
+            timeout: Override the default request timeout (seconds).
+
+        Returns:
+            FilesListResult
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
+        """
+
+        def _fetch(_cursor: str | None) -> httpx.Response:
+            return self._client.request(
+                "GET",
+                self._api,
+                "/files",
+                query_params={
+                    "$filter": filter_,
+                    "$orderBy": order_by,
+                    "$maxpagesize": maxpagesize,
+                    "$next": _cursor,
+                },
+                timeout=timeout,
+            )
+
+        _body_result = paginate_all(_fetch, extract_next_link, "data")
+        return FilesListResult.model_validate(_body_result)
+
+    async def get_files_async(
+        self,
+        *,
+        filter_: Optional[str] = None,
+        order_by: Optional[str] = None,
+        maxpagesize: Optional[int] = 1000,
+        timeout: Optional[float] = None,
+    ) -> FilesListResult:
+        """Retrieve a list of files (async)
+
+        Returns a paginated list of [files](ref:files#file).
+
+        Args:
+            filter_: The properties to filter the results by.
+            order_by: One or more comma-separated expressions to indicate the order in which to sort the results.
+            maxpagesize: The maximum number of results to retrieve
+            timeout: Override the default request timeout (seconds).
+
+        Returns:
+            FilesListResult
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
+        """
+
+        async def _fetch(_cursor: str | None) -> httpx.Response:
+            return await self._client.request_async(
+                "GET",
+                self._api,
+                "/files",
+                query_params={
+                    "$filter": filter_,
+                    "$orderBy": order_by,
+                    "$maxpagesize": maxpagesize,
+                    "$next": _cursor,
+                },
+                timeout=timeout,
+            )
+
+        _body_result = await paginate_all_async(_fetch, extract_next_link, "data")
+        return FilesListResult.model_validate(_body_result)
 
     def create_file(
         self,
@@ -189,90 +264,6 @@ class Files(BaseNamespace):
         )
         return File.model_validate(response.json())
 
-    def get_files(
-        self,
-        *,
-        filter_: Optional[str] = None,
-        order_by: Optional[str] = None,
-        maxpagesize: Optional[int] = 1000,
-        timeout: Optional[float] = None,
-    ) -> FilesListResult:
-        """Retrieve a list of files
-
-        Returns a paginated list of [files](ref:files#file).
-
-        Args:
-            filter_: The properties to filter the results by.
-            order_by: One or more comma-separated expressions to indicate the order in which to sort the results.
-            maxpagesize: The maximum number of results to retrieve
-            timeout: Override the default request timeout (seconds).
-
-        Returns:
-            FilesListResult
-
-        Raises:
-            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
-        """
-
-        def _fetch(_cursor: str | None) -> httpx.Response:
-            return self._client.request(
-                "GET",
-                self._api,
-                "/files",
-                query_params={
-                    "$filter": filter_,
-                    "$orderBy": order_by,
-                    "$maxpagesize": maxpagesize,
-                    "$next": _cursor,
-                },
-                timeout=timeout,
-            )
-
-        _body_result = paginate_all(_fetch, extract_next_link, "data")
-        return FilesListResult.model_validate(_body_result)
-
-    async def get_files_async(
-        self,
-        *,
-        filter_: Optional[str] = None,
-        order_by: Optional[str] = None,
-        maxpagesize: Optional[int] = 1000,
-        timeout: Optional[float] = None,
-    ) -> FilesListResult:
-        """Retrieve a list of files (async)
-
-        Returns a paginated list of [files](ref:files#file).
-
-        Args:
-            filter_: The properties to filter the results by.
-            order_by: One or more comma-separated expressions to indicate the order in which to sort the results.
-            maxpagesize: The maximum number of results to retrieve
-            timeout: Override the default request timeout (seconds).
-
-        Returns:
-            FilesListResult
-
-        Raises:
-            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
-        """
-
-        async def _fetch(_cursor: str | None) -> httpx.Response:
-            return await self._client.request_async(
-                "GET",
-                self._api,
-                "/files",
-                query_params={
-                    "$filter": filter_,
-                    "$orderBy": order_by,
-                    "$maxpagesize": maxpagesize,
-                    "$next": _cursor,
-                },
-                timeout=timeout,
-            )
-
-        _body_result = await paginate_all_async(_fetch, extract_next_link, "data")
-        return FilesListResult.model_validate(_body_result)
-
     def import_file(
         self,
         *,
@@ -280,12 +271,8 @@ class Files(BaseNamespace):
         kind: Optional[
             Literal["Document", "Spreadsheet", "Presentation", "Workiva", "SupportingDocument"]
         ] = None,
-        supporting_document_import_options: Optional[
-            SupportingDocumentImportOptions | SupportingDocumentImportOptionsParam
-        ] = None,
-        workiva_file_import_options: Optional[
-            WorkivaFileImportOptions | WorkivaFileImportOptionsParam
-        ] = None,
+        supporting_document_import_options: Optional[SupportingDocumentImportOptionsParam] = None,
+        workiva_file_import_options: Optional[WorkivaFileImportOptionsParam] = None,
         timeout: Optional[float] = None,
     ) -> FileImportResponse:
         """Initiate a file import
@@ -336,12 +323,8 @@ class Files(BaseNamespace):
         kind: Optional[
             Literal["Document", "Spreadsheet", "Presentation", "Workiva", "SupportingDocument"]
         ] = None,
-        supporting_document_import_options: Optional[
-            SupportingDocumentImportOptions | SupportingDocumentImportOptionsParam
-        ] = None,
-        workiva_file_import_options: Optional[
-            WorkivaFileImportOptions | WorkivaFileImportOptionsParam
-        ] = None,
+        supporting_document_import_options: Optional[SupportingDocumentImportOptionsParam] = None,
+        workiva_file_import_options: Optional[WorkivaFileImportOptionsParam] = None,
         timeout: Optional[float] = None,
     ) -> FileImportResponse:
         """Initiate a file import (async)
@@ -609,7 +592,7 @@ class Files(BaseNamespace):
         *,
         file_id: str,
         destination_container: Optional[str] = None,
-        options: Optional[FileCopyOptions | FileCopyOptionsParam] = None,
+        options: Optional[FileCopyOptionsParam] = None,
         timeout: Optional[float] = None,
         wait: Literal[False] = ...,
         wait_timeout: float = 300,
@@ -621,7 +604,7 @@ class Files(BaseNamespace):
         *,
         file_id: str,
         destination_container: Optional[str] = None,
-        options: Optional[FileCopyOptions | FileCopyOptionsParam] = None,
+        options: Optional[FileCopyOptionsParam] = None,
         timeout: Optional[float] = None,
         wait: Literal[True] = ...,
         wait_timeout: float = 300,
@@ -632,7 +615,7 @@ class Files(BaseNamespace):
         *,
         file_id: str,
         destination_container: Optional[str] = None,
-        options: Optional[FileCopyOptions | FileCopyOptionsParam] = None,
+        options: Optional[FileCopyOptionsParam] = None,
         timeout: Optional[float] = None,
         wait: bool = False,
         wait_timeout: float = 300,
@@ -695,7 +678,7 @@ class Files(BaseNamespace):
         *,
         file_id: str,
         destination_container: Optional[str] = None,
-        options: Optional[FileCopyOptions | FileCopyOptionsParam] = None,
+        options: Optional[FileCopyOptionsParam] = None,
         timeout: Optional[float] = None,
         wait: Literal[False] = ...,
         wait_timeout: float = 300,
@@ -707,7 +690,7 @@ class Files(BaseNamespace):
         *,
         file_id: str,
         destination_container: Optional[str] = None,
-        options: Optional[FileCopyOptions | FileCopyOptionsParam] = None,
+        options: Optional[FileCopyOptionsParam] = None,
         timeout: Optional[float] = None,
         wait: Literal[True] = ...,
         wait_timeout: float = 300,
@@ -718,7 +701,7 @@ class Files(BaseNamespace):
         *,
         file_id: str,
         destination_container: Optional[str] = None,
-        options: Optional[FileCopyOptions | FileCopyOptionsParam] = None,
+        options: Optional[FileCopyOptionsParam] = None,
         timeout: Optional[float] = None,
         wait: bool = False,
         wait_timeout: float = 300,
@@ -780,13 +763,16 @@ class Files(BaseNamespace):
         self,
         *,
         file_id: str,
-        document_export: Optional[DocumentExport | DocumentExportParam] = None,
-        folder_export: Optional[FolderExport | FolderExportParam] = None,
+        document_export: Optional[DocumentExportParam] = None,
+        folder_export: Optional[FolderExportParam] = None,
         kind: Optional[
-            Literal["Document", "Spreadsheet", "Presentation", "SupportingDocument", "Folder"]
+            Literal[
+                "Document", "Spreadsheet", "Presentation", "SupportingDocument", "Folder", "Workiva"
+            ]
         ] = None,
-        presentation_export: Optional[PresentationExport | PresentationExportParam] = None,
-        spreadsheet_export: Optional[SpreadsheetExport | SpreadsheetExportParam] = None,
+        presentation_export: Optional[PresentationExportParam] = None,
+        spreadsheet_export: Optional[SpreadsheetExportParam] = None,
+        workiva_file_export: Optional[WorkivaFileExportParam] = None,
         timeout: Optional[float] = None,
         wait: Literal[False] = ...,
         wait_timeout: float = 300,
@@ -797,13 +783,16 @@ class Files(BaseNamespace):
         self,
         *,
         file_id: str,
-        document_export: Optional[DocumentExport | DocumentExportParam] = None,
-        folder_export: Optional[FolderExport | FolderExportParam] = None,
+        document_export: Optional[DocumentExportParam] = None,
+        folder_export: Optional[FolderExportParam] = None,
         kind: Optional[
-            Literal["Document", "Spreadsheet", "Presentation", "SupportingDocument", "Folder"]
+            Literal[
+                "Document", "Spreadsheet", "Presentation", "SupportingDocument", "Folder", "Workiva"
+            ]
         ] = None,
-        presentation_export: Optional[PresentationExport | PresentationExportParam] = None,
-        spreadsheet_export: Optional[SpreadsheetExport | SpreadsheetExportParam] = None,
+        presentation_export: Optional[PresentationExportParam] = None,
+        spreadsheet_export: Optional[SpreadsheetExportParam] = None,
+        workiva_file_export: Optional[WorkivaFileExportParam] = None,
         timeout: Optional[float] = None,
         wait: Literal[True] = ...,
         wait_timeout: float = 300,
@@ -813,13 +802,16 @@ class Files(BaseNamespace):
         self,
         *,
         file_id: str,
-        document_export: Optional[DocumentExport | DocumentExportParam] = None,
-        folder_export: Optional[FolderExport | FolderExportParam] = None,
+        document_export: Optional[DocumentExportParam] = None,
+        folder_export: Optional[FolderExportParam] = None,
         kind: Optional[
-            Literal["Document", "Spreadsheet", "Presentation", "SupportingDocument", "Folder"]
+            Literal[
+                "Document", "Spreadsheet", "Presentation", "SupportingDocument", "Folder", "Workiva"
+            ]
         ] = None,
-        presentation_export: Optional[PresentationExport | PresentationExportParam] = None,
-        spreadsheet_export: Optional[SpreadsheetExport | SpreadsheetExportParam] = None,
+        presentation_export: Optional[PresentationExportParam] = None,
+        spreadsheet_export: Optional[SpreadsheetExportParam] = None,
+        workiva_file_export: Optional[WorkivaFileExportParam] = None,
         timeout: Optional[float] = None,
         wait: bool = False,
         wait_timeout: float = 300,
@@ -852,6 +844,7 @@ class Files(BaseNamespace):
             kind: Kind (Type) of the file which will be exported.
             presentation_export:
             spreadsheet_export:
+            workiva_file_export:
             timeout: Override the default request timeout (seconds).
             wait: If True, poll until the operation completes and return
                 the ``Operation`` result. Defaults to False.
@@ -881,6 +874,8 @@ class Files(BaseNamespace):
             _body["presentationExport"] = presentation_export
         if spreadsheet_export is not None:
             _body["spreadsheetExport"] = spreadsheet_export
+        if workiva_file_export is not None:
+            _body["workivaFileExport"] = workiva_file_export
         response = self._client.request(
             "POST",
             self._api,
@@ -900,13 +895,16 @@ class Files(BaseNamespace):
         self,
         *,
         file_id: str,
-        document_export: Optional[DocumentExport | DocumentExportParam] = None,
-        folder_export: Optional[FolderExport | FolderExportParam] = None,
+        document_export: Optional[DocumentExportParam] = None,
+        folder_export: Optional[FolderExportParam] = None,
         kind: Optional[
-            Literal["Document", "Spreadsheet", "Presentation", "SupportingDocument", "Folder"]
+            Literal[
+                "Document", "Spreadsheet", "Presentation", "SupportingDocument", "Folder", "Workiva"
+            ]
         ] = None,
-        presentation_export: Optional[PresentationExport | PresentationExportParam] = None,
-        spreadsheet_export: Optional[SpreadsheetExport | SpreadsheetExportParam] = None,
+        presentation_export: Optional[PresentationExportParam] = None,
+        spreadsheet_export: Optional[SpreadsheetExportParam] = None,
+        workiva_file_export: Optional[WorkivaFileExportParam] = None,
         timeout: Optional[float] = None,
         wait: Literal[False] = ...,
         wait_timeout: float = 300,
@@ -917,13 +915,16 @@ class Files(BaseNamespace):
         self,
         *,
         file_id: str,
-        document_export: Optional[DocumentExport | DocumentExportParam] = None,
-        folder_export: Optional[FolderExport | FolderExportParam] = None,
+        document_export: Optional[DocumentExportParam] = None,
+        folder_export: Optional[FolderExportParam] = None,
         kind: Optional[
-            Literal["Document", "Spreadsheet", "Presentation", "SupportingDocument", "Folder"]
+            Literal[
+                "Document", "Spreadsheet", "Presentation", "SupportingDocument", "Folder", "Workiva"
+            ]
         ] = None,
-        presentation_export: Optional[PresentationExport | PresentationExportParam] = None,
-        spreadsheet_export: Optional[SpreadsheetExport | SpreadsheetExportParam] = None,
+        presentation_export: Optional[PresentationExportParam] = None,
+        spreadsheet_export: Optional[SpreadsheetExportParam] = None,
+        workiva_file_export: Optional[WorkivaFileExportParam] = None,
         timeout: Optional[float] = None,
         wait: Literal[True] = ...,
         wait_timeout: float = 300,
@@ -933,13 +934,16 @@ class Files(BaseNamespace):
         self,
         *,
         file_id: str,
-        document_export: Optional[DocumentExport | DocumentExportParam] = None,
-        folder_export: Optional[FolderExport | FolderExportParam] = None,
+        document_export: Optional[DocumentExportParam] = None,
+        folder_export: Optional[FolderExportParam] = None,
         kind: Optional[
-            Literal["Document", "Spreadsheet", "Presentation", "SupportingDocument", "Folder"]
+            Literal[
+                "Document", "Spreadsheet", "Presentation", "SupportingDocument", "Folder", "Workiva"
+            ]
         ] = None,
-        presentation_export: Optional[PresentationExport | PresentationExportParam] = None,
-        spreadsheet_export: Optional[SpreadsheetExport | SpreadsheetExportParam] = None,
+        presentation_export: Optional[PresentationExportParam] = None,
+        spreadsheet_export: Optional[SpreadsheetExportParam] = None,
+        workiva_file_export: Optional[WorkivaFileExportParam] = None,
         timeout: Optional[float] = None,
         wait: bool = False,
         wait_timeout: float = 300,
@@ -972,6 +976,7 @@ class Files(BaseNamespace):
             kind: Kind (Type) of the file which will be exported.
             presentation_export:
             spreadsheet_export:
+            workiva_file_export:
             timeout: Override the default request timeout (seconds).
             wait: If True, poll until the operation completes and return
                 the ``Operation`` result. Defaults to False.
@@ -1001,6 +1006,8 @@ class Files(BaseNamespace):
             _body["presentationExport"] = presentation_export
         if spreadsheet_export is not None:
             _body["spreadsheetExport"] = spreadsheet_export
+        if workiva_file_export is not None:
+            _body["workivaFileExport"] = workiva_file_export
         response = await self._client.request_async(
             "POST",
             self._api,
@@ -1020,7 +1027,7 @@ class Files(BaseNamespace):
         self,
         *,
         file_id: str,
-        body: Optional[FileRestoreOptions | FileRestoreOptionsParam] = None,
+        body: Optional[FileRestoreOptionsParam] = None,
         timeout: Optional[float] = None,
         wait: Literal[False] = ...,
         wait_timeout: float = 300,
@@ -1031,7 +1038,7 @@ class Files(BaseNamespace):
         self,
         *,
         file_id: str,
-        body: Optional[FileRestoreOptions | FileRestoreOptionsParam] = None,
+        body: Optional[FileRestoreOptionsParam] = None,
         timeout: Optional[float] = None,
         wait: Literal[True] = ...,
         wait_timeout: float = 300,
@@ -1041,7 +1048,7 @@ class Files(BaseNamespace):
         self,
         *,
         file_id: str,
-        body: Optional[FileRestoreOptions | FileRestoreOptionsParam] = None,
+        body: Optional[FileRestoreOptionsParam] = None,
         timeout: Optional[float] = None,
         wait: bool = False,
         wait_timeout: float = 300,
@@ -1091,7 +1098,7 @@ class Files(BaseNamespace):
         self,
         *,
         file_id: str,
-        body: Optional[FileRestoreOptions | FileRestoreOptionsParam] = None,
+        body: Optional[FileRestoreOptionsParam] = None,
         timeout: Optional[float] = None,
         wait: Literal[False] = ...,
         wait_timeout: float = 300,
@@ -1102,7 +1109,7 @@ class Files(BaseNamespace):
         self,
         *,
         file_id: str,
-        body: Optional[FileRestoreOptions | FileRestoreOptionsParam] = None,
+        body: Optional[FileRestoreOptionsParam] = None,
         timeout: Optional[float] = None,
         wait: Literal[True] = ...,
         wait_timeout: float = 300,
@@ -1112,7 +1119,7 @@ class Files(BaseNamespace):
         self,
         *,
         file_id: str,
-        body: Optional[FileRestoreOptions | FileRestoreOptionsParam] = None,
+        body: Optional[FileRestoreOptionsParam] = None,
         timeout: Optional[float] = None,
         wait: bool = False,
         wait_timeout: float = 300,
@@ -1162,7 +1169,7 @@ class Files(BaseNamespace):
         self,
         *,
         file_id: str,
-        body: Optional[FileTrashOptions | FileTrashOptionsParam] = None,
+        body: Optional[FileTrashOptionsParam] = None,
         timeout: Optional[float] = None,
         wait: Literal[False] = ...,
         wait_timeout: float = 300,
@@ -1173,7 +1180,7 @@ class Files(BaseNamespace):
         self,
         *,
         file_id: str,
-        body: Optional[FileTrashOptions | FileTrashOptionsParam] = None,
+        body: Optional[FileTrashOptionsParam] = None,
         timeout: Optional[float] = None,
         wait: Literal[True] = ...,
         wait_timeout: float = 300,
@@ -1183,7 +1190,7 @@ class Files(BaseNamespace):
         self,
         *,
         file_id: str,
-        body: Optional[FileTrashOptions | FileTrashOptionsParam] = None,
+        body: Optional[FileTrashOptionsParam] = None,
         timeout: Optional[float] = None,
         wait: bool = False,
         wait_timeout: float = 300,
@@ -1233,7 +1240,7 @@ class Files(BaseNamespace):
         self,
         *,
         file_id: str,
-        body: Optional[FileTrashOptions | FileTrashOptionsParam] = None,
+        body: Optional[FileTrashOptionsParam] = None,
         timeout: Optional[float] = None,
         wait: Literal[False] = ...,
         wait_timeout: float = 300,
@@ -1244,7 +1251,7 @@ class Files(BaseNamespace):
         self,
         *,
         file_id: str,
-        body: Optional[FileTrashOptions | FileTrashOptionsParam] = None,
+        body: Optional[FileTrashOptionsParam] = None,
         timeout: Optional[float] = None,
         wait: Literal[True] = ...,
         wait_timeout: float = 300,
@@ -1254,7 +1261,7 @@ class Files(BaseNamespace):
         self,
         *,
         file_id: str,
-        body: Optional[FileTrashOptions | FileTrashOptionsParam] = None,
+        body: Optional[FileTrashOptionsParam] = None,
         timeout: Optional[float] = None,
         wait: bool = False,
         wait_timeout: float = 300,
@@ -1391,8 +1398,8 @@ class Files(BaseNamespace):
         self,
         *,
         file_id: str,
-        to_assign: Optional[list[ResourcePermission | ResourcePermissionParam]] = None,
-        to_revoke: Optional[list[ResourcePermission | ResourcePermissionParam]] = None,
+        to_assign: Optional[list[ResourcePermissionParam]] = None,
+        to_revoke: Optional[list[ResourcePermissionParam]] = None,
         timeout: Optional[float] = None,
     ) -> None:
         """Modify permissions on a file
@@ -1434,8 +1441,8 @@ class Files(BaseNamespace):
         self,
         *,
         file_id: str,
-        to_assign: Optional[list[ResourcePermission | ResourcePermissionParam]] = None,
-        to_revoke: Optional[list[ResourcePermission | ResourcePermissionParam]] = None,
+        to_assign: Optional[list[ResourcePermissionParam]] = None,
+        to_revoke: Optional[list[ResourcePermissionParam]] = None,
         timeout: Optional[float] = None,
     ) -> None:
         """Modify permissions on a file (async)

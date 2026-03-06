@@ -19,15 +19,11 @@ from workiva._pagination import (
 from workiva.models.platform import (
     Document,
     DocumentsListResult,
-    DocumentToDocxOptions,
-    DocumentToPdfOptions,
-    DocumentToXhtmlOptions,
+    DocumentTableCollectionResult,
     MilestoneListResult,
     Operation,
-    ResourcePermission,
     ResourcePermissionsListResult,
     Section,
-    SectionEdit,
     SectionsListResult,
 )
 from workiva.models.platform_types import (
@@ -510,10 +506,10 @@ class Documents(BaseNamespace):
         *,
         document_id: str,
         format_: Literal["pdf", "docx", "xhtml"],
-        docx_options: Optional[DocumentToDocxOptions | DocumentToDocxOptionsParam] = None,
-        pdf_options: Optional[DocumentToPdfOptions | DocumentToPdfOptionsParam] = None,
+        docx_options: Optional[DocumentToDocxOptionsParam] = None,
+        pdf_options: Optional[DocumentToPdfOptionsParam] = None,
         sections: Optional[list[str]] = None,
-        xhtml_options: Optional[DocumentToXhtmlOptions | DocumentToXhtmlOptionsParam] = None,
+        xhtml_options: Optional[DocumentToXhtmlOptionsParam] = None,
         timeout: Optional[float] = None,
         wait: Literal[False] = ...,
         wait_timeout: float = 300,
@@ -525,10 +521,10 @@ class Documents(BaseNamespace):
         *,
         document_id: str,
         format_: Literal["pdf", "docx", "xhtml"],
-        docx_options: Optional[DocumentToDocxOptions | DocumentToDocxOptionsParam] = None,
-        pdf_options: Optional[DocumentToPdfOptions | DocumentToPdfOptionsParam] = None,
+        docx_options: Optional[DocumentToDocxOptionsParam] = None,
+        pdf_options: Optional[DocumentToPdfOptionsParam] = None,
         sections: Optional[list[str]] = None,
-        xhtml_options: Optional[DocumentToXhtmlOptions | DocumentToXhtmlOptionsParam] = None,
+        xhtml_options: Optional[DocumentToXhtmlOptionsParam] = None,
         timeout: Optional[float] = None,
         wait: Literal[True] = ...,
         wait_timeout: float = 300,
@@ -539,10 +535,10 @@ class Documents(BaseNamespace):
         *,
         document_id: str,
         format_: Literal["pdf", "docx", "xhtml"],
-        docx_options: Optional[DocumentToDocxOptions | DocumentToDocxOptionsParam] = None,
-        pdf_options: Optional[DocumentToPdfOptions | DocumentToPdfOptionsParam] = None,
+        docx_options: Optional[DocumentToDocxOptionsParam] = None,
+        pdf_options: Optional[DocumentToPdfOptionsParam] = None,
         sections: Optional[list[str]] = None,
-        xhtml_options: Optional[DocumentToXhtmlOptions | DocumentToXhtmlOptionsParam] = None,
+        xhtml_options: Optional[DocumentToXhtmlOptionsParam] = None,
         timeout: Optional[float] = None,
         wait: bool = False,
         wait_timeout: float = 300,
@@ -620,10 +616,10 @@ class Documents(BaseNamespace):
         *,
         document_id: str,
         format_: Literal["pdf", "docx", "xhtml"],
-        docx_options: Optional[DocumentToDocxOptions | DocumentToDocxOptionsParam] = None,
-        pdf_options: Optional[DocumentToPdfOptions | DocumentToPdfOptionsParam] = None,
+        docx_options: Optional[DocumentToDocxOptionsParam] = None,
+        pdf_options: Optional[DocumentToPdfOptionsParam] = None,
         sections: Optional[list[str]] = None,
-        xhtml_options: Optional[DocumentToXhtmlOptions | DocumentToXhtmlOptionsParam] = None,
+        xhtml_options: Optional[DocumentToXhtmlOptionsParam] = None,
         timeout: Optional[float] = None,
         wait: Literal[False] = ...,
         wait_timeout: float = 300,
@@ -635,10 +631,10 @@ class Documents(BaseNamespace):
         *,
         document_id: str,
         format_: Literal["pdf", "docx", "xhtml"],
-        docx_options: Optional[DocumentToDocxOptions | DocumentToDocxOptionsParam] = None,
-        pdf_options: Optional[DocumentToPdfOptions | DocumentToPdfOptionsParam] = None,
+        docx_options: Optional[DocumentToDocxOptionsParam] = None,
+        pdf_options: Optional[DocumentToPdfOptionsParam] = None,
         sections: Optional[list[str]] = None,
-        xhtml_options: Optional[DocumentToXhtmlOptions | DocumentToXhtmlOptionsParam] = None,
+        xhtml_options: Optional[DocumentToXhtmlOptionsParam] = None,
         timeout: Optional[float] = None,
         wait: Literal[True] = ...,
         wait_timeout: float = 300,
@@ -649,10 +645,10 @@ class Documents(BaseNamespace):
         *,
         document_id: str,
         format_: Literal["pdf", "docx", "xhtml"],
-        docx_options: Optional[DocumentToDocxOptions | DocumentToDocxOptionsParam] = None,
-        pdf_options: Optional[DocumentToPdfOptions | DocumentToPdfOptionsParam] = None,
+        docx_options: Optional[DocumentToDocxOptionsParam] = None,
+        pdf_options: Optional[DocumentToPdfOptionsParam] = None,
         sections: Optional[list[str]] = None,
-        xhtml_options: Optional[DocumentToXhtmlOptions | DocumentToXhtmlOptionsParam] = None,
+        xhtml_options: Optional[DocumentToXhtmlOptionsParam] = None,
         timeout: Optional[float] = None,
         wait: bool = False,
         wait_timeout: float = 300,
@@ -1228,8 +1224,8 @@ class Documents(BaseNamespace):
         self,
         *,
         document_id: str,
-        to_assign: Optional[list[ResourcePermission | ResourcePermissionParam]] = None,
-        to_revoke: Optional[list[ResourcePermission | ResourcePermissionParam]] = None,
+        to_assign: Optional[list[ResourcePermissionParam]] = None,
+        to_revoke: Optional[list[ResourcePermissionParam]] = None,
         timeout: Optional[float] = None,
     ) -> None:
         """Modify permissions on a document
@@ -1271,8 +1267,8 @@ class Documents(BaseNamespace):
         self,
         *,
         document_id: str,
-        to_assign: Optional[list[ResourcePermission | ResourcePermissionParam]] = None,
-        to_revoke: Optional[list[ResourcePermission | ResourcePermissionParam]] = None,
+        to_assign: Optional[list[ResourcePermissionParam]] = None,
+        to_revoke: Optional[list[ResourcePermissionParam]] = None,
         timeout: Optional[float] = None,
     ) -> None:
         """Modify permissions on a document (async)
@@ -1309,134 +1305,6 @@ class Documents(BaseNamespace):
             timeout=timeout,
         )
         return None
-
-    def create_section(
-        self,
-        *,
-        document_id: str,
-        custom_fields: Optional[dict[str, Any]] = None,
-        id_: Optional[str] = None,
-        index: Optional[int] = None,
-        lock: Optional[str] = None,
-        name: Optional[str] = None,
-        non_printing: Optional[bool] = None,
-        parent: Optional[Section | SectionParam] = None,
-        timeout: Optional[float] = None,
-    ) -> Section:
-        """Create a new section in a document
-
-        Creates a new [section](ref:documents#section) in a
-        [document](ref:documents#document), given its properties. By default,
-        the new section appears at the top-most position.
-
-        Args:
-            document_id: The unique identifier of the document
-            custom_fields: A map of ids to values representing Custom Fields on the section.
-
-            id_: The unique identifier of the section
-            index: The integer index of the section relative to its parent section (or to the document if no parent section). The special value -1 may be used to position a section at the end of its siblings list.
-            lock: The type of lock applied to this section, if any. Note this property is not tied to revision and will always reflect the section's current lock state.
-            name: The name of the section
-            non_printing: Whether or not the section is non-printing
-            parent:
-            timeout: Override the default request timeout (seconds).
-
-        Returns:
-            Section
-
-        Raises:
-            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
-        """
-        _body: dict[str, Any] = {}
-        if custom_fields is not None:
-            _body["customFields"] = custom_fields
-        if id_ is not None:
-            _body["id"] = id_
-        if index is not None:
-            _body["index"] = index
-        if lock is not None:
-            _body["lock"] = lock
-        if name is not None:
-            _body["name"] = name
-        if non_printing is not None:
-            _body["nonPrinting"] = non_printing
-        if parent is not None:
-            _body["parent"] = parent
-        response = self._client.request(
-            "POST",
-            self._api,
-            "/documents/{documentId}/sections",
-            path_params={
-                "documentId": document_id,
-            },
-            json_body=_body or None,
-            timeout=timeout,
-        )
-        return Section.model_validate(response.json())
-
-    async def create_section_async(
-        self,
-        *,
-        document_id: str,
-        custom_fields: Optional[dict[str, Any]] = None,
-        id_: Optional[str] = None,
-        index: Optional[int] = None,
-        lock: Optional[str] = None,
-        name: Optional[str] = None,
-        non_printing: Optional[bool] = None,
-        parent: Optional[Section | SectionParam] = None,
-        timeout: Optional[float] = None,
-    ) -> Section:
-        """Create a new section in a document (async)
-
-        Creates a new [section](ref:documents#section) in a
-        [document](ref:documents#document), given its properties. By default,
-        the new section appears at the top-most position.
-
-        Args:
-            document_id: The unique identifier of the document
-            custom_fields: A map of ids to values representing Custom Fields on the section.
-
-            id_: The unique identifier of the section
-            index: The integer index of the section relative to its parent section (or to the document if no parent section). The special value -1 may be used to position a section at the end of its siblings list.
-            lock: The type of lock applied to this section, if any. Note this property is not tied to revision and will always reflect the section's current lock state.
-            name: The name of the section
-            non_printing: Whether or not the section is non-printing
-            parent:
-            timeout: Override the default request timeout (seconds).
-
-        Returns:
-            Section
-
-        Raises:
-            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
-        """
-        _body: dict[str, Any] = {}
-        if custom_fields is not None:
-            _body["customFields"] = custom_fields
-        if id_ is not None:
-            _body["id"] = id_
-        if index is not None:
-            _body["index"] = index
-        if lock is not None:
-            _body["lock"] = lock
-        if name is not None:
-            _body["name"] = name
-        if non_printing is not None:
-            _body["nonPrinting"] = non_printing
-        if parent is not None:
-            _body["parent"] = parent
-        response = await self._client.request_async(
-            "POST",
-            self._api,
-            "/documents/{documentId}/sections",
-            path_params={
-                "documentId": document_id,
-            },
-            json_body=_body or None,
-            timeout=timeout,
-        )
-        return Section.model_validate(response.json())
 
     def get_sections(
         self,
@@ -1526,67 +1394,133 @@ class Documents(BaseNamespace):
         _body_result = await paginate_all_async(_fetch, extract_next_link, "data")
         return SectionsListResult.model_validate(_body_result)
 
-    def delete_section_by_id(
+    def create_section(
         self,
         *,
         document_id: str,
-        section_id: str,
+        custom_fields: Optional[dict[str, Any]] = None,
+        id_: Optional[str] = None,
+        index: Optional[int] = None,
+        lock: Optional[str] = None,
+        name: Optional[str] = None,
+        non_printing: Optional[bool] = None,
+        parent: Optional[SectionParam] = None,
         timeout: Optional[float] = None,
-    ) -> None:
-        """Delete a single section
+    ) -> Section:
+        """Create a new section in a document
 
-        Deletes a [section](ref:documents#section) given its ID.
+        Creates a new [section](ref:documents#section) in a
+        [document](ref:documents#document), given its properties. By default,
+        the new section appears at the top-most position.
 
         Args:
             document_id: The unique identifier of the document
-            section_id: The unique identifier of the section
+            custom_fields: A map of ids to values representing Custom Fields on the section.
+
+            id_: The unique identifier of the section
+            index: The integer index of the section relative to its parent section (or to the document if no parent section). The special value -1 may be used to position a section at the end of its siblings list.
+            lock: The type of lock applied to this section, if any. Note this property is not tied to revision and will always reflect the section's current lock state.
+            name: The name of the section
+            non_printing: Whether or not the section is non-printing
+            parent:
             timeout: Override the default request timeout (seconds).
+
+        Returns:
+            Section
 
         Raises:
             WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
         """
-        self._client.request(
-            "DELETE",
+        _body: dict[str, Any] = {}
+        if custom_fields is not None:
+            _body["customFields"] = custom_fields
+        if id_ is not None:
+            _body["id"] = id_
+        if index is not None:
+            _body["index"] = index
+        if lock is not None:
+            _body["lock"] = lock
+        if name is not None:
+            _body["name"] = name
+        if non_printing is not None:
+            _body["nonPrinting"] = non_printing
+        if parent is not None:
+            _body["parent"] = parent
+        response = self._client.request(
+            "POST",
             self._api,
-            "/documents/{documentId}/sections/{sectionId}",
+            "/documents/{documentId}/sections",
             path_params={
                 "documentId": document_id,
-                "sectionId": section_id,
             },
+            json_body=_body or None,
             timeout=timeout,
         )
-        return None
+        return Section.model_validate(response.json())
 
-    async def delete_section_by_id_async(
+    async def create_section_async(
         self,
         *,
         document_id: str,
-        section_id: str,
+        custom_fields: Optional[dict[str, Any]] = None,
+        id_: Optional[str] = None,
+        index: Optional[int] = None,
+        lock: Optional[str] = None,
+        name: Optional[str] = None,
+        non_printing: Optional[bool] = None,
+        parent: Optional[SectionParam] = None,
         timeout: Optional[float] = None,
-    ) -> None:
-        """Delete a single section (async)
+    ) -> Section:
+        """Create a new section in a document (async)
 
-        Deletes a [section](ref:documents#section) given its ID.
+        Creates a new [section](ref:documents#section) in a
+        [document](ref:documents#document), given its properties. By default,
+        the new section appears at the top-most position.
 
         Args:
             document_id: The unique identifier of the document
-            section_id: The unique identifier of the section
+            custom_fields: A map of ids to values representing Custom Fields on the section.
+
+            id_: The unique identifier of the section
+            index: The integer index of the section relative to its parent section (or to the document if no parent section). The special value -1 may be used to position a section at the end of its siblings list.
+            lock: The type of lock applied to this section, if any. Note this property is not tied to revision and will always reflect the section's current lock state.
+            name: The name of the section
+            non_printing: Whether or not the section is non-printing
+            parent:
             timeout: Override the default request timeout (seconds).
+
+        Returns:
+            Section
 
         Raises:
             WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
         """
-        await self._client.request_async(
-            "DELETE",
+        _body: dict[str, Any] = {}
+        if custom_fields is not None:
+            _body["customFields"] = custom_fields
+        if id_ is not None:
+            _body["id"] = id_
+        if index is not None:
+            _body["index"] = index
+        if lock is not None:
+            _body["lock"] = lock
+        if name is not None:
+            _body["name"] = name
+        if non_printing is not None:
+            _body["nonPrinting"] = non_printing
+        if parent is not None:
+            _body["parent"] = parent
+        response = await self._client.request_async(
+            "POST",
             self._api,
-            "/documents/{documentId}/sections/{sectionId}",
+            "/documents/{documentId}/sections",
             path_params={
                 "documentId": document_id,
-                "sectionId": section_id,
             },
+            json_body=_body or None,
             timeout=timeout,
         )
-        return None
+        return Section.model_validate(response.json())
 
     def get_section_by_id(
         self,
@@ -2154,6 +2088,68 @@ class Documents(BaseNamespace):
             return await _poll_until_done_async(self._client, response, timeout=wait_timeout)
         return response
 
+    def delete_section_by_id(
+        self,
+        *,
+        document_id: str,
+        section_id: str,
+        timeout: Optional[float] = None,
+    ) -> None:
+        """Delete a single section
+
+        Deletes a [section](ref:documents#section) given its ID.
+
+        Args:
+            document_id: The unique identifier of the document
+            section_id: The unique identifier of the section
+            timeout: Override the default request timeout (seconds).
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
+        """
+        self._client.request(
+            "DELETE",
+            self._api,
+            "/documents/{documentId}/sections/{sectionId}",
+            path_params={
+                "documentId": document_id,
+                "sectionId": section_id,
+            },
+            timeout=timeout,
+        )
+        return None
+
+    async def delete_section_by_id_async(
+        self,
+        *,
+        document_id: str,
+        section_id: str,
+        timeout: Optional[float] = None,
+    ) -> None:
+        """Delete a single section (async)
+
+        Deletes a [section](ref:documents#section) given its ID.
+
+        Args:
+            document_id: The unique identifier of the document
+            section_id: The unique identifier of the section
+            timeout: Override the default request timeout (seconds).
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
+        """
+        await self._client.request_async(
+            "DELETE",
+            self._api,
+            "/documents/{documentId}/sections/{sectionId}",
+            path_params={
+                "documentId": document_id,
+                "sectionId": section_id,
+            },
+            timeout=timeout,
+        )
+        return None
+
     @overload
     def copy_section(
         self,
@@ -2367,7 +2363,7 @@ class Documents(BaseNamespace):
         self,
         *,
         document_id: str,
-        data: list[SectionEdit | SectionEditParam],
+        data: list[SectionEditParam],
         timeout: Optional[float] = None,
         wait: Literal[False] = ...,
         wait_timeout: float = 300,
@@ -2378,7 +2374,7 @@ class Documents(BaseNamespace):
         self,
         *,
         document_id: str,
-        data: list[SectionEdit | SectionEditParam],
+        data: list[SectionEditParam],
         timeout: Optional[float] = None,
         wait: Literal[True] = ...,
         wait_timeout: float = 300,
@@ -2388,7 +2384,7 @@ class Documents(BaseNamespace):
         self,
         *,
         document_id: str,
-        data: list[SectionEdit | SectionEditParam],
+        data: list[SectionEditParam],
         timeout: Optional[float] = None,
         wait: bool = False,
         wait_timeout: float = 300,
@@ -2447,7 +2443,7 @@ class Documents(BaseNamespace):
         self,
         *,
         document_id: str,
-        data: list[SectionEdit | SectionEditParam],
+        data: list[SectionEditParam],
         timeout: Optional[float] = None,
         wait: Literal[False] = ...,
         wait_timeout: float = 300,
@@ -2458,7 +2454,7 @@ class Documents(BaseNamespace):
         self,
         *,
         document_id: str,
-        data: list[SectionEdit | SectionEditParam],
+        data: list[SectionEditParam],
         timeout: Optional[float] = None,
         wait: Literal[True] = ...,
         wait_timeout: float = 300,
@@ -2468,7 +2464,7 @@ class Documents(BaseNamespace):
         self,
         *,
         document_id: str,
-        data: list[SectionEdit | SectionEditParam],
+        data: list[SectionEditParam],
         timeout: Optional[float] = None,
         wait: bool = False,
         wait_timeout: float = 300,
@@ -2623,8 +2619,8 @@ class Documents(BaseNamespace):
         *,
         document_id: str,
         section_id: str,
-        to_assign: Optional[list[ResourcePermission | ResourcePermissionParam]] = None,
-        to_revoke: Optional[list[ResourcePermission | ResourcePermissionParam]] = None,
+        to_assign: Optional[list[ResourcePermissionParam]] = None,
+        to_revoke: Optional[list[ResourcePermissionParam]] = None,
         timeout: Optional[float] = None,
     ) -> None:
         """Modify permissions on a given section of a document
@@ -2669,8 +2665,8 @@ class Documents(BaseNamespace):
         *,
         document_id: str,
         section_id: str,
-        to_assign: Optional[list[ResourcePermission | ResourcePermissionParam]] = None,
-        to_revoke: Optional[list[ResourcePermission | ResourcePermissionParam]] = None,
+        to_assign: Optional[list[ResourcePermissionParam]] = None,
+        to_revoke: Optional[list[ResourcePermissionParam]] = None,
         timeout: Optional[float] = None,
     ) -> None:
         """Modify permissions on a given section of a document (async)
@@ -2709,3 +2705,91 @@ class Documents(BaseNamespace):
             timeout=timeout,
         )
         return None
+
+    def get_document_table_collection(
+        self,
+        *,
+        document_id: str,
+        maxpagesize: Optional[int] = 1000,
+        revision: Optional[str] = None,
+        timeout: Optional[float] = None,
+    ) -> DocumentTableCollectionResult:
+        """Retrieve a collection of tables from a document
+
+        Returns the collection of tables within a document.
+
+        Args:
+            document_id: The unique identifier of the document
+            maxpagesize: The maximum number of results to retrieve
+            revision: Returns resources at a specific revision
+            timeout: Override the default request timeout (seconds).
+
+        Returns:
+            DocumentTableCollectionResult
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
+        """
+
+        def _fetch(_cursor: str | None) -> httpx.Response:
+            return self._client.request(
+                "GET",
+                self._api,
+                "/documents/{documentId}/tables",
+                path_params={
+                    "documentId": document_id,
+                },
+                query_params={
+                    "$maxpagesize": maxpagesize,
+                    "$revision": revision,
+                    "$next": _cursor,
+                },
+                timeout=timeout,
+            )
+
+        _body_result = paginate_all(_fetch, extract_next_link, "data")
+        return DocumentTableCollectionResult.model_validate(_body_result)
+
+    async def get_document_table_collection_async(
+        self,
+        *,
+        document_id: str,
+        maxpagesize: Optional[int] = 1000,
+        revision: Optional[str] = None,
+        timeout: Optional[float] = None,
+    ) -> DocumentTableCollectionResult:
+        """Retrieve a collection of tables from a document (async)
+
+        Returns the collection of tables within a document.
+
+        Args:
+            document_id: The unique identifier of the document
+            maxpagesize: The maximum number of results to retrieve
+            revision: Returns resources at a specific revision
+            timeout: Override the default request timeout (seconds).
+
+        Returns:
+            DocumentTableCollectionResult
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
+        """
+
+        async def _fetch(_cursor: str | None) -> httpx.Response:
+            return await self._client.request_async(
+                "GET",
+                self._api,
+                "/documents/{documentId}/tables",
+                path_params={
+                    "documentId": document_id,
+                },
+                query_params={
+                    "$maxpagesize": maxpagesize,
+                    "$revision": revision,
+                    "$next": _cursor,
+                },
+                timeout=timeout,
+            )
+
+        _body_result = await paginate_all_async(_fetch, extract_next_link, "data")
+        return DocumentTableCollectionResult.model_validate(_body_result)

@@ -235,62 +235,6 @@ class Milestones(BaseNamespace):
             return await _poll_until_done_async(self._client, response, timeout=wait_timeout)
         return response
 
-    def delete_milestone_by_id(
-        self,
-        *,
-        milestone_id: str,
-        timeout: Optional[float] = None,
-    ) -> None:
-        """Deletes a milestone
-
-        Deletes the [`Milestone`](ref:milestones#milestone) with a given id.
-
-        Args:
-            milestone_id: The unique identifier of a milestone.
-            timeout: Override the default request timeout (seconds).
-
-        Raises:
-            WorkivaAPIError: On API errors (400, 401, 403, 404, 500).
-        """
-        self._client.request(
-            "DELETE",
-            self._api,
-            "/milestones/{milestoneId}",
-            path_params={
-                "milestoneId": milestone_id,
-            },
-            timeout=timeout,
-        )
-        return None
-
-    async def delete_milestone_by_id_async(
-        self,
-        *,
-        milestone_id: str,
-        timeout: Optional[float] = None,
-    ) -> None:
-        """Deletes a milestone (async)
-
-        Deletes the [`Milestone`](ref:milestones#milestone) with a given id.
-
-        Args:
-            milestone_id: The unique identifier of a milestone.
-            timeout: Override the default request timeout (seconds).
-
-        Raises:
-            WorkivaAPIError: On API errors (400, 401, 403, 404, 500).
-        """
-        await self._client.request_async(
-            "DELETE",
-            self._api,
-            "/milestones/{milestoneId}",
-            path_params={
-                "milestoneId": milestone_id,
-            },
-            timeout=timeout,
-        )
-        return None
-
     def get_milestone_by_id(
         self,
         *,
@@ -442,3 +386,59 @@ class Milestones(BaseNamespace):
             timeout=timeout,
         )
         return Milestone.model_validate(response.json())
+
+    def delete_milestone_by_id(
+        self,
+        *,
+        milestone_id: str,
+        timeout: Optional[float] = None,
+    ) -> None:
+        """Deletes a milestone
+
+        Deletes the [`Milestone`](ref:milestones#milestone) with a given id.
+
+        Args:
+            milestone_id: The unique identifier of a milestone.
+            timeout: Override the default request timeout (seconds).
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 500).
+        """
+        self._client.request(
+            "DELETE",
+            self._api,
+            "/milestones/{milestoneId}",
+            path_params={
+                "milestoneId": milestone_id,
+            },
+            timeout=timeout,
+        )
+        return None
+
+    async def delete_milestone_by_id_async(
+        self,
+        *,
+        milestone_id: str,
+        timeout: Optional[float] = None,
+    ) -> None:
+        """Deletes a milestone (async)
+
+        Deletes the [`Milestone`](ref:milestones#milestone) with a given id.
+
+        Args:
+            milestone_id: The unique identifier of a milestone.
+            timeout: Override the default request timeout (seconds).
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 500).
+        """
+        await self._client.request_async(
+            "DELETE",
+            self._api,
+            "/milestones/{milestoneId}",
+            path_params={
+                "milestoneId": milestone_id,
+            },
+            timeout=timeout,
+        )
+        return None

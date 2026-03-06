@@ -19,8 +19,6 @@ from workiva._pagination import (
 from workiva.models.platform import (
     Dimension,
     DimensionsListResult,
-    DimensionValue,
-    FrameworkReference,
     Metric,
     MetricsListResult,
     MetricValue,
@@ -28,9 +26,7 @@ from workiva.models.platform import (
     Operation,
     Program,
     ProgramsListResult,
-    ResourcePermission,
     ResourcePermissionsListResult,
-    Tag,
     Topic,
     TopicsListResult,
 )
@@ -50,70 +46,6 @@ class Sustainability(BaseNamespace):
     """Sustainability operations."""
 
     _api: _API = _API.PLATFORM
-
-    def create_program(
-        self,
-        *,
-        name: Optional[str] = None,
-        timeout: Optional[float] = None,
-    ) -> Program:
-        """Create a new program
-
-        Creates a new [program](ref:sustainability#program).
-
-        Args:
-            name: The name of the program. Must be unique within the workspace.
-            timeout: Override the default request timeout (seconds).
-
-        Returns:
-            Program
-
-        Raises:
-            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
-        """
-        _body: dict[str, Any] = {}
-        if name is not None:
-            _body["name"] = name
-        response = self._client.request(
-            "POST",
-            self._api,
-            "/programs",
-            json_body=_body or None,
-            timeout=timeout,
-        )
-        return Program.model_validate(response.json())
-
-    async def create_program_async(
-        self,
-        *,
-        name: Optional[str] = None,
-        timeout: Optional[float] = None,
-    ) -> Program:
-        """Create a new program (async)
-
-        Creates a new [program](ref:sustainability#program).
-
-        Args:
-            name: The name of the program. Must be unique within the workspace.
-            timeout: Override the default request timeout (seconds).
-
-        Returns:
-            Program
-
-        Raises:
-            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
-        """
-        _body: dict[str, Any] = {}
-        if name is not None:
-            _body["name"] = name
-        response = await self._client.request_async(
-            "POST",
-            self._api,
-            "/programs",
-            json_body=_body or None,
-            timeout=timeout,
-        )
-        return Program.model_validate(response.json())
 
     def get_programs(
         self,
@@ -198,6 +130,70 @@ class Sustainability(BaseNamespace):
 
         _body_result = await paginate_all_async(_fetch, extract_next_link, "data")
         return ProgramsListResult.model_validate(_body_result)
+
+    def create_program(
+        self,
+        *,
+        name: Optional[str] = None,
+        timeout: Optional[float] = None,
+    ) -> Program:
+        """Create a new program
+
+        Creates a new [program](ref:sustainability#program).
+
+        Args:
+            name: The name of the program. Must be unique within the workspace.
+            timeout: Override the default request timeout (seconds).
+
+        Returns:
+            Program
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
+        """
+        _body: dict[str, Any] = {}
+        if name is not None:
+            _body["name"] = name
+        response = self._client.request(
+            "POST",
+            self._api,
+            "/programs",
+            json_body=_body or None,
+            timeout=timeout,
+        )
+        return Program.model_validate(response.json())
+
+    async def create_program_async(
+        self,
+        *,
+        name: Optional[str] = None,
+        timeout: Optional[float] = None,
+    ) -> Program:
+        """Create a new program (async)
+
+        Creates a new [program](ref:sustainability#program).
+
+        Args:
+            name: The name of the program. Must be unique within the workspace.
+            timeout: Override the default request timeout (seconds).
+
+        Returns:
+            Program
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
+        """
+        _body: dict[str, Any] = {}
+        if name is not None:
+            _body["name"] = name
+        response = await self._client.request_async(
+            "POST",
+            self._api,
+            "/programs",
+            json_body=_body or None,
+            timeout=timeout,
+        )
+        return Program.model_validate(response.json())
 
     def get_program_by_id(
         self,
@@ -341,98 +337,6 @@ class Sustainability(BaseNamespace):
         )
         return Program.model_validate(response.json())
 
-    def create_dimension(
-        self,
-        *,
-        program_id: str,
-        active: Optional[bool] = None,
-        name: Optional[str] = None,
-        values: Optional[list[DimensionValue | DimensionValueParam]] = None,
-        timeout: Optional[float] = None,
-    ) -> Dimension:
-        """Create a new dimension
-
-        Creates a new [dimension](ref:sustainability#dimension).
-
-        Args:
-            program_id: The unique identifier of the program
-            active: Indicates whether the dimension is available for use in new metrics
-            name: The name of the dimension, representing a specific category or grouping.
-            values: A list of values associated with this dimension, requiring at least one and limited to a maximum of 1500. This list is populated when retrieving an individual dimension and is null when listing dimensions.
-
-            timeout: Override the default request timeout (seconds).
-
-        Returns:
-            Dimension
-
-        Raises:
-            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
-        """
-        _body: dict[str, Any] = {}
-        if active is not None:
-            _body["active"] = active
-        if name is not None:
-            _body["name"] = name
-        if values is not None:
-            _body["values"] = values
-        response = self._client.request(
-            "POST",
-            self._api,
-            "/programs/{programId}/dimensions",
-            path_params={
-                "programId": program_id,
-            },
-            json_body=_body or None,
-            timeout=timeout,
-        )
-        return Dimension.model_validate(response.json())
-
-    async def create_dimension_async(
-        self,
-        *,
-        program_id: str,
-        active: Optional[bool] = None,
-        name: Optional[str] = None,
-        values: Optional[list[DimensionValue | DimensionValueParam]] = None,
-        timeout: Optional[float] = None,
-    ) -> Dimension:
-        """Create a new dimension (async)
-
-        Creates a new [dimension](ref:sustainability#dimension).
-
-        Args:
-            program_id: The unique identifier of the program
-            active: Indicates whether the dimension is available for use in new metrics
-            name: The name of the dimension, representing a specific category or grouping.
-            values: A list of values associated with this dimension, requiring at least one and limited to a maximum of 1500. This list is populated when retrieving an individual dimension and is null when listing dimensions.
-
-            timeout: Override the default request timeout (seconds).
-
-        Returns:
-            Dimension
-
-        Raises:
-            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
-        """
-        _body: dict[str, Any] = {}
-        if active is not None:
-            _body["active"] = active
-        if name is not None:
-            _body["name"] = name
-        if values is not None:
-            _body["values"] = values
-        response = await self._client.request_async(
-            "POST",
-            self._api,
-            "/programs/{programId}/dimensions",
-            path_params={
-                "programId": program_id,
-            },
-            json_body=_body or None,
-            timeout=timeout,
-        )
-        return Dimension.model_validate(response.json())
-
     def get_dimensions(
         self,
         *,
@@ -526,6 +430,98 @@ class Sustainability(BaseNamespace):
 
         _body_result = await paginate_all_async(_fetch, extract_next_link, "data")
         return DimensionsListResult.model_validate(_body_result)
+
+    def create_dimension(
+        self,
+        *,
+        program_id: str,
+        active: Optional[bool] = None,
+        name: Optional[str] = None,
+        values: Optional[list[DimensionValueParam]] = None,
+        timeout: Optional[float] = None,
+    ) -> Dimension:
+        """Create a new dimension
+
+        Creates a new [dimension](ref:sustainability#dimension).
+
+        Args:
+            program_id: The unique identifier of the program
+            active: Indicates whether the dimension is available for use in new metrics
+            name: The name of the dimension, representing a specific category or grouping.
+            values: A list of values associated with this dimension, requiring at least one and limited to a maximum of 1500. This list is populated when retrieving an individual dimension and is null when listing dimensions.
+
+            timeout: Override the default request timeout (seconds).
+
+        Returns:
+            Dimension
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
+        """
+        _body: dict[str, Any] = {}
+        if active is not None:
+            _body["active"] = active
+        if name is not None:
+            _body["name"] = name
+        if values is not None:
+            _body["values"] = values
+        response = self._client.request(
+            "POST",
+            self._api,
+            "/programs/{programId}/dimensions",
+            path_params={
+                "programId": program_id,
+            },
+            json_body=_body or None,
+            timeout=timeout,
+        )
+        return Dimension.model_validate(response.json())
+
+    async def create_dimension_async(
+        self,
+        *,
+        program_id: str,
+        active: Optional[bool] = None,
+        name: Optional[str] = None,
+        values: Optional[list[DimensionValueParam]] = None,
+        timeout: Optional[float] = None,
+    ) -> Dimension:
+        """Create a new dimension (async)
+
+        Creates a new [dimension](ref:sustainability#dimension).
+
+        Args:
+            program_id: The unique identifier of the program
+            active: Indicates whether the dimension is available for use in new metrics
+            name: The name of the dimension, representing a specific category or grouping.
+            values: A list of values associated with this dimension, requiring at least one and limited to a maximum of 1500. This list is populated when retrieving an individual dimension and is null when listing dimensions.
+
+            timeout: Override the default request timeout (seconds).
+
+        Returns:
+            Dimension
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
+        """
+        _body: dict[str, Any] = {}
+        if active is not None:
+            _body["active"] = active
+        if name is not None:
+            _body["name"] = name
+        if values is not None:
+            _body["values"] = values
+        response = await self._client.request_async(
+            "POST",
+            self._api,
+            "/programs/{programId}/dimensions",
+            path_params={
+                "programId": program_id,
+            },
+            json_body=_body or None,
+            timeout=timeout,
+        )
+        return Dimension.model_validate(response.json())
 
     def get_dimension_by_id(
         self,
@@ -685,180 +681,6 @@ class Sustainability(BaseNamespace):
         )
         return Dimension.model_validate(response.json())
 
-    def create_metric(
-        self,
-        *,
-        program_id: str,
-        allowed_dimensions: Optional[list[str]] = None,
-        code: Optional[int] = None,
-        data_type: Optional[Literal["text", "number", "date", "currency", "percent"]] = None,
-        description: Optional[str] = None,
-        framework_references: Optional[list[FrameworkReference | FrameworkReferenceParam]] = None,
-        id_: Optional[str] = None,
-        index: Optional[int] = None,
-        name: Optional[str] = None,
-        require_notes: Optional[bool] = None,
-        require_supporting_attachments: Optional[bool] = None,
-        tags: Optional[list[Tag | TagParam]] = None,
-        topic: Optional[str] = None,
-        unit: Optional[str] = None,
-        timeout: Optional[float] = None,
-    ) -> Metric:
-        """Create a new metric
-
-                Creates a new [metric](ref:sustainability#metric).
-
-                Args:
-                    program_id: The unique identifier of the program
-                    allowed_dimensions: A list of dimension ids that may be used when creating values for this metric.
-                    code: An optional user-specified metric code as an integer greater than 0, unique to each metric.
-        If not provided, the system assigns the next available integer.
-
-                    data_type: Used to specify the type of data for a metric.
-                    description: An optional description of the metric, explaining its purpose and main aspects, up to 32767 characters.
-                    framework_references: A list of framework/standard references or other related content, up to 20 references.
-                    id_: The unique UUID identifier of the metric.
-                    index: The index in the outline. If unset, the metric will be ordered last.
-                    name: The name of the metric, up to 300 characters.
-                    require_notes: Indicates whether notes are required for this metric.
-                    require_supporting_attachments: Indicates whether supporting attachments are required for this metric.
-                    tags: A collection of tags associated with the metric. A metric can have up to 20 tags.
-                    topic: The unique UUID identifier of the parent topic.
-                    unit: The unit of measurement for the metric, up to 300 characters.
-                    timeout: Override the default request timeout (seconds).
-
-                Returns:
-                    Metric
-
-                Raises:
-                    WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
-        """
-        _body: dict[str, Any] = {}
-        if allowed_dimensions is not None:
-            _body["allowedDimensions"] = allowed_dimensions
-        if code is not None:
-            _body["code"] = code
-        if data_type is not None:
-            _body["dataType"] = data_type
-        if description is not None:
-            _body["description"] = description
-        if framework_references is not None:
-            _body["frameworkReferences"] = framework_references
-        if id_ is not None:
-            _body["id"] = id_
-        if index is not None:
-            _body["index"] = index
-        if name is not None:
-            _body["name"] = name
-        if require_notes is not None:
-            _body["requireNotes"] = require_notes
-        if require_supporting_attachments is not None:
-            _body["requireSupportingAttachments"] = require_supporting_attachments
-        if tags is not None:
-            _body["tags"] = tags
-        if topic is not None:
-            _body["topic"] = topic
-        if unit is not None:
-            _body["unit"] = unit
-        response = self._client.request(
-            "POST",
-            self._api,
-            "/programs/{programId}/metrics",
-            path_params={
-                "programId": program_id,
-            },
-            json_body=_body or None,
-            timeout=timeout,
-        )
-        return Metric.model_validate(response.json())
-
-    async def create_metric_async(
-        self,
-        *,
-        program_id: str,
-        allowed_dimensions: Optional[list[str]] = None,
-        code: Optional[int] = None,
-        data_type: Optional[Literal["text", "number", "date", "currency", "percent"]] = None,
-        description: Optional[str] = None,
-        framework_references: Optional[list[FrameworkReference | FrameworkReferenceParam]] = None,
-        id_: Optional[str] = None,
-        index: Optional[int] = None,
-        name: Optional[str] = None,
-        require_notes: Optional[bool] = None,
-        require_supporting_attachments: Optional[bool] = None,
-        tags: Optional[list[Tag | TagParam]] = None,
-        topic: Optional[str] = None,
-        unit: Optional[str] = None,
-        timeout: Optional[float] = None,
-    ) -> Metric:
-        """Create a new metric (async)
-
-                Creates a new [metric](ref:sustainability#metric).
-
-                Args:
-                    program_id: The unique identifier of the program
-                    allowed_dimensions: A list of dimension ids that may be used when creating values for this metric.
-                    code: An optional user-specified metric code as an integer greater than 0, unique to each metric.
-        If not provided, the system assigns the next available integer.
-
-                    data_type: Used to specify the type of data for a metric.
-                    description: An optional description of the metric, explaining its purpose and main aspects, up to 32767 characters.
-                    framework_references: A list of framework/standard references or other related content, up to 20 references.
-                    id_: The unique UUID identifier of the metric.
-                    index: The index in the outline. If unset, the metric will be ordered last.
-                    name: The name of the metric, up to 300 characters.
-                    require_notes: Indicates whether notes are required for this metric.
-                    require_supporting_attachments: Indicates whether supporting attachments are required for this metric.
-                    tags: A collection of tags associated with the metric. A metric can have up to 20 tags.
-                    topic: The unique UUID identifier of the parent topic.
-                    unit: The unit of measurement for the metric, up to 300 characters.
-                    timeout: Override the default request timeout (seconds).
-
-                Returns:
-                    Metric
-
-                Raises:
-                    WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
-        """
-        _body: dict[str, Any] = {}
-        if allowed_dimensions is not None:
-            _body["allowedDimensions"] = allowed_dimensions
-        if code is not None:
-            _body["code"] = code
-        if data_type is not None:
-            _body["dataType"] = data_type
-        if description is not None:
-            _body["description"] = description
-        if framework_references is not None:
-            _body["frameworkReferences"] = framework_references
-        if id_ is not None:
-            _body["id"] = id_
-        if index is not None:
-            _body["index"] = index
-        if name is not None:
-            _body["name"] = name
-        if require_notes is not None:
-            _body["requireNotes"] = require_notes
-        if require_supporting_attachments is not None:
-            _body["requireSupportingAttachments"] = require_supporting_attachments
-        if tags is not None:
-            _body["tags"] = tags
-        if topic is not None:
-            _body["topic"] = topic
-        if unit is not None:
-            _body["unit"] = unit
-        response = await self._client.request_async(
-            "POST",
-            self._api,
-            "/programs/{programId}/metrics",
-            path_params={
-                "programId": program_id,
-            },
-            json_body=_body or None,
-            timeout=timeout,
-        )
-        return Metric.model_validate(response.json())
-
     def get_metrics(
         self,
         *,
@@ -953,67 +775,179 @@ class Sustainability(BaseNamespace):
         _body_result = await paginate_all_async(_fetch, extract_next_link, "data")
         return MetricsListResult.model_validate(_body_result)
 
-    def delete_metric_by_id(
+    def create_metric(
         self,
         *,
         program_id: str,
-        metric_id: str,
+        allowed_dimensions: Optional[list[str]] = None,
+        code: Optional[int] = None,
+        data_type: Optional[Literal["text", "number", "date", "currency", "percent"]] = None,
+        description: Optional[str] = None,
+        framework_references: Optional[list[FrameworkReferenceParam]] = None,
+        id_: Optional[str] = None,
+        index: Optional[int] = None,
+        name: Optional[str] = None,
+        require_notes: Optional[bool] = None,
+        require_supporting_attachments: Optional[bool] = None,
+        tags: Optional[list[TagParam]] = None,
+        topic: Optional[str] = None,
+        unit: Optional[str] = None,
         timeout: Optional[float] = None,
-    ) -> None:
-        """Delete a single metric
+    ) -> Metric:
+        """Create a new metric
 
-        Deletes a [metric](ref:sustainability#metric) given its ID
+                Creates a new [metric](ref:sustainability#metric).
 
-        Args:
-            program_id: The unique identifier of the program
-            metric_id: The unique identifier of the metric
-            timeout: Override the default request timeout (seconds).
+                Args:
+                    program_id: The unique identifier of the program
+                    allowed_dimensions: A list of dimension ids that may be used when creating values for this metric.
+                    code: An optional user-specified metric code as an integer greater than 0, unique to each metric.
+        If not provided, the system assigns the next available integer.
 
-        Raises:
-            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
+                    data_type: Used to specify the type of data for a metric.
+                    description: An optional description of the metric, explaining its purpose and main aspects, up to 32767 characters.
+                    framework_references: A list of framework/standard references or other related content, up to 20 references.
+                    id_: The unique UUID identifier of the metric.
+                    index: The index in the outline. If unset, the metric will be ordered last.
+                    name: The name of the metric, up to 300 characters.
+                    require_notes: Indicates whether notes are required for this metric.
+                    require_supporting_attachments: Indicates whether supporting attachments are required for this metric.
+                    tags: A collection of tags associated with the metric. A metric can have up to 20 tags.
+                    topic: The unique UUID identifier of the parent topic.
+                    unit: The unit of measurement for the metric, up to 300 characters.
+                    timeout: Override the default request timeout (seconds).
+
+                Returns:
+                    Metric
+
+                Raises:
+                    WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
         """
-        self._client.request(
-            "DELETE",
+        _body: dict[str, Any] = {}
+        if allowed_dimensions is not None:
+            _body["allowedDimensions"] = allowed_dimensions
+        if code is not None:
+            _body["code"] = code
+        if data_type is not None:
+            _body["dataType"] = data_type
+        if description is not None:
+            _body["description"] = description
+        if framework_references is not None:
+            _body["frameworkReferences"] = framework_references
+        if id_ is not None:
+            _body["id"] = id_
+        if index is not None:
+            _body["index"] = index
+        if name is not None:
+            _body["name"] = name
+        if require_notes is not None:
+            _body["requireNotes"] = require_notes
+        if require_supporting_attachments is not None:
+            _body["requireSupportingAttachments"] = require_supporting_attachments
+        if tags is not None:
+            _body["tags"] = tags
+        if topic is not None:
+            _body["topic"] = topic
+        if unit is not None:
+            _body["unit"] = unit
+        response = self._client.request(
+            "POST",
             self._api,
-            "/programs/{programId}/metrics/{metricId}",
+            "/programs/{programId}/metrics",
             path_params={
                 "programId": program_id,
-                "metricId": metric_id,
             },
+            json_body=_body or None,
             timeout=timeout,
         )
-        return None
+        return Metric.model_validate(response.json())
 
-    async def delete_metric_by_id_async(
+    async def create_metric_async(
         self,
         *,
         program_id: str,
-        metric_id: str,
+        allowed_dimensions: Optional[list[str]] = None,
+        code: Optional[int] = None,
+        data_type: Optional[Literal["text", "number", "date", "currency", "percent"]] = None,
+        description: Optional[str] = None,
+        framework_references: Optional[list[FrameworkReferenceParam]] = None,
+        id_: Optional[str] = None,
+        index: Optional[int] = None,
+        name: Optional[str] = None,
+        require_notes: Optional[bool] = None,
+        require_supporting_attachments: Optional[bool] = None,
+        tags: Optional[list[TagParam]] = None,
+        topic: Optional[str] = None,
+        unit: Optional[str] = None,
         timeout: Optional[float] = None,
-    ) -> None:
-        """Delete a single metric (async)
+    ) -> Metric:
+        """Create a new metric (async)
 
-        Deletes a [metric](ref:sustainability#metric) given its ID
+                Creates a new [metric](ref:sustainability#metric).
 
-        Args:
-            program_id: The unique identifier of the program
-            metric_id: The unique identifier of the metric
-            timeout: Override the default request timeout (seconds).
+                Args:
+                    program_id: The unique identifier of the program
+                    allowed_dimensions: A list of dimension ids that may be used when creating values for this metric.
+                    code: An optional user-specified metric code as an integer greater than 0, unique to each metric.
+        If not provided, the system assigns the next available integer.
 
-        Raises:
-            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
+                    data_type: Used to specify the type of data for a metric.
+                    description: An optional description of the metric, explaining its purpose and main aspects, up to 32767 characters.
+                    framework_references: A list of framework/standard references or other related content, up to 20 references.
+                    id_: The unique UUID identifier of the metric.
+                    index: The index in the outline. If unset, the metric will be ordered last.
+                    name: The name of the metric, up to 300 characters.
+                    require_notes: Indicates whether notes are required for this metric.
+                    require_supporting_attachments: Indicates whether supporting attachments are required for this metric.
+                    tags: A collection of tags associated with the metric. A metric can have up to 20 tags.
+                    topic: The unique UUID identifier of the parent topic.
+                    unit: The unit of measurement for the metric, up to 300 characters.
+                    timeout: Override the default request timeout (seconds).
+
+                Returns:
+                    Metric
+
+                Raises:
+                    WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
         """
-        await self._client.request_async(
-            "DELETE",
+        _body: dict[str, Any] = {}
+        if allowed_dimensions is not None:
+            _body["allowedDimensions"] = allowed_dimensions
+        if code is not None:
+            _body["code"] = code
+        if data_type is not None:
+            _body["dataType"] = data_type
+        if description is not None:
+            _body["description"] = description
+        if framework_references is not None:
+            _body["frameworkReferences"] = framework_references
+        if id_ is not None:
+            _body["id"] = id_
+        if index is not None:
+            _body["index"] = index
+        if name is not None:
+            _body["name"] = name
+        if require_notes is not None:
+            _body["requireNotes"] = require_notes
+        if require_supporting_attachments is not None:
+            _body["requireSupportingAttachments"] = require_supporting_attachments
+        if tags is not None:
+            _body["tags"] = tags
+        if topic is not None:
+            _body["topic"] = topic
+        if unit is not None:
+            _body["unit"] = unit
+        response = await self._client.request_async(
+            "POST",
             self._api,
-            "/programs/{programId}/metrics/{metricId}",
+            "/programs/{programId}/metrics",
             path_params={
                 "programId": program_id,
-                "metricId": metric_id,
             },
+            json_body=_body or None,
             timeout=timeout,
         )
-        return None
+        return Metric.model_validate(response.json())
 
     def get_metric_by_id(
         self,
@@ -1182,6 +1116,170 @@ class Sustainability(BaseNamespace):
             timeout=timeout,
         )
         return Metric.model_validate(response.json())
+
+    def delete_metric_by_id(
+        self,
+        *,
+        program_id: str,
+        metric_id: str,
+        timeout: Optional[float] = None,
+    ) -> None:
+        """Delete a single metric
+
+        Deletes a [metric](ref:sustainability#metric) given its ID
+
+        Args:
+            program_id: The unique identifier of the program
+            metric_id: The unique identifier of the metric
+            timeout: Override the default request timeout (seconds).
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
+        """
+        self._client.request(
+            "DELETE",
+            self._api,
+            "/programs/{programId}/metrics/{metricId}",
+            path_params={
+                "programId": program_id,
+                "metricId": metric_id,
+            },
+            timeout=timeout,
+        )
+        return None
+
+    async def delete_metric_by_id_async(
+        self,
+        *,
+        program_id: str,
+        metric_id: str,
+        timeout: Optional[float] = None,
+    ) -> None:
+        """Delete a single metric (async)
+
+        Deletes a [metric](ref:sustainability#metric) given its ID
+
+        Args:
+            program_id: The unique identifier of the program
+            metric_id: The unique identifier of the metric
+            timeout: Override the default request timeout (seconds).
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
+        """
+        await self._client.request_async(
+            "DELETE",
+            self._api,
+            "/programs/{programId}/metrics/{metricId}",
+            path_params={
+                "programId": program_id,
+                "metricId": metric_id,
+            },
+            timeout=timeout,
+        )
+        return None
+
+    def get_values(
+        self,
+        *,
+        program_id: str,
+        metric_id: str,
+        maxpagesize: Optional[int] = 1000,
+        filter_: Optional[str] = None,
+        order_by: Optional[str] = None,
+        timeout: Optional[float] = None,
+    ) -> MetricValuesListResult:
+        """Retrieve a list of metric values
+
+        Returns a paginated list of [metric
+        Values](ref:sustainability#metricvalue)
+
+        Args:
+            program_id: The unique identifier of the program
+            metric_id: The unique identifier of the metric
+            maxpagesize: The maximum number of results to retrieve
+            filter_: The properties to filter the results by.
+            order_by: One or more comma-separated expressions to indicate the order in which to sort the results.
+            timeout: Override the default request timeout (seconds).
+
+        Returns:
+            MetricValuesListResult
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
+        """
+
+        def _fetch(_cursor: str | None) -> httpx.Response:
+            return self._client.request(
+                "GET",
+                self._api,
+                "/programs/{programId}/metrics/{metricId}/values",
+                path_params={
+                    "programId": program_id,
+                    "metricId": metric_id,
+                },
+                query_params={
+                    "$maxpagesize": maxpagesize,
+                    "$filter": filter_,
+                    "$orderBy": order_by,
+                    "$next": _cursor,
+                },
+                timeout=timeout,
+            )
+
+        _body_result = paginate_all(_fetch, extract_next_link, "data")
+        return MetricValuesListResult.model_validate(_body_result)
+
+    async def get_values_async(
+        self,
+        *,
+        program_id: str,
+        metric_id: str,
+        maxpagesize: Optional[int] = 1000,
+        filter_: Optional[str] = None,
+        order_by: Optional[str] = None,
+        timeout: Optional[float] = None,
+    ) -> MetricValuesListResult:
+        """Retrieve a list of metric values (async)
+
+        Returns a paginated list of [metric
+        Values](ref:sustainability#metricvalue)
+
+        Args:
+            program_id: The unique identifier of the program
+            metric_id: The unique identifier of the metric
+            maxpagesize: The maximum number of results to retrieve
+            filter_: The properties to filter the results by.
+            order_by: One or more comma-separated expressions to indicate the order in which to sort the results.
+            timeout: Override the default request timeout (seconds).
+
+        Returns:
+            MetricValuesListResult
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
+        """
+
+        async def _fetch(_cursor: str | None) -> httpx.Response:
+            return await self._client.request_async(
+                "GET",
+                self._api,
+                "/programs/{programId}/metrics/{metricId}/values",
+                path_params={
+                    "programId": program_id,
+                    "metricId": metric_id,
+                },
+                query_params={
+                    "$maxpagesize": maxpagesize,
+                    "$filter": filter_,
+                    "$orderBy": order_by,
+                    "$next": _cursor,
+                },
+                timeout=timeout,
+            )
+
+        _body_result = await paginate_all_async(_fetch, extract_next_link, "data")
+        return MetricValuesListResult.model_validate(_body_result)
 
     def create_value(
         self,
@@ -1361,178 +1459,6 @@ class Sustainability(BaseNamespace):
         )
         return MetricValue.model_validate(response.json())
 
-    def get_values(
-        self,
-        *,
-        program_id: str,
-        metric_id: str,
-        maxpagesize: Optional[int] = 1000,
-        filter_: Optional[str] = None,
-        order_by: Optional[str] = None,
-        timeout: Optional[float] = None,
-    ) -> MetricValuesListResult:
-        """Retrieve a list of metric values
-
-        Returns a paginated list of [metric
-        Values](ref:sustainability#metricvalue)
-
-        Args:
-            program_id: The unique identifier of the program
-            metric_id: The unique identifier of the metric
-            maxpagesize: The maximum number of results to retrieve
-            filter_: The properties to filter the results by.
-            order_by: One or more comma-separated expressions to indicate the order in which to sort the results.
-            timeout: Override the default request timeout (seconds).
-
-        Returns:
-            MetricValuesListResult
-
-        Raises:
-            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
-        """
-
-        def _fetch(_cursor: str | None) -> httpx.Response:
-            return self._client.request(
-                "GET",
-                self._api,
-                "/programs/{programId}/metrics/{metricId}/values",
-                path_params={
-                    "programId": program_id,
-                    "metricId": metric_id,
-                },
-                query_params={
-                    "$maxpagesize": maxpagesize,
-                    "$filter": filter_,
-                    "$orderBy": order_by,
-                    "$next": _cursor,
-                },
-                timeout=timeout,
-            )
-
-        _body_result = paginate_all(_fetch, extract_next_link, "data")
-        return MetricValuesListResult.model_validate(_body_result)
-
-    async def get_values_async(
-        self,
-        *,
-        program_id: str,
-        metric_id: str,
-        maxpagesize: Optional[int] = 1000,
-        filter_: Optional[str] = None,
-        order_by: Optional[str] = None,
-        timeout: Optional[float] = None,
-    ) -> MetricValuesListResult:
-        """Retrieve a list of metric values (async)
-
-        Returns a paginated list of [metric
-        Values](ref:sustainability#metricvalue)
-
-        Args:
-            program_id: The unique identifier of the program
-            metric_id: The unique identifier of the metric
-            maxpagesize: The maximum number of results to retrieve
-            filter_: The properties to filter the results by.
-            order_by: One or more comma-separated expressions to indicate the order in which to sort the results.
-            timeout: Override the default request timeout (seconds).
-
-        Returns:
-            MetricValuesListResult
-
-        Raises:
-            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
-        """
-
-        async def _fetch(_cursor: str | None) -> httpx.Response:
-            return await self._client.request_async(
-                "GET",
-                self._api,
-                "/programs/{programId}/metrics/{metricId}/values",
-                path_params={
-                    "programId": program_id,
-                    "metricId": metric_id,
-                },
-                query_params={
-                    "$maxpagesize": maxpagesize,
-                    "$filter": filter_,
-                    "$orderBy": order_by,
-                    "$next": _cursor,
-                },
-                timeout=timeout,
-            )
-
-        _body_result = await paginate_all_async(_fetch, extract_next_link, "data")
-        return MetricValuesListResult.model_validate(_body_result)
-
-    def delete_metric_value_by_id(
-        self,
-        *,
-        program_id: str,
-        metric_id: str,
-        metric_value_id: str,
-        timeout: Optional[float] = None,
-    ) -> None:
-        """Delete a single metric value
-
-        Deletes a [metric value](ref:sustainability#metricvalue) value given its
-        ID
-
-        Args:
-            program_id: The unique identifier of the program
-            metric_id: The unique identifier of the metric
-            metric_value_id: The unique identifier of the value
-            timeout: Override the default request timeout (seconds).
-
-        Raises:
-            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
-        """
-        self._client.request(
-            "DELETE",
-            self._api,
-            "/programs/{programId}/metrics/{metricId}/values/{metricValueId}",
-            path_params={
-                "programId": program_id,
-                "metricId": metric_id,
-                "metricValueId": metric_value_id,
-            },
-            timeout=timeout,
-        )
-        return None
-
-    async def delete_metric_value_by_id_async(
-        self,
-        *,
-        program_id: str,
-        metric_id: str,
-        metric_value_id: str,
-        timeout: Optional[float] = None,
-    ) -> None:
-        """Delete a single metric value (async)
-
-        Deletes a [metric value](ref:sustainability#metricvalue) value given its
-        ID
-
-        Args:
-            program_id: The unique identifier of the program
-            metric_id: The unique identifier of the metric
-            metric_value_id: The unique identifier of the value
-            timeout: Override the default request timeout (seconds).
-
-        Raises:
-            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
-        """
-        await self._client.request_async(
-            "DELETE",
-            self._api,
-            "/programs/{programId}/metrics/{metricId}/values/{metricValueId}",
-            path_params={
-                "programId": program_id,
-                "metricId": metric_id,
-                "metricValueId": metric_value_id,
-            },
-            timeout=timeout,
-        )
-        return None
-
     def get_metric_value_by_id(
         self,
         *,
@@ -1703,12 +1629,82 @@ class Sustainability(BaseNamespace):
         )
         return MetricValue.model_validate(response.json())
 
+    def delete_metric_value_by_id(
+        self,
+        *,
+        program_id: str,
+        metric_id: str,
+        metric_value_id: str,
+        timeout: Optional[float] = None,
+    ) -> None:
+        """Delete a single metric value
+
+        Deletes a [metric value](ref:sustainability#metricvalue) value given its
+        ID
+
+        Args:
+            program_id: The unique identifier of the program
+            metric_id: The unique identifier of the metric
+            metric_value_id: The unique identifier of the value
+            timeout: Override the default request timeout (seconds).
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
+        """
+        self._client.request(
+            "DELETE",
+            self._api,
+            "/programs/{programId}/metrics/{metricId}/values/{metricValueId}",
+            path_params={
+                "programId": program_id,
+                "metricId": metric_id,
+                "metricValueId": metric_value_id,
+            },
+            timeout=timeout,
+        )
+        return None
+
+    async def delete_metric_value_by_id_async(
+        self,
+        *,
+        program_id: str,
+        metric_id: str,
+        metric_value_id: str,
+        timeout: Optional[float] = None,
+    ) -> None:
+        """Delete a single metric value (async)
+
+        Deletes a [metric value](ref:sustainability#metricvalue) value given its
+        ID
+
+        Args:
+            program_id: The unique identifier of the program
+            metric_id: The unique identifier of the metric
+            metric_value_id: The unique identifier of the value
+            timeout: Override the default request timeout (seconds).
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
+        """
+        await self._client.request_async(
+            "DELETE",
+            self._api,
+            "/programs/{programId}/metrics/{metricId}/values/{metricValueId}",
+            path_params={
+                "programId": program_id,
+                "metricId": metric_id,
+                "metricValueId": metric_value_id,
+            },
+            timeout=timeout,
+        )
+        return None
+
     def batch_deletion_metric_values(
         self,
         *,
         program_id: str,
         metric_id: str,
-        data: Optional[list[MetricValue | MetricValueParam]] = None,
+        data: Optional[list[MetricValueParam]] = None,
         timeout: Optional[float] = None,
     ) -> None:
         """Initiate a batch deletion of metric values
@@ -1749,7 +1745,7 @@ class Sustainability(BaseNamespace):
         *,
         program_id: str,
         metric_id: str,
-        data: Optional[list[MetricValue | MetricValueParam]] = None,
+        data: Optional[list[MetricValueParam]] = None,
         timeout: Optional[float] = None,
     ) -> None:
         """Initiate a batch deletion of metric values (async)
@@ -1791,7 +1787,7 @@ class Sustainability(BaseNamespace):
         *,
         program_id: str,
         metric_id: str,
-        data: Optional[list[MetricValue | MetricValueParam]] = None,
+        data: Optional[list[MetricValueParam]] = None,
         timeout: Optional[float] = None,
         wait: Literal[False] = ...,
         wait_timeout: float = 300,
@@ -1803,7 +1799,7 @@ class Sustainability(BaseNamespace):
         *,
         program_id: str,
         metric_id: str,
-        data: Optional[list[MetricValue | MetricValueParam]] = None,
+        data: Optional[list[MetricValueParam]] = None,
         timeout: Optional[float] = None,
         wait: Literal[True] = ...,
         wait_timeout: float = 300,
@@ -1814,7 +1810,7 @@ class Sustainability(BaseNamespace):
         *,
         program_id: str,
         metric_id: str,
-        data: Optional[list[MetricValue | MetricValueParam]] = None,
+        data: Optional[list[MetricValueParam]] = None,
         timeout: Optional[float] = None,
         wait: bool = False,
         wait_timeout: float = 300,
@@ -1883,7 +1879,7 @@ class Sustainability(BaseNamespace):
         *,
         program_id: str,
         metric_id: str,
-        data: Optional[list[MetricValue | MetricValueParam]] = None,
+        data: Optional[list[MetricValueParam]] = None,
         timeout: Optional[float] = None,
         wait: Literal[False] = ...,
         wait_timeout: float = 300,
@@ -1895,7 +1891,7 @@ class Sustainability(BaseNamespace):
         *,
         program_id: str,
         metric_id: str,
-        data: Optional[list[MetricValue | MetricValueParam]] = None,
+        data: Optional[list[MetricValueParam]] = None,
         timeout: Optional[float] = None,
         wait: Literal[True] = ...,
         wait_timeout: float = 300,
@@ -1906,7 +1902,7 @@ class Sustainability(BaseNamespace):
         *,
         program_id: str,
         metric_id: str,
-        data: Optional[list[MetricValue | MetricValueParam]] = None,
+        data: Optional[list[MetricValueParam]] = None,
         timeout: Optional[float] = None,
         wait: bool = False,
         wait_timeout: float = 300,
@@ -2063,8 +2059,8 @@ class Sustainability(BaseNamespace):
         self,
         *,
         program_id: str,
-        to_assign: Optional[list[ResourcePermission | ResourcePermissionParam]] = None,
-        to_revoke: Optional[list[ResourcePermission | ResourcePermissionParam]] = None,
+        to_assign: Optional[list[ResourcePermissionParam]] = None,
+        to_revoke: Optional[list[ResourcePermissionParam]] = None,
         timeout: Optional[float] = None,
     ) -> None:
         """Modify permissions on a program
@@ -2106,8 +2102,8 @@ class Sustainability(BaseNamespace):
         self,
         *,
         program_id: str,
-        to_assign: Optional[list[ResourcePermission | ResourcePermissionParam]] = None,
-        to_revoke: Optional[list[ResourcePermission | ResourcePermissionParam]] = None,
+        to_assign: Optional[list[ResourcePermissionParam]] = None,
+        to_revoke: Optional[list[ResourcePermissionParam]] = None,
         timeout: Optional[float] = None,
     ) -> None:
         """Modify permissions on a program (async)
@@ -2144,96 +2140,6 @@ class Sustainability(BaseNamespace):
             timeout=timeout,
         )
         return None
-
-    def create_topic(
-        self,
-        *,
-        program_id: str,
-        name: str,
-        index: Optional[int] = None,
-        parent: Optional[str] = None,
-        timeout: Optional[float] = None,
-    ) -> Topic:
-        """Create a new topic
-
-        Creates a new [topic](ref:sustainability#topic).
-
-        Args:
-            program_id: The unique identifier of the program
-            name: The name of the topic, up to 300 characters.
-            index: The index in the outline. If unset, the topic will be ordered last.
-            parent: The unique UUID identifier of the parent topic, if this topic is a subtopic. This field can be null for top-level topics.
-            timeout: Override the default request timeout (seconds).
-
-        Returns:
-            Topic
-
-        Raises:
-            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
-        """
-        _body: dict[str, Any] = {}
-        if name is not None:
-            _body["name"] = name
-        if index is not None:
-            _body["index"] = index
-        if parent is not None:
-            _body["parent"] = parent
-        response = self._client.request(
-            "POST",
-            self._api,
-            "/programs/{programId}/topics",
-            path_params={
-                "programId": program_id,
-            },
-            json_body=_body or None,
-            timeout=timeout,
-        )
-        return Topic.model_validate(response.json())
-
-    async def create_topic_async(
-        self,
-        *,
-        program_id: str,
-        name: str,
-        index: Optional[int] = None,
-        parent: Optional[str] = None,
-        timeout: Optional[float] = None,
-    ) -> Topic:
-        """Create a new topic (async)
-
-        Creates a new [topic](ref:sustainability#topic).
-
-        Args:
-            program_id: The unique identifier of the program
-            name: The name of the topic, up to 300 characters.
-            index: The index in the outline. If unset, the topic will be ordered last.
-            parent: The unique UUID identifier of the parent topic, if this topic is a subtopic. This field can be null for top-level topics.
-            timeout: Override the default request timeout (seconds).
-
-        Returns:
-            Topic
-
-        Raises:
-            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
-        """
-        _body: dict[str, Any] = {}
-        if name is not None:
-            _body["name"] = name
-        if index is not None:
-            _body["index"] = index
-        if parent is not None:
-            _body["parent"] = parent
-        response = await self._client.request_async(
-            "POST",
-            self._api,
-            "/programs/{programId}/topics",
-            path_params={
-                "programId": program_id,
-            },
-            json_body=_body or None,
-            timeout=timeout,
-        )
-        return Topic.model_validate(response.json())
 
     def get_topics(
         self,
@@ -2329,67 +2235,95 @@ class Sustainability(BaseNamespace):
         _body_result = await paginate_all_async(_fetch, extract_next_link, "data")
         return TopicsListResult.model_validate(_body_result)
 
-    def delete_topic_by_id(
+    def create_topic(
         self,
         *,
         program_id: str,
-        topic_id: str,
+        name: str,
+        index: Optional[int] = None,
+        parent: Optional[str] = None,
         timeout: Optional[float] = None,
-    ) -> None:
-        """Delete a single topic
+    ) -> Topic:
+        """Create a new topic
 
-        Deletes a [topic](ref:sustainability#topic) given its ID
+        Creates a new [topic](ref:sustainability#topic).
 
         Args:
             program_id: The unique identifier of the program
-            topic_id: The unique identifier of the topic
+            name: The name of the topic, up to 300 characters.
+            index: The index in the outline. If unset, the topic will be ordered last.
+            parent: The unique UUID identifier of the parent topic, if this topic is a subtopic. This field can be null for top-level topics.
             timeout: Override the default request timeout (seconds).
+
+        Returns:
+            Topic
 
         Raises:
             WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
         """
-        self._client.request(
-            "DELETE",
+        _body: dict[str, Any] = {}
+        if name is not None:
+            _body["name"] = name
+        if index is not None:
+            _body["index"] = index
+        if parent is not None:
+            _body["parent"] = parent
+        response = self._client.request(
+            "POST",
             self._api,
-            "/programs/{programId}/topics/{topicId}",
+            "/programs/{programId}/topics",
             path_params={
                 "programId": program_id,
-                "topicId": topic_id,
             },
+            json_body=_body or None,
             timeout=timeout,
         )
-        return None
+        return Topic.model_validate(response.json())
 
-    async def delete_topic_by_id_async(
+    async def create_topic_async(
         self,
         *,
         program_id: str,
-        topic_id: str,
+        name: str,
+        index: Optional[int] = None,
+        parent: Optional[str] = None,
         timeout: Optional[float] = None,
-    ) -> None:
-        """Delete a single topic (async)
+    ) -> Topic:
+        """Create a new topic (async)
 
-        Deletes a [topic](ref:sustainability#topic) given its ID
+        Creates a new [topic](ref:sustainability#topic).
 
         Args:
             program_id: The unique identifier of the program
-            topic_id: The unique identifier of the topic
+            name: The name of the topic, up to 300 characters.
+            index: The index in the outline. If unset, the topic will be ordered last.
+            parent: The unique UUID identifier of the parent topic, if this topic is a subtopic. This field can be null for top-level topics.
             timeout: Override the default request timeout (seconds).
+
+        Returns:
+            Topic
 
         Raises:
             WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
         """
-        await self._client.request_async(
-            "DELETE",
+        _body: dict[str, Any] = {}
+        if name is not None:
+            _body["name"] = name
+        if index is not None:
+            _body["index"] = index
+        if parent is not None:
+            _body["parent"] = parent
+        response = await self._client.request_async(
+            "POST",
             self._api,
-            "/programs/{programId}/topics/{topicId}",
+            "/programs/{programId}/topics",
             path_params={
                 "programId": program_id,
-                "topicId": topic_id,
             },
+            json_body=_body or None,
             timeout=timeout,
         )
-        return None
+        return Topic.model_validate(response.json())
 
     def get_topic_by_id(
         self,
@@ -2546,3 +2480,65 @@ class Sustainability(BaseNamespace):
             timeout=timeout,
         )
         return Topic.model_validate(response.json())
+
+    def delete_topic_by_id(
+        self,
+        *,
+        program_id: str,
+        topic_id: str,
+        timeout: Optional[float] = None,
+    ) -> None:
+        """Delete a single topic
+
+        Deletes a [topic](ref:sustainability#topic) given its ID
+
+        Args:
+            program_id: The unique identifier of the program
+            topic_id: The unique identifier of the topic
+            timeout: Override the default request timeout (seconds).
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
+        """
+        self._client.request(
+            "DELETE",
+            self._api,
+            "/programs/{programId}/topics/{topicId}",
+            path_params={
+                "programId": program_id,
+                "topicId": topic_id,
+            },
+            timeout=timeout,
+        )
+        return None
+
+    async def delete_topic_by_id_async(
+        self,
+        *,
+        program_id: str,
+        topic_id: str,
+        timeout: Optional[float] = None,
+    ) -> None:
+        """Delete a single topic (async)
+
+        Deletes a [topic](ref:sustainability#topic) given its ID
+
+        Args:
+            program_id: The unique identifier of the program
+            topic_id: The unique identifier of the topic
+            timeout: Override the default request timeout (seconds).
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
+        """
+        await self._client.request_async(
+            "DELETE",
+            self._api,
+            "/programs/{programId}/topics/{topicId}",
+            path_params={
+                "programId": program_id,
+                "topicId": topic_id,
+            },
+            timeout=timeout,
+        )
+        return None

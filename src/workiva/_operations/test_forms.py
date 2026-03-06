@@ -17,11 +17,9 @@ from workiva.models.platform import (
     GraphAttachmentUploadResponse,
     MatricesListResult,
     Matrix,
-    MatrixColumn,
     MatrixSample,
     MatrixSamplesListResult,
     Operation,
-    SampleCell,
     TestForm,
     TestFormsListResult,
     TestPhase,
@@ -1089,106 +1087,6 @@ class TestForms(BaseNamespace):
             return await _poll_until_done_async(self._client, response, timeout=wait_timeout)
         return response
 
-    def create_matrix(
-        self,
-        *,
-        test_form_id: str,
-        test_phase_id: str,
-        data_columns: Optional[list[MatrixColumn | MatrixColumnParam]] = None,
-        name: Optional[str] = None,
-        result_columns: Optional[list[MatrixColumn | MatrixColumnParam]] = None,
-        timeout: Optional[float] = None,
-    ) -> Matrix:
-        """Create a new matrix
-
-        Create a new empty [matrix](ref:testforms#matrix). The `id` field for
-        the matrix and its columns should be left blank; this will be populated
-        by the endpoint.
-
-        Args:
-            test_form_id: The unique identifier of the test form
-            test_phase_id: The unique identifier of the test phase
-            data_columns: An array of the data columns in the matrix
-            name: The name of the matrix
-            result_columns: An array of the result columns in the matrix
-            timeout: Override the default request timeout (seconds).
-
-        Returns:
-            Matrix
-
-        Raises:
-            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
-        """
-        _body: dict[str, Any] = {}
-        if data_columns is not None:
-            _body["dataColumns"] = data_columns
-        if name is not None:
-            _body["name"] = name
-        if result_columns is not None:
-            _body["resultColumns"] = result_columns
-        response = self._client.request(
-            "POST",
-            self._api,
-            "/testForms/{testFormId}/testPhases/{testPhaseId}/matrices",
-            path_params={
-                "testFormId": test_form_id,
-                "testPhaseId": test_phase_id,
-            },
-            json_body=_body or None,
-            timeout=timeout,
-        )
-        return Matrix.model_validate(response.json())
-
-    async def create_matrix_async(
-        self,
-        *,
-        test_form_id: str,
-        test_phase_id: str,
-        data_columns: Optional[list[MatrixColumn | MatrixColumnParam]] = None,
-        name: Optional[str] = None,
-        result_columns: Optional[list[MatrixColumn | MatrixColumnParam]] = None,
-        timeout: Optional[float] = None,
-    ) -> Matrix:
-        """Create a new matrix (async)
-
-        Create a new empty [matrix](ref:testforms#matrix). The `id` field for
-        the matrix and its columns should be left blank; this will be populated
-        by the endpoint.
-
-        Args:
-            test_form_id: The unique identifier of the test form
-            test_phase_id: The unique identifier of the test phase
-            data_columns: An array of the data columns in the matrix
-            name: The name of the matrix
-            result_columns: An array of the result columns in the matrix
-            timeout: Override the default request timeout (seconds).
-
-        Returns:
-            Matrix
-
-        Raises:
-            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
-        """
-        _body: dict[str, Any] = {}
-        if data_columns is not None:
-            _body["dataColumns"] = data_columns
-        if name is not None:
-            _body["name"] = name
-        if result_columns is not None:
-            _body["resultColumns"] = result_columns
-        response = await self._client.request_async(
-            "POST",
-            self._api,
-            "/testForms/{testFormId}/testPhases/{testPhaseId}/matrices",
-            path_params={
-                "testFormId": test_form_id,
-                "testPhaseId": test_phase_id,
-            },
-            json_body=_body or None,
-            timeout=timeout,
-        )
-        return Matrix.model_validate(response.json())
-
     def get_matrices(
         self,
         *,
@@ -1266,6 +1164,106 @@ class TestForms(BaseNamespace):
             timeout=timeout,
         )
         return MatricesListResult.model_validate(response.json())
+
+    def create_matrix(
+        self,
+        *,
+        test_form_id: str,
+        test_phase_id: str,
+        data_columns: Optional[list[MatrixColumnParam]] = None,
+        name: Optional[str] = None,
+        result_columns: Optional[list[MatrixColumnParam]] = None,
+        timeout: Optional[float] = None,
+    ) -> Matrix:
+        """Create a new matrix
+
+        Create a new empty [matrix](ref:testforms#matrix). The `id` field for
+        the matrix and its columns should be left blank; this will be populated
+        by the endpoint.
+
+        Args:
+            test_form_id: The unique identifier of the test form
+            test_phase_id: The unique identifier of the test phase
+            data_columns: An array of the data columns in the matrix
+            name: The name of the matrix
+            result_columns: An array of the result columns in the matrix
+            timeout: Override the default request timeout (seconds).
+
+        Returns:
+            Matrix
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
+        """
+        _body: dict[str, Any] = {}
+        if data_columns is not None:
+            _body["dataColumns"] = data_columns
+        if name is not None:
+            _body["name"] = name
+        if result_columns is not None:
+            _body["resultColumns"] = result_columns
+        response = self._client.request(
+            "POST",
+            self._api,
+            "/testForms/{testFormId}/testPhases/{testPhaseId}/matrices",
+            path_params={
+                "testFormId": test_form_id,
+                "testPhaseId": test_phase_id,
+            },
+            json_body=_body or None,
+            timeout=timeout,
+        )
+        return Matrix.model_validate(response.json())
+
+    async def create_matrix_async(
+        self,
+        *,
+        test_form_id: str,
+        test_phase_id: str,
+        data_columns: Optional[list[MatrixColumnParam]] = None,
+        name: Optional[str] = None,
+        result_columns: Optional[list[MatrixColumnParam]] = None,
+        timeout: Optional[float] = None,
+    ) -> Matrix:
+        """Create a new matrix (async)
+
+        Create a new empty [matrix](ref:testforms#matrix). The `id` field for
+        the matrix and its columns should be left blank; this will be populated
+        by the endpoint.
+
+        Args:
+            test_form_id: The unique identifier of the test form
+            test_phase_id: The unique identifier of the test phase
+            data_columns: An array of the data columns in the matrix
+            name: The name of the matrix
+            result_columns: An array of the result columns in the matrix
+            timeout: Override the default request timeout (seconds).
+
+        Returns:
+            Matrix
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
+        """
+        _body: dict[str, Any] = {}
+        if data_columns is not None:
+            _body["dataColumns"] = data_columns
+        if name is not None:
+            _body["name"] = name
+        if result_columns is not None:
+            _body["resultColumns"] = result_columns
+        response = await self._client.request_async(
+            "POST",
+            self._api,
+            "/testForms/{testFormId}/testPhases/{testPhaseId}/matrices",
+            path_params={
+                "testFormId": test_form_id,
+                "testPhaseId": test_phase_id,
+            },
+            json_body=_body or None,
+            timeout=timeout,
+        )
+        return Matrix.model_validate(response.json())
 
     def get_matrix_by_id(
         self,
@@ -1989,112 +1987,6 @@ class TestForms(BaseNamespace):
             return await _poll_until_done_async(self._client, response, timeout=wait_timeout)
         return response
 
-    def create_sample(
-        self,
-        *,
-        test_form_id: str,
-        test_phase_id: str,
-        matrix_id: str,
-        data_values: Optional[list[SampleCell | SampleCellParam]] = None,
-        id_: Optional[str] = None,
-        result_values: Optional[list[SampleCell | SampleCellParam]] = None,
-        timeout: Optional[float] = None,
-    ) -> MatrixSample:
-        """Create a new sample
-
-        Create a new [sample](ref:testforms#matrixsample) in a
-        [matrix](ref:testforms#matrix). The new sample will be appended to the
-        end of the matrix.
-
-        Args:
-            test_form_id: The unique identifier of the test form
-            test_phase_id: The unique identifier of the test phase
-            matrix_id: The unique identifier of the matrix
-            data_values: An array of SampleCell values representing the values for each data column of the sample matrix's cells
-            id_: The unique ID of the matrix sample
-            result_values: An array of SampleCell values representing the values for each result cell in the sample matrix's cells.
-            timeout: Override the default request timeout (seconds).
-
-        Returns:
-            MatrixSample
-
-        Raises:
-            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
-        """
-        _body: dict[str, Any] = {}
-        if data_values is not None:
-            _body["dataValues"] = data_values
-        if id_ is not None:
-            _body["id"] = id_
-        if result_values is not None:
-            _body["resultValues"] = result_values
-        response = self._client.request(
-            "POST",
-            self._api,
-            "/testForms/{testFormId}/testPhases/{testPhaseId}/matrices/{matrixId}/samples",
-            path_params={
-                "testFormId": test_form_id,
-                "testPhaseId": test_phase_id,
-                "matrixId": matrix_id,
-            },
-            json_body=_body or None,
-            timeout=timeout,
-        )
-        return MatrixSample.model_validate(response.json())
-
-    async def create_sample_async(
-        self,
-        *,
-        test_form_id: str,
-        test_phase_id: str,
-        matrix_id: str,
-        data_values: Optional[list[SampleCell | SampleCellParam]] = None,
-        id_: Optional[str] = None,
-        result_values: Optional[list[SampleCell | SampleCellParam]] = None,
-        timeout: Optional[float] = None,
-    ) -> MatrixSample:
-        """Create a new sample (async)
-
-        Create a new [sample](ref:testforms#matrixsample) in a
-        [matrix](ref:testforms#matrix). The new sample will be appended to the
-        end of the matrix.
-
-        Args:
-            test_form_id: The unique identifier of the test form
-            test_phase_id: The unique identifier of the test phase
-            matrix_id: The unique identifier of the matrix
-            data_values: An array of SampleCell values representing the values for each data column of the sample matrix's cells
-            id_: The unique ID of the matrix sample
-            result_values: An array of SampleCell values representing the values for each result cell in the sample matrix's cells.
-            timeout: Override the default request timeout (seconds).
-
-        Returns:
-            MatrixSample
-
-        Raises:
-            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
-        """
-        _body: dict[str, Any] = {}
-        if data_values is not None:
-            _body["dataValues"] = data_values
-        if id_ is not None:
-            _body["id"] = id_
-        if result_values is not None:
-            _body["resultValues"] = result_values
-        response = await self._client.request_async(
-            "POST",
-            self._api,
-            "/testForms/{testFormId}/testPhases/{testPhaseId}/matrices/{matrixId}/samples",
-            path_params={
-                "testFormId": test_form_id,
-                "testPhaseId": test_phase_id,
-                "matrixId": matrix_id,
-            },
-            json_body=_body or None,
-            timeout=timeout,
-        )
-        return MatrixSample.model_validate(response.json())
-
     def get_samples(
         self,
         *,
@@ -2178,6 +2070,112 @@ class TestForms(BaseNamespace):
             timeout=timeout,
         )
         return MatrixSamplesListResult.model_validate(response.json())
+
+    def create_sample(
+        self,
+        *,
+        test_form_id: str,
+        test_phase_id: str,
+        matrix_id: str,
+        data_values: Optional[list[SampleCellParam]] = None,
+        id_: Optional[str] = None,
+        result_values: Optional[list[SampleCellParam]] = None,
+        timeout: Optional[float] = None,
+    ) -> MatrixSample:
+        """Create a new sample
+
+        Create a new [sample](ref:testforms#matrixsample) in a
+        [matrix](ref:testforms#matrix). The new sample will be appended to the
+        end of the matrix.
+
+        Args:
+            test_form_id: The unique identifier of the test form
+            test_phase_id: The unique identifier of the test phase
+            matrix_id: The unique identifier of the matrix
+            data_values: An array of SampleCell values representing the values for each data column of the sample matrix's cells
+            id_: The unique ID of the matrix sample
+            result_values: An array of SampleCell values representing the values for each result cell in the sample matrix's cells.
+            timeout: Override the default request timeout (seconds).
+
+        Returns:
+            MatrixSample
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
+        """
+        _body: dict[str, Any] = {}
+        if data_values is not None:
+            _body["dataValues"] = data_values
+        if id_ is not None:
+            _body["id"] = id_
+        if result_values is not None:
+            _body["resultValues"] = result_values
+        response = self._client.request(
+            "POST",
+            self._api,
+            "/testForms/{testFormId}/testPhases/{testPhaseId}/matrices/{matrixId}/samples",
+            path_params={
+                "testFormId": test_form_id,
+                "testPhaseId": test_phase_id,
+                "matrixId": matrix_id,
+            },
+            json_body=_body or None,
+            timeout=timeout,
+        )
+        return MatrixSample.model_validate(response.json())
+
+    async def create_sample_async(
+        self,
+        *,
+        test_form_id: str,
+        test_phase_id: str,
+        matrix_id: str,
+        data_values: Optional[list[SampleCellParam]] = None,
+        id_: Optional[str] = None,
+        result_values: Optional[list[SampleCellParam]] = None,
+        timeout: Optional[float] = None,
+    ) -> MatrixSample:
+        """Create a new sample (async)
+
+        Create a new [sample](ref:testforms#matrixsample) in a
+        [matrix](ref:testforms#matrix). The new sample will be appended to the
+        end of the matrix.
+
+        Args:
+            test_form_id: The unique identifier of the test form
+            test_phase_id: The unique identifier of the test phase
+            matrix_id: The unique identifier of the matrix
+            data_values: An array of SampleCell values representing the values for each data column of the sample matrix's cells
+            id_: The unique ID of the matrix sample
+            result_values: An array of SampleCell values representing the values for each result cell in the sample matrix's cells.
+            timeout: Override the default request timeout (seconds).
+
+        Returns:
+            MatrixSample
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
+        """
+        _body: dict[str, Any] = {}
+        if data_values is not None:
+            _body["dataValues"] = data_values
+        if id_ is not None:
+            _body["id"] = id_
+        if result_values is not None:
+            _body["resultValues"] = result_values
+        response = await self._client.request_async(
+            "POST",
+            self._api,
+            "/testForms/{testFormId}/testPhases/{testPhaseId}/matrices/{matrixId}/samples",
+            path_params={
+                "testFormId": test_form_id,
+                "testPhaseId": test_phase_id,
+                "matrixId": matrix_id,
+            },
+            json_body=_body or None,
+            timeout=timeout,
+        )
+        return MatrixSample.model_validate(response.json())
 
     @overload
     def sample_insertion(

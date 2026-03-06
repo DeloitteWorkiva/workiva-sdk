@@ -20,8 +20,7 @@ from workiva.models.platform import (
     MilestoneListResult,
     Operation,
     Presentation,
-    PresentationToPdfOptions,
-    PresentationToPptxOptions,
+    PresentationTableCollectionResult,
     Slide,
     SlideLayout,
     SlideLayoutsListResult,
@@ -437,8 +436,8 @@ class Presentations(BaseNamespace):
         *,
         presentation_id: str,
         format_: Literal["pdf", "pptx"],
-        pdf_options: Optional[PresentationToPdfOptions | PresentationToPdfOptionsParam] = None,
-        pptx_options: Optional[PresentationToPptxOptions | PresentationToPptxOptionsParam] = None,
+        pdf_options: Optional[PresentationToPdfOptionsParam] = None,
+        pptx_options: Optional[PresentationToPptxOptionsParam] = None,
         slides: Optional[list[str]] = None,
         timeout: Optional[float] = None,
         wait: Literal[False] = ...,
@@ -451,8 +450,8 @@ class Presentations(BaseNamespace):
         *,
         presentation_id: str,
         format_: Literal["pdf", "pptx"],
-        pdf_options: Optional[PresentationToPdfOptions | PresentationToPdfOptionsParam] = None,
-        pptx_options: Optional[PresentationToPptxOptions | PresentationToPptxOptionsParam] = None,
+        pdf_options: Optional[PresentationToPdfOptionsParam] = None,
+        pptx_options: Optional[PresentationToPptxOptionsParam] = None,
         slides: Optional[list[str]] = None,
         timeout: Optional[float] = None,
         wait: Literal[True] = ...,
@@ -464,8 +463,8 @@ class Presentations(BaseNamespace):
         *,
         presentation_id: str,
         format_: Literal["pdf", "pptx"],
-        pdf_options: Optional[PresentationToPdfOptions | PresentationToPdfOptionsParam] = None,
-        pptx_options: Optional[PresentationToPptxOptions | PresentationToPptxOptionsParam] = None,
+        pdf_options: Optional[PresentationToPdfOptionsParam] = None,
+        pptx_options: Optional[PresentationToPptxOptionsParam] = None,
         slides: Optional[list[str]] = None,
         timeout: Optional[float] = None,
         wait: bool = False,
@@ -539,8 +538,8 @@ class Presentations(BaseNamespace):
         *,
         presentation_id: str,
         format_: Literal["pdf", "pptx"],
-        pdf_options: Optional[PresentationToPdfOptions | PresentationToPdfOptionsParam] = None,
-        pptx_options: Optional[PresentationToPptxOptions | PresentationToPptxOptionsParam] = None,
+        pdf_options: Optional[PresentationToPdfOptionsParam] = None,
+        pptx_options: Optional[PresentationToPptxOptionsParam] = None,
         slides: Optional[list[str]] = None,
         timeout: Optional[float] = None,
         wait: Literal[False] = ...,
@@ -553,8 +552,8 @@ class Presentations(BaseNamespace):
         *,
         presentation_id: str,
         format_: Literal["pdf", "pptx"],
-        pdf_options: Optional[PresentationToPdfOptions | PresentationToPdfOptionsParam] = None,
-        pptx_options: Optional[PresentationToPptxOptions | PresentationToPptxOptionsParam] = None,
+        pdf_options: Optional[PresentationToPdfOptionsParam] = None,
+        pptx_options: Optional[PresentationToPptxOptionsParam] = None,
         slides: Optional[list[str]] = None,
         timeout: Optional[float] = None,
         wait: Literal[True] = ...,
@@ -566,8 +565,8 @@ class Presentations(BaseNamespace):
         *,
         presentation_id: str,
         format_: Literal["pdf", "pptx"],
-        pdf_options: Optional[PresentationToPdfOptions | PresentationToPdfOptionsParam] = None,
-        pptx_options: Optional[PresentationToPptxOptions | PresentationToPptxOptionsParam] = None,
+        pdf_options: Optional[PresentationToPdfOptionsParam] = None,
+        pptx_options: Optional[PresentationToPptxOptionsParam] = None,
         slides: Optional[list[str]] = None,
         timeout: Optional[float] = None,
         wait: bool = False,
@@ -1900,3 +1899,91 @@ class Presentations(BaseNamespace):
         if wait:
             return await _poll_until_done_async(self._client, response, timeout=wait_timeout)
         return response
+
+    def get_presentation_table_collection(
+        self,
+        *,
+        presentation_id: str,
+        maxpagesize: Optional[int] = 1000,
+        revision: Optional[str] = None,
+        timeout: Optional[float] = None,
+    ) -> PresentationTableCollectionResult:
+        """Retrieve a collection of tables from a presentation
+
+        Returns the collection of tables within a presentation.
+
+        Args:
+            presentation_id: The unique identifier of the presentation
+            maxpagesize: The maximum number of results to retrieve
+            revision: Returns resources at a specific revision
+            timeout: Override the default request timeout (seconds).
+
+        Returns:
+            PresentationTableCollectionResult
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
+        """
+
+        def _fetch(_cursor: str | None) -> httpx.Response:
+            return self._client.request(
+                "GET",
+                self._api,
+                "/presentations/{presentationId}/tables",
+                path_params={
+                    "presentationId": presentation_id,
+                },
+                query_params={
+                    "$maxpagesize": maxpagesize,
+                    "$revision": revision,
+                    "$next": _cursor,
+                },
+                timeout=timeout,
+            )
+
+        _body_result = paginate_all(_fetch, extract_next_link, "data")
+        return PresentationTableCollectionResult.model_validate(_body_result)
+
+    async def get_presentation_table_collection_async(
+        self,
+        *,
+        presentation_id: str,
+        maxpagesize: Optional[int] = 1000,
+        revision: Optional[str] = None,
+        timeout: Optional[float] = None,
+    ) -> PresentationTableCollectionResult:
+        """Retrieve a collection of tables from a presentation (async)
+
+        Returns the collection of tables within a presentation.
+
+        Args:
+            presentation_id: The unique identifier of the presentation
+            maxpagesize: The maximum number of results to retrieve
+            revision: Returns resources at a specific revision
+            timeout: Override the default request timeout (seconds).
+
+        Returns:
+            PresentationTableCollectionResult
+
+        Raises:
+            WorkivaAPIError: On API errors (400, 401, 403, 404, 409, 429, 500, 503).
+        """
+
+        async def _fetch(_cursor: str | None) -> httpx.Response:
+            return await self._client.request_async(
+                "GET",
+                self._api,
+                "/presentations/{presentationId}/tables",
+                path_params={
+                    "presentationId": presentation_id,
+                },
+                query_params={
+                    "$maxpagesize": maxpagesize,
+                    "$revision": revision,
+                    "$next": _cursor,
+                },
+                timeout=timeout,
+            )
+
+        _body_result = await paginate_all_async(_fetch, extract_next_link, "data")
+        return PresentationTableCollectionResult.model_validate(_body_result)

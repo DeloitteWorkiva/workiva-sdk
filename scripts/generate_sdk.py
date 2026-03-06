@@ -247,6 +247,18 @@ class BaseNamespace:
             input_model_types &= api_typeddict_models.get(api, set())
             typeddict_imports = sorted(f"{t}Param" for t in input_model_types)
 
+            # Remove input-only models from Pydantic imports (TypedDicts replace them)
+            # Collect models used as output (response types)
+            output_model_types: set[str] = set()
+            for op in operations:
+                if op.success_response and op.success_response.python_type and op.success_response.python_type != "None":
+                    _collect_model_types(op.success_response.python_type, output_model_types)
+            # Keep a model import if it's used as output OR doesn't have a TypedDict
+            model_imports_filtered = sorted(
+                t for t in model_types
+                if t not in input_model_types or t in output_model_types
+            )
+
             # Render template
             source = namespace_template.render(
                 api=api,
@@ -254,7 +266,7 @@ class BaseNamespace:
                 class_name=class_name,
                 description=description,
                 operations=operations,
-                model_imports=sorted(model_types),
+                model_imports=model_imports_filtered,
                 has_pagination=has_pagination,
                 has_literal=has_literal,
                 has_long_running=has_long_running,
