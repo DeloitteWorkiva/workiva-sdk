@@ -263,6 +263,28 @@ class Workiva:
 
         return list(await asyncio.gather(*[_copy_one(p) for p in copies]))
 
+    def copy_sheets_sync(
+        self,
+        *,
+        spreadsheet_id: str,
+        copies: list[dict[str, Any]],
+        wait_timeout: float = 300,
+    ) -> list[Operation]:
+        """Copy multiple sheets sequentially (sync version).
+
+        For concurrent execution, use the async ``copy_sheets`` method.
+        """
+        results: list[Any] = []
+        for params in copies:
+            op = self.spreadsheets.copy_sheet(
+                spreadsheet_id=spreadsheet_id,
+                wait=True,
+                wait_timeout=wait_timeout,
+                **params,
+            )
+            results.append(op)
+        return results
+
     # -- Context manager -------------------------------------------------------
 
     def close(self) -> None:
