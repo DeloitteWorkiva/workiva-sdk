@@ -334,6 +334,23 @@ class TestOperationAcceptsDicts:
         assert "_types import" not in source
 
 
+class TestTypedDictExports:
+    """Tests for TypedDict re-exports from workiva.models package."""
+
+    def test_importable_from_models_package(self):
+        """TypedDict types should be importable from workiva.models."""
+        from workiva.models import FileCopyOptionsParam
+
+        assert FileCopyOptionsParam is not None
+
+    def test_importable_from_top_level(self):
+        """TypedDict types directly usable for typing."""
+        from workiva.models.platform_types import FileCopyOptionsParam
+
+        opts: FileCopyOptionsParam = {"shallow_copy": True}
+        assert opts["shallow_copy"] is True
+
+
 class TestSnakeToCamel:
     """Tests for the _snake_to_camel helper."""
 
