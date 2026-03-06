@@ -64,7 +64,7 @@ class TestSleepInterval:
     def test_respects_retry_after(self):
         config = RetryConfig()
         interval = _sleep_interval(config, attempt=0, retry_after=10.0)
-        assert interval == 10.0
+        assert 10.0 <= interval <= 11.0  # jitter adds uniform(0, 1)
 
     def test_caps_retry_after(self):
         config = RetryConfig(max_interval_ms=5000)

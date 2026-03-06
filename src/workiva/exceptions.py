@@ -4,7 +4,12 @@ from __future__ import annotations
 
 from typing import Optional
 
+from workiva._errors import WorkivaError
 from workiva.models.platform import Operation, OperationDetail
+
+
+class PaginationError(WorkivaError):
+    """Raised when pagination exceeds the safety limit."""
 
 
 def _detail_str(detail: OperationDetail) -> str:
@@ -26,7 +31,7 @@ def _detail_str(detail: OperationDetail) -> str:
     return " ".join(parts) if parts else "<no detail>"
 
 
-class OperationFailed(Exception):
+class OperationFailed(WorkivaError):
     """Raised when a polled operation reaches ``status == "failed"``."""
 
     def __init__(self, operation: Operation) -> None:
@@ -49,7 +54,7 @@ class OperationFailed(Exception):
         return f"Operation {op_id} failed:\n" + "\n".join(detail_lines)
 
 
-class OperationCancelled(Exception):
+class OperationCancelled(WorkivaError):
     """Raised when a polled operation reaches ``status == "cancelled"``."""
 
     def __init__(self, operation: Operation) -> None:
@@ -58,7 +63,7 @@ class OperationCancelled(Exception):
         super().__init__(f"Operation {op_id} was cancelled")
 
 
-class OperationTimeout(Exception):
+class OperationTimeout(WorkivaError):
     """Raised when polling exceeds the requested timeout."""
 
     def __init__(

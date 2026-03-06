@@ -74,7 +74,8 @@ def _sleep_interval(
     jitter. Capped at max_interval_ms.
     """
     if retry_after is not None and retry_after > 0:
-        return min(retry_after, config.max_interval_ms / 1000)
+        jittered = retry_after + random.uniform(0, 1)
+        return min(jittered, config.max_interval_ms / 1000)
 
     interval_s = (config.initial_interval_ms / 1000) * (
         config.exponent**attempt

@@ -84,6 +84,108 @@ def _get_retry_after(headers: dict[str, Any], default: float = 2.0) -> float:
     return default
 
 
+def _poll_until_done(
+    client: Any,
+    response: Any,
+    timeout: float = 300,
+) -> Operation:
+    """Poll a 202 response until the operation completes (sync).
+
+    Standalone function that works with ``BaseClient`` directly — used by
+    generated operations when ``wait=True``.
+
+    Args:
+        client: A ``BaseClient`` instance.
+        response: The raw ``httpx.Response`` from the 202 request.
+        timeout: Maximum seconds to wait for completion.
+
+    Returns:
+        The completed ``Operation``.
+
+    Raises:
+        OperationFailed: If the operation fails.
+        OperationCancelled: If the operation is cancelled.
+        OperationTimeout: If the timeout is exceeded.
+    """
+    headers = dict(response.headers)
+    operation_id = _extract_operation_id(headers)
+    retry_after = _get_retry_after(headers)
+    deadline = time.monotonic() + timeout
+
+    while True:
+        poll_response = client.request(
+            "GET",
+            _API.PLATFORM,
+            "/operations/{operationId}",
+            path_params={"operationId": operation_id},
+        )
+        operation = Operation.model_validate(poll_response.json())
+        retry_after = _get_retry_after(dict(poll_response.headers), retry_after)
+
+        if operation.status == "completed":
+            return operation
+        if operation.status == "failed":
+            raise OperationFailed(operation)
+        if operation.status == "cancelled":
+            raise OperationCancelled(operation)
+
+        remaining = deadline - time.monotonic()
+        if remaining <= 0:
+            raise OperationTimeout(operation_id, timeout, operation.status)
+        time.sleep(min(retry_after, remaining))
+
+
+async def _poll_until_done_async(
+    client: Any,
+    response: Any,
+    timeout: float = 300,
+) -> Operation:
+    """Poll a 202 response until the operation completes (async).
+
+    Standalone function that works with ``BaseClient`` directly — used by
+    generated operations when ``wait=True``.
+
+    Args:
+        client: A ``BaseClient`` instance.
+        response: The raw ``httpx.Response`` from the 202 request.
+        timeout: Maximum seconds to wait for completion.
+
+    Returns:
+        The completed ``Operation``.
+
+    Raises:
+        OperationFailed: If the operation fails.
+        OperationCancelled: If the operation is cancelled.
+        OperationTimeout: If the timeout is exceeded.
+    """
+    headers = dict(response.headers)
+    operation_id = _extract_operation_id(headers)
+    retry_after = _get_retry_after(headers)
+    deadline = time.monotonic() + timeout
+
+    while True:
+        poll_response = await client.request_async(
+            "GET",
+            _API.PLATFORM,
+            "/operations/{operationId}",
+            path_params={"operationId": operation_id},
+        )
+        operation = Operation.model_validate(poll_response.json())
+        retry_after = _get_retry_after(dict(poll_response.headers), retry_after)
+
+        if operation.status == "completed":
+            return operation
+        if operation.status == "failed":
+            raise OperationFailed(operation)
+        if operation.status == "cancelled":
+            raise OperationCancelled(operation)
+
+        remaining = deadline - time.monotonic()
+        if remaining <= 0:
+            raise OperationTimeout(operation_id, timeout, operation.status)
+        await asyncio.sleep(min(retry_after, remaining))
+
+
 class OperationPoller:
     """Polls a long-running Workiva operation until it reaches a terminal state.
 

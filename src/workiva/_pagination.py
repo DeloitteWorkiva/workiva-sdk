@@ -15,6 +15,8 @@ from typing import Any, AsyncGenerator, Callable, Generator, Optional
 
 import httpx
 
+from workiva.exceptions import PaginationError
+
 
 # -- Cursor extractors (one per pagination pattern) --------------------------
 
@@ -123,7 +125,7 @@ def paginate_all(
         if cursor is None:
             break
     else:
-        raise RuntimeError(
+        raise PaginationError(
             f"Pagination exceeded {max_pages} pages — aborting to prevent "
             f"infinite loop. Use API parameters to limit results, or pass "
             f"max_pages= to increase the limit."
@@ -161,7 +163,7 @@ async def paginate_all_async(
         if cursor is None:
             break
     else:
-        raise RuntimeError(
+        raise PaginationError(
             f"Pagination exceeded {max_pages} pages — aborting to prevent "
             f"infinite loop. Use API parameters to limit results, or pass "
             f"max_pages= to increase the limit."
@@ -206,7 +208,7 @@ def paginate_lazy(
         cursor = extract_cursor(body)
         if cursor is None:
             return
-    raise RuntimeError(
+    raise PaginationError(
         f"Pagination exceeded {max_pages} pages — aborting to prevent "
         f"infinite loop. Use API parameters to limit results, or pass "
         f"max_pages= to increase the limit."
@@ -241,7 +243,7 @@ async def paginate_lazy_async(
         cursor = extract_cursor(body)
         if cursor is None:
             return
-    raise RuntimeError(
+    raise PaginationError(
         f"Pagination exceeded {max_pages} pages — aborting to prevent "
         f"infinite loop. Use API parameters to limit results, or pass "
         f"max_pages= to increase the limit."

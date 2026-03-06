@@ -7,6 +7,7 @@ import json
 import httpx
 import pytest
 
+from workiva.exceptions import PaginationError
 from workiva._pagination import (
     _get_nested,
     _set_nested,
@@ -171,7 +172,7 @@ class TestPaginateAll:
         def fetch(cursor):
             return _mock_response({"data": ["item"], "@nextLink": "always-more"})
 
-        with pytest.raises(RuntimeError, match="exceeded 3 pages"):
+        with pytest.raises(PaginationError, match="exceeded 3 pages"):
             paginate_all(
                 fetch=fetch,
                 extract_cursor=extract_next_link,
@@ -224,7 +225,7 @@ class TestPaginateAllAsync:
         async def fetch(cursor):
             return _mock_response({"data": ["item"], "@nextLink": "always-more"})
 
-        with pytest.raises(RuntimeError, match="exceeded 3 pages"):
+        with pytest.raises(PaginationError, match="exceeded 3 pages"):
             await paginate_all_async(
                 fetch=fetch,
                 extract_cursor=extract_next_link,

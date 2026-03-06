@@ -25,7 +25,7 @@ from workiva._config import SDKConfig
 from workiva._constants import API_VERSION, Region, _API, get_base_url, get_token_url
 from workiva._errors import raise_for_status
 from workiva._retry import AsyncRetryTransport, RetryTransport
-from workiva._version import __user_agent__, __version__
+from workiva._version import __user_agent__
 
 # Regex for path template variables: {variableName}
 _PATH_PARAM_RE = re.compile(r"\{(\w+)\}")

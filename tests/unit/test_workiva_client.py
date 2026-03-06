@@ -2,9 +2,9 @@
 
 from __future__ import annotations
 
-from types import SimpleNamespace
-from unittest.mock import MagicMock
+import json
 
+import httpx
 import pytest
 
 from workiva.client import Workiva
@@ -12,21 +12,32 @@ from workiva._constants import Region
 from workiva.polling import OperationPoller
 
 
+def _make_202_response(
+    location: str = "/platform/v1/operations/op-abc",
+    retry_after: str = "3",
+    body: dict | None = None,
+) -> httpx.Response:
+    headers = {}
+    if location:
+        headers["location"] = location
+    if retry_after:
+        headers["retry-after"] = retry_after
+    content = json.dumps(body).encode() if body else b""
+    return httpx.Response(202, headers=headers, content=content)
+
+
 class TestWorkivaInit:
     def test_default_region(self):
-        """Workiva defaults to EU region."""
         client = Workiva(client_id="id", client_secret="secret")
         assert client._config.region == Region.EU
         client.close()
 
     def test_custom_region(self):
-        """Workiva accepts a custom region."""
         client = Workiva(client_id="id", client_secret="secret", region=Region.US)
         assert client._config.region == Region.US
         client.close()
 
     def test_has_namespace_attrs(self):
-        """Workiva exposes namespace attributes."""
         client = Workiva(client_id="id", client_secret="secret")
         d = dir(client)
         assert "files" in d
@@ -38,10 +49,7 @@ class TestWorkivaInit:
 
 class TestWait:
     def test_creates_poller_with_correct_id(self):
-        response = SimpleNamespace(
-            headers={"location": "/platform/v1/operations/op-abc", "retry-after": "3"},
-            result=None,
-        )
+        response = _make_202_response(location="/platform/v1/operations/op-abc")
         client = Workiva(client_id="id", client_secret="secret")
         poller = client.wait(response)
 
@@ -50,10 +58,7 @@ class TestWait:
         client.close()
 
     def test_extracts_retry_after(self):
-        response = SimpleNamespace(
-            headers={"location": "/operations/op-1", "retry-after": "5"},
-            result=None,
-        )
+        response = _make_202_response(location="/operations/op-1", retry_after="5")
         client = Workiva(client_id="id", client_secret="secret")
         poller = client.wait(response)
 
@@ -61,18 +66,16 @@ class TestWait:
         client.close()
 
     def test_preserves_response_body(self):
-        response = SimpleNamespace(
-            headers={"location": "/operations/op-1"},
-            result={"uploadUrl": "https://upload.example.com"},
-        )
+        body = {"uploadUrl": "https://upload.example.com"}
+        response = _make_202_response(location="/operations/op-1", body=body)
         client = Workiva(client_id="id", client_secret="secret")
         poller = client.wait(response)
 
-        assert poller.response_body == {"uploadUrl": "https://upload.example.com"}
+        assert poller.response_body == body
         client.close()
 
     def test_missing_location_raises(self):
-        response = SimpleNamespace(headers={}, result=None)
+        response = _make_202_response(location="", retry_after="")
         client = Workiva(client_id="id", client_secret="secret")
 
         with pytest.raises(ValueError, match="no 'location' header"):
