@@ -183,3 +183,42 @@ class TestBuildMessageFallback:
 
     def test_empty_dict(self):
         assert _build_message(400, {}) == "[400] API request failed"
+
+
+# ---------------------------------------------------------------------------
+# RateLimitError.retry_after property
+# ---------------------------------------------------------------------------
+
+
+class TestRateLimitRetryAfter:
+    def test_retry_after_from_header(self):
+        response = httpx.Response(
+            429,
+            headers={"retry-after": "30"},
+            json={"error": {"message": "rate limited"}},
+            request=httpx.Request("GET", "https://api.example.com/files"),
+        )
+        with pytest.raises(RateLimitError) as exc_info:
+            raise_for_status(response)
+        assert exc_info.value.retry_after == 30
+
+    def test_retry_after_missing_defaults_60(self):
+        response = httpx.Response(
+            429,
+            json={"error": {"message": "rate limited"}},
+            request=httpx.Request("GET", "https://api.example.com/files"),
+        )
+        with pytest.raises(RateLimitError) as exc_info:
+            raise_for_status(response)
+        assert exc_info.value.retry_after == 60
+
+    def test_retry_after_non_numeric_defaults_60(self):
+        response = httpx.Response(
+            429,
+            headers={"retry-after": "invalid"},
+            json={"error": {"message": "rate limited"}},
+            request=httpx.Request("GET", "https://api.example.com/files"),
+        )
+        with pytest.raises(RateLimitError) as exc_info:
+            raise_for_status(response)
+        assert exc_info.value.retry_after == 60

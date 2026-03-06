@@ -65,6 +65,20 @@ class ConflictError(WorkivaAPIError):
 class RateLimitError(WorkivaAPIError):
     """429 Too Many Requests."""
 
+    @property
+    def retry_after(self) -> int:
+        """Seconds to wait before retrying, from Retry-After header.
+
+        Defaults to 60 if header is missing or unparseable.
+        """
+        value = self.response.headers.get("retry-after")
+        if value is None:
+            return 60
+        try:
+            return int(value)
+        except (TypeError, ValueError):
+            return 60
+
 
 class ServerError(WorkivaAPIError):
     """5xx Server Error."""
@@ -82,7 +96,10 @@ _STATUS_MAP: dict[int, type[WorkivaAPIError]] = {
 
 
 def _redact_response(response: httpx.Response) -> httpx.Response:
-    """Return response with Authorization header redacted from the request."""
+    """Return response with Authorization header redacted from the request.
+
+    Creates a new request object to avoid mutating the original.
+    """
     try:
         request = response.request
     except RuntimeError:
@@ -90,7 +107,12 @@ def _redact_response(response: httpx.Response) -> httpx.Response:
     if request and "authorization" in request.headers:
         headers = dict(request.headers)
         headers["authorization"] = "[REDACTED]"
-        request.headers = httpx.Headers(headers)
+        redacted_request = httpx.Request(
+            method=request.method,
+            url=request.url,
+            headers=headers,
+        )
+        response._request = redacted_request
     return response
 
 
@@ -111,8 +133,15 @@ def raise_for_status(response: httpx.Response) -> None:
     except ValueError:
         body = response.text[:2000] if response.text else None
 
-    # Build a human-readable message
-    message = _build_message(status, body)
+    # Build a human-readable message with request context
+    request_context = ""
+    try:
+        req = response.request
+        path = req.url.raw_path.decode("ascii", errors="replace")
+        request_context = f"{req.method} {path}"
+    except (RuntimeError, AttributeError):
+        pass
+    message = _build_message(status, body, request_context)
 
     # Pick the right exception class
     if status in _STATUS_MAP:
@@ -130,8 +159,9 @@ def raise_for_status(response: httpx.Response) -> None:
     )
 
 
-def _build_message(status: int, body: Any) -> str:
+def _build_message(status: int, body: Any, request_context: str = "") -> str:
     """Build a human-readable error message from the response body."""
+    prefix = f"[{status} {request_context}]" if request_context else f"[{status}]"
     if isinstance(body, dict):
         # Workiva error format: {"error": {"code": "...", "message": "..."}}
         error = body.get("error", {})
@@ -139,11 +169,11 @@ def _build_message(status: int, body: Any) -> str:
             code = error.get("code", "")
             msg = error.get("message", "")
             if msg:
-                return f"[{status}] {code}: {msg}" if code else f"[{status}] {msg}"
+                return f"{prefix} {code}: {msg}" if code else f"{prefix} {msg}"
 
         # Alternative format: {"message": "..."}
         msg = body.get("message", "")
         if msg:
-            return f"[{status}] {msg}"
+            return f"{prefix} {msg}"
 
-    return f"[{status}] API request failed"
+    return f"{prefix} API request failed"
