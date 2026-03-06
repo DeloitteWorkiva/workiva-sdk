@@ -103,6 +103,24 @@ from workiva.models.wdata import TableDto
 
 Las operaciones que devuelven HTTP 202 (operaciones de larga duracion) o 204 (sin contenido) retornan `httpx.Response` directamente.
 
+### Dicts como parametros de entrada
+
+Los parametros de entrada aceptan **dicts planos** ademas de modelos Pydantic — no necesitas importar nada para empezar:
+
+```python
+# Dict plano — sin imports de modelos
+client.files.copy_file(
+    file_id="abc",
+    options={"shallow_copy": True, "include_comments": True},
+)
+
+# Modelo Pydantic — para quien prefiera validacion estricta
+from workiva.models.platform import FileCopyOptions
+client.files.copy_file(file_id="abc", options=FileCopyOptions(shallow_copy=True))
+```
+
+Los type hints de cada metodo usan `Union[Model, TypedDict]`, asi que ambas formas tienen autocompletado completo en el IDE.
+
 ## Version actual
 
 - **SDK**: 0.6.9
