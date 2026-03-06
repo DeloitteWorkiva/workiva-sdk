@@ -512,6 +512,10 @@ class TextLinkEditParam(TypedDict, total=False):
     type_: Required[Literal["insertDestinationLink", "removeLinks"]]
 
 
+class WorkivaFileExportParam(TypedDict, total=False):
+    workiva_file_export_options: dict[str, Any]
+
+
 class WorkivaFileImportOptionsParam(TypedDict, total=False):
     create_new_result_container: bool
     destination_container: str

@@ -413,6 +413,7 @@ components:
             - wdata_table_dataset
             - report
             - esg_program
+            - chart_visual
             - unknown_record_type
           readOnly: true
         destinationWorkspaceId:
@@ -477,6 +478,7 @@ components:
             - wdata_table_dataset
             - report
             - esg_program
+            - chart_visual
             - unknown_record_type
           readOnly: true
         sourceWorkspaceId:
@@ -4993,6 +4995,12 @@ paths:
             type: integer
             format: int64
             minimum: 0
+        - name: scope
+          description: 'Comma-separated list of scopes to filter parameters by (e.g., ''global,system''). If not provided, defaults to global.'
+          in: query
+          required: false
+          schema:
+            type: string
       responses:
         '200':
           description: OK

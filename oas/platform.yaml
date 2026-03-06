@@ -7691,6 +7691,61 @@ paths:
       summary: Modify permissions on a given section of a document
       tags:
         - Documents
+  /documents/{documentId}/tables:
+    get:
+      description: Returns the collection of tables within a document.
+      operationId: getDocumentTableCollection
+      parameters:
+        - $ref: '#/components/parameters/Next'
+        - $ref: '#/components/parameters/DocumentId'
+        - $ref: '#/components/parameters/MaxPageSize'
+        - $ref: '#/components/parameters/Revision'
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DocumentTableCollectionResult'
+              example:
+                data:
+                  - id: TmVsc29uIHdhcyBoZXJl
+                    name: Sheet 1
+                    index: 0
+                    parent:
+                      type: richText
+                      richText: dG90YWwgcmFuZG9tbmVzcw
+                  - id: YmFzZTY0IGlzIGdyZWF0
+                    name: Sheet 2
+                    index: 1
+                    parent:
+                      type: drawing
+                      drawing: ZHJhd2luZ0lkMTIzNDU2Nzg5
+                revision: 24601abc
+                '@nextLink': <opaque_url>
+          description: OK
+          headers: {}
+        "400":
+          $ref: '#/components/responses/BadRequest'
+        "401":
+          $ref: '#/components/responses/Unauthorized'
+        "403":
+          $ref: '#/components/responses/Forbidden'
+        "404":
+          $ref: '#/components/responses/NotFound'
+        "409":
+          $ref: '#/components/responses/Conflict'
+        "429":
+          $ref: '#/components/responses/TooManyRequests'
+        "500":
+          $ref: '#/components/responses/InternalServerError'
+        "503":
+          $ref: '#/components/responses/ServiceUnavailable'
+      security:
+        - oauth:
+            - file:read
+      summary: Retrieve a collection of tables from a document
+      tags:
+        - Documents
   /files:
     get:
       description: Returns a paginated list of [files](ref:files#file).
@@ -10535,6 +10590,55 @@ paths:
         - oauth:
             - file:write
       summary: Partially update a single slide
+      tags:
+        - Presentations
+  /presentations/{presentationId}/tables:
+    get:
+      description: Returns the collection of tables within a presentation.
+      operationId: getPresentationTableCollection
+      parameters:
+        - $ref: '#/components/parameters/Next'
+        - $ref: '#/components/parameters/PresentationId'
+        - $ref: '#/components/parameters/MaxPageSize'
+        - $ref: '#/components/parameters/Revision'
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PresentationTableCollectionResult'
+              example:
+                data:
+                  - id: TmVsc29uIHdhcyBoZXJl
+                    name: Sheet 1
+                    index: 0
+                    parent:
+                      type: drawing
+                      drawing: ZHJhd2luZ0lkMTIzNDU2Nzg5
+                revision: 24601abc
+                '@nextLink': <opaque_url>
+          description: OK
+          headers: {}
+        "400":
+          $ref: '#/components/responses/BadRequest'
+        "401":
+          $ref: '#/components/responses/Unauthorized'
+        "403":
+          $ref: '#/components/responses/Forbidden'
+        "404":
+          $ref: '#/components/responses/NotFound'
+        "409":
+          $ref: '#/components/responses/Conflict'
+        "429":
+          $ref: '#/components/responses/TooManyRequests'
+        "500":
+          $ref: '#/components/responses/InternalServerError'
+        "503":
+          $ref: '#/components/responses/ServiceUnavailable'
+      security:
+        - oauth:
+            - file:read
+      summary: Retrieve a collection of tables from a presentation
       tags:
         - Presentations
   /spreadsheets:
@@ -23011,6 +23115,50 @@ components:
       required:
         - data
       type: object
+    ContentTable:
+      description: A table within a document or presentation.
+      properties:
+        id:
+          $ref: '#/components/schemas/TableId'
+        name:
+          description: Name of the table
+          example: Sheet 1
+          type: string
+        index:
+          description: The zero-based index of the table within the document or presentation.
+          example: 0
+          minimum: 0
+          type: integer
+        parent:
+          description: A reference to the content that contains this table.
+          $ref: '#/components/schemas/ContentRef'
+      required:
+        - id
+        - name
+        - index
+        - parent
+      type: object
+    DocumentTableCollectionResult:
+      description: Returns a JSON object with `data` and `@nextLink` properties. `data` contains a list of `ContentTable` objects, and `@nextLink` provides the URL to the next set of results. If there are no additional results, `@nextLink` doesn't appear. If the request returns no results at all, `data` contains an empty array.
+      properties:
+        '@nextLink':
+          description: Pagination link for next set of results
+          example: <opaque_url>
+          type: string
+          nullable: true
+        data:
+          description: Tables contained by this document.
+          items:
+            $ref: '#/components/schemas/ContentTable'
+          type: array
+        revision:
+          description: The revision of the document.
+          example: 24601abc
+          type: string
+      required:
+        - data
+        - revision
+      type: object
     File:
       description: |
         Details about the file, including its ID, name, kind, and milestone dates.
@@ -23667,6 +23815,98 @@ components:
       required:
         - format
       type: object
+    WorkivaFileExportByIdOptions:
+      description: |
+        Additional export options used for Workiva (.tar.gz) files. Should only be provided when type is "Workiva".
+      properties:
+        emailOnComplete:
+          default: false
+          description: Whether or not to email the authorized user when this upload is complete.
+          example: true
+          type: boolean
+        includeAttachments:
+          default: false
+          description: Whether to preserve attachments for exported content.
+          example: true
+          type: boolean
+        includeComments:
+          default: false
+          description: Whether to preserve comments for exported content.
+          example: true
+          type: boolean
+        includeCustomFieldValues:
+          default: false
+          description: Whether to preserve custom field values for exported content.
+          example: true
+          type: boolean
+        includeDocumentMarkup:
+          default: false
+          description: Whether to preserve document markup for exported content.
+          example: true
+          type: boolean
+        includeInputCellValues:
+          default: false
+          description: Whether to preserve input cell values for exported content.
+          example: true
+          type: boolean
+        includeOutlineLabels:
+          default: false
+          description: Whether to preserve outline labels for exported content.
+          example: true
+          type: boolean
+        includeSmartLinkMetadata:
+          default: false
+          description: Whether to include smart link metadata for exported content.
+          example: true
+          type: boolean
+        includeWdataIncomingConnections:
+          default: false
+          description: Whether to preserve incoming wdata connections for exported content.
+          example: true
+          type: boolean
+        includeWdataOutgoingConnections:
+          default: false
+          description: Whether to preserve outgoing wdata connections for exported content.
+          example: true
+          type: boolean
+        includeXBRL:
+          default: false
+          description: Whether to preserve XBRL for exported content.
+          example: true
+          type: boolean
+        includeXBRLDisconnected:
+          default: false
+          description: Whether to preserve disconnected XBRL for exported content.
+          example: true
+          type: boolean
+        keepInputModeEnabled:
+          default: false
+          description: Whether to preserve input mode for exported content.
+          example: true
+          type: boolean
+        removeGRCLinks:
+          default: false
+          description: Whether to remove any connections to original GRC database, preserving only the textual or value representation of these links.
+          example: true
+          type: boolean
+        removeLinks:
+          default: false
+          description: Whether to remove any links from sources that are not part of the operation, preserving only the textual or value representation of these links.
+          example: true
+          type: boolean
+      type: object
+    WorkivaFileExport:
+      description: Details about a Workiva export.
+      example:
+        workivaFileExportOptions:
+          emailOnComplete: true
+          includeXBRL: true
+      properties:
+        workivaFileExportOptions:
+          allOf:
+            - $ref: '#/components/schemas/WorkivaFileExportByIdOptions'
+          nullable: true
+      type: object
     FileExportById:
       description: |
         Details about a file export including the target type.
@@ -23689,6 +23929,7 @@ components:
             - Presentation
             - SupportingDocument
             - Folder
+            - Workiva
           example: SupportingDocument
           type: string
         presentationExport:
@@ -23698,6 +23939,10 @@ components:
         spreadsheetExport:
           allOf:
             - $ref: '#/components/schemas/SpreadsheetExport'
+          nullable: true
+        workivaFileExport:
+          allOf:
+            - $ref: '#/components/schemas/WorkivaFileExport'
           nullable: true
       type: object
     FileRestoreOptions:
@@ -24949,6 +25194,27 @@ components:
           type: array
       required:
         - data
+      type: object
+    PresentationTableCollectionResult:
+      description: Returns a JSON object with `data` and `@nextLink` properties. `data` contains a list of `ContentTable` objects, and `@nextLink` provides the URL to the next set of results. If there are no additional results, `@nextLink` doesn't appear. If the request returns no results at all, `data` contains an empty array.
+      properties:
+        '@nextLink':
+          description: Pagination link for next set of results
+          example: <opaque_url>
+          type: string
+          nullable: true
+        data:
+          description: Tables contained by this presentation.
+          items:
+            $ref: '#/components/schemas/ContentTable'
+          type: array
+        revision:
+          description: The revision of the presentation.
+          example: 24601abc
+          type: string
+      required:
+        - data
+        - revision
       type: object
     SpreadsheetLockType:
       description: The type of the spreadsheet lock.
